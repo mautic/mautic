@@ -85,19 +85,22 @@ class AjaxController extends CommonController
                 if (count($parts) == 2) {
                     $bundle = ucfirst($parts[0]);
                     $action = $parts[1];
+                    if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
+                        // Check if a plugin is prefixed with Mautic
+                        $bundle      = 'Mautic'.$bundle;
+                        $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
+                    } elseif (!$isPlugin) {
+                        $bundle = 'Mautic'.$bundle;
+                    }
 
-                    if (class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
-                        if (!$isPlugin) {
-                            $bundle = 'Mautic'.$bundle;
-                        }
-
+                    if ($classExists) {
                         return $this->forward(
                             "{$bundle}Bundle:Ajax:executeAjax",
-                            array(
+                            [
                                 'action'  => $action,
                                 //forward the request as well as Symfony creates a subrequest without GET/POST
                                 'request' => $this->request
-                            )
+                            ]
                         );
                     }
                 }

@@ -168,6 +168,9 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog'
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory']
                 ]
             ],
             'mautic.lead.emailbundle.subscriber'    => [

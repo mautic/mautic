@@ -18,10 +18,7 @@ Mautic.formOnLoad = function (container) {
             }
         });
 
-        mQuery('#mauticforms_fields .mauticform-row').on('dblclick.mauticformfields', function(event) {
-            event.preventDefault();
-            mQuery(this).find('.btn-edit').first().click();
-        });
+        Mautic.initFormFieldButtons();
     }
 
     if (mQuery('#mauticforms_actions')) {
@@ -43,7 +40,6 @@ Mautic.formOnLoad = function (container) {
             mQuery(this).find('.btn-edit').first().click();
         });
     }
-
 
     if (mQuery('#mauticform_formType').length && mQuery('#mauticform_formType').val() == '') {
         mQuery('body').addClass('noscroll');
@@ -121,37 +117,40 @@ Mautic.formFieldOnLoad = function (container, response) {
     if (response.fieldHtml) {
         var newHtml = response.fieldHtml;
         var fieldId = '#mauticform_' + response.fieldId;
+        var fieldContainer = mQuery(fieldId).closest('.form-field-wrapper');
+
         if (mQuery(fieldId).length) {
             //replace content
-            mQuery(fieldId).parent().replaceWith(newHtml);
+            mQuery(fieldContainer).replaceWith(newHtml);
             var newField = false;
         } else {
             //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').parent();
+            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
             panel.before(newHtml);
             var newField = true;
         }
+
+        // Get the updated element
+        var fieldContainer = mQuery(fieldId).closest('.form-field-wrapper');
+
         //activate new stuff
-        mQuery(fieldId + " [data-toggle='ajax']").click(function (event) {
+        mQuery(fieldContainer).find("[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
+
         //initialize tooltips
-        mQuery(fieldId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(fieldContainer).find("*[data-toggle='tooltip']").tooltip({html: true});
 
         //initialize ajax'd modals
-        mQuery(fieldId + " [data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        mQuery(fieldContainer).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
+            console.log(this);
             Mautic.ajaxifyModal(this, event);
         });
 
-        Mautic.initHideItemButton(fieldId);
-
-        mQuery('#mauticforms_fields .mauticform-row').off(".mauticform");
-        mQuery('#mauticforms_fields .mauticform-row').on('dblclick.mauticformfields', function(event) {
-            event.preventDefault();
-            mQuery(this).find('.btn-edit').first().click();
-        });
+        Mautic.initFormFieldButtons(fieldContainer);
+        Mautic.initHideItemButton(fieldContainer);
 
         //show fields panel
         if (!mQuery('#fields-panel').hasClass('in')) {
@@ -166,6 +165,18 @@ Mautic.formFieldOnLoad = function (container, response) {
             mQuery('#form-field-placeholder').remove();
         }
     }
+};
+
+Mautic.initFormFieldButtons = function (container) {
+    if (typeof container == 'undefined') {
+        mQuery('#mauticforms_fields .mauticform-row').off(".mauticformfields");
+        var container = '#mauticforms_fields';
+    }
+
+    mQuery(container).find('.mauticform-row').on('dblclick.mauticformfields', function(event) {
+        event.preventDefault();
+        mQuery(this).closest('.form-field-wrapper').find('.btn-edit').first().click();
+    });
 };
 
 Mautic.formActionOnLoad = function (container, response) {
@@ -241,15 +252,13 @@ Mautic.onPostSubmitActionChange = function(value) {
 
 Mautic.selectFormType = function(formType) {
     if (formType == 'standalone') {
-        mQuery('#actions-tab').removeClass('hide');
-        mQuery('#actions-container').removeClass('hide')
+        mQuery('.action-standalone-only').removeClass('hide');
         mQuery('.page-header h3').text(mauticLang.newStandaloneForm);
     } else {
-        mQuery('#actions-tab').addClass('hide');
-        mQuery('#actions-container').addClass('hide');
+        mQuery('.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
-
+    console.log(mQuery('li.action-standalone-only').length);
     mQuery('#mauticform_formType').val(formType);
 
     mQuery('body').removeClass('noscroll');

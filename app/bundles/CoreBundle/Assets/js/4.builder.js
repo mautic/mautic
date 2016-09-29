@@ -393,7 +393,7 @@ Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
     Mautic.selectedSlot = null;
-    
+
     Mautic.builderContents.on('slot:selected', function(event, slot) {
         slot = mQuery(slot);
         Mautic.builderContents.find('[data-slot-focus]').remove();
@@ -562,11 +562,11 @@ Mautic.initSlotListeners = function() {
         Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
             if (tokens.length) {
                 mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') || 
-                        token.startsWith('{assetlink=') || 
-                        token.startsWith('{webview_url') || 
+                    if (token.startsWith('{pagelink=') ||
+                        token.startsWith('{assetlink=') ||
+                        token.startsWith('{webview_url') ||
                         token.startsWith('{unsubscribe_url')) {
-                        
+
                         linkList.push({
                             text: label,
                             href: token
@@ -631,7 +631,7 @@ Mautic.initSlotListeners = function() {
 
 // Init inside the builder's iframe
 mQuery(function() {
-    if (parent.mQuery('#builder-template-content').length) {
+    if (parent && parent.mQuery && parent.mQuery('#builder-template-content').length) {
         Mautic.builderContents = mQuery('body');
         Mautic.builderContents = Mautic.clearFroalaStyles(Mautic.builderContents);
         Mautic.initSlotListeners();

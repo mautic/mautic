@@ -391,7 +391,6 @@ abstract class AbstractPermissions
         ));
     }
 
-
     /**
      * Add a single full permission
      *

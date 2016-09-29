@@ -113,7 +113,8 @@ return [
                 'class' => 'Mautic\FormBundle\EventListener\FormSubscriber',
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog'
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.mailer',
                 ]
             ],
             'mautic.form.pagebundle.subscriber'     => [
@@ -178,7 +179,11 @@ return [
             ],
             'mautic.form.type.field'                     => [
                 'class' => 'Mautic\FormBundle\Form\Type\FieldType',
-                'alias' => 'formfield'
+                'alias' => 'formfield',
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
+                ],
             ],
             'mautic.form.type.action'                    => [
                 'class' => 'Mautic\FormBundle\Form\Type\ActionType',
@@ -199,6 +204,12 @@ return [
             'mautic.form.type.field_propertycaptcha'     => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldCaptchaType',
                 'alias' => 'formfield_captcha'
+            ],
+            'muatic.form.type.field_propertypagebreak'   => [
+                'class' => \Mautic\FormBundle\Form\Type\FormFieldPageBreakType::class,
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.field_propertygroup'      => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
@@ -224,16 +235,30 @@ return [
             ],
             'mautic.form.type.form_submitaction_sendemail'  => [
                 'class'     => 'Mautic\FormBundle\Form\Type\SubmitActionEmailType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'form_submitaction_sendemail'
-            ]
+                'arguments' => 'translator',
+                'alias'     => 'form_submitaction_sendemail',
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
+                ],
+            ],
+            'mautic.form.type.form_submitaction_repost' => [
+                'class'     => \Mautic\FormBundle\Form\Type\SubmitActionRepostType::class,
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
+                ],
+            ],
         ],
         'models' =>  [
             'mautic.form.model.action' => [
                 'class' => 'Mautic\FormBundle\Model\ActionModel'
             ],
             'mautic.form.model.field' => [
-                'class' => 'Mautic\FormBundle\Model\FieldModel'
+                'class' => 'Mautic\FormBundle\Model\FieldModel',
+                'arguments' => [
+                    'mautic.lead.model.field',
+                ]
             ],
             'mautic.form.model.form' => [
                 'class' => 'Mautic\FormBundle\Model\FormModel',
@@ -244,7 +269,9 @@ return [
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
-                    'mautic.lead.model.lead'
+                    'mautic.lead.model.lead',
+                    'mautic.helper.form.field_helper',
+                    'mautic.lead.model.field',
                 ]
             ],
             'mautic.form.model.submission' => [
@@ -256,7 +283,17 @@ return [
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
-                    'mautic.lead.model.field'
+                    'mautic.lead.model.field',
+                    'mautic.helper.form.field_helper',
+                ]
+            ]
+        ],
+        'other' => [
+            'mautic.helper.form.field_helper' => [
+                'class' => \Mautic\FormBundle\Helper\FormFieldHelper::class,
+                'arguments' => [
+                    'translator',
+                    'validator'
                 ]
             ]
         ]

@@ -15,11 +15,10 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Event\FilterChoiceEvent;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -406,13 +405,17 @@ class ListModel extends FormModel
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, array('lookup', 'boolean'))) {
+            if (in_array($type, array('lookup', 'multiselect', 'boolean'))) {
                 if ($type == 'boolean') {
                     //create a lookup list with ID
-                    $properties['list'] = $properties['yes'].'|'.$properties['no'].'||1|0';
+                    $properties['list'] = [
+                        0 => $properties['no'],
+                        1 => $properties['yes']
+                    ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
+                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
             $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
@@ -422,7 +425,7 @@ class ListModel extends FormModel
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, array('select', 'country', 'timezone', 'region'))) {
+            } elseif (in_array($type, array('select', 'multiselect', 'country', 'timezone', 'region'))) {
                 $choices[$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, array('lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'))) {
                 $choices[$field->getAlias()]['operators'] = 'text';
