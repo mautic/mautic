@@ -109,20 +109,41 @@ return [
         'events'  => [
             'mautic.core.subscriber'              => [
                 'class' => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
+                'arguments' => [
+                    'mautic.helper.bundle',
+                    'mautic.helper.menu',
+                    'mautic.helper.user',
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters',
+                    'security.context',
+                    'mautic.user.model.user'
+                ]
+            ],
+            'mautic.core.environment.subscriber' => [
+                'class' => 'Mautic\CoreBundle\EventListener\EnvironmentSubscriber',
+                'arguments' => [
+                    'mautic.helper.cookie',
+                ]
             ],
             'mautic.core.configbundle.subscriber' => [
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+                'arguments' => [
+                    'mautic.helper.language',
+                    'mautic.helper.core_parameters'
+                ]
             ],
             'mautic.webpush.js.subscriber'        => [
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber',
             ],
             'mautic.core.dashboard.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.core.maintenance.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'doctrine.dbal.default_connection'
                 ]
             ],
@@ -213,6 +234,26 @@ return [
             'mautic.form.type.theme.upload'        => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias'     => 'theme_upload'
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'alias'     => 'dynamic_content_filter'
+            ],
+            'mautic.form.type.dynamic_content_filter_entry' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
+                'alias'     => 'dynamic_content_filter_entry',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.stage.model.stage'
+                ]
+            ],
+            'mautic.form.type.dynamic_content_filter_entry_filters' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
+                'alias'     => 'dynamic_content_filter_entry_filters',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.list'
+                ]
             ]
         ],
         'helpers' => [
@@ -363,6 +404,10 @@ return [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
             ],
+            'mautic.model.factory'                      => [
+                'class'     => 'Mautic\CoreBundle\Factory\ModelFactory',
+                'arguments' => 'service_container',
+            ],
             'mautic.templating.name_parser'       => [
                 'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
                 'arguments' => 'kernel',
@@ -377,8 +422,6 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
-                    'doctrine.orm.entity_manager',
-                    'security.token_storage',
                     '%mautic.parameters%',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%'
@@ -479,7 +522,7 @@ return [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
                 'arguments' => [
                     'mautic.security',
-                    'security.token_storage',
+                    'mautic.helper.user',
                     'request_stack',
                     '%mautic.parameters%',
                 ],

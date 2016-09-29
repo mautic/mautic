@@ -15,12 +15,6 @@
     var mauticAssetPrefix = '<?php echo $view['assets']->getAssetPrefix(true); ?>';
     var mauticContent     = '<?php $view['slots']->output('mauticContent',''); ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
-    var mauticLang        = {
-        chosenChooseOne: '<?php echo $view['translator']->trans('mautic.core.form.chooseone'); ?>',
-        chosenChooseMore: '<?php echo $view['translator']->trans('mautic.core.form.choosemultiple'); ?>',
-        chosenNoResults: '<?php echo $view['translator']->trans('mautic.core.form.nomatches'); ?>',
-        pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>',
-        popupBlockerMessage: '<?php echo $view['translator']->trans('mautic.core.popupblocked'); ?>',
-    };
+    var mauticLang        = <?php echo $view['translator']->getJsLang(); ?>;
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>

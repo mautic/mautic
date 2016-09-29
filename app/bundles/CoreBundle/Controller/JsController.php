@@ -23,7 +23,7 @@ class JsController extends CommonController
      */
     public function indexAction()
     {
-        $dispatcher = $this->factory->getDispatcher();
+        $dispatcher = $this->dispatcher;
         $debug = $this->factory->getKernel()->isDebug();
         $event = new BuildJsEvent($this->getJsHeader(), $debug);
 

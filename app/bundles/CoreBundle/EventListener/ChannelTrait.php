@@ -9,8 +9,23 @@
 namespace Mautic\CoreBundle\EventListener;
 
 
+use Mautic\CoreBundle\Factory\ModelFactory;
+
 trait ChannelTrait
 {
+    /**
+     * @var ModelFactory
+     */
+    protected $modelFactory;
+
+    /**
+     * @param ModelFactory $modelFactory
+     */
+    public function setModelFactory(ModelFactory $modelFactory)
+    {
+        $this->modelFactory = $modelFactory;
+    }
+
     /**
      * Get the model for a channel
      *
@@ -20,20 +35,20 @@ trait ChannelTrait
      */
     protected function getChannelModel($channel)
     {
-        static $models = [];
-
-        if (!isset($models[$channel])) {
-            $channelModel = false;
+        if (null !== $this->modelFactory) {
+            if ($this->modelFactory->hasModel($channel)) {
+                return $this->modelFactory->getModel($channel);
+            }
+        } else {
+            // BC - @deprecated - to be removed in 3.0
             try {
-                $channelModel = $this->factory->getModel($channel);
+                return $this->factory->getModel($channel);
             } catch (\Exception $exception) {
                 // No model found
             }
-
-            $models[$channel] = $channelModel;
         }
 
-        return $models[$channel];
+        return false;
     }
 
     /**
@@ -41,6 +56,8 @@ trait ChannelTrait
      *
      * @param $channel
      * @param $channelId
+     *
+     * @return mixed
      */
     protected function getChannelEntity($channel, $channelId)
     {

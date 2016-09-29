@@ -12,6 +12,8 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 
 class FieldController extends FormController
@@ -27,9 +29,9 @@ class FieldController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
+        $permissions = $this->get('mautic.security')->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         if (!$permissions['lead:fields:full']) {
             return $this->accessDenied();
@@ -39,13 +41,13 @@ class FieldController extends FormController
             $this->setListFilters();
         }
 
-        $limit = $session->get('mautic.leadfield.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $search = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfilter.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.leadfilter.orderby', 'f.order');
-        $orderByDir = $this->factory->getSession()->get('mautic.leadfilter.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.leadfilter.orderby', 'f.order');
+        $orderByDir = $this->get('session')->get('mautic.leadfilter.orderbydir', 'ASC');
 
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -118,18 +120,19 @@ class FieldController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
         //retrieve the entity
-        $field     = new LeadField();
-        $model      = $this->getModel('lead.field');
+        $field = new LeadField();
+        /** @var FieldModel $model */
+        $model = $this->getModel('lead.field');
         //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_contactfield_index');
-        $action     = $this->generateUrl('mautic_contactfield_action', array('objectAction' => 'new'));
+        $returnUrl = $this->generateUrl('mautic_contactfield_index');
+        $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
         //get the user form factory
-        $form       = $model->createForm($field, $this->get('form.factory'), $action);
+        $form = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -141,9 +144,11 @@ class FieldController extends FormController
                         $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
                         if ($result !== true) {
                             //set the error
-                            $form->get('properties')->addError(new FormError(
-                                $this->get('translator')->trans($result, array(), 'validators')
-                            ));
+                            $form->get('properties')->addError(
+                                new FormError(
+                                    $this->get('translator')->trans($result, [], 'validators')
+                                )
+                            );
                             $valid = false;
                         }
                     }
@@ -153,16 +158,26 @@ class FieldController extends FormController
                             //form is valid so process the data
                             $model->saveEntity($field);
 
-                            $this->addFlash('mautic.core.notice.created', array(
-                                '%name%'      => $field->getLabel(),
-                                '%menu_link%' => 'mautic_contactfield_index',
-                                '%url%'       => $this->generateUrl('mautic_contactfield_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $field->getId()
-                                ))
-                            ));
+                            $this->addFlash(
+                                'mautic.core.notice.created',
+                                [
+                                    '%name%'      => $field->getLabel(),
+                                    '%menu_link%' => 'mautic_contactfield_index',
+                                    '%url%'       => $this->generateUrl(
+                                        'mautic_contactfield_action',
+                                        [
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $field->getId()
+                                        ]
+                                    )
+                                ]
+                            );
                         } catch (\Exception $e) {
-                            $form['alias']->addError(new FormError($this->get('translator')->trans('mautic.lead.field.failed', array('%error%' => $e->getMessage()), 'validators')));
+                            $form['alias']->addError(
+                                new FormError(
+                                    $this->get('translator')->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
+                                )
+                            );
                             $valid = false;
                         }
                     }
@@ -170,30 +185,34 @@ class FieldController extends FormController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'contentTemplate' => 'MauticLeadBundle:Field:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => '#mautic_contactfield_index',
-                        'mauticContent' => 'leadfield'
-                    )
-                ));
+                return $this->postActionRedirect(
+                    [
+                        'returnUrl'       => $returnUrl,
+                        'contentTemplate' => 'MauticLeadBundle:Field:index',
+                        'passthroughVars' => [
+                            'activeLink'    => '#mautic_contactfield_index',
+                            'mauticContent' => 'leadfield'
+                        ]
+                    ]
+                );
             } elseif ($valid && !$cancelled) {
                 return $this->editAction($field->getId(), true);
             }
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'form'            => $form->createView()
-            ),
-            'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_contactfield_index',
-                'route'         => $this->generateUrl('mautic_contactfield_action', array('objectAction' => 'new')),
-                'mauticContent' => 'leadfield'
-            )
-        ));
+        return $this->delegateView(
+            [
+                'viewParameters'  => [
+                    'form'            => $form->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contactfield_index',
+                    'route'         => $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']),
+                    'mauticContent' => 'leadfield'
+                ]
+            ]
+        );
     }
 
     /**
@@ -206,7 +225,7 @@ class FieldController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -325,7 +344,7 @@ class FieldController extends FormController
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+            if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
                 return $this->accessDenied();
             }
 
@@ -347,7 +366,7 @@ class FieldController extends FormController
      */
     public function deleteAction($objectId)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -405,7 +424,7 @@ class FieldController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction() {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 

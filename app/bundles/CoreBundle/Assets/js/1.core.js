@@ -181,6 +181,31 @@ var Mautic = {
     },
 
     /**
+     * Translations
+     *
+     * @param id     string
+     * @param params object
+     */
+    translate: function (id, params) {
+        if (!mauticLang.hasOwnProperty(id)) {
+            return id;
+        }
+
+        var translated = mauticLang[id];
+
+        if (params) {
+            for (var key in params) {
+                if (!params.hasOwnProperty(key)) continue;
+
+                var regEx = new RegExp('%' + key + '%', 'g');
+                translated = translated.replace(regEx, params[key])
+            }
+        }
+
+        return translated;
+    },
+
+    /**
      * Setups browser notifications
      */
     setupBrowserNotifier: function () {
@@ -283,8 +308,6 @@ var Mautic = {
             imageUploadURL: mauticBaseUrl + 's/file/upload',
             imageManagerLoadURL: mauticBaseUrl + 's/file/list',
             imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-            useClasses: false,
-            imageOutputSize: true,
             htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
             htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'allowfullscreen', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'frameborder', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'mozallowfullscreen', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'webkitallowfullscreen', 'width', 'wrap']
         };
@@ -347,36 +370,7 @@ var Mautic = {
 
         //initialize sortable lists
         mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
-            var prefix = mQuery(this).attr('data-prefix');
-
-            if (mQuery('#' + prefix + '_additem').length) {
-                mQuery('#' + prefix + '_additem').click(function () {
-                    var count = mQuery('#' + prefix + '_itemcount').val();
-                    var prototype = mQuery('#' + prefix + '_additem').attr('data-prototype');
-                    prototype = prototype.replace(/__name__/g, count);
-                    mQuery(prototype).appendTo(mQuery('#' + prefix + '_list div.list-sortable'));
-                    mQuery('#' + prefix + '_list_' + count).focus();
-                    count++;
-                    mQuery('#' + prefix + '_itemcount').val(count);
-                    return false;
-                });
-            }
-
-            mQuery('#' + prefix + '_list div.list-sortable').sortable({
-                items: 'div.sortable',
-                handle: 'span.postaddon',
-                axis: 'y',
-                containment: '#' + prefix + '_list',
-                stop: function (i) {
-                    var order = 0;
-                    mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
-                        var name = mQuery(this).attr('name');
-                        name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
-                        mQuery(this).attr('name', name);
-                        order++;
-                    });
-                }
-            });
+            Mautic.activateSortable(this);
         });
 
         //downloads
@@ -562,7 +556,7 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen', 'dynamicContent'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                 if (textarea.hasClass('editor-email')) {
@@ -591,9 +585,9 @@ var Mautic = {
                         Mautic.showChangeThemeWarning = true;
                     });
 
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
+                    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, options));
                 } else {
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+                    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                         // Set custom buttons with separator between them.
                         toolbarButtons: minButtons,
                         heightMin: 100
@@ -920,6 +914,50 @@ var Mautic = {
             selectableHeader: "<input type='text' class='ms-search form-control' autocomplete='off'>",
             selectionHeader:  "<input type='text' class='ms-search form-control' autocomplete='off'>",
             keepOrder: true
+        });
+    },
+
+    /**
+     * Activate sortable
+     *
+     * @param el
+     */
+    activateSortable: function(el) {
+        var prefix = mQuery(el).attr('data-prefix');
+        if (mQuery('#' + prefix + '_additem').length) {
+            mQuery('#' + prefix + '_additem').click(function () {
+                var count = mQuery('#' + prefix + '_itemcount').val();
+                var prototype = mQuery('#' + prefix + '_additem').attr('data-prototype');
+                prototype = prototype.replace(/__name__/g, count);
+                mQuery(prototype).appendTo(mQuery('#' + prefix + '_list div.list-sortable'));
+                mQuery('#' + prefix + '_list_' + count).focus();
+                count++;
+                mQuery('#' + prefix + '_itemcount').val(count);
+                return false;
+            });
+        }
+
+        mQuery('#' + prefix + '_list div.list-sortable').sortable({
+            items: 'div.sortable',
+            handle: 'span.postaddon',
+            axis: 'y',
+            containment: '#' + prefix + '_list',
+            stop: function (i) {
+                var order = 0;
+                mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
+                    var name = mQuery(this).attr('name');
+                    if (mQuery(this).hasClass('sortable-label')) {
+                        name = name.replace(/(\[list\]\[[0-9]+\]\[label\])$/g, '') + '[list][' + order + '][label]';
+                    } else if (mQuery(this).hasClass('sortable-value')) {
+                        name = name.replace(/(\[list\]\[[0-9]+\]\[value\])$/g, '') + '[list][' + order + '][value]';
+                        order++;
+                    } else {
+                        name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
+                        order++;
+                    }
+                    mQuery(this).attr('name', name);
+                });
+            }
         });
     },
 
@@ -2552,6 +2590,8 @@ var Mautic = {
             mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
             mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
         }
+
+        return true;
     },
 
     /**
@@ -3380,7 +3420,7 @@ var Mautic = {
                     return;
                 }
             }
-            
+
             // Markers have numerical indexes
             var firstKey = Object.keys(data)[0];
 
@@ -3573,6 +3613,56 @@ var Mautic = {
     switchFormFieldVisibilty: function (formName) {
         var form   = mQuery('form[name="'+formName+'"]');
         var fields = {};
+        var fieldsPriority = {};
+
+        var getFieldParts = function(fieldName) {
+            var returnObject = {"name": fieldName, "attribute": ''};
+            if (fieldName.search(':') !== -1) {
+                var returnArray = fieldName.split(':');
+                returnObject.name = returnArray[0];
+                returnObject.attribute = returnArray[1];
+            }
+
+            return returnObject;
+        };
+
+        var checkValueCondition = function (sourceFieldVal, condition) {
+            var visible = true;
+            if (typeof condition == 'object') {
+                visible = mQuery.inArray(sourceFieldVal, condition) !== -1;
+            } else if (condition == 'empty' || (condition == 'notEmpty')) {
+                var isEmpty = (sourceFieldVal == '' || sourceFieldVal == null || sourceFieldVal == 'undefined');
+                visible = (condition == 'empty') ? isEmpty : !isEmpty;
+            } else if (condition !== sourceFieldVal) {
+                visible = false;
+            }
+
+            return visible;
+        };
+
+        var checkFieldCondition = function (fieldId, attribute, condition) {
+            var visible = true;
+
+            if (attribute) {
+                // Compare the attribute value
+                if (typeof mQuery('#' + fieldId).attr(attribute) !== 'undefined') {
+                    var field = '#' + fieldId;
+                } else if (mQuery('#' + fieldId).is('select')) {
+                    // Check the value option
+                    var field = mQuery('#' + fieldId +' option[value="' + mQuery('#' + fieldId).val() + '"]');
+                } else {
+                    return visible;
+                }
+
+                var attributeValue = (typeof mQuery(field).attr(attribute) !== 'undefined') ? mQuery(field).attr(attribute) : null;
+
+                return checkValueCondition(attributeValue, condition);
+            } else if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                return (condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'));
+            }
+
+            return checkValueCondition(mQuery('#' + fieldId).val(), condition);
+        }
 
         // find all fields to show
         form.find('[data-show-on]').each(function(index, el) {
@@ -3580,21 +3670,11 @@ var Mautic = {
             var showOn = jQuery.parseJSON(field.attr('data-show-on'));
 
             mQuery.each(showOn, function(fieldId, condition) {
-                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
-                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
-                            fields[field.attr('id')] = true;
-                        } else {
-                            fields[field.attr('id')] = false;
-                        }
-                    } else {
-                        var sourceFieldVal = mQuery('#' + fieldId).val();
-                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
-                            fields[field.attr('id')] = false;
-                        } else {
-                            fields[field.attr('id')] = true;
-                        }
-                    }
+                var fieldParts = getFieldParts(fieldId);
+
+                // Treat multiple fields as OR statements
+                if (typeof fields[field.attr('id')] === 'undefined' || !fields[field.attr('id')]) {
+                    fields[field.attr('id')] = checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
                 }
             });
         });
@@ -3603,20 +3683,18 @@ var Mautic = {
         form.find('[data-hide-on]').each(function(index, el) {
             var field  = mQuery(el);
             var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+
+            if (typeof hideOn.display_priority !== 'undefined') {
+                fieldsPriority[field.attr('id')] = 'hide';
+                delete hideOn.display_priority;
+            }
+
             mQuery.each(hideOn, function(fieldId, condition) {
-                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
-                        fields[field.attr('id')] = false;
-                    } else {
-                        fields[field.attr('id')] = true;
-                    }
-                } else {
-                    var sourceFieldVal = mQuery('#' + fieldId).val();
-                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
-                        fields[field.attr('id')] = false;
-                    } else if (typeof fields[field.attr('id')] == 'undefined') {
-                        fields[field.attr('id')] = true;
-                    }
+                var fieldParts = getFieldParts(fieldId);
+
+                // Treat multiple fields as OR statements
+                if (typeof fields[field.attr('id')] === 'undefined' || fields[field.attr('id')]) {
+                    fields[field.attr('id')] = !checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
                 }
             });
         });
@@ -3646,3 +3724,15 @@ var Mautic = {
         return null;
     }
 };
+
+// Show overflow in the App Wrapper when a Chosen dropdown is shown
+
+mQuery(document).on({
+    // The order in which the handlers are registered matters
+    "chosen:hiding_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'hidden');
+    },
+    "chosen:showing_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'visible');
+    }
+});

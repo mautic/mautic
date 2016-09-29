@@ -103,4 +103,14 @@ final class CoreEvents
      * @var string
      */
     const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
+
+
+    /**
+     * The mautic.channel_broadcast event is dispatched by the mautic:send:broadcast command to process communication to pending contacts
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\ChannelBroadcastEvent instance.
+     *
+     * @var string
+     */
+    const CHANNEL_BROADCAST = 'mautic.channel_broadcast';
 }

@@ -12,6 +12,8 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 /**
  * Class DashboardSubscriber
@@ -58,6 +60,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var ListModel
+     */
+    protected $leadListModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param LeadModel $leadModel
+     * @param ListModel $leadListModel
+     */
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel)
+    {
+        $this->leadModel = $leadModel;
+        $this->leadListModel = $leadListModel;
+    }
+
+    /**
      * Set a widget detail when needed
      *
      * @param WidgetDetailEvent $event
@@ -78,11 +102,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsLineChartData(
+                    'chartData'   => $this->leadModel->getLeadsLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -101,11 +124,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'anonymous.vs.identified.leads') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
+                    'chartData'   => $this->leadModel->getAnonymousVsIdentifiedPieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
@@ -117,10 +139,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'map.of.leads') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $model->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers)
+                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
@@ -131,7 +152,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'top.lists') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('lead.list');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -141,13 +161,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $lists = $model->getTopLists($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $lists = $this->leadListModel->getTopLists($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
                 if ($lists) {
                     foreach ($lists as &$list) {
-                        $listUrl = $this->factory->getRouter()->generate('mautic_segment_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
+                        $listUrl = $this->router->generate('mautic_segment_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
                         $row = array(
                             array(
                                 'value' => $list['name'],
@@ -179,8 +199,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
         }
 
         if ($event->getType() == 'lead.lifetime') {
-
-            $model  = $this->factory->getModel('lead.list');
             $params = $event->getWidget()->getParams();
 
             if (empty($params['limit'])) {
@@ -198,17 +216,20 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $maxSegmentsToshow = count($params['filter']['flag']);
             }
 
-            $lists = $model->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
+            $lists = $this->leadListModel->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
             $items = array();
 
             // Build table rows with links
             if ($lists) {
+                $stages = [];
+                $deviceGranularity = [];
+
                 foreach ($lists as &$list) {
                     if($list['alias'] != ''){
-                        $listUrl = $this->factory->getRouter()->generate('mautic_contact_index', array('search' => 'segment:'.$list['alias']));
+                        $listUrl = $this->router->generate('mautic_contact_index', array('search' => 'segment:'.$list['alias']));
                     }
                     else{
-                        $listUrl = $this->factory->getRouter()->generate('mautic_contact_index', array());
+                        $listUrl = $this->router->generate('mautic_contact_index', array());
                     }
                     if($list['id']){
                         $params['filter']['leadlist_id']=array(
@@ -220,7 +241,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         unset($params['filter']['leadlist_id']);
                     }
 
-                    $column = $model->getLifeCycleSegmentChartData(
+                    $column = $this->leadListModel->getLifeCycleSegmentChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -234,14 +255,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $items['link'][] = $listUrl;
                     $items['chartItems'][] = $column;
 
-                    $stages[] = $model->getStagesBarChartData($params['timeUnit'],
+                    $stages[] = $this->leadListModel->getStagesBarChartData($params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
                         $canViewOthers);
 
-                    $deviceGranularity[] = $model->getDeviceGranularityData($params['timeUnit'],
+                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData($params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
@@ -272,13 +293,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'top.owners') {
 
             if (!$canViewOthers) {
-                $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+                $event->setErrorMessage($this->translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
                 $event->stopPropagation();
                 return;
             }
 
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('lead');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -288,13 +308,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $owners = $model->getTopOwners($limit, $params['dateFrom'], $params['dateTo']);
+                $owners = $this->leadModel->getTopOwners($limit, $params['dateFrom'], $params['dateTo']);
                 $items = array();
 
                 // Build table rows with links
                 if ($owners) {
                     foreach ($owners as &$owner) {
-                        $ownerUrl = $this->factory->getRouter()->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $owner['owner_id']));
+                        $ownerUrl = $this->router->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $owner['owner_id']));
                         $row = array(
                             array(
                                 'value' => $owner['first_name'] . ' ' . $owner['last_name'],
@@ -327,13 +347,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'top.creators') {
 
             if (!$canViewOthers) {
-                $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+                $event->setErrorMessage($this->translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
                 $event->stopPropagation();
                 return;
             }
 
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('lead');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -343,13 +362,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $creators = $model->getTopCreators($limit, $params['dateFrom'], $params['dateTo']);
+                $creators = $this->leadModel->getTopCreators($limit, $params['dateFrom'], $params['dateTo']);
                 $items = array();
 
                 // Build table rows with links
                 if ($creators) {
                     foreach ($creators as &$creator) {
-                        $creatorUrl = $this->factory->getRouter()->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $creator['created_by']));
+                        $creatorUrl = $this->router->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $creator['created_by']));
                         $row = array(
                             array(
                                 'value' => $creator['created_by_user'],
@@ -381,7 +400,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'created.leads') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('lead');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -391,13 +409,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $leads = $model->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, array(), array('canViewOthers' => $canViewOthers));
+                $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, array(), array('canViewOthers' => $canViewOthers));
                 $items = array();
 
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $leadUrl = $this->router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
                         $row = array(
                             array(
                                 'value' => $lead['name'],

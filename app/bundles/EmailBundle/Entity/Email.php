@@ -10,10 +10,12 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
@@ -37,6 +39,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
+    use DynamicContentEntityTrait;
 
     /**
      * @var int
@@ -215,11 +218,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->setTable('emails')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
-            ->addLifecycleEvent('cleanUrlsInContent', 'preUpdate')
-            ->addLifecycleEvent('cleanUrlsInContent', 'prePersist');
+            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
+            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-
         $builder->createField('subject', 'text')
             ->nullable()
             ->build();
@@ -298,6 +300,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
+        self::addDynamicContentMetadata($builder);
 
         $builder->createField('variantSentCount', 'integer')
             ->columnName('variant_sent_count')
@@ -442,7 +445,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'variantSentCount',
                     'variantReadCount',
                     'variantParent',
-                    'variantChildren'
+                    'variantChildren',
+                    'dynamicContent'
                 )
             )
             ->build();

@@ -73,6 +73,27 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
             }
         }
 
+        // Build permission object lists
+        // @todo - convert to tagged services
+        $permissionClasses = [];
+        if (file_exists($directory.'/Security/Permissions')) {
+            $finder = \Symfony\Component\Finder\Finder::create()->files('*Permissions.php')->in($directory.'/Security/Permissions');
+
+            foreach ($finder as $file) {
+                $className = basename($file->getFilename(), '.php');
+                $permissionClass    = '\\'.$baseNamespace.'\\Security\\Permissions\\'.$className;
+                // Skip CorePermissions and AbstractPermissions
+                if ('CoreBundle' === $bundleBase && in_array($className, ['CorePermissions', 'AbstractPermissions'])) {
+                    continue;
+                }
+
+                $permissionInstance = new $permissionClass([]);
+                $permissionName     = $permissionInstance->getName();
+
+                $permissionClasses[$permissionName] = $permissionClass;
+            }
+        }
+
         return array(
             'isPlugin'          => $isPlugin,
             'base'              => str_replace('Bundle', '', $bundleBase),
@@ -80,6 +101,7 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
             'namespace'         => $baseNamespace,
             'symfonyBundleName' => $bundle,
             'bundleClass'       => $namespace,
+            'permissionClasses' => $permissionClasses,
             'relative'          => $relative,
             'directory'         => $directory,
             'config'            => $config
@@ -317,7 +339,8 @@ $container->setParameter(
 
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
-    ->addMethodCall('includeStacktraces', array(true));
+    ->addMethodCall('includeStacktraces', array(true))
+    ->addMethodCall('ignoreEmptyContextAndExtra', array(true));
 
 //Register command line logging
 use Symfony\Component\DependencyInjection\Definition;

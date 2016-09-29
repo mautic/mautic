@@ -13,10 +13,12 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 
 /**
  * Class LeadSubscriber
@@ -33,16 +35,19 @@ class LeadSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param EntityManager $em
-     * @param AuditLogModel $auditLogModel
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
      */
-    public function __construct(MauticFactory $factory, AuditLogModel $auditLogModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
-        parent::__construct($factory);
-
+        $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -94,7 +99,7 @@ class LeadSubscriber extends CommonSubscriber
                     "objectId"  => $lead->getId(),
                     "action"    => ($event->isNew()) ? "create" : "update",
                     "details"   => $details,
-                    "ipAddress" => $this->factory->getIpAddressFromRequest()
+                    "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
                 ];
                 $this->auditLogModel->writeToLog($log);
 
@@ -106,7 +111,7 @@ class LeadSubscriber extends CommonSubscriber
                         "objectId"  => $lead->getId(),
                         "action"    => "identified",
                         "details"   => [],
-                        "ipAddress" => $this->factory->getIpAddressFromRequest()
+                        "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
                     ];
                     $this->auditLogModel->writeToLog($log);
 
@@ -160,7 +165,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $lead->deletedId,
             "action"    => "delete",
             "details"   => ['name' => $lead->getPrimaryIdentifier()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -180,7 +185,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $field->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -200,7 +205,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $field->deletedId,
             "action"    => "delete",
             "details"   => ['name', $field->getLabel()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -220,7 +225,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $note->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -240,7 +245,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $note->deletedId,
             "action"    => "delete",
             "details"   => ['text', $note->getText()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -271,7 +276,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $event->getLoser()->getId(),
             "action"    => "merge",
             "details"   => ['merged_into' => $event->getVictor()->getId()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -529,18 +534,32 @@ class LeadSubscriber extends CommonSubscriber
 
                 if (!empty($row['channel'])) {
                     if ($channelModel = $this->getChannelModel($row['channel'])) {
+                        if ($channelModel instanceof ChannelTimelineInterface) {
+                            if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $row)) {
+                                $template = $overrideTemplate;
+                            }
+
+                            if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $row)) {
+                                $eventTypeName = $overrideEventTypeName;
+                            }
+
+                            if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $row)) {
+                                $icon = $overrideIcon;
+                            }
+                        }
+
+                        /** @deprecated - BC support to be removed in 3.0 */
                         // Allow a custom template if applicable
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineTemplate')) {
                             $template = $channelModel->getDoNotContactLeadTimelineTemplate($row);
                         }
-
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineLabel')) {
                             $eventTypeName = $channelModel->getDoNotContactLeadTimelineLabel($row);
                         }
-
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineIcon')) {
                             $icon = $channelModel->getDoNotContactLeadTimelineIcon($row);
                         }
+                        /** end deprecation */
 
                         if (!empty($row['channel_id'])) {
                             if ($item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {

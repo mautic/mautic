@@ -28,13 +28,10 @@ class MaintenanceSubscriber extends CommonSubscriber
     /**
      * MaintenanceSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param Connection    $db
      */
-    public function __construct(MauticFactory $factory, Connection $db)
+    public function __construct(Connection $db)
     {
-        parent::__construct($factory);
-
         $this->db = $db;
     }
 

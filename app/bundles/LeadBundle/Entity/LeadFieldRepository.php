@@ -24,10 +24,11 @@ class LeadFieldRepository extends CommonRepository
      * @param $exludingId
      * @param $publishedOnly
      * @param $includeEntityFields
+     * @param  string  $object name of object using the custom fields
      *
      * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true)
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -44,6 +45,10 @@ class LeadFieldRepository extends CommonRepository
             )
                 ->setParameter(':true', true, 'boolean');
         }
+
+        $q->andWhere(
+            $q->expr()->eq('l.object', ':object')
+        )->setParameter('object', $object);
 
         $results = $q->execute()->fetchAll();
         $aliases = array();
@@ -71,9 +76,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     * @param  string  $object name of object using the custom fields
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter, $object = 'lead')
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -85,6 +91,11 @@ class LeadFieldRepository extends CommonRepository
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
+
+        $q->andWhere(
+            $q->expr()->eq('f.object', ':object')
+        )->setParameter('object', $object);
+
         return array(
             $expr,
             array("$unique" => $string)
@@ -103,13 +114,19 @@ class LeadFieldRepository extends CommonRepository
 
     /**
      * Get field aliases for lead table columns
+     *
+     * @param  string $object name of object using the custom fields
+     *
+     * @return array
      */
-    public function getFieldAliases()
+    public function getFieldAliases($object = 'lead')
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
-        return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type')
+        return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where( $qb->expr()->eq('object', ':object'))
+                ->setParameter('f.object',$object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
     }
@@ -128,8 +145,33 @@ class LeadFieldRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where(
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        if ($field === "tags") {
+            // Special reserved tags field
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id') 
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->eq('t.tag', ':value')
+                    )
+                )
+                ->setParameter('lead', (int) $lead)
+                ->setParameter('value', $value);
+
+            $result = $q->execute()->fetch();
+
+            if (($operatorExpr === "eq") || ($operatorExpr === "like")) {
+                return !empty($result['id']);
+            } elseif (($operatorExpr === "neq") || ($operatorExpr === "notLike")) {
+                return empty($result['id']);
+            } else {
+                return false;
+            }            
+        } else {
+            // Standard field
+            $q->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
                     $q->expr()->$operatorExpr('l.' . $field, ':value')
@@ -138,9 +180,10 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $result = $q->execute()->fetch();
+            $result = $q->execute()->fetch();
 
-        return !empty($result['id']);
+            return !empty($result['id']);
+        }
     }
 
 }

@@ -14,7 +14,7 @@ return [
             'mautic.sms.campaignbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
                     'mautic.sms.api',
@@ -27,7 +27,7 @@ return [
             'mautic.sms.smsbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',

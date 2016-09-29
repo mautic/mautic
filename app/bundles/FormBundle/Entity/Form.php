@@ -236,11 +236,6 @@ class Form extends FormEntity
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
             'groups'  => array('urlRequired')
         )));
-
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url(array(
-            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => array('urlRequiredPassTwo')
-        )));
     }
 
     /**
@@ -259,7 +254,6 @@ class Form extends FormEntity
             $groups[] = 'messageRequired';
         } elseif ($postAction == 'redirect') {
             $groups[] = 'urlRequired';
-            $groups[] = 'urlRequiredPassTwo';
         }
 
         return $groups;

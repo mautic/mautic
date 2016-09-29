@@ -9,14 +9,13 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -38,18 +37,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel     $leadModel
-     * @param EmailModel    $emailModel
+     * @param LeadModel  $leadModel
+     * @param EmailModel $emailModel
+     * @param EventModel $eventModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, EmailModel $emailModel)
+    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel)
     {
         $this->leadModel  = $leadModel;
         $this->emailModel = $emailModel;
-
-        parent::__construct($factory);
+        $this->campaignEventModel = $eventModel;
     }
 
     /**
@@ -76,7 +79,7 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'         => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'associatedActions' => ['email.send'],
         ];
-        $event->addLeadDecision('email.open', $trigger);
+        $event->addDecision('email.open', $trigger);
 
         $action = [
             'label'           => 'mautic.email.campaign.event.send',
@@ -99,7 +102,7 @@ class CampaignSubscriber extends CommonSubscriber
         $email = $event->getEmail();
 
         if ($email !== null) {
-            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email', $email->getId());
+            $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
 

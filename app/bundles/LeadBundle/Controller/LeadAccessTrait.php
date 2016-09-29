@@ -57,7 +57,7 @@ trait LeadAccessTrait
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:'.$action.'own',
             'lead:leads:'.$action.'other',
-            $lead->getOwner()
+            $lead->getPermissionUser()
         )
         ) {
 

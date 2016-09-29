@@ -20,7 +20,6 @@ use Mautic\FormBundle\FormEvents;
  */
 class FormSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
@@ -45,7 +44,8 @@ class FormSubscriber extends CommonSubscriber
             'description'        => 'mautic.asset.asset.submitaction.downloadfile_descr',
             'formType'           => 'asset_submitaction_downloadfile',
             'formTypeCleanMasks' => array('message' => 'html'),
-            'callback'           => '\Mautic\AssetBundle\Helper\FormSubmitHelper::onFormSubmit'
+            'callback'           => '\Mautic\AssetBundle\Helper\FormSubmitHelper::onFormSubmit',
+            'allowCampaignForm'  => true
         );
 
         $event->addSubmitAction('asset.download', $action);

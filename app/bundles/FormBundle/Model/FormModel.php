@@ -10,10 +10,11 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -42,6 +43,11 @@ class FormModel extends CommonFormModel
     protected $templatingHelper;
 
     /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
+
+    /**
      * @var SchemaHelperFactory
      */
     protected $schemaHelperFactory;
@@ -62,26 +68,49 @@ class FormModel extends CommonFormModel
     protected $leadModel;
 
     /**
+     * @var FormFieldHelper
+     */
+    protected $fieldHelper;
+
+    /**
+     * @var LeadFieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
      * FormModel constructor.
      *
-     * @param ActionModel $formActionModel
-     * @param FieldModel $formFieldModel
+     * @param RequestStack        $requestStack
+     * @param TemplatingHelper    $templatingHelper
+     * @param ThemeHelper         $themeHelper
+     * @param SchemaHelperFactory $schemaHelperFactory
+     * @param ActionModel         $formActionModel
+     * @param FieldModel          $formFieldModel
+     * @param LeadModel           $leadModel
+     * @param FormFieldHelper     $fieldHelper
+     * @param LeadFieldModel      $leadFieldModel
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
+        ThemeHelper $themeHelper,
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
-        LeadModel $leadModel
+        LeadModel $leadModel,
+        FormFieldHelper $fieldHelper,
+        LeadFieldModel $leadFieldModel
     )
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->templatingHelper = $templatingHelper;
+        $this->themeHelper = $themeHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
-        $this->formActionModel = $formActionModel;
-        $this->formFieldModel = $formFieldModel;
-        $this->leadModel = $leadModel;
+        $this->formActionModel     = $formActionModel;
+        $this->formFieldModel      = $formFieldModel;
+        $this->leadModel           = $leadModel;
+        $this->fieldHelper         = $fieldHelper;
+        $this->leadFieldModel      = $leadFieldModel;
     }
 
     /**
@@ -365,9 +394,10 @@ class FormModel extends CommonFormModel
     public function generateHtml(Form $entity, $persist = true)
     {
         //generate cached HTML
-        $theme = $entity->getTemplate();
+        $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead = $this->leadModel->getCurrentLead();
+        $lead        = $this->leadModel->getCurrentLead();
+        $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -383,13 +413,76 @@ class FormModel extends CommonFormModel
             );
         }
 
+        if ($entity->getRenderStyle()) {
+            $templating = $this->templatingHelper->getTemplating();
+            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+        }
+
+        // Determine pages
+        $fields = $entity->getFields()->toArray();
+
+        // Ensure the correct order in case this is generated right after a form save with new fields
+        uasort($fields, function ($a, $b) {
+            if ($a->getOrder() === $b->getOrder()) {
+                return 0;
+            }
+
+            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
+        });
+
+        $pages  = ['open' => [], 'close' => []];
+
+        $openFieldId =
+        $closeFieldId =
+        $previousId =
+        $lastPage = false;
+        $pageCount   = 1;
+
+        foreach ($fields as $fieldId => $field) {
+            if ('pagebreak' == $field->getType() && $openFieldId) {
+                // Open the page
+                $pages['open'][$openFieldId] = $pageCount;
+                $openFieldId                 = false;
+                $lastPage                    = $fieldId;
+
+                // Close the page at the next page break
+                if ($previousId) {
+                    $pages['close'][$previousId] = $pageCount;
+
+                    $pageCount++;
+                }
+            } else {
+                if (!$openFieldId) {
+                    $openFieldId = $fieldId;
+                }
+            }
+
+            $previousId = $fieldId;
+        }
+
+        if (!empty($pages)) {
+            if ($openFieldId) {
+                $pages['open'][$openFieldId] = $pageCount;
+            }
+            if ($previousId !== $lastPage) {
+                $pages['close'][$previousId] = $pageCount;
+            }
+        }
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'form'        => $entity,
-                'theme'       => $theme,
-                'submissions' => $submissions,
-                'lead'        => $lead
+                'fieldSettings' => $this->getCustomComponents()['fields'],
+                'fields'        => $fields,
+                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'form'          => $entity,
+                'theme'         => $theme,
+                'submissions'   => $submissions,
+                'lead'          => $lead,
+                'formPages'     => $pages,
+                'lastFormPage'  => $lastPage,
+                'style'         => $style
             ]
         );
 
@@ -481,26 +574,26 @@ class FormModel extends CommonFormModel
     {
         $fields = $form->getFields()->toArray();
 
-        $columns = array(
-            array(
+        $columns     = [
+            [
                 'name' => 'submission_id',
                 'type' => 'integer'
-            ),
-            array(
+            ],
+            [
                 'name' => 'form_id',
                 'type' => 'integer'
-            )
-        );
-        $ignoreTypes = array('button', 'freetext');
+            ]
+        ];
+        $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
-                $columns[] = array(
+                $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
-                    'options' => array(
+                    'options' => [
                         'notnull' => false
-                    )
-                );
+                    ]
+                ];
             }
         }
 
@@ -519,9 +612,19 @@ class FormModel extends CommonFormModel
             //build them
             $event = new FormBuilderEvent($this->translator);
             $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
-            $customComponents['fields']  = $event->getFormFields();
-            $customComponents['actions'] = $event->getSubmitActions();
-            $customComponents['choices'] = $event->getSubmitActionGroups();
+            $customComponents['fields']     = $event->getFormFields();
+            $customComponents['actions']    = $event->getSubmitActions();
+            $customComponents['choices']    = $event->getSubmitActionGroups();
+            $customComponents['validators'] = $event->getValidators();
+
+            // Generate a list of fields that are not persisted to the database by default
+            $notPersist = ['button', 'captcha', 'freetext', 'pagebreak'];
+            foreach ($customComponents['fields'] as $type => $field) {
+                if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
+                    $notPersist[] = $type;
+                }
+            }
+            $customComponents['viewOnlyFields'] = $notPersist;
         }
 
         return $customComponents;
@@ -576,7 +679,6 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $fieldHelper = new FormFieldHelper($this->translator);
         $formName    = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
@@ -586,32 +688,32 @@ class FormModel extends CommonFormModel
             if ($this->request->query->has($alias)) {
                 $value = $this->request->query->get($alias);
 
-                $fieldHelper->populateField($f, $value, $formName, $formHtml);
+                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
         }
     }
 
+    /**
+     * @param Form $form
+     * @param      $formHtml
+     */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
-        $fieldHelper = new FormFieldHelper($this->translator);
-
         $formName = $form->generateFormName();
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $lead = $this->factory->getModel('lead')->getCurrentLead();
+        $lead     = $this->leadModel->getCurrentLead();
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
-            $leadField = $f->getLeadField();
+            $leadField  = $f->getLeadField();
             $isAutoFill = $f->getIsAutoFill();
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
 
-		        if (!empty($value)) {
-		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
-		        }
+                if (!empty($value)) {
+                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+                }
             }
         }
     }

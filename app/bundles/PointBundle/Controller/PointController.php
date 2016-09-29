@@ -27,7 +27,7 @@ class PointController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
+        $permissions = $this->get('mautic.security')->isGranted(array(
             'point:points:view',
             'point:points:create',
             'point:points:edit',
@@ -44,18 +44,18 @@ class PointController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get('mautic.point.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.point.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.point.filter', ''));
-        $this->factory->getSession()->set('mautic.point.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.point.filter', ''));
+        $this->get('session')->set('mautic.point.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.point.orderby', 'p.name');
-        $orderByDir = $this->factory->getSession()->get('mautic.point.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.point.orderby', 'p.name');
+        $orderByDir = $this->get('session')->get('mautic.point.orderbydir', 'ASC');
 
         $points = $this->getModel('point')->getEntities(array(
             'start'      => $start,
@@ -68,7 +68,7 @@ class PointController extends FormController
         $count = count($points);
         if ($count && $count < ($start + 1)) {
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->factory->getSession()->set('mautic.point.page', $lastPage);
+            $this->get('session')->set('mautic.point.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_point_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -83,7 +83,7 @@ class PointController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.point.page', $page);
+        $this->get('session')->set('mautic.point.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -125,12 +125,12 @@ class PointController extends FormController
             $entity  = $model->getEntity();
         }
 
-        if (!$this->factory->getSecurity()->isGranted('point:points:create')) {
+        if (!$this->get('mautic.security')->isGranted('point:points:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page = $this->get('session')->get('mautic.point.page', 1);
 
         $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
 
@@ -224,7 +224,7 @@ class PointController extends FormController
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page = $this->get('session')->get('mautic.point.page', 1);
 
         $viewParameters = array('page' => $page);
 
@@ -254,7 +254,7 @@ class PointController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->factory->getSecurity()->isGranted('point:points:edit')) {
+        } elseif (!$this->get('mautic.security')->isGranted('point:points:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -351,7 +351,7 @@ class PointController extends FormController
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('point:points:create')) {
+            if (!$this->get('mautic.security')->isGranted('point:points:create')) {
                 return $this->accessDenied();
             }
 
@@ -371,7 +371,7 @@ class PointController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page      = $this->get('session')->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
         $flashes   = array();
 
@@ -395,7 +395,7 @@ class PointController extends FormController
                     'msg'     => 'mautic.point.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('point:points:delete')) {
+            } elseif (!$this->get('mautic.security')->isGranted('point:points:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'point');
@@ -428,7 +428,7 @@ class PointController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page      = $this->get('session')->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
         $flashes   = array();
 
@@ -457,7 +457,7 @@ class PointController extends FormController
                         'msg'     => 'mautic.point.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('point:points:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted('point:points:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'point', true);

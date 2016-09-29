@@ -37,11 +37,10 @@ $groups = array_keys($fields);
 $edit   = $view['security']->hasEntityAccess(
     $permissions['lead:leads:editown'],
     $permissions['lead:leads:editother'],
-    $lead->getOwner()
+    $lead->getPermissionUser()
 );
 
 $buttons = [];
-
 //Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = [
@@ -80,6 +79,7 @@ $buttons[] = [
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-pie-chart',
 ];
+
 //View Contact Frequency button
 
 if ($edit) {
@@ -124,7 +124,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
 if (($view['security']->hasEntityAccess(
         $permissions['lead:leads:deleteown'],
         $permissions['lead:leads:deleteother'],
-        $lead->getOwner()
+        $lead->getPermissionUser()
     ))
     && $edit
 ) {
@@ -158,20 +158,16 @@ $view['slots']->set(
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:leads:editother'],
-                    $lead->getCreatedBy()
-                ),
+                'edit'   => $edit,
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:deleteown'],
                     $permissions['lead:leads:deleteother'],
-                    $lead->getOwner()
+                    $lead->getPermissionUser()
                 ),
                 'close'  => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:viewown'],
                     $permissions['lead:leads:viewother'],
-                    $lead->getCreatedBy()
+                    $lead->getPermissionUser()
                 ),
             ],
         ]
@@ -219,14 +215,16 @@ $view['slots']->set(
                                                 <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span>
                                                 </td>
                                                 <td>
-                                                    <?php if ($group == 'core' && $field['alias'] == 'country'
-                                                    && !empty($flag)): ?>
-                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt=""
-                                                         style="max-height: 24px;"/>
+                                                    <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
+                                                    <?php else: ?>
+                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                            <?php echo implode(", ",$field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -445,6 +443,11 @@ $view['slots']->set(
                 </div>
             </div>
             <div class="panel-body pt-sm">
+            <?php if ($lead->getOwner()) : ?>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
+            <?php endif; ?>
+
                 <h6 class="fw-sb">
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>
@@ -510,6 +513,17 @@ $view['slots']->set(
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
                 <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span>
+                </h5>
+            <?php endforeach; ?>
+            <div class="clearfix"></div>
+        </div>
+        <div class="pa-sm">
+            <div class="panel-title">  <?php echo $view['translator']->trans(
+                    'mautic.lead.lead.companies'); ?></div>
+            <?php foreach ($companies as $key => $company): ?>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label <?php if ($key == 0): ?>label-primary <?php else: ?>label-success<?php endif?>" >
+                        <a href="<?php echo $view['router']->path('mautic_company_action', array("objectAction" => "edit", "objectId" => $company['id'])); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
+                    </span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>

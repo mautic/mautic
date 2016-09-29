@@ -44,17 +44,14 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory       $factory
      * @param LeadModel           $leadModel
      * @param DynamicContentModel $dynamicContentModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
     {
         $this->leadModel = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session = $session;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -87,7 +84,7 @@ class CampaignSubscriber extends CommonSubscriber
             ]
         );
 
-        $event->addLeadDecision(
+        $event->addDecision(
             'dwc.decision',
             [
                 'label'           => 'mautic.dynamicContent.campaign.decision_dwc',
@@ -147,7 +144,7 @@ class CampaignSubscriber extends CommonSubscriber
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
             $content = $tokenEvent->getContent();
 

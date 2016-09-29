@@ -24,7 +24,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
             <?php
             $fields = $form->getFields();
             foreach ($fields as $f):
-            if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false) continue;
+            if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) continue;
             ?>
             <th class="col-formresult-field col-formresult-<?php echo $f->getType(); ?> col-formresult-field<?php echo $f->getId(); ?>"><?php echo $f->getLabel(); ?></th>
             <?php endforeach; ?>

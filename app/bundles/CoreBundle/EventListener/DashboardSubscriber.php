@@ -8,10 +8,9 @@
  */
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 
@@ -39,6 +38,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param AuditLogModel $auditLogModel
+     */
+    public function __construct(AuditLogModel $auditLogModel)
+    {
+        $this->auditLogModel = $auditLogModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -49,13 +63,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
     {
         if ($event->getType() == 'recent.activity') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('core.auditLog');
                 $height = $event->getWidget()->getHeight();
                 $limit  = round(($height - 80) / 75);
-                $logs   = $model->getLogForObject(null, null, null, $limit);
+                $logs   = $this->auditLogModel->getLogForObject(null, null, null, $limit);
 
                 // Get names of log's items
-                $router = $this->factory->getRouter();
                 foreach ($logs as $key => &$log) {
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
@@ -65,15 +77,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
                                 if ($log['bundle'] == 'lead' && $log['objectName'] == 'mautic.lead.lead.anonymous') {
-                                    $log['objectName'] = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+                                    $log['objectName'] = $this->translator ->trans('mautic.lead.lead.anonymous');
                                 }
                             } else {
                                 $log['objectName'] = '';
                             }
 
                             $routeName = 'mautic_'.$log['bundle'].'_action';
-                            if ($router->getRouteCollection()->get($routeName) !== null) {
-                                $log['route'] = $router->generate(
+                            if ($this->router->getRouteCollection()->get($routeName) !== null) {
+                                $log['route'] = $this->router->generate(
                                     'mautic_'.$log['bundle'].'_action',
                                     array('objectAction' => 'view', 'objectId' => $log['objectId'])
                                 );
@@ -86,8 +98,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
                 }
 
-                $iconEvent = new IconEvent($this->factory->getSecurity());
-                $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $iconEvent);
+                $iconEvent = new IconEvent($this->security);
+                $this->dispatcher->dispatch(CoreEvents::FETCH_ICONS, $iconEvent);
                 $event->setTemplateData(array('logs' => $logs, 'icons' => $iconEvent->getIcons()));
             }
 

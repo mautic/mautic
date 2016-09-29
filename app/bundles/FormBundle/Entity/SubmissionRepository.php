@@ -47,6 +47,10 @@ class SubmissionRepository extends CommonRepository
         $form  = $args['form'];
 
         //DBAL
+        if (!isset($args['viewOnlyFields'])) {
+            $args['viewOnlyFields'] = ['button', 'freetext', 'pagebreak', 'captcha'];
+        }
+        $viewOnlyFields = array_map(function ($value) { return '"'.$value.'"'; }, $args['viewOnlyFields']);
 
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
@@ -54,7 +58,7 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'form_fields', 'f')
             ->where('f.form_id = ' . $form->getId())
             ->andWhere(
-                $fq->expr()->notIn('f.type', array("'button'", "'freetext'")),
+                $fq->expr()->notIn('f.type', $viewOnlyFields),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
             ->orderBy('f.field_order', 'ASC')

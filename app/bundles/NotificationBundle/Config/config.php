@@ -14,7 +14,7 @@ return [
             'mautic.notification.campaignbundle.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
@@ -25,7 +25,10 @@ return [
             ],
             'mautic.notification.pagebundle.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters'
+                ]
             ],
             'mautic.core.js.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
@@ -33,7 +36,7 @@ return [
             'mautic.notification.notificationbundle.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
@@ -106,6 +109,7 @@ return [
             'mautic_receive_notification' => [
                 'path' => '/notification/receive',
                 'controller' => 'MauticNotificationBundle:Api\NotificationApi:receive',
+
             ],
             'mautic_subscribe_notification' => [
                 'path' => '/notification/subscribe',
@@ -143,6 +147,7 @@ return [
                         ],
                     ],
                     'parent' => 'mautic.core.channels',
+                    'priority'  => 80
                 ],
             ],
         ],

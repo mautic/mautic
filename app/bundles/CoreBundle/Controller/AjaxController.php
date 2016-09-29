@@ -31,7 +31,7 @@ class AjaxController extends CommonController
 
     /**
      * @param array   $dataArray
-     * @param integer $statusCoce
+     * @param integer $statusCode
      * @param boolean $addIgnoreWdt
      *
      * @return JsonResponse
@@ -85,19 +85,22 @@ class AjaxController extends CommonController
                 if (count($parts) == 2) {
                     $bundle = ucfirst($parts[0]);
                     $action = $parts[1];
+                    if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
+                        // Check if a plugin is prefixed with Mautic
+                        $bundle      = 'Mautic'.$bundle;
+                        $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
+                    } elseif (!$isPlugin) {
+                        $bundle = 'Mautic'.$bundle;
+                    }
 
-                    if (class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
-                        if (!$isPlugin) {
-                            $bundle = 'Mautic'.$bundle;
-                        }
-
+                    if ($classExists) {
                         return $this->forward(
                             "{$bundle}Bundle:Ajax:executeAjax",
-                            array(
+                            [
                                 'action'  => $action,
                                 //forward the request as well as Symfony creates a subrequest without GET/POST
                                 'request' => $this->request
-                            )
+                            ]
                         );
                     }
                 }
@@ -133,7 +136,7 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 1);
         $searchStr = InputHelper::clean($request->query->get("global_search", ""));
-        $this->factory->getSession()->set('mautic.global_search', $searchStr);
+        $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
@@ -248,7 +251,7 @@ class AjaxController extends CommonController
         $entity = $model->getEntity($id);
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
-            $security       = $this->factory->getSecurity();
+            $security       = $this->get('mautic.security');
             $createdBy      = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
             if ($security->checkPermissionExists($permissionBase.':publishown')) {
@@ -308,7 +311,7 @@ class AjaxController extends CommonController
         $extra       = InputHelper::clean($request->request->get('parameter'));
         $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
-        $currentUser = $this->factory->getUser();
+        $currentUser = $this->user;
 
         if (method_exists($entity, 'getCheckedOutBy')) {
 
@@ -356,7 +359,7 @@ class AjaxController extends CommonController
     protected function updateDownloadPackageAction(Request $request)
     {
         $dataArray  = array('success' => 0);
-        $translator = $this->factory->getTranslator();
+        $translator = $this->translator;
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->factory->getHelper('update');
@@ -401,7 +404,7 @@ class AjaxController extends CommonController
     protected function updateExtractPackageAction(Request $request)
     {
         $dataArray  = array('success' => 0);
-        $translator = $this->factory->getTranslator();
+        $translator = $this->translator;
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->factory->getHelper('update');
@@ -483,7 +486,7 @@ class AjaxController extends CommonController
     public function updateDatabaseMigrationAction(Request $request)
     {
         $dataArray  = array('success' => 0);
-        $translator = $this->factory->getTranslator();
+        $translator = $this->translator;
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
@@ -516,7 +519,7 @@ class AjaxController extends CommonController
         }
 
         // Update languages
-        $supportedLanguages = $this->factory->getParameter('supported_languages');
+        $supportedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
 
         // If there is only one language, assume it is 'en_US' and skip this
         if (count($supportedLanguages) > 1) {
@@ -614,7 +617,7 @@ class AjaxController extends CommonController
     public function updateFinalizationAction(Request $request)
     {
         $dataArray  = array('success' => 0);
-        $translator = $this->factory->getTranslator();
+        $translator = $this->translator;
 
         // Here as a just in case it's needed for a future upgrade
         $dataArray['success'] = 1;
@@ -634,7 +637,7 @@ class AjaxController extends CommonController
         }
 
         // Execute the mautic.post_upgrade event
-        $this->factory->getDispatcher()->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+        $this->dispatcher->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -660,7 +663,7 @@ class AjaxController extends CommonController
         /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->getModel('user');
 
-        $currentStatus = $this->factory->getUser()->getOnlineStatus();
+        $currentStatus = $this->user->getOnlineStatus();
         if (!in_array($currentStatus, array('manualaway', 'dnd'))) {
             if ($status == 'back') {
                 $status = 'online';

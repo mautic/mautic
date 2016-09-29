@@ -8,6 +8,13 @@
  */
 
 // Defaults
+$appendAttribute = function (&$attributes, $attributeName, $append) {
+    if (stripos($attributes, "{$attributeName}=") === false) {
+        $attributes .= ' '.$attributeName.'="'.$append.'"';
+    } else {
+        $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);
+    };
+};
 
 if (!isset($defaultInputFormClass)) {
     $defaultInputFormClass = '';
@@ -57,8 +64,8 @@ if (!empty($properties['placeholder'])) {
 
 // Label and input
 if (!empty($inForm)) {
-    if ($field['type'] == 'button') {
-        $defaultInputFormClass = ' btn btn-default';
+    if (in_array($field['type'], ['button', 'pagebreak'])) {
+        $defaultInputFormClass .= ' btn btn-default';
     }
     $labelAttr .= ' class="'.$defaultLabelClass.'"';
     $inputAttr .= ' disabled="disabled" class="'.$defaultInputClass.$defaultInputFormClass.'"';
@@ -67,27 +74,20 @@ if (!empty($inForm)) {
     if ($field['labelAttributes'])
         $labelAttr .= ' '.htmlspecialchars_decode($field['labelAttributes']);
 
-    if (stripos($labelAttr, 'class=') === false) {
-        $labelAttr .= ' class="'.$defaultLabelClass.'"';
-    } else {
-        $labelAttr = str_ireplace('class="', 'class="'.$defaultLabelClass.' ', $labelAttr);
-    }
+    $appendAttribute($labelAttr, 'class', $defaultLabelClass);
 
     if ($field['inputAttributes'])
         $inputAttr .= ' '.htmlspecialchars_decode($field['inputAttributes']);
 
-    if (stripos($inputAttr, 'class=') === false) {
-        $inputAttr .= ' class="'.$defaultInputClass.'"';
-    } else {
-        $inputAttr = str_ireplace('class="', 'class="'.$defaultInputClass.' ', $inputAttr);
-    }
+    $appendAttribute($inputAttr, 'class', $defaultInputClass);
 }
 
 // Container
 $containerAttr         = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 if (!isset($containerClass))
     $containerClass = $containerType;
-$defaultContainerClass = 'mauticform-row mauticform-'.$containerClass;
+$order = (isset($field['order'])) ? $field['order'] : 0;
+$defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
 
 // Field is required
 $validationMessage     = '';
@@ -109,8 +109,54 @@ if (isset($field['isRequired']) && $field['isRequired']) {
     $defaultContainerClass .= ' mauticform-required';
 }
 
-if (stripos($containerAttr, 'class=') === false) {
-    $containerAttr .= ' class="'.$defaultContainerClass.'"';
-} else {
-    $containerAttr = str_ireplace('class="', 'class="'.$defaultContainerClass.' ', $containerAttr);
+$appendAttribute($containerAttr, 'class', $defaultContainerClass);
+
+// Setup list parsing
+if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
+    $parseList = [];
+    $ignoreNumericalKeys = false;
+    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
+        $leadFieldType = $contactFields[$field['leadField']]['type'];
+        switch (true) {
+            case (!empty($contactFields[$field['leadField']]['properties']['list'])):
+                $parseList = $contactFields[$field['leadField']]['properties']['list'];
+                break;
+            case ('boolean' == $leadFieldType):
+                $parseList = [
+                    0 => $contactFields[$field['leadField']]['properties']['no'],
+                    1 => $contactFields[$field['leadField']]['properties']['yes'],
+                ];
+                $ignoreNumericalKeys = true;
+                break;
+            case ('country' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
+                break;
+            case ('region' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
+                break;
+            case ('timezone' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
+                break;
+            case ('locale'):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
+                break;
+        }
+    }
+
+    if (empty($parseList)) {
+        if (isset($list)) {
+            $parseList = $list;
+        } elseif (!empty($properties['list'])) {
+            $parseList = $properties['list'];
+        } elseif (!empty($properties['optionlist'])) {
+            $parseList = $properties['optionlist'];
+        }
+
+        if (isset($parseList['list'])) {
+            $parseList = $parseList['list'];
+        }
+    }
+
+    $list           = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList, false, $ignoreNumericalKeys);
+    $firstListValue = reset($list);
 }
