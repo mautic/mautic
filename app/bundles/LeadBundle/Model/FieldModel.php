@@ -241,7 +241,7 @@ class FieldModel extends FormModel
             'object'     => 'company'
         ],
         'companyindustry'  => [
-            'type'       => 'lookup',
+            'type'       => 'select',
             'group'    => 'professional',
             'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
             'fixed'      => true,
