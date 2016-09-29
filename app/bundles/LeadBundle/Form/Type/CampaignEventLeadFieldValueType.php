@@ -95,8 +95,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     $fieldType  = $field->getType();
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
-                        $fieldValues = explode('|', $properties['list']);
-                        $fieldValues = array_combine($fieldValues, $fieldValues);
+                        $fieldValues = FormFieldHelper::parseList($properties['list']);
                     } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
                         $fieldValues = [

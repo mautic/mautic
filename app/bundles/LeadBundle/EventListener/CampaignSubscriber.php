@@ -129,7 +129,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formTheme'   => 'MauticLeadBundle:FormTheme\FieldValueCondition',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
         ];
-        $event->addLeadCondition('lead.field_value', $trigger);
+        $event->addCondition('lead.field_value', $trigger);
     }
 
     /**

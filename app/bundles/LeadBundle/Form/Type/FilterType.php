@@ -219,9 +219,8 @@ class FilterType extends AbstractType
                     $fields = (isset($options['fields']['lead']))?$options['fields']['lead']: [];
                     $fields[] = (isset($options['fields']['company']))?$options['fields']['company']: [];
 
-                    $list = $fields[$fieldName]['properties']['list'];
-
-                    $choices = FormFieldHelper::parseListStringIntoArray($list);
+                    $list = $options['fields'][$fieldName]['properties']['list'];
+                    $choices = FormFieldHelper::parseList($list);
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys

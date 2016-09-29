@@ -215,14 +215,16 @@ $view['slots']->set(
                                                 <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span>
                                                 </td>
                                                 <td>
-                                                    <?php if ($group == 'core' && $field['alias'] == 'country'
-                                                    && !empty($flag)): ?>
-                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt=""
-                                                         style="max-height: 24px;"/>
+                                                    <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
+                                                    <?php else: ?>
+                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                            <?php echo implode(", ",$field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

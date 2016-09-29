@@ -57,19 +57,11 @@ class FacebookType extends AbstractType
         ));
 
         $builder->add('showFaces', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(0, 1),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
             'label' => 'mautic.integration.Facebook.share.showfaces',
             'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces']
         ));
 
         $builder->add('showShare', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(0, 1),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
             'label' => 'mautic.integration.Facebook.share.showshare',
             'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare']
         ));

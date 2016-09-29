@@ -9,7 +9,7 @@
 
 ?>
 
-<div class="mauticform-row panel" id="mauticform_action_<?php echo $id; ?>">
+<div class="mauticform-row panel<?php if (empty($action['settings']['allowCampaignForm'])) echo ' action-standalone-only'; ?>" id="mauticform_action_<?php echo $id; ?>">
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(

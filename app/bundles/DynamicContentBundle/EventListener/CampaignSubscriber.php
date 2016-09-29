@@ -84,7 +84,7 @@ class CampaignSubscriber extends CommonSubscriber
             ]
         );
 
-        $event->addLeadDecision(
+        $event->addDecision(
             'dwc.decision',
             [
                 'label'           => 'mautic.dynamicContent.campaign.decision_dwc',

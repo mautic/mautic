@@ -384,6 +384,10 @@ return [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
             ],
+            'mautic.model.factory'                      => [
+                'class'     => 'Mautic\CoreBundle\Factory\ModelFactory',
+                'arguments' => 'service_container',
+            ],
             'mautic.templating.name_parser'       => [
                 'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
                 'arguments' => 'kernel',
@@ -398,8 +402,6 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
-                    'doctrine.orm.entity_manager',
-                    'security.token_storage',
                     '%mautic.parameters%',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%'

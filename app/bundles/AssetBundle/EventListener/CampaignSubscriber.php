@@ -63,7 +63,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'    => 'campaignevent_assetdownload'
         ];
 
-        $event->addLeadDecision('asset.download', $trigger);
+        $event->addDecision('asset.download', $trigger);
     }
 
     /**

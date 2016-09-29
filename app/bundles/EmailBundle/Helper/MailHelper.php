@@ -125,6 +125,13 @@ class MailHelper
      * @var bool
      */
     protected $tokenizationEnabled = false;
+    
+    /**
+     * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue
+     *
+     * @var bool
+     */
+    protected $queueEnabled = false;
 
     /**
      * @var array
@@ -327,7 +334,7 @@ class MailHelper
 
             $this->message->setSubject($this->subject);
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
-            // messages only with plain text            
+            // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
@@ -1083,7 +1090,7 @@ class MailHelper
      */
     protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
     {
-        if ($this->tokenizationEnabled) {
+        if ($this->queueEnabled) {
             // Check if max batching has been hit
             $maxAllowed = $this->transport->getMaxBatchLimit();
 
@@ -1428,7 +1435,9 @@ class MailHelper
     public function parsePlainText($content = null)
     {
         if ($content == null) {
-            $content = $this->message->getBody();
+            if (!$content = $this->message->getBody()) {
+                $content = $this->body['content'];
+            }
         }
 
         $request = $this->factory->getRequest();
@@ -1442,7 +1451,7 @@ class MailHelper
     /**
      * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
      *
-     * @deprecated 2.1.1 - to be removed in 3.0
+     * @deprecated 2.1.1 - to be removed in 3.0; use enableQueue() instead
      *
      * @param bool $tokenizationEnabled
      *
@@ -1450,7 +1459,21 @@ class MailHelper
      */
     public function useMailerTokenization($tokenizationEnabled = true)
     {
-        trigger_error('useMailerTokenization is no longer used as it is automatically handled based on what the transport supports.', E_DEPRECATED);
+        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_DEPRECATED);
+        
+        $this->enableQueue($tokenizationEnabled);
+    }
+    
+    /**
+     * Enables queue mode if the transport supports tokenization
+     *
+     * @param bool $enabled 
+     */
+    public function enableQueue($enabled = true)
+    {
+        if ($this->tokenizationEnabled) {
+    	    $this->queueEnabled = $enabled;
+    	}
     }
 
     /**

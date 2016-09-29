@@ -371,13 +371,6 @@ class FieldModel extends FormModel
         if ($type == 'time') {
             //time does not work well with list filters
             $entity->setIsListable(false);
-        } elseif ($type == 'select' || $type == 'lookup') {
-            // Convert to a string
-            $properties = $entity->getProperties();
-            if (isset($properties['list']) && is_array($properties['list'])) {
-                $properties['list'] = implode('|', array_map('trim', $properties['list']));
-            }
-            $entity->setProperties($properties);
         }
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
@@ -679,6 +672,37 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getFieldListWithProperties($object = 'lead')
+    {
+        $contactFields = $this->getEntities(
+            [
+                'object'           => $object,
+                'ignore_paginator' => true,
+                'hydration_mode'   => 'hydrate_array'
+            ]
+        );
+
+        $fields = [];
+        foreach ($contactFields as $contactField) {
+            $fields[$contactField['alias']] = [
+                'label'        => $contactField['label'],
+                'alias'        => $contactField['alias'],
+                'type'         => $contactField['type'],
+                'group'        => $contactField['group'],
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.' . $contactField['group']),
+                'defaultValue' => $contactField['defaultValue'],
+                'properties'   => $contactField['properties'],
+            ];
+        }
+
+        return $fields;
+    }
+
+    /**
      * Get the fields for a specific group
      *
      * @param       $group
@@ -720,7 +744,7 @@ class FieldModel extends FormModel
         return $leadFields;
     }
 
-    /*
+    /**
      * Retrieves a list of published fields that are unique identifers
      *
      * @return array
@@ -734,7 +758,7 @@ class FieldModel extends FormModel
         return $fields;
     }
 
-    /*
+    /**
      * Wrapper for misspelled getUniqueIdentiferFields
      *
      * @return array

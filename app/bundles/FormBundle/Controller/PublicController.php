@@ -11,6 +11,9 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,12 +31,13 @@ class PublicController extends CommonFormController
         if ($this->request->getMethod() !== 'POST') {
             return $this->accessDenied();
         }
-        $isAjax = $this->request->query->get('ajax', false);
+        $isAjax        = $this->request->query->get('ajax', false);
         $form          = null;
         $post          = $this->request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $this->request->server->all();
         $return        = (isset($post['return'])) ? $post['return'] : false;
+
         if (empty($return)) {
             //try to get it from the HTTP_REFERER
             $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
@@ -41,7 +45,7 @@ class PublicController extends CommonFormController
 
         if (!empty($return)) {
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
-            $return = InputHelper::url($return, null, null, null, array('mauticError', 'mauticMessage'), true);
+            $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
             $query  = (strpos($return, '?') === false) ? '?' : '&';
 
         }
@@ -56,34 +60,42 @@ class PublicController extends CommonFormController
 
         //check to ensure there is a formId
         if (!isset($post['formId'])) {
-            $error =  $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
+            $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
         } else {
             $formModel = $this->getModel('form.form');
             $form      = $formModel->getEntity($post['formId']);
 
             //check to see that the form was found
             if ($form === null) {
-                $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
+                $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
                 //get what to do immediately after successful post
                 $postAction         = $form->getPostAction();
                 $postActionProperty = $form->getPostActionProperty();
 
-               //check to ensure the form is published
-                $status = $form->getPublishStatus();
+                //check to ensure the form is published
+                $status             = $form->getPublishStatus();
                 $dateTemplateHelper = $this->get('mautic.helper.template.date');
                 if ($status == 'pending') {
-                    $error = $translator->trans('mautic.form.submit.error.pending', array(
-                        '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())
-                    ), 'flashes');
+                    $error = $translator->trans(
+                        'mautic.form.submit.error.pending',
+                        [
+                            '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())
+                        ],
+                        'flashes'
+                    );
                 } elseif ($status == 'expired') {
-                    $error = $translator->trans('mautic.form.submit.error.expired', array(
-                        '%date%' => $dateTemplateHelper->toFull($form->getPublishDown())
-                    ), 'flashes');
+                    $error = $translator->trans(
+                        'mautic.form.submit.error.expired',
+                        [
+                            '%date%' => $dateTemplateHelper->toFull($form->getPublishDown())
+                        ],
+                        'flashes'
+                    );
                 } elseif ($status != 'published') {
-                    $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
+                    $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
-                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form);
+                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form, $this->request, true);
                     if (!empty($result['errors'])) {
                         if ($messengerMode || $isAjax) {
                             $error = $result['errors'];
@@ -93,44 +105,86 @@ class PublicController extends CommonFormController
                                 implode("</li><li>", $result['errors']).'</li></ol>' : false;
                         }
                     } elseif (!empty($result['callback'])) {
-                        $callback = $result['callback']['callback'];
-                        if (is_callable($callback)) {
-                            if (is_array($callback)) {
-                                $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                            } elseif (strpos($callback, '::') !== false) {
-                                $parts      = explode('::', $callback);
-                                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                            } else {
-                                $reflection= new \ReflectionMethod(null, $callback);
+                        /** @var SubmissionEvent $submissionEvent */
+                        $submissionEvent = $result['callback'];
+
+                        // Return the first Response object if one is defined
+                        $firstResponseObject = false;
+                        if ($callbackResponses = $submissionEvent->getPostSubmitCallbackResponse()) {
+                            // Some submit actions already injected it's responses
+                            foreach ($callbackResponses as $key => $response) {
+                                if ($response instanceof Response) {
+                                    $firstResponseObject = $key;
+                                    break;
+                                }
                             }
+                        }
 
-                            //add the factory to the arguments
-                            $result['callback']['factory'] = $this->factory;
+                        // These submit actions have requested a callback after all is said and done
+                        $callbacksRequested = $submissionEvent->getPostSubmitCallback();
+                        foreach ($callbacksRequested as $key => $callbackRequested) {
+                            $callbackRequested['messengerMode'] = $messengerMode;
+                            $callbackRequested['ajaxMode']      = $isAjax;
 
-                            $pass = array();
-                            $result['callback']['messengerMode'] = $messengerMode;
-                            foreach ($reflection->getParameters() as $param) {
-                                if (isset($result['callback'][$param->getName()])) {
-                                    $pass[] = $result['callback'][$param->getName()];
-                                } else {
-                                    $pass[] = null;
+                            if (isset($callbackRequested['eventName'])) {
+                                $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
+
+                                $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
+                            } elseif (isset($callbackRequested['callback'])) {
+                                // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
+                                $callback = $callbackRequested['callback'];
+                                if (is_callable($callback)) {
+                                    if (is_array($callback)) {
+                                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                                    } elseif (strpos($callback, '::') !== false) {
+                                        $parts      = explode('::', $callback);
+                                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                                    } else {
+                                        $reflection = new \ReflectionMethod(null, $callback);
+                                    }
+
+                                    //add the factory to the arguments
+                                    $callbackRequested['factory'] = $this->factory;
+
+                                    $pass = [];
+                                    foreach ($reflection->getParameters() as $param) {
+                                        if (isset($callbackRequested[$param->getName()])) {
+                                            $pass[] = $callbackRequested[$param->getName()];
+                                        } else {
+                                            $pass[] = null;
+                                        }
+                                    }
+
+                                    $callbackResponses[$key] = $reflection->invokeArgs($this, $pass);
                                 }
                             }
 
-                            $callbackResponse = $reflection->invokeArgs($this, $pass);
-
-                            if (!$messengerMode && !$isAjax) {
-                                return $callbackResponse;
+                            if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
+                                $firstResponseObject = $key;
                             }
                         }
+
+                        if ($firstResponseObject && !$messengerMode && !$isAjax) {
+                            // Return the response given by the sbumit action
+
+                            return $callbackResponses[$firstResponseObject];
+                        }
+                    } elseif (isset($result['submission'])) {
+                        /** @var SubmissionEvent $submissionEvent */
+                        $submissionEvent = $result['submission'];
                     }
                 }
             }
         }
 
+        if (isset($submissionEvent) && !empty($postActionProperty)) {
+            // Replace post action property with tokens to support custom redirects, etc
+            $postActionProperty = $this->replacePostSubmitTokens($postActionProperty, $submissionEvent);
+        }
+
         if ($messengerMode || $isAjax) {
             // Return the call via postMessage API
-            $data = array('success' => 1);
+            $data = ['success' => 1];
             if (!empty($error)) {
                 if (is_array($error)) {
                     $data['validationErrors'] = $error;
@@ -139,22 +193,41 @@ class PublicController extends CommonFormController
                 }
                 $data['success'] = 0;
             } else {
+                // Include results in ajax response for JS callback use
+                if (isset($submissionEvent)) {
+                    $data['results'] = $submissionEvent->getResults();
+                }
+
                 if ($postAction == 'redirect') {
                     $data['redirect'] = $postActionProperty;
                 } elseif (!empty($postActionProperty)) {
-                    $data['successMessage'] = $postActionProperty;
+                    $data['successMessage'] = [$postActionProperty];
                 }
 
-                if (!empty($callbackResponse)) {
-                    if ($callbackResponse instanceof RedirectResponse) {
-                        $data['redirect'] = $callbackResponse->getTargetUrl();
-                    } elseif ($callbackResponse instanceof Response) {
-                        $data['successMessage'] = $callbackResponse->getContent();
-                    } elseif (is_array($callbackResponse)) {
-                        $data = array_merge($data, $callbackResponse);
-                    } else {
-                        $data['successMessage'] = $callbackResponse->getContent();
+                if (!empty($callbackResponses)) {
+                    foreach ($callbackResponses as $key => $response) {
+                        // Convert the responses to something useful for a JS response
+                        if ($response instanceof RedirectResponse && !isset($data['redirect'])) {
+                            $data['redirect'] = $response->getTargetUrl();
+                        } elseif ($response instanceof Response) {
+                            if (!isset($data['successMessage'])) {
+                                $data['successMessage'] = [];
+                            }
+                            $data['successMessage'][] = $response->getContent();
+                        } elseif (is_array($response)) {
+                            $data = array_merge($data, $response);
+                        } elseif (is_string($response)) {
+                            if (!isset($data['successMessage'])) {
+                                $data['successMessage'] = [];
+                            }
+                            $data['successMessage'][] = $response;
+                        } // ignore anything else
                     }
+                }
+
+                // Combine all messages into one
+                if (isset($data['successMessage'])) {
+                    $data['successMessage'] = implode('<br /><br />', $data['successMessage']);
                 }
             }
 
@@ -174,7 +247,8 @@ class PublicController extends CommonFormController
         } else {
             if (!empty($error)) {
                 if ($return) {
-                    $hash = ($form !== null) ? '#' . strtolower($form->getAlias()) : '';
+                    $hash = ($form !== null) ? '#'.strtolower($form->getAlias()) : '';
+
                     return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
                 } else {
                     $msg     = $error;
@@ -200,10 +274,10 @@ class PublicController extends CommonFormController
             $session = $this->get('session');
             $session->set(
                 'mautic.emailbundle.message',
-                array(
+                [
                     'message' => $msg,
                     'type'    => (empty($msgType)) ? 'notice' : $msgType
-                )
+                ]
             );
 
             return $this->redirect($this->generateUrl('mautic_form_postmessage'));
@@ -339,9 +413,13 @@ class PublicController extends CommonFormController
         return $response;
     }
 
+    /**
+     * @return Response
+     */
     public function embedAction()
     {
         $formId = InputHelper::int($this->request->get('id'));
+        /** @var FormModel $model */
         $model = $this->getModel('form');
         $form = $model->getEntity($formId);
 
@@ -349,7 +427,10 @@ class PublicController extends CommonFormController
             $status = $form->getPublishStatus();
             if ($status === 'published') {
                 if ($this->request->get('video')) {
-                    return $this->render('MauticFormBundle:Public:videoembed.html.php', ['form' => $form]);
+                    return $this->render(
+                        'MauticFormBundle:Public:videoembed.html.php',
+                        ['form' => $form, 'fieldSettings' => $model->getCustomComponents()['fields']]
+                    );
                 }
 
                 $content = $model->getContent($form, false, true);
@@ -359,5 +440,22 @@ class PublicController extends CommonFormController
         }
 
         return new Response('', Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * @param $string
+     * @param $submissionEvent
+     */
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
+    {
+        static $tokens = [];
+        if (empty($tokens)) {
+            $tokens = array_merge(
+                $submissionEvent->getTokens(),
+                TokenHelper::findLeadTokens($string, $submissionEvent->getLead()->getProfileFields())
+            );
+        }
+
+        return str_replace(array_keys($tokens), array_values($tokens), $string);
     }
 }

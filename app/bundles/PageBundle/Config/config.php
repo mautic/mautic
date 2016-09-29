@@ -129,8 +129,11 @@ return [
                 'class'       => 'Mautic\PageBundle\EventListener\LeadSubscriber',
                 'arguments' => [
                     'mautic.page.model.page',
-                    'mautic.page.model.video'
-                ]
+                    'mautic.page.model.video',
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory']
+                ],
             ],
             'mautic.page.calendarbundle.subscriber' => [
                 'class' => 'Mautic\PageBundle\EventListener\CalendarSubscriber',

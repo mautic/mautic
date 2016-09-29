@@ -23,9 +23,15 @@ $formId = $form->getId();
                     'target'   => '#formResultTable'
                 ));
                 endif;
-                ?>
-                <th class="col-formresult-id"></th>
-                <?php
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'formresult.'.$formId,
+                    'orderBy'    => 's.id',
+                    'text'       => 'mautic.core.id',
+                    'class'      => 'col-formresult-id',
+                    'filterBy'   => 's.id'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'formresult.'.$formId,
                     'orderBy'    => 's.date_submitted',
@@ -47,7 +53,7 @@ $formId = $form->getId();
                 $fields = $form->getFields();
                 $fieldCount = ($canDelete) ? 4 : 3;
                 foreach ($fields as $f):
-                    if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
+                    if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false)
                         continue;
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'formresult.'.$formId,

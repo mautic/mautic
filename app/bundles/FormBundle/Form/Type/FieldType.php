@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class FieldType extends AbstractType
 {
+    use FormFieldTrait;
 
     /**
      * {@inheritdoc}
@@ -30,11 +32,13 @@ class FieldType extends AbstractType
         $cleanMasks = [
             'labelAttributes'     => 'string',
             'inputAttributes'     => 'string',
-            'containerAttributes' => 'string'
+            'containerAttributes' => 'string',
+            'label'               => 'strict_html',
         ];
 
         $addHelpMessage =
         $addShowLabel =
+        $allowCustomAlias =
         $addDefaultValue =
         $addLabelAttributes =
         $addInputAttributes =
@@ -47,7 +51,7 @@ class FieldType extends AbstractType
         if (!empty($options['customParameters'])) {
             $type = 'custom';
 
-            $customParams    =& $options['customParameters'];
+            $customParams    = $options['customParameters'];
             $formTypeOptions = [
                 'required' => false,
                 'label'    => false
@@ -71,7 +75,8 @@ class FieldType extends AbstractType
                 'addLeadFieldList',
                 'addSaveResult',
                 'addBehaviorFields',
-                'addIsRequired'
+                'addIsRequired',
+                'addHtml'
             ];
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
@@ -82,7 +87,7 @@ class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
+                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -98,10 +103,20 @@ class FieldType extends AbstractType
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    break;
+                case 'pagebreak':
+                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'email':
                     $addBehaviorFields = false;
+                    break;
+                case 'select':
+                    $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
+                    break;
+                case 'checkboxgrp':
+                case 'radiogrp':
+                    $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
             }
         }
@@ -122,68 +137,21 @@ class FieldType extends AbstractType
             ]
         );
 
-        if (!empty($options['customParameters'])) {
-            $builder->add('properties', $customParams['formType'], $formTypeOptions);
-        } else {
-            switch ($type) {
-                case 'select':
-                case 'country':
-                    $builder->add(
-                        'properties',
-                        'formfield_select',
-                        [
-                            'field_type' => $type,
-                            'label'      => false,
-                            'parentData' => $options['data']
-                        ]
-                    );
-                    break;
-                case 'checkboxgrp':
-                case 'radiogrp':
-                    $builder->add(
-                        'properties',
-                        'formfield_group',
-                        [
-                            'label' => false,
-                            'data'  => (isset($options['data']['properties'])) ? $options['data']['properties'] : array()
-                        ]
-                    );
-                    break;
-                case 'freetext':
-                    $builder->add(
-                        'properties',
-                        'formfield_text',
-                        [
-                            'required' => false,
-                            'label'    => false,
-                            'editor'   => true
-                        ]
-                    );
-                    break;
-                case 'date':
-                case 'email':
-                case 'number':
-                case 'tel':
-                case 'text':
-                case 'url':
-                    $builder->add(
-                        'properties',
-                        'formfield_placeholder',
-                        [
-                            'label' => false
-                        ]
-                    );
-                    break;
-                case 'captcha':
-                    $builder->add(
-                        'properties',
-                        'formfield_captcha',
-                        [
-                            'label' => false
-                        ]
-                    );
-                    break;
-            }
+        if ($allowCustomAlias) {
+            $builder->add(
+                'alias',
+                'text',
+                [
+                    'label'      => 'mautic.form.field.form.alias',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.form.alias.tooltip'
+                    ],
+                    'disabled'   => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                    'required'   => false
+                ]
+            );
         }
 
         if ($addShowLabel) {
@@ -389,6 +357,13 @@ class FieldType extends AbstractType
                 'choice',
                 [
                     'choices'    => $options['leadFields'],
+                    'choice_attr' => function($val, $key, $index) use ($options) {
+                        if (!empty($options['leadFieldProperties'][$val]) && (in_array($options['leadFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
+                            return ['data-list-type' => 1];
+                        }
+
+                        return [];
+                    },
                     'label'      => 'mautic.form.field.form.lead_field',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
@@ -431,6 +406,86 @@ class FieldType extends AbstractType
             ]
         );
 
+        // Put properties last so that the other values are available to form events
+        if (!empty($options['customParameters'])) {
+            $builder->add('properties', $customParams['formType'], $formTypeOptions);
+        } else {
+            $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+            switch ($type) {
+                case 'select':
+                case 'country':
+                    $builder->add(
+                        'properties',
+                        'formfield_select',
+                        [
+                            'field_type' => $type,
+                            'label'      => false,
+                            'parentData' => $options['data'],
+                            'data'       => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'checkboxgrp':
+                case 'radiogrp':
+                    $builder->add(
+                        'properties',
+                        'formfield_group',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'freetext':
+                    $builder->add(
+                        'properties',
+                        'formfield_text',
+                        [
+                            'required' => false,
+                            'label'    => false,
+                            'editor'   => true,
+                            'data'     => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'date':
+                case 'email':
+                case 'number':
+                case 'tel':
+                case 'text':
+                case 'url':
+                    $builder->add(
+                        'properties',
+                        'formfield_placeholder',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'captcha':
+                    $builder->add(
+                        'properties',
+                        'formfield_captcha',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'pagebreak':
+                    $builder->add(
+                        'properties',
+                        FormFieldPageBreakType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+            }
+        }
+
         $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
 
         if (!empty($options["action"])) {
@@ -449,7 +504,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setOptional(['customParameters']);
+        $resolver->setOptional(['customParameters', 'leadFieldProperties']);
 
         $resolver->setRequired(['leadFields']);
     }

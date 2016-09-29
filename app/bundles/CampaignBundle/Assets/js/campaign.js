@@ -117,7 +117,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
             if (destroy) {
                 mQuery(chosenOption).tooltip('destroy');
             } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body'});
+                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
             }
         }
     });

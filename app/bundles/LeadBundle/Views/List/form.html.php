@@ -90,7 +90,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
+                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                             $object    = $object;
                                             $list      = json_encode($choices);
                                             $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
@@ -105,8 +105,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
-                            <?php
-                            echo $view['form']->widget($form['filters']); ?>
+                            <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>
                 </div>
