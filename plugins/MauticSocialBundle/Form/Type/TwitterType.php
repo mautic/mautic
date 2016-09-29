@@ -85,12 +85,10 @@ class TwitterType extends AbstractType
         ));
 
         $builder->add('size', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array('medium', 'large'),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'label' => 'mautic.integration.Twitter.share.largesize',
-            'data'  => (!empty($options['data']['size'])) ? $options['data']['size'] : 'medium'
+            'no_value'  => 'medium',
+            'yes_value' => 'large',
+            'label'     => 'mautic.integration.Twitter.share.largesize',
+            'data'      => (!empty($options['data']['size'])) ? $options['data']['size'] : 'medium'
         ));
     }
 

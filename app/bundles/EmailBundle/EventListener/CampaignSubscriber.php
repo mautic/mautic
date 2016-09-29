@@ -86,7 +86,7 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'         => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'associatedActions' => ['email.send'],
         ];
-        $event->addLeadDecision('email.open', $trigger);
+        $event->addDecision('email.open', $trigger);
 
         $action = [
             'label'           => 'mautic.email.campaign.event.send',

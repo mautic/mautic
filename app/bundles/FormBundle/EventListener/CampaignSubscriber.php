@@ -80,19 +80,17 @@ class CampaignSubscriber extends CommonSubscriber
             'description' => 'mautic.form.campaign.event.submit_descr',
             'formType'    => 'campaignevent_formsubmit',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'callback'    => array('\\Mautic\\FormBundle\\Helper\\CampaignEventHelper', 'validateFormSubmit')
         );
-        $event->addLeadDecision('form.submit', $trigger);
+        $event->addDecision('form.submit', $trigger);
 
         $trigger = array(
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => 'campaignevent_form_field_value',
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
-            'callback'    => array('\\Mautic\\FormBundle\\Helper\\CampaignEventHelper', 'validateFormValue'),
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION
         );
-        $event->addLeadCondition('form.field_value', $trigger);
+        $event->addCondition('form.field_value', $trigger);
     }
 
     /**

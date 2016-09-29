@@ -11,16 +11,9 @@ $defaultInputClass = $containerType = 'hidden';
 
 include __DIR__.'/field_helper.php';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'       => $id,
-        'formId'   => $formId,
-        'formName' => $formName
-    ]) : '';
-
 if (!empty($inForm)):
 $html = <<<HTML
-<div $containerAttr>$formButtons
+<div $containerAttr>
     <label class="text-muted">{$field['label']}</label>
 </div>
 HTML;

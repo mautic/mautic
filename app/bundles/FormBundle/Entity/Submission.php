@@ -284,7 +284,7 @@ class Submission
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead ()
     {

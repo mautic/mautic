@@ -9,20 +9,18 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SortableListType
- *
- * @deprecated Use DynamicListType instead
  */
 class SortableListType extends AbstractType
 {
@@ -32,55 +30,52 @@ class SortableListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('list', 'collection', array(
-            'label'        => false,
-            'options'      => array(
-                'label'    => false,
-                'required' => false,
-                'attr'     => array(
-                    'class'         => 'form-control',
-                    'preaddon'      => $options['remove_icon'],
-                    'preaddon_attr' => array(
-                        'onclick' => $options['remove_onclick']
-                    ),
-                    'postaddon'     => $options['sortable']
-                ),
-                'constraints' => ($options['option_notblank']) ? array(
-                    new NotBlank(
-                        array('message' => 'mautic.form.lists.notblank')
-                    )
-                ) : array(),
-                'error_bubbling' => true
-            ),
-            'allow_add'    => true,
-            'allow_delete' => true,
-            'prototype'    => true,
-            'constraints'  => ($options['option_required']) ? array(
-                new Count(array(
+        $constraints = ($options['option_required']) ? [
+            new Count(
+                [
                     'minMessage' => 'mautic.form.lists.count',
                     'min'        => 1
-                ))
-            ) : array(),
-            'error_bubbling' => false
-        ));
+                ]
+            )
+        ] : [];
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use($options) {
-            // remove empty options
-            $data = $event->getData();
-            if (isset($data['list']) && $options['option_notblank']) {
-                $data['list'] = array_filter($data['list']);
-                $event->setData($data);
-            }
-        });
+        if ($options['constraint_callback'] instanceof Callback) {
+            $constraints[] = $options['constraint_callback'];
+        }
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            //reorder list in case keys were dynamically removed
-            $data = $event->getData();
-            if (isset($data['list'])) {
-                $data['list'] = array_values($data['list']);
-                $event->setData($data);
-            }
-        });
+        $builder->add(
+            $builder->create(
+                'list',
+                'collection',
+                [
+                    'label'          => false,
+                    'entry_type'     => ($options['with_labels']) ? SortableValueLabelListType::class : 'text',
+                    'options'        => [
+                        'label'          => false,
+                        'required'       => false,
+                        'attr'           => [
+                            'class'         => 'form-control',
+                            'preaddon'      => $options['remove_icon'],
+                            'preaddon_attr' => [
+                                'onclick' => $options['remove_onclick']
+                            ],
+                            'postaddon'     => $options['sortable']
+                        ],
+                        'constraints'    => ($options['option_notblank']) ? [
+                            new NotBlank(
+                                ['message' => 'mautic.form.lists.notblank']
+                            )
+                        ] : [],
+                        'error_bubbling' => true
+                    ],
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
+                    'prototype'      => true,
+                    'constraints'    => $constraints,
+                    'error_bubbling' => false,
+                ]
+            )
+        )->addModelTransformer(new SortableListTransformer($options['option_notblank']));
     }
 
     /**
@@ -94,23 +89,29 @@ class SortableListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'remove_onclick'  => 'Mautic.removeFormListOption(this);',
-            'option_required' => true,
-            'option_notblank' => true,
-            'remove_icon'     => 'fa fa-times',
-            'sortable'        => 'fa fa-ellipsis-v handle'
-        ));
+        $resolver->setDefaults(
+            [
+                'remove_onclick'      => 'Mautic.removeFormListOption(this);',
+                'option_required'     => true,
+                'option_notblank'     => true,
+                'constraint_callback' => false,
+                'remove_icon'         => 'fa fa-times',
+                'sortable'            => 'fa fa-ellipsis-v handle',
+                'with_labels'         => false,
+            ]
+        );
 
-        $resolver->setOptional(array(
-            'sortable',
-            'remove_onclick',
-            'option_required',
-            'option_notblank',
-            'remove_icon'
-        ));
+        $resolver->setDefined(
+            [
+                'sortable',
+                'remove_onclick',
+                'option_required',
+                'option_notblank',
+                'remove_icon'
+            ]
+        );
     }
 
     /**
