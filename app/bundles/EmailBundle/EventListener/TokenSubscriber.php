@@ -108,7 +108,10 @@ class TokenSubscriber extends CommonSubscriber
         $groupNum = 0;
 
         foreach ($filter as $key => $data) {
-            if (!array_key_exists($data['field'], $lead)) {
+            $isCompanyField = (strpos($data['field'], 'company') === 0 && $data['field'] !== 'company');
+            $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
+
+            if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
                 continue;
             }
 
@@ -131,7 +134,7 @@ class TokenSubscriber extends CommonSubscriber
                 continue;
             }
 
-            $leadVal   = $lead[$data['field']];
+            $leadVal   = $isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']];
             $filterVal = $data['filter'];
 
             if (!is_array($filterVal) && in_array($data['type'], ['number', 'boolean'])) {
