@@ -395,6 +395,7 @@ class LeadController extends FormController
      */
     public function newAction()
     {
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity();
 
