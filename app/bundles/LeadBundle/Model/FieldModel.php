@@ -212,6 +212,7 @@ class FieldModel extends FormModel
         ],
         'companyname'            => [
             'fixed' => true,
+            'required' =>true,
             'object'=> 'company'
         ],
         'companywebsite'          => [

@@ -116,13 +116,10 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                         </div>
                                     </div>
                                     <hr class="mnr-md mnl-md">
-
-                                    <?php if (isset($form['company']) || isset($form['position'])): ?>
                                         <div class="form-group mb-0">
-                                            <label
-                                                class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.company'); ?></label>
+                                            <label><?php echo $view['translator']->trans('mautic.company.company'); ?></label>
                                             <div class="row">
-                                                <?php if (isset($form['company'])): ?>
+                                                <?php if (isset($form['companies'])): ?>
                                                     <div class="col-sm-4">
                                                         <?php echo $view['form']->widget($form['companies']); ?>
                                                     </div>
@@ -135,7 +132,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                             </div>
                                         </div>
                                         <hr class="mnr-md mnl-md">
-                                    <?php endif; ?>
+
                                     <?php if (isset($form['address1']) || isset($form['address2']) || isset($form['city']) || isset($form['state']) || isset($form['zipcode']) || isset($form['country'])): ?>
                                         <div class="form-group mb-0">
                                             <label
@@ -200,6 +197,12 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 <div class="form-group mb-0">
                                     <div class="row">
                                         <?php foreach ($groupFields as $alias => $field): ?>
+                                            <?php
+                                            if ($alias == 'company'):?><?php
+                                                unset($form[$alias]);
+                                                continue;
+                                                ?>
+                                                <?php endif; ?>
                                             <?php if ($form[$alias]->isRendered()) continue; ?>
                                             <div class="col-sm-8">
                                                 <?php echo $view['form']->row($form[$alias]); ?>

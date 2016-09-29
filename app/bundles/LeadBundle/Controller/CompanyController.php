@@ -150,6 +150,7 @@ class CompanyController extends FormController
 
         $action         = $this->generateUrl('mautic_company_action', array('objectAction' => 'new'));
 
+
         $updateSelect = ($this->request->getMethod() == 'POST')
             ? $this->request->request->get('company[updateSelect]', false, true)
             : $this->request->get(
@@ -174,6 +175,8 @@ class CompanyController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = array('page' => $page);
+        $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
+        $template  = 'MauticLeadBundle:Company:index';
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -191,11 +194,10 @@ class CompanyController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
                     $this->addFlash(
                         'mautic.core.notice.created',
                         array(
-                            '%name%'      => $identifier,
+                            '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_company_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
@@ -215,9 +217,6 @@ class CompanyController extends FormController
                         return $this->editAction($entity->getId(), true);
                     }
                 }
-            } else {
-                $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'MauticLeadBundle:Company:index';
             }
 
             $passthrough = [
@@ -530,12 +529,11 @@ class CompanyController extends FormController
 
             $model->deleteEntity($entity);
 
-            $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[]  = array(
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
-                    '%name%' => $identifier,
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId
                 )
             );
