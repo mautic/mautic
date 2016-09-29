@@ -157,7 +157,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         if (isset($this->types[$type]['constraints'])) {
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
                 //don't check empty values unless the constraint is NotBlank
-                if (strpos($constraint, 'NotBlank') === false && empty($value)) {
+                if (NotBlank::class === $constraint && empty($value)) {
                     continue;
                 }
 
@@ -165,7 +165,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
                         // Used as a honeypot
-                        continue;
+                        $captcha = '';
                     } elseif (Blank::class === $constraint) {
                         continue;
                     }
