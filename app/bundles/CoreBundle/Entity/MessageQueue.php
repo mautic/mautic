@@ -56,7 +56,7 @@ class MessageQueue
     /**
      * @var int
      */
-    private $maxAttempts = 1;
+    private $maxAttempts = 3;
 
     /**
      * @var int

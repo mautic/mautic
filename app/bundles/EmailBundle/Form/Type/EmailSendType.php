@@ -147,34 +147,42 @@ class EmailSendType extends AbstractType
                 ]
             );
             if (!empty($options['with_email_types'])) {
+                $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
                     'priority',
                     'choice',
-                    array(
-                        'choices' => [
-                            '2' => 'mautic.core.message.send.priority.normal',
-                            '1' => 'mautic.core.message.send.priority.high'
+                    [
+                        'choices'     => [
+                            2 => 'mautic.core.message.send.priority.normal',
+                            1 => 'mautic.core.message.send.priority.high'
                         ],
-                        'label' => 'mautic.core.message.send.priority',
-                        'required' => false,
-                        'attr' => array(
-                            'class' => 'form-control',
-                            'tooltip' => 'mautic.core.message.send.priority.tooltip'
-                        )
-                    )
+                        'label'       => 'mautic.core.message.send.priority',
+                        'required'    => false,
+                        'attr'        => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.core.message.send.priority.tooltip',
+                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}'
+                        ],
+                        'data'        => $data,
+                        'empty_value' => false
+                    ]
                 );
 
+                $data = (!isset($options['data']['attempts'])) ? 3 : (int) $options['data']['attempts'];
                 $builder->add(
                     'attempts',
-                    'text',
-                    array(
-                        'label' => 'mautic.core.message.send.attempts',
-                        'required' => true,
-                        'attr' => array(
-                            'class' => 'form-control',
-                            'tooltip' => 'mautic.core.message.send.attempts.tooltip'
-                        )
-                    )
+                    'number',
+                    [
+                        'label'      => 'mautic.core.message.send.attempts',
+                        'attr'       => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.core.message.send.attempts.tooltip',
+                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                        ],
+                        'data'       => $data,
+                        'empty_data' => 0,
+                        'required'   => false
+                    ]
                 );
             }
         }

@@ -771,22 +771,3 @@ Mautic.convertDynamicContentFilterInput = function(el) {
         Mautic.activateChosenSelect(filterEl);
     }
 };
-
-Mautic.campaignEventOnLoad = function(container, response) {
-    var emailTypeBtns = mQuery('input.email-type');
-    if (emailTypeBtns.length) {
-        Mautic.toggleMessageQueueFields();
-        emailTypeBtns.on('change', function() {
-            Mautic.toggleMessageQueueFields();
-        });
-    }
-}
-
-Mautic.toggleMessageQueueFields = function() {
-    val = mQuery('input.email-type:checked').val();
-    if (val === 'marketing') {
-        mQuery('#priority, #attempts').show();
-    } else {
-        mQuery('#priority, #attempts').hide();
-    }
-};
