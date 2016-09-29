@@ -384,6 +384,10 @@ return [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
             ],
+            'mautic.model.factory'                      => [
+                'class'     => 'Mautic\CoreBundle\Factory\ModelFactory',
+                'arguments' => 'service_container',
+            ],
             'mautic.templating.name_parser'       => [
                 'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
                 'arguments' => 'kernel',

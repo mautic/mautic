@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 
@@ -95,22 +96,36 @@ class LeadSubscriber extends CommonSubscriber
 
                 if (!empty($hit['source'])) {
                     if ($channelModel = $this->getChannelModel($hit['source'])) {
+                        if ($channelModel instanceof ChannelTimelineInterface) {
+                            if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $hit)) {
+                                $template = $overrideTemplate;
+                            }
+
+                            if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $hit)) {
+                                $eventTypeName = $overrideEventTypeName;
+                            }
+
+                            if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $hit)) {
+                                $icon = $overrideIcon;
+                            }
+                        }
+
+                        /** @deprecated - BC support to be removed in 3.0 */
                         // Allow a custom template if applicable
                         if (method_exists($channelModel, 'getPageHitLeadTimelineTemplate')) {
                             $template = $channelModel->getPageHitLeadTimelineTemplate($hit);
                         }
-
                         if (method_exists($channelModel, 'getPageHitLeadTimelineLabel')) {
                             $eventTypeName = $channelModel->getPageHitLeadTimelineLabel($hit);
                         }
-
                         if (method_exists($channelModel, 'getPageHitLeadTimelineIcon')) {
                             $icon = $channelModel->getPageHitLeadTimelineIcon($hit);
                         }
+                        /** end deprecation */
 
                         if (!empty($hit['sourceId'])) {
                             if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
-                                $hit['sourceName'] = $source['name'];
+                                $hit['sourceName']  = $source['name'];
                                 $hit['sourceRoute'] = $source['url'];
                             }
                         }
