@@ -72,7 +72,7 @@ class EmailSendType extends AbstractType
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
+                        'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                         'onClick' => 'Mautic.useMessageQueue(this.value)'
                     ],
