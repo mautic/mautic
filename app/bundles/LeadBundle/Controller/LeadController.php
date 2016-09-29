@@ -558,6 +558,7 @@ class LeadController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity($objectId);
 

@@ -17,6 +17,15 @@ namespace Mautic\EmailBundle;
  */
 final class EmailEvents
 {
+    /**
+     * The mautic.email_token_replacement event is thrown right before the content is returned.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
 
     /**
      * The mautic.email_on_open event is dispatched when an email is opened

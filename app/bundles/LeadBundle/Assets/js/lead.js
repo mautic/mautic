@@ -308,6 +308,7 @@ Mautic.leadlistPopulateChoices = function(el) {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operator = mQuery(el).val();
+    console.log(el);
     // Extract the filter number
     var regExp    = /leadlist_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
