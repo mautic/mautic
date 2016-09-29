@@ -1713,7 +1713,7 @@ class LeadModel extends FormModel
             }
         }
 
-        $this->companyModel->addLeadToCompany($companies,$lead,true, false, 1, null, true);
+        $this->companyModel->addLeadToCompany($companies, $lead, true);
     }
 
     /**

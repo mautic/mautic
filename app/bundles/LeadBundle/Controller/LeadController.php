@@ -650,10 +650,7 @@ class LeadController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
-
-                    if (!empty($companies)) {
-                        $model->modifyCompanies($lead,$companies);
-                    }
+                    $model->modifyCompanies($lead,$companies);
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();

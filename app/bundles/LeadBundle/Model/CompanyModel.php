@@ -114,7 +114,7 @@ class CompanyModel extends CommonFormModel
 
         return parent::getEntity($id);
     }
-    
+
     /**
      *
      * @return mixed
@@ -122,7 +122,7 @@ class CompanyModel extends CommonFormModel
     public function getUserCompanies()
     {
         $user  = (!$this->security->isGranted('lead:leads:viewother')) ?
-            $this->factory->getUser() : false;
+            $this->user : false;
         $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
         return $companies;
@@ -381,6 +381,7 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
+
         $companyLeadRemove = array();
         if (!$companies instanceof Company) {
             //make sure they are ints
@@ -482,6 +483,4 @@ class CompanyModel extends CommonFormModel
 
         unset($lead, $deleteCompany, $persistCompany, $companies);
     }
-
-
 }
