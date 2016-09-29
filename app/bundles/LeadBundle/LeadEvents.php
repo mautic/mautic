@@ -58,6 +58,15 @@ final class LeadEvents
     const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
 
     /**
+     * The mautic.lead_company_change event is dispatched if a lead's company changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadCompanyChange instance.
+     *
+     * @var string
+     */
+    const LEAD_COMPANY_CHANGE   = 'mautic.lead_company_change';
+    /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a
@@ -297,4 +306,67 @@ final class LeadEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
+
+    /**
+     * The mautic.company_pre_save event is thrown right before a form is persisted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_PRE_SAVE = 'mautic.company_pre_save';
+
+    /**
+     * The mautic.company_post_save event is thrown right after a form is persisted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_POST_SAVE = 'mautic.company_post_save';
+
+    /**
+     * The mautic.company_pre_delete event is thrown before a form is deleted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_PRE_DELETE = 'mautic.company_pre_delete';
+
+    /**
+     * The mautic.company_post_delete event is thrown after a form is deleted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.company_on_build event is thrown before displaying the company builder form to allow adding of custom actions
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyBuilderEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_ON_BUILD = 'mautic.company_on_build';
+
+    /**
+     * The mautic.company_on_action event is thrown to execute a company action
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyActionEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_ON_ACTION = 'mautic.company_on_action';
+    /**
+     * The mautic.company.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_COMPANY_ACTION = 'mautic.company.on_campaign_trigger_action';
 }

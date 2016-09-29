@@ -29,6 +29,8 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -79,9 +81,15 @@ class SubmissionModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-     * @var LeadFieldModel
-     */
+    * @var LeadFieldModel
+    */
     protected $leadFieldModel;
+
+    /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
 
     /**
      * @var FormFieldHelper
@@ -108,15 +116,18 @@ class SubmissionModel extends CommonFormModel
         LeadModel $leadModel,
         CampaignModel $campaignModel,
         LeadFieldModel $leadFieldModel,
+        CompanyModel $companyModel,
         FormFieldHelper $fieldHelper
-    ) {
-        $this->ipLookupHelper   = $ipLookupHelper;
+    )
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
         $this->templatingHelper = $templatingHelper;
-        $this->formModel        = $formModel;
-        $this->pageModel        = $pageModel;
-        $this->leadModel        = $leadModel;
-        $this->campaignModel    = $campaignModel;
-        $this->leadFieldModel   = $leadFieldModel;
+        $this->formModel = $formModel;
+        $this->pageModel = $pageModel;
+        $this->leadModel = $leadModel;
+        $this->campaignModel = $campaignModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->companyModel = $companyModel;
         $this->fieldHelper      = $fieldHelper;
     }
 

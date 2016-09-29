@@ -32,7 +32,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress", "tagList");
     }
 
     /**
@@ -319,6 +319,11 @@ class LeadApiController extends CommonApiController
             unset($parameters['tags']);
         }
 
+        if (isset($parameters['companies'])) {
+            $this->model->modifyCompanies($entity, $parameters['companies']);
+            unset($parameters['companies']);
+        }
+
         // Check for lastActive date
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
@@ -369,3 +374,4 @@ class LeadApiController extends CommonApiController
         }
     }
 }
+

@@ -330,7 +330,6 @@ class FieldType extends AbstractType
         }
 
         if ($addLeadFieldList) {
-
             if (!isset($options['data']['leadField'])) {
                 switch ($type) {
                     case 'email':
