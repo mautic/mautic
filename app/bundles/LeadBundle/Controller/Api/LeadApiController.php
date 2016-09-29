@@ -32,7 +32,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress", "tagList");
     }
 
     /**

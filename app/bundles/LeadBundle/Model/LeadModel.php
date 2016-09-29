@@ -17,8 +17,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -328,9 +326,9 @@ class LeadModel extends FormModel
         $companyFieldMatches = [];
         $fields = $entity->getFields();
         $updatedFields = $entity->getUpdatedFields();
+
         if (isset($updatedFields['company'])) {
-            $entity->addUpdatedField('company', null);
-            //$this->logger->error('Entity Save: Could not identify or create company, please provide  city and country fields for exact matches' . $updatedFields['company']);
+            $companyFieldMatches['company'] = $updatedFields['company'];
         }
 
         //check to see if we can glean information from ip address
@@ -357,13 +355,18 @@ class LeadModel extends FormModel
         }
 
         if (!empty($companyFieldMatches)) {
-            $company = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
-            if ($company[1]) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[1]);
+            list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            if ($leadAdded) {
+                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company->getName(), $company->getId());
             }
         }
 
         parent::saveEntity($entity, $unlock);
+
+        if (!empty($company)) {
+            // Save after the lead in for new leads created through the API and maybe other places
+            $this->companyModel->addLeadToCompany($company, $entity, true);
+        }
     }
 
     /**
@@ -1710,12 +1713,18 @@ class LeadModel extends FormModel
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
         foreach ($leadCompanies as $key => $leadCompany) {
-                if (array_search($leadCompany['company_id'], $companies) === false) {
-                    $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
-                }
+            if (array_search($leadCompany['company_id'], $companies) === false) {
+                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
+            }
         }
 
-        $this->companyModel->addLeadToCompany($companies,$lead,true, false, 1, null, true);
+        if (count($companies)) {
+            $this->companyModel->addLeadToCompany($companies, $lead, true);
+        } else {
+            // update the lead's company name to nothing
+            $lead->addUpdatedField('company', '');
+            $this->getRepository()->saveEntity($lead);
+        }
     }
 
     /**

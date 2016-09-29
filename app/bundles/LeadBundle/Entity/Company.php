@@ -33,23 +33,19 @@ class Company extends FormEntity
     private $id;
 
     /**
-     * @var ArrayCollection
-     */
-    private $leads;
-
-
-    /**
      * Used by Mautic to populate the fields pulled from the DB
      *
      * @var array
      */
     protected $fields = [];
+
     /**
      * Just a place to store updated field values so we don't have to loop through them again comparing
      *
      * @var array
      */
     private $updatedFields = [];
+
     /**
      * @var \Mautic\UserBundle\Entity\User
      */
@@ -63,13 +59,6 @@ class Company extends FormEntity
     }
 
     /**
-     * Construct
-     */
-    public function __construct()
-    {
-        $this->leads = new ArrayCollection();
-    }
-    /**
      * @param $name
      *
      * @return bool
@@ -78,6 +67,7 @@ class Company extends FormEntity
     {
         return $this->getFieldValue(strtolower($name));
     }
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -90,16 +80,6 @@ class Company extends FormEntity
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
             ->generatedValue()
-            ->build();
-
-        $builder->createManyToMany('leads', 'Mautic\LeadBundle\Entity\Lead')
-            ->setJoinTable('company_leads_xref')
-            ->addInverseJoinColumn('lead_id', 'id', false)
-            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
@@ -118,7 +98,7 @@ class Company extends FormEntity
             ->addListProperties(
                 array(
                     'id',
-                    'leads'
+                    'fields'
                 )
             )
             ->build();
@@ -202,48 +182,6 @@ class Company extends FormEntity
         return $this->fields;
     }
 
-
-    /**
-     * Add lead
-     *
-     * @param                                    $key
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
-     * @return Company
-     */
-    public function addLead ($key, Lead $lead)
-    {
-        $action     = ($this->leads->contains($lead)) ? 'updated' : 'added';
-        $leadEntity = $lead->getLead();
-
-        $this->changes['leads'][$action][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-        $this->leads[$key]                                     = $lead;
-
-        return $this;
-    }
-
-    /**
-     * Remove lead
-     *
-     * @param Lead $lead
-     */
-    public function removeLead (Lead $lead)
-    {
-        $leadEntity                                              = $lead->getLead();
-        $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
-        $this->leads->removeElement($lead);
-    }
-
-    /**
-     * Get leads
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLeads ()
-    {
-        return $this->leads;
-    }
-
     /**
      * Get name
      *
@@ -255,9 +193,9 @@ class Company extends FormEntity
 
             return $this->updatedFields['companyname'];
         }
-        if (!empty($this->fields['companyname']['value'])) {
+        if (!empty($this->fields['core']['companyname']['value'])) {
 
-            return $this->fields['companyname']['value'];
+            return $this->fields['core']['companyname']['value'];
         }
 
         return '';

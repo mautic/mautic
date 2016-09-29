@@ -391,7 +391,7 @@ class CompanyRepository extends CommonRepository
             $q->setParameter('user', $user->getId());
         }
 
-        $q->orderBy('comp.id', 'DESC');
+        $q->orderBy('comp.companyname', 'ASC');
 
         $results = $q->execute()->fetchAll();
 

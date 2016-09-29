@@ -36,37 +36,35 @@ class IdentifyCompanyHelper
      * @param array $parameters
      * @param Lead $lead
      * @param CompanyModel $companyModel
-     * @return mixed
+     * @return array
      *
      */
     static public function identifyLeadsCompany ($parameters = array(), Lead $lead, CompanyModel $companyModel)
     {
         $companyName = $companyDomain = null;
-        $leadAdded = false;
+        $leadAdded   = false;
 
         if (isset($parameters['company'])) {
-            $companyName = filter_var($parameters['company'], FILTER_SANITIZE_SPECIAL_CHARS);
-        } elseif(isset($parameters['email'])) {
-            $companyName = $companyDomain = IdentifyCompanyHelper::domain_exists($parameters['email']);
+            $companyName = filter_var($parameters['company'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        } elseif (isset($parameters['email'])) {
+            $companyName = $companyDomain = IdentifyCompanyHelper::domainExists($parameters['email']);
         }
-        if ($companyName and isset($parameters['city']) and isset($parameters['country'])) {
+
+        if ($companyName) {
             $companyRepo = $companyModel->getRepository();
 
-            $city = $parameters['city'];
-            $country = $parameters['country'];
-            $state = null;
+            $city    = isset($parameters['city']) ? $parameters['city'] : null;
+            $country = isset($parameters['country']) ? $parameters['country'] : null;
+            $state   = isset($parameters['state']) ? $parameters['state'] : null;
 
-            if (isset($parameters['state'])) {
-                $state = $parameters['state'];
-            }
             $company = $companyRepo->identifyCompany($companyName, $city, $country, $state);
+
             if (!empty($company)) {
                 //check if lead is already assigned to company
                 $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(),$company[0]['id']))) {
-                    $companyLeadRepo->getCompaniesByLeadId($lead->getId(),$company[0]['id']);
+                if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']))) {
+                    $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']);
                     $company = $companyModel->getEntity($company[0]['id']);
-                    $companyModel->addLeadToCompany($company,$lead);
                     $leadAdded = true;
                 }
             } else {
@@ -78,18 +76,24 @@ class IdentifyCompanyHelper
                     'companystate'   => $state,
                     'companycountry' => $country
                 ];
-                $entity = $companyModel->getEntity();
-                $companyModel->setFieldValues($entity, $companyData, true);
-                $companyModel->saveEntity($entity);
-                $companyModel->addLeadToCompany($entity,$lead);
+                $company  = $companyModel->getEntity();
+                $companyModel->setFieldValues($company, $companyData, true);
+                $companyModel->saveEntity($company);
                 $leadAdded = true;
             }
+
             return [$company, $leadAdded];
         }
-        return false;
+
+        return [null, false];
     }
 
-    private function domain_exists($email){
+    /**
+     * @param $email
+     *
+     * @return mixed
+     */
+    private function domainExists($email){
         list($user, $domain) = explode('@', $email);
         $arr= dns_get_record($domain,DNS_MX);
         if($arr[0]['host']==$domain&&!empty($arr[0]['target'])){

@@ -35,13 +35,14 @@ class Version20160926182807 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql        = <<<SQL
-insert into {$this->prefix}companies (companyname) SELECT DISTINCT TRIM(company) from {$this->prefix}leads where company IS NOT NULL and company <> ''
+insert into {$this->prefix}companies (companyname, is_published) SELECT DISTINCT TRIM(company), 1 from {$this->prefix}leads where company IS NOT NULL and company <> ''
 SQL;
 
         $this->addSql($sql);
 
+        $now = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
         $sql        = <<<SQL
-insert into {$this->prefix}companies_leads (company_id, lead_id) SELECT c.id, l.id from {$this->prefix}leads l join {$this->prefix}companies c on c.companyname = l.company
+insert into {$this->prefix}companies_leads (company_id, lead_id, date_added, manually_added, manually_removed) SELECT c.id, l.id, '$now', 0, 0 from {$this->prefix}leads l join {$this->prefix}companies c on c.companyname = l.company
 SQL;
 
         $this->addSql($sql);

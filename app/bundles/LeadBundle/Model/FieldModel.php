@@ -44,6 +44,10 @@ class FieldModel extends FormModel
             'short' => true,
             'object'=> 'lead'
         ],
+        'company'          => [
+            'fixed' => true,
+            'object'=> 'lead'
+        ],
         'position'         => [
             'fixed' => true,
             'object'=> 'lead'
@@ -170,7 +174,7 @@ class FieldModel extends FormModel
         ],
         'companyindustry'  => [
             'type'       => 'lookup',
-            'properties' => ['list' => 'Construction|Manufacturing|Wholesale|Finance|Healthcare|Education|Government|Other,'],
+            'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
             'fixed'      => true,
             'object'     => 'company'
         ],
@@ -225,8 +229,9 @@ class FieldModel extends FormModel
             'fixed' => true,
             'object'=> 'company'
         ],
-        'companynumberOfEmployees' => [
+        'companynumber_of_employees' => [
             'type'       => 'number',
+            'properties' => ['roundmode' => 4, 'precision' => 0],
             'fixed' => true,
             'group' => 'other',
             'object'=> 'company'
@@ -237,7 +242,7 @@ class FieldModel extends FormModel
             'group' => 'other',
             'object'   => 'company'
         ],
-        'companyannualRevenue'      => [
+        'companyannual_revenue'      => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,

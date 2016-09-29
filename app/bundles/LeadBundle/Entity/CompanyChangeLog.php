@@ -81,6 +81,10 @@ class CompanyChangeLog
             ->columnName('action_name')
             ->build();
 
+        $builder->createField('company', 'integer')
+            ->columnName('company_id')
+            ->build();
+
         $builder->addDateAdded();
     }
 

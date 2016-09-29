@@ -114,7 +114,7 @@ class CompanyModel extends CommonFormModel
 
         return parent::getEntity($id);
     }
-    
+
     /**
      *
      * @return mixed
@@ -122,7 +122,7 @@ class CompanyModel extends CommonFormModel
     public function getUserCompanies()
     {
         $user  = (!$this->security->isGranted('lead:leads:viewother')) ?
-            $this->factory->getUser() : false;
+            $this->user : false;
         $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
         return $companies;
@@ -236,6 +236,9 @@ class CompanyModel extends CommonFormModel
     */
     public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $batchProcess = false, $searchCompanyLead = 1, $dateManipulated = null)
     {
+        // Primary company name to be peristed to the lead's contact company field
+        $companyName = '';
+
         if ($dateManipulated == null) {
             $dateManipulated = new \DateTime();
         }
@@ -247,6 +250,7 @@ class CompanyModel extends CommonFormModel
             $leadId = $lead->getId();
         }
 
+        /** @var Company[] $companyLeadAdd */
         $companyLeadAdd = array();
         if (!$companies instanceof Company) {
             //make sure they are ints
@@ -322,6 +326,8 @@ class CompanyModel extends CommonFormModel
 
                     $persistLists[]   = $companyLead;
                     $dispatchEvents[] = $companyId;
+                    $companyName = $companyLeadAdd[$companyId]->getName();
+
                 } else {
                     // Detach from Doctrine
                     $this->em->detach($companyLead);
@@ -337,6 +343,7 @@ class CompanyModel extends CommonFormModel
 
                 $persistCompany[]   = $companyLead;
                 $dispatchEvents[] = $companyId;
+                $companyName = $companyLeadAdd[$companyId]->getName();
             }
         }
 
@@ -346,6 +353,14 @@ class CompanyModel extends CommonFormModel
 
         // Clear CompanyLead entities from Doctrine memory
         $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
+
+        if (!empty($companyName)) {
+            $currentCompanyName  = $lead->getCompany();
+            if ($currentCompanyName !== $companyName) {
+                $lead->addUpdatedField('company', $companyName);
+                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            }
+        }
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -381,6 +396,7 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
+
         $companyLeadRemove = array();
         if (!$companies instanceof Company) {
             //make sure they are ints
@@ -482,6 +498,4 @@ class CompanyModel extends CommonFormModel
 
         unset($lead, $deleteCompany, $persistCompany, $companies);
     }
-
-
 }
