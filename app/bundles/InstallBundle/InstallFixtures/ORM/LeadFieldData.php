@@ -61,6 +61,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             $entity->setOrder($order);
             $entity->setAlias($alias);
             $entity->setType($type);
+            $entity->setObject($field['object']);
             $entity->setIsUniqueIdentifer(!empty($field['unique']));
             $entity->setProperties(isset($field['properties']) ? $field['properties'] : []);
             $entity->setIsFixed(!empty($field['fixed']));
