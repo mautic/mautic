@@ -1713,7 +1713,13 @@ class LeadModel extends FormModel
             }
         }
 
-        $this->companyModel->addLeadToCompany($companies, $lead, true);
+        if (count($companies)) {
+            $this->companyModel->addLeadToCompany($companies, $lead, true);
+        } else {
+            // update the lead's company name to nothing
+            $lead->addUpdatedField('company', '');
+            $this->getRepository()->saveEntity($lead);
+        }
     }
 
     /**
