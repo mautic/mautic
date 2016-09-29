@@ -17,8 +17,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -1710,9 +1708,9 @@ class LeadModel extends FormModel
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
         foreach ($leadCompanies as $key => $leadCompany) {
-                if (array_search($leadCompany['company_id'], $companies) === false) {
-                    $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
-                }
+            if (array_search($leadCompany['company_id'], $companies) === false) {
+                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
+            }
         }
 
         $this->companyModel->addLeadToCompany($companies,$lead,true, false, 1, null, true);

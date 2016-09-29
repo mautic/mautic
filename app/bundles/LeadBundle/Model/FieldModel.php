@@ -225,8 +225,9 @@ class FieldModel extends FormModel
             'fixed' => true,
             'object'=> 'company'
         ],
-        'companynumberOfEmployees' => [
+        'companynumber_of_employees' => [
             'type'       => 'number',
+            'properties' => ['roundmode' => 4, 'precision' => 0],
             'fixed' => true,
             'group' => 'other',
             'object'=> 'company'
@@ -237,7 +238,7 @@ class FieldModel extends FormModel
             'group' => 'other',
             'object'   => 'company'
         ],
-        'companyannualRevenue'      => [
+        'companyannual_revenue'      => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,

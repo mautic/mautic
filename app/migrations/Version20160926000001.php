@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20160912000000 extends AbstractMauticMigration
+class Version20160926000001 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
@@ -38,7 +38,6 @@ class Version20160912000000 extends AbstractMauticMigration
 CREATE TABLE {$this->prefix}lead_companies_change_log (
   id int(11) AUTO_INCREMENT NOT NULL,
   lead_id int(11) NOT NULL,
-  company_id int(11) NOT NULL,
   type tinytext NOT NULL,
   event_name varchar(255) NOT NULL,
   action_name varchar(255) NOT NULL,
@@ -48,6 +47,11 @@ CREATE TABLE {$this->prefix}lead_companies_change_log (
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
+
+        $leadFk = $this->generatePropertyName('lead_companies_change_log', 'fk', ['lead_id']);
+        $leadIdx = $this->generatePropertyName('lead_companies_change_log', 'idx', ['lead_id']);
+        $this->addSql("ALTER TABLE {$this->prefix}lead_companies_change_log ADD CONSTRAINT $leadFk FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE");
+        $this->addSql("CREATE INDEX $leadIdx ON {$this->prefix}lead_companies_change_log (lead_id)");
 
     }
 }
