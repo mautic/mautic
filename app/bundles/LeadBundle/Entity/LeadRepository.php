@@ -974,4 +974,22 @@ class LeadRepository extends CommonRepository
 
         return $result;
     }
+
+    /**
+     * Gets Do Not Contact Status for Specified Contact
+     *
+     * @param  integer $id
+     *
+     * @return array|false
+     */
+    public function getDoNotEmail($id)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('date_added','reason','channel','channel_id','comments')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'e')
+            ->where('lead_id = :id')
+            ->setParameter('id', $id);
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
 }
