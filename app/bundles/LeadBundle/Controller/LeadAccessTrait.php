@@ -21,11 +21,9 @@ trait LeadAccessTrait
      * @param $leadId
      * @param $action
      *
-     * @param bool $isPlugin
-     * @param string $integration
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkLeadAccess ($leadId, $action, $isPlugin = false, $integration = '')
+    protected function checkLeadAccess ($leadId, $action)
     {
         //make sure the user has view access to this lead
         $leadModel = $this->getModel('lead');
@@ -33,16 +31,16 @@ trait LeadAccessTrait
 
         if ($lead === null) {
             //set the return URL
-            $page      = $this->get('session')->get($isPlugin?'mautic.'.$integration.'.page':'mautic.lead.page', 1);
-            $returnUrl = $this->generateUrl($isPlugin?'mautic_plugin_timeline_index':'mautic_contact_index', ['page' => $page]);
+            $page      = $this->get('session')->get('mautic.lead.page', 1);
+            $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
 
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => $isPlugin?'MauticLeadBundle:Lead:pluginIndex':'MauticLeadBundle:Lead:index',
+                    'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
-                        'activeLink'    => $isPlugin?'#mautic_plugin_timeline_index':'#mautic_contact_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadNote'
                     ],
                     'flashes'         => [
@@ -66,57 +64,5 @@ trait LeadAccessTrait
 
             return $lead;
         }
-    }
-
-    /**
-     * Returns leads the user has access to
-     *
-     * @param $action
-     *
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    protected function checkAllAccess ($action, $limit)
-    {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-
-        //make sure the user has view access to leads
-        $repo = $model->getRepository();
-
-        // order by lastactive, filter
-        $leads = $repo->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'r.date_identified',
-                            'expr'   => 'is not null',
-                            'value'  => true
-                        ]
-                    ]
-                ],
-                'oderBy' => 'r.last_active',
-                'orderByDir' => 'DESC',
-                'limit' => $limit,
-                'hydration_mode' => 'HYDRATE_ARRAY'
-            ]);
-
-        if ($leads === null) {
-
-            return $this->accessDenied();
-        }
-
-        foreach($leads as $lead){
-            if (!$this->get('mautic.security')->hasEntityAccess(
-                'lead:leads:'.$action.'own',
-                'lead:leads:'.$action.'other',
-                $lead->getOwner()
-            )
-            ) {
-                unset($lead);
-            }
-        }
-
-        return $leads;
     }
 }
