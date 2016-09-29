@@ -20,10 +20,10 @@
         <?php echo $view['form']->widget($form['content']); ?>
     </div>
     <div class="row">
-        <div class="col-xs-8">
+        <div class="col-xs-7">
             <label><?php echo $view['translator']->trans('Filters'); ?></label>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-5">
             <div class="form-group">
                 <div class="available-filters pl-0">
                     <select class="chosen form-control" data-mautic="available_filters">
