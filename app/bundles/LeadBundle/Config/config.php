@@ -10,6 +10,17 @@
 return [
     'routes'   => [
         'main' => [
+            'mautic_plugin_timeline_index'       => [
+                'path'         => '/plugin/{integration}/timeline/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginIndex',
+            ],
+            'mautic_plugin_timeline_view'        => [
+                'path'         => '/plugin/{integration}/timeline/view/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginView',
+                'requirements' => [
+                    'leadId' => '\d+'
+                ]
+            ],
             'mautic_contact_emailtoken_index' => [
                 'path'       => '/contacts/emailtokens/{page}',
                 'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index'
@@ -410,7 +421,14 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
+            ],
+            'mautic.lead.model.company' => [
+            'class' => 'Mautic\LeadBundle\Model\CompanyModel',
+            'arguments' => [
+                'mautic.lead.model.field',
+                'session'
             ]
+]
         ]
     ]
 ];

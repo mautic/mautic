@@ -15,13 +15,13 @@
 //endif;
 
 if (isset($tmpl) && $tmpl == 'index') {
-    $view->extend('MauticGmailBundle:Timeline:index.html.php');
+    $view->extend('MauticLeadBundle:Timeline:pluginIndex.html.php');
 }
 
 $baseUrl = isset($lead) ? $view['router']->path(
-    'mautic_gmail_timeline_view',['leadId' => $lead->getId()]
+    'mautic_plugin_timeline_view',['leadId' => $lead->getId()]
 ) :
-    $view['router']->path('mautic_gmail_timeline_index');
+    $view['router']->path('mautic_plugin_timeline_index');
 ?>
 <style>
     .col-xs-6 {
