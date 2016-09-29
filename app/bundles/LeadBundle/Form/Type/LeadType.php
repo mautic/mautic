@@ -129,10 +129,10 @@ class LeadType extends AbstractType
         );
 
         $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-        $leadCompanies = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
-        $lead_companies = [];
-        foreach ($leadCompanies as $company) {
-            $lead_companies[$company['company_id']] = $company['company_id'];
+        $companies = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
+        $leadCompanies = [];
+        foreach ($companies as $company) {
+            $leadCompanies[$company['company_id']] = $company['company_id'];
         }
 
         $builder->add(
@@ -148,7 +148,7 @@ class LeadType extends AbstractType
                 'multiple'    => true,
                 'required'    => false,
                 'mapped'     => false,
-                'data'      => $lead_companies
+                'data'      => $leadCompanies
             ]
         );
 
