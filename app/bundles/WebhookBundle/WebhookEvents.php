@@ -3,7 +3,7 @@
  * @package     Mautic
  * @copyright   Mautic, Inc
  * @author      Mautic, Inc
- * @link        http://allyde.com
+ * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
