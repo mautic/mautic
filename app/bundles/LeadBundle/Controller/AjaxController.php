@@ -12,11 +12,11 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
@@ -103,23 +103,30 @@ class AjaxController extends CommonAjaxController
         $filter    = InputHelper::clean($request->query->get('filter'));
         $leadField = InputHelper::clean($request->query->get('field'));
         if (!empty($leadField)) {
-            if ($leadField == "owner_id") {
-                $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+            if (strpos($leadField, 'company') === 0) {
+                $results = $this->getModel('company')->getLookupResults('company', [$leadField, $filter]);
                 foreach ($results as $r) {
-                    $name        = $r['firstName'].' '.$r['lastName'];
-                    $dataArray[] = [
-                        "value" => $name,
-                        "id"    => $r['id']
-                    ];
+                    $dataArray[] = ['value' => $r['label']];
                 }
-            } elseif ($leadField == "hit_url") {
-                $dataArray[] = [
-                    'value' => ''
-                ];
             } else {
-                $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
-                foreach ($results as $r) {
-                    $dataArray[] = ['value' => $r[$leadField]];
+                if ($leadField == 'owner_id') {
+                    $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+                    foreach ($results as $r) {
+                        $name        = $r['firstName'].' '.$r['lastName'];
+                        $dataArray[] = [
+                            'value' => $name,
+                            'id'    => $r['id'],
+                        ];
+                    }
+                } elseif ($leadField == 'hit_url') {
+                    $dataArray[] = [
+                        'value' => '',
+                    ];
+                } else {
+                    $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
+                    foreach ($results as $r) {
+                        $dataArray[] = ['value' => $r[$leadField]];
+                    }
                 }
             }
         }

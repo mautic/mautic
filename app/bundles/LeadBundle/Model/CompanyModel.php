@@ -500,6 +500,39 @@ class CompanyModel extends CommonFormModel
     }
 
     /**
+     * Get list of entities for autopopulate fields.
+     *
+     * @param $type
+     * @param $filter
+     * @param $limit
+     * @param $start
+     *
+     * @return array
+     */
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
+    {
+        $results = [];
+        switch ($type) {
+            case 'company':
+                $expr = null;
+
+                if (is_array($filter)) {
+                    $column    = $filter[0];
+                    $filterVal = $filter[1];
+
+                    // @todo: Create a CompositeExpression filter and pass it to getSimpleList
+                } else {
+                    $column = $filter;
+                }
+
+                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($expr, [], $column);
+                break;
+        }
+
+        return $results;
+    }
+
+    /**
      * @param array $contacts
      */
     public function getCompaniesForContacts(array $contacts)

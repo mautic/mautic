@@ -454,7 +454,6 @@ class ListModel extends FormModel
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
             } elseif (in_array($type, array('select', 'country', 'timezone', 'region'))) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
-                $choices[$field->getAlias()]['operators'] = 'bool';
             } elseif (in_array($type, array('select', 'multiselect', 'country', 'timezone', 'region'))) {
                 $choices[$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, array('lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'))) {
