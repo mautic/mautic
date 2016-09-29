@@ -225,7 +225,7 @@ class CompanyController extends FormController
             ];
 
             // Check to see if this is a popup
-            if (isset($form['updateSelect'])) {
+            if (empty($form['updateSelect'])) {
                 $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
