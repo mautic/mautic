@@ -28,7 +28,6 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (!is_array($value)) {
-
             return (null === $value) ? 'N;' : 'a:0:{}';
         }
 
