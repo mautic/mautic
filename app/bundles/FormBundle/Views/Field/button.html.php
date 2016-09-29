@@ -12,19 +12,9 @@ include __DIR__ . '/field_helper.php';
 
 $buttonType = (isset($properties['type'])) ? $properties['type'] : 'submit';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'             => $id,
-        'formId'         => $formId,
-        'formName'       => $formName,
-        'disallowDelete' => true
-    ]) : '';
-
-
-
 $html = <<<HTML
 
-            <div $containerAttr>$formButtons
+            <div $containerAttr>
                 <button type="$buttonType" name="mauticform[{$field['alias']}]" $inputAttr value="1">{$field['label']}</button>
             </div>
 HTML;

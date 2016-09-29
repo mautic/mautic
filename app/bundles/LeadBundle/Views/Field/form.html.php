@@ -79,10 +79,11 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                             ));
                             break;
                         case 'select':
+                        case 'multiselect':
                         case 'lookup':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
                                 'form'           => $form['properties'],
-                                'selectTemplate' => $selectTemplate
+                                'selectTemplate' => $selectTemplate,
                             ));
                             break;
                         endswitch;

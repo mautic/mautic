@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
@@ -107,13 +108,21 @@ class LeadType extends AbstractType
             );
         }
 
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true]];
+        // @todo - this will conflict with https://github.com/mautic/mautic/pull/2558; merge this into the new trait then update UpdateLeadActionType to use the trait as well
+        $fieldValues = [];
+        $isObject    = false;
+        if (!empty($options['data'])) {
+            $isObject    = is_object($options['data']);
+            $fieldValues = ($isObject) ? $options['data']->getFields() : $options['data'];
+        }
+        $mapped = !$isObject;
+
         foreach ($options['fields'] as $field) {
             if ($field['isPublished'] === false) continue;
             $attr        = ['class' => 'form-control'];
             $properties  = $field['properties'];
             $type        = $field['type'];
-            $required    = $field['isRequired'];
+            $required    = ($isObject) ? $field['isRequired'] : false;
             $alias       = $field['alias'];
             $group       = $field['group'];
 
@@ -121,10 +130,15 @@ class LeadType extends AbstractType
                 $attr['data-unique-identifier'] = $field['alias'];
             }
 
-            $value       = (isset($fieldValues[$group][$alias]['value'])) ?
-                $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+            if ($isObject) {
+                $value       = (isset($fieldValues[$group][$alias]['value'])) ?
+                    $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+            } else {
+                $value = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : '';
+            }
+
             $constraints = [];
-            if ($required) {
+            if ($required && empty($options['ignore_required_constraints'])) {
                 $constraints[] = new NotBlank(
                     ['message' => 'mautic.lead.customfield.notblank']
                 );
@@ -139,6 +153,11 @@ class LeadType extends AbstractType
                         $properties['precision'] = (int) $properties['precision'];
                     }
 
+                    if ('' === $value) {
+                        // Prevent transform errors
+                        $value = null;
+                    }
+
                     $builder->add(
                         $alias,
                         $type,
@@ -147,9 +166,8 @@ class LeadType extends AbstractType
                             'label'         => $field['label'],
                             'label_attr'    => ['class' => 'control-label'],
                             'attr'          => $attr,
-                            'data'          => (isset($fieldValues[$group][$alias]['value'])) ?
-                                (float) $fieldValues[$group][$alias]['value'] : (float) $field['defaultValue'],
-                            'mapped'        => false,
+                            'data'          => (null !== $value) ? (float) $value : $value,
+                            'mapped'        => $mapped,
                             'constraints'   => $constraints,
                             'precision'     => $properties['precision'],
                             'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0
@@ -166,17 +184,19 @@ class LeadType extends AbstractType
                         'label_attr'  => ['class' => 'control-label'],
                         'widget'      => 'single_text',
                         'attr'        => $attr,
-                        'mapped'      => false,
+                        'mapped'      => $mapped,
                         'input'       => 'string',
                         'html5'       => false,
                         'constraints' => $constraints
                     ];
 
-                    try {
-                        $dtHelper = new DateTimeHelper($value, null, 'local');
-                    } catch (\Exception $e) {
-                        // Rather return empty value than break the page
-                        $value = '';
+                    if ($value) {
+                        try {
+                            $dtHelper = new DateTimeHelper($value, null, 'local');
+                        } catch (\Exception $e) {
+                            // Rather return empty value than break the page
+                            $value = null;
+                        }
                     }
 
                     if ($type == 'datetime') {
@@ -195,41 +215,47 @@ class LeadType extends AbstractType
                     $builder->add($alias, $type, $opts);
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
-                    $choices = [];
-                    if ($type == 'select' && !empty($properties['list'])) {
-                        $list = explode('|', $properties['list']);
-                        foreach ($list as $l) {
-                            $l           = trim($l);
-                            $choices[$l] = $l;
+                    $typeProperties = [
+                        'required'    => $required,
+                        'label'       => $field['label'],
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => $attr,
+                        'mapped'      => $mapped,
+                        'multiple'    => false,
+                        'constraints' => $constraints
+                    ];
+
+                    $choiceType = 'choice';
+                    $emptyValue = '';
+                    if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
+                        $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
+                        $typeProperties['expanded'] = false;
+                        $typeProperties['multiple'] = ('multiselect' === $type);
+
+                        if ($typeProperties['multiple']) {
+                            $emptyValue = false;
                         }
-                        $expanded = false;
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $expanded = true;
-                        $choices  = [1 => $properties['yes'], 0 => $properties['no']];
-                        $attr     = [];
+                        $choiceType              = 'yesno_button_group';
+                        $typeProperties['expanded']  = true;
+                        $typeProperties['yes_label'] = $properties['yes'];
+                        $typeProperties['no_label']  = $properties['no'];
+                        $typeProperties['attr']      = [];
+                        $emptyValue                  = ' x ';
+                        if ($value !== '' && $value !== null) {
+                            $value = (int) $value;
+                        }
                     }
-
-                    if (!empty($choices)) {
-                        $builder->add(
-                            $alias,
-                            'choice',
-                            [
-                                'choices'     => $choices,
-                                'required'    => $required,
-                                'label'       => $field['label'],
-                                'label_attr'  => ['class' => 'control-label'],
-                                'data'        => ($type == 'boolean') ? (int) $value : $value,
-                                'attr'        => $attr,
-                                'mapped'      => false,
-                                'multiple'    => false,
-                                'empty_value' => false,
-                                'expanded'    => $expanded,
-                                'constraints' => $constraints
-                            ]
-                        );
-                    }
+                    $typeProperties['data']        = $value;
+                    $typeProperties['empty_value'] = $emptyValue;
+                    $builder->add(
+                        $alias,
+                        $choiceType,
+                        $typeProperties
+                    );
                     break;
                 case 'country':
                 case 'region':
@@ -263,7 +289,7 @@ class LeadType extends AbstractType
                                 'class'            => 'form-control',
                                 'data-placeholder' => $field['label']
                             ],
-                            'mapped'      => false,
+                            'mapped'      => $mapped,
                             'multiple'    => false,
                             'expanded'    => false,
                             'constraints' => $constraints
@@ -289,7 +315,7 @@ class LeadType extends AbstractType
                             'label_attr'  => ['class' => 'control-label'],
                             'attr'        => $attr,
                             'data'        => $value,
-                            'mapped'      => false,
+                            'mapped'      => $mapped,
                             'constraints' => $constraints
                         ]
                     );

@@ -72,7 +72,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'    => 'campaignevent_pagehit',
             'eventName'   => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION
         );
-        $event->addLeadDecision('page.pagehit', $pageHitTrigger);
+        $event->addDecision('page.pagehit', $pageHitTrigger);
     }
 
     /**

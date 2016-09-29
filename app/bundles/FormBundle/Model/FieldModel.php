@@ -9,7 +9,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -25,11 +25,67 @@ class FieldModel extends CommonFormModel
     protected $session;
 
     /**
+     * @var LeadFieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
+     * FieldModel constructor.
+     *
+     * @param LeadFieldModel $leadFieldModel
+     */
+    public function __construct(LeadFieldModel $leadFieldModel)
+    {
+        $this->leadFieldModel = $leadFieldModel;
+    }
+
+    /**
      * @param Session $session
      */
     public function setSession(Session $session)
     {
         $this->session = $session;
+    }
+
+    /**
+     * @param object                              $entity
+     * @param \Symfony\Component\Form\FormFactory $formFactory
+     * @param null                                $action
+     * @param array                               $options
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = [])
+    {
+        $fields  = $this->leadFieldModel->getFieldListWithProperties();
+        $choices = [];
+
+        foreach ($fields as $alias => $field) {
+            if (!isset($choices[$field['group_label']])) {
+                $choices[$field['group_label']] = [];
+            }
+
+            $choices[$field['group_label']][$alias] = $field['label'];
+        }
+
+        // Only show the lead fields not already used
+        $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
+        $testLeadFields   = array_flip($usedLeadFields);
+        $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
+        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
+            unset($testLeadFields[$currentLeadField]);
+        }
+
+        foreach ($choices as &$group) {
+            $group = array_diff_key($group, $testLeadFields);
+        }
+
+        $options['leadFields']     = $choices;
+        $options['leadFieldProperties'] = $fields;
+
+        if ($action) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('formfield', $entity, $options);
     }
 
     /**
