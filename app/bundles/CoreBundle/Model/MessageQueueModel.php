@@ -119,7 +119,7 @@ class MessageQueueModel extends FormModel
                 $message->setStatus('sent');
                 $messages[$queueItem['channelId']] = $message;
             } else {
-                $this->rescheduleMessage($lead->getId(),$queueItem['sms'],  $queueItem['channelId'],  '15M', $message);
+                $this->rescheduleMessage($lead->getId(),$queueItem['channel'],  $queueItem['channelId'],  '15M', $message);
             }
         }
 
@@ -140,7 +140,7 @@ class MessageQueueModel extends FormModel
         if ($queue) {
             $queue->setAttempts($queue->getAttempts() + 1);
             $queue->setLastAttempt(new \DateTime());
-            $queue->setScheduledDate($queue->getScheduledDate()->add('PT'.$rescheduleDate));
+            $queue->setScheduledDate($queue->getScheduledDate()->add(new DateInterval('PT'.$rescheduleDate)));
             $queue->setStatus('rescheduled');
             $this->saveEntity($queue);
         }
