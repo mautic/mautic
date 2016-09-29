@@ -78,6 +78,7 @@ Mautic.emailOnLoad = function (container, response) {
             opener.mQuery(el).trigger("chosen:updated");
 
             Mautic.disabledEmailAction(opener);
+            Mautic.useMessageQueue(opener);
         }
 
         window.close();
@@ -319,10 +320,11 @@ Mautic.disabledEmailAction = function(opener) {
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };
-Mautic.useMessageQueue = function(val, opener) {
+Mautic.useMessageQueue = function(opener) {
     if (typeof opener == 'undefined') {
         opener = window;
     }
+    val = opener.mQuery('input[name="campaignevent[properties][email_type]"]:checked').val();
     if (val === 'marketing') {
         opener.mQuery('#priority').removeClass( "queue_hide" ).addClass( "queue_show" );
         opener.mQuery('#attempts').removeClass( "queue_hide" ).addClass( "queue_show" );
