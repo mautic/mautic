@@ -58,12 +58,12 @@ trait SortableListTrait
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event) {
             $formData = $event->getForm()->getParent()->getData();
-
+            $form = $event->getForm();
             if (empty($formData['leadField'])) {
                 // Disable sync list if a contact field is not mapped
                 $data = $event->getData();
                 $data['syncList'] = '0';
-                $event->setData($data);
+                $form->setData($data);
             }
         });
     }
