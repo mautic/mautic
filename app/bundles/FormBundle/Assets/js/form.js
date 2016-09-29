@@ -125,7 +125,7 @@ Mautic.formFieldOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').parent();
+            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
             panel.before(newHtml);
             var newField = true;
         }
