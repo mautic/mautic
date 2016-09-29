@@ -20,24 +20,36 @@ trait EntityFieldsBuildFormTrait
 
     private function getFormFields(FormBuilderInterface $builder, array $options, $object =  'lead')
     {
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => $object]];
+        $fieldValues = [];
+        $isObject    = false;
+        if (!empty($options['data'])) {
+            $isObject    = is_object($options['data']);
+            $fieldValues = ($isObject) ? $options['data']->getFields() : $options['data'];
+        }
+        $mapped = !$isObject;
+
         foreach ($options['fields'] as $field) {
             if ($field['isPublished'] === false || $field['object'] !== $object) continue;
-            $attr = ['class' => 'form-control'];
-            $properties = $field['properties'];
-            $type = $field['type'];
-            $required = $field['isRequired'];
-            $alias = $field['alias'];
-            $group = $field['group'];
+            $attr        = ['class' => 'form-control'];
+            $properties  = $field['properties'];
+            $type        = $field['type'];
+            $required    = ($isObject) ? $field['isRequired'] : false;
+            $alias       = $field['alias'];
+            $group       = $field['group'];
 
             if ($field['isUniqueIdentifer']) {
                 $attr['data-unique-identifier'] = $field['alias'];
             }
 
-            $value = (isset($fieldValues[$group][$alias]['value'])) ?
-                $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+            if ($isObject) {
+                $value       = (isset($fieldValues[$group][$alias]['value'])) ?
+                    $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+            } else {
+                $value = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : '';
+            }
+
             $constraints = [];
-            if ($required) {
+            if ($required && empty($options['ignore_required_constraints'])) {
                 $constraints[] = new NotBlank(
                     ['message' => 'mautic.lead.customfield.notblank']
                 );
@@ -49,23 +61,27 @@ trait EntityFieldsBuildFormTrait
                         $properties['precision'] = null;
                     } //ensure default locale is used
                     else {
-                        $properties['precision'] = (int)$properties['precision'];
+                        $properties['precision'] = (int) $properties['precision'];
+                    }
+
+                    if ('' === $value) {
+                        // Prevent transform errors
+                        $value = null;
                     }
 
                     $builder->add(
                         $alias,
                         $type,
                         [
-                            'required' => $required,
-                            'label' => $field['label'],
-                            'label_attr' => ['class' => 'control-label'],
-                            'attr' => $attr,
-                            'data' => (isset($fieldValues[$group][$alias]['value'])) ?
-                                (float)$fieldValues[$group][$alias]['value'] : (float)$field['defaultValue'],
-                            'mapped' => false,
-                            'constraints' => $constraints,
-                            'precision' => $properties['precision'],
-                            'rounding_mode' => isset($properties['roundmode']) ? (int)$properties['roundmode'] : 0
+                            'required'      => $required,
+                            'label'         => $field['label'],
+                            'label_attr'    => ['class' => 'control-label'],
+                            'attr'          => $attr,
+                            'data'          => (null !== $value) ? (float) $value : $value,
+                            'mapped'        => $mapped,
+                            'constraints'   => $constraints,
+                            'precision'     => $properties['precision'],
+                            'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0
                         ]
                     );
                     break;
@@ -73,30 +89,32 @@ trait EntityFieldsBuildFormTrait
                 case 'datetime':
                 case 'time':
                     $attr['data-toggle'] = $type;
-                    $opts = [
-                        'required' => $required,
-                        'label' => $field['label'],
-                        'label_attr' => ['class' => 'control-label'],
-                        'widget' => 'single_text',
-                        'attr' => $attr,
-                        'mapped' => false,
-                        'input' => 'string',
-                        'html5' => false,
+                    $opts                = [
+                        'required'    => $required,
+                        'label'       => $field['label'],
+                        'label_attr'  => ['class' => 'control-label'],
+                        'widget'      => 'single_text',
+                        'attr'        => $attr,
+                        'mapped'      => $mapped,
+                        'input'       => 'string',
+                        'html5'       => false,
                         'constraints' => $constraints
                     ];
 
-                    try {
-                        $dtHelper = new DateTimeHelper($value, null, 'local');
-                    } catch (\Exception $e) {
-// Rather return empty value than break the page
-                        $value = '';
+                    if ($value) {
+                        try {
+                            $dtHelper = new DateTimeHelper($value, null, 'local');
+                        } catch (\Exception $e) {
+                            // Rather return empty value than break the page
+                            $value = null;
+                        }
                     }
 
                     if ($type == 'datetime') {
                         $opts['model_timezone'] = 'UTC';
-                        $opts['view_timezone'] = date_default_timezone_get();
-                        $opts['format'] = 'yyyy-MM-dd HH:mm';
-                        $opts['with_seconds'] = false;
+                        $opts['view_timezone']  = date_default_timezone_get();
+                        $opts['format']         = 'yyyy-MM-dd HH:mm';
+                        $opts['with_seconds']   = false;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
                     } elseif ($type == 'date') {
@@ -108,41 +126,43 @@ trait EntityFieldsBuildFormTrait
                     $builder->add($alias, $type, $opts);
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
-                    $choices = [];
-                    if ($type == 'select' && !empty($properties['list'])) {
-                        $list = explode('|', $properties['list']);
-                        foreach ($list as $l) {
-                            $l = trim($l);
-                            $choices[$l] = $l;
-                        }
-                        $expanded = false;
+                    $typeProperties = [
+                        'required'    => $required,
+                        'label'       => $field['label'],
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => $attr,
+                        'mapped'      => $mapped,
+                        'multiple'    => false,
+                        'constraints' => $constraints
+                    ];
+
+                    $choiceType = 'choice';
+                    $emptyValue = '';
+                    if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
+                        $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
+                        $typeProperties['expanded'] = false;
+                        $typeProperties['multiple'] = ('multiselect' === $type);
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $expanded = true;
-                        $choices = [1 => $properties['yes'], 0 => $properties['no']];
-                        $attr = [];
+                        $choiceType              = 'yesno_button_group';
+                        $typeProperties['expanded']  = true;
+                        $typeProperties['yes_label'] = $properties['yes'];
+                        $typeProperties['no_label']  = $properties['no'];
+                        $typeProperties['attr']      = [];
+                        $emptyValue                  = ' x ';
+                        if ($value !== '' && $value !== null) {
+                            $value = (int) $value;
+                        }
                     }
-
-                    if (!empty($choices)) {
-                        $builder->add(
-                            $alias,
-                            'choice',
-                            [
-                                'choices' => $choices,
-                                'required' => $required,
-                                'label' => $field['label'],
-                                'label_attr' => ['class' => 'control-label'],
-                                'data' => ($type == 'boolean') ? (int)$value : $value,
-                                'attr' => $attr,
-                                'mapped' => false,
-                                'multiple' => false,
-                                'empty_value' => false,
-                                'expanded' => $expanded,
-                                'constraints' => $constraints
-                            ]
-                        );
-                    }
+                    $typeProperties['data'] = $value;
+                    $typeProperties['empty_value'] = $emptyValue;
+                    $builder->add(
+                        $alias,
+                        $choiceType,
+                        $typeProperties
+                    );
                     break;
                 case 'country':
                 case 'region':
@@ -167,25 +187,25 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         'choice',
                         [
-                            'choices' => $choices,
-                            'required' => $required,
-                            'label' => $field['label'],
-                            'label_attr' => ['class' => 'control-label'],
-                            'data' => $value,
-                            'attr' => [
-                                'class' => 'form-control',
+                            'choices'     => $choices,
+                            'required'    => $required,
+                            'label'       => $field['label'],
+                            'label_attr'  => ['class' => 'control-label'],
+                            'data'        => $value,
+                            'attr'        => [
+                                'class'            => 'form-control',
                                 'data-placeholder' => $field['label']
                             ],
-                            'mapped' => false,
-                            'multiple' => false,
-                            'expanded' => false,
+                            'mapped'      => $mapped,
+                            'multiple'    => false,
+                            'expanded'    => false,
                             'constraints' => $constraints
                         ]
                     );
                     break;
                 default:
                     if ($type == 'lookup') {
-                        $type = "text";
+                        $type                = "text";
                         $attr['data-toggle'] = 'field-lookup';
                         $attr['data-target'] = $alias;
 
@@ -197,12 +217,12 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         $type,
                         [
-                            'required' => $field['isRequired'],
-                            'label' => $field['label'],
-                            'label_attr' => ['class' => 'control-label'],
-                            'attr' => $attr,
-                            'data' => $value,
-                            'mapped' => false,
+                            'required'    => $field['isRequired'],
+                            'label'       => $field['label'],
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => $attr,
+                            'data'        => $value,
+                            'mapped'      => $mapped,
                             'constraints' => $constraints
                         ]
                     );
