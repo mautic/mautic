@@ -30,7 +30,8 @@ if ($tmpl == 'index') {
                     array(
                         'sessionVar' => 'company',
                         'text'       => 'mautic.company.name',
-                        'class'      => 'col-company-name'
+                        'class'      => 'col-company-name',
+                        'orderBy'    => 'comp.companyname',
                     )
                 );
                 echo $view->render(
@@ -38,7 +39,8 @@ if ($tmpl == 'index') {
                     array(
                         'sessionVar' => 'company',
                         'text'       => 'mautic.company.email',
-                        'class'      => 'visible-md visible-lg col-company-category'
+                        'class'      => 'visible-md visible-lg col-company-category',
+                        'orderBy'    => 'comp.companyemail',
                     )
                 );
                 echo $view->render(
@@ -46,11 +48,12 @@ if ($tmpl == 'index') {
                     array(
                         'sessionVar' => 'company',
                         'text'       => 'mautic.company.website',
-                        'class'      => 'visible-md visible-lg col-company-category'
+                        'class'      => 'visible-md visible-lg col-company-website',
+                        'orderBy'    => 'comp.companywebsite',
                     )
                 );
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'segment',
+                    'sessionVar' => 'company',
                     'text'       => 'mautic.lead.list.thead.leadcount',
                     'class'      => 'visible-md visible-lg col-leadlist-leadcount'
                 ));

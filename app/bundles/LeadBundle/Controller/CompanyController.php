@@ -28,7 +28,7 @@ class CompanyController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             array(
                 'lead:leads:viewother',
                 'lead:leads:create',
@@ -47,7 +47,7 @@ class CompanyController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get(
+        $limit = $this->get('session')->get(
             'mautic.company.limit',
             $this->factory->getParameter('default_pagelimit')
         );
@@ -56,14 +56,14 @@ class CompanyController extends FormController
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.company.filter', ''));
-        $this->factory->getSession()->set('mautic.company.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.company.filter', ''));
+        $this->get('session')->set('mautic.company.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.company.orderby', 'comp.id');
-        $orderByDir = $this->factory->getSession()->get('mautic.company.orderbydir', 'DESC');
+        $orderBy    = $this->get('session')->get('mautic.company.orderby', 'comp.companyname');
+        $orderByDir = $this->get('session')->get('mautic.company.orderbydir', 'ASC');
 
-        $companies = $this->factory->getModel('company')->getEntities(
+        $companies = $this->getModel('company')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -76,7 +76,7 @@ class CompanyController extends FormController
         $count = count($companies);
         if ($count && $count < ($start + 1)) {
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->factory->getSession()->set('mautic.company.page', $lastPage);
+            $this->get('session')->set('mautic.company.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_company_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(
@@ -93,7 +93,7 @@ class CompanyController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.company.page', $page);
+        $this->get('session')->set('mautic.company.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $model = $this->getModel('company');
@@ -137,12 +137,12 @@ class CompanyController extends FormController
             $entity = $model->getEntity();
         }
 
-        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
+        if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.company.page', 1);
+        $page = $this->get('session')->get('mautic.company.page', 1);
 
         $action         = $this->generateUrl('mautic_company_action', array('objectAction' => 'new'));
 
@@ -287,7 +287,7 @@ class CompanyController extends FormController
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.company.page', 1);
+        $page = $this->get('session')->get('mautic.company.page', 1);
 
         $viewParameters = array('page' => $page);
 
@@ -475,7 +475,7 @@ class CompanyController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
+            if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
                 return $this->accessDenied();
             }
 
@@ -494,7 +494,7 @@ class CompanyController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.company.page', 1);
+        $page      = $this->get('session')->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', array('page' => $page));
         $flashes   = array();
 
@@ -518,7 +518,7 @@ class CompanyController extends FormController
                     'msg'     => 'mautic.company.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:deleteother')) {
+            } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'company');
@@ -554,7 +554,7 @@ class CompanyController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.company.page', 1);
+        $page      = $this->get('session')->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', array('page' => $page));
         $flashes   = array();
 
@@ -583,7 +583,7 @@ class CompanyController extends FormController
                         'msg'     => 'mautic.company.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:deleteother')) {
+                } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'company', true);
