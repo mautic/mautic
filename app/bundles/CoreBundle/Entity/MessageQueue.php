@@ -51,7 +51,7 @@ class MessageQueue
     /**
      * @var int
      */
-    private $priority;
+    private $priority = 2;
 
     /**
      * @var int
@@ -113,11 +113,16 @@ class MessageQueue
 
         $builder->setTable('message_queue')
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\MessageQueueRepository')
-            ->addIndex(['status'], 'status_search')
-            ->addIndex(['date_sent'], 'message_date_sent');
+            ->addIndex(['status'], 'message_status_search')
+            ->addIndex(['date_sent'], 'message_date_sent')
+            ->addIndex(['scheduled_date'], 'message_scheduled_date')
+            ->addIndex(['priority'], 'message_priority')
+            ->addIndex(['success'], 'message_success')
+            ->addIndex(['channel', 'channel_id'], 'message_channel_search');
 
-        $builder->addNullableField('channel', 'string');
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
+
+        $builder->addField('channel', 'string');
+        $builder->addNamedField('channelId', 'integer', 'channel_id');
 
         $builder->createField('campaign', 'integer')
             ->columnName('campaign_id')
@@ -125,20 +130,20 @@ class MessageQueue
             ->build();
 
         $builder->createManyToOne('event', 'Mautic\CampaignBundle\Entity\Event')
-            ->addJoinColumn('event_id', 'id', true, false)
+            ->addJoinColumn('event_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addLead(false, 'CASCADE', false);
 
-        $builder->createField('priority', 'integer')
+        $builder->createField('priority', 'smallint')
             ->columnName('priority')
             ->build();
 
-        $builder->createField('maxAttempts', 'integer')
+        $builder->createField('maxAttempts', 'smallint')
             ->columnName('max_attempts')
             ->build();
 
-        $builder->createField('attempts', 'integer')
+        $builder->createField('attempts', 'smallint')
             ->columnName('attempts')
             ->build();
 
@@ -149,7 +154,6 @@ class MessageQueue
         $builder->createField('status', 'string')
             ->columnName('status')
             ->build();
-
 
         $builder->createField('datePublished', 'datetime')
             ->columnName('date_published')
