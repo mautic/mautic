@@ -478,4 +478,26 @@ class CompanyRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
         return $results;
     }
+
+    /**
+     * @param array $contacts
+     *
+     * @return array
+     */
+    public function getCompaniesForContacts(array $contacts)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('c.*, l.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
+            ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.manually_removed', 0),
+                    $qb->expr()->in('l.lead_id', $contacts)
+                )
+            )
+            ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
+
+        return $qb->execute()->fetchAll();
+    }
 }

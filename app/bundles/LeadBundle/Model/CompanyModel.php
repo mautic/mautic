@@ -223,17 +223,17 @@ class CompanyModel extends CommonFormModel
         $company->setFields($fieldValues);
     }
 
-    /* Add lead to company
-    *
-    * @param array|Company     $companies
-    * @param array|Lead        $lead
-    * @param bool              $manuallyAdded
-    * @param bool              $batchProcess
-    * @param int               $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
-    * @param \DateTime         $dateManipulated
-    *
-    * @throws \Doctrine\ORM\ORMException
-    */
+    /** Add lead to company
+     *
+     * @param array|Company     $companies
+     * @param array|Lead        $lead
+     * @param bool              $manuallyAdded
+     * @param bool              $batchProcess
+     * @param int               $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
+     * @param \DateTime         $dateManipulated
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $batchProcess = false, $searchCompanyLead = 1, $dateManipulated = null)
     {
         // Primary company name to be peristed to the lead's contact company field
@@ -497,5 +497,25 @@ class CompanyModel extends CommonFormModel
         }
 
         unset($lead, $deleteCompany, $persistCompany, $companies);
+    }
+
+    /**
+     * @param array $contacts
+     */
+    public function getCompaniesForContacts(array $contacts)
+    {
+        $companies = $this->getRepository()->getCompaniesForContacts($contacts);
+
+        // Group companies per contact
+        $contactCompanies = [];
+        foreach ($companies as $company) {
+            if (!isset($contactCompanies[$company['lead_id']])) {
+                $contactCompanies[$company['lead_id']] = [];
+            }
+
+            $contactCompanies[$company['lead_id']][] = $company;
+        }
+
+        return $contactCompanies;
     }
 }
