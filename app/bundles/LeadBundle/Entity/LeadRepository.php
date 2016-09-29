@@ -593,6 +593,33 @@ class LeadRepository extends CommonRepository
             ) : $results;
     }
 
+    public function getEntitiesLight($args = array()){
+    	$limit = 20000; //lines
+    	$results = array();
+    	$offset = 0;
+    	$result = $this->requestEntitiesLight($args, $offset, $limit);
+    	$results = array_merge($results, $result);
+    	while (count($result) === $limit){
+    		$offset += $limit;
+    		$result = $this->requestEntitiesLight($args, $offset + 1, $limit);
+    		$results = array_merge($results, $result);
+    	}
+    	return $results;
+    }
+
+    private function requestEntitiesLight($args, $first, $limit){
+     	$q = $this->_em->getConnection()->createQueryBuilder();
+    	$q->select('l.id, l.lastname, l.email, l.points, l.company, l.phone, l.website, l.country, l.date_identified')
+    	  ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+    	  ->setFirstResult($first)
+    	  ->setMaxResults($limit);
+    	$this->buildWhereClause($q, $args);
+    	$this->buildOrderByClause($q, $args);
+    	$results = $q->execute()->fetchAll(Query::HYDRATE_ARRAY);
+    	unset($q);
+    	return $results;
+    }
+
     /**
      * Get contats for a specific channel entity
      *

@@ -11,16 +11,19 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StatDevice;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LeadController extends FormController
 {
@@ -1598,6 +1601,95 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.importfields', []);
 
         unlink($filepath);
+    }
+
+    public function exportCurrentListAction(){
+        $formatter = $this->factory->getHelper('template.formatter');
+        $date      = $this->factory->getDate()->toLocalString();
+        $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum('export_lead', false, '-');
+
+        $permissions = $this->factory->getSecurity()->isGranted(
+            array(
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother'
+            ),
+            "RETURN_ARRAY"
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model   = $this->factory->getModel('lead.lead');
+        $session = $this->factory->getSession();
+
+        $search = $this->request->get('search', $session->get('mautic.lead.filter', ''));
+        $session->set('mautic.lead.filter', $search);
+
+        //do some default filtering
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+
+        $filter      = array('string' => $search, 'force' => '');
+        $translator  = $this->factory->getTranslator();
+        $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine        = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode   = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+
+        $session->set('mautic.lead.indexmode', $indexMode);
+
+        if (!$permissions['lead:leads:viewother']) {
+            $filter['force'] .= " $mine";
+        }
+        $leads = $model->getEntitiesLight(
+            array(
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir
+            )
+        );
+
+
+        $this->factory->getLogger(true)->info("leads : ".count($leads));
+
+        $response = new StreamedResponse(function () use ($leads, $formatter) {
+            $handle = fopen('php://output', 'r+');
+            $header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'date_identified');
+            fputcsv($handle, $header);
+
+            // Build the data rows
+            for($i=0; $i<count($leads); $i += 1) {
+                $row = array();
+                $row[] = $leads[$i]['id'];
+                $row[] = $formatter->_($leads[$i]['lastname'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['email'], 'email', true);
+                $row[] = $formatter->_($leads[$i]['company'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['phone'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['website'], 'url', true);
+                $row[] = $formatter->_($leads[$i]['country'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['points'], 'int', true);
+                $row[] = $formatter->_($leads[$i]['date_identified'], 'date', true);
+
+                fputcsv($handle, $row);
+            }
+            //free memory
+            unset($lead);
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'application/force-download');
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.csv"');
+        $response->headers->set('Expires', 0);
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+
+        return $response;
     }
 
     /**
