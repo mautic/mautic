@@ -40,7 +40,7 @@ class Version20160916000000 extends AbstractMauticMigration
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}message_queue (
-  `id` int(10) unsigned NOT NULL,
+  `id` INT AUTO_INCREMENT NOT NULL,
   `channel` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   `channel_id` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `campaign_id` int(11) DEFAULT NULL,
