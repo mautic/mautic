@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 
 /**
  * Class LeadSubscriber
@@ -533,18 +534,32 @@ class LeadSubscriber extends CommonSubscriber
 
                 if (!empty($row['channel'])) {
                     if ($channelModel = $this->getChannelModel($row['channel'])) {
+                        if ($channelModel instanceof ChannelTimelineInterface) {
+                            if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $row)) {
+                                $template = $overrideTemplate;
+                            }
+
+                            if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $row)) {
+                                $eventTypeName = $overrideEventTypeName;
+                            }
+
+                            if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $row)) {
+                                $icon = $overrideIcon;
+                            }
+                        }
+
+                        /** @deprecated - BC support to be removed in 3.0 */
                         // Allow a custom template if applicable
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineTemplate')) {
                             $template = $channelModel->getDoNotContactLeadTimelineTemplate($row);
                         }
-
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineLabel')) {
                             $eventTypeName = $channelModel->getDoNotContactLeadTimelineLabel($row);
                         }
-
                         if (method_exists($channelModel, 'getDoNotContactLeadTimelineIcon')) {
                             $icon = $channelModel->getDoNotContactLeadTimelineIcon($row);
                         }
+                        /** end deprecation */
 
                         if (!empty($row['channel_id'])) {
                             if ($item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {

@@ -256,7 +256,8 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    '%mautic.mailer_amazon_region%'
+                    '%mautic.mailer_amazon_region%',
+                    'mautic.http.connector'
                 ],
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
