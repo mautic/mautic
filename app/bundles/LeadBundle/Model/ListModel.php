@@ -415,7 +415,7 @@ class ListModel extends FormModel
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
-                $properties['list'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list']));
+                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
             $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
