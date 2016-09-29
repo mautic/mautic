@@ -71,7 +71,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             $manager->persist($entity);
             $manager->flush();
 
-            if(isset ($field['object']) and $field['object'] == 'company')
+            if(isset($field['object']) and $field['object'] === 'company')
             {
                 //add the column to the companies table
                 $companiesSchema->addColumn(
@@ -90,6 +90,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             $order++;
         }
 
+        $companiesSchema->executeChanges();
         $leadsSchema->executeChanges();
 
         /** @var IndexSchemaHelper $indexHelper */
