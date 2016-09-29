@@ -301,9 +301,6 @@ class CompanyModel extends CommonFormModel
                 continue;
             }
 
-            // Store the last company name to persist to contact
-            $companyName = $companyLeadAdd[$companyId]->getName();
-
             if ($searchCompanyLead == -1) {
                 $companyLead = null;
             } elseif ($searchCompanyLead) {
@@ -329,6 +326,8 @@ class CompanyModel extends CommonFormModel
 
                     $persistLists[]   = $companyLead;
                     $dispatchEvents[] = $companyId;
+                    $companyName = $companyLeadAdd[$companyId]->getName();
+
                 } else {
                     // Detach from Doctrine
                     $this->em->detach($companyLead);
@@ -344,6 +343,7 @@ class CompanyModel extends CommonFormModel
 
                 $persistCompany[]   = $companyLead;
                 $dispatchEvents[] = $companyId;
+                $companyName = $companyLeadAdd[$companyId]->getName();
             }
         }
 
@@ -355,8 +355,11 @@ class CompanyModel extends CommonFormModel
         $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
 
         if (!empty($companyName)) {
-            $lead->addUpdatedField('company', $companyName);
-            $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            $currentCompanyName  = $lead->getCompany();
+            if ($currentCompanyName !== $companyName) {
+                $lead->addUpdatedField('company', $companyName);
+                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            }
         }
 
         if ($batchProcess) {

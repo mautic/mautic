@@ -326,9 +326,9 @@ class LeadModel extends FormModel
         $companyFieldMatches = [];
         $fields = $entity->getFields();
         $updatedFields = $entity->getUpdatedFields();
+
         if (isset($updatedFields['company'])) {
-            $entity->addUpdatedField('company', null);
-            //$this->logger->error('Entity Save: Could not identify or create company, please provide  city and country fields for exact matches' . $updatedFields['company']);
+            $companyFieldMatches['company'] = $updatedFields['company'];
         }
 
         //check to see if we can glean information from ip address
@@ -355,13 +355,18 @@ class LeadModel extends FormModel
         }
 
         if (!empty($companyFieldMatches)) {
-            $company = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
-            if ($company[1]) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[1]);
+            list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            if ($leadAdded) {
+                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company->getName(), $company->getId());
             }
         }
 
         parent::saveEntity($entity, $unlock);
+
+        if (!empty($company)) {
+            // Save after the lead in for new leads created through the API and maybe other places
+            $this->companyModel->addLeadToCompany($company, $entity, true);
+        }
     }
 
     /**
