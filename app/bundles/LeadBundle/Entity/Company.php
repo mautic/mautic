@@ -21,24 +21,12 @@ use Mautic\UserBundle\Entity\User;
  */
 class Company extends FormEntity
 {
+    use CustomFieldEntityTrait;
+
     /**
      * @var int
      */
     private $id;
-
-    /**
-     * Used by Mautic to populate the fields pulled from the DB.
-     *
-     * @var array
-     */
-    protected $fields = [];
-
-    /**
-     * Just a place to store updated field values so we don't have to loop through them again comparing.
-     *
-     * @var array
-     */
-    private $updatedFields = [];
 
     /**
      * @var \Mautic\UserBundle\Entity\User
@@ -50,16 +38,6 @@ class Company extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    /**
-     * @param $name
-     *
-     * @return bool
-     */
-    public function __get($name)
-    {
-        return $this->getFieldValue(strtolower($name));
     }
 
     /**
@@ -133,16 +111,7 @@ class Company extends FormEntity
     }
 
     /**
-     * @param $fields
-     */
-    public function setFields($fields)
-    {
-        $this->fields = $fields;
-    }
-    /**
-     * Get the primary identifier for the lead.
-     *
-     * @param bool $lastFirst
+     * Get the primary identifier for the company.
      *
      * @return string
      */
@@ -153,25 +122,6 @@ class Company extends FormEntity
         } elseif (!empty($this->fields['core']['companyemail']['value'])) {
             return $this->fields['core']['companyemail']['value'];
         }
-    }
-
-    /**
-     * @param bool $ungroup
-     *
-     * @return array
-     */
-    public function getFields($ungroup = false)
-    {
-        if ($ungroup && isset($this->fields['core'])) {
-            $return = [];
-            foreach ($this->fields as $group => $fields) {
-                $return += $fields;
-            }
-
-            return $return;
-        }
-
-        return $this->fields;
     }
 
     /**
@@ -214,63 +164,5 @@ class Company extends FormEntity
     public function getOwner()
     {
         return $this->owner;
-    }
-
-    /**
-     * Add an updated field to persist to the DB and to note changes.
-     *
-     * @param        $alias
-     * @param        $value
-     * @param string $oldValue
-     */
-    public function addUpdatedField($alias, $value, $oldValue = '')
-    {
-        $value = trim($value);
-        if ($value == '') {
-            // Ensure value is null for consistency
-            $value = null;
-        }
-
-        $this->changes['fields'][$alias] = [$oldValue, $value];
-        $this->updatedFields[$alias]     = $value;
-    }
-
-    /**
-     * Get the array of updated fields.
-     *
-     * @return array
-     */
-    public function getUpdatedFields()
-    {
-        return $this->updatedFields;
-    }
-
-    /**
-     * Get company field value.
-     *
-     * @param      $field
-     * @param null $group
-     *
-     * @return bool
-     */
-    public function getFieldValue($field, $group = null)
-    {
-        if (isset($this->updatedFields[$field])) {
-            return $this->updatedFields[$field];
-        }
-
-        if (!empty($group) && isset($this->fields[$group][$field])) {
-            return $this->fields[$group][$field]['value'];
-        }
-
-        foreach ($this->fields as $group => $groupFields) {
-            foreach ($groupFields as $name => $details) {
-                if ($name == $field) {
-                    return $details['value'];
-                }
-            }
-        }
-
-        return false;
     }
 }

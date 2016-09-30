@@ -343,23 +343,6 @@ final class LeadEvents
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
 
     /**
-     * The mautic.company_on_build event is thrown before displaying the company builder form to allow adding of custom actions.
-     *
-     * The event listener receives a Mautic\LeadBundle\Event\CompanyBuilderEvent instance.
-     *
-     * @var string
-     */
-    const COMPANY_ON_BUILD = 'mautic.company_on_build';
-
-    /**
-     * The mautic.company_on_action event is thrown to execute a company action.
-     *
-     * The event listener receives a Mautic\LeadBundle\Event\CompanyActionEvent instance.
-     *
-     * @var string
-     */
-    const COMPANY_ON_ACTION = 'mautic.company_on_action';
-    /**
      * The mautic.company.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a

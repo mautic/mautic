@@ -188,6 +188,13 @@ return [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
+            'mautic.lead.subscriber.company' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\CompanySubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
             'mautic.lead.emailbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
             ],
