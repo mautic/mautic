@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -1514,6 +1513,31 @@ class LeadModel extends FormModel
                     'hydration_mode' => 'HYDRATE_ARRAY',
                 ]
             );
+        }
+
+        $booleanTrue  = ['1', 'true', 'yes'];
+        $booleanFalse = ['0', 'false', 'no'];
+
+        foreach ($leadFields as $leadField) {
+            if (isset($fieldData[$leadField['alias']])) {
+
+                // Adjust the boolean values from text to boolean
+                if ($leadField['type'] == 'boolean') {
+                    $value = strtolower($fieldData[$leadField['alias']]);
+                    if (in_array($value, $booleanTrue)) {
+                        $fieldData[$leadField['alias']] = 1;
+                    } elseif (in_array($value, $booleanFalse)) {
+                        $fieldData[$leadField['alias']] = 0;
+                    }
+                }
+
+                // Skip if the value is in the CSV row
+                continue;
+            } elseif ($leadField['defaultValue']) {
+
+                // Fill in the default value if any
+                $fieldData[$leadField['alias']] = $leadField['defaultValue'];
+            }
         }
 
         $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
