@@ -119,6 +119,29 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Obtains a specific entity url history of specific contact
+     *
+     * @param int $id contact id
+     *            
+     * @return Response
+     */
+    public function getEntityUrlHistoryAction($id)
+    {
+        $start= $this->request->query->get('start', 0);
+        $limit= $this->request->query->get('limit', 0);
+        
+        $entity = $this->model->getEntityUrlHistory($id,$start,$limit);
+        
+        $this->preSerializeEntity($entity);
+        $view = $this->view(array(
+            $this->entityNameOne => $entity
+        ), Codes::HTTP_OK);
+        $this->setSerializationContext($view);
+        
+        return $this->handleView($view);
+    }
+    
+    /**
      * Obtains a list of custom fields
      *
      * @return \Symfony\Component\HttpFoundation\Response
