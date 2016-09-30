@@ -19,49 +19,54 @@ class MessageQueueRepository extends CommonRepository
 {
     public function findMessage($channel,$channelId,$leadId)
     {
-        $results = $this->_em->getConnection()->createQueryBuilder()
-            ->select('mq.id, mq.channel ,mq.channel_id, mq.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'message_queue', 'mq')
-            ->where('mq.lead_id = :leadId')
+        $results = $this->createQueryBuilder('mq')
+            ->where('IDENTITY(mq.lead) = :leadId')
             ->andWhere('mq.channel = :channel')
-            ->andWhere('mq.channel_id = :channelId')
-            ->setParameter('leadId',$leadId)
-            ->setParameter('channel',$channel)
-            ->setParameter('channelId',$channelId)
-            ->execute()
-            ->fetchAll();
+            ->andWhere('mq.channelId = :channelId')
+            ->setParameter('leadId', $leadId)
+            ->setParameter('channel', $channel)
+            ->setParameter('channelId', $channelId)
+            ->getQuery()
+            ->getResult();
 
-       return $results;
+        return ($results) ? $results[0] : null;
     }
 
-    public function getQueuedMessages($channel = null, $channelId =  null)
+    /**
+     * @param      $limit
+     * @param      $processStarted
+     * @param null $channel
+     * @param null $channelId
+     *
+     * @return mixed
+     */
+    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId =  null)
     {
-
-        $scheduledDate = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('mq.id,mq.channel, mq.channel_id as channelId, mq.lead_id as lead, mq.options')
-            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
+        $q = $this->createQueryBuilder('mq');
 
         $q->where($q->expr()->eq('mq.success', ':success'))
-            ->andWhere($q->expr()->lt('mq.attempts', 'mq.max_attempts'))
-            ->andWhere('mq.scheduled_date BETWEEN :scheduledDate AND :scheduledDateEnd')
+            ->andWhere($q->expr()->lt('mq.attempts', 'mq.maxAttempts'))
+            ->andWhere('mq.lastAttempt is null or mq.lastAttempt < :processStarted')
+            ->andWhere('mq.scheduledDate <= :processStarted')
             ->setParameter('success', false, 'boolean')
-            ->setParameter('scheduledDate', $scheduledDate->format('Y-m-d 00:00:00'))
-            ->setParameter('scheduledDateEnd', $scheduledDate->format('Y-m-d 23:59:59'));
-        $q->orderBy('priority,scheduled_date', 'ASC');
+            ->setParameter('processStarted', $processStarted);
+
+        $q->orderBy('mq.priority, mq.scheduledDate', 'ASC');
+
+        if ($limit) {
+            $q->setMaxResults((int) $limit);
+        }
 
         if ($channel) {
             $q->andWhere($q->expr()->eq('mq.channel', ':channel'))
                 ->setParameter('channel', $channel);
 
             if ($channelId) {
-                $q->andWhere($q->expr()->eq('mq.channel_id', (int) $channelId));
+                $q->andWhere($q->expr()->eq('mq.channelId', (int) $channelId));
             }
         }
 
-        $results = $q->execute()
-            ->fetchAll();
+        $results = $q->getQuery()->getResult();
 
         return $results;
     }

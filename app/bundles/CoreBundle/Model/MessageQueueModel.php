@@ -10,6 +10,8 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
+use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Entity\MessageQueue;
@@ -103,52 +105,68 @@ class MessageQueueModel extends FormModel
      */
     public function sendMessages($channel = null, $channelId = null)
     {
-        $queue = $this->getRepository()->getQueuedMessages($channel, $channelId);
-        /* @var $queueItem messageQueue */
-        $messages = [];
+        // Note when the process started for batch purposes
+        $processStarted = new \DateTime();
+        $limit   = 50;
+        $counter = 0;
+        while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
+            /** @var MessageQueue $message */
+            foreach ($queue as $message) {
+                $event   = new MessageQueueProcessEvent($message);
+                $new     = false;
+                $success = $this->dispatchEvent('process_message_queue', $message, $new, $event);
+                $lead    = $message->getLead();
 
-        foreach ($queue as $queueItem)
-        {
-            $message = $this->getRepository()->getEntity((int)$queueItem['id']);
-            $event = new MessageQueueProcessEvent($message);
-            $new = false;
-            $success = $this->dispatchEvent('process_message_queue',$message, $new, $event);
-            $lead = $message->getLead();
-
-            if ($success) {
-                $message->setAttempts($message->getAttempts() + 1);
-                $message->setSuccess(true);
-                $message->setLastAttempt(new \DateTime());
-                $message->setDateSent(new \DateTime());
-                $message->setStatus('sent');
-                $messages[$queueItem['channelId']] = $message;
-            } else {
-                $this->rescheduleMessage($lead->getId(),$queueItem['channel'],  $queueItem['channelId'],  '15M', $message);
+                if ($success) {
+                    $counter++;
+                    $message->setAttempts($message->getAttempts() + 1);
+                    $message->setSuccess(true);
+                    $message->setLastAttempt(new \DateTime());
+                    $message->setDateSent(new \DateTime());
+                    $message->setStatus('sent');
+                } else {
+                    $this->rescheduleMessage($lead->getId(), $message->getChannel(), $message->getChannelId(), '15M', $message);
+                }
             }
+
+            //add listener
+            $this->saveEntities($queue);
+
+            // Remove the entities from memory
+            $this->em->clear(MessageQueue::class);
+            $this->em->clear(Lead::class);
         }
 
-        //add listener
-        $this->saveEntities($messages);
+        return $counter;
     }
 
     /**
-     * @param $queue
-     * @param $leadId
+     * @param        $leadId
+     * @param        $channel
+     * @param        $channelId
      * @param string $rescheduleDate
+     * @param null   $message
      */
-    public function rescheduleMessage($leadId, $channel, $channelId, $rescheduleDate = '15M', $queue)
+    public function rescheduleMessage($leadId, $channel, $channelId, $rescheduleDate = '15M', MessageQueue $message = null)
     {
-        if (!$queue) {
-            $queue = $this->getRepository()->findMessage($channel,$channelId,$leadId);
-        }
-        if ($queue) {
-            $queue->setAttempts($queue->getAttempts() + 1);
-            $queue->setLastAttempt(new \DateTime());
-            $queue->setScheduledDate($queue->getScheduledDate()->add(new \DateInterval('PT'.$rescheduleDate)));
-            $queue->setStatus('rescheduled');
-            $this->saveEntity($queue);
+        $persist = false;
+        if (!$message) {
+            $message   = $this->getRepository()->findMessage($channel, $channelId, $leadId);
+            $persist = true;
         }
 
+        if ($message) {
+            $message->setAttempts($message->getAttempts() + 1);
+            $message->setLastAttempt(new \DateTime());
+            $rescheduleTo = clone $message->getScheduledDate();
+            $rescheduleTo->add(new \DateInterval('PT'.$rescheduleDate));
+            $message->setScheduledDate($rescheduleTo);
+            $message->setStatus('rescheduled');
+
+            if ($persist) {
+                $this->saveEntity($message);
+            }
+        }
     }
 
     /**
