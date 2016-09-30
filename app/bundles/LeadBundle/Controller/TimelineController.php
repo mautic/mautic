@@ -133,7 +133,7 @@ class TimelineController extends CommonController
             return $this->notFound();
         }
 
-        $lead = $this->checkAccess($leadId, 'view', true, $integration);
+        $lead = $this->checkLeadAccess($leadId, 'view', true, $integration);
         if ($lead instanceof Response) {
 
             return $lead;
