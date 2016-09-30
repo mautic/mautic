@@ -273,13 +273,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-
         $params['fields'] = implode(',', $fields);
 
         $count = 0;
 
         if (isset($data['records']) and $object !== 'Activity') {
-
             foreach ($data['records'] as $record) {
                 $integrationEntities = [];
 
