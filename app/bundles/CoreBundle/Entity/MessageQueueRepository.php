@@ -34,23 +34,33 @@ class MessageQueueRepository extends CommonRepository
        return $results;
     }
 
-    public function getQueuedMessages($channel = null, $channelId =  null) {
+    public function getQueuedMessages($channel = null, $channelId =  null)
+    {
 
-        $scheduledDate = new \DateTime();
+        $scheduledDate = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('mq.id,mq.channel, mq.channel_id as channelId, mq.lead_id as lead, mq.options')
-            ->from(MAUTIC_TABLE_PREFIX . 'message_queue', 'mq');
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
 
-        $exp = $q->where( $q->expr()->eq('mq.success' ,':success'))
-                   ->andWhere($q->expr()->lt('mq.attempts','mq.max_attempts'))
-            ->andWhere($q->expr()->gt('mq.scheduled_date', ':scheduledDate'))
-            ->andWhere($q->expr()->lt('mq.scheduled_date', ':scheduledDateEnd'))
+        $q->where($q->expr()->eq('mq.success', ':success'))
+            ->andWhere($q->expr()->lt('mq.attempts', 'mq.max_attempts'))
+            ->andWhere('mq.scheduled_date BETWEEN :scheduledDate AND :scheduledDateEnd')
             ->setParameter('success', false, 'boolean')
-            ->setParameter('scheduledDate',$scheduledDate->format('Y-m-d 00:00:00'))
-            ->setParameter('scheduledDateEnd',$scheduledDate->format('Y-m-d 23:59:59'));
+            ->setParameter('scheduledDate', $scheduledDate->format('Y-m-d 00:00:00'))
+            ->setParameter('scheduledDateEnd', $scheduledDate->format('Y-m-d 23:59:59'));
         $q->orderBy('priority,scheduled_date', 'ASC');
-        $results= $q->execute($exp)
+
+        if ($channel) {
+            $q->andWhere($q->expr()->eq('mq.channel', ':channel'))
+                ->setParameter('channel', $channel);
+
+            if ($channelId) {
+                $q->andWhere($q->expr()->eq('mq.channel_id', (int) $channelId));
+            }
+        }
+
+        $results = $q->execute()
             ->fetchAll();
 
         return $results;
