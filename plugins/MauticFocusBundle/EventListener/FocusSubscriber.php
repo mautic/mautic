@@ -105,7 +105,7 @@ class FocusSubscriber extends CommonSubscriber
         $entity = $event->getFocus();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle'    => 'plugin.focus',
+                'bundle'    => 'focus',
                 'object'    => 'focus',
                 'objectId'  => $entity->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',

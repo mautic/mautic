@@ -94,6 +94,11 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $router;
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * CommonSubscriber constructor.
      */
     public function __construct()
@@ -173,6 +178,14 @@ class CommonSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * Automatic post-construct setup.
      */
     public function init()
@@ -185,13 +198,5 @@ class CommonSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [];
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 }
