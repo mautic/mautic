@@ -328,6 +328,7 @@ class LeadModel extends FormModel
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
         $updatedFields       = $entity->getUpdatedFields();
+        $company             = null;
 
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company'] = $updatedFields['company'];
@@ -367,7 +368,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company, $entity, true);
+            $this->companyModel->addLeadToCompany($company[0]['id'], $entity, true, true);
         }
     }
 

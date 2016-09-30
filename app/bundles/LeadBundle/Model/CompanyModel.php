@@ -246,7 +246,9 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
-
+        if (!is_array($companies)) {
+            $companies = array($companies);
+        }
         /** @var Company[] $companyLeadAdd */
         $companyLeadAdd = [];
         if (!$companies instanceof Company) {
@@ -285,9 +287,7 @@ class CompanyModel extends CommonFormModel
             $companies = [$companies->getId()];
         }
 
-        if (!is_array($companies)) {
-            $companies = [$companies];
-        }
+
 
         $persistCompany = [];
         $dispatchEvents = [];
