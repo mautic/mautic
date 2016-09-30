@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Queue\QueueName;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -101,12 +102,13 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        if($this->get('mautic.helper.core_parameters')->getParameter('track_mail_use_queue')) {
-            $msg = array('request' => $this->request, 'idHash' => $idHash);
-            $this->get('old_sound_rabbit_mq.task_email_producer')->publish(serialize($msg));
+        if ($this->get('mautic.helper.core_parameters')->getParameter('track_mail_use_queue')) {
+            $msg = ['request' => $this->request, 'idHash' => $idHash];
+            $this->get('mautic.queue_service')->addMessageToQueue(serialize($msg), QueueName::Email);
         } else {
             $this->getModel('email')->hitEmail($idHash, $this->request);
         }
+
         return TrackingPixelHelper::getResponse($this->request);
     }
 

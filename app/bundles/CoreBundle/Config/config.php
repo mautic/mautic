@@ -462,6 +462,19 @@ return [
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
+            'mautic.rabbitMQ' => [
+              'class' => 'Mautic\CoreBundle\Queue\RabbitMq',
+              'arguments' => [
+                'old_sound_rabbit_mq.task_email_producer'
+              ]
+            ],
+            'mautic.queue_service' => [
+                'class' => 'Mautic\CoreBundle\Queue\QueueService',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.rabbitMQ',
+                ]
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -903,5 +916,6 @@ return [
         'rabbitmq_vhost'            => '/',
         'rabbitmq_user'             => 'guest',
         'rabbitmq_password'         => 'guest',
+        'queue_protocol'            => 0,
     ],
 ];
