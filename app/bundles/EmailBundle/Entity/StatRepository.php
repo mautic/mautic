@@ -556,6 +556,12 @@ class StatRepository extends CommonRepository
             ->getResult();
     }
 
+    /**
+     * @param $contacts
+     * @param $emailId
+     *
+     * @return mixed
+     */
     public function checkContactsSentEmail($contacts, $emailId)
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();

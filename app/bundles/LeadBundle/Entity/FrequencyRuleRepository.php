@@ -28,9 +28,12 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('es.lead_id, fr.frequency_time, fr.frequency_number')
+        $selectFrequency = ($defaultFrequencyNumber) ? 'IFNULL(fr.frequency_number,:defaultNumber) as frequency_number' : 'fr.frequency_number';
+        $selectNumber     = ($defaultFrequencyTime) ? 'IFNULL(fr.frequency_time,:frequencyTime) as frequency_time' : 'fr.frequency_time';
+
+        $q->select("es.lead_id, $selectFrequency, $selectNumber")
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->join('es', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr','es.lead_id = fr.lead_id' );
+            ->leftJoin('es', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr','es.lead_id = fr.lead_id' );
 
         if ($channel) {
             $q->andWhere('fr.channel = :channel or fr.channel is null')
@@ -42,18 +45,20 @@ class FrequencyRuleRepository extends CommonRepository
                 ->andWhere('cs.leadlist_id = :list_id')
                 ->setParameter('list_id', $listId);
         }
+
         if (!empty($defaultFrequencyTime)) {
             $q->andWhere('es.date_sent >= case fr.frequency_time 
                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
                     when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
                     else DATE_SUB(NOW(),INTERVAL 1 '.$defaultFrequencyTime.')
-                    end');
+                    end')
+                ->setParameter('frequencyTime', $defaultFrequencyTime);
         } else {
-            $q->andWhere('(es.date_sent >= case fr.frequency_time 
-                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
-                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
-                     when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK) 
+            $q->andWhere('(es.date_sent >= case fr.frequency_time
+                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
+                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
+                     when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
                     end)');
         }
 
@@ -65,11 +70,12 @@ class FrequencyRuleRepository extends CommonRepository
         $q->groupBy('es.lead_id, fr.frequency_time, fr.frequency_number');
 
         if ($defaultFrequencyNumber != null) {
-            $q->having('(count(es.lead_id) > fr.frequency_number and fr.frequency_number is not null) or (count(es.lead_id) < :defaultNumber)')
+            $q->having('(count(es.lead_id) >= IFNULL(fr.frequency_number,:defaultNumber))')
                 ->setParameter('defaultNumber', $defaultFrequencyNumber);
         } else {
-            $q->having('(count(es.lead_id) > fr.frequency_number)');
+            $q->having('(count(es.lead_id) >= fr.frequency_number)');
         }
+
         $results = $q->execute()->fetchAll();
 
         return $results;

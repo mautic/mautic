@@ -46,7 +46,6 @@ CREATE TABLE {$this->prefix}message_queue (
   lead_id INT NOT NULL, 
   channel VARCHAR(255) NOT NULL,
   channel_id INT NOT NULL, 
-  campaign_id INT DEFAULT NULL, 
   priority SMALLINT NOT NULL, 
   max_attempts SMALLINT NOT NULL, 
   attempts SMALLINT NOT NULL, 

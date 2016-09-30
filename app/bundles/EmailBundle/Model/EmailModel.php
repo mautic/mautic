@@ -1140,6 +1140,7 @@ class EmailModel extends FormModel
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
+        $isMarketing      = ('marketing' === $emailType);
         $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
         $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
 
@@ -1189,35 +1190,38 @@ class EmailModel extends FormModel
             }
         }
 
-        $leadIds = array_keys($sendTo);
-        $leadIds = implode(",", $leadIds);
+        $leadIds         = array_keys($sendTo);
+        $leadIds         = implode(",", $leadIds);
+        $campaignEventId = ($isMarketing && is_array($source) && 'campaign.event' === $source[0] && !empty($source[1])) ? $source[1] : null;
+        $dontSendTo      = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
 
-        if ($emailType == 'marketing') {
-            $this->messageQueueModel->addToQueue($sendTo, $source[1],'email', $email->getId(), $emailAttempts, $emailPriority);
-        }
+        if (!empty($dontSendTo) && $isMarketing) {
+            foreach ($dontSendTo as $frequencyRuleMet) {
+                // Queue this message to be processed by frequency and priority
+                $this->messageQueueModel->addToQueue(
+                    [$sendTo[$frequencyRuleMet['lead_id']]],
+                    'email',
+                    $email->getId(),
+                    $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'], 0, 1),
+                    $emailAttempts,
+                    $emailPriority,
+                    $campaignEventId
+                );
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
-        if (!empty($dontSendTo) and $emailType != 'transactional') {
-            foreach ($dontSendTo as $frequencyRuleMet)
-            {
                 unset($sendTo[$frequencyRuleMet['lead_id']]);
-                if ($emailType == 'marketing') {
-                    $this->messageQueueModel->rescheduleMessage($frequencyRuleMet['lead_id'],'email', $email->getId(), $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'],0,1));
-                }
             }
         }
-
-        // Hydrate contacts with company profile fields
-        $this->getContactCompanies($sendTo);
 
         //get a count of leads
         $count = count($sendTo);
 
         //noone to send to so bail or if marketing email from a campaign has been put in a queue
-        if (empty($count) || $emailType == 'marketing') {
+        if (empty($count)) {
             return $singleEmail ? true : [];
         }
+
+        // Hydrate contacts with company profile fields
+        $this->getContactCompanies($sendTo);
 
         foreach ($emailSettings as $eid => $details) {
             if (isset($details['send_weight'])) {
@@ -1235,7 +1239,7 @@ class EmailModel extends FormModel
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
         $mailer->enableQueue();
-		
+
         // Flushes the batch in case of using API mailers
         $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 
