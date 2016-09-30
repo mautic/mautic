@@ -435,6 +435,10 @@ class PublicController extends CommonFormController
         }
     }
 
+    /**
+     * @param $integration
+     * @throws \Exception
+     */
     private function doTracking($integration){
         $logger = $this->get('monolog.logger.mautic');
 

@@ -97,7 +97,12 @@ trait LeadDetailsTrait
 
         return $result;
     }
-
+    
+    /**
+     * @param $a
+     * @param $b
+     * @return int
+     */
     private function cmp($a, $b)
     {
         if ($a['timestamp'] === $b['timestamp']) {
@@ -105,7 +110,7 @@ trait LeadDetailsTrait
         }
         return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
     }
-    
+
     /**
      * Get a list of places for the lead based on IP location
      *

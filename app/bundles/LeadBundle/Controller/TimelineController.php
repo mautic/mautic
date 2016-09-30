@@ -175,5 +175,4 @@ class TimelineController extends CommonController
             ]
         );
     }
-
 }
