@@ -10,7 +10,9 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MessageQueue
@@ -23,6 +25,7 @@ class MessageQueue
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
@@ -34,14 +37,9 @@ class MessageQueue
     private $channelId;
 
     /**
-     * @var
+     * @var Event
      */
     private $event;
-
-    /**
-     * @var \Mautic\CampaignBundle\Entity\Campaign
-     */
-    private $campaign;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
@@ -98,7 +96,6 @@ class MessageQueue
      */
     private $options = [];
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -120,14 +117,8 @@ class MessageQueue
             ->addIndex(['success'], 'message_success')
             ->addIndex(['channel', 'channel_id'], 'message_channel_search');
 
-
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->createField('campaign', 'integer')
-            ->columnName('campaign_id')
-            ->nullable()
-            ->build();
 
         $builder->createManyToOne('event', 'Mautic\CampaignBundle\Entity\Event')
             ->addJoinColumn('event_id', 'id', true, false, 'CASCADE')
@@ -181,6 +172,14 @@ class MessageQueue
     }
 
     /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * @return integer
      */
     public function getAttempts ()
@@ -213,23 +212,6 @@ class MessageQueue
     }
 
     /**
-     * @return mixed
-     */
-    public function getCampaign ()
-    {
-        return $this->campaign;
-    }
-
-    /**
-     * @param mixed $campaign
-     */
-    public function setCampaign ($campaign)
-    {
-        $this->campaign = $campaign;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getChannel ()
@@ -244,7 +226,6 @@ class MessageQueue
     {
         $this->channel = $channel;
     }
-
 
     /**
      * @return mixed
@@ -267,7 +248,7 @@ class MessageQueue
     }
 
     /**
-     * @return mixed
+     * @return Event
      */
     public function getEvent()
     {
@@ -275,17 +256,16 @@ class MessageQueue
     }
 
     /**
-     * @param mixed $event
+     * @param Event $event
      *
      * @return MessageQueue
      */
-    public function setEvent($event)
+    public function setEvent(Event $event)
     {
         $this->event = $event;
 
         return $this;
     }
-
 
     /**
      * @return \DateTime
@@ -335,7 +315,7 @@ class MessageQueue
         $this->lastAttempt = $lastAttempt;
     }
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead ()
     {
@@ -343,9 +323,9 @@ class MessageQueue
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
      */
-    public function setLead ($lead)
+    public function setLead (Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -429,6 +409,4 @@ class MessageQueue
     {
         $this->success = $success;
     }
-
-
 }
