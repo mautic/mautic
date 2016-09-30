@@ -310,7 +310,7 @@ class ListModel extends FormModel
 
             ],
             'leadlist' => [
-                'label'      => 'lead '.$this->translator->trans('mautic.lead.list.filter.lists'),
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
                 ],
