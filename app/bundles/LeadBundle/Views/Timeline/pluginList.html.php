@@ -7,21 +7,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//$request = $app->getRequest();
-//if (!$request->isXmlHttpRequest() && $view['slots']->get('contentOnly', false) === false):
-//    //load base template
-//    $template = ($request->get('contentOnly')) ? 'slim' : 'base';
-//    $view->extend("MauticCoreBundle:Default:$template.html.php");
-//endif;
-
 if (isset($tmpl) && $tmpl == 'index') {
     $view->extend('MauticLeadBundle:Timeline:pluginIndex.html.php');
 }
 
 $baseUrl = isset($lead) ? $view['router']->path(
-    'mautic_plugin_timeline_view',['leadId' => $lead->getId()]
+    'mautic_plugin_timeline_view',['leadId' => $lead->getId(), 'integration'=>$integration]
 ) :
-    $view['router']->path('mautic_plugin_timeline_index');
+    $view['router']->path('mautic_plugin_timeline_index', ['integration'=>$integration]);
 ?>
 <style>
     .col-xs-6 {

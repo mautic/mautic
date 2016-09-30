@@ -70,7 +70,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginIndexAction(Request $request, $page = 1)
+    public function pluginIndexAction(Request $request, $integration, $page = 1)
     {
         $limit = 25;
         $leads = $this->checkAllAccess('view', $limit);
@@ -112,6 +112,7 @@ class TimelineController extends CommonController
                     'leads'        => $leads,
                     'page'        => $page,
                     'events'      => $events,
+                    'integration'      => $integration,
                     'tmpl'   => (!$this->request->isXmlHttpRequest())?'index':'',
                     'newCount' => (array_key_exists('count', $query) && $query['count'])?$query['count']:0
                 ],
@@ -164,6 +165,7 @@ class TimelineController extends CommonController
                 'viewParameters'  => [
                     'lead'        => $lead,
                     'page'        => $page,
+                    'integration'      => $integration,
                     'events'      => $events
                 ],
                 'passthroughVars' => [

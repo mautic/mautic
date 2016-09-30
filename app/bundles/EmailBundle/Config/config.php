@@ -42,7 +42,10 @@ return [
         'public' => [
             'mautic_plugin_tracker'             => [
                 'path'       => '/plugin/{integration}/tracking.gif',
-                'controller' => 'MauticEmailBundle:Public:pluginTrackingGif'
+                'controller' => 'MauticEmailBundle:Public:pluginTrackingGif',
+                'requirements' => [
+                    'integration' => '.+',
+                ]
             ],
             'mautic_email_tracker'             => [
                 'path'       => '/email/{idHash}.gif',

@@ -87,9 +87,8 @@ trait LeadAccessTrait
                 'filter' => [
                     'force' => [
                         [
-                            'column' => 'r.date_identified',
-                            'expr'   => 'is not null',
-                            'value'  => true
+                            'column' => 'l.date_identified',
+                            'expr'   => 'isNotNull',
                         ]
                     ]
                 ],
