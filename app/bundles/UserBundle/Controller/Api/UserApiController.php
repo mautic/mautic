@@ -78,8 +78,8 @@ class UserApiController extends CommonApiController
 
         $parameters = $this->request->request->all();
 
-        if (isset($parameters['plainPassword']['password'])) {
-            $submittedPassword = $parameters['plainPassword']['password'];
+        if (isset($parameters['plainPassword'])) {
+            $submittedPassword = $parameters['plainPassword'];
             $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
@@ -202,5 +202,17 @@ class UserApiController extends CommonApiController
         $view->setSerializationContext($context);
 
         return $this->handleView($view);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     *
+     * @return mixed|void
+     */
+    protected function createEntityForm($entity)
+    {
+        return $this->model->createForm($entity, $this->get('form.factory'), null, ['csrf_protection' => false]);
     }
 }
