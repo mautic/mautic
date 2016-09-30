@@ -36,10 +36,12 @@ class CompanyModel extends CommonFormModel
      * @var FieldModel
      */
     protected $leadFieldModel;
+
     /**
-     * PointModel constructor.
+     * CompanyModel constructor.
      *
-     * @param Session $session
+     * @param FieldModel $leadFieldModel
+     * @param Session    $session
      */
     public function __construct(FieldModel $leadFieldModel, Session $session)
     {
@@ -249,7 +251,7 @@ class CompanyModel extends CommonFormModel
             $leadId = $lead->getId();
         }
         if (!is_array($companies)) {
-            $companies = array($companies);
+            $companies = [$companies];
         }
         /** @var Company[] $companyLeadAdd */
         $companyLeadAdd = [];
@@ -288,8 +290,6 @@ class CompanyModel extends CommonFormModel
 
             $companies = [$companies->getId()];
         }
-
-
 
         $persistCompany = [];
         $dispatchEvents = [];

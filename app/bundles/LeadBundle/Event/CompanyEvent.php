@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class CompanyEvent.
@@ -20,7 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class CompanyEvent extends CommonEvent
 {
     /**
-     * @param Company $lead
+     * @param Company $company
      * @param bool    $isNew
      */
     public function __construct(Company $company, $isNew = false)
@@ -30,9 +29,9 @@ class CompanyEvent extends CommonEvent
     }
 
     /**
-     * Returns the Lead entity.
+     * Returns the Company entity.
      *
-     * @return Lead
+     * @return Company
      */
     public function getCompany()
     {
@@ -40,12 +39,12 @@ class CompanyEvent extends CommonEvent
     }
 
     /**
-     * Sets the Lead entity.
+     * Sets the Company entity.
      *
-     * @param Lead $lead
+     * @param Company $company
      */
-    public function setLead(Lead $lead)
+    public function setCompany(Company $company)
     {
-        $this->entity = $lead;
+        $this->entity = $company;
     }
 }
