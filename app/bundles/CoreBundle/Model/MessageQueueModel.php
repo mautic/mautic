@@ -9,23 +9,14 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\DBAL\DBALException;
-
 use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\MessageQueueEvent;
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Entity\MessageQueueRepository;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-
-
 
 /**
  * Class MessageQueueModel
@@ -39,50 +30,63 @@ class MessageQueueModel extends FormModel
     protected $leadModel;
 
     /**
-     * messageModel constructor.
+     * MessageQueueModel constructor.
      *
-     *
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel            $leadModel
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, LeadModel $leadModel) {
 
         $this->leadModel = $leadModel;
     }
 
+    /**
+     * @return \Doctrine\ORM\EntityRepository|\Mautic\CoreBundle\Entity\MessageQueueRepository
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticCoreBundle:MessageQueue');
     }
 
     /**
-     * @param $leads
-     * @param $campaignId
-     * @param $channel
-     * @param $channelId
-     * @param $options
-     * @param int $maxAttempts
-     * @param int $priority
-     * @return bool|MessageQueue
+     * @param      $leads
+     * @param      $channel
+     * @param      $channelId
+     * @param int  $maxAttempts
+     * @param int  $priority
+     * @param null $campaignEventId
+     *
+     * @return bool
      */
-    public function addToQueue($leads, $campaignId, $channel, $channelId, $maxAttempts = 1, $priority = 1)
+    public function addToQueue($leads, $channel, $channelId, $scheduledDate = null, $maxAttempts = 1, $priority = 1, $campaignEventId = null)
     {
         $messageQueues = [];
 
         echo $channel;
         echo $channelId;
 
+        if (!$scheduledDate) {
+            $scheduledDate = new \DateTime();
+        } elseif (!$scheduledDate instanceof \DateTime) {
+            $intervalPrefix = ('H' === $scheduledDate) ? 'PT' : 'P';
+            $scheduledDate = (new \DateTime())->add(new \DateInterval($intervalPrefix.$scheduledDate));
+        }
+
         foreach ($leads as $lead){
 
-            if (empty($this->getRepository()->findMessage($channel,$channelId,$lead['id']))) {
+            if (empty($this->getRepository()->findMessage($channel, $channelId, $lead['id']))) {
                 $leadEntity = $this->leadModel->getEntity($lead['id']);
                 $messageQueue = new MessageQueue();
-                $messageQueue->setCampaign($campaignId);
+                if ($campaignEventId) {
+                    $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
+                }
                 $messageQueue->setChannel($channel);
                 $messageQueue->setChannelId($channelId);
                 $messageQueue->setDatePublished(new \DateTime());
                 $messageQueue->setMaxAttempts($maxAttempts);
                 $messageQueue->setLead($leadEntity);
                 $messageQueue->setPriority($priority);
-                $messageQueue->setScheduledDate(new \DateTime());
+                $messageQueue->setScheduledDate($scheduledDate);
 
                 $messageQueues[] = $messageQueue;
             }
@@ -105,7 +109,6 @@ class MessageQueueModel extends FormModel
 
         foreach ($queue as $queueItem)
         {
-            $success = false;
             $message = $this->getRepository()->getEntity((int)$queueItem['id']);
             $event = new MessageQueueProcessEvent($message);
             $new = false;
