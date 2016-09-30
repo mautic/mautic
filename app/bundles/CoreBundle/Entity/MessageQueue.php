@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,9 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class MessageQueue
- *
- * @package Mautic\CoreBundle\Entity
+ * Class MessageQueue.
  */
 class MessageQueue
 {
@@ -97,7 +96,7 @@ class MessageQueue
     private $options = [];
 
     /**
-     * Used by listeners to note if the message had been processed in bulk
+     * Used by listeners to note if the message had been processed in bulk.
      *
      * @var bool
      */
@@ -106,7 +105,7 @@ class MessageQueue
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -187,17 +186,17 @@ class MessageQueue
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getAttempts ()
+    public function getAttempts()
     {
         return $this->attempts;
     }
 
     /**
-     * @param integer $attempts
+     * @param int $attempts
      */
-    public function setAttempts ($attempts)
+    public function setAttempts($attempts)
     {
         $this->attempts = $attempts;
     }
@@ -205,7 +204,7 @@ class MessageQueue
     /**
      * @return array
      */
-    public function getOptions ()
+    public function getOptions()
     {
         return $this->options;
     }
@@ -213,7 +212,7 @@ class MessageQueue
     /**
      * @param array $options
      */
-    public function setOptions ($options)
+    public function setOptions($options)
     {
         $this->options[] = $options;
     }
@@ -221,7 +220,7 @@ class MessageQueue
     /**
      * @return string
      */
-    public function getChannel ()
+    public function getChannel()
     {
         return $this->channel;
     }
@@ -229,7 +228,7 @@ class MessageQueue
     /**
      * @param string $channel
      */
-    public function setChannel ($channel)
+    public function setChannel($channel)
     {
         $this->channel = $channel;
     }
@@ -277,7 +276,7 @@ class MessageQueue
     /**
      * @return \DateTime
      */
-    public function getDatePublished ()
+    public function getDatePublished()
     {
         return $this->datePublished;
     }
@@ -285,7 +284,7 @@ class MessageQueue
     /**
      * @param \DateTime $datePublished
      */
-    public function setDatePublished ($datePublished)
+    public function setDatePublished($datePublished)
     {
         $this->datePublished = $datePublished;
     }
@@ -293,7 +292,7 @@ class MessageQueue
     /**
      * @return \DateTime
      */
-    public function getDateSent ()
+    public function getDateSent()
     {
         return $this->dateSent;
     }
@@ -301,7 +300,7 @@ class MessageQueue
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent ($dateSent)
+    public function setDateSent($dateSent)
     {
         $this->dateSent = $dateSent;
     }
@@ -309,7 +308,7 @@ class MessageQueue
     /**
      * @return \DateTime
      */
-    public function getLastAttempt ()
+    public function getLastAttempt()
     {
         return $this->lastAttempt;
     }
@@ -317,14 +316,14 @@ class MessageQueue
     /**
      * @param \DateTime $lastAttempt
      */
-    public function setLastAttempt ($lastAttempt)
+    public function setLastAttempt($lastAttempt)
     {
         $this->lastAttempt = $lastAttempt;
     }
     /**
      * @return Lead
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -332,39 +331,39 @@ class MessageQueue
     /**
      * @param Lead $lead
      */
-    public function setLead (Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getMaxAttempts ()
+    public function getMaxAttempts()
     {
         return $this->maxAttempts;
     }
 
     /**
-     * @param integer $maxAttempts
+     * @param int $maxAttempts
      */
-    public function setMaxAttempts ($maxAttempts)
+    public function setMaxAttempts($maxAttempts)
     {
         $this->maxAttempts = $maxAttempts;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getPriority ()
+    public function getPriority()
     {
         return $this->priority;
     }
 
     /**
-     * @param integer $priority
+     * @param int $priority
      */
-    public function setPriority ($priority)
+    public function setPriority($priority)
     {
         $this->priority = $priority;
     }
@@ -372,7 +371,7 @@ class MessageQueue
     /**
      * @return mixed
      */
-    public function getScheduledDate ()
+    public function getScheduledDate()
     {
         return $this->scheduledDate;
     }
@@ -388,7 +387,7 @@ class MessageQueue
     /**
      * @return string
      */
-    public function getStatus ()
+    public function getStatus()
     {
         return $this->status;
     }
@@ -396,7 +395,7 @@ class MessageQueue
     /**
      * @param string $status
      */
-    public function setStatus ($status)
+    public function setStatus($status)
     {
         $this->status = $status;
     }
@@ -404,7 +403,7 @@ class MessageQueue
     /**
      * @return bool
      */
-    public function getSuccess ()
+    public function getSuccess()
     {
         return $this->success;
     }
@@ -412,7 +411,7 @@ class MessageQueue
     /**
      * @return bool
      */
-    public function isSuccess ()
+    public function isSuccess()
     {
         return $this->success;
     }
@@ -420,13 +419,13 @@ class MessageQueue
     /**
      * @param bool $success
      */
-    public function setSuccess ($success = true)
+    public function setSuccess($success = true)
     {
         $this->success = $success;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isProcessed()
     {
@@ -434,7 +433,7 @@ class MessageQueue
     }
 
     /**
-     * @param boolean $processed
+     * @param bool $processed
      *
      * @return MessageQueue
      */

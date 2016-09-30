@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -49,15 +50,14 @@ class OAuthEventListener
     /**
      * @param OAuthEvent $event
      *
-     * @return void
      * @throws AccessDeniedException
      */
     public function onPreAuthorizationProcess(OAuthEvent $event)
     {
         if ($user = $this->getUser($event)) {
             //check to see if user has api access
-            if (!$this->mauticSecurity->isGranted("api:access:full")) {
-                throw new AccessDeniedException($this->translator->trans('mautic.core.error.accessdenied', array(), 'flashes'));
+            if (!$this->mauticSecurity->isGranted('api:access:full')) {
+                throw new AccessDeniedException($this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'));
             }
             $client = $event->getClient();
             $event->setAuthorizedClient(
@@ -68,8 +68,6 @@ class OAuthEventListener
 
     /**
      * @param OAuthEvent $event
-     *
-     * @return void
      */
     public function onPostAuthorizationProcess(OAuthEvent $event)
     {

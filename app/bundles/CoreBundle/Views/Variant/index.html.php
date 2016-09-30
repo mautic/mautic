@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if (!isset($nameGetter)) {
@@ -88,7 +89,7 @@ $totalWeight = 0;
             $abTestResults['supportTemplate'],
             ['results' => $abTestResults, 'variants' => $variants]
         ) : $view['translator']->trans('mautic.core.ab_test.noresults'),
-        'size'   => 'lg',
+        'size' => 'lg',
     ]
 ); ?>
 <?php endif; ?>

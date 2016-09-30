@@ -1,11 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CalendarBundle\CalendarEvents;
@@ -14,29 +16,24 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class CalendarSubscriber
- *
- * @package Mautic\FormBundle\EventListener
+ * Class CalendarSubscriber.
  */
 class CalendarSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
+        return [
             //CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
-        );
+        ];
     }
 
     /**
-     * Adds events to the calendar
+     * Adds events to the calendar.
      *
      * @param CalendarGeneratorEvent $event
-     *
-     * @return void
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
@@ -44,8 +41,8 @@ class CalendarSubscriber extends CommonSubscriber
 
         $query = $this->em->getConnection()->createQueryBuilder();
         $query->select('fs.referer AS url, f.name AS title, fs.date_submitted AS start')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'fs.form_id = f.id')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'fs.form_id = f.id')
             ->where($query->expr()->andX(
                 $query->expr()->gte('fs.date_submitted', ':start'),
                 $query->expr()->lte('fs.date_submitted', ':end')
@@ -59,9 +56,9 @@ class CalendarSubscriber extends CommonSubscriber
 
         // We need to convert the date to a ISO8601 compliant string
         foreach ($results as &$object) {
-            $date = new DateTimeHelper($object['start']);
+            $date            = new DateTimeHelper($object['start']);
             $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-            $object['title'] = $this->translator->trans('mautic.form.event.submission', array('%form%' => $object['title']));
+            $object['title'] = $this->translator->trans('mautic.form.event.submission', ['%form%' => $object['title']]);
         }
 
         $event->addEvents($results);

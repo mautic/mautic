@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Point;
 
 /**
- * Class PointActionEvent
+ * Class PointActionEvent.
  */
 class PointActionEvent extends CommonEvent
 {
@@ -30,7 +31,7 @@ class PointActionEvent extends CommonEvent
 
     /**
      * @param Point $point
-     * @param Lead $lead
+     * @param Lead  $lead
      */
     public function __construct(Point &$point, Lead &$lead)
     {
@@ -39,7 +40,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Returns the Point entity
+     * Returns the Point entity.
      *
      * @return Point
      */
@@ -49,7 +50,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Sets the Point entity
+     * Sets the Point entity.
      *
      * @param Point $point
      */
@@ -59,7 +60,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -69,7 +70,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Sets the Lead entity
+     * Sets the Lead entity.
      *
      * @param $lead
      */

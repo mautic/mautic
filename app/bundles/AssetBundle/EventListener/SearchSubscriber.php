@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
@@ -39,12 +38,12 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     /**
@@ -57,44 +56,44 @@ class SearchSubscriber extends CommonSubscriber
             return;
         }
 
-        $filter     = array("string" => $str, "force" => array());
+        $filter = ['string' => $str, 'force' => []];
 
         $permissions = $this->security->isGranted(
-            array('asset:assets:viewown', 'asset:assets:viewother'),
+            ['asset:assets:viewown', 'asset:assets:viewother'],
             'RETURN_ARRAY'
         );
         if ($permissions['asset:assets:viewown'] || $permissions['asset:assets:viewother']) {
             if (!$permissions['asset:assets:viewother']) {
-                $filter['force'][] = array(
+                $filter['force'][] = [
                     'column' => 'IDENTITY(a.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
-                );
+                    'value'  => $this->factory->getUser()->getId(),
+                ];
             }
 
             $assets = $this->assetModel->getEntities(
-                array(
+                [
                     'limit'  => 5,
-                    'filter' => $filter
-                ));
+                    'filter' => $filter,
+                ]);
 
             if (count($assets) > 0) {
-                $assetResults = array();
+                $assetResults = [];
 
                 foreach ($assets as $asset) {
                     $assetResults[] = $this->templating->renderResponse(
                         'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
-                        array('asset' => $asset)
+                        ['asset' => $asset]
                     )->getContent();
                 }
                 if (count($assets) > 5) {
                     $assetResults[] = $this->templating->renderResponse(
                         'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($assets) - 5)
-                        )
+                            'remaining'    => (count($assets) - 5),
+                        ]
                     )->getContent();
                 }
                 $assetResults['count'] = count($assets);
@@ -108,7 +107,7 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        if ($this->security->isGranted(array('asset:assets:viewown', 'asset:assets:viewother'), "MATCH_ONE")) {
+        if ($this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {
             $event->addCommands(
                 'mautic.asset.assets',
                 $this->assetModel->getCommandList()

@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$style = $focus['style'];
-$props = $focus['properties'];
+$style          = $focus['style'];
+$props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
 $useUnloadEvent = ($props['when'] == 'leave');
-$useTimeout = (!$useUnloadEvent && !$useScrollEvent && $props['when'] != 'immediately');
+$useTimeout     = (!$useUnloadEvent && !$useScrollEvent && $props['when'] != 'immediately');
 
 if ($useTimeout) {
     $timeout = ($props['when'] == '5seconds') ? 5000 : 60000;
@@ -48,7 +49,7 @@ switch ($style) {
     case 'bar':
         $iframeClass = "mf-bar-iframe mf-bar-iframe-{$props['bar']['placement']} mf-bar-iframe-{$props['bar']['size']}";
         if ($props['bar']['sticky']) {
-            $iframeClass .= " mf-bar-iframe-sticky";
+            $iframeClass .= ' mf-bar-iframe-sticky';
         }
         break;
 

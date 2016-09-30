@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if ($tmpl == 'index') {
     $view->extend('MauticFocusBundle:Focus:index.html.php');
 }
@@ -89,7 +89,7 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->hasEntityAccess(
+                                    'edit' => $view['security']->hasEntityAccess(
                                         $permissions['plugin:focus:items:editown'],
                                         $permissions['plugin:focus:items:editother'],
                                         $item->getCreatedBy()
@@ -101,7 +101,7 @@ if ($tmpl == 'index') {
                                         $item->getCreatedBy()
                                     ),
                                 ],
-                                'routeBase'       => 'focus',
+                                'routeBase' => 'focus',
                             ]
                         );
                         ?>
@@ -124,8 +124,8 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
-                        <?php $catName = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
-                        <?php $color = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
+                        <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                        <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.focus.type.'.$item->getType()); ?></td>

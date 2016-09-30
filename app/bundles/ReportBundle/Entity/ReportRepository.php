@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,19 +14,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository
+ * ReportRepository.
  */
 class ReportRepository extends CommonRepository
 {
-
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('r')
@@ -41,8 +41,8 @@ class ReportRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
             $q->expr()->like('r.name',  ":$unique")
@@ -50,10 +50,11 @@ class ReportRepository extends CommonRepository
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
+
+        return [
             $expr,
-            array("$unique" => $string)
-        );
+            ["$unique" => $string],
+        ];
     }
 
     /**
@@ -67,17 +68,17 @@ class ReportRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq("r.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq("r.isPublished", ":$unique");
-                $forceParameters = array($unique => false);
+                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq("IDENTITY(r.createdBy)", $this->currentUser->getId());
+                $expr            = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
         }
@@ -89,13 +90,13 @@ class ReportRepository extends CommonRepository
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif (!$returnParameter) {
-            $parameters = array();
+            $parameters = [];
         } else {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array($expr, $parameters);
+        return [$expr, $parameters];
     }
 
     /**
@@ -103,11 +104,11 @@ class ReportRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
-            'mautic.core.searchcommand.ismine'
-        );
+            'mautic.core.searchcommand.ismine',
+        ];
     }
 
     /**
@@ -115,9 +116,9 @@ class ReportRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('r.name', 'ASC')
-        );
+        return [
+            ['r.name', 'ASC'],
+        ];
     }
 
     /**

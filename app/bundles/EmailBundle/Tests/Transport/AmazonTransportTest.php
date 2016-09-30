@@ -1,25 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Tests\Transport;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Joomla\Http\Http;
+use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
- * Class AmazonTransportTest
- *
+ * Class AmazonTransportTest.
  */
 class AmazonTransportTest extends KernelTestCase
 {
-
     private $container;
 
     public function setUp()
@@ -30,8 +29,7 @@ class AmazonTransportTest extends KernelTestCase
     }
 
     /**
-     * Test that the confirmation URL from the payload is called
-     *
+     * Test that the confirmation URL from the payload is called.
      */
     public function testConfirmationCallbackSuccessfull()
     {
@@ -52,8 +50,8 @@ class AmazonTransportTest extends KernelTestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        # payload which is sent by Amazon SES
-        $payload = <<<PAYLOAD
+        // payload which is sent by Amazon SES
+        $payload = <<<'PAYLOAD'
 {
   "Type" : "SubscriptionConfirmation",
   "MessageId" : "a3466e9f-872a-4438-9cf8-91d282af0f53",
@@ -68,22 +66,21 @@ class AmazonTransportTest extends KernelTestCase
 }
 PAYLOAD;
 
-        $jsonPayload = json_decode($payload, TRUE);
+        $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', $mockHttp);
         $transport->processJsonPayload($jsonPayload, $logger, $translator);
     }
 
     /**
-     * Test that a bounce message is properly processed by the mailer callback
-     *
+     * Test that a bounce message is properly processed by the mailer callback.
      */
     public function testSingleBounceCallbackSuccessfull()
     {
         $logger     = $this->container->get('logger');
         $translator = $this->container->get('translator');
 
-        # payload which is sent by Amazon SES
+        // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
 {
   "Type" : "Notification",
@@ -98,25 +95,24 @@ PAYLOAD;
 }
 PAYLOAD;
 
-        $jsonPayload = json_decode($payload, TRUE);
+        $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', new Http());
-        $rows = $transport->processJsonPayload($jsonPayload, $logger, $translator);
+        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('nope@nope.com', $rows[2]['emails']);
         $this->assertContains('Recipient address rejected', $rows[2]['emails']['nope@nope.com']);
     }
 
     /**
-     * Test that a complaint message without a feedback report is processed with the reason "unkown"
-     *
+     * Test that a complaint message without a feedback report is processed with the reason "unkown".
      */
     public function testSingleComplaintWithoutFeedbackCallbackSuccessfull()
     {
         $logger     = $this->container->get('logger');
         $translator = $this->container->get('translator');
 
-        # payload which is sent by Amazon SES
+        // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
 {
   "Type" : "Notification",
@@ -131,25 +127,24 @@ PAYLOAD;
 }
 PAYLOAD;
 
-        $jsonPayload = json_decode($payload, TRUE);
+        $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', new Http());
-        $rows = $transport->processJsonPayload($jsonPayload, $logger, $translator);
+        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
         $this->assertEquals('mautic.email.complaint.reason.unkown', $rows[1]['emails']['richard@example.com']);
     }
 
     /**
-     * Test that a complaint message with a feedback is processed and the reason is set accordingly
-     *
+     * Test that a complaint message with a feedback is processed and the reason is set accordingly.
      */
     public function testSingleComplaintWithFeedbackCallbackSuccessfull()
     {
         $logger     = $this->container->get('logger');
         $translator = $this->container->get('translator');
 
-        # payload which is sent by Amazon SES
+        // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
 {
   "Type" : "Notification",
@@ -164,13 +159,12 @@ PAYLOAD;
 }
 PAYLOAD;
 
-        $jsonPayload = json_decode($payload, TRUE);
+        $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', new Http());
-        $rows = $transport->processJsonPayload($jsonPayload, $logger, $translator);
+        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
         $this->assertEquals('mautic.email.complaint.reason.abuse', $rows[1]['emails']['richard@example.com']);
     }
-
 }

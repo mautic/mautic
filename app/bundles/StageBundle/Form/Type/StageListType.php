@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,30 +15,28 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class UserListType
- *
- * @package Mautic\UserBundle\Form\Type
+ * Class UserListType.
  */
 class StageListType extends AbstractType
 {
-
-    private $choices = array();
+    private $choices = [];
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
-        $choices = $factory->getModel('stage')->getRepository()->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
+    public function __construct(MauticFactory $factory)
+    {
+        $choices = $factory->getModel('stage')->getRepository()->getEntities([
+            'filter' => [
+                'force' => [
+                    [
                         'column' => 's.isPublished',
                         'expr'   => 'eq',
-                        'value'  => true
-                    )
-                )
-            )
-        ));
+                        'value'  => true,
+                    ],
+                ],
+            ],
+        ]);
 
         foreach ($choices as $choice) {
             $this->choices[$choice->getId()] = $choice->getName(true);
@@ -52,21 +51,22 @@ class StageListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices'       => $this->choices,
-            'empty_value'   => false,
-            'expanded'      => false,
-            'multiple'      => true,
-            'required'      => false,
-            'empty_value'   => 'mautic.core.form.chooseone'
-        ));
+        $resolver->setDefaults([
+            'choices'     => $this->choices,
+            'empty_value' => false,
+            'expanded'    => false,
+            'multiple'    => true,
+            'required'    => false,
+            'empty_value' => 'mautic.core.form.chooseone',
+        ]);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "stage_list";
+    public function getName()
+    {
+        return 'stage_list';
     }
 
     public function getParent()

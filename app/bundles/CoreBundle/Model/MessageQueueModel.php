@@ -1,30 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\CoreBundle\Event\MessageQueueEvent;
 use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\CoreBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Event\MessageQueueEvent;
-use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class MessageQueueModel
+ * Class MessageQueueModel.
  */
 class MessageQueueModel extends FormModel
 {
-
     /**
      * @var LeadModel
      */
@@ -76,13 +76,12 @@ class MessageQueueModel extends FormModel
             $scheduledDate = new \DateTime();
         } elseif (!$scheduledDate instanceof \DateTime) {
             $intervalPrefix = ('H' === $scheduledDate) ? 'PT' : 'P';
-            $scheduledDate = (new \DateTime())->add(new \DateInterval($intervalPrefix.$scheduledDate));
+            $scheduledDate  = (new \DateTime())->add(new \DateInterval($intervalPrefix.$scheduledDate));
         }
 
-        foreach ($leads as $lead){
-
+        foreach ($leads as $lead) {
             if (empty($this->getRepository()->findMessage($channel, $channelId, $lead['id']))) {
-                $leadEntity = $this->leadModel->getEntity($lead['id']);
+                $leadEntity   = $this->leadModel->getEntity($lead['id']);
                 $messageQueue = new MessageQueue();
                 if ($campaignEventId) {
                     $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
@@ -112,10 +111,10 @@ class MessageQueueModel extends FormModel
     {
         // Note when the process started for batch purposes
         $processStarted = new \DateTime();
-        $limit   = 50;
-        $counter = 0;
+        $limit          = 50;
+        $counter        = 0;
         while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
-            $contacts = [];
+            $contacts  = [];
             $byChannel = [];
 
             // Lead entities will not have profile fields populated due to the custom field use - therefore to optimize resources,
@@ -166,12 +165,12 @@ class MessageQueueModel extends FormModel
                 $lead = $message->getLead();
 
                 if (!$message->isProcessed()) {
-                    $event   = new MessageQueueProcessEvent($message);
+                    $event = new MessageQueueProcessEvent($message);
                     $this->dispatchEvent('process_message_queue', $message, false, $event);
                 }
 
                 if ($message->isSuccess()) {
-                    $counter++;
+                    ++$counter;
                     $message->setAttempts($message->getAttempts() + 1);
                     $message->setSuccess(true);
                     $message->setLastAttempt(new \DateTime());
@@ -204,7 +203,7 @@ class MessageQueueModel extends FormModel
     {
         $persist = false;
         if (!$message) {
-            $message   = $this->getRepository()->findMessage($channel, $channelId, $leadId);
+            $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
             $persist = true;
         }
 
@@ -235,13 +234,13 @@ class MessageQueueModel extends FormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         switch ($action) {
-            case "process_message_queue":
+            case 'process_message_queue':
                 $name = CoreEvents::PROCESS_MESSAGE_QUEUE;
                 break;
-            case "process_batch_message_queue":
+            case 'process_batch_message_queue':
                 $name = CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = CoreEvents::MESSAGE_QUEUED;
                 break;
             default:

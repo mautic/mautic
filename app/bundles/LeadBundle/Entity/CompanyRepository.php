@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributorcomp. All rights reserved.
+ * @copyright   2014 Mautic Contributorcomp. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,15 +14,14 @@ use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CompanyRepository
+ * Class CompanyRepository.
  */
 class CompanyRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      *
-     * @param integer $id
+     * @param int $id
      *
      * @return mixed|null
      */
@@ -48,23 +48,23 @@ class CompanyRepository extends CommonRepository
         return $entity;
     }
     /**
-     * Get a list of leads
+     * Get a list of leads.
      *
      * @param array $args
      *
      * @return array
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where($fq->expr()->eq('object',':company'))
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where($fq->expr()->eq('object', ':company'))
             ->setParameter('company', 'company');
         $results = $fq->execute()->fetchAll();
 
-        $fields = array();
+        $fields = [];
         foreach ($results as $r) {
             $fields[$r['alias']] = $r;
         }
@@ -108,8 +108,8 @@ class CompanyRepository extends CommonRepository
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
-        $fieldValues = array();
-        $groups      = array('core', 'other');
+        $fieldValues = [];
+        $groups      = ['core', 'other'];
 
         foreach ($results as $result) {
             $companyId = $result['id'];
@@ -118,7 +118,7 @@ class CompanyRepository extends CommonRepository
 
             foreach ($result as $k => $r) {
                 if (isset($fields[$k])) {
-                    $fieldValues[$companyId][$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
+                    $fieldValues[$companyId][$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
                     $fieldValues[$companyId][$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
                 }
             }
@@ -126,7 +126,7 @@ class CompanyRepository extends CommonRepository
             //make sure each group key is present
             foreach ($groups as $g) {
                 if (!isset($fieldValues[$companyId][$g])) {
-                    $fieldValues[$companyId][$g] = array();
+                    $fieldValues[$companyId][$g] = [];
                 }
             }
         }
@@ -146,14 +146,14 @@ class CompanyRepository extends CommonRepository
             //We should probably totally ditch orm for leads
             $order = '(CASE';
             foreach ($ids as $count => $id) {
-                $order .= ' WHEN comp.id = ' . $id . ' THEN ' . $count;
-                $count++;
+                $order .= ' WHEN comp.id = '.$id.' THEN '.$count;
+                ++$count;
             }
-            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+            $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
             //ORM - generates lead entities
             $q = $this->_em->createQueryBuilder();
-            $q->select('comp,' . $order)
+            $q->select('comp,'.$order)
                 ->from('MauticLeadBundle:Company', 'comp', 'comp.id');
 
             //only pull the leads as filtered via DBAL
@@ -172,17 +172,16 @@ class CompanyRepository extends CommonRepository
             foreach ($results as $r) {
                 $companyId = $r->getId();
                 $r->setFields($fieldValues[$companyId]);
-
             }
         } else {
-            $results = array();
+            $results = [];
         }
 
         return (!empty($args['withTotalCount'])) ?
-            array(
-                'count' => $total,
-                'results' => $results
-            ) : $results;
+            [
+                'count'   => $total,
+                'results' => $results,
+            ] : $results;
     }
     /**
      * {@inheritdoc}
@@ -194,18 +193,18 @@ class CompanyRepository extends CommonRepository
     {
         $this->_em->persist($entity);
 
-        if ($flush)
+        if ($flush) {
             $this->_em->flush($entity);
+        }
 
         $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {
-            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'companies', $fields, array('id' => $entity->getId()));
+            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'companies', $fields, ['id' => $entity->getId()]);
         }
     }
 
-
     /**
-     * Persist an array of entities
+     * Persist an array of entities.
      *
      * @param array $entities
      */
@@ -217,7 +216,7 @@ class CompanyRepository extends CommonRepository
         }
     }
     /**
-     * Get a list of fields and values
+     * Get a list of fields and values.
      *
      * @param           $id
      * @param bool|true $byGroup
@@ -229,13 +228,13 @@ class CompanyRepository extends CommonRepository
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where($fq->expr()->eq('f.object',':object'))
-            ->setParameter('object','company')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where($fq->expr()->eq('f.object', ':object'))
+            ->setParameter('object', 'company')
             ->orderBy('f.field_order', 'asc');
         $results = $fq->execute()->fetchAll();
 
-        $fields = array();
+        $fields = [];
         foreach ($results as $r) {
             $fields[$r['alias']] = $r;
         }
@@ -243,7 +242,7 @@ class CompanyRepository extends CommonRepository
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('*')
-            ->from(MAUTIC_TABLE_PREFIX . 'companies', 'comp')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->where('comp.id = :companyId')
             ->setParameter('companyId', $id);
         $companyValues = $q->execute()->fetch();
@@ -252,7 +251,7 @@ class CompanyRepository extends CommonRepository
         // Reorder leadValues based on field order
         $companyValues = array_merge(array_flip(array_keys($fields)), $companyValues);
 
-        $fieldValues = array();
+        $fieldValues = [];
 
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($companyValues as $k => $r) {
@@ -269,10 +268,10 @@ class CompanyRepository extends CommonRepository
 
         if ($byGroup) {
             //make sure each group key is present
-            $groups = array('core', 'social', 'personal', 'professional');
+            $groups = ['core', 'social', 'personal', 'professional'];
             foreach ($groups as $g) {
                 if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = array();
+                    $fieldValues[$g] = [];
                 }
             }
         }
@@ -280,9 +279,9 @@ class CompanyRepository extends CommonRepository
         return $fieldValues;
     }
     /**
-     * Get companies by lead
+     * Get companies by lead.
      *
-     * @param      $leadId
+     * @param   $leadId
      *
      * @return array
      */
@@ -292,7 +291,7 @@ class CompanyRepository extends CommonRepository
 
         $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
-            ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
             ->orderBy('cl.date_added', 'DESC');
@@ -305,7 +304,7 @@ class CompanyRepository extends CommonRepository
         return $results;
     }
     /**
-     * Function to remove non custom field columns from an arrayed lead row
+     * Function to remove non custom field columns from an arrayed lead row.
      *
      * @param array $r
      */
@@ -326,16 +325,15 @@ class CompanyRepository extends CommonRepository
         return 'comp';
     }
 
-
     /**
      * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, array(
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
             'comp.companyname',
-            'comp.companydescription'
-        ));
+            'comp.companydescription',
+        ]);
     }
 
     /**
@@ -355,7 +353,7 @@ class CompanyRepository extends CommonRepository
     }
 
     /**
-     * Get a list of lists
+     * Get a list of lists.
      *
      * @param bool   $user
      * @param string $alias
@@ -365,20 +363,20 @@ class CompanyRepository extends CommonRepository
      */
     public function getCompanies($user = false, $id = '')
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        static $companies = array();
+        $q                = $this->_em->getConnection()->createQueryBuilder();
+        static $companies = [];
 
         if ($user) {
             $user = $this->currentUser;
         }
 
-        $key = (int)$id;
+        $key = (int) $id;
         if (isset($companies[$key])) {
             return $companies[$key];
         }
 
         $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
 
         if (!empty($id)) {
             $q->where(
@@ -401,12 +399,12 @@ class CompanyRepository extends CommonRepository
     }
 
     /**
-    * Get a count of leads that belong to the company
-    *
-    * @param $companyIds
-    *
-    * @return array
-    */
+     * Get a count of leads that belong to the company.
+     *
+     * @param $companyIds
+     *
+     * @return array
+     */
     public function getLeadCount($companyIds)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -417,7 +415,7 @@ class CompanyRepository extends CommonRepository
         $returnArray = (is_array($companyIds));
 
         if (!$returnArray) {
-            $companyIds = array($companyIds);
+            $companyIds = [$companyIds];
         }
 
         $q->where(
@@ -429,35 +427,36 @@ class CompanyRepository extends CommonRepository
 
         $result = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
         foreach ($result as $r) {
-                $return[$r['company_id']] = $r['thecount'];
-            }
+            $return[$r['company_id']] = $r['thecount'];
+        }
 
         // Ensure lists without leads have a value
         foreach ($companyIds as $l) {
-                if (!isset($return[$l])) {
-                        $return[$l] = 0;
-                    }
+            if (!isset($return[$l])) {
+                $return[$l] = 0;
+            }
         }
 
         return ($returnArray) ? $return : $return[$companyIds[0]];
     }
 
     /**
-     * Get a list of lists
+     * Get a list of lists.
      *
      * @param $companyName
      * @param $city
      * @param $country
      * @param null $state
+     *
      * @return array
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
-            return array();
+            return [];
         }
         $q->select('comp.id')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');

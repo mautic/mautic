@@ -1,11 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CalendarBundle\CalendarEvents;
@@ -14,39 +16,34 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class CalendarSubscriber
- *
- * @package Mautic\LeadBundle\EventListener
+ * Class CalendarSubscriber.
  */
 class CalendarSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
-        );
+        return [
+            CalendarEvents::CALENDAR_ON_GENERATE => ['onCalendarGenerate', 0],
+        ];
     }
 
     /**
-     * Adds events to the calendar
+     * Adds events to the calendar.
      *
      * @param CalendarGeneratorEvent $event
-     *
-     * @return void
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
-        $dates  = $event->getDates();
+        $dates = $event->getDates();
 
         // Lead Notes
         $query = $this->em->getConnection()->createQueryBuilder();
         $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_notes', 'ln')
-            ->leftJoin('ln', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'ln.lead_id = l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_notes', 'ln')
+            ->leftJoin('ln', MAUTIC_TABLE_PREFIX.'leads', 'l', 'ln.lead_id = l.id')
             ->where($query->expr()->andX(
                 $query->expr()->gte('ln.date_time', ':start'),
                 $query->expr()->lte('ln.date_time', ':end')
@@ -61,14 +58,14 @@ class CalendarSubscriber extends CommonSubscriber
         // We need to convert the date to a ISO8601 compliant string
         foreach ($results as &$object) {
             if ($object['firstname'] || $object['lastname']) {
-                $leadName = $object['firstname'] . ' ' . $object['lastname'];
+                $leadName = $object['firstname'].' '.$object['lastname'];
             } else {
                 $leadName = $this->translator->trans('mautic.lead.lead.anonymous');
             }
-            $date = new DateTimeHelper($object['start']);
-            $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-            $object['url']   = $this->router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
-            $object['attr']  = 'data-toggle="ajax"';
+            $date                  = new DateTimeHelper($object['start']);
+            $object['start']       = $date->toLocalString(\DateTime::ISO8601);
+            $object['url']         = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $object['lead_id']], true);
+            $object['attr']        = 'data-toggle="ajax"';
             $object['description'] = strip_tags(html_entity_decode($object['description']));
 
             switch ($object['type']) {
@@ -87,8 +84,8 @@ class CalendarSubscriber extends CommonSubscriber
                     break;
             }
 
-            $object['iconClass'] = 'fa fa-fw ' . $icon;
-            $object['title'] = $leadName;
+            $object['iconClass'] = 'fa fa-fw '.$icon;
+            $object['title']     = $leadName;
             //$object['title'] .= ' (' . $this->translator->trans('mautic.lead.note.type.' . $object['type']) . ')';
         }
 

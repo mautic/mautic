@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +14,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class LeadImportType
+ * Class LeadImportType.
  */
 class BatchSendType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -28,20 +28,20 @@ class BatchSendType extends AbstractType
         $builder->add(
             'batchlimit',
             'text',
-            array(
+            [
                 'label'       => false,
-                'attr'        => array('class' => 'form-control'),
+                'attr'        => ['class' => 'form-control'],
                 'data'        => $default,
-                'constraints' => array(
+                'constraints' => [
                     new \Symfony\Component\Validator\Constraints\NotBlank(
-                        array('message' => 'mautic.core.value.required')
-                    )
-                )
-            )
+                        ['message' => 'mautic.core.value.required']
+                    ),
+                ],
+            ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -50,6 +50,6 @@ class BatchSendType extends AbstractType
      */
     public function getName()
     {
-        return "batch_send";
+        return 'batch_send';
     }
 }

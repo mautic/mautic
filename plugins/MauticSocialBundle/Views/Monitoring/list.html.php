@@ -1,14 +1,15 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticSocialBundle:Monitoring:index.html.php');
+}
 ?>
 <?php if (count($items)): ?>
 <div class="table-responsive">
@@ -16,25 +17,25 @@ if ($tmpl == 'index')
         <thead>
             <tr>
                 <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'checkall' => 'true',
-                        'target'   => '#monitoringTable'
-                    ));
+                        'target'   => '#monitoringTable',
+                    ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'social.monitoring',
                         'orderBy'    => 'e.title',
                         'text'       => 'mautic.core.title',
                         'class'      => 'col-monitoring-title',
-                        'default'    => true
-                    ));
+                        'default'    => true,
+                    ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'social.monitoring',
                         'orderBy'    => 'e.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-asset-id'
-                    ));
+                        'class'      => 'visible-md visible-lg col-asset-id',
+                    ]);
                 ?>
             </tr>
         </thead>
@@ -43,26 +44,26 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                                'item'       => $item,
-                                'templateButtons' => array(
-                                    'edit'       => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                                    'delete'     => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-                                ),
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                                'item'            => $item,
+                                'templateButtons' => [
+                                    'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
+                                    'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                                ],
                                 'routeBase'  => 'social',
                                 'langVar'    => 'mautic.social.monitoring',
                                 'nameGetter' => 'getTitle',
-                            ));
+                            ]);
                         ?>
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array(
-                                    'item'       => $item,
-                                    'model'      => 'plugin.mauticSocial.monitoring'
-                                )); ?>
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', [
+                                    'item'  => $item,
+                                    'model' => 'plugin.mauticSocial.monitoring',
+                                ]); ?>
                             <a href="<?php echo $view['router']->path('mautic_social_action',
-                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getTitle(); ?>
                             </a>
@@ -78,21 +79,21 @@ if ($tmpl == 'index')
     </table>
 </div>
 <div class="panel-footer">
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            'totalItems'      => count($items),
-            'page'            => $page,
-            'limit'           => $limit,
-            'menuLinkId'      => 'mautic_campaign_index',
-            'baseUrl'         => $view['router']->path('mautic_social_index'),
-            'sessionVar'      => 'social.monitoring',
-            'routeBase'       => 'social'
-        )); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+            'totalItems' => count($items),
+            'page'       => $page,
+            'limit'      => $limit,
+            'menuLinkId' => 'mautic_campaign_index',
+            'baseUrl'    => $view['router']->path('mautic_social_index'),
+            'sessionVar' => 'social.monitoring',
+            'routeBase'  => 'social',
+        ]); ?>
 </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('tip' => 'mautic.mautic.social.monitoring.noresults.tip')); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'mautic.mautic.social.monitoring.noresults.tip']); ?>
 <?php endif; ?>
 
-<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
         'id'     => 'MonitoringPreviewModal',
-        'header' => false
-    ));
+        'header' => false,
+    ]);

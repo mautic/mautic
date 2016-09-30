@@ -1,19 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
 class PluginFactory implements SecurityFactoryInterface
 {
@@ -33,12 +34,11 @@ class PluginFactory implements SecurityFactoryInterface
             ->replaceArgument(3, new Reference($userProvider))
             ->replaceArgument(4, $id);
 
-
         $listenerId = 'security.authentication.listener.mautic.'.$id;
         $container->setDefinition($listenerId, new DefinitionDecorator('mautic.security.authentication_listener'))
             ->replaceArgument(5, $id);
 
-        return array($providerId, $listenerId, $defaultEntryPoint);
+        return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
     /**

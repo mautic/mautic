@@ -1,59 +1,57 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * Class DashboardSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class DashboardSubscriber.
  */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
-     * Define the name of the bundle/category of the widget(s)
+     * Define the name of the bundle/category of the widget(s).
      *
      * @var string
      */
     protected $bundle = 'email';
 
     /**
-     * Define the widget(s)
+     * Define the widget(s).
      *
      * @var string
      */
-    protected $types = array(
-        'emails.in.time' => array(
-            'formAlias' => 'email_dashboard_emails_in_time_widget'
-        ),
-        'ignored.vs.read.emails' => array(),
-        'upcoming.emails' => array(),
-        'most.sent.emails' => array(),
-        'most.read.emails' => array(),
-        'created.emails' => array(),
-        'device.granularity.email' => array()
-    );
+    protected $types = [
+        'emails.in.time' => [
+            'formAlias' => 'email_dashboard_emails_in_time_widget',
+        ],
+        'ignored.vs.read.emails'   => [],
+        'upcoming.emails'          => [],
+        'most.sent.emails'         => [],
+        'most.read.emails'         => [],
+        'created.emails'           => [],
+        'device.granularity.email' => [],
+    ];
 
     /**
-     * Define permissions to see those widgets
+     * Define permissions to see those widgets.
      *
      * @var array
      */
-    protected $permissions = array(
+    protected $permissions = [
         'email:emails:viewown',
-        'email:emails:viewother'
-    );
+        'email:emails:viewother',
+    ];
 
     /**
      * @var EmailModel
@@ -71,19 +69,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     }
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed.
      *
      * @param WidgetDetailEvent $event
-     *
-     * @return void
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('email:emails:viewother');
-        
-        if ($event->getType() == 'emails.in.time') {
 
+        if ($event->getType() == 'emails.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -92,7 +87,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             if (!$event->isCached()) {
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->emailModel->getEmailsLineChartData(
@@ -102,8 +97,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFormat'],
                         $params['filter'],
                         $canViewOthers
-                    )
-                ));
+                    ),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
@@ -115,11 +110,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $this->emailModel->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
-                ));
+                    'chartData'   => $this->emailModel->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
@@ -135,7 +130,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $upcomingEmails = $this->emailModel->getUpcomingEmails($limit, $canViewOthers);
 
             $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
-            $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
+            $event->setTemplateData(['upcomingEmails' => $upcomingEmails]);
             $event->stopPropagation();
         }
 
@@ -154,39 +149,39 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
-                    array(),
-                    array('groupBy' => 'sends', 'canViewOthers' => $canViewOthers)
+                    [],
+                    ['groupBy' => 'sends', 'canViewOthers' => $canViewOthers]
                 );
-                $items = array();
+                $items = [];
 
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
-                        $row = array(
-                            array(
+                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                        $row      = [
+                            [
                                 'value' => $email['name'],
-                                'type' => 'link',
-                                'link' => $emailUrl
-                            ),
-                            array(
-                                'value' => $email['count']
-                            )
-                        );
+                                'type'  => 'link',
+                                'link'  => $emailUrl,
+                            ],
+                            [
+                                'value' => $email['count'],
+                            ],
+                        ];
                         $items[] = $row;
                     }
                 }
 
-                $event->setTemplateData(array(
-                    'headItems'   => array(
+                $event->setTemplateData([
+                    'headItems' => [
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.email.label.sends')
-                    ),
-                    'bodyItems'   => $items,
-                    'raw'         => $emails
-                ));
+                        $event->getTranslator()->trans('mautic.email.label.sends'),
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $emails,
+                ]);
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
@@ -206,39 +201,39 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
-                    array(),
-                    array('groupBy' => 'reads', 'canViewOthers' => $canViewOthers)
+                    [],
+                    ['groupBy' => 'reads', 'canViewOthers' => $canViewOthers]
                 );
-                $items = array();
+                $items = [];
 
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
-                        $row = array(
-                            array(
+                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                        $row      = [
+                            [
                                 'value' => $email['name'],
-                                'type' => 'link',
-                                'link' => $emailUrl
-                            ),
-                            array(
-                                'value' => $email['count']
-                            )
-                        );
+                                'type'  => 'link',
+                                'link'  => $emailUrl,
+                            ],
+                            [
+                                'value' => $email['count'],
+                            ],
+                        ];
                         $items[] = $row;
                     }
                 }
 
-                $event->setTemplateData(array(
-                    'headItems'   => array(
+                $event->setTemplateData([
+                    'headItems' => [
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.email.label.reads')
-                    ),
-                    'bodyItems'   => $items,
-                    'raw'         => $emails
-                ));
+                        $event->getTranslator()->trans('mautic.email.label.reads'),
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $emails,
+                ]);
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
@@ -258,41 +253,41 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
-                    array(),
-                    array('groupBy' => 'creations', 'canViewOthers' => $canViewOthers)
+                    [],
+                    ['groupBy' => 'creations', 'canViewOthers' => $canViewOthers]
                 );
-                $items = array();
+                $items = [];
 
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
                         $emailUrl = $this->router->generate(
-                            'mautic_email_action', 
-                            array(
+                            'mautic_email_action',
+                            [
                                 'objectAction' => 'view',
-                                'objectId' => $email['id']
-                            )
+                                'objectId'     => $email['id'],
+                            ]
                         );
-                        $row = array(
-                            array(
+                        $row = [
+                            [
                                 'value' => $email['name'],
-                                'type' => 'link',
-                                'link' => $emailUrl
-                            )
-                        );
+                                'type'  => 'link',
+                                'link'  => $emailUrl,
+                            ],
+                        ];
                         $items[] = $row;
                     }
                 }
 
-                $event->setTemplateData(array(
-                    'headItems'   => array(
-                        $event->getTranslator()->trans('mautic.dashboard.label.title')
-                    ),
-                    'bodyItems'   => $items,
-                    'raw'         => $emails
-                ));
+                $event->setTemplateData([
+                    'headItems' => [
+                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $emails,
+                ]);
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
@@ -301,16 +296,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->emailModel->getDeviceGranularityPieChartData(
                         $params['dateFrom'],
                         $params['dateTo'],
                         $canViewOthers
-                    )
-                ));
+                    ),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignEventFormSubmitType
+ * Class CampaignEventFormSubmitType.
  */
 class CampaignEventFormFieldValueType extends AbstractType
 {
@@ -44,14 +45,14 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.campaign.event.forms_descr',
-                    'onchange' => 'Mautic.updateFormFields(this)'
+                    'onchange' => 'Mautic.updateFormFields(this)',
                 ],
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.core.value.required']
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -113,8 +114,8 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'choices' => $fields,
                     'attr'    => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
-                        'data-field-options' => json_encode($options)
-                    ]
+                        'data-field-options' => json_encode($options),
+                    ],
                 ]
             );
 
@@ -124,17 +125,17 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'value',
                     'text',
                     [
-                        'label'       => 'mautic.form.field.form.value',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class' => 'form-control'
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
                         ],
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ],
                     ]
                 );
             } else {
@@ -142,18 +143,18 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'value',
                     'choice',
                     [
-                        'choices'     => $options[$data['field']],
-                        'label'       => 'mautic.form.field.form.value',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class' => 'form-control not-chosen'
+                        'choices'    => $options[$data['field']],
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control not-chosen',
                         ],
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ],
                     ]
                 );
             }
@@ -169,6 +170,6 @@ class CampaignEventFormFieldValueType extends AbstractType
      */
     public function getName()
     {
-        return "campaignevent_form_field_value";
+        return 'campaignevent_form_field_value';
     }
 }

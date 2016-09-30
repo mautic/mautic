@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class FocusSubscriber
+ * Class FocusSubscriber.
  */
 class FocusSubscriber extends CommonSubscriber
 {
@@ -61,7 +62,7 @@ class FocusSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST    => ['onKernelRequest', 0],
@@ -95,7 +96,7 @@ class FocusSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param FocusEvent $event
      */
@@ -116,7 +117,7 @@ class FocusSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param FocusEvent $event
      */

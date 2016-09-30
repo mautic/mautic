@@ -1,26 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class AssetBundle
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class AssetBundle.
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -42,7 +40,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -52,7 +50,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -65,7 +63,6 @@ class LeadSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -85,19 +82,19 @@ class LeadSubscriber extends CommonSubscriber
                 $asset = $this->assetModel->getEntity($download['asset_id']);
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
                             'label' => $download['title'],
-                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']])
+                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
                         ],
-                        'extra'           => [
+                        'extra' => [
                             'asset'            => $asset,
-                            'assetDownloadUrl' => $this->assetModel->generateUrl($asset)
+                            'assetDownloadUrl' => $this->assetModel->generateUrl($asset),
                         ],
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
-                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
+                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
                     ]
                 );
             }

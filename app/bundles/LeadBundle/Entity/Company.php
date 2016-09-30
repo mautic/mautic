@@ -1,46 +1,40 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\UserBundle\Entity\User;
-use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Company
- *
- * @package Mautic\LeadBundle\Entity
+ * Class Company.
  */
 class Company extends FormEntity
 {
-
     /**
      * @var int
      */
     private $id;
 
     /**
-     * Used by Mautic to populate the fields pulled from the DB
+     * Used by Mautic to populate the fields pulled from the DB.
      *
      * @var array
      */
     protected $fields = [];
 
     /**
-     * Just a place to store updated field values so we don't have to loop through them again comparing
+     * Just a place to store updated field values so we don't have to loop through them again comparing.
      *
      * @var array
      */
@@ -71,7 +65,7 @@ class Company extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
@@ -88,7 +82,7 @@ class Company extends FormEntity
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -96,10 +90,10 @@ class Company extends FormEntity
     {
         $metadata->setGroupPrefix('company')
             ->addListProperties(
-                array(
+                [
                     'id',
-                    'fields'
-                )
+                    'fields',
+                ]
             )
             ->build();
     }
@@ -107,12 +101,10 @@ class Company extends FormEntity
     /**
      * @param string $prop
      * @param mixed  $val
-     *
-     * @return void
      */
-    protected function isChanged ($prop, $val)
+    protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
@@ -122,20 +114,20 @@ class Company extends FormEntity
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')'
+                    $val->getName().'('.$val->getId().')',
                 ];
             }
         } else {
-            $this->changes[$prop] = array($current, $val);
+            $this->changes[$prop] = [$current, $val];
         }
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -148,7 +140,7 @@ class Company extends FormEntity
         $this->fields = $fields;
     }
     /**
-     * Get the primary identifier for the lead
+     * Get the primary identifier for the lead.
      *
      * @param bool $lastFirst
      *
@@ -183,18 +175,16 @@ class Company extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
     public function getName()
     {
         if (isset($this->updatedFields['companyname'])) {
-
             return $this->updatedFields['companyname'];
         }
         if (!empty($this->fields['core']['companyname']['value'])) {
-
             return $this->fields['core']['companyname']['value'];
         }
 
@@ -202,7 +192,7 @@ class Company extends FormEntity
     }
 
     /**
-     * Set owner
+     * Set owner.
      *
      * @param User $owner
      *
@@ -217,7 +207,7 @@ class Company extends FormEntity
     }
 
     /**
-     * Get owner
+     * Get owner.
      *
      * @return User
      */
@@ -227,7 +217,7 @@ class Company extends FormEntity
     }
 
     /**
-     * Add an updated field to persist to the DB and to note changes
+     * Add an updated field to persist to the DB and to note changes.
      *
      * @param        $alias
      * @param        $value
@@ -246,7 +236,7 @@ class Company extends FormEntity
     }
 
     /**
-     * Get the array of updated fields
+     * Get the array of updated fields.
      *
      * @return array
      */
@@ -255,9 +245,8 @@ class Company extends FormEntity
         return $this->updatedFields;
     }
 
-
     /**
-     * Get company field value
+     * Get company field value.
      *
      * @param      $field
      * @param null $group
@@ -267,19 +256,16 @@ class Company extends FormEntity
     public function getFieldValue($field, $group = null)
     {
         if (isset($this->updatedFields[$field])) {
-
             return $this->updatedFields[$field];
         }
 
         if (!empty($group) && isset($this->fields[$group][$field])) {
-
             return $this->fields[$group][$field]['value'];
         }
 
         foreach ($this->fields as $group => $groupFields) {
             foreach ($groupFields as $name => $details) {
                 if ($name == $field) {
-
                     return $details['value'];
                 }
             }
@@ -287,6 +273,4 @@ class Company extends FormEntity
 
         return false;
     }
-
-
 }

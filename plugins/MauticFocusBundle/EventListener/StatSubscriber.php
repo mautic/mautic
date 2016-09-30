@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,7 +20,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 /**
- * Class StatSubscriber
+ * Class StatSubscriber.
  */
 class StatSubscriber extends CommonSubscriber
 {
@@ -44,7 +45,7 @@ class StatSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             PageEvents::PAGE_ON_HIT    => ['onPageHit', 0],
@@ -71,7 +72,7 @@ class StatSubscriber extends CommonSubscriber
     }
 
     /**
-     * Note if this submission is from a focus submit
+     * Note if this submission is from a focus submit.
      *
      * @param SubmissionEvent $event
      */

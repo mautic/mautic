@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
-
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,7 +42,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.push_page.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data'  => (isset($options['data']['push_page'])) ? $options['data']['push_page'] : true,
+                        'data' => (isset($options['data']['push_page'])) ? $options['data']['push_page'] : true,
                     ]
                 );
 
@@ -55,7 +55,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.sticky.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data'  => (isset($options['data']['sticky'])) ? $options['data']['sticky'] : true,
+                        'data' => (isset($options['data']['sticky'])) ? $options['data']['sticky'] : true,
                     ]
                 );
 
@@ -63,13 +63,13 @@ class FocusPropertiesType extends AbstractType
                     'size',
                     'choice',
                     [
-                        'choices'     => [
+                        'choices' => [
                             'large'   => 'mautic.focus.form.bar.size.large',
                             'regular' => 'mautic.focus.form.bar.size.regular',
                         ],
-                        'label'       => 'mautic.focus.form.bar.size',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
+                        'label'      => 'mautic.focus.form.bar.size',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
                             'class'    => 'form-control',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
@@ -107,10 +107,10 @@ class FocusPropertiesType extends AbstractType
                 'placement',
                 'choice',
                 [
-                    'choices'     => $choices,
-                    'label'       => 'mautic.focus.form.placement',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
+                    'choices'    => $choices,
+                    'label'      => 'mautic.focus.form.placement',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',
                     ],

@@ -1,24 +1,24 @@
 <?php
+
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\LeadBundle\MauticLeadBundle;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 class SalesforceApi extends CrmApi
 {
-    protected $object  = 'Lead';
-    protected $requestSettings = array(
-        'encode_parameters' => 'json'
-    );
+    protected $object          = 'Lead';
+    protected $requestSettings = [
+        'encode_parameters' => 'json',
+    ];
 
     public function __construct(CrmAbstractIntegration $integration)
     {
         parent::__construct($integration);
 
-        $this->requestSettings['curl_options'] = array(
-            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1
-        );
+        $this->requestSettings['curl_options'] = [
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1,
+        ];
     }
 
     /**
@@ -30,19 +30,20 @@ class SalesforceApi extends CrmApi
      * @param null   $queryUrl
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = array(), $method = 'GET', $retry = false, $object = null, $queryUrl = null)
+    public function request($operation, $elementData = [], $method = 'GET', $retry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;
         }
 
-        if(!$queryUrl){
-            $queryUrl = $this->integration->getApiUrl();
-            $request_url = sprintf($queryUrl . '/%s/%s', $object, $operation);
-        } else{
-            $request_url = sprintf($queryUrl . '/%s', $operation);
+        if (!$queryUrl) {
+            $queryUrl    = $this->integration->getApiUrl();
+            $request_url = sprintf($queryUrl.'/%s/%s', $object, $operation);
+        } else {
+            $request_url = sprintf($queryUrl.'/%s', $operation);
         }
 
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
@@ -50,12 +51,12 @@ class SalesforceApi extends CrmApi
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
-            $errors = array();
+            $errors = [];
             foreach ($response as $r) {
                 if (is_array($r) && !empty($r['errorCode']) && !empty($r['message'])) {
                     // Check for expired session then retry if we can refresh
                     if ($r['errorCode'] == 'INVALID_SESSION_ID' && !$retry) {
-                        $refreshError = $this->integration->authCallback(array('use_refresh_token' => true));
+                        $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
 
                         if (empty($refreshError)) {
                             return $this->request($operation, $elementData, $method, true);
@@ -82,7 +83,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * Creates Salesforce lead
+     * Creates Salesforce lead.
      *
      * @param array $data
      *
@@ -90,7 +91,7 @@ class SalesforceApi extends CrmApi
      */
     public function createLead(array $data, $lead)
     {
-        $createdLeadData =  $this->request('', $data, 'POST');
+        $createdLeadData = $this->request('', $data, 'POST');
         //todo: check if push activities is selected in config
 
         return $createdLeadData;
@@ -113,15 +114,15 @@ class SalesforceApi extends CrmApi
             foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $key => $record) {
                     $activityData['records'][$key] = [
-                        'attributes'                 => [
+                        'attributes' => [
                             'type'        => $mActivityObjectName,
-                            'referenceId' => $record['id'].'-'.$sfId
+                            'referenceId' => $record['id'].'-'.$sfId,
                         ],
                         $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
                         $namespace.'Description__c'  => $record['description'],
                         'Name'                       => $record['name'],
                         $namespace.'Mautic_url__c'   => $records['leadUrl'],
-                        $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId
+                        $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId,
                     ];
 
                     if ($object === 'Lead') {
@@ -148,13 +149,13 @@ class SalesforceApi extends CrmApi
                 if ($results['hasErrors']) {
                     foreach ($results['results'] as $result) {
                         if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
-                            $references   = explode("-", $result['referenceId']);
+                            $references   = explode('-', $result['referenceId']);
                             $SF_leadIds[] = $references[1];
 
                             $leadIds = implode("','", $SF_leadIds);
-                            $query   = "select Id, ConvertedContactId from ".$object." where id in ('".$leadIds."')";
+                            $query   = 'select Id, ConvertedContactId from '.$object." where id in ('".$leadIds."')";
 
-                            $contacts = $this->request('query', ["q" => $query], 'GET', false, null, $queryUrl);
+                            $contacts = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
 
                             foreach ($contacts['records'] as $contact) {
                                 foreach ($activityData['records'] as $key => $record) {
@@ -165,7 +166,6 @@ class SalesforceApi extends CrmApi
                                         unset($activityData['records'][$key]);
                                     }
                                 }
-
                             }
                         }
                     }
@@ -189,7 +189,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * Get Salesforce leads
+     * Get Salesforce leads.
      *
      * @param string $query
      *
@@ -199,32 +199,32 @@ class SalesforceApi extends CrmApi
     {
         //find out if start date is not our of range for org
         if (isset($query['start'])) {
-            $queryUrl = $this->integration->getQueryUrl();
-            $organization = $this->request('query', array("q"=>"SELECT CreatedDate from Organization"),'GET',false,null,$queryUrl);
+            $queryUrl     = $this->integration->getQueryUrl();
+            $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
 
             if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
-                $query['start'] = date('c',strtotime($organization['records'][0]['CreatedDate']." +1 hour"));
+                $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
-        $settings['feature_settings']['objects']=$object;
+        $settings['feature_settings']['objects'] = $object;
 
-        $fields = $this->integration->getAvailableLeadFields($settings);
-        $fields['id']=array('id' => array());
-        $result = array();
+        $fields       = $this->integration->getAvailableLeadFields($settings);
+        $fields['id'] = ['id' => []];
+        $result       = [];
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields = implode(", ",array_keys($fields));
-            $getLeadsQuery = "SELECT ".$fields." from ".$object." where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
-            $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
+            $fields        = implode(', ', array_keys($fields));
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
+            $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {
-            $result = $this->request('query/'.$query, array(),'GET',false,null,$queryUrl);
+            $result = $this->request('query/'.$query, [], 'GET', false, null, $queryUrl);
         }
 
         return $result;
     }
 
     /**
-     * Get Salesforce leads
+     * Get Salesforce leads.
      *
      * @param string $query
      *
@@ -232,6 +232,6 @@ class SalesforceApi extends CrmApi
      */
     public function getSalesForceLeadById($id, $params, $object)
     {
-        return $this->request($id.'/',$params, 'GET', false,$object);
+        return $this->request($id.'/', $params, 'GET', false, $object);
     }
 }

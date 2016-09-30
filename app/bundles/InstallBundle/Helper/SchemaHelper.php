@@ -1,22 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\InstallBundle\Helper;
 
-
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Index;
 
 class SchemaHelper
 {
@@ -77,7 +77,7 @@ class SchemaHelper
     }
 
     /**
-     * Test db connection
+     * Test db connection.
      */
     public function testConnection()
     {
@@ -129,7 +129,6 @@ class SchemaHelper
                 $this->db                 = DriverManager::getConnection($this->dbParams);
                 $this->db->close();
             } catch (\Exception $e) {
-
                 return false;
             }
         }
@@ -138,11 +137,11 @@ class SchemaHelper
     }
 
     /**
-     * Generates SQL for installation
+     * Generates SQL for installation.
      *
      * @param object $originalData
      *
-     * @return array|boolean Array containing the flash message data on a failure, boolean true on success
+     * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     public function installSchema()
     {
@@ -173,7 +172,7 @@ class SchemaHelper
 
         foreach ($installSchema->getTables() as $m) {
             $tableName                = $m->getName();
-            $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);;
+            $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
         $sql = ['SET foreign_key_checks = 0;'];
@@ -208,12 +207,13 @@ class SchemaHelper
      * @param $backupPrefix
      *
      * @return array
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
     {
         $sql = [];
-        $sm = $this->db->getSchemaManager();
+        $sm  = $this->db->getSchemaManager();
 
         //backup existing tables
         $backupRestraints = $backupSequences = $backupIndexes = $backupTables = $dropSequences = $dropTables = [];
@@ -298,7 +298,7 @@ class SchemaHelper
                     $backupPrefix.$or->getName(),
                     $or->getOptions()
                 );
-                $sql[]            = $this->platform->getCreateForeignKeySQL($r, $table);
+                $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
             }
         }
 
@@ -335,10 +335,8 @@ class SchemaHelper
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
         if (empty($prefix) || strpos($name, $prefix) === false) {
-
             return $backupPrefix.$name;
         } else {
-
             return str_replace($prefix, $backupPrefix, $name);
         }
     }

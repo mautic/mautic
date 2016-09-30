@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class StatRepository extends CommonRepository
 {
     /**
-     * Fetch the base stat data from the database
+     * Fetch the base stat data from the database.
      *
      * @param int  $id
      * @param      $type

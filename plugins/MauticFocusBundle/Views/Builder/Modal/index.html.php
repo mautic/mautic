@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $props     = $focus['properties'];
@@ -17,13 +18,13 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
         }
     </style>
     <div class="mautic-focus mf-<?php echo $style; ?><?php if ($placement) {
-        echo " mf-$style-$placement";
-    } ?><?php echo $animate; ?>">
+    echo " mf-$style-$placement";
+} ?><?php echo $animate; ?>">
         <div class="mf-<?php echo $style; ?>-container">
             <div class="mf-<?php echo $style; ?>-close">
                 <a href="javascript:void(0)"<?php if (!empty($preview)) {
-                    echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"';
-                } ?>>x</a>
+    echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"';
+} ?>>x</a>
             </div>
             <div class="mf-content">
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,9 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class CacheStorageHelper
- *
- * @package Mautic\CoreBundle\Helper
+ * Class CacheStorageHelper.
  */
 class CacheStorageHelper
 {
@@ -33,10 +32,10 @@ class CacheStorageHelper
      */
     public function __construct($cacheDir, $uniqueCacheDir = null)
     {
-        $this->cacheDir = $cacheDir . '/data';
+        $this->cacheDir = $cacheDir.'/data';
 
         if ($uniqueCacheDir) {
-            $this->cacheDir .= '/' . $uniqueCacheDir;
+            $this->cacheDir .= '/'.$uniqueCacheDir;
         }
 
         $this->fs = new Filesystem();
@@ -44,7 +43,7 @@ class CacheStorageHelper
     }
 
     /**
-     * Creates the cache directory if doesn't exist
+     * Creates the cache directory if doesn't exist.
      */
     public function touchDir()
     {
@@ -54,14 +53,14 @@ class CacheStorageHelper
     }
 
     /**
-     * Writes/updates a file in app/cache/{env}/data directory
+     * Writes/updates a file in app/cache/{env}/data directory.
      *
-     * @param  string $fileName
-     * @param  array  $data
+     * @param string $fileName
+     * @param array  $data
      */
     public function set($fileName, $data)
     {
-        $filePath = $this->cacheDir . '/' . $fileName . '.php';
+        $filePath = $this->cacheDir.'/'.$fileName.'.php';
 
         if (is_writable($this->cacheDir)) {
             file_put_contents($filePath, json_encode($data));
@@ -72,8 +71,8 @@ class CacheStorageHelper
      * Reads a file in app/cache/{env}/data/$filename.
      * If the cache file is expired, it will return false as well as if it doesn't exist.
      *
-     * @param  string  $fileName
-     * @param  integer $maxAge in minutes. 0 == any
+     * @param string $fileName
+     * @param int    $maxAge   in minutes. 0 == any
      *
      * @return array|false
      */
@@ -86,14 +85,12 @@ class CacheStorageHelper
         $filePath = $this->cacheDir.'/'.$fileName.'.php';
 
         if ($this->fs->exists($filePath)) {
-
             if ($maxAge) {
                 $modifiedAt = filemtime($filePath);
                 $now        = time();
                 $fileAge    = round(($now - $modifiedAt) / 60); // in minutes
 
                 if ($fileAge >= $maxAge) {
-
                     return false;
                 }
             }
@@ -105,7 +102,7 @@ class CacheStorageHelper
     }
 
     /**
-     * Wipes out the cache directory
+     * Wipes out the cache directory.
      */
     public function clear()
     {

@@ -1,19 +1,20 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class NotificationSendType.
@@ -40,14 +41,14 @@ class NotificationSendType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('notification', 'notification_list', [
-            'label' => 'mautic.notification.send.selectnotifications',
+            'label'      => 'mautic.notification.send.selectnotifications',
             'label_attr' => ['class' => 'control-label'],
-            'attr' => [
-                'class' => 'form-control',
-                'tooltip' => 'mautic.notification.choose.notifications',
+            'attr'       => [
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.notification.choose.notifications',
                 'onchange' => 'Mautic.disabledNotificationAction()',
             ],
-            'multiple' => false,
+            'multiple'    => false,
             'constraints' => [
                 new NotBlank(
                     ['message' => 'mautic.notification.choosenotification.notblank']
@@ -58,13 +59,13 @@ class NotificationSendType extends AbstractType
         if (!empty($options['update_select'])) {
             $windowUrl = $this->router->generate('mautic_notification_action', [
                 'objectAction' => 'new',
-                'contentOnly' => 1,
+                'contentOnly'  => 1,
                 'updateSelect' => $options['update_select'],
             ]);
 
             $builder->add('newNotificationButton', 'button', [
                 'attr' => [
-                    'class' => 'btn btn-primary btn-nospin',
+                    'class'   => 'btn btn-primary btn-nospin',
                     'onclick' => 'Mautic.loadNewNotificationWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
@@ -78,17 +79,17 @@ class NotificationSendType extends AbstractType
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_notification_action', [
                 'objectAction' => 'edit',
-                'objectId' => 'notificationId',
-                'contentOnly' => 1,
+                'objectId'     => 'notificationId',
+                'contentOnly'  => 1,
                 'updateSelect' => $options['update_select'],
             ]);
 
             $builder->add('editNotificationButton', 'button', [
                 'attr' => [
-                    'class' => 'btn btn-primary btn-nospin',
-                    'onclick' => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                    'class'    => 'btn btn-primary btn-nospin',
+                    'onclick'  => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                     'disabled' => !isset($notification),
-                    'icon' => 'fa fa-edit',
+                    'icon'     => 'fa fa-edit',
                 ],
                 'label' => 'mautic.notification.send.edit.notification',
             ]);

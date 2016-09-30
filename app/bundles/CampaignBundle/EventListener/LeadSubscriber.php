@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,17 +12,14 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\CampaignBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -50,18 +48,18 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::LEAD_LIST_BATCH_CHANGE => ['onLeadListBatchChange', 0],
             LeadEvents::LEAD_LIST_CHANGE       => ['onLeadListChange', 0],
             LeadEvents::TIMELINE_ON_GENERATE   => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE        => ['onLeadMerge', 0]
+            LeadEvents::LEAD_POST_MERGE        => ['onLeadMerge', 0],
         ];
     }
 
     /**
-     * Add/remove leads from campaigns based on batch lead list changes
+     * Add/remove leads from campaigns based on batch lead list changes.
      *
      * @param ListChangeEvent $event
      */
@@ -117,7 +115,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add/remove leads from campaigns based on lead list changes
+     * Add/remove leads from campaigns based on lead list changes.
      *
      * @param ListChangeEvent $event
      */
@@ -152,7 +150,6 @@ class LeadSubscriber extends CommonSubscriber
                     $this->campaignModel->addLead($campaign, $lead);
                 } else {
                     if (array_intersect($leadListIds, $campaignLists[$c['id']])) {
-
                         continue;
                     }
 
@@ -165,7 +162,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -178,7 +175,6 @@ class LeadSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -206,21 +202,21 @@ class LeadSubscriber extends CommonSubscriber
 
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
                             'label' => $log['event_name'].' / '.$log['campaign_name'],
                             'href'  => $this->router->generate(
                                 'mautic_campaign_action',
                                 ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
-                            )
+                            ),
                         ],
-                        'eventType'       => $eventTypeName,
-                        'timestamp'       => $log['dateTriggered'],
-                        'extra'           => [
-                            'log' => $log
+                        'eventType' => $eventTypeName,
+                        'timestamp' => $log['dateTriggered'],
+                        'extra'     => [
+                            'log' => $log,
                         ],
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-clock-o'
+                        'icon'            => 'fa-clock-o',
                     ]
                 );
             }
@@ -228,7 +224,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Update records after lead merge
+     * Update records after lead merge.
      *
      * @param LeadMergeEvent $event
      */

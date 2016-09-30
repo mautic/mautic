@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class DynamicContentFilterType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class DynamicContentFilterType.
  */
 class DynamicContentFilterType extends AbstractType
 {
@@ -32,8 +31,8 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.token_name',
                 'attr'  => [
-                    'class' => 'form-control dynamic-content-token-name'
-                ]
+                    'class' => 'form-control dynamic-content-token-name',
+                ],
             ]
         );
 
@@ -43,8 +42,8 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-basic'
-                ]
+                    'class' => 'form-control editor editor-basic',
+                ],
             ]
         );
 
@@ -53,15 +52,15 @@ class DynamicContentFilterType extends AbstractType
                 'filters',
                 'collection',
                 [
-                    'type' => 'dynamic_content_filter_entry',
+                    'type'    => 'dynamic_content_filter_entry',
                     'options' => [
                         'label' => false,
                         'attr'  => [
-                            'class' => 'form-control'
-                        ]
+                            'class' => 'form-control',
+                        ],
                     ],
-                    'allow_add'      => true,
-                    'allow_delete'   => true,
+                    'allow_add'    => true,
+                    'allow_delete' => true,
                 ]
             )
         );
@@ -75,7 +74,7 @@ class DynamicContentFilterType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'          => false,
-                'error_bubbling' => false
+                'error_bubbling' => false,
             ]
         );
     }
@@ -85,6 +84,6 @@ class DynamicContentFilterType extends AbstractType
      */
     public function getName()
     {
-        return "dynamic_content_filter";
+        return 'dynamic_content_filter';
     }
 }

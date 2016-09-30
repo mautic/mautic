@@ -1,13 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$formName  = '_'.$form->generateFormName();
+$formName = '_'.$form->generateFormName();
 if (!isset($fields)) {
     $fields = $form->getFields();
 }
@@ -54,7 +54,7 @@ $pageCount = 1;
                             'id'            => $f->getAlias(),
                             'formName'      => $formName,
                             'fieldPage'     => ($pageCount - 1), // current page,
-                            'contactFields' => $contactFields
+                            'contactFields' => $contactFields,
                         ]
                     );
                 endif;
@@ -62,7 +62,7 @@ $pageCount = 1;
                 if (isset($formPages) && isset($formPages['close'][$fieldId])):
                     // Close the page
                     echo "\n            </div>\n";
-                    $pageCount++;
+                    ++$pageCount;
                 endif;
 
             endforeach;

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -47,7 +48,7 @@ if ($modified):
 </tr>
 <tr>
     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.publish.down'); ?></span></td>
-    <td><?php echo (!is_null($entity->getPublishDown())) ? $view['date']->toFull($entity->getPublishDown()) : $view['translator']->trans('mautic.core.never');; ?></td>
+    <td><?php echo (!is_null($entity->getPublishDown())) ? $view['date']->toFull($entity->getPublishDown()) : $view['translator']->trans('mautic.core.never'); ?></td>
 </tr>
 <?php endif; ?>
 <?php if (method_exists($entity, 'getId')): ?>

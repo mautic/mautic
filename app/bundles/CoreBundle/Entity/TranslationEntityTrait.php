@@ -1,15 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Entity;
-
-
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,7 +17,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 trait TranslationEntityTrait
 {
     /**
-     * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity
+     * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity.
      *
      * @var string
      */
@@ -44,7 +43,7 @@ trait TranslationEntityTrait
      * @param               $entityClass
      * @param string        $languageColumnName
      */
-    static protected function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -63,7 +62,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Add translation
+     * Add translation.
      *
      * @param TranslationEntityInterface $translationChildren
      *
@@ -79,7 +78,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Remove translation
+     * Remove translation.
      *
      * @param TranslationEntityInterface $child
      */
@@ -89,7 +88,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get translated items
+     * Get translated items.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
@@ -99,7 +98,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Set translation parent
+     * Set translation parent.
      *
      * @param TranslationEntityInterface $translationParent
      *
@@ -117,7 +116,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get translation parent
+     * Get translation parent.
      *
      * @return $this
      */
@@ -127,7 +126,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Remove translation parent
+     * Remove translation parent.
      */
     public function removeTranslationParent()
     {
@@ -139,7 +138,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Set language
+     * Set language.
      *
      * @param string $language
      *
@@ -157,7 +156,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get language
+     * Get language.
      *
      * @return string
      */
@@ -177,16 +176,14 @@ trait TranslationEntityTrait
         $children = $this->getTranslationChildren();
 
         if ($isChild) {
-
             return ($parent === null) ? false : true;
         } else {
-
             return (!empty($parent) || count($children)) ? true : false;
         }
     }
 
     /**
-     * Check if this entity has translations
+     * Check if this entity has translations.
      *
      * @return int
      */
@@ -198,7 +195,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Clear translations
+     * Clear translations.
      */
     public function clearTranslations()
     {
@@ -207,7 +204,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get translation parent/children
+     * Get translation parent/children.
      *
      * @param bool $onlyChildren
      *
@@ -232,7 +229,6 @@ trait TranslationEntityTrait
         }
 
         if ($onlyChildren) {
-
             return $children;
         }
 

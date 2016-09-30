@@ -1,13 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
  * Modified from
+ *
  * @see    https://github.com/barbushin/php-imap
+ *
  * @author Barbushin Sergey http://linkedin.com/in/barbushin
  * @copyright BSD (three-clause)
  */
@@ -16,7 +19,6 @@ namespace Mautic\EmailBundle\MonitoredEmail;
 
 class Message
 {
-
     public $id;
     public $date;
     public $subject;
@@ -24,10 +26,10 @@ class Message
     public $fromName;
     public $fromAddress;
 
-    public $to = array();
+    public $to = [];
     public $toString;
-    public $cc = array();
-    public $replyTo = array();
+    public $cc      = [];
+    public $replyTo = [];
 
     public $textPlain;
     public $textHtml;
@@ -35,10 +37,10 @@ class Message
     public $dsnMessage;
     public $fblReport;
     public $fblMessage;
-    public $xHeaders = array();
+    public $xHeaders = [];
 
     /** @var Attachment[] */
-    protected $attachments = array();
+    protected $attachments = [];
 
     /**
      * @param Attachment $attachment
@@ -57,14 +59,13 @@ class Message
     }
 
     /**
-     * Get array of internal HTML links placeholders
+     * Get array of internal HTML links placeholders.
      *
      * @return array attachmentId => link placeholder
      */
     public function getInternalLinksPlaceholders()
     {
-        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : array();
-
+        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
     }
 
     /**

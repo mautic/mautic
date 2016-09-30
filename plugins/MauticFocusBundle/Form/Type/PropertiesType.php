@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -26,7 +27,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'bar',
-                'data'        => (isset($options['data']['bar'])) ? $options['data']['bar'] : []
+                'data'        => (isset($options['data']['bar'])) ? $options['data']['bar'] : [],
             ]
         );
 
@@ -35,7 +36,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'modal',
-                'data'        => (isset($options['data']['modal'])) ? $options['data']['modal'] : []
+                'data'        => (isset($options['data']['modal'])) ? $options['data']['modal'] : [],
             ]
         );
 
@@ -44,7 +45,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'notification',
-                'data'        => (isset($options['data']['notification'])) ? $options['data']['notification'] : []
+                'data'        => (isset($options['data']['notification'])) ? $options['data']['notification'] : [],
             ]
         );
 
@@ -53,7 +54,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'page',
-                'data'        => (isset($options['data']['page'])) ? $options['data']['page'] : []
+                'data'        => (isset($options['data']['page'])) ? $options['data']['page'] : [],
             ]
         );
 
@@ -76,8 +77,8 @@ class PropertiesType extends AbstractType
                 'label' => 'mautic.focus.form.activate_for_links',
                 'data'  => (isset($options['data']['link_activation'])) ? $options['data']['link_activation'] : true,
                 'attr'  => [
-                    'data-show-on' => '{"focus_properties_when": ["leave"]}'
-                ]
+                    'data-show-on' => '{"focus_properties_when": ["leave"]}',
+                ],
             ]
         );
 
@@ -101,7 +102,7 @@ class PropertiesType extends AbstractType
             'when',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'immediately'   => 'mautic.focus.form.when.immediately',
                     '5seconds'      => 'mautic.focus.form.when.5seconds',
                     'minute'        => 'mautic.focus.form.when.minute',
@@ -124,7 +125,7 @@ class PropertiesType extends AbstractType
             'frequency',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'everypage' => 'mautic.focus.form.frequency.everypage',
                     'once'      => 'mautic.focus.form.frequency.once',
                     'q2min'     => 'mautic.focus.form.frequency.q2m',

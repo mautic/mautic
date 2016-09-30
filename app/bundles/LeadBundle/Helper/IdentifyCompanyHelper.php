@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,18 +15,31 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 /**
- * Class IdentifyCompanyHelper
+ * Class IdentifyCompanyHelper.
  */
 class IdentifyCompanyHelper
 {
     /**
-     * @param array $parameters
-     * @param Lead $lead
-     * @param CompanyModel $companyModel
-     * @return array
-     *
+     * @var MauticFactory
      */
-    static public function identifyLeadsCompany ($parameters = array(), Lead $lead, CompanyModel $companyModel)
+    private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
+     * @param array        $parameters
+     * @param Lead         $lead
+     * @param CompanyModel $companyModel
+     *
+     * @return array
+     */
+    public static function identifyLeadsCompany($parameters, Lead $lead, CompanyModel $companyModel)
     {
         $companyName = $companyDomain = null;
         $leadAdded   = false;
@@ -33,7 +47,7 @@ class IdentifyCompanyHelper
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         } elseif (isset($parameters['email'])) {
-            $companyName = $companyDomain = IdentifyCompanyHelper::domainExists($parameters['email']);
+            $companyName = $companyDomain = self::domainExists($parameters['email']);
         }
 
         if ($companyName) {
@@ -50,7 +64,7 @@ class IdentifyCompanyHelper
                 $companyLeadRepo = $companyModel->getCompanyLeadRepository();
                 if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']))) {
                     $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']);
-                    $company = $companyModel->getEntity($company[0]['id']);
+                    $company   = $companyModel->getEntity($company[0]['id']);
                     $leadAdded = true;
                 }
             } else {
@@ -60,13 +74,12 @@ class IdentifyCompanyHelper
                     'companywebsite' => $companyDomain,
                     'companycity'    => $city,
                     'companystate'   => $state,
-                    'companycountry' => $country
+                    'companycountry' => $country,
                 ];
-                $company  = $companyModel->getEntity();
+                $company = $companyModel->getEntity();
                 $companyModel->setFieldValues($company, $companyData, true);
                 $companyModel->saveEntity($company);
                 $leadAdded = true;
-
             }
 
             return [$company, $leadAdded];
@@ -80,11 +93,12 @@ class IdentifyCompanyHelper
      *
      * @return mixed
      */
-    private function domainExists($email){
+    private function domainExists($email)
+    {
         list($user, $domain) = explode('@', $email);
-        $arr= dns_get_record($domain,DNS_MX);
-        if($arr[0]['host']==$domain&&!empty($arr[0]['target'])){
-                return $arr[0]['target'];
+        $arr                 = dns_get_record($domain, DNS_MX);
+        if ($arr[0]['host'] == $domain && !empty($arr[0]['target'])) {
+            return $arr[0]['target'];
         }
     }
 }

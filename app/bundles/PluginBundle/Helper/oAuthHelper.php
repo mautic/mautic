@@ -1,22 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PluginBundle\Helper;
+
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class oAuthHelper
+ * Class oAuthHelper.
  *
  * Portions modified from https://code.google.com/p/simple-php-oauth/
- *
- * @package Mautic\PluginBundle\Helper
  */
 class oAuthHelper
 {
@@ -34,7 +34,7 @@ class oAuthHelper
 
     private $request;
 
-    public  function __construct (AbstractIntegration $integration, Request $request, $settings = array())
+    public function __construct(AbstractIntegration $integration, Request $request, $settings = [])
     {
         $keys                    = $integration->getDecryptedApiKeys();
         $this->clientId          = $keys[$integration->getClientIdKey()];
@@ -63,7 +63,6 @@ class oAuthHelper
             $headers['oauth_verifier'] = $this->request->query->get('oauth_verifier');
         }
 
-
         if (!empty($this->settings['query'])) {
             // Include query in the base string if appended
             $parameters = array_merge($parameters, $this->settings['query']);
@@ -80,41 +79,41 @@ class oAuthHelper
         $composite_key              = $this->getCompositeKey();
         $headers['oauth_signature'] = base64_encode(hash_hmac('sha1', $base_info, $composite_key, true));
 
-        return array($this->buildAuthorizationHeader($headers), 'Expect:');
+        return [$this->buildAuthorizationHeader($headers), 'Expect:'];
     }
 
     /**
-     * Get composite key for OAuth 1 signature signing
+     * Get composite key for OAuth 1 signature signing.
      *
      * @return string
      */
-    private function getCompositeKey ()
+    private function getCompositeKey()
     {
         if (strlen($this->accessTokenSecret) > 0) {
-            $composite_key = $this->encode($this->clientSecret) . '&' . $this->encode($this->accessTokenSecret);
+            $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         } else {
-            $composite_key = $this->encode($this->clientSecret) . '&';
+            $composite_key = $this->encode($this->clientSecret).'&';
         }
 
         return $composite_key;
     }
 
     /**
-     * Get OAuth 1.0 Headers
+     * Get OAuth 1.0 Headers.
      *
      * @return array
      */
-    private function getOauthHeaders ()
+    private function getOauthHeaders()
     {
-        $oauth = array(
+        $oauth = [
             'oauth_consumer_key'     => $this->clientId,
             'oauth_nonce'            => $this->generateNonce(),
             'oauth_signature_method' => 'HMAC-SHA1',
             'oauth_timestamp'        => time(),
-            'oauth_version'          => '1.0'
-        );
+            'oauth_version'          => '1.0',
+        ];
 
-        if (empty($this->settings['authorize_session']) && !empty($this->accessToken))  {
+        if (empty($this->settings['authorize_session']) && !empty($this->accessToken)) {
             $oauth['oauth_token'] = $this->accessToken;
         } elseif (!empty($this->settings['request_token'])) {
             // OAuth1.a access_token request that requires the retrieved request_token to be appended
@@ -129,7 +128,7 @@ class oAuthHelper
     }
 
     /**
-     * Build base string for OAuth 1 signature signing
+     * Build base string for OAuth 1 signature signing.
      *
      * @param $baseURI
      * @param $method
@@ -137,21 +136,21 @@ class oAuthHelper
      *
      * @return string
      */
-    private function buildBaseString ($baseURI, $method, $params)
+    private function buildBaseString($baseURI, $method, $params)
     {
         $r = $this->normalizeParameters($params);
 
-        return $method . '&' . $this->encode($baseURI) . '&' . $this->encode($r);
+        return $method.'&'.$this->encode($baseURI).'&'.$this->encode($r);
     }
 
     /**
-     * Build header for OAuth 1 authorization
+     * Build header for OAuth 1 authorization.
      *
      * @param $oauth
      *
      * @return string
      */
-    private function buildAuthorizationHeader ($oauth)
+    private function buildAuthorizationHeader($oauth)
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
@@ -161,7 +160,7 @@ class oAuthHelper
     }
 
     /**
-     * Normalize parameters
+     * Normalize parameters.
      *
      * @param      $parameters
      * @param bool $encode
@@ -169,7 +168,7 @@ class oAuthHelper
      *
      * @return string
      */
-    private function normalizeParameters ($parameters, $encode = false, $returnarray = false, $normalized = array(), $key = '')
+    private function normalizeParameters($parameters, $encode = false, $returnarray = false, $normalized = [], $key = '')
     {
         //Sort by key
         ksort($parameters);
@@ -184,9 +183,9 @@ class oAuthHelper
                     $k = $key;
                 }
                 if ($encode) {
-                    $normalized[] = $this->encode($k) . '="' . $this->encode($v).'"';
+                    $normalized[] = $this->encode($k).'="'.$this->encode($v).'"';
                 } else {
-                    $normalized[] = $k . '=' . $v;
+                    $normalized[] = $k.'='.$v;
                 }
             }
         }
@@ -201,19 +200,19 @@ class oAuthHelper
      *
      * @return string
      */
-    public function encode ($string)
+    public function encode($string)
     {
         return str_replace('%7E', '~', rawurlencode($string));
     }
 
     /**
-     * OAuth1.0 nonce generator
+     * OAuth1.0 nonce generator.
      *
      * @param int $bits
      *
      * @return string
      */
-    private function generateNonce ($bits = 64)
+    private function generateNonce($bits = 64)
     {
         $result          = '';
         $accumulatedBits = 0;
@@ -234,7 +233,7 @@ class oAuthHelper
             $moreBits = mt_rand() & ((1 << $bitsToAdd) - 1);
 
             // format as hex (this will be safe)
-            $format_string = '%0' . ($bitsToAdd / 4) . 'x';
+            $format_string = '%0'.($bitsToAdd / 4).'x';
             $result .= sprintf($format_string, $moreBits);
             $accumulatedBits += $bitsToAdd;
         }

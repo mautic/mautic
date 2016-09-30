@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,18 +13,18 @@ namespace Mautic\WebhookBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class WebhookRepository
+ * Class WebhookRepository.
  */
 class WebhookRepository extends CommonRepository
 {
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         return parent::getEntities($args);
     }
@@ -35,12 +36,13 @@ class WebhookRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, array('e.name'));
+        return $this->addStandardCatchAllWhereClause($q, $filter, ['e.name']);
     }
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
@@ -61,8 +63,8 @@ class WebhookRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array($this->getTableAlias() . '.name', 'ASC')
-        );
+        return [
+            [$this->getTableAlias().'.name', 'ASC'],
+        ];
     }
 }

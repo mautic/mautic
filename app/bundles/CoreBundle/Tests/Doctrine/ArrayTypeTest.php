@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,28 +17,28 @@ use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class ExampleClassWithPrivateProperty
 {
-    private /** @noinspection PhpUnusedPrivateFieldInspection */
-        $test = "value";
+    /** @noinspection PhpUnusedPrivateFieldInspection */
+        private $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty
 {
-    protected $test = "value";
+    protected $test = 'value';
 }
 
 class ExampleClassWithPublicProperty
 {
-    public $test = "value";
+    public $test = 'value';
 }
 
 /**
- * Class IpLookupFactoryTest
+ * Class IpLookupFactoryTest.
  */
 class ArrayTypeTest extends \PHPUnit_Framework_TestCase
 {
-    const MAUTIC_ARRAY_TYPE_NAME = "mautic-array-type";
+    const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
-    /** @var  ArrayType */
+    /** @var ArrayType */
     private $arrayType;
 
     /** @var AbstractPlatform */
@@ -47,7 +48,7 @@ class ArrayTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        if(!Type::hasType(self::MAUTIC_ARRAY_TYPE_NAME)) {
+        if (!Type::hasType(self::MAUTIC_ARRAY_TYPE_NAME)) {
             Type::addType(self::MAUTIC_ARRAY_TYPE_NAME, 'Mautic\CoreBundle\Doctrine\Type\ArrayType');
         }
 
@@ -58,8 +59,8 @@ class ArrayTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGiven_simpleArray_when_convertsToDatabaseValue_then_getEncodedData()
     {
-        $stringWithUtf8Characters = "--ěš--";
-        $result = $this->arrayType->convertToDatabaseValue(array($stringWithUtf8Characters), $this->platform);
+        $stringWithUtf8Characters = '--ěš--';
+        $result                   = $this->arrayType->convertToDatabaseValue([$stringWithUtf8Characters], $this->platform);
         $this->assertEquals('a:1:{i:0;s:8:"--ěš--";}', $result);
     }
 
@@ -67,26 +68,26 @@ class ArrayTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
 
-        $this->arrayType->convertToDatabaseValue(array("abcd\0efgh"), $this->platform);
+        $this->arrayType->convertToDatabaseValue(["abcd\0efgh"], $this->platform);
     }
 
     public function testGiven_objectWithPrivateProperty_when_convertsToDatabaseValue_then_error()
     {
         $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
 
-        $this->arrayType->convertToDatabaseValue(array(new ExampleClassWithPrivateProperty()), $this->platform);
+        $this->arrayType->convertToDatabaseValue([new ExampleClassWithPrivateProperty()], $this->platform);
     }
 
     public function testGiven_objectWithProtectedProperty_when_convertsToDatabaseValue_then_error()
     {
         $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
 
-        $this->arrayType->convertToDatabaseValue(array(new ExampleClassWithProtectedProperty()), $this->platform);
+        $this->arrayType->convertToDatabaseValue([new ExampleClassWithProtectedProperty()], $this->platform);
     }
 
     public function testGiven_objectWithPublicProperty_when_convertsToDatabaseValue_then_getEncodedData()
     {
-        $result = $this->arrayType->convertToDatabaseValue(array(new ExampleClassWithPublicProperty()), $this->platform);
+        $result = $this->arrayType->convertToDatabaseValue([new ExampleClassWithPublicProperty()], $this->platform);
         $this->assertEquals(
             'a:1:{i:0;O:63:"Mautic\CoreBundle\Tests\Doctrine\ExampleClassWithPublicProperty":1:{s:4:"test";s:5:"value";}}',
             $result
@@ -95,10 +96,10 @@ class ArrayTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGiven_stdClass_when_convertsToDatabaseValue_then_getEncodedData()
     {
-        $object = new \stdClass();
-        $object->test = "value";
+        $object       = new \stdClass();
+        $object->test = 'value';
 
-        $result = $this->arrayType->convertToDatabaseValue(array($object), $this->platform);
+        $result = $this->arrayType->convertToDatabaseValue([$object], $this->platform);
         $this->assertEquals(
             'a:1:{i:0;O:8:"stdClass":1:{s:4:"test";s:5:"value";}}',
             $result

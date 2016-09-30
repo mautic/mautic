@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class AjaxController
+ * Class AjaxController.
  */
 class AjaxController extends CommonAjaxController
 {
@@ -47,14 +48,15 @@ class AjaxController extends CommonAjaxController
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
         $results   = $this->getModel('page.page')->getLookupResults('page', $filter);
-        $dataArray = array();
+        $dataArray = [];
 
         foreach ($results as $r) {
-            $dataArray[] = array(
-                "label" => $r['title'] . " ({$r['id']}:{$r['alias']})",
-                "value" => $r['id']
-            );
+            $dataArray[] = [
+                'label' => $r['title']." ({$r['id']}:{$r['alias']})",
+                'value' => $r['id'],
+            ];
         }
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -65,19 +67,19 @@ class AjaxController extends CommonAjaxController
      */
     protected function setBuilderContentAction(Request $request)
     {
-        $dataArray = array('success' => 0);
+        $dataArray = ['success' => 0];
         $entityId  = InputHelper::clean($request->request->get('entity'));
         $session   = $this->get('session');
 
         if (!empty($entityId)) {
-            $sessionVar = 'mautic.pagebuilder.' . $entityId . '.content';
+            $sessionVar = 'mautic.pagebuilder.'.$entityId.'.content';
 
             // Check for an array of slots
-            $slots   = InputHelper::_($request->request->get('slots', array(), true), 'html');
-            $content = $session->get($sessionVar, array());
+            $slots   = InputHelper::_($request->request->get('slots', [], true), 'html');
+            $content = $session->get($sessionVar, []);
 
             if (!is_array($content)) {
-                $content = array();
+                $content = [];
             }
 
             if (!empty($slots)) {
@@ -105,7 +107,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Called by parent::getBuilderTokensAction()
+     * Called by parent::getBuilderTokensAction().
      *
      * @param $query
      *
@@ -114,9 +116,8 @@ class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model  = $this->getModel('page');
+        $model = $this->getModel('page');
 
-        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
+        return $model->getBuilderComponents(null, ['tokens', 'visualTokens'], $query);
     }
-
 }

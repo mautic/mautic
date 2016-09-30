@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\IpLookup;
-
 
 class GeobytesLookup extends AbstractRemoteDataLookup
 {
@@ -35,7 +35,7 @@ class GeobytesLookup extends AbstractRemoteDataLookup
     {
         $data = json_decode($response);
         foreach ($data as $key => $value) {
-            $key = str_replace('geobytes', '', $key);
+            $key        = str_replace('geobytes', '', $key);
             $this->$key = $value;
         }
     }

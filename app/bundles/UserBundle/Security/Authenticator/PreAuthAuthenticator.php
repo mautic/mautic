@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -80,7 +81,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-
             return null;
         }
 
@@ -128,7 +128,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
             }
 
             if (!$authenticated && empty($response)) {
-
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
         }

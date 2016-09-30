@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,26 +14,26 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PublicController
+ * Class PublicController.
  */
 class PublicController extends CommonFormController
 {
-
     /**
      * @param         $slug
      * @param Request $request
      *
      * @return Response
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
@@ -107,7 +108,6 @@ class PublicController extends CommonFormController
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariants)) {
-
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
@@ -225,7 +225,6 @@ class PublicController extends CommonFormController
                 /**
                  * @deprecated  BC support to be removed in 3.0
                  */
-
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
@@ -283,6 +282,7 @@ class PublicController extends CommonFormController
      * @param $id
      *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
@@ -321,7 +321,7 @@ class PublicController extends CommonFormController
                     'content'  => $content,
                     'page'     => $entity,
                     'template' => $template,
-                    'public'   => true // @deprecated Remove in 2.0
+                    'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
 
@@ -359,6 +359,7 @@ class PublicController extends CommonFormController
      * @param $redirectId
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function redirectAction($redirectId)
@@ -471,11 +472,11 @@ class PublicController extends CommonFormController
                 $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
+                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
             } else {
                 // Fallback for other types like html, text, textarea and all unknown
-                $value = isset($content[$slot]) ? $content[$slot] : "";
+                $value = isset($content[$slot]) ? $content[$slot] : '';
                 $slotsHelper->set($slot, $value);
             }
         }
@@ -486,7 +487,7 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * Track video views
+     * Track video views.
      */
     public function hitVideoAction()
     {
@@ -508,7 +509,7 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * Get the ID of the currently tracked Contact
+     * Get the ID of the currently tracked Contact.
      *
      * @return JsonResponse
      */

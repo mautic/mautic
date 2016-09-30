@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +14,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CommonEvent
+ * Class CommonEvent.
  */
 class CommonEvent extends Event
 {
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -39,7 +39,7 @@ class CommonEvent extends Event
     protected $changes;
 
     /**
-     * Sets the entity manager for the event to use
+     * Sets the entity manager for the event to use.
      *
      * @param \Doctrine\ORM\EntityManager $em
      */
@@ -49,7 +49,7 @@ class CommonEvent extends Event
     }
 
     /**
-     * Returns if a saved lead is new or not
+     * Returns if a saved lead is new or not.
      *
      * @return bool
      */
@@ -59,7 +59,7 @@ class CommonEvent extends Event
     }
 
     /**
-     * Gets changes to original entity
+     * Gets changes to original entity.
      *
      * @return mixed
      */
@@ -85,7 +85,6 @@ class CommonEvent extends Event
     public function getLead()
     {
         if (method_exists($this->entity, 'getLead')) {
-
             return $this->entity->getLead();
         }
 

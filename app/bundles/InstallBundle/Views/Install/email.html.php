@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -64,7 +65,7 @@ if ($tmpl == 'index') {
     <?php
     $authMode = $form['mailer_auth_mode']->vars['data'];
     $mailer   = $form['mailer_transport']->vars['data'];
-    $hide = (!in_array($mailer, array('mail', 'sendmail')) || ($mailer == 'smtp' && !empty($authMode))) ? '' : ' class="hide"';
+    $hide     = (!in_array($mailer, ['mail', 'sendmail']) || ($mailer == 'smtp' && !empty($authMode))) ? '' : ' class="hide"';
     ?>
     <div id="authDetails"<?php echo $hide; ?>>
         <div class="row">
@@ -78,7 +79,7 @@ if ($tmpl == 'index') {
     </div>
     <div class="row mt-20">
         <div class="col-sm-9">
-            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', array('step' => $index, 'count' => $count, 'completedSteps' => $completedSteps)); ?>
+            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', ['step' => $index, 'count' => $count, 'completedSteps' => $completedSteps]); ?>
         </div>
         <div class="col-sm-3">
             <?php echo $view['form']->row($form['buttons']); ?>

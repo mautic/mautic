@@ -1,11 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
@@ -32,7 +34,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
     /**
      * IpLookupDownloadDataStoreButtonType constructor.
      *
-     * @param DateHelper $dateHelper
+     * @param DateHelper          $dateHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
@@ -53,10 +55,10 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
             'button',
             [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
-                'attr' => [
+                'attr'  => [
                     'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
                     'onclick' => 'Mautic.downloadIpLookupDataStore()',
-                ]
+                ],
             ]
         );
     }

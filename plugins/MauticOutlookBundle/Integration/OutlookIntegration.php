@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -20,7 +21,7 @@ class OutlookIntegration extends AbstractIntegration
     }
 
     /**
-     * Return's authentication method such as oauth2, oauth1a, key, etc
+     * Return's authentication method such as oauth2, oauth1a, key, etc.
      *
      * @return string
      */
@@ -32,16 +33,14 @@ class OutlookIntegration extends AbstractIntegration
 
     /**
      * Return array of key => label elements that will be converted to inputs to
-     * obtain from the user
+     * obtain from the user.
      *
      * @return array
      */
     public function getRequiredKeyFields()
     {
-        return array(
-            'secret'     => 'mautic.integration.outlook.secret',
-        );
+        return [
+            'secret' => 'mautic.integration.outlook.secret',
+        ];
     }
-
-
 }

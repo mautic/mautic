@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,12 +12,10 @@ namespace MauticPlugin\MauticOutlookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
-
     /**
      * @return Response
      */
@@ -29,30 +28,33 @@ class PublicController extends CommonFormController
         if (!$query_str) {
             $logger->log('error', 'Query string not available');
         } else {
-            if (strpos($query_str, '?d=') >= 0) $query_str = substr($query_str, strpos($query_str, '?d=')+1);
+            if (strpos($query_str, '?d=') >= 0) {
+                $query_str = substr($query_str, strpos($query_str, '?d=') + 1);
+            }
             parse_str($query_str, $query);
 
             // URL attr 'd' is encoded so let's decode it first.
             if (!isset($query['d'], $query['sig'])) {
-                $logger->log('error', 'Parameters are missing: ' . $query_str);
+                $logger->log('error', 'Parameters are missing: '.$query_str);
             } else {
                 // get secret from Outlook plugin settings
-                $integrationHelper = $this->get('mautic.helper.integration');
+                $integrationHelper  = $this->get('mautic.helper.integration');
                 $outlookIntegration = $integrationHelper->getIntegrationObject('Outlook');
-                $keys = $outlookIntegration->getDecryptedApiKeys();
+                $keys               = $outlookIntegration->getDecryptedApiKeys();
 
                 // generate signature
                 $salt = $keys['secret'];
-                if (strpos($salt, '$1$') === FALSE)
-                    $salt = '$1$'.$salt; // add MD5 prefix
-                $cr = crypt(urlencode($query['d']), $salt);
+                if (strpos($salt, '$1$') === false) {
+                    $salt = '$1$'.$salt;
+                } // add MD5 prefix
+                $cr    = crypt(urlencode($query['d']), $salt);
                 $mySig = hash('crc32b', $cr); // this hash type is used in c#
 
                 // compare signatures
                 if (hash_equals($mySig, $query['sig'])) {
                     // decode and parse query variables
                     $b64 = base64_decode($query['d']);
-                    $gz = gzdecode($b64);
+                    $gz  = gzdecode($b64);
                     parse_str($gz, $query);
                 } else {
                     // signatures don't match: stop
@@ -69,7 +71,7 @@ class PublicController extends CommonFormController
 
                     // email is a semicolon delimited list of emails
                     $emails = explode(';', $query['email']);
-                    $repo = $this->getModel('lead')->getRepository();
+                    $repo   = $this->getModel('lead')->getRepository();
 
                     foreach ($emails as $email) {
                         $lead = $repo->getLeadByEmail($email);
@@ -138,6 +140,7 @@ class PublicController extends CommonFormController
     /**
      * @param $email
      * @param $repo
+     *
      * @return mixed
      */
     public function createLead($email, $repo)
@@ -145,12 +148,11 @@ class PublicController extends CommonFormController
         $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity();
         // set custom field values
-        $data = ['email'=>$email];
+        $data = ['email' => $email];
         $model->setFieldValues($lead, $data, true);
         // create lead
         $model->saveEntity($lead);
         // return entity
         return $repo->getLeadByEmail($email);
     }
-
 }

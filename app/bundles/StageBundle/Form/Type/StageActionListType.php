@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,22 +12,21 @@ namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class StageActionType
+ * Class StageActionType.
  */
 class StageActionListType extends AbstractType
 {
-
     private $model;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->model = $factory->getModel('stage');
     }
 
@@ -37,19 +37,19 @@ class StageActionListType extends AbstractType
     {
         /** @var \Mautic\StageBundle\Model\StageModel $model */
         $model = $this->model;
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
                 $stages = $model->getUserStages();
 
-                $choices = array();
+                $choices = [];
                 foreach ($stages as $s) {
                     $choices[$s['id']] = $s['name'];
                 }
 
                 return $choices;
             },
-            'required'    => false
-        ));
+            'required' => false,
+        ]);
     }
 
     /**
@@ -60,12 +60,11 @@ class StageActionListType extends AbstractType
         return 'choice';
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return "stageaction_list";
+        return 'stageaction_list';
     }
 }

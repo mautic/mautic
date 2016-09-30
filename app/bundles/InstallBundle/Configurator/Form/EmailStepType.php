@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -29,20 +30,20 @@ class EmailStepType extends AbstractType
             'mailer_from_name',
             'text',
             [
-                'label'       => false,
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
-                    'placeholder' => 'mautic.install.form.email.from_name'
+                    'placeholder' => 'mautic.install.form.email.from_name',
                 ],
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -50,9 +51,9 @@ class EmailStepType extends AbstractType
             'mailer_from_email',
             'email',
             [
-                'label'       => false,
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
                     'preaddon'    => 'fa fa-envelope',
                     'placeholder' => 'mautic.install.form.email.from_address',
@@ -61,15 +62,15 @@ class EmailStepType extends AbstractType
                 'constraints' => [
                     new NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                     new Email(
                         [
-                            'message' => 'mautic.core.email.required'
+                            'message' => 'mautic.core.email.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -77,7 +78,7 @@ class EmailStepType extends AbstractType
             'mailer_transport',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'mail'                      => 'mautic.email.config.mailer_transport.mail',
                     'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
                     'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
@@ -85,7 +86,7 @@ class EmailStepType extends AbstractType
                     'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
                     'gmail'                     => 'mautic.email.config.mailer_transport.gmail',
                     'smtp'                      => 'mautic.email.config.mailer_transport.smtp',
-                    'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail'
+                    'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail',
                 ],
                 'label'       => 'mautic.install.form.email.transport',
                 'label_attr'  => ['class' => 'control-label'],
@@ -93,8 +94,8 @@ class EmailStepType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.install.form.email.transport_descr',
-                    'onchange' => 'MauticInstaller.toggleTransportDetails(this.value);'
-                ]
+                    'onchange' => 'MauticInstaller.toggleTransportDetails(this.value);',
+                ],
             ]
         );
 
@@ -105,8 +106,8 @@ class EmailStepType extends AbstractType
                 'label'      => 'mautic.install.form.email.mailer_host',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control'
-                ]
+                    'class' => 'form-control',
+                ],
             ]
         );
 
@@ -117,8 +118,8 @@ class EmailStepType extends AbstractType
                 'label'      => 'mautic.install.form.email.mailer_port',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control'
-                ]
+                    'class' => 'form-control',
+                ],
             ]
         );
 
@@ -129,8 +130,8 @@ class EmailStepType extends AbstractType
                 'label'      => 'mautic.core.username',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control'
-                ]
+                    'class' => 'form-control',
+                ],
             ]
         );
 
@@ -142,8 +143,8 @@ class EmailStepType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-lock'
-                ]
+                    'preaddon' => 'fa fa-lock',
+                ],
             ]
         );
 
@@ -157,7 +158,7 @@ class EmailStepType extends AbstractType
                 ),
                 'label'       => 'mautic.install.form.email.encryption',
                 'expanded'    => true,
-                'empty_value' => 'mautic.install.form.none'
+                'empty_value' => 'mautic.install.form.none',
             ]
         );
 
@@ -169,12 +170,12 @@ class EmailStepType extends AbstractType
                     [
                         'plain',
                         'login',
-                        'cram-md5'
+                        'cram-md5',
                     ],
                     [
                         'mautic.email.config.mailer_auth_mode.plain',
                         'mautic.email.config.mailer_auth_mode.login',
-                        'mautic.email.config.mailer_auth_mode.cram-md5'
+                        'mautic.email.config.mailer_auth_mode.cram-md5',
                     ]
                 ),
                 'label'       => 'mautic.install.form.email.auth_mode',
@@ -182,8 +183,8 @@ class EmailStepType extends AbstractType
                 'empty_value' => 'mautic.install.form.none',
                 'attr'        => [
                     'class'    => 'form-control',
-                    'onchange' => 'MauticInstaller.toggleAuthDetails(this.value);'
-                ]
+                    'onchange' => 'MauticInstaller.toggleAuthDetails(this.value);',
+                ],
             ]
         );
 
@@ -195,12 +196,12 @@ class EmailStepType extends AbstractType
                     ['memory', 'file'],
                     [
                         'mautic.email.config.mailer_spool_type.memory',
-                        'mautic.email.config.mailer_spool_type.file'
+                        'mautic.email.config.mailer_spool_type.file',
                     ]
                 ),
                 'label'       => 'mautic.install.form.email.spool_type',
                 'expanded'    => true,
-                'empty_value' => false
+                'empty_value' => false,
             ]
         );
 
@@ -218,16 +219,15 @@ class EmailStepType extends AbstractType
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
                             'icon'    => 'fa fa-arrow-circle-right',
-                            'onclick' => 'MauticInstaller.showWaitMessage(event);'
-                        ]
-                    ]
+                            'onclick' => 'MauticInstaller.showWaitMessage(event);',
+                        ],
+                    ],
                 ],
-                'apply_text'        => '',
-                'save_text'         => '',
-                'cancel_text'       => ''
+                'apply_text'  => '',
+                'save_text'   => '',
+                'cancel_text' => '',
             ]
         );
-
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

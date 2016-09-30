@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -14,7 +14,7 @@
     <body class="header-fixed">
         <!-- start: app-wrapper -->
         <section id="app-wrapper">
-            <?php $view['assets']->outputScripts("bodyOpen"); ?>
+            <?php $view['assets']->outputScripts('bodyOpen'); ?>
 
             <!-- start: app-sidebar(left) -->
             <aside class="app-sidebar sidebar-left">
@@ -40,7 +40,7 @@
             <footer id="app-footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xs-6 text-muted"><?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => date('Y'))); ?></div>
+                        <div class="col-xs-6 text-muted"><?php echo $view['translator']->trans('mautic.core.copyright', ['%date%' => date('Y')]); ?></div>
                         <div class="col-xs-6 text-muted text-right small">v<?php echo $view['formatter']->getVersion(); ?></div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
 
         <script>
             Mautic.onPageLoad('body');
-            <?php if ($app->getEnvironment() === "dev"): ?>
+            <?php if ($app->getEnvironment() === 'dev'): ?>
             mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
                 if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
                     if (mQuery('[class*="sf-tool"]').length) {
@@ -72,10 +72,10 @@
             });
             <?php endif; ?>
         </script>
-        <?php $view['assets']->outputScripts("bodyClose"); ?>
-        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+        <?php $view['assets']->outputScripts('bodyClose'); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
             'id'            => 'MauticSharedModal',
-            'footerButtons' => true
-        )); ?>
+            'footerButtons' => true,
+        ]); ?>
     </body>
 </html>

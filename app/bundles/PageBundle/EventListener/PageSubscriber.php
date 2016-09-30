@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
@@ -18,7 +18,7 @@ use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class PageSubscriber
+ * Class PageSubscriber.
  */
 class PageSubscriber extends CommonSubscriber
 {
@@ -56,15 +56,15 @@ class PageSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            PageEvents::PAGE_POST_SAVE       => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0),
-            PageEvents::PAGE_ON_DISPLAY      => array('onPageDisplay', -255) // We want this to run last
-        );
+        return [
+            PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
+            PageEvents::PAGE_POST_DELETE => ['onPageDelete', 0],
+            PageEvents::PAGE_ON_DISPLAY  => ['onPageDisplay', -255], // We want this to run last
+        ];
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param Events\PageEvent $event
      */
@@ -72,34 +72,34 @@ class PageSubscriber extends CommonSubscriber
     {
         $page = $event->getPage();
         if ($details = $event->getChanges()) {
-            $log = array(
-                "bundle"    => "page",
-                "object"    => "page",
-                "objectId"  => $page->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
-            );
+            $log = [
+                'bundle'    => 'page',
+                'object'    => 'page',
+                'objectId'  => $page->getId(),
+                'action'    => ($event->isNew()) ? 'create' : 'update',
+                'details'   => $details,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
             $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param Events\PageEvent $event
      */
     public function onPageDelete(Events\PageEvent $event)
     {
         $page = $event->getPage();
-        $log = array(
-            "bundle"     => "page",
-            "object"     => "page",
-            "objectId"   => $page->deletedId,
-            "action"     => "delete",
-            "details"    => array('name' => $page->getTitle()),
-            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
-        );
+        $log  = [
+            'bundle'    => 'page',
+            'object'    => 'page',
+            'objectId'  => $page->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $page->getTitle()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
         $this->auditLogModel->writeToLog($log);
     }
 
@@ -107,7 +107,7 @@ class PageSubscriber extends CommonSubscriber
      * Allow event listeners to add scripts to
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
-     * - </body> : onPageDisplay_bodyClose
+     * - </body> : onPageDisplay_bodyClose.
      *
      * @param Events\PageDisplayEvent $event
      */
@@ -121,7 +121,7 @@ class PageSubscriber extends CommonSubscriber
         $headCloseScripts = ob_get_clean();
 
         if ($headCloseScripts) {
-            $content = str_ireplace('</head>', $headCloseScripts . "\n</head>", $content);
+            $content = str_ireplace('</head>', $headCloseScripts."\n</head>", $content);
         }
 
         // Get scripts to insert after <body>
@@ -132,7 +132,7 @@ class PageSubscriber extends CommonSubscriber
         if ($bodyOpenScripts) {
             preg_match('/(<body[a-z=\s\-_:"\']*>)/i', $content, $matches);
 
-            $content = str_ireplace($matches[0], $matches[0] . "\n" . $bodyOpenScripts, $content);
+            $content = str_ireplace($matches[0], $matches[0]."\n".$bodyOpenScripts, $content);
         }
 
         // Get scripts to insert before </body>
@@ -141,7 +141,7 @@ class PageSubscriber extends CommonSubscriber
         $bodyCloseScripts = ob_get_clean();
 
         if ($bodyCloseScripts) {
-            $content = str_ireplace('</body>', $bodyCloseScripts . "\n</body>", $content);
+            $content = str_ireplace('</body>', $bodyCloseScripts."\n</body>", $content);
         }
 
         $event->setContent($content);

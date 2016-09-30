@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +15,10 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 /**
- * Class PageHitEvent
+ * Class PageHitEvent.
  */
 class PageHitEvent extends CommonEvent
 {
-
     /**
      * @var
      */
@@ -64,7 +64,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Returns the Page entity
+     * Returns the Page entity.
      *
      * @return Page
      */
@@ -74,7 +74,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Get page request
+     * Get page request.
      *
      * @return string
      */
@@ -84,7 +84,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Get HTML code
+     * Get HTML code.
      *
      * @return mixed
      */
@@ -110,7 +110,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Returns if this page hit is unique
+     * Returns if this page hit is unique.
      *
      * @return bool
      */
