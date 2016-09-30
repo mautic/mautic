@@ -324,6 +324,7 @@ class LeadModel extends FormModel
     public function saveEntity($entity, $unlock = true)
     {
         $companyFieldMatches = [];
+        $company = null;
         $fields = $entity->getFields();
         $updatedFields = $entity->getUpdatedFields();
 
@@ -355,7 +356,9 @@ class LeadModel extends FormModel
         }
 
         if (!empty($companyFieldMatches)) {
+
             list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company->getName(), $company->getId());
             }
@@ -365,7 +368,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company, $entity, true);
+            $this->companyModel->addLeadToCompany($company[0]['id'], $entity, true, true);
         }
     }
 

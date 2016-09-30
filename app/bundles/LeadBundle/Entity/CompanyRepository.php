@@ -453,29 +453,36 @@ class CompanyRepository extends CommonRepository
      * @param null $state
      * @return array
      */
-    public function identifyCompany($companyName, $city, $country, $state = null)
+    public function identifyCompany($companyName, $city = null, $country = null, $state = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        if (!$companyName or !$city or !$country) {
+        if (empty($companyName)) {
             return array();
         }
-        $q->select('id')
+        $q->select('comp.id')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
-        $q->andWhere(
+
+        $q->where(
             $q->expr()->eq('comp.companyname', ':companyName')
-        )->andWhere(
-            $q->expr()->eq('comp.companycity', ':city')
-        )->andWhere(
-            $q->expr()->eq('comp.companycountry',':country')
-        )->setParameter('companyName', $companyName)
-            ->setParameter('city', $city)
-            ->setParameter('country', $country);
+        )->setParameter('companyName', $companyName);
+
+        if ($city) {
+            $q->andWhere(
+                $q->expr()->eq('comp.companycity', ':city')
+            )->setParameter('city', $city);
+        }
+        if ($country) {
+            $q->andWhere(
+                $q->expr()->eq('comp.companycountry', ':country')
+            )->setParameter('country', $country);
+        }
         if ($state) {
             $q->andWhere(
                 $q->expr()->eq('comp.companystate', ':state')
             )->setParameter('state', $state);
         }
         $results = $q->execute()->fetchAll();
+
         return $results;
     }
 

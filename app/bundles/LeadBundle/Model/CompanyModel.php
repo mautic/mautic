@@ -249,7 +249,9 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
-
+        if (!is_array($companies)) {
+            $companies = array($companies);
+        }
         /** @var Company[] $companyLeadAdd */
         $companyLeadAdd = array();
         if (!$companies instanceof Company) {
@@ -288,15 +290,14 @@ class CompanyModel extends CommonFormModel
             $companies = array($companies->getId());
         }
 
-        if (!is_array($companies)) {
-            $companies = array($companies);
-        }
+
 
         $persistCompany   = array();
         $dispatchEvents = array();
 
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
+                $this->logger->error('no company');
                 // List no longer exists in the DB so continue to the next
                 continue;
             }

@@ -18,20 +18,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
  */
 class IdentifyCompanyHelper
 {
-
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct (MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * @param array $parameters
      * @param Lead $lead
@@ -80,6 +66,7 @@ class IdentifyCompanyHelper
                 $companyModel->setFieldValues($company, $companyData, true);
                 $companyModel->saveEntity($company);
                 $leadAdded = true;
+
             }
 
             return [$company, $leadAdded];

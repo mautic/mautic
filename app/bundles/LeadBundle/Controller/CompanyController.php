@@ -330,7 +330,7 @@ class CompanyController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'company');
+            return $this->isLocked($postActionVars, $entity, 'lead.company');
         }
 
         $action  = $this->generateUrl('mautic_company_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -524,7 +524,7 @@ class CompanyController extends FormController
             } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'company');
+                return $this->isLocked($postActionVars, $entity, 'lead.company');
             }
 
             $model->deleteEntity($entity);
@@ -588,7 +588,7 @@ class CompanyController extends FormController
                 } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'company', true);
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.company', true);
                 } else {
                     $deleteIds[] = $objectId;
                 }
