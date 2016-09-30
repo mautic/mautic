@@ -78,6 +78,7 @@ Mautic.emailOnLoad = function (container, response) {
             opener.mQuery(el).trigger("chosen:updated");
 
             Mautic.disabledEmailAction(opener);
+            Mautic.useMessageQueue(opener);
         }
 
         window.close();
@@ -529,8 +530,6 @@ Mautic.initRemoveEvents = function (elements) {
         });
     }
 };
-
-
 
 Mautic.addDynamicContentFilter = function (selectedFilter) {
     var dynamicContentItems  = mQuery('.tab-pane.dynamic-content');

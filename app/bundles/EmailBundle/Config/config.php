@@ -108,7 +108,8 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.email.model.email',
-                    'mautic.campaign.model.event'
+                    'mautic.campaign.model.event',
+                    'mautic.core.model.messagequeue'
                 ]
             ],
             'mautic.email.formbundle.subscriber'     => [
@@ -162,7 +163,15 @@ return [
                 'arguments' => [
                     'mautic.email.model.email',
                     'doctrine.orm.entity_manager',
-                    'translator'
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.email.model.email',
+                ]
+            ],
+            'mautic.email.messagequeue.subscriber' => [
+                'class' => \Mautic\EmailBundle\EventListener\MessageQueueSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ]
             ]
         ],
@@ -310,7 +319,8 @@ return [
                     'mautic.lead.model.company',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
-                    'mautic.helper.core_parameters'
+                    'mautic.helper.core_parameters',
+                    'mautic.core.model.messagequeue',
                 ]
             ]
         ]

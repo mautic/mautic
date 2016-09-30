@@ -498,6 +498,18 @@ class CompanyRepository extends CommonRepository
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
 
-        return $qb->execute()->fetchAll();
+        $companies = $qb->execute()->fetchAll();
+
+        // Group companies per contact
+        $contactCompanies = [];
+        foreach ($companies as $company) {
+            if (!isset($contactCompanies[$company['lead_id']])) {
+                $contactCompanies[$company['lead_id']] = [];
+            }
+
+            $contactCompanies[$company['lead_id']][] = $company;
+        }
+
+        return $contactCompanies;
     }
 }

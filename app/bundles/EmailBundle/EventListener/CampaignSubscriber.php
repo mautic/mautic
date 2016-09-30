@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -37,6 +38,11 @@ class CampaignSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
+     * @var EmailModel
+     */
+    protected $messageQueueModel;
+
+    /**
      * @var EventModel
      */
     protected $campaignEventModel;
@@ -48,11 +54,12 @@ class CampaignSubscriber extends CommonSubscriber
      * @param EmailModel $emailModel
      * @param EventModel $eventModel
      */
-    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel)
+    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
     {
         $this->leadModel  = $leadModel;
         $this->emailModel = $emailModel;
         $this->campaignEventModel = $eventModel;
+        $this->messageQueueModel = $messageQueueModel;
     }
 
     /**
@@ -131,9 +138,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $emailSent       = false;
-        $lead            = $event->getLead();
-        $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
+        $emailSent                   = false;
+        $lead                        = $event->getLead();
+        $leadCredentials             = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
         $leadCredentials['owner_id'] = (
             ($lead instanceof Lead) && ($owner = $lead->getOwner())
         ) ? $owner->getId() : 0;
@@ -144,25 +151,29 @@ class CampaignSubscriber extends CommonSubscriber
 
             $email = $this->emailModel->getEntity($emailId);
 
+            $options      = [
+                'source'         => ['campaign.event', $event->getEvent()['id']],
+                'email_type'     => $config['email_type'],
+                'email_attempts' => $config['attempts'],
+                'email_priority' => $config['priority'],
+                'email_type'     => $config['email_type']
+            ];
+            $event->setChannel('email', $emailId);
+
             if ($email != null && $email->isPublished()) {
                 // Determine if this email is transactional/marketing
-                $type = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+                $type  = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+                $stats = [];
                 if ('marketing' == $type) {
                     // Determine if this lead has received the email before
-                    $stats = $this->emailModel->getStatRepository()->findContactEmailStats($leadCredentials['id'], $emailId);
-
-                    if (count($stats)) {
-                        // Already sent
-                        return $event->setResult(true);
-                    }
+                    $leadIds   = implode(",", [$leadCredentials['id']]);
+                    $stats     = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
+                    $emailSent = true; // Assume it was sent to prevent the campaign event from getting rescheduled over and over
                 }
-
-                $eventDetails = $event->getEventDetails();
-                $options      = ['source' => ['campaign', $eventDetails['campaign']['id']]];
-                $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                if (empty($stats)) {
+                    $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                }
             }
-
-            $event->setChannel('email', $emailId);
         }
 
         return $event->setResult($emailSent);

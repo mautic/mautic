@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -38,6 +39,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -95,6 +97,11 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
+     * @var MessageQueueModel
+     */
+    protected $messageQueueModel;
+
+    /**
      * @var Mixed
      */
     protected $coreParameters;
@@ -131,7 +138,8 @@ class EmailModel extends FormModel
         CompanyModel $companyModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        MessageQueueModel $messageQueueModel
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -142,6 +150,8 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
+        $this->messageQueueModel  = $messageQueueModel;
+
     }
 
     /**
@@ -1116,7 +1126,7 @@ class EmailModel extends FormModel
      *                       bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                       bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
      *                       array assetAttachments Array of optional Asset IDs to attach
-     *
+     * @param MessageQueue $queue
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1129,6 +1139,10 @@ class EmailModel extends FormModel
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
+        $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
+        $isMarketing      = ('marketing' === $emailType);
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
 
         if (!$email->getId()) {
             return false;
@@ -1154,6 +1168,7 @@ class EmailModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
+        $sendTo = $leads;
         $leadIds = array_keys($leads);
         $leadIds = implode(",", $leadIds);
 
@@ -1174,19 +1189,39 @@ class EmailModel extends FormModel
                 }
             }
         }
-        $sendTo = $leads;
 
-        // Hydrate contacts with company profile fields
-        $this->getContactCompanies($sendTo);
+        $leadIds         = array_keys($sendTo);
+        $leadIds         = implode(",", $leadIds);
+        $campaignEventId = ($isMarketing && is_array($source) && 'campaign.event' === $source[0] && !empty($source[1])) ? $source[1] : null;
+        $dontSendTo      = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo) && $isMarketing) {
+            foreach ($dontSendTo as $frequencyRuleMet) {
+                // Queue this message to be processed by frequency and priority
+                $this->messageQueueModel->addToQueue(
+                    [$sendTo[$frequencyRuleMet['lead_id']]],
+                    'email',
+                    $email->getId(),
+                    $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'], 0, 1),
+                    $emailAttempts,
+                    $emailPriority,
+                    $campaignEventId
+                );
+
+                unset($sendTo[$frequencyRuleMet['lead_id']]);
+            }
+        }
 
         //get a count of leads
         $count = count($sendTo);
 
-        //noone to send to so bail
+        //noone to send to so bail or if marketing email from a campaign has been put in a queue
         if (empty($count)) {
-
             return $singleEmail ? true : [];
         }
+
+        // Hydrate contacts with company profile fields
+        $this->getContactCompanies($sendTo);
 
         foreach ($emailSettings as $eid => $details) {
             if (isset($details['send_weight'])) {
@@ -1204,7 +1239,7 @@ class EmailModel extends FormModel
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
         $mailer->enableQueue();
-		
+
         // Flushes the batch in case of using API mailers
         $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 
@@ -2001,7 +2036,7 @@ class EmailModel extends FormModel
         }
 
         if (!empty($fetchCompanies)) {
-            $companies = $this->companyModel->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
+            $companies = $this->companyModel->getRepository()->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
 
             foreach ($companies as $contactId => $contactCompanies) {
                 $key = $fetchCompanies[$contactId];
