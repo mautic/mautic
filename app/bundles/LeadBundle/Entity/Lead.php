@@ -1101,18 +1101,24 @@ class Lead extends FormEntity
      */
     public function getProfileFields()
     {
-        $fieldValues = [
-            'id' => $this->id
-        ];
         if (isset($this->fields['core'])) {
-            foreach ($this->fields as $group => $fields) {
-                foreach ($fields as $alias => $field) {
-                    $fieldValues[$alias] = $field['value'];
+            $fieldValues = [
+                'id' => $this->id
+            ];
+            if (isset($this->fields['core'])) {
+                foreach ($this->fields as $group => $fields) {
+                    foreach ($fields as $alias => $field) {
+                        $fieldValues[$alias] = $field['value'];
+                    }
                 }
             }
-        }
 
-        return array_merge($fieldValues, $this->updatedFields);
+            return array_merge($fieldValues, $this->updatedFields);
+        } else {
+            // The fields are already flattened
+
+            return $this->fields;
+        }
     }
 
     /**

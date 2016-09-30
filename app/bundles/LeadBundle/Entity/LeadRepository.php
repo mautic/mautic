@@ -992,4 +992,30 @@ class LeadRepository extends CommonRepository
 
         return $result;
     }
+
+    /**
+     * @param $contactIds
+     */
+    public function getContacts(array $contactIds)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('*')->from(MAUTIC_TABLE_PREFIX.'leads')
+            ->where(
+                $qb->expr()->in('l.id', $contactIds)
+            );
+
+        $results = $qb->execute()->fetchAll();
+
+        if ($results) {
+            $contacts = [];
+            foreach ($results as $result) {
+                $contacts[$result['id']] = $result;
+            }
+
+            return $contacts;
+        }
+
+        return [];
+    }
 }
