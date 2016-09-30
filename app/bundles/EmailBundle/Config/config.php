@@ -171,7 +171,6 @@ return [
             'mautic.email.messagequeue.subscriber' => [
                 'class' => \Mautic\EmailBundle\EventListener\MessageQueueSubscriber::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.email.model.email',
                 ]
             ]

@@ -2036,7 +2036,7 @@ class EmailModel extends FormModel
         }
 
         if (!empty($fetchCompanies)) {
-            $companies = $this->companyModel->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
+            $companies = $this->companyModel->getRepository()->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
 
             foreach ($companies as $contactId => $contactCompanies) {
                 $key = $fetchCompanies[$contactId];

@@ -97,6 +97,13 @@ class MessageQueue
     private $options = [];
 
     /**
+     * Used by listeners to note if the message had been processed in bulk
+     *
+     * @var bool
+     */
+    private $processed = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -403,10 +410,38 @@ class MessageQueue
     }
 
     /**
+     * @return bool
+     */
+    public function isSuccess ()
+    {
+        return $this->success;
+    }
+
+    /**
      * @param bool $success
      */
-    public function setSuccess ($success)
+    public function setSuccess ($success = true)
     {
         $this->success = $success;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isProcessed()
+    {
+        return $this->processed;
+    }
+
+    /**
+     * @param boolean $processed
+     *
+     * @return MessageQueue
+     */
+    public function setProcessed($processed = true)
+    {
+        $this->processed = $processed;
+
+        return $this;
     }
 }

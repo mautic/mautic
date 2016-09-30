@@ -49,7 +49,8 @@ class MessageQueueRepository extends CommonRepository
             ->andWhere('mq.lastAttempt is null or mq.lastAttempt < :processStarted')
             ->andWhere('mq.scheduledDate <= :processStarted')
             ->setParameter('success', false, 'boolean')
-            ->setParameter('processStarted', $processStarted);
+            ->setParameter('processStarted', $processStarted)
+            ->indexBy('mq', 'mq.id');
 
         $q->orderBy('mq.priority, mq.scheduledDate', 'ASC');
 

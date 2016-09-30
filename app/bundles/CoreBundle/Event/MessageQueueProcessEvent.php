@@ -9,7 +9,6 @@
  */
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Entity\MessageQueue;
 
 class MessageQueueProcessEvent extends CommonEvent
@@ -34,10 +33,12 @@ class MessageQueueProcessEvent extends CommonEvent
     }
 
     /**
-     * @param MessageQueue $entity
+     * @param $channel
+     *
+     * @return bool
      */
-    public function setMessageQueue($entity)
+    public function checkContext($channel)
     {
-        $this->entity = $entity;
+        return ($channel === $this->entity->getChannel());
     }
 }

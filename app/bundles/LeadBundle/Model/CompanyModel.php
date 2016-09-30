@@ -531,24 +531,4 @@ class CompanyModel extends CommonFormModel
 
         return $results;
     }
-
-    /**
-     * @param array $contacts
-     */
-    public function getCompaniesForContacts(array $contacts)
-    {
-        $companies = $this->getRepository()->getCompaniesForContacts($contacts);
-
-        // Group companies per contact
-        $contactCompanies = [];
-        foreach ($companies as $company) {
-            if (!isset($contactCompanies[$company['lead_id']])) {
-                $contactCompanies[$company['lead_id']] = [];
-            }
-
-            $contactCompanies[$company['lead_id']][] = $company;
-        }
-
-        return $contactCompanies;
-    }
 }

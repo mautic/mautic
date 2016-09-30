@@ -9,16 +9,15 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
-use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\MessageQueueEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class MessageQueueModel
@@ -32,14 +31,20 @@ class MessageQueueModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * MessageQueueModel constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadModel            $leadModel
+     * @param LeadModel    $leadModel
+     * @param CompanyModel $companyModel
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, LeadModel $leadModel) {
-
-        $this->leadModel = $leadModel;
+    public function __construct(LeadModel $leadModel, CompanyModel $companyModel)
+    {
+        $this->leadModel    = $leadModel;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -110,14 +115,62 @@ class MessageQueueModel extends FormModel
         $limit   = 50;
         $counter = 0;
         while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
+            $contacts = [];
+            $byChannel = [];
+
+            // Lead entities will not have profile fields populated due to the custom field use - therefore to optimize resources,
+            // get a list of leads to fetch details all at once along with company details for dynamic email content, etc
             /** @var MessageQueue $message */
             foreach ($queue as $message) {
-                $event   = new MessageQueueProcessEvent($message);
-                $new     = false;
-                $success = $this->dispatchEvent('process_message_queue', $message, $new, $event);
-                $lead    = $message->getLead();
+                $contacts[$message->getId()] = $message->getLead()->getId();
+            }
+            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+            $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
+            foreach ($contacts as $messageId => $contactId) {
+                $contactData[$contactId]['companies'] = $companyData[$contactId];
+                $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
+            }
 
-                if ($success) {
+            // Group queue by channel and channel ID - this make it possible for processing listeners to batch process such as
+            // sending emails in batches to 3rd party transactional services via HTTP APIs
+            foreach ($queue as $message) {
+                $messageChannel   = $message->getChannel();
+                $messageChannelId = $message->getChannelId();
+                if (!$messageChannelId) {
+                    $messageChannelId = 0;
+                }
+
+                if (!isset($byChannel[$messageChannel])) {
+                    $byChannel[$messageChannel] = [];
+                }
+                if (!isset($byChannel[$messageChannel][$messageChannelId])) {
+                    $byChannel[$messageChannel][$messageChannelId] = [];
+                }
+
+                $byChannel[$messageChannel][$messageChannelId][] = $message;
+            }
+
+            // First try to batch process each channel
+            foreach ($byChannel as $messageChannel => $channelMessages) {
+                foreach ($channelMessages as $messageChannelId => $messages) {
+                    $event  = new MessageQueueBatchProcessEvent($messages, $messageChannel, $messageChannelId);
+                    $ignore = null;
+                    $this->dispatchEvent('process_batch_message_queue', $ignore, false, $event);
+                }
+            }
+            unset($byChannel);
+
+            // Now check to see if the message was processed by the listener and if not
+            // send it through a single process event listener
+            foreach ($queue as $message) {
+                $lead = $message->getLead();
+
+                if (!$message->isProcessed()) {
+                    $event   = new MessageQueueProcessEvent($message);
+                    $this->dispatchEvent('process_message_queue', $message, false, $event);
+                }
+
+                if ($message->isSuccess()) {
                     $counter++;
                     $message->setAttempts($message->getAttempts() + 1);
                     $message->setSuccess(true);
@@ -181,12 +234,12 @@ class MessageQueueModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
-        if (!$entity instanceof MessageQueue) {
-            throw new MethodNotAllowedHttpException(['Message Queue']);
-        }
         switch ($action) {
             case "process_message_queue":
                 $name = CoreEvents::PROCESS_MESSAGE_QUEUE;
+                break;
+            case "process_batch_message_queue":
+                $name = CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH;
                 break;
             case "post_save":
                 $name = CoreEvents::MESSAGE_QUEUED;
@@ -194,16 +247,17 @@ class MessageQueueModel extends FormModel
             default:
                 return null;
         }
+
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         } else {
             return null;
         }
     }
-
 }

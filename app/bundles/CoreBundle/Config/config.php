@@ -646,8 +646,8 @@ return [
             'mautic.core.model.messagequeue' => [
                 'class'       => 'Mautic\CoreBundle\Model\MessageQueueModel',
                 'arguments'   => [
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.model.lead'
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company'
                 ]
             ],
         ],

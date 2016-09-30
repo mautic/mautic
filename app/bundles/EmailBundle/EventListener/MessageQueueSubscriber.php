@@ -10,9 +10,9 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
@@ -22,10 +22,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
  */
 class MessageQueueSubscriber extends CommonSubscriber
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
 
     /**
      * @var EmailModel
@@ -35,12 +31,10 @@ class MessageQueueSubscriber extends CommonSubscriber
     /**
      * MessageQueueSubscriber constructor.
      *
-     * @param LeadModel  $leadModel
      * @param EmailModel $emailModel
      */
-    public function __construct(LeadModel $leadModel, EmailModel $emailModel)
+    public function __construct(EmailModel $emailModel)
     {
-        $this->leadModel  = $leadModel;
         $this->emailModel = $emailModel;
     }
 
@@ -50,36 +44,53 @@ class MessageQueueSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return [
-            CoreEvents::PROCESS_MESSAGE_QUEUE => ['onProcessMessageQueue', 0]
+            CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
         ];
     }
 
     /**
-     * sends campaign emails
+     * Sends campaign emails
      *
-     * @param MessageQueueProcessEvent $event
+     * @param MessageQueueBatchProcessEvent $event
      *
      * @return void
      */
-    public function onProcessMessageQueue(MessageQueueProcessEvent $event)
+    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {
-        $queueItem                   = $event->getMessageQueue();
-        $lead                        = $queueItem->getLead();
-        $leadCredentials             = $lead->getProfileFields();
-
-        $leadCredentials['owner_id'] = (
-            ($lead instanceof Lead) && ($owner = $lead->getOwner())
-        ) ? $owner->getId() : 0;
-
-        $success = false;
-        if (!empty($leadCredentials['email'])) {
-            $options = $queueItem->getOptions();
-
-            $message = $this->emailModel->getEntity($queueItem->getChannelId());
-
-            $success = $this->emailModel->sendEmail($message, $leadCredentials, $options);
+        if (!$event->checkContext('email')) {
+            return;
         }
 
-        return $success;
+        $messages = $event->getMessages();
+        $emailId  = $event->getChannelId();
+        $email    = $this->emailModel->getEntity($emailId);
+
+        $sendTo = [];
+        $messagesByContact = [];
+
+        /** @var MessageQueue $message */
+        foreach ($messages as $id => $message) {
+            $contact = $message->getLead()->getProfileFields();
+            if (empty($contact['email'])) {
+                // No email so just let this slide
+                $message->isProcessed();
+                $message->setSuccess(true);
+            }
+
+            $sendTo[$contact['id']] = $contact;
+            $messagesByContact[$contact['id']] = $id;
+        }
+
+        if (count($sendTo)) {
+            $errors = $this->emailModel->sendEmail($email, $sendTo, ['source' => ['campaign.event', $message->getEvent()->getId()]]);
+
+            // Let's see who was successful
+            foreach ($messagesByContact as $contactId => $messageId) {
+                $messages[$messageId]->setProcessed();
+                $messages[$messageId]->setSuccess(empty($errors[$contactId]));
+            }
+        }
+
+        $event->stopPropagation();
     }
 }

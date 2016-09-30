@@ -1000,7 +1000,7 @@ class LeadRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->select('*')->from(MAUTIC_TABLE_PREFIX.'leads')
+        $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $qb->expr()->in('l.id', $contactIds)
             );
