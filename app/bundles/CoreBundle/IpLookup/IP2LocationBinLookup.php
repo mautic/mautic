@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +13,7 @@ namespace Mautic\CoreBundle\IpLookup;
 use IP2Location\Database;
 
 /**
- * Class IP2LocationBinLookup
+ * Class IP2LocationBinLookup.
  */
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
@@ -27,7 +28,6 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
     /**
      * @return string
      */
-
     public function getLocalDataStoreFilepath()
     {
         return $this->getDataDir();
@@ -39,7 +39,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
     public function getRemoteDateStoreDownloadUrl()
     {
         $usernamePass = explode(':', $this->auth);
-        $data         = array();
+        $data         = [];
 
         if (isset($usernamePass[0]) && isset($usernamePass[1])) {
             $data['login']       = $usernamePass[0];
@@ -56,7 +56,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
     }
 
     /**
-     * Extract the IP from the local database
+     * Extract the IP from the local database.
      */
     protected function lookup()
     {
@@ -76,7 +76,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
-                $this->logger->warn("IP LOOKUP: " . $exception->getMessage());
+                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
             }
         }
     }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,24 +14,22 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 
 /**
- * Class LeadListEvent
- *
- * @package Mautic\ListBundle\Event
+ * Class LeadListEvent.
  */
 class LeadListEvent extends CommonEvent
 {
     /**
      * @param LeadList $list
-     * @param bool $isNew
+     * @param bool     $isNew
      */
     public function __construct(LeadList &$list, $isNew = false)
     {
-        $this->entity  =& $list;
-        $this->isNew = $isNew;
+        $this->entity = &$list;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the List entity
+     * Returns the List entity.
      *
      * @return List
      */
@@ -40,7 +39,7 @@ class LeadListEvent extends CommonEvent
     }
 
     /**
-     * Sets the List entity
+     * Sets the List entity.
      *
      * @param List $list
      */

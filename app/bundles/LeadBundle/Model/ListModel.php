@@ -1,16 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\BarChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -19,10 +24,6 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\CoreBundle\Helper\Chart\BarChart;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -30,7 +31,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class ListModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class ListModel extends FormModel
 {
@@ -45,11 +45,11 @@ class ListModel extends FormModel
     }
 
     /**
-     * Used by addLead and removeLead functions
+     * Used by addLead and removeLead functions.
      *
      * @var array
      */
-    private $leadChangeLists = array();
+    private $leadChangeLists = [];
 
     /**
      * {@inheritdoc}
@@ -67,7 +67,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * Returns the repository for the table that houses the leads associated with a list
+     * Returns the repository for the table that houses the leads associated with a list.
      *
      * @return \Mautic\LeadBundle\Entity\ListLeadRepository
      */
@@ -91,6 +91,7 @@ class ListModel extends FormModel
      *
      * @param      $entity
      * @param bool $unlock
+     *
      * @return mixed|void
      */
     public function saveEntity($entity, $unlock = true)
@@ -114,44 +115,48 @@ class ListModel extends FormModel
         $aliasTag  = $count;
 
         while ($count) {
-            $testAlias = $alias . $aliasTag;
+            $testAlias = $alias.$aliasTag;
             $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
             $count     = count($existing);
-            $aliasTag++;
+            ++$aliasTag;
         }
         if ($testAlias != $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
 
-        $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+        $event = $this->dispatchEvent('pre_save', $entity, $isNew);
         $repo->saveEntity($entity);
-        $this->dispatchEvent("post_save", $entity, $isNew, $event);
+        $this->dispatchEvent('post_save', $entity, $isNew, $event);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
+     * @param       $entity
+     * @param       $formFactory
+     * @param null  $action
      * @param array $options
+     *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadList) {
-            throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
+            throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        $params = (!empty($action)) ? ['action' => $action] : [];
+
         return $formFactory->create('leadlist', $entity, $params);
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
+     *
      * @return null|object
      */
     public function getEntity($id = null)
@@ -172,25 +177,26 @@ class ListModel extends FormModel
      * @param $event
      * @param $entity
      * @param $isNew
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadList) {
-            throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
+            throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = LeadEvents::LIST_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = LeadEvents::LIST_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = LeadEvents::LIST_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = LeadEvents::LIST_POST_DELETE;
                 break;
             default:
@@ -219,244 +225,244 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get a list of field choices for filters
+     * Get a list of field choices for filters.
      *
      * @return array
      */
     public function getChoiceFields()
     {
-        $operators = array(
-            'text' => array(
-                'include' => array(
+        $operators = [
+            'text' => [
+                'include' => [
                     '=',
                     '!=',
                     'empty',
                     '!empty',
                     'like',
-                    '!like'
-                )
-            ),
-            'select' => array(
-                'include' => array(
+                    '!like',
+                ],
+            ],
+            'select' => [
+                'include' => [
                     '=',
                     '!=',
                     'empty',
                     '!empty',
                     'in',
-                    '!in'
-                )
-            ),
-            'bool' => array(
-                'include' => array(
+                    '!in',
+                ],
+            ],
+            'bool' => [
+                'include' => [
                     '=',
-                    '!='
-                )
-            ),
-            'default' => array(
-                'exclude' => array(
+                    '!=',
+                ],
+            ],
+            'default' => [
+                'exclude' => [
                     'in',
-                    '!in'
-                )
-            ),
-            'multiselect' => array(
-                'include' => array(
+                    '!in',
+                ],
+            ],
+            'multiselect' => [
+                'include' => [
                     'in',
-                    '!in'
-                )
-            )
-        );
+                    '!in',
+                ],
+            ],
+        ];
 
         //field choices
-        $choices['lead'] = array(
-            'date_added' => array(
+        $choices['lead'] = [
+            'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
-                'properties' => array('type' => 'date'),
+                'properties' => ['type' => 'date'],
                 'operators'  => 'default',
-                'object'     => 'lead'
-            ),
-            'date_identified' => array(
+                'object'     => 'lead',
+            ],
+            'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
-                'properties' => array('type' => 'date'),
+                'properties' => ['type' => 'date'],
                 'operators'  => 'default',
-                'object'     => 'lead'
-            ),
-            'last_active' => array(
+                'object'     => 'lead',
+            ],
+            'last_active' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
-                'properties' => array('type' => 'date'),
+                'properties' => ['type' => 'date'],
                 'operators'  => 'default',
-                'object'     => 'lead'
-            ),
-            'owner_id'   => array(
+                'object'     => 'lead',
+            ],
+            'owner_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
-                'properties' => array(
+                'properties' => [
                     'type'     => 'lookup_id',
-                    'callback' => 'activateLeadFieldTypeahead'
-                ),
-                'operators'  => 'text',
-                'object'     => 'lead'
+                    'callback' => 'activateLeadFieldTypeahead',
+                ],
+                'operators' => 'text',
+                'object'    => 'lead',
 
-            ),
-            'points'     => array(
+            ],
+            'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
-                'properties' => array('type' => 'number'),
+                'properties' => ['type' => 'number'],
                 'operators'  => 'default',
-                'object'     => 'lead'
+                'object'     => 'lead',
 
-            ),
-            'leadlist'       => array(
+            ],
+            'leadlist' => [
                 'label'      => 'lead '.$this->translator->trans('mautic.lead.list.filter.lists'),
-                'properties' => array(
-                    'type' => 'leadlist'
-                ),
-                'operators'  => 'multiselect',
-                'object'     => 'lead'
+                'properties' => [
+                    'type' => 'leadlist',
+                ],
+                'operators' => 'multiselect',
+                'object'    => 'lead',
 
-            ),
-            'lead_email_received'       => array(
+            ],
+            'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
-                'properties' => array(
-                    'type' => 'lead_email_received'
-                ),
-                'operators'  => array(
-                    'include' => array(
+                'properties' => [
+                    'type' => 'lead_email_received',
+                ],
+                'operators' => [
+                    'include' => [
                         'in',
-                        '!in'
-                    )
-                ),
-                'object'     => 'lead'
+                        '!in',
+                    ],
+                ],
+                'object' => 'lead',
 
-            ),
-            'tags'       => array(
+            ],
+            'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
-                'properties' => array(
-                    'type' => 'tags'
-                ),
-                'operators'  => 'multiselect',
-                'object'     => 'lead'
+                'properties' => [
+                    'type' => 'tags',
+                ],
+                'operators' => 'multiselect',
+                'object'    => 'lead',
 
-            ),
-            'dnc_bounced'        => array(
+            ],
+            'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
-                'properties' => array(
+                'properties' => [
                     'type' => 'boolean',
-                    'list' => array(
+                    'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes')
-                    )
-                ),
-                'operators'  => 'bool',
-                'object'     => 'lead'
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => 'bool',
+                'object'    => 'lead',
 
-            ),
-            'dnc_unsubscribed'   => array(
+            ],
+            'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
-                'properties' => array(
+                'properties' => [
                     'type' => 'boolean',
-                    'list' => array(
+                    'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes')
-                    )
-                ),
-                'operators'  => 'bool',
-                'object'     => 'lead'
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => 'bool',
+                'object'    => 'lead',
 
-            ),
-            'dnc_bounced_sms'        => array(
+            ],
+            'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
-                'properties' => array(
+                'properties' => [
                     'type' => 'boolean',
-                    'list' => array(
+                    'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes')
-                    )
-                ),
-                'operators'  => 'bool',
-                'object'     => 'lead'
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => 'bool',
+                'object'    => 'lead',
 
-            ),
-            'dnc_unsubscribed_sms'   => array(
+            ],
+            'dnc_unsubscribed_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
-                'properties' => array(
+                'properties' => [
                     'type' => 'boolean',
-                    'list' => array(
+                    'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes')
-                    )
-                ),
-                'operators'  => 'bool',
-                'object'     => 'lead'
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => 'bool',
+                'object'    => 'lead',
 
-            ),
-            'hit_url' => array(
-                'label' => $this->translator->trans('mautic.lead.list.filter.visited_url'),
-                'properties' => array(
-                    'type' => 'text'
-                ),
-                'operators' => array(
-                    'include' => array(
+            ],
+            'hit_url' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
                         '=',
-                        'like'
-                    )
-                ),
-                'object'     => 'lead'
+                        'like',
+                    ],
+                ],
+                'object' => 'lead',
 
-            ),
-            'stage' => array(
-                'label' => $this->translator->trans('mautic.lead.lead.field.stage'),
-                'properties' => array(
-                    'type' => 'stage'
-                ),
-                'operators' => array(
-                    'include' => array(
+            ],
+            'stage' => [
+                'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
+                'properties' => [
+                    'type' => 'stage',
+                ],
+                'operators' => [
+                    'include' => [
                         '=',
-                        '!='
-                    )
-                ),
-                'object'     => 'lead'
+                        '!=',
+                    ],
+                ],
+                'object' => 'lead',
 
-            )
-        );
+            ],
+        ];
 
         //get list of custom fields
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
-            array(
-                'filter' => array(
+            [
+                'filter' => [
                     'isListable'  => true,
-                    'isPublished' => true
-                ),
-                'orderBy'    => 'f.object'
-            )
+                    'isPublished' => true,
+                ],
+                'orderBy' => 'f.object',
+            ]
         );
         foreach ($fields as $field) {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, array('lookup', 'multiselect', 'boolean'))) {
+            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
                 if ($type == 'boolean') {
                     //create a lookup list with ID
                     $properties['list'] = [
                         0 => $properties['no'],
-                        1 => $properties['yes']
+                        1 => $properties['yes'],
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
                 $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
-            $choices[$field->getObject()][$field->getAlias()] = array(
+            $choices[$field->getObject()][$field->getAlias()] = [
                 'label'      => $field->getLabel(),
                 'properties' => $properties,
-                'object'     => $field->getObject()
-            );
+                'object'     => $field->getObject(),
+            ];
 
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, array('select', 'country', 'timezone', 'region'))) {
+            } elseif (in_array($type, ['select', 'country', 'timezone', 'region'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
-            } elseif (in_array($type, array('select', 'multiselect', 'country', 'timezone', 'region'))) {
+            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region'])) {
                 $choices[$field->getAlias()]['operators'] = 'select';
-            } elseif (in_array($type, array('lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'))) {
+            } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
             } else {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'default';
@@ -466,12 +472,10 @@ class ListModel extends FormModel
         foreach ($choices as $key => $choice) {
             $cmp = function ($a, $b) {
                 return strcmp($a['label'], $b['label']);
-
             };
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }
-
 
         foreach ($choices as $object => $choiceObject) {
             foreach ($choiceObject as $key => $choice) {
@@ -480,6 +484,7 @@ class ListModel extends FormModel
                 }
             }
         }
+
         return $choices;
     }
 
@@ -490,7 +495,7 @@ class ListModel extends FormModel
      */
     public function getUserLists($alias = '')
     {
-        $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
+        $user = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->user : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
@@ -498,18 +503,19 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get a list of global lead lists
+     * Get a list of global lead lists.
      *
      * @return mixed
      */
     public function getGlobalLists()
     {
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists();
+
         return $lists;
     }
 
     /**
-     * Rebuild lead lists
+     * Rebuild lead lists.
      *
      * @param LeadList        $entity
      * @param int             $limit
@@ -523,12 +529,12 @@ class ListModel extends FormModel
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
         $id       = $entity->getId();
-        $list     = array('id' => $id, 'filters' => $entity->getFilters());
-        $dtHelper = new DateTimeHelper;
+        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
+        $dtHelper = new DateTimeHelper();
 
-        $batchLimiters = array(
-            'dateTime' => $dtHelper->toUtcString()
-        );
+        $batchLimiters = [
+            'dateTime' => $dtHelper->toUtcString(),
+        ];
 
         $localDateTime = $dtHelper->getLocalDateTime();
 
@@ -536,11 +542,11 @@ class ListModel extends FormModel
         $newLeadsCount = $this->getLeadsByList(
             $list,
             true,
-            array(
+            [
                 'countOnly'     => true,
                 'newOnly'       => true,
-                'batchLimiters' => $batchLimiters
-            )
+                'batchLimiters' => $batchLimiters,
+            ]
         );
 
         // Ensure the same list is used each batch
@@ -550,7 +556,7 @@ class ListModel extends FormModel
         $leadCount = (int) $newLeadsCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
         }
 
         // Handle by batches
@@ -575,12 +581,12 @@ class ListModel extends FormModel
                 $newLeadList = $this->getLeadsByList(
                     $list,
                     true,
-                    array(
-                        'newOnly'       => true,
+                    [
+                        'newOnly' => true,
                         // No start set because of newOnly thus always at 0
                         'limit'         => $limit,
-                        'batchLimiters' => $batchLimiters
-                    )
+                        'batchLimiters' => $batchLimiters,
+                    ]
                 );
 
                 if (empty($newLeadList[$id])) {
@@ -593,7 +599,7 @@ class ListModel extends FormModel
 
                     unset($l);
 
-                    $leadsProcessed++;
+                    ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
@@ -638,23 +644,22 @@ class ListModel extends FormModel
         $removeLeadCount = $this->getLeadsByList(
             $list,
             true,
-            array(
+            [
                 'countOnly'      => true,
                 'nonMembersOnly' => true,
-                'batchLimiters'  => $batchLimiters
-            )
+                'batchLimiters'  => $batchLimiters,
+            ]
         );
 
         // Restart batching
-        $start     = $lastRoundPercentage = 0;
+        $start     = $lastRoundPercentage     = 0;
         $leadCount = $removeLeadCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
         }
 
         if ($leadCount) {
-
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
             if ($output) {
@@ -670,12 +675,12 @@ class ListModel extends FormModel
                 $removeLeadList = $this->getLeadsByList(
                     $list,
                     true,
-                    array(
+                    [
                         // No start because the items are deleted so always 0
                         'limit'          => $limit,
                         'nonMembersOnly' => true,
-                        'batchLimiters'  => $batchLimiters
-                    )
+                        'batchLimiters'  => $batchLimiters,
+                    ]
                 );
 
                 if (empty($removeLeadList[$id])) {
@@ -684,10 +689,9 @@ class ListModel extends FormModel
                 }
 
                 foreach ($removeLeadList[$id] as $l) {
-
                     $this->removeLead($l, $entity, false, true, true);
 
-                    $leadsProcessed++;
+                    ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
@@ -732,14 +736,14 @@ class ListModel extends FormModel
     }
 
     /**
-     * Add lead to lists
+     * Add lead to lists.
      *
-     * @param array|Lead        $lead
-     * @param array|LeadList    $lists
-     * @param bool              $manuallyAdded
-     * @param bool              $batchProcess
-     * @param int               $searchListLead 0 = reference, 1 = yes, -1 = known to not exist
-     * @param \DateTime         $dateManipulated
+     * @param array|Lead     $lead
+     * @param array|LeadList $lists
+     * @param bool           $manuallyAdded
+     * @param bool           $batchProcess
+     * @param int            $searchListLead  0 = reference, 1 = yes, -1 = known to not exist
+     * @param \DateTime      $dateManipulated
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -758,7 +762,7 @@ class ListModel extends FormModel
 
         if (!$lists instanceof LeadList) {
             //make sure they are ints
-            $searchForLists = array();
+            $searchForLists = [];
             foreach ($lists as $k => &$l) {
                 $l = (int) $l;
                 if (!isset($this->leadChangeLists[$l])) {
@@ -767,17 +771,17 @@ class ListModel extends FormModel
             }
 
             if (!empty($searchForLists)) {
-                $listEntities = $this->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                $listEntities = $this->getEntities([
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'l.id',
                                 'expr'   => 'in',
-                                'value'  => $searchForLists
-                            )
-                        )
-                    )
-                ));
+                                'value'  => $searchForLists,
+                            ],
+                        ],
+                    ],
+                ]);
 
                 foreach ($listEntities as $list) {
                     $this->leadChangeLists[$list->getId()] = $list;
@@ -788,15 +792,15 @@ class ListModel extends FormModel
         } else {
             $this->leadChangeLists[$lists->getId()] = $lists;
 
-            $lists = array($lists->getId());
+            $lists = [$lists->getId()];
         }
 
         if (!is_array($lists)) {
-            $lists = array($lists);
+            $lists = [$lists];
         }
 
-        $persistLists   = array();
-        $dispatchEvents = array();
+        $persistLists   = [];
+        $dispatchEvents = [];
 
         foreach ($lists as $listId) {
             if (!isset($this->leadChangeLists[$listId])) {
@@ -808,17 +812,17 @@ class ListModel extends FormModel
                 $listLead = null;
             } elseif ($searchListLead) {
                 $listLead = $this->getListLeadRepository()->findOneBy(
-                    array(
+                    [
                         'lead' => $lead,
-                        'list' => $this->leadChangeLists[$listId]
-                    )
+                        'list' => $this->leadChangeLists[$listId],
+                    ]
                 );
             } else {
                 $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
-                    array(
+                    [
                         'lead' => $leadId,
-                        'list' => $listId
-                    )
+                        'list' => $listId,
+                    ]
                 );
             }
 
@@ -870,13 +874,13 @@ class ListModel extends FormModel
     }
 
     /**
-     * Remove a lead from lists
+     * Remove a lead from lists.
      *
-     * @param           $lead
-     * @param           $lists
-     * @param bool      $manuallyRemoved
-     * @param bool      $batchProcess
-     * @param bool      $skipFindOne
+     * @param      $lead
+     * @param      $lists
+     * @param bool $manuallyRemoved
+     * @param bool $batchProcess
+     * @param bool $skipFindOne
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -891,26 +895,26 @@ class ListModel extends FormModel
 
         if (!$lists instanceof LeadList) {
             //make sure they are ints
-            $searchForLists = array();
+            $searchForLists = [];
             foreach ($lists as $k => &$l) {
-                $l = (int)$l;
+                $l = (int) $l;
                 if (!isset($this->leadChangeLists[$l])) {
                     $searchForLists[] = $l;
                 }
             }
 
             if (!empty($searchForLists)) {
-                $listEntities = $this->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                $listEntities = $this->getEntities([
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'l.id',
                                 'expr'   => 'in',
-                                'value'  => $searchForLists
-                            )
-                        )
-                    )
-                ));
+                                'value'  => $searchForLists,
+                            ],
+                        ],
+                    ],
+                ]);
 
                 foreach ($listEntities as $list) {
                     $this->leadChangeLists[$list->getId()] = $list;
@@ -918,20 +922,19 @@ class ListModel extends FormModel
             }
 
             unset($listEntities, $searchForLists);
-
         } else {
             $this->leadChangeLists[$lists->getId()] = $lists;
 
-            $lists = array($lists->getId());
+            $lists = [$lists->getId()];
         }
 
         if (!is_array($lists)) {
-            $lists = array($lists);
+            $lists = [$lists];
         }
 
-        $persistLists   = array();
-        $deleteLists    = array();
-        $dispatchEvents = array();
+        $persistLists   = [];
+        $deleteLists    = [];
+        $dispatchEvents = [];
 
         foreach ($lists as $listId) {
             if (!isset($this->leadChangeLists[$listId])) {
@@ -940,14 +943,14 @@ class ListModel extends FormModel
             }
 
             $listLead = (!$skipFindOne) ?
-                $this->getListLeadRepository()->findOneBy(array(
+                $this->getListLeadRepository()->findOneBy([
                     'lead' => $lead,
-                    'list' => $this->leadChangeLists[$listId]
-                )) :
-                $this->em->getReference('MauticLeadBundle:ListLead', array(
+                    'list' => $this->leadChangeLists[$listId],
+                ]) :
+                $this->em->getReference('MauticLeadBundle:ListLead', [
                     'lead' => $leadId,
-                    'list' => $listId
-                ));
+                    'list' => $listId,
+                ]);
 
             if ($listLead == null) {
                 // Lead is not part of this list
@@ -994,7 +997,6 @@ class ListModel extends FormModel
         unset($lead, $deleteLists, $persistLists, $lists);
     }
 
-
     /**
      * @param       $lists
      * @param bool  $idOnly
@@ -1002,14 +1004,15 @@ class ListModel extends FormModel
      *
      * @return mixed
      */
-    public function getLeadsByList($lists, $idOnly = false, $args = array())
+    public function getLeadsByList($lists, $idOnly = false, $args = [])
     {
         $args['idOnly'] = $idOnly;
+
         return $this->getRepository()->getLeadsByList($lists, $args);
     }
 
     /**
-     * Batch sleep according to settings
+     * Batch sleep according to settings.
      */
     protected function batchSleep()
     {
@@ -1019,7 +1022,6 @@ class ListModel extends FormModel
         }
 
         if (empty($leadSleepTime)) {
-
             return;
         }
 
@@ -1031,16 +1033,16 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get a list of top (by leads added) lists
+     * Get a list of top (by leads added) lists.
      *
-     * @param integer $limit
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
+     * @param int    $limit
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param array  $filters
      *
      * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
@@ -1066,40 +1068,40 @@ class ListModel extends FormModel
         return $results;
     }
     /**
-     * Get a list of top (by leads added) lists
+     * Get a list of top (by leads added) lists.
      *
-     * @param integer $limit
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
+     * @param int    $limit
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param array  $filters
      *
      * @return array
      */
-    public function getLifeCycleSegments($limit = null, $dateFrom = null, $dateTo = null, $filters = array(), $segments)
+    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $filters, $segments)
     {
-        if(!empty($segments)){
+        if (!empty($segments)) {
             $segmentlist = "'".implode("','", $segments)."'";
         }
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name as name,ll.alias as alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
-            ->join('t',MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id' )
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('ll.is_published', ':published'))
             ->setParameter('published', true)
             ->groupBy('ll.id');
 
-        if($limit){
+        if ($limit) {
             $q->setMaxResults($limit);
         }
-        if(!empty($segments)){
-            $q->andWhere("ll.id IN (".$segmentlist.")");
+        if (!empty($segments)) {
+            $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
-        if(!empty($dateFrom)){
+        if (!empty($dateFrom)) {
             $q->andWhere("l.date_added >= '".$dateFrom->format('Y-m-d')."'");
         }
-        if(!empty($dateTo)){
+        if (!empty($dateTo)) {
             $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
         if (!empty($options['canViewOthers'])) {
@@ -1109,31 +1111,30 @@ class ListModel extends FormModel
 
         $results = $q->execute()->fetchAll();
 
-        if(in_array(0,$segments))
-        {
+        if (in_array(0, $segments)) {
             $qAll = $this->em->getConnection()->createQueryBuilder();
             $qAll->select('COUNT(t.date_added) AS leads, 0 as id, "All Contacts" as name, "" as alias')
                 ->from(MAUTIC_TABLE_PREFIX.'leads', 't');
-
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->user->getId());
             }
-            if(!empty($dateFrom)){
+            if (!empty($dateFrom)) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
             }
-            if(!empty($dateTo)){
+            if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
             $resultsAll = $qAll->execute()->fetchAll();
-            $results = array_merge($results,$resultsAll);
+            $results    = array_merge($results, $resultsAll);
         }
+
         return $results;
     }
 
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true, $listName){
-
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName)
+    {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
@@ -1165,9 +1166,9 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
+     * Get bar chart data of hits.
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
@@ -1175,31 +1176,31 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
-        $data['values'] = array();
-        $data['labels'] = array();
+        $data['values'] = [];
+        $data['labels'] = [];
 
         $q = $this->em->getConnection()->createQueryBuilder();
 
         $q->select('count(l.id) as leads, s.name as stage')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
-            ->join('t', MAUTIC_TABLE_PREFIX.'stages','s', 's.id=l.stage_id')
+            ->join('t', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id=l.stage_id')
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('s.is_published', ':published'))
 
             ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
-            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'))
             ->setParameter('published', true);
 
-        if(isset($filter['leadlist_id']['value'])){
-           $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter('leadlistid', $filter['leadlist_id']['value']);
+        if (isset($filter['leadlist_id']['value'])) {
+            $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter('leadlistid', $filter['leadlist_id']['value']);
         }
 
-            $q->groupBy('s.name');
+        $q->groupBy('s.name');
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
@@ -1208,39 +1209,38 @@ class ListModel extends FormModel
 
         $results = $q->execute()->fetchAll();
 
-        foreach($results as $result){
-            $percentage = $result['leads'];
-            $data['labels'][]=substr($result['stage'],0,12);
-            $data['values'][]=$result['leads'];
-
+        foreach ($results as $result) {
+            $percentage       = $result['leads'];
+            $data['labels'][] = substr($result['stage'], 0, 12);
+            $data['values'][] = $result['leads'];
         }
-        $data['xAxes'][] =array('display' => true);
-        $data['yAxes'][] =array('display' => true);
+        $data['xAxes'][] = ['display' => true];
+        $data['yAxes'][] = ['display' => true];
 
-        $baseData = array(
+        $baseData = [
             'label' => $this->translator->trans('mautic.lead.leads'),
             'data'  => $data['values'],
-        );
+        ];
 
-        $chart     = new BarChart($data['labels']);
+        $chart = new BarChart($data['labels']);
 
-        $datasetId = count($data['values']);
+        $datasetId  = count($data['values']);
         $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
-        $chartData = array(
-            'labels' => $data['labels'],
+        $chartData = [
+            'labels'   => $data['labels'],
             'datasets' => $datasets,
-            'options' => array(
+            'options'  => [
                 'xAxes' => $data['xAxes'],
-                'yAxes' => $data['yAxes']
-            ));
+                'yAxes' => $data['yAxes'],
+            ], ];
 
         return $chartData;
     }
     /**
-     * Get bar chart data of hits
+     * Get bar chart data of hits.
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
@@ -1248,10 +1248,10 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
-        $data['values'] = array();
-        $data['labels'] = array();
+        $data['values'] = [];
+        $data['labels'] = [];
 
         $q = $this->em->getConnection()->createQueryBuilder();
 
@@ -1259,12 +1259,12 @@ class ListModel extends FormModel
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
             ->join('t', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'h.lead_id=l.id')
-            ->join('h',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id')
+            ->join('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id')
             ->orderBy('ds.device', 'DESC')
             ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
-            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
+            ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
 
         if (isset($filter['leadlist_id']['value'])) {
             $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter(
@@ -1283,30 +1283,30 @@ class ListModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $result) {
-            $data['labels'][] = substr( empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12 );
+            $data['labels'][] = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
             $data['values'][] = $result['leads'];
         }
 
-        $data['xAxes'][] = array('display' => true);
-        $data['yAxes'][] = array('display' => true);
+        $data['xAxes'][] = ['display' => true];
+        $data['yAxes'][] = ['display' => true];
 
-        $baseData = array(
+        $baseData = [
             'label' => $this->translator->trans('mautic.core.device'),
-            'data'  => $data['values']
-        );
+            'data'  => $data['values'],
+        ];
 
         $chart = new BarChart($data['labels']);
 
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
-        $chartData = array(
+        $chartData = [
             'labels'   => $data['labels'],
             'datasets' => $datasets,
-            'options'  => array(
+            'options'  => [
                 'xAxes' => $data['xAxes'],
-                'yAxes' => $data['yAxes']
-            )
-        );
+                'yAxes' => $data['yAxes'],
+            ],
+        ];
 
         return $chartData;
     }

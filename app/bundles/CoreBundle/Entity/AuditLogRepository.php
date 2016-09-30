@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,14 +15,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * AuditLogRepository
+ * AuditLogRepository.
  */
 class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * Get array of objects which belongs to the object
+     * Get array of objects which belongs to the object.
      *
      * @param null $object
      * @param null $id

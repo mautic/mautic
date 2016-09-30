@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,18 +15,16 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
- * Mautic's Factory
+ * Mautic's Factory.
  *
  * @deprecated 2.0 to be removed in 3.0
  */
@@ -55,7 +54,7 @@ class MauticFactory
     }
 
     /**
-     * Get a model instance from the service container
+     * Get a model instance from the service container.
      *
      * @param $modelNameKey
      *
@@ -69,7 +68,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Mautic's security object
+     * Retrieves Mautic's security object.
      *
      * @return \Mautic\CoreBundle\Security\Permissions\CorePermissions
      */
@@ -79,7 +78,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Symfony's security context
+     * Retrieves Symfony's security context.
      *
      * @return \Symfony\Component\Security\Core\SecurityContext
      */
@@ -89,7 +88,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves user currently logged in
+     * Retrieves user currently logged in.
      *
      * @param bool $nullIfGuest
      *
@@ -101,7 +100,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves session object
+     * Retrieves session object.
      *
      * @return \Symfony\Component\HttpFoundation\Session\Session
      */
@@ -111,7 +110,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Doctrine EntityManager
+     * Retrieves Doctrine EntityManager.
      *
      * @return \Doctrine\ORM\EntityManager
      */
@@ -129,7 +128,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Doctrine database connection for DBAL use
+     * Retrieves Doctrine database connection for DBAL use.
      *
      * @return \Doctrine\DBAL\Connection
      */
@@ -147,7 +146,7 @@ class MauticFactory
     }
 
     /**
-     * Gets a schema helper for manipulating database schemas
+     * Gets a schema helper for manipulating database schemas.
      *
      * @param string $type
      * @param string $name Object name; i.e. table name
@@ -160,7 +159,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Translator
+     * Retrieves Translator.
      *
      * @return \Mautic\CoreBundle\Translation\Translator
      */
@@ -181,7 +180,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves serializer
+     * Retrieves serializer.
      *
      * @return \JMS\Serializer\Serializer
      */
@@ -191,7 +190,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves templating service
+     * Retrieves templating service.
      *
      * @return \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
@@ -201,7 +200,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves event dispatcher
+     * Retrieves event dispatcher.
      *
      * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
@@ -211,7 +210,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves request
+     * Retrieves request.
      *
      * @return \Symfony\Component\HttpFoundation\Request|null
      */
@@ -230,7 +229,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Symfony's validator
+     * Retrieves Symfony's validator.
      *
      * @return \Symfony\Component\Validator\Validator
      */
@@ -240,7 +239,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Mautic system parameters
+     * Retrieves Mautic system parameters.
      *
      * @return array
      */
@@ -250,7 +249,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves a Mautic parameter
+     * Retrieves a Mautic parameter.
      *
      * @param       $id
      * @param mixed $default
@@ -263,7 +262,7 @@ class MauticFactory
     }
 
     /**
-     * Get DateTimeHelper
+     * Get DateTimeHelper.
      *
      * @param string $string
      * @param string $format
@@ -277,7 +276,7 @@ class MauticFactory
     }
 
     /**
-     * Get Router
+     * Get Router.
      *
      * @return Router
      */
@@ -288,12 +287,13 @@ class MauticFactory
 
     /**
      * Get the path to specified area.  Returns relative by default with the exception of cache and log
-     * which will be absolute regardless of $fullPath setting
+     * which will be absolute regardless of $fullPath setting.
      *
      * @param string $name
      * @param bool   $fullPath
      *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function getSystemPath($name, $fullPath = false)
@@ -302,7 +302,7 @@ class MauticFactory
     }
 
     /**
-     * Returns local config file path
+     * Returns local config file path.
      *
      * @param bool $checkExists If true, returns false if file doesn't exist
      *
@@ -317,7 +317,7 @@ class MauticFactory
     }
 
     /**
-     * Get the current environment
+     * Get the current environment.
      *
      * @return string
      */
@@ -327,7 +327,7 @@ class MauticFactory
     }
 
     /**
-     * Returns if Symfony is in debug mode
+     * Returns if Symfony is in debug mode.
      *
      * @return mixed
      */
@@ -337,12 +337,13 @@ class MauticFactory
     }
 
     /**
-     * returns a ThemeHelper instance for the given theme
+     * returns a ThemeHelper instance for the given theme.
      *
      * @param string $theme
      * @param bool   $throwException
      *
      * @return mixed
+     *
      * @throws FileNotFoundException
      * @throws \Exception
      */
@@ -352,10 +353,10 @@ class MauticFactory
     }
 
     /**
-     * Gets a list of installed themes
+     * Gets a list of installed themes.
      *
      * @param string $specificFeature limits list to those that support a specific feature
-     * @param boolean $extended returns extended information about the themes
+     * @param bool   $extended        returns extended information about the themes
      *
      * @return array
      */
@@ -365,7 +366,7 @@ class MauticFactory
     }
 
     /**
-     * Returns MailHelper wrapper for Swift_Message via $helper->message
+     * Returns MailHelper wrapper for Swift_Message via $helper->message.
      *
      * @param bool $cleanSlate False to preserve current settings, i.e. to process batched emails
      *
@@ -387,7 +388,7 @@ class MauticFactory
     }
 
     /**
-     * Get an IpAddress entity for current session or for passed in IP address
+     * Get an IpAddress entity for current session or for passed in IP address.
      *
      * @param string $ip
      *
@@ -399,7 +400,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves the application's version number
+     * Retrieves the application's version number.
      *
      * @return string
      */
@@ -409,7 +410,7 @@ class MauticFactory
     }
 
     /**
-     * Get Symfony's logger
+     * Get Symfony's logger.
      *
      * @param bool|false $system
      *
@@ -425,7 +426,7 @@ class MauticFactory
     }
 
     /**
-     * Get a mautic helper service
+     * Get a mautic helper service.
      *
      * @param $helper
      *
@@ -450,7 +451,7 @@ class MauticFactory
     }
 
     /**
-     * Get's the Symfony kernel
+     * Get's the Symfony kernel.
      *
      * @return \AppKernel
      */
@@ -460,7 +461,7 @@ class MauticFactory
     }
 
     /**
-     * Get's an array of details for Mautic core bundles
+     * Get's an array of details for Mautic core bundles.
      *
      * @param bool|false $includePlugins
      *
@@ -472,7 +473,7 @@ class MauticFactory
     }
 
     /**
-     * Get's an array of details for enabled Mautic plugins
+     * Get's an array of details for enabled Mautic plugins.
      *
      * @return array
      */
@@ -482,13 +483,14 @@ class MauticFactory
     }
 
     /**
-     * Gets an array of a specific bundle's config settings
+     * Gets an array of a specific bundle's config settings.
      *
      * @param        $bundleName
      * @param string $configKey
      * @param bool   $includePlugins
      *
      * @return mixed
+     *
      * @throws \Exception
      */
     public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)

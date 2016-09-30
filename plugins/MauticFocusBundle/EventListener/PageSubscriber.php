@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +13,6 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\FormBundle\Helper\PageTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -20,7 +20,7 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class PageSubscriber
+ * Class PageSubscriber.
  */
 class PageSubscriber extends CommonSubscriber
 {
@@ -53,7 +53,7 @@ class PageSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
@@ -62,7 +62,7 @@ class PageSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add forms to available page tokens
+     * Add forms to available page tokens.
      *
      * @param PageBuilderEvent $event
      */
@@ -102,11 +102,11 @@ class PageSubscriber extends CommonSubscriber
                         )
                     )
                 ) {
-                    $script  = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], true)
+                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], true)
                         .'" type="text/javascript" charset="utf-8" async="async"></script>';
                     $content = preg_replace('#{focus='.$id.'}#', $script, $content);
                 } else {
-                    $content = preg_replace("#{focus=".$id."}#", "", $content);
+                    $content = preg_replace('#{focus='.$id.'}#', '', $content);
                 }
             }
         }

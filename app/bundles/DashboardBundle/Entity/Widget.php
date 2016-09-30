@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,9 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Widget
- *
- * @package Mautic\DashboardBundle\Entity
+ * Class Widget.
  */
 class Widget extends FormEntity
 {
@@ -33,17 +32,17 @@ class Widget extends FormEntity
     private $name;
 
     /**
-     * @var integer
+     * @var int
      */
     private $width;
 
     /**
-     * @var integer
+     * @var int
      */
     private $height;
 
     /**
-     * @var integer
+     * @var int
      */
     private $ordering;
 
@@ -55,7 +54,7 @@ class Widget extends FormEntity
     /**
      * @var array
      */
-    private $params = array();
+    private $params = [];
 
     /**
      * @var string
@@ -68,24 +67,24 @@ class Widget extends FormEntity
     private $errorMessage;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $cached = false;
 
     /**
-     * @var integer
+     * @var int
      */
     private $loadTime = 0;
 
     /**
-     * @var integer (minutes)
+     * @var int (minutes)
      */
     private $cacheTimeout;
 
     /**
      * @var array
      */
-    private $templateData = array();
+    private $templateData = [];
 
     public function __clone()
     {
@@ -97,7 +96,7 @@ class Widget extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -127,17 +126,17 @@ class Widget extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('type', new NotBlank(array(
-            'message' => 'mautic.core.type.required'
-        )));
+        $metadata->addPropertyConstraint('type', new NotBlank([
+            'message' => 'mautic.core.type.required',
+        ]));
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -145,7 +144,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
@@ -160,7 +159,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -170,7 +169,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
@@ -185,7 +184,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -195,9 +194,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set width
+     * Set width.
      *
-     * @param integer $width
+     * @param int $width
      *
      * @return Widget
      */
@@ -210,9 +209,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get width
+     * Get width.
      *
-     * @return integer
+     * @return int
      */
     public function getWidth()
     {
@@ -220,9 +219,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set height
+     * Set height.
      *
-     * @param integer $height
+     * @param int $height
      *
      * @return Widget
      */
@@ -235,9 +234,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get cache timeout
+     * Get cache timeout.
      *
-     * @return integer (minutes)
+     * @return int (minutes)
      */
     public function getCacheTimeout()
     {
@@ -245,9 +244,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set cache timeout
+     * Set cache timeout.
      *
-     * @param integer $cacheTimeout (minutes)
+     * @param int $cacheTimeout (minutes)
      *
      * @return Widget
      */
@@ -260,9 +259,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get height
+     * Get height.
      *
-     * @return integer
+     * @return int
      */
     public function getHeight()
     {
@@ -270,9 +269,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set ordering
+     * Set ordering.
      *
-     * @param integer $ordering
+     * @param int $ordering
      *
      * @return Widget
      */
@@ -285,9 +284,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get ordering
+     * Get ordering.
      *
-     * @return integer
+     * @return int
      */
     public function getOrdering()
     {
@@ -295,7 +294,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get params
+     * Get params.
      *
      * @return array $params
      */
@@ -305,7 +304,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set params
+     * Set params.
      *
      * @param array $params
      *
@@ -320,7 +319,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set template
+     * Set template.
      *
      * @param string $template
      *
@@ -335,7 +334,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template
+     * Get template.
      *
      * @return string
      */
@@ -345,7 +344,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template data
+     * Get template data.
      *
      * @return array $templateData
      */
@@ -355,7 +354,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set template data
+     * Set template data.
      *
      * @param array $templateData
      *
@@ -370,7 +369,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set errorMessage
+     * Set errorMessage.
      *
      * @param string $errorMessage
      *
@@ -384,7 +383,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get errorMessage
+     * Get errorMessage.
      *
      * @return string
      */
@@ -394,7 +393,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set cached flag
+     * Set cached flag.
      *
      * @param string $cached
      *
@@ -408,9 +407,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get cached
+     * Get cached.
      *
-     * @return boolean
+     * @return bool
      */
     public function isCached()
     {
@@ -418,7 +417,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set loadTime
+     * Set loadTime.
      *
      * @param string $loadTime
      *
@@ -432,9 +431,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get loadTime
+     * Get loadTime.
      *
-     * @return integer
+     * @return int
      */
     public function getLoadTime()
     {

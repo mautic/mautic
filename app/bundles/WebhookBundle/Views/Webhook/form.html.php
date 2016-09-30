@@ -1,21 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'mauticWebhook');
 
 $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.webhook.webhook.header.edit',
-        array('%name%' => $view['translator']->trans($entity->getName()))) :
+        ['%name%' => $view['translator']->trans($entity->getName())]) :
     $view['translator']->trans('mautic.webhook.webhook.header.new');
 
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
 ?>
 

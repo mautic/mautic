@@ -1,27 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Event;
 
-use Joomla\Http\Response;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class SubmissionEvent
+ * Class SubmissionEvent.
  */
 class SubmissionEvent extends CommonEvent
 {
-
     /**
-     * Raw POST results
+     * Raw POST results.
      *
      * @var array
      */
@@ -33,28 +32,28 @@ class SubmissionEvent extends CommonEvent
     private $server = [];
 
     /**
-     * Cleaned post results
+     * Cleaned post results.
      *
      * @var array
      */
     private $results = [];
 
     /**
-     * Form fields
+     * Form fields.
      *
      * @var array
      */
     private $fields = [];
 
     /**
-     * Results converted to tokens
+     * Results converted to tokens.
      *
      * @var array
      */
     private $tokens = [];
 
     /**
-     * Callback for post form submit
+     * Callback for post form submit.
      *
      * @var mixed
      */
@@ -71,21 +70,21 @@ class SubmissionEvent extends CommonEvent
     private $contactFieldMatches = [];
 
     /**
-     * Array to hold information set by other actions that may be useful to subsequent actions
+     * Array to hold information set by other actions that may be useful to subsequent actions.
      *
      * @var array
      */
     private $feedback = [];
 
     /**
-     * Configuration for the action
+     * Configuration for the action.
      *
      * @var array
      */
     private $actionConfig = [];
 
     /**
-     * Active action
+     * Active action.
      *
      * @var
      */
@@ -113,7 +112,7 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * Returns the Submission entity
+     * Returns the Submission entity.
      *
      * @return Submission
      */
@@ -244,7 +243,7 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * Get feedback injected by another action
+     * Get feedback injected by another action.
      *
      * @param null $key
      *
@@ -268,7 +267,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function checkContext($action)
     {
-        return ($this->action === $action);
+        return $this->action === $action;
     }
 
     /**
@@ -289,7 +288,7 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...]
+     * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...].
      *
      * @param string $key
      * @param array  $callback

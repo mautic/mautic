@@ -1,28 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CompanyBuilderEvent
+ * Class CompanyBuilderEvent.
  */
 class CompanyBuilderEvent extends Event
 {
-
     /**
      * @var array
      */
-    private $actions = array();
+    private $actions = [];
 
     /**
      * @var Translator
@@ -51,7 +51,7 @@ class CompanyBuilderEvent extends Event
      *                       'eventName'        => (required) The event to fire when this event is triggered.
      *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
      *                       'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
-     * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function addAction($key, array $action)
@@ -75,7 +75,7 @@ class CompanyBuilderEvent extends Event
     }
 
     /**
-     * Get actions
+     * Get actions.
      *
      * @return array
      */
@@ -85,31 +85,34 @@ class CompanyBuilderEvent extends Event
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });
+
         return $this->actions;
     }
 
     /**
-     * Gets a list of actions supported by the choice form field
+     * Gets a list of actions supported by the choice form field.
      *
      * @return array
      */
     public function getActionList()
     {
-        $list = array();
+        $list    = [];
         $actions = $this->getActions();
         foreach ($actions as $k => $a) {
             $list[$k] = $a['label'];
         }
+
         return $list;
     }
 
     public function getActionChoices()
     {
-        $choices = array();
+        $choices = [];
         $actions = $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }
+
         return $choices;
     }
 
@@ -118,7 +121,6 @@ class CompanyBuilderEvent extends Event
      * @param array $methods
      * @param array $component
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
@@ -131,7 +133,7 @@ class CompanyBuilderEvent extends Event
 
         foreach ($methods as $m) {
             if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException($component[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
+                throw new InvalidArgumentException($component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }
     }

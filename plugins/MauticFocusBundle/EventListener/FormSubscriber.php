@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +17,7 @@ use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 /**
- * Class FormSubscriber
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
@@ -41,7 +42,7 @@ class FormSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             FormEvents::FORM_POST_SAVE   => ['onFormPostSave', 0],
@@ -50,7 +51,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -59,14 +60,12 @@ class FormSubscriber extends CommonSubscriber
         $form = $event->getForm();
 
         if ($event->isNew()) {
-
             return;
         }
 
         $foci = $this->model->getRepository()->findByForm($form->getId());
 
         if (empty($foci)) {
-
             return;
         }
 
@@ -82,7 +81,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -93,7 +92,6 @@ class FormSubscriber extends CommonSubscriber
         $foci   = $this->model->getRepository()->findByForm($formId);
 
         if (empty($foci)) {
-
             return;
         }
 
@@ -109,4 +107,3 @@ class FormSubscriber extends CommonSubscriber
         $this->model->saveEntities($foci);
     }
 }
-

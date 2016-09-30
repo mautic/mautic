@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -14,7 +15,9 @@
 
     <div class="builder-content">
         <div id="CampaignCanvas">
-            <div id="CampaignEvent_newsource<?php if (!empty($campaignSources)) echo "_hide"; ?>" class="text-center list-campaign-source list-campaign-leadsource">
+            <div id="CampaignEvent_newsource<?php if (!empty($campaignSources)) {
+    echo '_hide';
+} ?>" class="text-center list-campaign-source list-campaign-leadsource">
                 <div class="campaign-event-content">
                     <div>
                         <span class="campaign-event-name ellipsis">
@@ -124,7 +127,9 @@
                                     data-target="#CampaignEventModal"
                                     title="<?php echo $view->escape($view['translator']->trans('mautic.campaign.leadsource.'.$option.'.tooltip')); ?>"
                                     value="<?php echo $option; ?>"
-                                <?php if (!empty($campaignSources[$option])) echo 'disabled'; ?>>
+                                <?php if (!empty($campaignSources[$option])) {
+                                        echo 'disabled';
+                                    } ?>>
                                 <span><?php echo $view['translator']->trans('mautic.campaign.leadsource.'.$option); ?></span>
                             </option>
                         <?php endforeach; ?>
@@ -185,8 +190,9 @@
         $sourceFound = false;
 
         foreach ($canvasSettings['nodes'] as $n):
-        if (isset($campaignSources[$n['id']]))
+        if (isset($campaignSources[$n['id']])) {
             $sourceFound = true;
+        }
         ?>
 
         mQuery('#CampaignEvent_<?php echo $n['id']; ?>').css({
@@ -278,7 +284,7 @@
             <?php
             $restrictions = [];
             foreach ($groupRestrictions as $event => $allowed):
-                $allowedString = implode("', '", $allowed);
+                $allowedString  = implode("', '", $allowed);
                 $restrictions[] = "'$event': ['$allowedString']";
             endforeach;
             ?>
@@ -296,7 +302,7 @@
                 <?php
                 $restrictions = [];
                 foreach ($groupRestrictions as $event => $disallow):
-                    $allowedString = implode("', '", $disallow);
+                    $allowedString  = implode("', '", $disallow);
                     $restrictions[] = "'$event': ['$allowedString']";
                 endforeach;
                 ?>

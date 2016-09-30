@@ -1,58 +1,56 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PageBundle\Model\PageModel;
 
 /**
- * Class DashboardSubscriber
- *
- * @package Mautic\PageBundle\EventListener
+ * Class DashboardSubscriber.
  */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
-     * Define the name of the bundle/category of the widget(s)
+     * Define the name of the bundle/category of the widget(s).
      *
      * @var string
      */
     protected $bundle = 'page';
 
     /**
-     * Define the widget(s)
+     * Define the widget(s).
      *
      * @var string
      */
-    protected $types = array(
-        'page.hits.in.time' => array(
-            'formAlias' => 'page_dashboard_hits_in_time_widget'
-        ),
-        'unique.vs.returning.leads' => array(),
-        'dwell.times' => array(),
-        'popular.pages' => array(),
-        'created.pages' => array(),
-        'device.granularity' => array()
-    );
+    protected $types = [
+        'page.hits.in.time' => [
+            'formAlias' => 'page_dashboard_hits_in_time_widget',
+        ],
+        'unique.vs.returning.leads' => [],
+        'dwell.times'               => [],
+        'popular.pages'             => [],
+        'created.pages'             => [],
+        'device.granularity'        => [],
+    ];
 
     /**
-     * Define permissions to see those widgets
+     * Define permissions to see those widgets.
      *
      * @var array
      */
-    protected $permissions = array(
+    protected $permissions = [
         'page:pages:viewown',
-        'page:pages:viewother'
-    );
+        'page:pages:viewother',
+    ];
 
     /**
      * @var PageModel
@@ -70,17 +68,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
     }
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed.
      *
      * @param WidgetDetailEvent $event
-     *
-     * @return void
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
-        
+
         if ($event->getType() == 'page.hits.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
@@ -90,7 +86,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             if (!$event->isCached()) {
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->pageModel->getHitsLineChartData(
@@ -100,8 +96,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFormat'],
                         $params['filter'],
                         $canViewOthers
-                    )
-                ));
+                    ),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
@@ -111,11 +107,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'unique.vs.returning.leads') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->pageModel->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
-                ));
+                    'chartData'   => $this->pageModel->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
@@ -125,11 +121,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'dwell.times') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->pageModel->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
-                ));
+                    'chartData'   => $this->pageModel->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
@@ -147,37 +143,37 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $this->pageModel->getPopularPages($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
-                $items = array();
+                $pages = $this->pageModel->getPopularPages($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
+                $items = [];
 
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
-                        $row = array(
-                            array(
+                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                        $row     = [
+                            [
                                 'value' => $page['title'],
-                                'type' => 'link',
-                                'link' => $pageUrl
-                            ),
-                            array(
-                                'value' => $page['hits']
-                            )
-                        );
+                                'type'  => 'link',
+                                'link'  => $pageUrl,
+                            ],
+                            [
+                                'value' => $page['hits'],
+                            ],
+                        ];
                         $items[] = $row;
                     }
                 }
 
-                $event->setTemplateData(array(
-                    'headItems'   => array(
+                $event->setTemplateData([
+                    'headItems' => [
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.dashboard.label.hits')
-                    ),
-                    'bodyItems'   => $items,
-                    'raw'         => $pages
-                ));
+                        $event->getTranslator()->trans('mautic.dashboard.label.hits'),
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $pages,
+                ]);
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
@@ -193,33 +189,33 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $this->pageModel->getPageList($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
-                $items = array();
+                $pages = $this->pageModel->getPageList($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
+                $items = [];
 
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
-                        $row = array(
-                            array(
+                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                        $row     = [
+                            [
                                 'value' => $page['name'],
-                                'type' => 'link',
-                                'link' => $pageUrl
-                            )
-                        );
+                                'type'  => 'link',
+                                'link'  => $pageUrl,
+                            ],
+                        ];
                         $items[] = $row;
                     }
                 }
 
-                $event->setTemplateData(array(
-                    'headItems'   => array(
-                        $event->getTranslator()->trans('mautic.dashboard.label.title')
-                    ),
-                    'bodyItems'   => $items,
-                    'raw'         => $pages
-                ));
+                $event->setTemplateData([
+                    'headItems' => [
+                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $pages,
+                ]);
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
@@ -229,16 +225,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $event->setTemplateData(array(
+                $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->pageModel->getDeviceGranularityData(
                         $params['dateFrom'],
                         $params['dateTo'],
-                        array(),
+                        [],
                         $canViewOthers
-                    )
-                ));
+                    ),
+                ]);
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');

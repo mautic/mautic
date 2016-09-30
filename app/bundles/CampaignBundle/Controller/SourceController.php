@@ -1,21 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CampaignBundle\Entity\Source;
+use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SourceController extends CommonFormController
 {
-    private $supportedSourceTypes = array('lists', 'forms');
+    private $supportedSourceTypes = ['lists', 'forms'];
 
     /**
      * @param int $objectId
@@ -25,7 +26,7 @@ class SourceController extends CommonFormController
     public function newAction($objectId = 0)
     {
         $success = 0;
-        $valid   = $cancelled = false;
+        $valid   = $cancelled   = false;
         $method  = $this->request->getMethod();
         $session = $this->get('session');
         if ($method == 'POST') {
@@ -33,9 +34,9 @@ class SourceController extends CommonFormController
             $sourceType = $source['sourceType'];
         } else {
             $sourceType = $this->request->query->get('sourceType');
-            $source     = array(
-                'sourceType' => $sourceType
-            );
+            $source     = [
+                'sourceType' => $sourceType,
+            ];
         }
 
         //set the sourceType key for sources
@@ -46,10 +47,10 @@ class SourceController extends CommonFormController
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
             || !$this->get('mautic.security')->isGranted(
-                array(
+                [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
-                ),
+                    'campaign:campaigns:create',
+                ],
                 'MATCH_ONE'
             )
         ) {
@@ -60,10 +61,10 @@ class SourceController extends CommonFormController
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,
-            array(
-                'action'         => $this->generateUrl('mautic_campaignsource_action', array('objectAction' => 'new', 'objectId' => $objectId)),
-                'source_choices' => $sourceList
-            )
+            [
+                'action'         => $this->generateUrl('mautic_campaignsource_action', ['objectAction' => 'new', 'objectId' => $objectId]),
+                'source_choices' => $sourceList,
+            ]
         );
 
         //Check for a submitted form and process it
@@ -81,21 +82,21 @@ class SourceController extends CommonFormController
             }
         }
 
-        $passthroughVars = array(
+        $passthroughVars = [
             'mauticContent' => 'campaignSource',
             'success'       => $success,
-            'route'         => false
-        );
+            'route'         => false,
+        ];
 
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['sourceHtml'] = $this->renderView(
                     'MauticCampaignBundle:Source:index.html.php',
-                    array(
+                    [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
-                        'names'      => implode(', ', array_intersect_key($sourceList, array_flip($modifiedSources[$sourceType])))
-                    )
+                        'names'      => implode(', ', array_intersect_key($sourceList, array_flip($modifiedSources[$sourceType]))),
+                    ]
                 );
                 $passthroughVars['sourceType'] = $sourceType;
             }
@@ -105,18 +106,17 @@ class SourceController extends CommonFormController
 
             return new JsonResponse($passthroughVars);
         } else {
-
-            $viewParams = array(
+            $viewParams = [
                 'sourceType' => $sourceType,
-                'form'       => $form->createView()
-            );
+                'form'       => $form->createView(),
+            ];
 
             return $this->ajaxAction(
-                array(
+                [
                     'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
                     'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
-                )
+                    'passthroughVars' => $passthroughVars,
+                ]
             );
         }
     }
@@ -130,20 +130,20 @@ class SourceController extends CommonFormController
     {
         $session         = $this->get('session');
         $method          = $this->request->getMethod();
-        $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', array());
+        $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
         if ($method == 'POST') {
             $source     = $this->request->request->get('campaign_leadsource');
             $sourceType = $source['sourceType'];
         } else {
             $sourceType = $this->request->query->get('sourceType');
-            $source     = array(
+            $source     = [
                 'sourceType' => $sourceType,
-                $sourceType  => $selectedSources[$sourceType]
-            );
+                $sourceType  => $selectedSources[$sourceType],
+            ];
         }
 
         $success = 0;
-        $valid   = $cancelled = false;
+        $valid   = $cancelled   = false;
 
         if (!in_array($sourceType, $this->supportedSourceTypes)) {
             return $this->modalAccessDenied();
@@ -152,10 +152,10 @@ class SourceController extends CommonFormController
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
             || !$this->get('mautic.security')->isGranted(
-                array(
+                [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
-                ),
+                    'campaign:campaigns:create',
+                ],
                 'MATCH_ONE'
             )
         ) {
@@ -166,10 +166,10 @@ class SourceController extends CommonFormController
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,
-            array(
-                'action'         => $this->generateUrl('mautic_campaignsource_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
-                'source_choices' => $sourceList
-            )
+            [
+                'action'         => $this->generateUrl('mautic_campaignsource_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
+                'source_choices' => $sourceList,
+            ]
         );
 
         //Check for a submitted form and process it
@@ -187,22 +187,22 @@ class SourceController extends CommonFormController
             }
         }
 
-        $passthroughVars = array(
+        $passthroughVars = [
             'mauticContent' => 'campaignSource',
             'success'       => $success,
-            'route'         => false
-        );
+            'route'         => false,
+        ];
 
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['updateHtml'] = $this->renderView(
                     'MauticCampaignBundle:Source:index.html.php',
-                    array(
+                    [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
                         'names'      => implode(', ', array_intersect_key($sourceList, array_flip($modifiedSources[$sourceType]))),
-                        'update'     => true
-                    )
+                        'update'     => true,
+                    ]
                 );
                 $passthroughVars['sourceType'] = $sourceType;
             }
@@ -212,42 +212,41 @@ class SourceController extends CommonFormController
 
             return new JsonResponse($passthroughVars);
         } else {
-
-            $viewParams = array(
+            $viewParams = [
                 'sourceType' => $sourceType,
-                'form'       => $form->createView()
-            );
+                'form'       => $form->createView(),
+            ];
 
             return $this->ajaxAction(
-                array(
+                [
                     'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
                     'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
-                )
+                    'passthroughVars' => $passthroughVars,
+                ]
             );
         }
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
-     * @param         $objectId
+     * @param   $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId)
     {
         $session         = $this->get('session');
-        $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', array());
+        $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
         $sourceType      = $this->request->get('sourceType');
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
             || !$this->get('mautic.security')->isGranted(
-                array(
+                [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
-                ),
+                    'campaign:campaigns:create',
+                ],
                 'MATCH_ONE'
             )
         ) {
@@ -261,15 +260,15 @@ class SourceController extends CommonFormController
                 $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $modifiedSources);
             }
 
-            $dataArray = array(
+            $dataArray = [
                 'mauticContent' => 'campaignSource',
                 'success'       => 1,
                 'route'         => false,
                 'sourceType'    => $sourceType,
-                'deleted'       => 1
-            );
+                'deleted'       => 1,
+            ];
         } else {
-            $dataArray = array('success' => 0);
+            $dataArray = ['success' => 0];
         }
 
         $response = new JsonResponse($dataArray);

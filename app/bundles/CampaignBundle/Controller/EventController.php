@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController extends CommonFormController
@@ -18,14 +19,14 @@ class EventController extends CommonFormController
     private $supportedEventTypes = ['decision', 'action', 'condition'];
 
     /**
-     * Generates new form and processes post data
+     * Generates new form and processes post data.
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction()
     {
         $success = 0;
-        $valid   = $cancelled = false;
+        $valid   = $cancelled   = false;
         $method  = $this->request->getMethod();
         $session = $this->get('session');
         if ($method == 'POST') {
@@ -44,7 +45,7 @@ class EventController extends CommonFormController
                 'type'       => $type,
                 'eventType'  => $eventType,
                 'campaignId' => $campaignId,
-                'anchor'     => $anchorName
+                'anchor'     => $anchorName,
             ];
         }
 
@@ -59,7 +60,7 @@ class EventController extends CommonFormController
             || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
+                    'campaign:campaigns:create',
                 ],
                 'MATCH_ONE'
             )
@@ -68,13 +69,13 @@ class EventController extends CommonFormController
         }
 
         //fire the builder event
-        $events            = $this->getModel('campaign')->getEvents();
-        $form              = $this->get('form.factory')->create(
+        $events = $this->getModel('campaign')->getEvents();
+        $form   = $this->get('form.factory')->create(
             'campaignevent',
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'new']),
-                'settings' => $events[$eventType][$type]
+                'settings' => $events[$eventType][$type],
             ]
         );
         $event['settings'] = $events[$eventType][$type];
@@ -94,7 +95,7 @@ class EventController extends CommonFormController
                     $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');
                     $formData       = $form->getData();
                     $event          = array_merge($event, $formData);
-                    $event['id']    = $event['tempId'] = $keyId;
+                    $event['id']    = $event['tempId']    = $keyId;
                     if (empty($event['name'])) {
                         //set it to the event default
                         $event['name'] = $this->get('translator')->trans($event['settings']['label']);
@@ -117,7 +118,7 @@ class EventController extends CommonFormController
                 $formThemes[] = $event['settings']['formTheme'];
             }
 
-            $viewParams['form'] = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);;
+            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
             $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
             $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
                 $event['settings']['description']
@@ -129,7 +130,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
-            'route'         => false
+            'route'         => false,
         ];
 
         if (!empty($keyId)) {
@@ -147,7 +148,7 @@ class EventController extends CommonFormController
                 [
                     'event'      => $event,
                     'id'         => $keyId,
-                    'campaignId' => $campaignId
+                    'campaignId' => $campaignId,
                 ]
             );
             $passthroughVars['eventType'] = $eventType;
@@ -165,7 +166,7 @@ class EventController extends CommonFormController
                         '%unit%'   => $translator->transChoice(
                             'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
                             $event['triggerInterval']
-                        )
+                        ),
                     ]
                 );
             } elseif ($event['triggerMode'] == 'date') {
@@ -180,7 +181,7 @@ class EventController extends CommonFormController
                     [
                         '%full%' => $dh->toFull($event['triggerDate']),
                         '%time%' => $dh->toTime($event['triggerDate']),
-                        '%date%' => $dh->toShort($event['triggerDate'])
+                        '%date%' => $dh->toShort($event['triggerDate']),
                     ]
                 );
             }
@@ -197,29 +198,29 @@ class EventController extends CommonFormController
                 [
                     'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
                     'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
+                    'passthroughVars' => $passthroughVars,
                 ]
             );
         }
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction($objectId)
     {
-        $session        = $this->get('session');
-        $method         = $this->request->getMethod();
-        $campaignId     = ($method == "POST")
+        $session    = $this->get('session');
+        $method     = $this->request->getMethod();
+        $campaignId = ($method == 'POST')
             ? $this->request->request->get('campaignevent[campaignId]', '', true)
             : $this->request->query->get(
                 'campaignId'
             );
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $success        = 0;
-        $valid          = $cancelled = false;
+        $valid          = $cancelled          = false;
         $event          = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ($method == 'POST') {
@@ -240,7 +241,6 @@ class EventController extends CommonFormController
             $type      = $event['type'];
             $eventType = $event['eventType'];
             if (!in_array($eventType, $this->supportedEventTypes)) {
-
                 return $this->modalAccessDenied();
             }
 
@@ -249,7 +249,7 @@ class EventController extends CommonFormController
                 || !$this->get('mautic.security')->isGranted(
                     [
                         'campaign:campaigns:edit',
-                        'campaign:campaigns:create'
+                        'campaign:campaigns:create',
                     ],
                     'MATCH_ONE'
                 )
@@ -258,13 +258,13 @@ class EventController extends CommonFormController
             }
 
             //fire the builder event
-            $events            = $this->getModel('campaign')->getEvents();
-            $form              = $this->get('form.factory')->create(
+            $events = $this->getModel('campaign')->getEvents();
+            $form   = $this->get('form.factory')->create(
                 'campaignevent',
                 $event,
                 [
                     'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
-                    'settings' => $events[$eventType][$type]
+                    'settings' => $events[$eventType][$type],
                 ]
             );
             $event['settings'] = $events[$eventType][$type];
@@ -304,7 +304,7 @@ class EventController extends CommonFormController
                 if (isset($event['settings']['formTheme'])) {
                     $formThemes[] = $event['settings']['formTheme'];
                 }
-                $viewParams['form'] = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
+                $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
                 $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
                 $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
                     $event['settings']['description']
@@ -316,7 +316,7 @@ class EventController extends CommonFormController
             $passthroughVars = [
                 'mauticContent' => 'campaignEvent',
                 'success'       => $success,
-                'route'         => false
+                'route'         => false,
             ];
 
             if ($closeModal) {
@@ -337,10 +337,10 @@ class EventController extends CommonFormController
                             'event'      => $event,
                             'id'         => $objectId,
                             'update'     => true,
-                            'campaignId' => $campaignId
+                            'campaignId' => $campaignId,
                         ]
                     );
-                    $passthroughVars['eventType']  = $eventType;
+                    $passthroughVars['eventType'] = $eventType;
 
                     $translator = $this->translator;
                     if ($event['triggerMode'] == 'interval') {
@@ -355,7 +355,7 @@ class EventController extends CommonFormController
                                 '%unit%'   => $translator->transChoice(
                                     'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
                                     $event['triggerInterval']
-                                )
+                                ),
                             ]
                         );
                     } elseif ($event['triggerMode'] == 'date') {
@@ -370,7 +370,7 @@ class EventController extends CommonFormController
                             [
                                 '%full%' => $dh->toFull($event['triggerDate']),
                                 '%time%' => $dh->toTime($event['triggerDate']),
-                                '%date%' => $dh->toShort($event['triggerDate'])
+                                '%date%' => $dh->toShort($event['triggerDate']),
                             ]
                         );
                     }
@@ -385,7 +385,7 @@ class EventController extends CommonFormController
                     [
                         'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
                         'viewParameters'  => $viewParams,
-                        'passthroughVars' => $passthroughVars
+                        'passthroughVars' => $passthroughVars,
                     ]
                 );
             }
@@ -395,9 +395,9 @@ class EventController extends CommonFormController
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
-     * @param         $objectId
+     * @param   $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -413,7 +413,7 @@ class EventController extends CommonFormController
             || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
+                    'campaign:campaigns:create',
                 ],
                 'MATCH_ONE'
             )
@@ -439,7 +439,7 @@ class EventController extends CommonFormController
                 'route'         => false,
                 'eventId'       => $objectId,
                 'deleted'       => 1,
-                'event'         => $event
+                'event'         => $event,
             ];
         } else {
             $dataArray = ['success' => 0];
@@ -451,9 +451,9 @@ class EventController extends CommonFormController
     }
 
     /**
-     * Undeletes the entity
+     * Undeletes the entity.
      *
-     * @param         $objectId
+     * @param   $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -469,7 +469,7 @@ class EventController extends CommonFormController
             || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
-                    'campaign:campaigns:create'
+                    'campaign:campaigns:create',
                 ],
                 'MATCH_ONE'
             )
@@ -508,9 +508,9 @@ class EventController extends CommonFormController
                     [
                         'event'      => $event,
                         'id'         => $objectId,
-                        'campaignId' => $campaignId
+                        'campaignId' => $campaignId,
                     ]
-                )
+                ),
             ];
         } else {
             $dataArray = ['success' => 0];

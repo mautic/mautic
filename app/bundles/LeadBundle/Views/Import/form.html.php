@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'leadImport');
@@ -90,16 +90,16 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
                 <?php $rowCount = 2; ?>
                 <?php foreach ($form->children as $key => $child): ?>
                     <?php if ($key != 'properties'): ?>
-                        <?php if ($rowCount++ % 3 == 1 ): ?>
+                        <?php if ($rowCount++ % 3 == 1): ?>
                             <div class="row">
                         <?php endif; ?>
                         <div class="col-sm-4">
                             <?php echo $view['form']->row($child); ?>
                         </div>
-                        <?php if ($rowCount++ % 3 == 1 ): ?>
+                        <?php if ($rowCount++ % 3 == 1): ?>
                             </div>
                         <?php endif; ?>
-                        <?php $rowCount++; ?>
+                        <?php ++$rowCount; ?>
                     <?php endif; ?>
                 <?php endforeach; ?>
             </div>
@@ -111,16 +111,16 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
             <div class="panel-body">
                 <?php $rowCount = 2; ?>
                 <?php foreach ($form->children['properties'] as $child): ?>
-                    <?php if ($rowCount++ % 3 == 1 ): ?>
+                    <?php if ($rowCount++ % 3 == 1): ?>
                         <div class="row">
                     <?php endif; ?>
                     <div class="col-sm-4">
                         <?php echo $view['form']->row($child); ?>
                     </div>
-                    <?php if ($rowCount++ % 3 == 1 ): ?>
+                    <?php if ($rowCount++ % 3 == 1): ?>
                         </div>
                     <?php endif; ?>
-                    <?php $rowCount++; ?>
+                    <?php ++$rowCount; ?>
                 <?php endforeach; ?>
             </div>
         </div>

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -25,9 +26,9 @@
                 <?php endif; ?>
                 </div>
                 <div class="media-body">
-                    <?php echo $view['translator']->trans('mautic.core.' . $log['action'] . '.by.past.tense'); ?>
+                    <?php echo $view['translator']->trans('mautic.core.'.$log['action'].'.by.past.tense'); ?>
                     <?php if (isset($log['userId']) && $log['userId']) : ?>
-                        <a href="<?php echo $view['router']->path('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $log['userId']]); ?>" data-toggle="ajax">
                             <?php echo $log['userName']; ?>
                         </a>
                     <?php else: ?>

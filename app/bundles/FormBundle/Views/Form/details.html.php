@@ -1,15 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
-$view['slots']->set("headerTitle", $activeForm->getName());
+$view['slots']->set('headerTitle', $activeForm->getName());
 
 $view['slots']->set(
     'actions',
@@ -18,7 +18,7 @@ $view['slots']->set(
         [
             'item'            => $activeForm,
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
+                'edit' => $view['security']->hasEntityAccess(
                     $permissions['form:forms:editown'],
                     $permissions['form:forms:editother'],
                     $activeForm->getCreatedBy()
@@ -29,17 +29,17 @@ $view['slots']->set(
                     $permissions['form:forms:deleteother'],
                     $activeForm->getCreatedBy()
                 ),
-                'close'  => $view['security']->hasEntityAccess(
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['form:forms:viewown'],
                     $permissions['form:forms:viewother'],
                     $activeForm->getCreatedBy()
                 ),
             ],
-            'routeBase'       => 'form',
-            'langVar'         => 'form',
-            'customButtons'   => [
+            'routeBase'     => 'form',
+            'langVar'       => 'form',
+            'customButtons' => [
                 [
-                    'attr'      => [
+                    'attr' => [
                         'data-toggle' => '',
                         'target'      => '_blank',
                         'href'        => $view['router']->path(
@@ -52,7 +52,7 @@ $view['slots']->set(
                     'btnClass'  => 'btn btn-default btn-nospin',
                 ],
                 [
-                    'attr'      => [
+                    'attr' => [
                         'data-toggle' => 'ajax',
                         'href'        => $view['router']->path(
                             'mautic_form_action',
@@ -160,7 +160,9 @@ $showActions = count($activeFormActions);
                         </a>
                     </li>
                 <?php endif; ?>
-                <li class="<?php if (!$showActions) echo 'active'; ?>">
+                <li class="<?php if (!$showActions) {
+                                    echo 'active';
+                                } ?>">
                     <a href="#fields-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.form.tab.fields'); ?>
                     </a>
@@ -215,7 +217,9 @@ $showActions = count($activeFormActions);
             <?php endif; ?>
 
             <!-- #fields-container -->
-            <div class="tab-pane fade<?php if (!$showActions) echo ' active in'; ?> bdr-w-0" id="fields-container">
+            <div class="tab-pane fade<?php if (!$showActions) {
+                                            echo ' active in';
+                                        } ?> bdr-w-0" id="fields-container">
                 <h5 class="fw-sb mb-xs">Form Field</h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var \Mautic\FormBundle\Entity\Field $field */

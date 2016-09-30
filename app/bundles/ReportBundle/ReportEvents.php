@@ -1,22 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ReportBundle;
 
 /**
- * Class ReportEvents
+ * Class ReportEvents.
  *
  * Events available for ReportBundle
  */
 final class ReportEvents
 {
-
     /**
      * The mautic.report_pre_save event is dispatched right before a report is persisted.
      *
@@ -55,7 +55,7 @@ final class ReportEvents
 
     /**
      * The mautic.report_on_build event is dispatched before displaying the report builder form to allow
-     * bundles to specify report sources and columns
+     * bundles to specify report sources and columns.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportBuilderEvent instance.
      *
@@ -64,7 +64,7 @@ final class ReportEvents
     const REPORT_ON_BUILD = 'mautic.report_on_build';
 
     /**
-     * The mautic.report_on_generate event is dispatched when generating a report to build the base query
+     * The mautic.report_on_generate event is dispatched when generating a report to build the base query.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportGeneratorEvent instance.
      *
@@ -73,7 +73,7 @@ final class ReportEvents
     const REPORT_ON_GENERATE = 'mautic.report_on_generate';
 
     /**
-     * The mautic.report_on_display event is dispatched when displaying a report
+     * The mautic.report_on_display event is dispatched when displaying a report.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportDataEvent instance.
      *
@@ -82,7 +82,7 @@ final class ReportEvents
     const REPORT_ON_DISPLAY = 'mautic.report_on_display';
 
     /**
-     * The mautic.report_on_graph_generate event is dispatched to generate a graph data
+     * The mautic.report_on_graph_generate event is dispatched to generate a graph data.
      *
      * The event listener receives a Mautic\ReportBundle\Event\ReportGraphEvent instance.
      *

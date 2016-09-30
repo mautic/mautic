@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,10 +14,9 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PageListType
+ * Class PageListType.
  */
 class PageListType extends AbstractType
 {
@@ -49,9 +49,9 @@ class PageListType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'choices'     => function (Options $options) use ($model, $canViewOther) {
+                'choices' => function (Options $options) use ($model, $canViewOther) {
                     $choices = [];
-                    $pages   = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
+                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
                     foreach ($pages as $page) {
                         $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
                     }
@@ -70,7 +70,7 @@ class PageListType extends AbstractType
                 'multiple'    => true,
                 'required'    => false,
                 'top_level'   => 'variant',
-                'ignore_ids'  => []
+                'ignore_ids'  => [],
             ]
         );
 

@@ -1,26 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 /**
- * Class ConstantContactIntegration
+ * Class ConstantContactIntegration.
  */
 class ConstantContactIntegration extends EmailAbstractIntegration
 {
-
     /**
      * {@inheritdoc}
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return 'ConstantContact';
     }
@@ -33,44 +33,43 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return 'Constant Contact';
     }
 
-
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType ()
+    public function getAuthenticationType()
     {
         return 'oauth2';
     }
 
     /**
-     * Get the URL required to obtain an oauth2 access token
+     * Get the URL required to obtain an oauth2 access token.
      *
      * @return string
      */
-    public function getAccessTokenUrl ()
+    public function getAccessTokenUrl()
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/token';
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
+     * Get the authentication/login URL for oauth2 access.
      *
      * @return string
      */
-    public function getAuthenticationUrl ()
+    public function getAuthenticationUrl()
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/siteowner/authorize';
     }
 
     /**
-     * Retrieves and stores tokens returned from oAuthLogin
+     * Retrieves and stores tokens returned from oAuthLogin.
      *
      * @param array $settings
      * @param array $parameters
      *
      * @return bool|string false if no error; otherwise the error string
      */
-    public function authCallback ($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         // Constanct Contact doesn't like POST
         $settings['method'] = 'GET';
@@ -81,13 +80,13 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * @return array
      */
-    public function getAvailableLeadFields ($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
         if (!$this->isAuthorized()) {
-            return array();
+            return [];
         }
 
-        $fields = array(
+        $fields = [
             'email',
             'prefix_name',
             'first_name',
@@ -103,26 +102,26 @@ class ConstantContactIntegration extends EmailAbstractIntegration
             'cell_phone',
             'fax',
             'work_phone',
-            'home_phone'
-        );
+            'home_phone',
+        ];
 
-        $leadFields = array();
+        $leadFields = [];
         foreach ($fields as $f) {
-            $leadFields[$f] = array(
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.field.' . $f),
+            $leadFields[$f] = [
+                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
-                'required' => ($f == 'email' ) ? true : false
-            );
+                'required' => ($f == 'email') ? true : false,
+            ];
         }
 
         $c = 1;
         while ($c <= 15) {
-            $leadFields['customfield_' . $c] = array(
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.customfield.' . $f),
+            $leadFields['customfield_'.$c] = [
+                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.customfield.'.$f),
                 'type'     => 'string',
-                'required' => false
-            );
-            $c++;
+                'required' => false,
+            ];
+            ++$c;
         }
 
         return $leadFields;
@@ -131,7 +130,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * @param $lead
      */
-    public function pushLead($lead, $config = array())
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -150,18 +149,18 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                 $email = $mappedData['email'];
                 unset($mappedData['email']);
 
-                $addresses    = array();
-                $customfields = array();
+                $addresses    = [];
+                $customfields = [];
                 foreach ($mappedData as $k => $v) {
                     if (strpos($v, 'address_') === 0) {
                         $addresses[str_replace('address_', '', $k)] = $v;
                         unset($mappedData[$k]);
                     } elseif (strpos($v, 'customfield_') === 0) {
-                        $key = str_replace('customfield_', 'CustomField', $k);
-                        $customfields[] = array(
+                        $key            = str_replace('customfield_', 'CustomField', $k);
+                        $customfields[] = [
                             'name'  => $key,
-                            'value' => $v
-                        );
+                            'value' => $v,
+                        ];
                         unset($mappedData[$k]);
                     }
                 }
@@ -175,9 +174,9 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                     $mappedData['custom_fields'] = $customfields;
                 }
 
-                $options = array();
+                $options              = [];
                 $options['action_by'] = (!empty($config['list_settings']['sendWelcome'])) ? 'ACTION_BY_VISITOR' : 'ACTION_BY_OWNER';
-                $listId = $config['list_settings']['list'];
+                $listId               = $config['list_settings']['list'];
 
                 $this->getApiHelper()->subscribeLead($email, $listId, $mappedData, $options);
 

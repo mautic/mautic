@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: alan
  * Date: 9/14/16
- * Time: 5:42 PM
+ * Time: 5:42 PM.
  */
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
@@ -14,7 +14,6 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
 {
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-
     }
 
     public function getMaxBatchLimit()

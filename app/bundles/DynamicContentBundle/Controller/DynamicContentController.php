@@ -1,16 +1,17 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Controller;
 
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -97,7 +98,7 @@ class DynamicContentController extends FormController
                     'mauticContent' => 'dynamicContent',
                     'route'         => $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]),
                 ],
-                'viewParameters'  => [
+                'viewParameters' => [
                     'searchValue' => $search,
                     'items'       => $entities,
                     'categories'  => $categories,
@@ -161,10 +162,10 @@ class DynamicContentController extends FormController
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
+                            'objectId'     => $entity->getId(),
                         ];
-                        $retUrl         = $this->generateUrl('mautic_dynamicContent_action', $viewParameters);
-                        $template       = 'MauticDynamicContentBundle:DynamicContent:view';
+                        $retUrl   = $this->generateUrl('mautic_dynamicContent_action', $viewParameters);
+                        $template = 'MauticDynamicContentBundle:DynamicContent:view';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -190,7 +191,7 @@ class DynamicContentController extends FormController
                         'updateSelect'       => $form['updateSelect']->getData(),
                         'dynamicContentId'   => $entity->getId(),
                         'dynamicContentName' => $entity->getName(),
-                        'dynamicContentLang' => $entity->getLanguage()
+                        'dynamicContentLang' => $entity->getLanguage(),
                     ]
                 );
             }
@@ -201,7 +202,7 @@ class DynamicContentController extends FormController
                         'returnUrl'       => $retUrl,
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
-                        'passthroughVars' => $passthrough
+                        'passthroughVars' => $passthrough,
                     ]
                 );
             } elseif ($valid && !$cancelled) {
@@ -213,11 +214,11 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
-                'passthroughVars' => $passthrough
+                'passthroughVars' => $passthrough,
             ]
         );
     }
@@ -317,7 +318,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
                     'currentListId' => $objectId,
                 ],
@@ -361,7 +362,7 @@ class DynamicContentController extends FormController
                         'activeLink'    => '#mautic_dynamicContent_index',
                         'mauticContent' => 'dynamicContent',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.dynamicContent.error.notfound',
@@ -379,8 +380,8 @@ class DynamicContentController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var DynamicContent $parent */
-        /** @var DynamicContent[] $children */
+        /* @var DynamicContent $parent */
+        /* @var DynamicContent[] $children */
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
         // Audit Log
@@ -402,23 +403,23 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'returnUrl' => $action,
+                'returnUrl'       => $action,
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
                 ],
-                'viewParameters'  => [
-                    'entity'        => $entity,
-                    'permissions'   => $this->getPermissions(),
-                    'logs'          => $logs,
-                    'translations'  => [
+                'viewParameters' => [
+                    'entity'       => $entity,
+                    'permissions'  => $this->getPermissions(),
+                    'logs'         => $logs,
+                    'translations' => [
                         'parent'   => $translationParent,
-                        'children' => $translationChildren
+                        'children' => $translationChildren,
                     ],
                     'trackables'    => $trackables,
                     'entityViews'   => $entityViews,
-                    'dateRangeForm' => $dateRangeForm->createView()
+                    'dateRangeForm' => $dateRangeForm->createView(),
                 ],
             ]
         );

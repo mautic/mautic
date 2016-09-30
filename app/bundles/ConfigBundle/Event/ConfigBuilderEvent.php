@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,22 +14,19 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ConfigEvent
- *
- * @package Mautic\ConfigBundle\Event
+ * Class ConfigEvent.
  */
 class ConfigBuilderEvent extends Event
 {
+    /**
+     * @var array
+     */
+    private $forms = [];
 
     /**
      * @var array
      */
-    private $forms = array();
-
-    /**
-     * @var array
-     */
-    private $formThemes = array();
+    private $formThemes = [];
 
     /**
      * @var MauticFactory
@@ -38,19 +36,17 @@ class ConfigBuilderEvent extends Event
     /**
      * @param MauticFactory $factory
      */
-    public function __construct (MauticFactory $factory)
+    public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
     /**
-     * Set new form to the forms array
+     * Set new form to the forms array.
      *
      * @param array $form
-     *
-     * @return void
      */
-    public function addForm ($form)
+    public function addForm($form)
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
@@ -60,31 +56,31 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * Returns the forms array
+     * Returns the forms array.
      *
      * @return array
      */
-    public function getForms ()
+    public function getForms()
     {
         return $this->forms;
     }
 
     /**
-     * Returns the formThemes array
+     * Returns the formThemes array.
      *
      * @return array
      */
-    public function getFormThemes ()
+    public function getFormThemes()
     {
         return $this->formThemes;
     }
 
     /**
-     * Returns the factory
+     * Returns the factory.
      *
      * @return MauticFactory
      */
-    public function getFactory ()
+    public function getFactory()
     {
         return $this->factory;
     }
@@ -96,9 +92,9 @@ class ConfigBuilderEvent extends Event
      *
      * @return array
      */
-    public function getParameters ($path = null)
+    public function getParameters($path = null)
     {
-        $paramsFile = $this->factory->getSystemPath('app') . $path;
+        $paramsFile = $this->factory->getSystemPath('app').$path;
 
         if (file_exists($paramsFile)) {
             // Import the bundle configuration, $parameters is defined in this file
@@ -106,7 +102,7 @@ class ConfigBuilderEvent extends Event
         }
 
         if (!isset($parameters)) {
-            $parameters = array();
+            $parameters = [];
         }
 
         return $parameters;
@@ -117,7 +113,7 @@ class ConfigBuilderEvent extends Event
      *
      * @return array
      */
-    public function getParametersFromConfig ($bundle)
+    public function getParametersFromConfig($bundle)
     {
         static $allBundles;
 
@@ -128,7 +124,7 @@ class ConfigBuilderEvent extends Event
         if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
             return $allBundles[$bundle]['config']['parameters'];
         } else {
-            return array();
+            return [];
         }
     }
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +15,12 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class TableSchemaHelper
+ * Class TableSchemaHelper.
  *
  * Used to manipulate creation/removal of tables
  */
 class TableSchemaHelper
 {
-
     /**
      * @var Connection
      */
@@ -63,15 +63,15 @@ class TableSchemaHelper
      */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
-        $this->db            = $db;
-        $this->sm            = $db->getSchemaManager();
-        $this->prefix        = $prefix;
-        $this->columnHelper  = $columnHelper;
-        $this->schema        = new Schema(array(), array(), $this->sm->createSchemaConfig());
+        $this->db           = $db;
+        $this->sm           = $db->getSchemaManager();
+        $this->prefix       = $prefix;
+        $this->columnHelper = $columnHelper;
+        $this->schema       = new Schema([], [], $this->sm->createSchemaConfig());
     }
 
     /**
-     * Get the SchemaManager
+     * Get the SchemaManager.
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
@@ -81,11 +81,10 @@ class TableSchemaHelper
     }
 
     /**
-     * Add an array of tables to db
+     * Add an array of tables to db.
      *
      * @param array $tables
      *
-     * @return void
      * @throws SchemaException
      */
     public function addTables(array $tables)
@@ -107,28 +106,27 @@ class TableSchemaHelper
     }
 
     /**
-     * Add a table to the db
+     * Add a table to the db.
      *
      * @param array $table
-     *  ['name']    string (required) unique name of table; cannot already exist
-     *  ['columns'] array  (optional) Array of columns to add in the format of
-     *      array(
-     *          array(
-     *              'name'    => 'column_name', //required
-     *              'type'    => 'string',  //optional, defaults to text
-     *              'options' => array(...) //optional, column options
-     *          ),
-     *          ...
-     *      )
-     *  ['options'] array  (optional) Defining options for table
-     *      array(
-     *          'primaryKey' => array(),
-     *          'uniqueIndex' => array()
-     *      )
+     *                     ['name']    string (required) unique name of table; cannot already exist
+     *                     ['columns'] array  (optional) Array of columns to add in the format of
+     *                     array(
+     *                     array(
+     *                     'name'    => 'column_name', //required
+     *                     'type'    => 'string',  //optional, defaults to text
+     *                     'options' => array(...) //optional, column options
+     *                     ),
+     *                     ...
+     *                     )
+     *                     ['options'] array  (optional) Defining options for table
+     *                     array(
+     *                     'primaryKey' => array(),
+     *                     'uniqueIndex' => array()
+     *                     )
      * @param $checkExists
      * @param $dropExisting
      *
-     * @return void
      * @throws SchemaException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false)
@@ -146,14 +144,14 @@ class TableSchemaHelper
 
         $this->addTables[] = $table;
 
-        $options = (isset($table['options'])) ? $table['options'] : array();
-        $columns = (isset($table['columns'])) ? $table['columns'] : array();
+        $options = (isset($table['options'])) ? $table['options'] : [];
+        $columns = (isset($table['columns'])) ? $table['columns'] : [];
 
-        $newTable  = $this->schema->createTable($this->prefix . $table['name']);
+        $newTable = $this->schema->createTable($this->prefix.$table['name']);
 
         if (!empty($columns)) {
             //just to make sure a same name column is not added
-            $columnsAdded = array();
+            $columnsAdded = [];
             foreach ($columns as $column) {
                 if (empty($column['name'])) {
                     throw new SchemaException('A column is missing required name key.');
@@ -161,7 +159,7 @@ class TableSchemaHelper
 
                 if (!isset($columns[$column['name']])) {
                     $type       = (isset($column['type'])) ? $column['type'] : 'text';
-                    $colOptions = (isset($column['options'])) ? $column['options'] : array();
+                    $colOptions = (isset($column['options'])) ? $column['options'] : [];
 
                     $newTable->addColumn($column['name'], $type, $colOptions);
                     $columnsAdded[] = $column['name'];
@@ -171,7 +169,7 @@ class TableSchemaHelper
 
         if (!empty($options)) {
             foreach ($options as $option => $value) {
-                $func = ($option == 'uniqueIndex' ? "add" : "set") . ucfirst($option);
+                $func = ($option == 'uniqueIndex' ? 'add' : 'set').ucfirst($option);
                 $newTable->$func($value);
             }
         }
@@ -179,8 +177,6 @@ class TableSchemaHelper
 
     /**
      * @param string $table
-     *
-     * @return void
      */
     public function deleteTable($table)
     {
@@ -190,9 +186,7 @@ class TableSchemaHelper
     }
 
     /**
-     * Executes the changes
-     *
-     * @return void
+     * Executes the changes.
      */
     public function executeChanges()
     {
@@ -200,7 +194,7 @@ class TableSchemaHelper
 
         if (!empty($this->dropTables)) {
             foreach ($this->dropTables as $t) {
-                $this->sm->dropTable($this->prefix . $t);
+                $this->sm->dropTable($this->prefix.$t);
             }
         }
 
@@ -213,24 +207,25 @@ class TableSchemaHelper
         }
 
         //reset schema
-        $this->schema     = new Schema(array(), array(), $this->sm->createSchemaConfig());
-        $this->dropTables = $this->addTables = array();
+        $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
+        $this->dropTables = $this->addTables = [];
     }
 
     /**
-     * Determine if a table exists
+     * Determine if a table exists.
      *
      * @param string $table
      * @param bool   $throwException
      *
      * @return bool
+     *
      * @throws SchemaException
      */
     public function checkTableExists($table, $throwException = false)
     {
-        if ($this->sm->tablesExist($this->prefix . $table)) {
+        if ($this->sm->tablesExist($this->prefix.$table)) {
             if ($throwException) {
-                throw new SchemaException($this->prefix . "$table already exists");
+                throw new SchemaException($this->prefix."$table already exists");
             }
 
             return true;

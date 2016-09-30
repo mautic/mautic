@@ -1,19 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
-$properties     = (isset($form['properties'])) ? $form['properties'] : array();
+$properties     = (isset($form['properties'])) ? $form['properties'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
 
-$placeholder    = '';
+$placeholder = '';
 if (isset($properties['placeholder'])):
     $placeholder = $view['form']->rowIfExists($properties, 'placeholder', $template);
     unset($properties['placeholder']);
@@ -54,7 +55,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a<?php if ($generalTabError) echo ' class="text-danger" '; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError) {
+    echo ' class="text-danger" ';
+} ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
                     <?php if ($generalTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -80,7 +83,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a<?php if ($propertiesTabError) echo ' class="text-danger" '; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError) {
+    echo ' class="text-danger" ';
+} ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
                     <?php if ($propertiesTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -165,7 +170,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <div class="row">
                     <?php
                     foreach ($properties as $name => $property):
-                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue;
+                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') {
+                        continue;
+                    }
 
                     if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') :
                         echo $view['form']->row($form['properties'][$name]);

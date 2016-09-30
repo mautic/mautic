@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +13,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * Class ExceptionHelper
+ * Class ExceptionHelper.
  *
  * Code in this class is derived from \Symfony\Bridge\Twig\Extension\CodeExtension
  */
@@ -29,7 +30,7 @@ class ExceptionHelper extends Helper
     public function __construct($rootDir)
     {
         $this->fileLinkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->rootDir = str_replace('\\', '/', dirname($rootDir)).'/';
+        $this->rootDir        = str_replace('\\', '/', dirname($rootDir)).'/';
     }
 
     /**
@@ -41,7 +42,7 @@ class ExceptionHelper extends Helper
     }
 
     /**
-     * Returns an abbreviated class name with the full name as a tooltip
+     * Returns an abbreviated class name with the full name as a tooltip.
      *
      * @param string $class
      *
@@ -52,7 +53,7 @@ class ExceptionHelper extends Helper
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
+        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     /**
@@ -70,11 +71,11 @@ class ExceptionHelper extends Helper
             // see https://bugs.php.net/bug.php?id=25725
             $code = @highlight_file($file, true);
             // remove main code/span tags
-            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
+            $code    = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             $content = preg_split('#<br />#', $code);
 
-            $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
+            $lines = [];
+            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; ++$i) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.$this->fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
@@ -91,14 +92,14 @@ class ExceptionHelper extends Helper
      */
     public function formatArgs($args)
     {
-        $result = array();
+        $result = [];
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $parts = explode('\\', $item[1]);
-                $short = array_pop($parts);
-                $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
+                $parts          = explode('\\', $item[1]);
+                $short          = array_pop($parts);
+                $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->charset));
             } elseif ('null' === $item[0]) {
@@ -132,9 +133,9 @@ class ExceptionHelper extends Helper
     /**
      * Formats a file path.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
-     * @param string  $text Use this text for the link rather than the file path
+     * @param string $file An absolute file path
+     * @param int    $line The line number
+     * @param string $text Use this text for the link rather than the file path
      *
      * @return string
      */
@@ -177,22 +178,22 @@ class ExceptionHelper extends Helper
     /**
      * Returns the link for a given file/line pair.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
+     * @param string $file An absolute file path
+     * @param int    $line The line number
      *
      * @return string A link of false
      */
     public function getFileLink($file, $line)
     {
         if ($this->fileLinkFormat && is_file($file)) {
-            return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
+            return strtr($this->fileLinkFormat, ['%f' => $file, '%l' => $line]);
         }
 
         return false;
     }
 
     /**
-     * Corrects the markup for a line
+     * Corrects the markup for a line.
      *
      * @param string $line
      *

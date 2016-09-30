@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +15,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 /**
- * Class ProcessMarketingMessagesQueueCommand
+ * Class ProcessMarketingMessagesQueueCommand.
  */
 class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
 {
@@ -28,9 +28,9 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:campaigns:messagequeue')
             ->setAliases(
-                array(
-                    'mautic:campaigns:messages'
-                )
+                [
+                    'mautic:campaigns:messages',
+                ]
             )
             ->setDescription('Process sending of messages queue.')
             ->addOption(
@@ -61,10 +61,9 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
 
-        $translator     = $factory->getTranslator();
-        $channel        = $input->getOption('channel');
-        $channelId      = $input->getOption('channelid');
-
+        $translator = $factory->getTranslator();
+        $channel    = $input->getOption('channel');
+        $channelId  = $input->getOption('channelid');
 
         /** @var \Mautic\CoreBundle\Model\MessageQueueModel $model */
         $model = $factory->getModel('core.messagequeue');
@@ -73,7 +72,7 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
 
         $processed = intval($model->sendMessages($channel, $channelId));
 
-        $output->writeln('<comment>'.$translator->trans('mautic.campaign.command.messages.sent', array('%events%' => $processed)).'</comment>'."\n");
+        $output->writeln('<comment>'.$translator->trans('mautic.campaign.command.messages.sent', ['%events%' => $processed]).'</comment>'."\n");
 
         return 0;
     }

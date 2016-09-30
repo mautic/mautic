@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,13 +13,9 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
- * Class UpdateLeadActionType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class UpdateLeadActionType.
  */
 class UpdateLeadActionType extends AbstractType
 {
@@ -27,33 +24,34 @@ class UpdateLeadActionType extends AbstractType
     private $factory;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
-        $this->factory    = $factory;
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
         $fieldModel = $this->factory->getModel('lead.field');
         $leadFields = $fieldModel->getEntities(
-            array(
-                'force'          => array(
-                    array(
+            [
+                'force' => [
+                    [
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
-                        'value'  => true
-                    )
-                ),
-                'hydration_mode' => 'HYDRATE_ARRAY'
-            )
+                        'value'  => true,
+                    ],
+                ],
+                'hydration_mode' => 'HYDRATE_ARRAY',
+            ]
         );
 
-        $options['fields'] = $leadFields;
+        $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
 
         $this->getFormFields($builder, $options);
@@ -62,7 +60,8 @@ class UpdateLeadActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
-        return "updatelead_action";
+    public function getName()
+    {
+        return 'updatelead_action';
     }
 }

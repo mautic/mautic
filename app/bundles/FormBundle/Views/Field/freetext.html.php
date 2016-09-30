@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $defaultInputClass = $containerType = 'freetext';
 include __DIR__.'/field_helper.php';
 
@@ -17,7 +17,6 @@ $label = (!$field['showLabel']) ? '' :
                     {$field['label']}
                 </h3>
 HTML;
-
 
 $html = <<<HTML
 

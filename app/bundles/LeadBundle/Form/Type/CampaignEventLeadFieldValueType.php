@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +12,6 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignEventLeadFieldValueType
+ * Class CampaignEventLeadFieldValueType.
  */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
@@ -47,14 +47,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.campaign.event.field_descr',
-                    'onchange' => 'Mautic.updateLeadFieldValues(this)'
+                    'onchange' => 'Mautic.updateLeadFieldValues(this)',
                 ],
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.core.value.required']
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -62,7 +62,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $fieldModel = $this->factory->getModel('lead.field');
         $operators  = $leadModel->getFilterExpressionFunctions();
         $choices    = [];
-
 
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
@@ -100,7 +99,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         // Boolean options
                         $fieldValues = [
                             0 => $properties['no'],
-                            1 => $properties['yes']
+                            1 => $properties['yes'],
                         ];
                     } else {
                         switch ($fieldType) {
@@ -135,14 +134,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control'
+                            'class' => 'form-control',
                         ],
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ],
                     ]
                 );
             } else {
@@ -153,14 +152,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control'
+                            'class' => 'form-control',
                         ],
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ],
                     ]
                 );
             }
@@ -176,6 +175,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     public function getName()
     {
-        return "campaignevent_lead_field_value";
+        return 'campaignevent_lead_field_value';
     }
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,15 +19,15 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class AuthorizeController
+ * Class AuthorizeController.
  */
 class AuthorizeController extends Controller
 {
-
     /**
      * @param Request $request
      *
      * @return Response
+     *
      * @throws AccessDeniedException
      * @throws HttpException
      */
@@ -55,13 +56,12 @@ class AuthorizeController extends Controller
         if ($token instanceof RequestTokenInterface) {
             $tokenProvider->setUserForRequestToken($token, $securityContext->getToken()->getUser());
 
-            return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', array(
+            return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', [
                 'consumer'       => $token->getConsumer(),
                 'oauth_token'    => $oauth_token,
-                'oauth_callback' => $oauth_callback
-            )));
+                'oauth_callback' => $oauth_callback,
+            ]));
         }
-
 
         throw new HttpException(404);
     }

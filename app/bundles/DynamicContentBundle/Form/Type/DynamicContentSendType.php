@@ -1,19 +1,20 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class DynamicContentSendType.
@@ -28,7 +29,7 @@ class DynamicContentSendType extends AbstractType
     /**
      * DynamicContentSendType constructor.
      *
-     * @param RouterInterface   $router
+     * @param RouterInterface $router
      */
     public function __construct(RouterInterface $router)
     {
@@ -45,16 +46,16 @@ class DynamicContentSendType extends AbstractType
             'dynamicContent',
             'dwc_list',
             [
-                'label'         => 'mautic.dynamicContent.send.selectDynamicContents',
-                'label_attr'    => ['class' => 'control-label'],
-                'attr'          => [
+                'label'      => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
                     'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'multiple'      => false,
-                'required'      => true,
-                'constraints'   => [
+                'multiple'    => false,
+                'required'    => true,
+                'constraints' => [
                     new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
             ]
@@ -80,7 +81,7 @@ class DynamicContentSendType extends AbstractType
                         'onclick' => 'Mautic.loadNewDynamicContentWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
-                        'icon'    => 'fa fa-plus',
+                        'icon' => 'fa fa-plus',
                     ],
                 ]
             );

@@ -1,24 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * ConsumerRepository
+ * ConsumerRepository.
  */
 class ConsumerRepository extends CommonRepository
 {
-
     /**
      * @param User $user
      *
@@ -41,8 +41,6 @@ class ConsumerRepository extends CommonRepository
     /**
      * @param Consumer $consumer
      * @param User     $user
-     *
-     * @return void
      */
     public function deleteAccessTokens(Consumer $consumer, User $user)
     {
@@ -55,10 +53,10 @@ class ConsumerRepository extends CommonRepository
                     $qb->expr()->eq('a.user', ':user')
                 )
             )
-            ->setParameters(array(
+            ->setParameters([
                 'consumer' => $consumer,
-                'user'     => $user
-            ));
+                'user'     => $user,
+            ]);
 
         $qb->getQuery()->execute();
     }
@@ -66,12 +64,13 @@ class ConsumerRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('c');
 
         $query = $q->getQuery();
+
         return new Paginator($query);
     }
 
@@ -80,8 +79,8 @@ class ConsumerRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
             $q->expr()->like('c.name',  ':'.$unique),
@@ -92,10 +91,10 @@ class ConsumerRepository extends CommonRepository
             $expr = $q->expr()->not($expr);
         }
 
-        return array(
+        return [
             $expr,
-            array("$unique" => $string)
-        );
+            ["$unique" => $string],
+        ];
     }
 
     /**
@@ -103,9 +102,9 @@ class ConsumerRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('c.name', 'ASC')
-        );
+        return [
+            ['c.name', 'ASC'],
+        ];
     }
 
     /**

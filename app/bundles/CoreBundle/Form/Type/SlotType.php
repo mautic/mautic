@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +15,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class SlotType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class SlotType.
  */
 class SlotType extends AbstractType
 {
-
     private $factory;
 
     /**
@@ -37,27 +35,27 @@ class SlotType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('padding-top', 'number', array(
+        $builder->add('padding-top', 'number', [
             'label'      => 'mautic.core.padding.top',
-            'label_attr' => array('class' => 'control-label'),
+            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
-            'attr'       => array(
+            'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'padding-top',
                 'postaddon_text'  => 'px',
-            ),
-        ));
+            ],
+        ]);
 
-        $builder->add('padding-bottom', 'number', array(
+        $builder->add('padding-bottom', 'number', [
             'label'      => 'mautic.core.padding.bottom',
-            'label_attr' => array('class' => 'control-label'),
+            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
-            'attr'       => array(
+            'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'padding-bottom',
                 'postaddon_text'  => 'px',
-            ),
-        ));
+            ],
+        ]);
     }
 
     /**
@@ -65,6 +63,6 @@ class SlotType extends AbstractType
      */
     public function getName()
     {
-        return "slot";
+        return 'slot';
     }
 }

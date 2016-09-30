@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +17,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
 
 /**
- * Class ReportSubscriber
+ * Class ReportSubscriber.
  */
 class ReportSubscriber extends CommonSubscriber
 {
@@ -47,14 +48,14 @@ class ReportSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ReportEvents::REPORT_POST_SAVE   => array('onReportPostSave', 0),
-            ReportEvents::REPORT_POST_DELETE => array('onReportDelete', 0)
-        );
+        return [
+            ReportEvents::REPORT_POST_SAVE   => ['onReportPostSave', 0],
+            ReportEvents::REPORT_POST_DELETE => ['onReportDelete', 0],
+        ];
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param ReportEvent $event
      */
@@ -62,34 +63,34 @@ class ReportSubscriber extends CommonSubscriber
     {
         $report = $event->getReport();
         if ($details = $event->getChanges()) {
-            $log = array(
-                "bundle"    => "report",
-                "object"    => "report",
-                "objectId"  => $report->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
-            );
+            $log = [
+                'bundle'    => 'report',
+                'object'    => 'report',
+                'objectId'  => $report->getId(),
+                'action'    => ($event->isNew()) ? 'create' : 'update',
+                'details'   => $details,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
             $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param ReportEvent $event
      */
     public function onReportDelete(ReportEvent $event)
     {
         $report = $event->getReport();
-        $log = array(
-            "bundle"     => "report",
-            "object"     => "report",
-            "objectId"   => $report->deletedId,
-            "action"     => "delete",
-            "details"    => array('name' => $report->getName()),
-            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
-        );
+        $log    = [
+            'bundle'    => 'report',
+            'object'    => 'report',
+            'objectId'  => $report->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $report->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
         $this->auditLogModel->writeToLog($log);
     }
 }

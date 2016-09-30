@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,23 +16,22 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 
 class EmailModelTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
-     * Test that an array of contacts are sent emails according to A/B test weights
+     * Test that an array of contacts are sent emails according to A/B test weights.
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContacts()
     {
@@ -183,7 +183,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                     [
                         ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
                         ['MauticEmailBundle:Email', $emailRepository],
-                        ['MauticEmailBundle:Stat', $statRepository]
+                        ['MauticEmailBundle:Stat', $statRepository],
                     ]
                 )
             );
@@ -202,16 +202,16 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $emailModel->setTranslator($translator);
         $emailModel->setEntityManager($entityManager);
 
-        $count = 12;
+        $count    = 12;
         $contacts = [];
         while ($count > 0) {
             $contacts[] = [
-                'id' => $count,
-                'email' => "email{$count}@domain.com",
+                'id'        => $count,
+                'email'     => "email{$count}@domain.com",
                 'firstname' => "firstname{$count}",
-                'lastname' => "lastname{$count}"
+                'lastname'  => "lastname{$count}",
             ];
-            $count--;
+            --$count;
         }
 
         $emailModel->sendEmail($emailEntity, $contacts);
@@ -237,7 +237,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that sending emails to contacts one at a time are according to A/B test weights
+     * Test that sending emails to contacts one at a time are according to A/B test weights.
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContactsSentOneAtATime()
     {
@@ -389,7 +389,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                     [
                         ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
                         ['MauticEmailBundle:Email', $emailRepository],
-                        ['MauticEmailBundle:Stat', $statRepository]
+                        ['MauticEmailBundle:Stat', $statRepository],
                     ]
                 )
             );
@@ -411,16 +411,14 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $count = 12;
         while ($count > 0) {
             $contact = [
-                'id' => $count,
-                'email' => "email{$count}@domain.com",
+                'id'        => $count,
+                'email'     => "email{$count}@domain.com",
                 'firstname' => "firstname{$count}",
-                'lastname' => "lastname{$count}"
+                'lastname'  => "lastname{$count}",
             ];
-            $count--;
-
+            --$count;
 
             $emailModel->sendEmail($emailEntity, [$contact]);
-
         }
 
         $emailSettings = $emailModel->getEmailSettings($emailEntity);
@@ -444,7 +442,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that processMailerCallback handles an array of emails correctly
+     * Test that processMailerCallback handles an array of emails correctly.
      */
     public function testProcessMailerCallbackWithEmails()
     {
@@ -514,7 +512,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['foo@bar.com', true, 1],
-                        ['notfound@nowhere.com', true, null]
+                        ['notfound@nowhere.com', true, null],
                     ]
                 )
             );
@@ -531,7 +529,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticEmailBundle:Stat', $statRepository]
+                        ['MauticEmailBundle:Stat', $statRepository],
                     ]
                 )
             );
@@ -557,9 +555,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             2 => [
                 'emails' => [
                     'foo@bar.com'          => 'some reason',
-                    'notfound@nowhere.com' => 'some reason'
-                ]
-            ]
+                    'notfound@nowhere.com' => 'some reason',
+                ],
+            ],
         ];
 
         $dnc = $emailModel->processMailerCallback($response);
@@ -568,7 +566,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that processMailerCallback handles an array of hashIds correctly
+     * Test that processMailerCallback handles an array of hashIds correctly.
      */
     public function testProcessMailerCallbackWithHashIds()
     {
@@ -655,7 +653,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Stat', $statRepository]
+                        ['MauticEmailBundle:Stat', $statRepository],
                     ]
                 )
             );
@@ -681,9 +679,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             2 => [
                 'hashIds' => [
                     'xyz123' => 'some reason',
-                    '123xyz' => 'some reason' // not found
-                ]
-            ]
+                    '123xyz' => 'some reason', // not found
+                ],
+            ],
         ];
 
         $dnc = $emailModel->processMailerCallback($response);

@@ -1,23 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
- * MessageQueueRepository
+ * MessageQueueRepository.
  */
 class MessageQueueRepository extends CommonRepository
 {
-    public function findMessage($channel,$channelId,$leadId)
+    public function findMessage($channel, $channelId, $leadId)
     {
         $results = $this->createQueryBuilder('mq')
             ->where('IDENTITY(mq.lead) = :leadId')
@@ -40,7 +38,7 @@ class MessageQueueRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId =  null)
+    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
     {
         $q = $this->createQueryBuilder('mq');
 

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20160926000000
+ * Class Version20160926000000.
  */
 class Version20160926000000 extends AbstractMauticMigration
 {
@@ -36,9 +37,9 @@ class Version20160926000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $ownerFk = $this->generatePropertyName('companies', 'fk', ['owner_id']);
+        $ownerFk  = $this->generatePropertyName('companies', 'fk', ['owner_id']);
         $ownerIdx = $this->generatePropertyName('companies', 'idx', ['owner_id']);
-        $sql        = <<<SQL
+        $sql      = <<<SQL
 CREATE TABLE {$this->prefix}companies (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `companyname` varchar(255) DEFAULT NULL,
@@ -87,8 +88,8 @@ CREATE TABLE {$this->prefix}companies (
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
-        $lead_index = $this->generatePropertyName('companies_leads', 'idx', ['lead_id']);
-        $company_index =  $this->generatePropertyName('companies_leads', 'idx', ['company_id']);
+        $lead_index    = $this->generatePropertyName('companies_leads', 'idx', ['lead_id']);
+        $company_index = $this->generatePropertyName('companies_leads', 'idx', ['company_id']);
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}companies_leads (
@@ -106,7 +107,7 @@ SQL;
 
         $this->addSql($sql);
 
-        $lead_fk = $this->generatePropertyName('companies_leads', 'fk', ['lead_id']);
+        $lead_fk    = $this->generatePropertyName('companies_leads', 'fk', ['lead_id']);
         $company_fk = $this->generatePropertyName('companies_leads', 'fk', ['company_id']);
 
         $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$company_fk} FOREIGN KEY (company_id) REFERENCES {$this->prefix}companies (id) ON DELETE CASCADE;");

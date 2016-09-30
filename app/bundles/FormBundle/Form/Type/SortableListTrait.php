@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -25,10 +26,10 @@ trait SortableListTrait
     {
         $listOptions = [
             'with_labels' => true,
-            'attr'  => [
+            'attr'        => [
                 'data-show-on' => '{"'.$formName.'_properties_syncList_1": "", "'.$formName.'_leadField:data-list-type": "empty"}',
             ],
-            'option_required' => false,
+            'option_required'     => false,
             'constraint_callback' => new Callback(
                 function ($validateMe, ExecutionContextInterface $context) use ($listName) {
                     $data = $context->getRoot()->getData();
@@ -36,7 +37,7 @@ trait SortableListTrait
                         $context->buildViolation('mautic.form.lists.count')->addViolation();
                     }
                 }
-            )
+            ),
         ];
 
         if (null !== $listData) {
@@ -49,14 +50,14 @@ trait SortableListTrait
             'yesno_button_group',
             [
                 'attr' => [
-                    'data-show-on' => '{"'.$formName.'_leadField:data-list-type": "1"}'
+                    'data-show-on' => '{"'.$formName.'_leadField:data-list-type": "1"}',
                 ],
                 'label' => 'mautic.form.field.form.property_list_sync_choices',
-                'data'  => !isset($options['data']['syncList']) ? false : (boolean) $options['data']['syncList'],
+                'data'  => !isset($options['data']['syncList']) ? false : (bool) $options['data']['syncList'],
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $formData = $event->getForm()->getParent()->getData();
             $form = $event->getForm();
             if (empty($formData['leadField'])) {

@@ -1,41 +1,41 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\CoreBundle\Event\IconEvent;
-use Mautic\CoreBundle\CoreEvents;
 
 /**
- * Class DashboardSubscriber
- *
- * @package Mautic\CoreBundle\EventListener
+ * Class DashboardSubscriber.
  */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
-     * Define the name of the bundle/category of the widget(s)
+     * Define the name of the bundle/category of the widget(s).
      *
      * @var string
      */
     protected $bundle = 'core';
 
     /**
-     * Define the widget(s)
+     * Define the widget(s).
      *
      * @var string
      */
-    protected $types = array(
-        'recent.activity' => array()
-    );
+    protected $types = [
+        'recent.activity' => [],
+    ];
 
     /**
      * @var AuditLogModel
@@ -53,11 +53,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
     }
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed.
      *
      * @param WidgetDetailEvent $event
-     *
-     * @return void
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
@@ -77,7 +75,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
                                 if ($log['bundle'] == 'lead' && $log['objectName'] == 'mautic.lead.lead.anonymous') {
-                                    $log['objectName'] = $this->translator ->trans('mautic.lead.lead.anonymous');
+                                    $log['objectName'] = $this->translator->trans('mautic.lead.lead.anonymous');
                                 }
                             } else {
                                 $log['objectName'] = '';
@@ -87,7 +85,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             if ($this->router->getRouteCollection()->get($routeName) !== null) {
                                 $log['route'] = $this->router->generate(
                                     'mautic_'.$log['bundle'].'_action',
-                                    array('objectAction' => 'view', 'objectId' => $log['objectId'])
+                                    ['objectAction' => 'view', 'objectId' => $log['objectId']]
                                 );
                             } else {
                                 $log['route'] = false;
@@ -100,7 +98,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $iconEvent = new IconEvent($this->security);
                 $this->dispatcher->dispatch(CoreEvents::FETCH_ICONS, $iconEvent);
-                $event->setTemplateData(array('logs' => $logs, 'icons' => $iconEvent->getIcons()));
+                $event->setTemplateData(['logs' => $logs, 'icons' => $iconEvent->getIcons()]);
             }
 
             $event->setTemplate('MauticDashboardBundle:Dashboard:recentactivity.html.php');

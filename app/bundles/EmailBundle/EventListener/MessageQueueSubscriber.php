@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,17 +13,14 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * Class CalendarSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class CalendarSubscriber.
  */
 class MessageQueueSubscriber extends CommonSubscriber
 {
-
     /**
      * @var EmailModel
      */
@@ -41,7 +39,7 @@ class MessageQueueSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
@@ -49,11 +47,9 @@ class MessageQueueSubscriber extends CommonSubscriber
     }
 
     /**
-     * Sends campaign emails
+     * Sends campaign emails.
      *
      * @param MessageQueueBatchProcessEvent $event
-     *
-     * @return void
      */
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {
@@ -65,7 +61,7 @@ class MessageQueueSubscriber extends CommonSubscriber
         $emailId  = $event->getChannelId();
         $email    = $this->emailModel->getEntity($emailId);
 
-        $sendTo = [];
+        $sendTo            = [];
         $messagesByContact = [];
 
         /** @var MessageQueue $message */
@@ -77,7 +73,7 @@ class MessageQueueSubscriber extends CommonSubscriber
                 $message->setSuccess(true);
             }
 
-            $sendTo[$contact['id']] = $contact;
+            $sendTo[$contact['id']]            = $contact;
             $messagesByContact[$contact['id']] = $id;
         }
 

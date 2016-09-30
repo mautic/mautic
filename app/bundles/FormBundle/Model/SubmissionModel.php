@@ -1,15 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -21,15 +24,11 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\Event\ValidateEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -39,7 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Class SubmissionModel
+ * Class SubmissionModel.
  */
 class SubmissionModel extends CommonFormModel
 {
@@ -81,15 +80,14 @@ class SubmissionModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-    * @var LeadFieldModel
-    */
+     * @var LeadFieldModel
+     */
     protected $leadFieldModel;
 
     /**
      * @var CompanyModel
      */
     protected $companyModel;
-
 
     /**
      * @var FormFieldHelper
@@ -118,16 +116,15 @@ class SubmissionModel extends CommonFormModel
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper
-    )
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
+    ) {
+        $this->ipLookupHelper   = $ipLookupHelper;
         $this->templatingHelper = $templatingHelper;
-        $this->formModel = $formModel;
-        $this->pageModel = $pageModel;
-        $this->leadModel = $leadModel;
-        $this->campaignModel = $campaignModel;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->companyModel = $companyModel;
+        $this->formModel        = $formModel;
+        $this->pageModel        = $pageModel;
+        $this->leadModel        = $leadModel;
+        $this->campaignModel    = $campaignModel;
+        $this->leadFieldModel   = $leadFieldModel;
+        $this->companyModel     = $companyModel;
         $this->fieldHelper      = $fieldHelper;
     }
 
@@ -288,7 +285,7 @@ class SubmissionModel extends CommonFormModel
                 $leadValue = $value;
                 if (is_array($leadValue)) {
                     // Multiselect lead fields store the values with bars
-                    $delimeter =  ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
+                    $delimeter = ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
                     $leadValue = implode($delimeter, $leadValue);
                 }
 
@@ -297,7 +294,7 @@ class SubmissionModel extends CommonFormModel
 
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
-                $value = implode(", ", $value);
+                $value = implode(', ', $value);
             }
 
             $tokens["{formfield={$alias}}"] = $value;
@@ -401,6 +398,7 @@ class SubmissionModel extends CommonFormModel
      * @param $queryArgs
      *
      * @return StreamedResponse|Response
+     *
      * @throws \Exception
      */
     public function exportResults($format, $form, $queryArgs)
@@ -410,7 +408,7 @@ class SubmissionModel extends CommonFormModel
         $results                     = $this->getEntities($queryArgs);
         $translator                  = $this->translator;
 
-        $date = (new DateTimeHelper)->toLocalString();
+        $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
 
         switch ($format) {
@@ -459,7 +457,7 @@ class SubmissionModel extends CommonFormModel
                             fputcsv($handle, $row);
 
                             //free memory
-                            unset($row, $results[$k]);;
+                            unset($row, $results[$k]);
                         }
 
                         fclose($handle);
@@ -481,7 +479,7 @@ class SubmissionModel extends CommonFormModel
                         'form'           => $form,
                         'results'        => $results,
                         'pageTitle'      => $name,
-                        'viewOnlyFields' => $viewOnlyFields
+                        'viewOnlyFields' => $viewOnlyFields,
                     ]
                 )->getContent();
 
@@ -539,7 +537,7 @@ class SubmissionModel extends CommonFormModel
                                 unset($row, $results[$k]);
 
                                 //increment letter
-                                $count++;
+                                ++$count;
                             }
 
                             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
@@ -564,14 +562,14 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Get line chart data of submissions
+     * Get line chart data of submissions.
      *
-     * @param char      $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
      * @param array     $filter
-     * @param boolean   $canViewOthers
+     * @param bool      $canViewOthers
      *
      * @return array
      */
@@ -600,13 +598,13 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Get a list of top submission referrers
+     * Get a list of top submission referrers.
      *
-     * @param integer $limit
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
-     * @param boolean $canViewOthers
+     * @param int    $limit
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param array  $filters
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -635,13 +633,13 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Get a list of the most submisions per lead
+     * Get a list of the most submisions per lead.
      *
-     * @param integer $limit
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
-     * @param boolean $canViewOthers
+     * @param int    $limit
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param array  $filters
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -671,7 +669,7 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Execute a form submit action
+     * Execute a form submit action.
      *
      * @param SubmissionEvent $event
      */
@@ -690,7 +688,7 @@ class SubmissionModel extends CommonFormModel
             'form'       => $event->getSubmission()->getForm(),
             'tokens'     => $event->getTokens(),
             'feedback'   => [],
-            'lead'       => $event->getSubmission()->getLead()
+            'lead'       => $event->getSubmission()->getLead(),
         ];
 
         foreach ($actions as $action) {
@@ -750,7 +748,7 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Create/update lead from form submit
+     * Create/update lead from form submit.
      *
      * @param       $form
      * @param array $leadFieldMatches
@@ -826,7 +824,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Get data for the form submission
-        list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        list($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
@@ -849,7 +847,7 @@ class SubmissionModel extends CommonFormModel
             $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
-            $uniqueFieldsFound = $getData($foundLeadFields, true);
+            $uniqueFieldsFound             = $getData($foundLeadFields, true);
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict) {
@@ -861,7 +859,6 @@ class SubmissionModel extends CommonFormModel
                 } else {
                     $this->logger->debug('FORM: In kiosk mode so not merging');
                 }
-
             } else {
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
@@ -906,7 +903,6 @@ class SubmissionModel extends CommonFormModel
                 $lead->addIpAddress($ipAddress);
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
             }
-
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
             if (!$leadIpAddresses->contains($ipAddress)) {
@@ -942,7 +938,7 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value
+     * Validates a field value.
      *
      * @param Field $field
      * @param       $value
@@ -977,7 +973,7 @@ class SubmissionModel extends CommonFormModel
      * @param Action[]        $actions
      * @param SubmissionEvent $event
      * @param                 $validationErrors
-     * @param                 $lastAlias            Because prior to now the last alias was used regardless
+     * @param                 $lastAlias        Because prior to now the last alias was used regardless
      */
     protected function validateActionCallbacks(SubmissionEvent $event, &$validationErrors, $lastAlias)
     {
@@ -1034,4 +1030,3 @@ class SubmissionModel extends CommonFormModel
         unset($args, $actions, $availableActions);
     }
 }
-

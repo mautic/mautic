@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,12 +14,12 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 
 /**
- * Class PostCountModel
+ * Class PostCountModel.
  */
 class PostCountModel extends AbstractCommonModel
 {
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
      *
@@ -39,7 +40,7 @@ class PostCountModel extends AbstractCommonModel
     }
 
     /**
-     * Get this model's repository
+     * Get this model's repository.
      *
      * @return \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
      */

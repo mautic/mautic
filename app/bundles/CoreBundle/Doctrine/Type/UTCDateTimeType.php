@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,11 +16,10 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class UTCDateTimeType
+ * Class UTCDateTimeType.
  */
 class UTCDateTimeType extends DateTimeType
 {
-
     /**
      * @var \DateTimeZone
      */
@@ -37,15 +37,16 @@ class UTCDateTimeType extends DateTimeType
             return null;
         }
 
-        if (!self::$utc)
+        if (!self::$utc) {
             self::$utc = new \DateTimeZone('UTC');
+        }
 
         if (!is_object($value)) {
             $dateHelper = new DateTimeHelper($value);
             $value      = $dateHelper->getDateTime();
         }
 
-        $tz = $value->getTimeZone();
+        $tz          = $value->getTimeZone();
         $utcDatetime = new \DateTime($value->format($platform->getDateTimeFormatString()), $tz);
         $utcDatetime->setTimezone(self::$utc);
 
@@ -57,6 +58,7 @@ class UTCDateTimeType extends DateTimeType
      * @param AbstractPlatform $platform
      *
      * @return \DateTime|null
+     *
      * @throws ConversionException
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
@@ -65,8 +67,9 @@ class UTCDateTimeType extends DateTimeType
             return null;
         }
 
-        if (!self::$utc)
+        if (!self::$utc) {
             self::$utc = new \DateTimeZone('UTC');
+        }
 
         $val = \DateTime::createFromFormat(
             $platform->getDateTimeFormatString(),

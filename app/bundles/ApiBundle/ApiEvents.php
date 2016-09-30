@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle;
 
 /**
- * Class ApiEvents
+ * Class ApiEvents.
  */
 final class ApiEvents
 {
@@ -42,7 +43,7 @@ final class ApiEvents
     const CLIENT_POST_DELETE = 'mautic.client_post_delete';
 
     /**
-     * The mautic.build_api_route event is thrown to build Mautic API routes
+     * The mautic.build_api_route event is thrown to build Mautic API routes.
      *
      * The event listener receives a Mautic\CoreBundle\Event\RouteEvent instance.
      *

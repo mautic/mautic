@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class PointsChangeLog
- *
- * @package Mautic\LeadBundle\Entity
+ * Class PointsChangeLog.
  */
 class CompanyChangeLog
 {
@@ -57,7 +56,7 @@ class CompanyChangeLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -89,9 +88,9 @@ class CompanyChangeLog
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -99,9 +98,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return CompanyChangeLog
      */
     public function setType($type)
@@ -112,7 +112,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -122,9 +122,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set eventName
+     * Set eventName.
      *
      * @param string $eventName
+     *
      * @return CompanyChangeLog
      */
     public function setEventName($eventName)
@@ -135,7 +136,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get eventName
+     * Get eventName.
      *
      * @return string
      */
@@ -145,9 +146,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set actionName
+     * Set actionName.
      *
      * @param string $actionName
+     *
      * @return CompanyChangeLog
      */
     public function setActionName($actionName)
@@ -158,7 +160,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get actionName
+     * Get actionName.
      *
      * @return string
      */
@@ -168,9 +170,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set delta
+     * Set delta.
      *
      * @param Company $company
+     *
      * @return CompanyChangeLog
      */
     public function setCompany($company)
@@ -181,7 +184,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get company
+     * Get company.
      *
      * @return \Mautic\LeadBundle\Entity\Company
      */
@@ -191,9 +194,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set dateAdded
+     * Set dateAdded.
      *
      * @param \DateTime $dateAdded
+     *
      * @return CompanyChangeLog
      */
     public function setDateAdded($dateAdded)
@@ -204,7 +208,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get dateAdded
+     * Get dateAdded.
      *
      * @return \DateTime
      */
@@ -214,9 +218,10 @@ class CompanyChangeLog
     }
 
     /**
-     * Set lead
+     * Set lead.
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
+     *
      * @return CompanyChangeLog
      */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
@@ -227,7 +232,7 @@ class CompanyChangeLog
     }
 
     /**
-     * Get lead
+     * Get lead.
      *
      * @return \Mautic\LeadBundle\Entity\Lead
      */
@@ -235,5 +240,4 @@ class CompanyChangeLog
     {
         return $this->lead;
     }
-
 }

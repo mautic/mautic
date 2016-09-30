@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,13 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class AuditLog
- *
- * @package Mautic\CoreBundle\Entity
+ * Class AuditLog.
  */
 class AuditLog
 {
-
     /**
      * @var int
      */
@@ -58,7 +56,7 @@ class AuditLog
     /**
      * @var array
      */
-    protected $details = array();
+    protected $details = [];
 
     /**
      * @var \DateTime
@@ -73,14 +71,14 @@ class AuditLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('audit_log')
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository')
-            ->addIndex(array('object', 'object_id'), 'object_search')
-            ->addIndex(array('bundle', 'object', 'action', 'object_id'), 'timeline_search');
+            ->addIndex(['object', 'object_id'], 'object_search')
+            ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search');
 
         $builder->addId();
 
@@ -121,23 +119,23 @@ class AuditLog
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
      *
      * @return AuditLog
      */
-    public function setUserId ($userId)
+    public function setUserId($userId)
     {
         $this->userId = $userId;
 
@@ -145,23 +143,23 @@ class AuditLog
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
-    public function getUserId ()
+    public function getUserId()
     {
         return $this->userId;
     }
 
     /**
-     * Set object
+     * Set object.
      *
      * @param string $object
      *
      * @return AuditLog
      */
-    public function setObject ($object)
+    public function setObject($object)
     {
         $this->object = $object;
 
@@ -169,23 +167,23 @@ class AuditLog
     }
 
     /**
-     * Get object
+     * Get object.
      *
      * @return string
      */
-    public function getObject ()
+    public function getObject()
     {
         return $this->object;
     }
 
     /**
-     * Set objectId
+     * Set objectId.
      *
-     * @param integer $objectId
+     * @param int $objectId
      *
      * @return AuditLog
      */
-    public function setObjectId ($objectId)
+    public function setObjectId($objectId)
     {
         $this->objectId = $objectId;
 
@@ -193,23 +191,23 @@ class AuditLog
     }
 
     /**
-     * Get objectId
+     * Get objectId.
      *
-     * @return integer
+     * @return int
      */
-    public function getObjectId ()
+    public function getObjectId()
     {
         return $this->objectId;
     }
 
     /**
-     * Set action
+     * Set action.
      *
      * @param string $action
      *
      * @return AuditLog
      */
-    public function setAction ($action)
+    public function setAction($action)
     {
         $this->action = $action;
 
@@ -217,23 +215,23 @@ class AuditLog
     }
 
     /**
-     * Get action
+     * Get action.
      *
      * @return string
      */
-    public function getAction ()
+    public function getAction()
     {
         return $this->action;
     }
 
     /**
-     * Set details
+     * Set details.
      *
      * @param string $details
      *
      * @return AuditLog
      */
-    public function setDetails ($details)
+    public function setDetails($details)
     {
         $this->details = $details;
 
@@ -241,23 +239,23 @@ class AuditLog
     }
 
     /**
-     * Get details
+     * Get details.
      *
      * @return string
      */
-    public function getDetails ()
+    public function getDetails()
     {
         return $this->details;
     }
 
     /**
-     * Set dateAdded
+     * Set dateAdded.
      *
      * @param \DateTime $dateAdded
      *
      * @return AuditLog
      */
-    public function setDateAdded ($dateAdded)
+    public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
 
@@ -265,23 +263,23 @@ class AuditLog
     }
 
     /**
-     * Get dateAdded
+     * Get dateAdded.
      *
      * @return \DateTime
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param string $ipAddress
      *
      * @return AuditLog
      */
-    public function setIpAddress ($ipAddress)
+    public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -289,23 +287,23 @@ class AuditLog
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return string
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
     /**
-     * Set bundle
+     * Set bundle.
      *
      * @param string $bundle
      *
      * @return AuditLog
      */
-    public function setBundle ($bundle)
+    public function setBundle($bundle)
     {
         $this->bundle = $bundle;
 
@@ -313,23 +311,23 @@ class AuditLog
     }
 
     /**
-     * Get bundle
+     * Get bundle.
      *
      * @return string
      */
-    public function getBundle ()
+    public function getBundle()
     {
         return $this->bundle;
     }
 
     /**
-     * Set userName
+     * Set userName.
      *
      * @param string $userName
      *
      * @return AuditLog
      */
-    public function setUserName ($userName)
+    public function setUserName($userName)
     {
         $this->userName = $userName;
 
@@ -337,11 +335,11 @@ class AuditLog
     }
 
     /**
-     * Get userName
+     * Get userName.
      *
      * @return string
      */
-    public function getUserName ()
+    public function getUserName()
     {
         return $this->userName;
     }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -24,7 +25,6 @@ class Version20160926000001 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix.'lead_companies_change_log')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -49,10 +49,9 @@ CREATE TABLE {$this->prefix}lead_companies_change_log (
 SQL;
         $this->addSql($sql);
 
-        $leadFk = $this->generatePropertyName('lead_companies_change_log', 'fk', ['lead_id']);
+        $leadFk  = $this->generatePropertyName('lead_companies_change_log', 'fk', ['lead_id']);
         $leadIdx = $this->generatePropertyName('lead_companies_change_log', 'idx', ['lead_id']);
         $this->addSql("ALTER TABLE {$this->prefix}lead_companies_change_log ADD CONSTRAINT $leadFk FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE");
         $this->addSql("CREATE INDEX $leadIdx ON {$this->prefix}lead_companies_change_log (lead_id)");
-
     }
 }

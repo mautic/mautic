@@ -1,33 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Console\Output;
 
-use Symfony\Component\Console\Output\ConsoleOutput,
-    Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
  * Custom console output to prefix all messages with the current datetime
- * Heavily inspired by https://github.com/8p/AssistBundle
+ * Heavily inspired by https://github.com/8p/AssistBundle.
  *
  * Class ConsoleDatetimeOutput
- *
- * @package Mautic\CoreBundle\Console\Output
  */
 class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterface
 {
-
     /**
-     * Prefix message with current datetime
+     * Prefix message with current datetime.
      *
      * @param string $message
-     * @param bool $newline
+     * @param bool   $newline
      */
     protected function doWrite($message, $newline)
     {
@@ -39,5 +37,4 @@ class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterf
 
         parent::doWrite($message, $newline);
     }
-
 }

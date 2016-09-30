@@ -1,22 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class Security
+ * Class Security.
  */
 class CorePermissions
 {
@@ -68,10 +69,10 @@ class CorePermissions
     /**
      * CorePermissions constructor.
      *
-     * @param Translator            $translator
-     * @param array                 $parameters
-     * @param                       $bundles
-     * @param                       $pluginBundles
+     * @param Translator $translator
+     * @param array      $parameters
+     * @param            $bundles
+     * @param            $pluginBundles
      */
     public function __construct(UserHelper $userHelper, TranslatorInterface $translator, array $parameters, $bundles, $pluginBundles)
     {
@@ -85,7 +86,7 @@ class CorePermissions
     }
 
     /**
-     * Retrieves each bundles permission objects
+     * Retrieves each bundles permission objects.
      *
      * @return array
      */
@@ -104,13 +105,14 @@ class CorePermissions
     }
 
     /**
-     * Returns the bundles permission class object
+     * Returns the bundles permission class object.
      *
      * @param string $bundle
      * @param bool   $throwException
      * @param bool   $pluginBundle
      *
      * @return mixed
+     *
      * @throws \InvalidArgumentException
      */
     public function getPermissionObject($bundle, $throwException = true, $pluginBundle = false)
@@ -137,11 +139,12 @@ class CorePermissions
     }
 
     /**
-     * Generates the bit value for the bundle's permission
+     * Generates the bit value for the bundle's permission.
      *
      * @param array $permissions
      *
      * @return array
+     *
      * @throws \InvalidArgumentException
      */
     public function generatePermissions(array $permissions)
@@ -154,7 +157,7 @@ class CorePermissions
         //bust out permissions into their respective bundles
         $bundlePermissions = [];
         foreach ($permissions as $permission => $perms) {
-            list ($bundle, $level) = explode(':', $permission);
+            list($bundle, $level)               = explode(':', $permission);
             $bundlePermissions[$bundle][$level] = $perms;
         }
 
@@ -193,7 +196,7 @@ class CorePermissions
                 $entity->setName(strtolower($name));
 
                 $bit   = 0;
-                $class = $this->getPermissionObject($bundle, true, array_key_exists(ucfirst($bundle)."Bundle", $pluginBundles));
+                $class = $this->getPermissionObject($bundle, true, array_key_exists(ucfirst($bundle).'Bundle', $pluginBundles));
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
@@ -212,18 +215,19 @@ class CorePermissions
     }
 
     /**
-     * Determines if the user has permission to access the given area
+     * Determines if the user has permission to access the given area.
      *
      * @param array|string $requestedPermission
-     * @param string       $mode           MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param string       $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param User         $userEntity
-     * @param bool         $allowUnknown   If the permission is not recognized, false will be returned.  Otherwise an
-     *                                     exception will be thrown
+     * @param bool         $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
+     *                                          exception will be thrown
      *
      * @return mixed
+     *
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null, $allowUnknown = false)
+    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
     {
         if ($userEntity === null) {
             $userEntity = $this->userHelper->getUser();
@@ -253,7 +257,7 @@ class CorePermissions
                 throw new \InvalidArgumentException(
                     $this->getTranslator()->trans(
                         'mautic.core.permissions.badformat',
-                        ["%permission%" => $permission]
+                        ['%permission%' => $permission]
                     )
                 );
             }
@@ -271,11 +275,11 @@ class CorePermissions
                     throw new \InvalidArgumentException(
                         $this->getTranslator()->trans(
                             'mautic.core.permissions.notfound',
-                            ["%permission%" => $permission]
+                            ['%permission%' => $permission]
                         )
                     );
                 }
-            } elseif ($userEntity == "anon.") {
+            } elseif ($userEntity == 'anon.') {
                 //anon user or session timeout
                 $permissions[$permission] = false;
             } elseif ($userEntity->isAdmin()) {
@@ -291,26 +295,26 @@ class CorePermissions
             $this->grantedPermissions[$permission] = $permissions[$permission];
         }
 
-        if ($mode == "MATCH_ALL") {
+        if ($mode == 'MATCH_ALL') {
             //deny if any of the permissions are denied
             return in_array(0, $permissions) ? false : true;
-        } elseif ($mode == "MATCH_ONE") {
+        } elseif ($mode == 'MATCH_ONE') {
             //grant if any of the permissions were granted
             return in_array(1, $permissions) ? true : false;
-        } elseif ($mode == "RETURN_ARRAY") {
+        } elseif ($mode == 'RETURN_ARRAY') {
             return $permissions;
         } else {
             throw new \InvalidArgumentException(
                 $this->getTranslator()->trans(
                     'mautic.core.permissions.mode.notfound',
-                    ["%mode%" => $mode]
+                    ['%mode%' => $mode]
                 )
             );
         }
     }
 
     /**
-     * Check if a permission or array of permissions exist
+     * Check if a permission or array of permissions exist.
      *
      * @param array|string $permission
      *
@@ -349,7 +353,7 @@ class CorePermissions
     }
 
     /**
-     * Checks if the user has access to the requested entity
+     * Checks if the user has access to the requested entity.
      *
      * @param string|bool $ownPermission
      * @param string|bool $otherPermission
@@ -409,9 +413,9 @@ class CorePermissions
     }
 
     /**
-     * Retrieves all permissions
+     * Retrieves all permissions.
      *
-     * @param boolean $forJs
+     * @param bool $forJs
      *
      * @return array
      */
@@ -478,7 +482,7 @@ class CorePermissions
     }
 
     /**
-     * Register permission classes
+     * Register permission classes.
      */
     private function registerPermissionClasses()
     {

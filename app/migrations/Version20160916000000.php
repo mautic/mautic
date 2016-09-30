@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -24,7 +25,6 @@ class Version20160916000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix.'message_queue')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,7 +37,7 @@ class Version20160916000000 extends AbstractMauticMigration
         $leadIDX  = $this->generatePropertyName('message_queue', 'idx', ['lead_id']);
         $leadFK   = $this->generatePropertyName('message_queue', 'fk', ['lead_id']);
         $eventIdx = $this->generatePropertyName('message_queue', 'idx', ['event_id']);
-        $eventFk = $this->generatePropertyName('message_queue', 'fk', ['event_id']);
+        $eventFk  = $this->generatePropertyName('message_queue', 'fk', ['event_id']);
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}message_queue (

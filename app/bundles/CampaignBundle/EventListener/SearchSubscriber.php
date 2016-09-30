@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\CampaignBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
@@ -39,12 +38,12 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     /**
@@ -59,29 +58,29 @@ class SearchSubscriber extends CommonSubscriber
             }
 
             $campaigns = $this->campaignModel->getEntities(
-                array(
+                [
                     'limit'  => 5,
-                    'filter' => $str
-                ));
+                    'filter' => $str,
+                ]);
 
             if (count($campaigns) > 0) {
-                $campaignResults = array();
+                $campaignResults = [];
                 foreach ($campaigns as $campaign) {
                     $campaignResults[] = $this->templating->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
-                        array(
-                            'campaign'  => $campaign
-                        )
+                        [
+                            'campaign' => $campaign,
+                        ]
                     )->getContent();
                 }
                 if (count($campaigns) > 5) {
                     $campaignResults[] = $this->templating->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($campaigns) - 5)
-                        )
+                            'remaining'    => (count($campaigns) - 5),
+                        ]
                     )->getContent();
                 }
                 $campaignResults['count'] = count($campaigns);
@@ -95,7 +94,7 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security   = $this->security;
+        $security = $this->security;
         if ($security->isGranted('campaign:campaigns:view')) {
             $event->addCommands(
                 'mautic.campaign.campaigns',

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -83,7 +84,7 @@ class FocusModel extends FormModel
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Focus) {
-            throw new MethodNotAllowedHttpException (['Focus']);
+            throw new MethodNotAllowedHttpException(['Focus']);
         }
 
         if (!empty($action)) {
@@ -147,7 +148,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Obtains the cached JS of a form and generates it if missing
+     * Obtains the cached JS of a form and generates it if missing.
      *
      * @param Focus $focus
      *
@@ -230,14 +231,14 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Get whether the color is light or dark
+     * Get whether the color is light or dark.
      *
      * @param $hex
      * @param $level
      *
      * @return bool
      */
-    static function isLightColor($hex, $level = 200)
+    public static function isLightColor($hex, $level = 200)
     {
         $hex = str_replace('#', '', $hex);
         $r   = hexdec(substr($hex, 0, 2));
@@ -250,7 +251,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Add a stat entry
+     * Add a stat entry.
      *
      * @param Focus $focus
      * @param       $type
@@ -286,6 +287,7 @@ class FocusModel extends FormModel
      * {@inheritdoc}
      *
      * @return bool|FocusEvent|void
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -295,16 +297,16 @@ class FocusModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = FocusEvents::PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = FocusEvents::POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = FocusEvents::PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = FocusEvents::POST_DELETE;
                 break;
             default:
@@ -369,7 +371,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Joins the email table and limits created_by to currently logged in user
+     * Joins the email table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
      */

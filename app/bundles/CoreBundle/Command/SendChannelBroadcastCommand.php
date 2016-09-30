@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,11 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * CLI Command to send a scheduled broadcast
+ * CLI Command to send a scheduled broadcast.
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -30,7 +30,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
         $this->setName('mautic:broadcasts:send')
             ->setDescription('Process contacts pending to receive a channel broadcast.')
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
 
 <info>php %command.full_name% --channel=email --id=3</info>
@@ -62,7 +62,6 @@ EOT
     {
         $channelId = $input->getOption('id');
         if (!$this->checkRunStatus($input, $output, ($channelId) ? $channelId : 'all')) {
-
             return 0;
         }
 

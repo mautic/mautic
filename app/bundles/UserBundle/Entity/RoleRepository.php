@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,19 +14,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * RoleRepository
+ * RoleRepository.
  */
 class RoleRepository extends CommonRepository
 {
-
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->createQueryBuilder('r');
 
@@ -35,7 +35,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param string $search
      * @param int    $limit
@@ -70,8 +70,8 @@ class RoleRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
             $q->expr()->like('r.name',  ':'.$unique),
@@ -82,10 +82,10 @@ class RoleRepository extends CommonRepository
             $q->expr()->not($expr);
         }
 
-        return array(
+        return [
             $expr,
-            array("$unique" => $string)
-        );
+            ["$unique" => $string],
+        ];
     }
 
     /**
@@ -98,27 +98,28 @@ class RoleRepository extends CommonRepository
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                $expr = $q->expr()->eq("r.isAdmin", 1);
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+                $expr            = $q->expr()->eq('r.isAdmin', 1);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like("r.name", ':'.$unique);
+                $expr = $q->expr()->like('r.name', ':'.$unique);
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
+
+        return [
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
+            ($returnParameter) ? ["$unique" => $string] : [],
+        ];
     }
 
     /**
-     * Get a count of users that belong to the role
+     * Get a count of users that belong to the role.
      *
      * @param $roleIds
      *
@@ -134,7 +135,7 @@ class RoleRepository extends CommonRepository
         $returnArray = (is_array($roleIds));
 
         if (!$returnArray) {
-            $roleIds = array($roleIds);
+            $roleIds = [$roleIds];
         }
 
         $q->where(
@@ -144,7 +145,7 @@ class RoleRepository extends CommonRepository
 
         $result = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
         foreach ($result as $r) {
             $return[$r['role_id']] = $r['thecount'];
         }
@@ -164,10 +165,10 @@ class RoleRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.user.user.searchcommand.isadmin',
-            'mautic.core.searchcommand.name'
-        );
+            'mautic.core.searchcommand.name',
+        ];
     }
 
     /**
@@ -175,9 +176,9 @@ class RoleRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('r.name', 'ASC')
-        );
+        return [
+            ['r.name', 'ASC'],
+        ];
     }
 
     /**

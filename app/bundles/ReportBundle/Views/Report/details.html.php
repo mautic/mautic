@@ -1,66 +1,66 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $header = $view['translator']->trans(
     'mautic.report.report.header.view',
-    array('%name%' => $view['translator']->trans($report->getName()))
+    ['%name%' => $view['translator']->trans($report->getName())]
 );
 
 if ($tmpl == 'index') {
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', 'report');
 
-    $view['slots']->set("headerTitle", $header);
+    $view['slots']->set('headerTitle', $header);
 
-    $buttons = array();
+    $buttons = [];
     if (!empty($data) || !empty($graphs)) {
-        $buttons[] = array(
-            'attr'      => array(
+        $buttons[] = [
+            'attr' => [
                 'target'      => '_new',
                 'data-toggle' => '',
                 'class'       => 'btn btn-default btn-nospin',
                 'href'        => $view['router']->path(
                     'mautic_report_export',
-                    array('objectId' => $report->getId(), 'format' => 'html')
-                )
-            ),
+                    ['objectId' => $report->getId(), 'format' => 'html']
+                ),
+            ],
             'btnText'   => $view['translator']->trans('mautic.form.result.export.html'),
-            'iconClass' => 'fa fa-file-code-o'
-        );
+            'iconClass' => 'fa fa-file-code-o',
+        ];
 
         if (!empty($data)) {
-            $buttons[] = array(
-                'attr'      => array(
+            $buttons[] = [
+                'attr' => [
                     'data-toggle' => 'download',
                     'class'       => 'btn btn-default btn-nospin',
                     'href'        => $view['router']->path(
                         'mautic_report_export',
-                        array('objectId' => $report->getId(), 'format' => 'csv')
-                    )
-                ),
+                        ['objectId' => $report->getId(), 'format' => 'csv']
+                    ),
+                ],
                 'btnText'   => $view['translator']->trans('mautic.form.result.export.csv'),
-                'iconClass' => 'fa fa-file-text-o'
-            );
+                'iconClass' => 'fa fa-file-text-o',
+            ];
 
             if (class_exists('PHPExcel')) {
-                $buttons[] = array(
-                    'attr'      => array(
+                $buttons[] = [
+                    'attr' => [
                         'data-toggle' => 'download',
                         'class'       => 'btn btn-default btn-nospin',
                         'href'        => $view['router']->path(
                             'mautic_report_export',
-                            array('objectId' => $report->getId(), 'format' => 'xlsx')
-                        )
-                    ),
+                            ['objectId' => $report->getId(), 'format' => 'xlsx']
+                        ),
+                    ],
                     'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
-                    'iconClass' => 'fa fa-file-excel-o'
-                );
+                    'iconClass' => 'fa fa-file-excel-o',
+                ];
             }
         }
     }
@@ -69,10 +69,10 @@ if ($tmpl == 'index') {
         'actions',
         $view->render(
             'MauticCoreBundle:Helper:page_actions.html.php',
-            array(
-                'item'              => $report,
-                'templateButtons'   => array(
-                    'edit'   => $view['security']->hasEntityAccess(
+            [
+                'item'            => $report,
+                'templateButtons' => [
+                    'edit' => $view['security']->hasEntityAccess(
                         $permissions['report:reports:editown'],
                         $permissions['report:reports:editother'],
                         $report->getCreatedBy()
@@ -82,22 +82,22 @@ if ($tmpl == 'index') {
                         $permissions['report:reports:deleteother'],
                         $report->getCreatedBy()
                     ),
-                    'close'  => $view['security']->hasEntityAccess(
+                    'close' => $view['security']->hasEntityAccess(
                         $permissions['report:reports:viewown'],
                         $permissions['report:reports:viewother'],
                         $report->getCreatedBy()
-                    )
-                ),
+                    ),
+                ],
                 'routeBase'         => 'report',
                 'langVar'           => 'report.report',
-                'postCustomButtons' => $buttons
-            )
+                'postCustomButtons' => $buttons,
+            ]
         )
     );
 
     $view['slots']->set(
         'publishStatus',
-        $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $report))
+        $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $report])
     );
 }
 ?>
@@ -118,7 +118,7 @@ if ($tmpl == 'index') {
                     <tbody>
                     <?php echo $view->render(
                         'MauticCoreBundle:Helper:details.html.php',
-                        array('entity' => $report)
+                        ['entity' => $report]
                     ); ?>
                     </tbody>
                 </table>
@@ -130,11 +130,13 @@ if ($tmpl == 'index') {
             <div class="panel shd-none mb-0 pa-lg">
                 <div class="row">
                     <div class="col-sm-12 mb-10">
-                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm]); ?>
                     </div>
                     <?php $view['form']->start($dynamicFilterForm); ?>
                     <?php foreach ($dynamicFilterForm->children as $filter): ?>
-                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') continue; ?>
+                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') {
+                        continue;
+                    } ?>
                     <div class="col-sm-4">
                         <?php echo $view['form']->row($filter); ?>
                     </div>

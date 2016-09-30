@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,10 +39,10 @@ class CampaignController extends FormController
                 'campaign:campaigns:create',
                 'campaign:campaigns:edit',
                 'campaign:campaigns:delete',
-                'campaign:campaigns:publish'
+                'campaign:campaigns:publish',
 
             ],
-            "RETURN_ARRAY"
+            'RETURN_ARRAY'
         );
 
         if (!$permissions['campaign:campaigns:view']) {
@@ -75,14 +76,14 @@ class CampaignController extends FormController
                 'groups'      => [
                     'mautic.campaign.leadsource.form' => [
                         'options' => $sourceLists['forms'],
-                        'prefix'  => 'form'
+                        'prefix'  => 'form',
                     ],
                     'mautic.campaign.leadsource.list' => [
                         'options' => $sourceLists['lists'],
-                        'prefix'  => 'list'
-                    ]
-                ]
-            ]
+                        'prefix'  => 'list',
+                    ],
+                ],
+            ],
         ];
 
         if ($updatedFilters) {
@@ -143,7 +144,7 @@ class CampaignController extends FormController
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
                 'joinLists'  => $joinLists,
-                'joinForms'  => $joinForms
+                'joinForms'  => $joinForms,
             ]
         );
 
@@ -165,8 +166,8 @@ class CampaignController extends FormController
                     'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_campaign_index',
-                        'mauticContent' => 'campaign'
-                    ]
+                        'mauticContent' => 'campaign',
+                    ],
                 ]
             );
         }
@@ -178,27 +179,27 @@ class CampaignController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'searchValue' => $search,
                     'items'       => $campaigns,
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
                     'tmpl'        => $tmpl,
-                    'filters'     => $listFilters
+                    'filters'     => $listFilters,
                 ],
                 'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_campaign_index',
                     'mauticContent' => 'campaign',
-                    'route'         => $this->generateUrl('mautic_campaign_index', ['page' => $page])
-                ]
+                    'route'         => $this->generateUrl('mautic_campaign_index', ['page' => $page]),
+                ],
             ]
         );
     }
 
     /**
-     * View a specific campaign
+     * View a specific campaign.
      *
      * @param $objectId
      *
@@ -220,9 +221,9 @@ class CampaignController extends FormController
                 'campaign:campaigns:create',
                 'campaign:campaigns:edit',
                 'campaign:campaigns:delete',
-                'campaign:campaigns:publish'
+                'campaign:campaigns:publish',
             ],
-            "RETURN_ARRAY"
+            'RETURN_ARRAY'
         );
 
         if ($entity === null) {
@@ -236,19 +237,18 @@ class CampaignController extends FormController
                     'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_campaign_index',
-                        'mauticContent' => 'campaign'
+                        'mauticContent' => 'campaign',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.campaign.error.notfound',
-                            'msgVars' => ['%id%' => $objectId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$permissions['campaign:campaigns:view']) {
-
             return $this->accessDenied();
         }
 
@@ -266,7 +266,7 @@ class CampaignController extends FormController
         $sortedEvents = [
             'decision'  => [],
             'action'    => [],
-            'condition' => []
+            'condition' => [],
         ];
         foreach ($events as $event) {
             $event['logCount']                   = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
@@ -287,7 +287,7 @@ class CampaignController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'campaign'      => $entity,
                     'permissions'   => $permissions,
                     'security'      => $security,
@@ -301,9 +301,9 @@ class CampaignController extends FormController
                         [
                             'objectId'   => $entity->getId(),
                             'page'       => $this->get('session')->get('mautic.campaign.contact.page', 1),
-                            'ignoreAjax' => true
+                            'ignoreAjax' => true,
                         ]
-                    )->getContent()
+                    )->getContent(),
                 ],
                 'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
                 'passthroughVars' => [
@@ -313,10 +313,10 @@ class CampaignController extends FormController
                         'mautic_campaign_action',
                         [
                             'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
+                            'objectId'     => $entity->getId(),
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
@@ -329,7 +329,6 @@ class CampaignController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-
         return $this->generateContactsGrid(
             $objectId,
             $page,
@@ -343,7 +342,7 @@ class CampaignController extends FormController
     }
 
     /**
-     * Generates new form and processes post data
+     * Generates new form and processes post data.
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -424,19 +423,19 @@ class CampaignController extends FormController
                                     'mautic_campaign_action',
                                     [
                                         'objectAction' => 'edit',
-                                        'objectId'     => $entity->getId()
+                                        'objectId'     => $entity->getId(),
                                     ]
-                                )
+                                ),
                             ]
                         );
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
                             $viewParameters = [
                                 'objectAction' => 'view',
-                                'objectId'     => $entity->getId()
+                                'objectId'     => $entity->getId(),
                             ];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:view';
+                            $returnUrl = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                            $template  = 'MauticCampaignBundle:Campaign:view';
                         } else {
                             //return edit view so that all the session stuff is loaded
                             return $this->editAction($entity->getId(), true);
@@ -454,7 +453,7 @@ class CampaignController extends FormController
                             $campaignSources[$type] = [
                                 'sourceType' => $type,
                                 'campaignId' => $sessionId,
-                                'names'      => implode(', ', array_intersect_key($sourceList, array_flip($sources)))
+                                'names'      => implode(', ', array_intersect_key($sourceList, array_flip($sources))),
                             ];
                         }
                     }
@@ -476,8 +475,8 @@ class CampaignController extends FormController
                         'contentTemplate' => $template,
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_campaign_index',
-                            'mauticContent' => 'campaign'
-                        ]
+                            'mauticContent' => 'campaign',
+                        ],
                     ]
                 );
             }
@@ -491,7 +490,7 @@ class CampaignController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'eventSettings' => $eventSettings,
 
                     'campaignEvents'  => $modifiedEvents,
@@ -499,7 +498,7 @@ class CampaignController extends FormController
                     'deletedEvents'   => $deletedEvents,
                     'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'          => $entity,
-                    'form'            => $form->createView()
+                    'form'            => $form->createView(),
                 ],
                 'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
                 'passthroughVars' => [
@@ -509,21 +508,21 @@ class CampaignController extends FormController
                         'mautic_campaign_action',
                         [
                             'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
-                            'objectId'     => $entity->getId()
+                            'objectId'     => $entity->getId(),
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
-     * @param integer|string $objectId
-     * @param boolean        $ignorePost
-     * @param Campaign       $clonedEntity
-     * @param array          $currentSources
+     * @param int|string $objectId
+     * @param bool       $ignorePost
+     * @param Campaign   $clonedEntity
+     * @param array      $currentSources
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -534,7 +533,7 @@ class CampaignController extends FormController
         $formData  = $this->request->request->get('campaign');
         $sessionId = isset($formData['sessionId']) ? $formData['sessionId'] : null;
         $session   = $this->get('session');
-        $isClone = false;
+        $isClone   = false;
         if ($clonedEntity instanceof Campaign) {
             $entity  = $clonedEntity;
             $isClone = true;
@@ -560,8 +559,8 @@ class CampaignController extends FormController
             'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_campaign_index',
-                'mauticContent' => 'campaign'
-            ]
+                'mauticContent' => 'campaign',
+            ],
         ];
         //form not found
         if ($entity === null) {
@@ -573,9 +572,9 @@ class CampaignController extends FormController
                             [
                                 'type'    => 'error',
                                 'msg'     => 'mautic.campaign.error.notfound',
-                                'msgVars' => ['%id%' => $objectId]
-                            ]
-                        ]
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
                     ]
                 )
             );
@@ -649,7 +648,7 @@ class CampaignController extends FormController
 
                         if ($entity->getId() !== $objectId) {
                             // No longer a clone - this is important for Apply
-                            $isClone = false;
+                            $isClone  = false;
                             $objectId = $entity->getId();
                         }
 
@@ -662,9 +661,9 @@ class CampaignController extends FormController
                                     'mautic_campaign_action',
                                     [
                                         'objectAction' => 'edit',
-                                        'objectId'     => $entity->getId()
+                                        'objectId'     => $entity->getId(),
                                     ]
-                                )
+                                ),
                             ]
                         );
                     }
@@ -686,7 +685,7 @@ class CampaignController extends FormController
 
                 $viewParameters = [
                     'objectAction' => 'view',
-                    'objectId'     => $entity->getId()
+                    'objectId'     => $entity->getId(),
                 ];
 
                 if (!$isClone) {
@@ -695,7 +694,7 @@ class CampaignController extends FormController
                         [
                             'returnUrl'       => $this->generateUrl('mautic_campaign_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticCampaignBundle:Campaign:view'
+                            'contentTemplate' => 'MauticCampaignBundle:Campaign:view',
                         ]
                     );
                 } // else redirect to index since there is no view page for the cancelled clone
@@ -769,7 +768,7 @@ class CampaignController extends FormController
                     $campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,
-                        'names'      => implode(', ', array_intersect_key($sourceList, $sources))
+                        'names'      => implode(', ', array_intersect_key($sourceList, $sources)),
                     ];
                 }
             }
@@ -777,14 +776,14 @@ class CampaignController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'eventSettings'   => $eventSettings,
                     'campaignEvents'  => $campaignEvents,
                     'campaignSources' => $campaignSources,
                     'deletedEvents'   => $deletedEvents,
                     'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'          => $entity,
-                    'form'            => $form->createView()
+                    'form'            => $form->createView(),
                 ],
                 'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
                 'passthroughVars' => [
@@ -794,16 +793,16 @@ class CampaignController extends FormController
                         'mautic_campaign_action',
                         [
                             'objectAction' => 'edit',
-                            'objectId'     => $entity->getId()
+                            'objectId'     => $entity->getId(),
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
 
     /**
-     * Clone an entity
+     * Clone an entity.
      *
      * @param $objectId
      *
@@ -883,9 +882,9 @@ class CampaignController extends FormController
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
-     * @param         $objectId
+     * @param   $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -901,8 +900,8 @@ class CampaignController extends FormController
             'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_campaign_index',
-                'mauticContent' => 'campaign'
-            ]
+                'mauticContent' => 'campaign',
+            ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
@@ -913,7 +912,7 @@ class CampaignController extends FormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.campaign.error.notfound',
-                    'msgVars' => ['%id%' => $objectId]
+                    'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->get('mautic.security')->isGranted('campaign:campaigns:delete')) {
                 return $this->accessDenied();
@@ -929,8 +928,8 @@ class CampaignController extends FormController
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => [
                     '%name%' => $identifier,
-                    '%id%'   => $objectId
-                ]
+                    '%id%'   => $objectId,
+                ],
             ];
         } //else don't do anything
 
@@ -938,14 +937,14 @@ class CampaignController extends FormController
             array_merge(
                 $postActionVars,
                 [
-                    'flashes' => $flashes
+                    'flashes' => $flashes,
                 ]
             )
         );
     }
 
     /**
-     * Deletes a group of entities
+     * Deletes a group of entities.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -961,8 +960,8 @@ class CampaignController extends FormController
             'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_campaign_index',
-                'mauticContent' => 'campaign'
-            ]
+                'mauticContent' => 'campaign',
+            ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
@@ -978,7 +977,7 @@ class CampaignController extends FormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.campaign.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->isGranted('campaign:campaigns:delete')) {
                     $flashes[] = $this->accessDenied(true);
@@ -997,8 +996,8 @@ class CampaignController extends FormController
                     'type'    => 'notice',
                     'msg'     => 'mautic.campaign.notice.batch_deleted',
                     'msgVars' => [
-                        '%count%' => count($entities)
-                    ]
+                        '%count%' => count($entities),
+                    ],
                 ];
             }
         } //else don't do anything
@@ -1007,14 +1006,14 @@ class CampaignController extends FormController
             array_merge(
                 $postActionVars,
                 [
-                    'flashes' => $flashes
+                    'flashes' => $flashes,
                 ]
             )
         );
     }
 
     /**
-     * Clear field and events from the session
+     * Clear field and events from the session.
      *
      * @param $id
      */
@@ -1030,7 +1029,7 @@ class CampaignController extends FormController
     }
 
     /**
-     * Get events from session
+     * Get events from session.
      *
      * @param $id
      *
@@ -1049,7 +1048,7 @@ class CampaignController extends FormController
     }
 
     /**
-     * Set events to session
+     * Set events to session.
      *
      * @param $id
      * @param $events
@@ -1062,7 +1061,7 @@ class CampaignController extends FormController
     }
 
     /**
-     * Get events from session
+     * Get events from session.
      *
      * @param $id
      * @param $isClone
@@ -1081,7 +1080,6 @@ class CampaignController extends FormController
                 // Clone hasn't saved the sources yet so return the current list as added
                 return [$currentSources, [], $currentSources];
             } else {
-
                 return [[], [], $currentSources];
             }
         }
@@ -1110,7 +1108,7 @@ class CampaignController extends FormController
     }
 
     /**
-     * Set sources to session
+     * Set sources to session.
      *
      * @param $id
      * @param $sources

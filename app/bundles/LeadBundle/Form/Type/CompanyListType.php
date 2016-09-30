@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,9 +18,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class CompanyListType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class CompanyListType.
  */
 class CompanyListType extends AbstractType
 {
@@ -32,8 +31,7 @@ class CompanyListType extends AbstractType
 
     /**
      * @param CompanyModel $companyModel
-     * @param UserHelper $userHelper
-     *
+     * @param UserHelper   $userHelper
      */
     public function __construct(CompanyModel $companyModel, UserHelper $userHelper)
     {
@@ -47,7 +45,7 @@ class CompanyListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $companies = $this->repo->getCompanies(false);
+        $companies      = $this->repo->getCompanies(false);
         $companies_list = [];
 
         foreach ($companies as $company) {
@@ -55,13 +53,13 @@ class CompanyListType extends AbstractType
         }
         $resolver->setDefaults(
             [
-                'choices'          => $companies_list,
-                'expanded'         => false,
-                'multiple'         => true,
-                'required'         => false,
-                'empty_value'      => function (Options $options) {
+                'choices'     => $companies_list,
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.company.no.companies.note' : 'mautic.core.form.chooseone';
-                }
+                },
             ]
         );
         $resolver->setDefined(['top_level', 'top_level_parent', 'ignore_ids']);
@@ -72,7 +70,7 @@ class CompanyListType extends AbstractType
      */
     public function getName()
     {
-        return "company_list";
+        return 'company_list';
     }
 
     /**

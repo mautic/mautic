@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if (!isset($preview)) {
@@ -100,7 +101,7 @@ echo $view->render(
 $less = ob_get_clean();
 
 require_once __DIR__.'/../../Include/lessc.inc.php';
-$compiler = new \lessc;
+$compiler = new \lessc();
 $css      = $compiler->compile($less);
 
 if (empty($preview) && $app->getEnvironment() != 'dev') {

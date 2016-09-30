@@ -9,7 +9,7 @@
         $size = 6;
     }
     ?>
-    <?php $vars = $widget == 'text' ? array('attr' => array('size' => 1, 'class' => 'not-chosen')) : array('attr' => array('class' => 'not-chosen')); ?>
+    <?php $vars = $widget == 'text' ? ['attr' => ['size' => 1, 'class' => 'not-chosen']] : ['attr' => ['class' => 'not-chosen']]; ?>
     <div <?php echo $view['form']->block($form, 'widget_container_attributes') ?>>
         <?php
         // There should be no spaces between the colons and the widgets, that's why
