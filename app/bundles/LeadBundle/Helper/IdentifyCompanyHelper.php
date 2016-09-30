@@ -76,9 +76,11 @@ class IdentifyCompanyHelper
                     'companystate'   => $state,
                     'companycountry' => $country,
                 ];
-                $company = $companyModel->getEntity();
-                $companyModel->setFieldValues($company, $companyData, true);
-                $companyModel->saveEntity($company);
+                $companyEntity = $companyModel->getEntity();
+                $companyModel->setFieldValues($companyEntity, $companyData, true);
+                $companyModel->saveEntity($companyEntity);
+
+                $company   = [['id' => $companyEntity->getId()]];
                 $leadAdded = true;
             }
 
