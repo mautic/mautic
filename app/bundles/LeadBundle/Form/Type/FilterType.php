@@ -90,6 +90,14 @@ class FilterType extends AbstractType
             $displayType = 'hidden';
             $displayAttr = array();
 
+            $field = [];
+
+            if (isset($options['fields']['lead'][$fieldName])) {
+                $field = $options['fields']['lead'][$fieldName];
+            } elseif(isset($options['fields']['company'][$fieldName])) {
+                $field = $options['fields']['company'][$fieldName];
+            }
+
             $customOptions = array();
             switch ($fieldType) {
                 case 'leadlist':
@@ -191,8 +199,8 @@ class FilterType extends AbstractType
                         )
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
-                        $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    if (isset($field['properties']['list'])) {
+                        $displayAttr['data-options'] = $field['properties']['list'];
                     }
 
                     break;
@@ -215,7 +223,7 @@ class FilterType extends AbstractType
                         }
                     }
 
-                    $list = $options['fields'][$fieldName]['properties']['list'];
+                    $list = $field['properties']['list'];
                     $choices = FormFieldHelper::parseList($list);
 
                     if ($fieldType == 'select') {
@@ -238,8 +246,8 @@ class FilterType extends AbstractType
                         )
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
-                        $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    if (isset($field['properties']['list'])) {
+                        $attr['data-options'] = $field['properties']['list'];
                     }
 
                     break;
@@ -299,12 +307,12 @@ class FilterType extends AbstractType
             );
 
             $choices = $operatorChoices;
-            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+            if (isset($field['operators']['include'])) {
                 // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
-            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                $choices = array_intersect_key($choices, array_flip($field['operators']['include']));
+            } elseif (isset($field['operators']['exclude'])) {
                 // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+                $choices = array_diff_key($choices, array_flip($field['operators']['exclude']));
             }
 
             $form->add(
