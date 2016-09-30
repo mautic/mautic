@@ -493,6 +493,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $query
+     * @param $object
+     */
+    public function ammendToSfFields($fields) {
+        $newFields = [];
+        foreach ($fields as $key => $field) {
+            $key = explode('-',$key);
+            $newFields[trim($key[0])] = $field;
+        }
+        return $newFields;
+    }
+
+    /**
      * @param array $params
      *
      * @return int|null
