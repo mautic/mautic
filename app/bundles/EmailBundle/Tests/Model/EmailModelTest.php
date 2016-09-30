@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -21,9 +22,11 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -188,15 +191,31 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository = $this->getMockBuilder(CompanyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository->method('getCompaniesForContacts')
+            ->will($this->returnValue([]));
+        $companyModel->method('getRepository')
+            ->willReturn($companyRepository);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
             $mailboxHelper,
             $mailHelper,
             $leadModel,
+            $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -394,15 +413,31 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository = $this->getMockBuilder(CompanyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository->method('getCompaniesForContacts')
+            ->will($this->returnValue([]));
+        $companyModel->method('getRepository')
+            ->willReturn($companyRepository);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
             $mailboxHelper,
             $mailHelper,
             $leadModel,
+            $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -537,15 +572,31 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->method('getReference')
             ->will($this->returnValue($leadEntity));
 
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository = $this->getMockBuilder(CompanyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository->method('getCompaniesForContacts')
+            ->will($this->returnValue([]));
+        $companyModel->method('getRepository')
+            ->willReturn($companyRepository);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
             $mailboxHelper,
             $mailHelper,
             $leadModel,
+            $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -661,15 +712,31 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->method('getReference')
             ->will($this->returnValue($leadEntity));
 
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository = $this->getMockBuilder(CompanyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyRepository->method('getCompaniesForContacts')
+            ->will($this->returnValue([]));
+        $companyModel->method('getRepository')
+            ->willReturn($companyRepository);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
             $mailboxHelper,
             $mailHelper,
             $leadModel,
+            $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
