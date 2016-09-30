@@ -29,7 +29,6 @@ class FilterType extends AbstractType
     private $operatorChoices;
     private $translator;
     private $currentListId;
-    private $factory;
 
     /**
      * @param MauticFactory $factory
@@ -47,7 +46,6 @@ class FilterType extends AbstractType
         }
         $this->translator    = $factory->getTranslator();
         $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
-        $this->factory       = $factory;
     }
 
     /**
@@ -89,6 +87,14 @@ class FilterType extends AbstractType
             ];
             $displayType = 'hidden';
             $displayAttr = [];
+
+            $field = [];
+
+            if (isset($options['fields']['lead'][$fieldName])) {
+                $field = $options['fields']['lead'][$fieldName];
+            } elseif (isset($options['fields']['company'][$fieldName])) {
+                $field = $options['fields']['company'][$fieldName];
+            }
 
             $customOptions = [];
             switch ($fieldType) {
@@ -191,8 +197,8 @@ class FilterType extends AbstractType
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
-                        $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    if (isset($field['properties']['list'])) {
+                        $displayAttr['data-options'] = $field['properties']['list'];
                     }
 
                     break;
@@ -214,10 +220,8 @@ class FilterType extends AbstractType
                             $data['filter'] = [$data['filter']];
                         }
                     }
-                    $fields   = (isset($options['fields']['lead'])) ? $options['fields']['lead'] : [];
-                    $fields[] = (isset($options['fields']['company'])) ? $options['fields']['company'] : [];
-die(var_dump($options['fields']));
-                    $list    = $options['fields'][$fieldName]['properties']['list'];
+
+                    $list    = $field['properties']['list'];
                     $choices = FormFieldHelper::parseList($list);
 
                     if ($fieldType == 'select') {
@@ -240,8 +244,8 @@ die(var_dump($options['fields']));
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
-                        $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                    if (isset($field['properties']['list'])) {
+                        $attr['data-options'] = $field['properties']['list'];
                     }
 
                     break;
@@ -301,12 +305,12 @@ die(var_dump($options['fields']));
             );
 
             $choices = $operatorChoices;
-            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+            if (isset($field['operators']['include'])) {
                 // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
-            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                $choices = array_intersect_key($choices, array_flip($field['operators']['include']));
+            } elseif (isset($field['operators']['exclude'])) {
                 // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+                $choices = array_diff_key($choices, array_flip($field['operators']['exclude']));
             }
 
             $form->add(
