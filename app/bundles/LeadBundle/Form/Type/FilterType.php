@@ -31,7 +31,6 @@ class FilterType extends AbstractType
     private $operatorChoices;
     private $translator;
     private $currentListId;
-    private $factory;
 
     /**
      * @param MauticFactory $factory
@@ -49,7 +48,6 @@ class FilterType extends AbstractType
         }
         $this->translator    = $factory->getTranslator();
         $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
-        $this->factory = $factory;
     }
 
     /**
@@ -216,8 +214,6 @@ class FilterType extends AbstractType
                             $data['filter'] = array($data['filter']);
                         }
                     }
-                    $fields = (isset($options['fields']['lead']))?$options['fields']['lead']: [];
-                    $fields[] = (isset($options['fields']['company']))?$options['fields']['company']: [];
 
                     $list = $options['fields'][$fieldName]['properties']['list'];
                     $choices = FormFieldHelper::parseList($list);
