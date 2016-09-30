@@ -193,14 +193,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
-                                        ['reference', 'boolean']
+                                        ['reference']
                                     )
                                 ) {
                                     continue;
                                 }
-
+                                if ($fieldInfo['type'] == 'boolean') {
+                                    $type = 'boolean';
+                                } else {
+                                    $type = 'string';
+                                }
                                 $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
-                                    'type'     => 'string',
+                                    'type'     => $type,
                                     'label'    => $sfObject.' - '.$fieldInfo['label'],
                                     'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], ['Status']))
                                 ];
