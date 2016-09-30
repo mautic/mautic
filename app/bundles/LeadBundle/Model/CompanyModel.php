@@ -15,8 +15,10 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -361,7 +363,7 @@ class CompanyModel extends CommonFormModel
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
@@ -525,5 +527,52 @@ class CompanyModel extends CommonFormModel
         }
 
         return $results;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof Company) {
+            throw new MethodNotAllowedHttpException(['Email']);
+        }
+
+        switch ($action) {
+            case 'pre_save':
+                $name = LeadEvents::COMPANY_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = LeadEvents::COMPANY_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = LeadEvents::COMPANY_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = LeadEvents::COMPANY_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new CompanyEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }
