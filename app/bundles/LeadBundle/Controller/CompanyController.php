@@ -598,14 +598,14 @@ class CompanyController extends FormController
             // Delete everything we are able to
             if (!empty($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.company.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
+                $deleted  = count($entities);
+                $this->addFlash(
+                    'mautic.company.notice.batch_deleted',
+                    [
+                        'pluralCount' => $deleted,
+                        '%count%'     => $deleted,
+                    ]
+                );
             }
         } //else don't do anything
 
