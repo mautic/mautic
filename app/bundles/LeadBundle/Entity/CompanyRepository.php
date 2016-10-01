@@ -458,7 +458,7 @@ class CompanyRepository extends CommonRepository
         if (empty($companyName)) {
             return [];
         }
-        $q->select('comp.id')
+        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, comp.companystate')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
 
         $q->where(
@@ -480,9 +480,10 @@ class CompanyRepository extends CommonRepository
                 $q->expr()->eq('comp.companystate', ':state')
             )->setParameter('state', $state);
         }
+
         $results = $q->execute()->fetchAll();
 
-        return $results;
+        return ($results) ? $results[0] : null;
     }
 
     /**

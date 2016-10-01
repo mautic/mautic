@@ -62,14 +62,12 @@ class IdentifyCompanyHelper
             if (!empty($company)) {
                 //check if lead is already assigned to company
                 $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']))) {
-                    $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company[0]['id']);
-                    $company   = $companyModel->getEntity($company[0]['id']);
+                if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company['id']))) {
                     $leadAdded = true;
                 }
             } else {
                 //create new company
-                $companyData = [
+                $company = [
                     'companyname'    => $companyName,
                     'companywebsite' => $companyDomain,
                     'companycity'    => $city,
@@ -77,11 +75,10 @@ class IdentifyCompanyHelper
                     'companycountry' => $country,
                 ];
                 $companyEntity = $companyModel->getEntity();
-                $companyModel->setFieldValues($companyEntity, $companyData, true);
+                $companyModel->setFieldValues($companyEntity, $company, true);
                 $companyModel->saveEntity($companyEntity);
-
-                $company   = [['id' => $companyEntity->getId()]];
-                $leadAdded = true;
+                $company['id'] = $companyEntity->getId();
+                $leadAdded     = true;
             }
 
             return [$company, $leadAdded];
