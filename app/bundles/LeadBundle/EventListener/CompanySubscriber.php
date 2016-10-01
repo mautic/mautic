@@ -88,7 +88,7 @@ class CompanySubscriber extends CommonSubscriber
             'object'    => 'field',
             'objectId'  => $company->deletedId,
             'action'    => 'delete',
-            'details'   => ['name', $company->getLabel()],
+            'details'   => ['name', $company->getPrimaryIdentifier()],
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
