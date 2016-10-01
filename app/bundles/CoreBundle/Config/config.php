@@ -523,7 +523,6 @@ return [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
                 'arguments' => [
                     'mautic.security',
-                    'mautic.helper.user',
                     'request_stack',
                     '%mautic.parameters%',
                 ],

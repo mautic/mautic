@@ -215,6 +215,14 @@ class CorePermissions
     }
 
     /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->userHelper->getUser()->isAdmin();
+    }
+
+    /**
      * Determines if the user has permission to access the given area.
      *
      * @param array|string $requestedPermission
@@ -262,34 +270,36 @@ class CorePermissions
                 );
             }
 
-            $activePermissions = ($userEntity instanceof User) ? $userEntity->getActivePermissions() : [];
-
-            //check against bundle permissions class
-            $permissionObject = $this->getPermissionObject($parts[0], true, $isPlugin);
-
-            //Is the permission supported?
-            if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-                if ($allowUnknown) {
-                    $permissions[$permission] = false;
-                } else {
-                    throw new \InvalidArgumentException(
-                        $this->getTranslator()->trans(
-                            'mautic.core.permissions.notfound',
-                            ['%permission%' => $permission]
-                        )
-                    );
-                }
-            } elseif ($userEntity == 'anon.') {
-                //anon user or session timeout
-                $permissions[$permission] = false;
-            } elseif ($userEntity->isAdmin()) {
+            if ($userEntity->isAdmin()) {
                 //admin user has access to everything
                 $permissions[$permission] = true;
-            } elseif (!isset($activePermissions[$parts[0]])) {
-                //user does not have implicit access to bundle so deny
-                $permissions[$permission] = false;
             } else {
-                $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
+                $activePermissions = ($userEntity instanceof User) ? $userEntity->getActivePermissions() : [];
+
+                //check against bundle permissions class
+                $permissionObject = $this->getPermissionObject($parts[0], true, $isPlugin);
+
+                //Is the permission supported?
+                if (!$permissionObject->isSupported($parts[1], $parts[2])) {
+                    if ($allowUnknown) {
+                        $permissions[$permission] = false;
+                    } else {
+                        throw new \InvalidArgumentException(
+                            $this->getTranslator()->trans(
+                                'mautic.core.permissions.notfound',
+                                ['%permission%' => $permission]
+                            )
+                        );
+                    }
+                } elseif ($userEntity == 'anon.') {
+                    //anon user or session timeout
+                    $permissions[$permission] = false;
+                } elseif (!isset($activePermissions[$parts[0]])) {
+                    //user does not have implicit access to bundle so deny
+                    $permissions[$permission] = false;
+                } else {
+                    $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
+                }
             }
 
             $this->grantedPermissions[$permission] = $permissions[$permission];
