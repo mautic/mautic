@@ -11,7 +11,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -37,15 +36,13 @@ class PageSubscriber extends CommonSubscriber
     protected $router;
 
     /**
-     * FormSubscriber constructor.
+     * PageSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param FocusModel    $model
+     * @param FocusModel      $model
+     * @param RouterInterface $router
      */
-    public function __construct(MauticFactory $factory, FocusModel $model, RouterInterface $router)
+    public function __construct(FocusModel $model, RouterInterface $router)
     {
-        parent::__construct($factory);
-
         $this->router = $router;
         $this->model  = $model;
     }

@@ -11,7 +11,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -45,15 +44,12 @@ class FocusSubscriber extends CommonSubscriber
     /**
      * FocusSubscriber constructor.
      *
-     * @param MauticFactory   $factory
      * @param RouterInterface $router
      * @param IpLookupHelper  $ipLookupHelper
      * @param AuditLogModel   $auditLogModel
      */
-    public function __construct(MauticFactory $factory, RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
-        parent::__construct($factory);
-
         $this->router        = $router;
         $this->ipHelper      = $ipLookupHelper;
         $this->auditLogModel = $auditLogModel;

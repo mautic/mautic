@@ -46,14 +46,12 @@ return [
             'mautic.focus.subscriber.form_bundle' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FormSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.subscriber.page_bundle' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                     'router',
                 ],
@@ -61,14 +59,12 @@ return [
             'mautic.focus.subscriber.stat' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'router',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
