@@ -214,6 +214,12 @@ class SubmissionModel extends CommonFormModel
             }
 
             if ($f->isRequired() && empty($value)) {
+
+                //field is required, but hidden from form because of 'ShowWhenValueExists'
+                if( null !== $f->getShowWhenValueExists() && $f->getShowWhenValueExists() === false ){
+                    continue;
+                }
+                
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
