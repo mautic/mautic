@@ -216,7 +216,7 @@ class SubmissionModel extends CommonFormModel
             if ($f->isRequired() && empty($value)) {
 
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
-                if( null !== $f->getShowWhenValueExists() && $f->getShowWhenValueExists() === false) ){
+                if( null !== $f->getShowWhenValueExists() && $f->getShowWhenValueExists() === false ){
                     continue;
                 }
 
