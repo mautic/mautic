@@ -1163,6 +1163,7 @@ var Mautic = {
                         window["Mautic"][callback].apply('window', []);
                     }
                 }
+                Mautic.generatePageTitle( route );
                 delete Mautic.loadContentXhr[target];
             }
         });
@@ -1170,6 +1171,23 @@ var Mautic = {
         //prevent firing of href link
         //mQuery(link).attr("href", "javascript: void(0)");
         return false;
+    },
+
+    /**
+    * Generates the title of the current page
+    *
+    * @param route
+    */
+    generatePageTitle: function(route){
+
+        if( -1 !== route.indexOf('view') ){
+            //loading view of module title
+            var currentModule = route.split('/')[3];
+            mQuery('title').html( 'Mautic - ' + currentModule[0].toUpperCase() + currentModule.slice(1) + ' - ' + mQuery('.page-header h3').html() );
+        } else {
+            //loading basic title
+            mQuery('title').html( 'Mautic - ' + mQuery('.page-header h3').html() );
+        }
     },
 
     /**
