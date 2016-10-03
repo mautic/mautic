@@ -63,27 +63,37 @@ class MessageQueueSubscriber extends CommonSubscriber
 
         $sendTo            = [];
         $messagesByContact = [];
+        $options           = [
+            'email_type' => 'marketing',
+        ];
 
         /** @var MessageQueue $message */
         foreach ($messages as $id => $message) {
             $contact = $message->getLead()->getProfileFields();
             if (empty($contact['email'])) {
                 // No email so just let this slide
-                $message->isProcessed();
-                $message->setSuccess(true);
+                die('nope');
+                $message->setProcessed();
+                $message->setSuccess();
             }
 
             $sendTo[$contact['id']]            = $contact;
-            $messagesByContact[$contact['id']] = $id;
+            $messagesByContact[$contact['id']] = $message;
         }
 
         if (count($sendTo)) {
-            $errors = $this->emailModel->sendEmail($email, $sendTo, ['source' => ['campaign.event', $message->getEvent()->getId()]]);
+            $options['resend_message_queue'] = $messagesByContact;
+            $errors                          = $this->emailModel->sendEmail($email, $sendTo, $options);
 
             // Let's see who was successful
-            foreach ($messagesByContact as $contactId => $messageId) {
-                $messages[$messageId]->setProcessed();
-                $messages[$messageId]->setSuccess(empty($errors[$contactId]));
+            foreach ($messagesByContact as $contactId => $message) {
+                // If the message is processed, it was rescheduled by sendEmail
+                if (!$message->isProcessed()) {
+                    $message->setProcessed();
+                    if (empty($errors[$contactId])) {
+                        $message->setSuccess();
+                    }
+                }
             }
         }
 
