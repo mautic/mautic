@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Entity\MessageQueue;
@@ -95,7 +94,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewEmailWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
                         'icon' => 'fa fa-plus',
