@@ -120,13 +120,18 @@ class FormModel extends AbstractCommonModel
 
             $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             $this->getRepository()->saveEntity($entity, false);
-            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if ((($k + 1) % $batchSize) === 0) {
                 $this->em->flush();
             }
         }
+
         $this->em->flush();
+
+        // Dispatch post events after everything has been flushed
+        foreach ($entities as $k => $entity) {
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
+        }
     }
 
     /**
