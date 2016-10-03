@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -594,9 +593,7 @@ class FormController extends CommonFormController
                         }
 
                         // Delete deleted actions
-                        if (count($deletedActions)) {
-                            $this->getModel('form.action')->deleteEntities($deletedActions);
-                        }
+                        $model->deleteActions($entity, $deletedActions);
 
                         // Persist and execute listeners
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());

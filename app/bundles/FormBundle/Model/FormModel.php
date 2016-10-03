@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
@@ -335,6 +334,32 @@ class FormModel extends CommonFormModel
         // Persist if form is being edited
         if ($entity->getId()) {
             $this->formActionModel->saveEntities($existingActions);
+        }
+    }
+
+    /**
+     * @param Form  $entity
+     * @param array $actions
+     */
+    public function deleteActions(Form $entity, $actions)
+    {
+        if (empty($actions)) {
+            return;
+        }
+
+        $existingActions = $entity->getActions()->toArray();
+        $deleteActions   = [];
+        foreach ($actions as $actionId) {
+            if (isset($existingActions[$actionId])) {
+                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $entity->removeAction($actionEntity);
+                $deleteActions[] = $actionId;
+            }
+        }
+
+        // Delete actions from db
+        if (count($deleteActions)) {
+            $this->formActionModel->deleteEntities($deleteActions);
         }
     }
 
