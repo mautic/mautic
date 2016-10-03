@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $searchValue    = (empty($searchValue)) ? '' : $searchValue;
 $target         = (empty($target)) ? '.page-list' : $target;
 $overlayTarget  = (empty($overlayTarget)) ? $target : $overlayTarget;
@@ -34,10 +34,10 @@ $tmpl           = (empty($tmpl)) ? 'list' : $tmpl;
 
 <?php
 if ($searchHelp):
-echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => $searchId . '-search-help',
+echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
+    'id'     => $searchId.'-search-help',
     'header' => $view['translator']->trans('mautic.core.search.header'),
-    'body'   => $view['translator']->trans('mautic.core.search.help') . $view['translator']->trans($searchHelp)
-));
+    'body'   => $view['translator']->trans('mautic.core.search.help').$view['translator']->trans($searchHelp),
+]);
 endif;
 ?>

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,20 +16,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class StageActionType
+ * Class StageActionType.
  */
 class StageActionType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $masks           = array();
-        $formTypeOptions = array(
-            'label' => false
-        );
+        $masks           = [];
+        $formTypeOptions = [
+            'label' => false,
+        ];
         if (!empty($options['formTypeOptions'])) {
             $formTypeOptions = array_merge($formTypeOptions, $options['formTypeOptions']);
         }
@@ -46,18 +46,17 @@ class StageActionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'formType'        => 'genericstage_settings',
-            'formTypeOptions' => array()
-        ));
+            'formTypeOptions' => [],
+        ]);
     }
-
 
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return "stageaction";
+        return 'stageaction';
     }
 }

@@ -1,17 +1,18 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
@@ -19,13 +20,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
-use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 
 /**
- * Class DynamicContentSubscriber
- *
- * @package Mautic\DynamicContentBundle\EventListener
+ * Class DynamicContentSubscriber.
  */
 class DynamicContentSubscriber extends CommonSubscriber
 {
@@ -62,28 +60,27 @@ class DynamicContentSubscriber extends CommonSubscriber
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
         AuditLogModel $auditLogModel
-    )
-    {
-        $this->trackableModel = $trackableModel;
-        $this->pageTokenHelper = $pageTokenHelper;
+    ) {
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-        $this->auditLogModel = $auditLogModel;
+        $this->auditLogModel    = $auditLogModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
-            DynamicContentEvents::POST_SAVE    => ['onPostSave', 0],
-            DynamicContentEvents::POST_DELETE  => ['onDelete', 0],
-            DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
+            DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
+            DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
+            DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param Events\DynamicContentEvent $event
      */
@@ -92,30 +89,30 @@ class DynamicContentSubscriber extends CommonSubscriber
         $entity = $event->getDynamicContent();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "dynamicContent",
-                "object"    => "dynamicContent",
-                "objectId"  => $entity->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details
+                'bundle'   => 'dynamicContent',
+                'object'   => 'dynamicContent',
+                'objectId' => $entity->getId(),
+                'action'   => ($event->isNew()) ? 'create' : 'update',
+                'details'  => $details,
             ];
             $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param Events\DynamicContentEvent $event
      */
     public function onDelete(Events\DynamicContentEvent $event)
     {
         $entity = $event->getDynamicContent();
-        $log = [
-            "bundle"     => "dynamicContent",
-            "object"     => "dynamicContent",
-            "objectId"   => $entity->getId(),
-            "action"     => "delete",
-            "details"    => ['name' => $entity->getName()]
+        $log    = [
+            'bundle'   => 'dynamicContent',
+            'object'   => 'dynamicContent',
+            'objectId' => $entity->getId(),
+            'action'   => 'delete',
+            'details'  => ['name' => $entity->getName()],
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -123,8 +120,8 @@ class DynamicContentSubscriber extends CommonSubscriber
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
-        $lead = $event->getLead();
-        $content = $event->getContent();
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
         if ($content) {
@@ -142,7 +139,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             );
 
             /**
-             * @var string $token
+             * @var string
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

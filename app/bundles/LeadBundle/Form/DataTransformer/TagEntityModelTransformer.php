@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +16,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * Class TagEntityModelTransformer
+ * Class TagEntityModelTransformer.
  */
 class TagEntityModelTransformer implements DataTransformerInterface
 {
@@ -67,10 +68,10 @@ class TagEntityModelTransformer implements DataTransformerInterface
         }
 
         if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
-            return array();
+            return [];
         }
 
-        $return = array();
+        $return = [];
         foreach ($entity as $e) {
             $return[] = $e->getTag();
         }
@@ -81,7 +82,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws TransformationFailedException if object is not found.
+     * @throws TransformationFailedException if object is not found
      */
     public function transform($id)
     {
@@ -93,7 +94,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
             $column = (is_numeric($id)) ? 'id' : 'tag';
             $entity = $this->em
                 ->getRepository($this->repository)
-                ->findOneBy(array($column => $id))
+                ->findOneBy([$column => $id])
             ;
 
             if ($entity === null) {
@@ -107,7 +108,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         }
 
         if (empty($id) || !is_array($id)) {
-            return array();
+            return [];
         }
 
         $column = (is_numeric($id[0])) ? 'id' : 'tag';
@@ -115,18 +116,18 @@ class TagEntityModelTransformer implements DataTransformerInterface
         $repo   = $this->em->getRepository($this->repository);
         $prefix = $repo->getTableAlias();
 
-        $entities = $repo->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
-                        'column' => $prefix . '.' . $column,
+        $entities = $repo->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => $prefix.'.'.$column,
                         'expr'   => 'in',
-                        'value'  => $id
-                    )
-                )
-            ),
-            'ignore_paginator' => true
-        ));
+                        'value'  => $id,
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
 
         if (!count($entities)) {
             throw new TransformationFailedException(sprintf(
@@ -139,11 +140,9 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * Set the repository to use
+     * Set the repository to use.
      *
      * @param string $repo
-     *
-     * @return void
      */
     public function setRepository($repo)
     {
@@ -151,11 +150,9 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * Set the identifier to use
+     * Set the identifier to use.
      *
      * @param string $id
-     *
-     * @return void
      */
     public function setIdentifier($id)
     {

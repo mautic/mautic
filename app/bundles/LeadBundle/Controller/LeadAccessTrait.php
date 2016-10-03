@@ -1,22 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Controller;
 
-
 /**
- * Class LeadAccessTrait
+ * Class LeadAccessTrait.
  */
 trait LeadAccessTrait
 {
     /**
-     * Determines if the user has access to the lead the note is for
+     * Determines if the user has access to the lead the note is for.
      *
      * @param $leadId
      * @param $action
@@ -24,7 +24,7 @@ trait LeadAccessTrait
      * @param string $intgegration
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkLeadAccess ($leadId, $action, $isPlugin = false, $intgegration = '')
+    protected function checkLeadAccess ($leadId, $action, $isPlugin = false, $integration = '')
     {
         //make sure the user has view access to this lead
         $leadModel = $this->getModel('lead');
@@ -42,15 +42,15 @@ trait LeadAccessTrait
                     'contentTemplate' => $isPlugin?'MauticLeadBundle:Lead:pluginIndex':'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
                         'activeLink'    => $isPlugin?'#mautic_plugin_timeline_index':'#mautic_contact_index',
-                        'mauticContent' => 'leadNote'
+                        'mauticContent' => 'leadTimeline'
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.lead.lead.error.notfound',
-                            'msgVars' => ['%id%' => $leadId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $leadId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -59,10 +59,8 @@ trait LeadAccessTrait
             $lead->getPermissionUser()
         )
         ) {
-
             return $this->accessDenied();
         } else {
-
             return $lead;
         }
     }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Focus
+ * Class Focus.
  */
 class Focus extends FormEntity
 {

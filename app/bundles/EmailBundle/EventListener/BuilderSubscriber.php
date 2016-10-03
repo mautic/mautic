@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -20,9 +21,7 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 
 /**
- * Class BuilderSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class BuilderSubscriber.
  */
 class BuilderSubscriber extends CommonSubscriber
 {
@@ -59,32 +58,31 @@ class BuilderSubscriber extends CommonSubscriber
         EmailModel $emailModel,
         TrackableModel $trackableModel,
         RedirectModel $redirectModel
-    )
-    {
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel = $emailModel;
-        $this->pageTrackableModel = $trackableModel;
-        $this->pageRedirectModel = $redirectModel;
+        $this->emailModel           = $emailModel;
+        $this->pageTrackableModel   = $trackableModel;
+        $this->pageRedirectModel    = $redirectModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array(
-                array('onEmailGenerate', 0),
+        return [
+            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_ON_SEND  => [
+                ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
-                array('convertUrlsToTokens', -9999)
-            ),
-            EmailEvents::EMAIL_ON_DISPLAY => array(
-                array('onEmailGenerate', 0),
+                ['convertUrlsToTokens', -9999],
+            ],
+            EmailEvents::EMAIL_ON_DISPLAY => [
+                ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
-                array('convertUrlsToTokens', -9999)
-            )
-        );
+                ['convertUrlsToTokens', -9999],
+            ],
+        ];
     }
 
     /**
@@ -100,27 +98,27 @@ class BuilderSubscriber extends CommonSubscriber
 
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
-            $openRate = array(
+            $openRate = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
-            );
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner',
+            ];
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
-            $clickThrough = array(
+            $clickThrough = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.clickthrough',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
-            );
+                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner',
+            ];
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
 
-        $tokens = array(
+        $tokens = [
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
             '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
             '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
-            '{subject}'          => $this->translator->trans('mautic.email.subject')
-        );
+            '{subject}'          => $this->translator->trans('mautic.email.subject'),
+        ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -130,10 +128,10 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         // these should not allow visual tokens
-        $tokens = array(
+        $tokens = [
             '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url')
-        );
+            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url'),
+        ];
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
                 $event->filterTokens($tokens)
@@ -192,25 +190,25 @@ class BuilderSubscriber extends CommonSubscriber
 
         $unsubscribeText = $this->coreParametersHelper->getParameter('unsubscribe_text');
         if (!$unsubscribeText) {
-            $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', array('%link%' => '|URL|'));
+            $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
-        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)), $unsubscribeText);
+        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', $unsubscribeText);
 
-        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)));
+        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
 
         $webviewText = $this->coreParametersHelper->getParameter('webview_text');
         if (!$webviewText) {
-            $webviewText = $this->translator->trans('mautic.email.webview.text', array('%link%' => '|URL|'));
+            $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
-        $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
+        $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
         $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
-            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', array('objectId' => $email->getId())));
+            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
-            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
         }
 
         $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
@@ -250,7 +248,7 @@ class BuilderSubscriber extends CommonSubscriber
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         /**
-         * @var string    $token
+         * @var string
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {
@@ -265,7 +263,7 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * Parses content for URLs and tokens
+     * Parses content for URLs and tokens.
      *
      * @param EmailSendEvent $event
      * @param                $emailId
@@ -274,17 +272,17 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected function parseContentForUrls(EmailSendEvent $event, $emailId)
     {
-        static $convertedContent = array();
+        static $convertedContent = [];
 
         // Prevent parsing the exact same content over and over
         if (!isset($convertedContent[$event->getContentHash()])) {
             $html = $event->getContent();
             $text = $event->getPlainText();
 
-            $contentTokens  = $event->getTokens();
+            $contentTokens = $event->getTokens();
 
             list($content, $trackables) = $this->pageTrackableModel->parseContentForTrackables(
-                array($html, $text),
+                [$html, $text],
                 $contentTokens,
                 ($emailId) ? 'email' : null,
                 $emailId

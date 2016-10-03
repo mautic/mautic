@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
 /**
- * Class ValidationEvent
+ * Class ValidationEvent.
  */
 class ValidationEvent extends CommonEvent
 {
@@ -76,7 +77,7 @@ class ValidationEvent extends CommonEvent
     }
 
     /**
-     * Is the field valid
+     * Is the field valid.
      *
      * @return bool
      */
@@ -86,7 +87,7 @@ class ValidationEvent extends CommonEvent
     }
 
     /**
-     * Get the reason this field was invalidated
+     * Get the reason this field was invalidated.
      *
      * @return string
      */

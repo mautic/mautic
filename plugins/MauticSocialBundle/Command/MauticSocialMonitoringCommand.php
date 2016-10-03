@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,8 +12,8 @@ namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MauticSocialMonitoringCommand extends ContainerAwareCommand
@@ -40,14 +41,14 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
     protected $input;
 
     /**
-     * Configure the command
+     * Configure the command.
      */
     protected function configure()
     {
         $this->setName('mautic:social:monitoring')
             ->setDescription('Looks at the records of monitors and iterates through them. ')
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 I'm not sure what to put here yet
 EOT
             )
@@ -64,8 +65,6 @@ EOT
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     *
-     * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -90,8 +89,9 @@ EOT
         $monitorList = $this->getMonitors($monitorId);
 
         // no mid found, quit now
-        if (! $monitorList->count()) {
+        if (!$monitorList->count()) {
             $this->output->writeln('No published monitors found. Make sure the id you supplied is published');
+
             return;
         }
 
@@ -114,21 +114,21 @@ EOT
      */
     protected function getMonitors($id = null)
     {
-        $filter = array(
+        $filter = [
             'start' => 0,
-            'limit' => 100
-        );
+            'limit' => 100,
+        ];
 
         if ($id !== null) {
-            $filter['filter'] = array(
-                'force' => array(
-                    array(
+            $filter['filter'] = [
+                'force' => [
+                    [
                         'column' => $this->monitorRepo->getTableAlias().'.id',
                         'expr'   => 'eq',
-                        'value'  => (int) $id
-                    )
-                )
-            );
+                        'value'  => (int) $id,
+                    ],
+                ],
+            ];
         }
 
         $monitorList = $this->monitorRepo->getPublishedEntities($filter);
@@ -140,6 +140,7 @@ EOT
      * @param $listItem
      *
      * @return bool|int
+     *
      * @throws \Exception
      */
     protected function processMonitorListItem($listItem)
@@ -150,12 +151,12 @@ EOT
         $commandName = '';
 
         // hashtag command
-        if ($networkType == "twitter_hashtag") {
+        if ($networkType == 'twitter_hashtag') {
             $commandName = 'social:monitor:twitter:hashtags';
         }
 
         // mention command
-        if ($networkType == "twitter_handle") {
+        if ($networkType == 'twitter_handle') {
             $commandName = 'social:monitor:twitter:mentions';
         }
 
@@ -169,12 +170,12 @@ EOT
         $command = $this->getApplication()->find($commandName);
 
         // create command options
-        $cliArgs = array(
+        $cliArgs = [
             'command'       => $commandName,
             '--mid'         => $listItem->getId(),
             '--max-runs'    => $this->maxPerIterations,
-            '--query-count' => $this->input->getOption('query-count')
-        );
+            '--query-count' => $this->input->getOption('query-count'),
+        ];
 
         // create an input array
         $input = new ArrayInput($cliArgs);

@@ -1,87 +1,6 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
-    if (response && response.updateSelect) {
-        //added email through a popup
-        var newOption = mQuery('<option />').val(response.emailId);
-        newOption.html(response.emailName);
-
-        var opener = window.opener;
-        if(opener) {
-            var el = '#' + response.updateSelect;
-            var optgroup = el + " optgroup[label=" + response.emailLang + "]";
-            if (opener.mQuery(optgroup).length) {
-                // update option when new option equal with option item in group.
-                var firstOptionGroups = opener.mQuery(el + ' optgroup');
-                var isUpdateOption = false;
-                firstOptionGroups.each(function() {
-                    var firstOptions = mQuery(this).children();
-                    for (var i = 0; i < firstOptions.length; i++) {
-                        if (firstOptions[i].value === response.emailId.toString()) {
-                            firstOptions[i].text = response.emailName;
-                            isUpdateOption = true;
-                            break;
-                        }
-                    }
-                });
-
-                if (!isUpdateOption) {
-                    //the optgroup exist so append to it
-                    opener.mQuery(optgroup + " option:last").prev().before(newOption);
-                }
-            } else {
-                //create the optgroup
-                var newOptgroup = mQuery('<optgroup label="' + response.emailLang + '" />');
-                newOption.appendTo(newOptgroup);
-                opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
-            }
-
-            var chooseOneOption = opener.mQuery(el + ' option:first');
-
-            var optionGroups = opener.mQuery(el + ' optgroup');
-            optionGroups.sort(function(a, b) {
-                var aLabel = mQuery(a).attr('label');
-                var bLabel = mQuery(b).attr('label');
-
-                if (aLabel > bLabel) {
-                    return 1;
-                } else if (aLabel < bLabel) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
-
-            optionGroups.each(function() {
-                var options = mQuery(this).children();
-                options.sort(function(a, b) {
-                    if (a.text > b.text) {
-                        return 1;
-                    } else if (a.text < b.text) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                });
-                mQuery(this).html(options);
-            });
-
-            if (opener.mQuery(el).prop('disabled')) {
-                opener.mQuery(el).prop('disabled', false);
-                chooseOneOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
-            }
-
-            opener.mQuery(el).html(chooseOneOption);
-            optionGroups.appendTo(opener.mQuery(el));
-
-            newOption.prop('selected', true);
-
-            opener.mQuery(el).trigger("chosen:updated");
-
-            Mautic.disabledEmailAction(opener);
-        }
-
-        window.close();
-    } else if (mQuery('#emailform_plainText').length) {
+    if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
@@ -159,25 +78,6 @@ Mautic.getEmailAbTestWinnerForm = function(abKey) {
             Mautic.removeLabelLoadingIndicator();
         }
     });
-};
-
-Mautic.loadNewEmailWindow = function(options) {
-    if (options.windowUrl) {
-        Mautic.startModalLoadingBar();
-
-        setTimeout(function() {
-            var generator = window.open(options.windowUrl, 'newemailwindow', 'height=600,width=1100');
-
-            if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(mauticLang.popupBlockerMessage);
-            } else {
-                generator.onload = function () {
-                    Mautic.stopModalLoadingBar();
-                    Mautic.stopIconSpinPostEvent();
-                };
-            }
-        }, 100);
-    }
 };
 
 Mautic.submitSendForm = function () {
@@ -380,14 +280,6 @@ Mautic.initEmailDynamicContent = function() {
 
         Mautic.initDynamicContentItem();
     }
-
-    mQuery("*[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field  = mQuery(this).attr('id');
-
-        Mautic.activateLeadFieldTypeahead(field, target, options);
-    });
 };
 
 Mautic.initDynamicContentItem = function (tabId) {
@@ -529,8 +421,6 @@ Mautic.initRemoveEvents = function (elements) {
         });
     }
 };
-
-
 
 Mautic.addDynamicContentFilter = function (selectedFilter) {
     var dynamicContentItems  = mQuery('.tab-pane.dynamic-content');

@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation;
 
 /**
- * Class WebhookController
+ * Class WebhookController.
  */
 class WebhookController extends FormController
 {
@@ -44,7 +42,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Generates new form and processes post data
+     * Generates new form and processes post data.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
@@ -54,7 +52,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
      * @param int  $objectId
      * @param bool $ignorePost
@@ -67,7 +65,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Displays details on a Focus
+     * Displays details on a Focus.
      *
      * @param $objectId
      *
@@ -79,7 +77,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Clone an entity
+     * Clone an entity.
      *
      * @param int $objectId
      *
@@ -91,7 +89,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
      * @param int $objectId
      *
@@ -103,7 +101,7 @@ class WebhookController extends FormController
     }
 
     /**
-     * Deletes a group of entities
+     * Deletes a group of entities.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -111,5 +109,4 @@ class WebhookController extends FormController
     {
         return parent::batchDeleteStandard();
     }
-
 }

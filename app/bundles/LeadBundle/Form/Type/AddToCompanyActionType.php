@@ -1,25 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Doctrine\ORM\EntityRepository;
 
 /**
- * Class FormSubmitActionAddUtmTagType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class FormSubmitActionAddUtmTagType.
  */
 class AddToCompanyActionType extends AbstractType
 {
@@ -29,7 +26,7 @@ class AddToCompanyActionType extends AbstractType
     protected $router;
 
     /**
-     * @param RouterInterface   $router
+     * @param RouterInterface $router
      */
     public function __construct(RouterInterface $router)
     {
@@ -37,29 +34,23 @@ class AddToCompanyActionType extends AbstractType
     }
 
     /**
-    * @param FormBuilderInterface $builder
+     * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->add(
             'company',
             'company_list',
             [
-                'label'       => 'mautic.company.selectcompany',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.company.choose.company_descr'
-                ],
                 'multiple'    => false,
                 'required'    => true,
+                'modal_route' => false,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.company.choosecompany.notblank']
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -68,7 +59,7 @@ class AddToCompanyActionType extends AbstractType
             [
                 'objectAction' => 'new',
                 'contentOnly'  => 1,
-                'updateSelect' => 'campaignevent_properties_company'
+                'updateSelect' => 'campaignevent_properties_company',
             ]
         );
 
@@ -76,14 +67,12 @@ class AddToCompanyActionType extends AbstractType
             'newCompanyButton',
             'button',
             [
-                'attr'  => [
+                'attr' => [
                     'class'   => 'btn btn-primary btn-nospin',
-                    'onclick' => 'Mautic.loadNewCompanyWindow({
-                    "windowUrl": "'.$windowUrl.'"
-                })',
-                    'icon'    => 'fa fa-plus'
+                    'onclick' => 'Mautic.loadNewWindow({"windowUrl": "'.$windowUrl.'"})',
+                    'icon'    => 'fa fa-plus',
                 ],
-                'label' => 'mautic.company.new.company'
+                'label' => 'mautic.company.new.company',
             ]
         );
     }
@@ -93,6 +82,6 @@ class AddToCompanyActionType extends AbstractType
      */
     public function getName()
     {
-        return "addtocompany_action";
+        return 'addtocompany_action';
     }
 }

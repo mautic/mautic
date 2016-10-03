@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $locale    = $app->getRequest()->getLocale();
-$settings  = (!empty($field['properties'])) ? $field['properties'] : array();
+$settings  = (!empty($field['properties'])) ? $field['properties'] : [];
 $layout    = (!empty($settings['layout'])) ? $settings['layout'] : 'standard';
 $action    = (!empty($settings['action'])) ? $settings['action'] : 'like';
 $showFaces = (!empty($settings['showFaces'])) ? 'true' : 'false';
@@ -27,7 +27,7 @@ $js = <<<JS
 JS;
 ?>
 
-<?php //add FB's required OG tag ?>
+<?php //add FB's required OG tag?>
 <?php echo $js; ?>
 <meta property="og:type" content="website" />
 <div class="fb-<?php echo ($action == 'share') ? 'share-button' : 'like'; ?> share-button facebook-share-button layout-<?php echo $layout; ?> action-<?php echo $action; ?>"

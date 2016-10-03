@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +13,10 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class ArrayStringTransformer
+ * Class ArrayStringTransformer.
  */
 class ArrayStringTransformer implements DataTransformerInterface
 {
-
     /**
      * {@inheritdoc}
      *
@@ -25,10 +25,10 @@ class ArrayStringTransformer implements DataTransformerInterface
     public function transform($array)
     {
         if ($array === null) {
-            return "";
+            return '';
         }
 
-        return implode(",", $array);
+        return implode(',', $array);
     }
 
     /**
@@ -39,7 +39,7 @@ class ArrayStringTransformer implements DataTransformerInterface
     public function reverseTransform($string)
     {
         if (!$string) {
-            return array();
+            return [];
         }
 
         return array_map('trim', explode(',', $string));

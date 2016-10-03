@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticFocusBundle\Controller\SubscribedEvents;
 
 /**
- * Class BuilderTokenController
+ * Class BuilderTokenController.
  */
 class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEvents\BuilderTokenController
 {
@@ -30,17 +31,11 @@ class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEve
         return 'plugin:focus:items';
     }
 
-    /**
-     * @return null
-     */
     protected function getBundleName()
     {
         return 'MauticFocusBundle';
     }
 
-    /**
-     * @return null
-     */
     protected function getLangVar()
     {
         return 'mautic.focus';

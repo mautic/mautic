@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -28,46 +29,46 @@ class FormSubmitHelper
         $form       = $action->getForm();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel  = $factory->getModel('email');
-        $email  	 = $emailModel->getEntity($emailId);
+        $emailModel = $factory->getModel('email');
+        $email      = $emailModel->getEntity($emailId);
 
-		/** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-		$leadModel = $factory->getModel('lead');
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $factory->getModel('lead');
 
         //make sure the email still exists and is published
         if ($email != null && $email->isPublished()) {
-		    // Deal with Lead email
-		    if (!empty($feedback['lead.create']['lead'])) {
-		    	//the lead was just created via the lead.create action
-		    	$currentLead = $feedback['lead.create']['lead'];
-		    } else {
-		        $currentLead = $leadModel->getCurrentLead();
-		    }
+            // Deal with Lead email
+            if (!empty($feedback['lead.create']['lead'])) {
+                //the lead was just created via the lead.create action
+                $currentLead = $feedback['lead.create']['lead'];
+            } else {
+                $currentLead = $leadModel->getCurrentLead();
+            }
 
-			if ($currentLead instanceof Lead) {
-				//flatten the lead
-				$lead = $currentLead;
-				$currentLead = array(
-					'id' => $lead->getId()
-				);
-				$leadFields = $leadModel->flattenFields($lead->getFields());
+            if ($currentLead instanceof Lead) {
+                //flatten the lead
+                $lead        = $currentLead;
+                $currentLead = [
+                    'id' => $lead->getId(),
+                ];
+                $leadFields = $leadModel->flattenFields($lead->getFields());
 
-				$currentLead = array_merge($currentLead, $leadFields);
-			}
+                $currentLead = array_merge($currentLead, $leadFields);
+            }
 
-			if (isset($properties['user_id']) && $properties['user_id']) {
-				// User email
-				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $tokens);
-			} elseif (isset($currentLead)) {
-		    	if (isset($leadFields['email'])) {
-					$options = array(
-						'source' 	   => array('form', $form->getId()),
-						'tokens' 	   => $tokens,
-                        'ignoreDNC'    => true
-					);
-		    		$emailModel->sendEmail($email, $currentLead, $options);
-		    	}
-		    }
-		}
+            if (isset($properties['user_id']) && $properties['user_id']) {
+                // User email
+                $emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $tokens);
+            } elseif (isset($currentLead)) {
+                if (isset($leadFields['email'])) {
+                    $options = [
+                        'source'    => ['form', $form->getId()],
+                        'tokens'    => $tokens,
+                        'ignoreDNC' => true,
+                    ];
+                    $emailModel->sendEmail($email, $currentLead, $options);
+                }
+            }
+        }
     }
 }

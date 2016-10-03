@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -28,13 +29,13 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                                 <p class="small"><?php echo $config['description']; ?></p>
                                 <?php endif; ?>
                                 <p class="list-group-item-text">
-                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'import', 'preview' => $dashboard]); ?>">
                                         <?php echo $view['translator']->trans('mautic.dashboard.preview'); ?>
                                     </a>&#183;
-                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}"]); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
                                     </a><?php if ($config['type'] == 'user'): ?>&#183;
-                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}"]); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view['translator']->trans('mautic.core.form.delete')); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel')); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
                                     </a><?php endif; ?>
                                 </p>
@@ -73,8 +74,8 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
     <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php if ($widgets): ?>
             <?php foreach ($widgets as $widget): ?>
-                <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getHeight() ? $widget->getWidth() . '' : '100' ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight() . 'px' : '300px' ?>">
-                    <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', array('widget' => $widget)); ?>
+                <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getHeight() ? $widget->getWidth().'' : '100' ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight().'px' : '300px' ?>">
+                    <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', ['widget' => $widget]); ?>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>

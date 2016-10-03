@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -50,7 +51,7 @@
         </div>
          <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center text-muted">
-                <?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => date('Y'))); ?>
+                <?php echo $view['translator']->trans('mautic.core.copyright', ['%date%' => date('Y')]); ?>
             </div>
         </div>
     </div>

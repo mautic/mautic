@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -15,23 +15,23 @@ $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
-            'templateButtons' => array(
-                'new' => $permissions['notification:notifications:create']
-            ),
-            'routeBase'       => 'notification'
-        )
+        [
+            'templateButtons' => [
+                'new' => $permissions['notification:notifications:create'],
+            ],
+            'routeBase' => 'notification',
+        ]
     )
 );
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue' => $searchValue,
-        'searchHelp' => 'mautic.notification.help.searchcommands',
-        'searchId' => 'notification-search',
-        'action' => $currentRoute,
-        'routeBase' => 'notification',
+        'searchValue'     => $searchValue,
+        'searchHelp'      => 'mautic.notification.help.searchcommands',
+        'searchId'        => 'notification-search',
+        'action'          => $currentRoute,
+        'routeBase'       => 'notification',
         'templateButtons' => [
             'delete' => $permissions['notification:notifications:deleteown'] || $permissions['notification:notifications:deleteother'],
         ],

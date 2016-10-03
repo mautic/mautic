@@ -1,13 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\LeadBundle\Controller;
 
+namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,13 +23,11 @@ class TimelineController extends CommonController
     public function indexAction(Request $request, $leadId, $page = 1)
     {
         if (empty($leadId)) {
-
             return $this->accessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
-
             return $lead;
         }
 
@@ -39,14 +38,14 @@ class TimelineController extends CommonController
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', []))
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', [])),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
             $filters = null;
         }
 
-        $order  = [
+        $order = [
             $session->get('mautic.lead.'.$leadId.'.timeline.orderby'),
             $session->get('mautic.lead.'.$leadId.'.timeline.orderbydir'),
         ];
@@ -55,17 +54,17 @@ class TimelineController extends CommonController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
-                    'lead'        => $lead,
-                    'page'        => $page,
-                    'events'      => $events
+                'viewParameters' => [
+                    'lead'   => $lead,
+                    'page'   => $page,
+                    'events' => $events,
                 ],
                 'passthroughVars' => [
                     'route'         => false,
                     'mauticContent' => 'leadTimeline',
-                    'timelineCount' => $events['total']
+                    'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.php'
+                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.php',
             ]
         );
     }

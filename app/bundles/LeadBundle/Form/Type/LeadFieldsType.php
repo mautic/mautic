@@ -1,34 +1,32 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class LeadFieldsType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class LeadFieldsType.
  */
 class LeadFieldsType extends AbstractType
 {
     private $model;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->model = $factory->getModel('lead.field');
     }
 
@@ -39,18 +37,19 @@ class LeadFieldsType extends AbstractType
     {
         /** @var \Mautic\LeadBundle\Model\FieldModel $model */
         $model = $this->model;
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
                 $fieldList = $model->getFieldList();
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
+
                 return $fieldList;
             },
             'global_only' => false,
             'required'    => false,
-            'with_tags'   => false
-        ));
+            'with_tags'   => false,
+        ]);
     }
 
     /**
@@ -64,7 +63,8 @@ class LeadFieldsType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
-        return "leadfields_choices";
+    public function getName()
+    {
+        return 'leadfields_choices';
     }
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
- * Class IpLookupHelper
+ * Class IpLookupHelper.
  */
 class UserHelper
 {
@@ -34,7 +35,7 @@ class UserHelper
 
     /**
      * @param bool $nullIfGuest
-     * 
+     *
      * @return User|null
      */
     public function getUser($nullIfGuest = false)
@@ -46,12 +47,12 @@ class UserHelper
             $user = $token->getUser();
         }
 
-        if (! $user instanceof User) {
+        if (!$user instanceof User) {
             if ($nullIfGuest) {
                 return null;
             }
-            
-            $user = new User();
+
+            $user          = new User();
             $user->isGuest = true;
         }
 

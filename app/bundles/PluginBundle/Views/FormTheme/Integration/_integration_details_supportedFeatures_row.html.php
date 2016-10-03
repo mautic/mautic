@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $attr      = $form->vars['attr'];
-$builtin   = (isset($formSettings['builtin_features'])) ? $formSettings['builtin_features'] : array();
+$builtin   = (isset($formSettings['builtin_features'])) ? $formSettings['builtin_features'] : [];
 $showLabel = (count($builtin) !== count($form->children));
 ?>
 
@@ -26,7 +26,7 @@ $showLabel = (count($builtin) !== count($form->children));
             <?php if (!in_array($child->vars['value'], $builtin)): ?>
             <div class="checkbox" >
                 <label>
-                    <?php echo $view['form']->widget($child, array('attr' => $attr)); ?>
+                    <?php echo $view['form']->widget($child, ['attr' => $attr]); ?>
                     <?php echo $view['translator']->trans($child->vars['label']); ?>
                 </label>
             </div>

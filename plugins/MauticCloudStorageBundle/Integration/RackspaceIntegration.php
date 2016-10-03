@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +15,10 @@ use Gaufrette\Adapter\OpenStackCloudFiles\ObjectStoreFactory;
 use OpenCloud\Rackspace;
 
 /**
- * Class RackspaceIntegration
+ * Class RackspaceIntegration.
  */
 class RackspaceIntegration extends CloudStorageIntegration
 {
-
     /**
      * @var Rackspace
      */
@@ -38,7 +38,7 @@ class RackspaceIntegration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
@@ -48,7 +48,7 @@ class RackspaceIntegration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
@@ -62,11 +62,11 @@ class RackspaceIntegration extends CloudStorageIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             'username'      => 'mautic.integration.keyfield.Rackspace.username',
             'apiKey'        => 'mautic.integration.keyfield.Rackspace.apiKey',
-            'containerName' => 'mautic.integration.keyfield.OpenCloud.containerName'
-        );
+            'containerName' => 'mautic.integration.keyfield.OpenCloud.containerName',
+        ];
     }
 
     /**
@@ -92,10 +92,10 @@ class RackspaceIntegration extends CloudStorageIntegration
 
             $this->connection = new Rackspace(
                 $url,
-                array(
+                [
                     'username' => $keys['username'],
-                    'apiKey'   => $keys['apiKey']
-                )
+                    'apiKey'   => $keys['apiKey'],
+                ]
             );
 
             $this->storeFactory = new ObjectStoreFactory($this->connection);

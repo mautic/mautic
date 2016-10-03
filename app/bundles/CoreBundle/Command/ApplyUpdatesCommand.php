@@ -1,30 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
- * CLI Command to update the application
+ * CLI Command to update the application.
  */
 class ApplyUpdatesCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -42,7 +42,7 @@ class ApplyUpdatesCommand extends ContainerAwareCommand
                 ]
             )
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 The <info>%command.name%</info> command updates the Mautic application.
 
 <info>php %command.full_name%</info>
@@ -85,7 +85,7 @@ EOT
         if (!$force) {
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
-            $question = new ConfirmationQuestion($translator->trans('mautic.core.update.confirm_application_update'). " ", false);
+            $question = new ConfirmationQuestion($translator->trans('mautic.core.update.confirm_application_update').' ', false);
 
             if (!$helper->ask($input, $output, $question)) {
                 $output->writeln($translator->trans('mautic.core.update.aborted'));
@@ -99,12 +99,12 @@ EOT
         $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         if ($package) {
-            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.loading_package')."                  ");
+            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.loading_package').'                  ');
             $progressBar->advance();
             $zipFile = $package;
             $version = basename($package);
         } else {
-            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.loading_update_information')."                  ");
+            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.loading_update_information').'                  ');
             $progressBar->advance();
 
             $updateHelper = $this->getContainer()->get('mautic.helper.update');
@@ -116,7 +116,7 @@ EOT
                 return 1;
             }
 
-            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.download_update_package')."                  ");
+            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.download_update_package').'                  ');
             $progressBar->advance();
 
             // Fetch the update package
@@ -132,7 +132,7 @@ EOT
             $version = $update['version'];
         }
 
-        $progressBar->setMessage($translator->trans('mautic.core.command.update.step.validate_update_package')."                  ");
+        $progressBar->setMessage($translator->trans('mautic.core.command.update.step.validate_update_package').'                  ');
         $progressBar->advance();
 
         $zipper  = new \ZipArchive();
@@ -169,7 +169,7 @@ EOT
         }
 
         // Extract the archive file now in place
-        $progressBar->setMessage($translator->trans('mautic.core.update.step.extracting.package')."                  ");
+        $progressBar->setMessage($translator->trans('mautic.core.update.step.extracting.package').'                  ');
         $progressBar->advance();
 
         if (!$zipper->extractTo($appRoot)) {
@@ -190,7 +190,7 @@ EOT
 
         // Make sure we have a deleted_files list otherwise we can't process this step
         if (file_exists($appRoot.'/deleted_files.txt')) {
-            $progressBar->setMessage($translator->trans('mautic.core.update.remove.deleted.files')."                  ");
+            $progressBar->setMessage($translator->trans('mautic.core.update.remove.deleted.files').'                  ');
             $progressBar->advance();
 
             $deletedFiles = json_decode(file_get_contents($appRoot.'/deleted_files.txt'), true);
@@ -231,7 +231,7 @@ EOT
         }
 
         // Clear the dev and prod cache instances to reset the system
-        $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache')."                  ");
+        $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache').'                  ');
         $progressBar->advance();
 
         $cacheHelper = $this->getContainer()->get('mautic.helper.cache');
@@ -242,7 +242,7 @@ EOT
 
         // If there is only one language, assume it is 'en_US' and skip this
         if (count($supportedLanguages) > 1) {
-            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.update_languages'."                  "));
+            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.update_languages'.'                  '));
             $progressBar->advance();
 
             /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
@@ -272,7 +272,7 @@ EOT
         }
 
         // Migrate the database to the current version
-        $progressBar->setMessage($translator->trans('mautic.core.update.migrating.database.schema'."                  "));
+        $progressBar->setMessage($translator->trans('mautic.core.update.migrating.database.schema'.'                  '));
         $progressBar->advance();
 
         $migrationApplication = new Application($this->getContainer()->get('kernel'));
@@ -282,7 +282,7 @@ EOT
         $migrateExitCode = $migrationApplication->run($migrationCommandArgs, new NullOutput());
         unset($migrationApplication);
 
-        $progressBar->setMessage($translator->trans('mautic.core.update.step.wrapping_up'."                  "));
+        $progressBar->setMessage($translator->trans('mautic.core.update.step.wrapping_up'.'                  '));
         $progressBar->advance();
 
         // Clear the cached update data and the download package now that we've updated
@@ -295,7 +295,7 @@ EOT
         @unlink($appRoot.'/upgrade.php');
 
         // Update successful
-        $progressBar->setMessage($translator->trans('mautic.core.update.update_successful', ['%version%' => $version])."                  ");
+        $progressBar->setMessage($translator->trans('mautic.core.update.update_successful', ['%version%' => $version]).'                  ');
         $progressBar->finish();
 
         // Check for a post install message

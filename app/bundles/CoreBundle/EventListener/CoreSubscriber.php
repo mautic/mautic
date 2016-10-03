@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,12 +12,10 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
-use Mautic\CoreBundle\Event\IconEvent;
-use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
@@ -27,7 +26,6 @@ use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -35,7 +33,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
- * Class CoreSubscriber
+ * Class CoreSubscriber.
  */
 class CoreSubscriber extends CommonSubscriber
 {
@@ -82,8 +80,7 @@ class CoreSubscriber extends CommonSubscriber
         CoreParametersHelper $coreParametersHelper,
         SecurityContext $securityContext,
         UserModel $userModel
-    )
-    {
+    ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
         $this->userHelper           = $userHelper;
@@ -99,19 +96,19 @@ class CoreSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER          => [
+            KernelEvents::CONTROLLER => [
                 ['onKernelController', 0],
                 ['onKernelRequestAddGlobalJS', 0],
             ],
             CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
             CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
             CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
-            SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0]
+            SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
         ];
     }
 
     /**
-     * Add mauticForms in js script tag for Froala
+     * Add mauticForms in js script tag for Froala.
      *
      * @param FilterControllerEvent $event
      */
@@ -129,11 +126,9 @@ class CoreSubscriber extends CommonSubscriber
     }
 
     /**
-     * Set vars on login
+     * Set vars on login.
      *
      * @param InteractiveLoginEvent $event
-     *
-     * @return void
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
@@ -144,7 +139,6 @@ class CoreSubscriber extends CommonSubscriber
         $session = $event->getRequest()->getSession();
 
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
@@ -188,11 +182,9 @@ class CoreSubscriber extends CommonSubscriber
     }
 
     /**
-     * Populates namespace, bundle, controller, and action into request to be used throughout application
+     * Populates namespace, bundle, controller, and action into request to be used throughout application.
      *
      * @param FilterControllerEvent $event
-     *
-     * @return void
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -260,21 +252,19 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * @param MenuEvent $event
-     *
-     * @return void
      */
     public function onBuildMenu(MenuEvent $event)
     {
-        $name = $event->getType();
+        $name    = $event->getType();
         $bundles = $this->bundleHelper->getMauticBundles(true);
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['menu'][$name])) {
                 $menu = $bundle['config']['menu'][$name];
                 $event->addMenuItems(
-                    array(
+                    [
                         'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                        'items'    => !isset($menu['items']) ? $menu : $menu['items']
-                    )
+                        'items'    => !isset($menu['items']) ? $menu : $menu['items'],
+                    ]
                 );
             }
         }
@@ -282,8 +272,6 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * @param RouteEvent $event
-     *
-     * @return void
      */
     public function onBuildRoute(RouteEvent $event)
     {
@@ -295,7 +283,7 @@ class CoreSubscriber extends CommonSubscriber
             if (!empty($bundle['config']['routes'][$type])) {
                 foreach ($bundle['config']['routes'][$type] as $name => $details) {
                     // Set defaults and controller
-                    $defaults = (!empty($details['defaults'])) ? $details['defaults'] : array();
+                    $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];
                     if (isset($details['controller'])) {
                         $defaults['_controller'] = $details['controller'];
                     }
@@ -315,7 +303,7 @@ class CoreSubscriber extends CommonSubscriber
                     }
 
                     // Set requirements
-                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
                     // Set some very commonly used defaults and requirements
                     if (strpos($details['path'], '{page}') !== false) {
@@ -333,7 +321,7 @@ class CoreSubscriber extends CommonSubscriber
                         }
                         if (!isset($requirements['objectId'])) {
                             // Only allow alphanumeric for objectId
-                            $requirements['objectId'] = "[a-zA-Z0-9_]+";
+                            $requirements['objectId'] = '[a-zA-Z0-9_]+';
                         }
                     }
                     if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
@@ -351,13 +339,11 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * @param IconEvent $event
-     *
-     * @return void
      */
     public function onFetchIcons(IconEvent $event)
     {
         $session = $this->request->getSession();
-        $icons   = $session->get('mautic.menu.icons', array());
+        $icons   = $session->get('mautic.menu.icons', []);
 
         if (empty($icons)) {
             $bundles = $this->bundleHelper->getMauticBundles(true);

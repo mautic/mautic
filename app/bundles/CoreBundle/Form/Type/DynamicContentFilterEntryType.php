@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,18 +20,16 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class DynamicContentFilterEntryType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class DynamicContentFilterEntryType.
  */
 class DynamicContentFilterEntryType extends AbstractType
 {
-    private $fieldChoices = [];
-    private $countryChoices = [];
-    private $regionChoices = [];
+    private $fieldChoices    = [];
+    private $countryChoices  = [];
+    private $regionChoices   = [];
     private $timezoneChoices = [];
-    private $stageChoices = [];
-    private $localeChoices = [];
+    private $stageChoices    = [];
+    private $localeChoices   = [];
 
     /**
      * DynamicContentFilterEntryType constructor.
@@ -40,7 +39,7 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     public function __construct(ListModel $listModel, StageModel $stageModel)
     {
-        $this->fieldChoices    = $listModel->getChoiceFields();
+        $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();
 
@@ -68,8 +67,8 @@ class DynamicContentFilterEntryType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-basic'
-                ]
+                    'class' => 'form-control editor editor-basic',
+                ],
             ]
         );
 
@@ -78,11 +77,11 @@ class DynamicContentFilterEntryType extends AbstractType
                 'filters',
                 'collection',
                 [
-                    'type' => 'dynamic_content_filter_entry_filters',
+                    'type'    => 'dynamic_content_filter_entry_filters',
                     'options' => [
                         'label' => false,
                         'attr'  => [
-                            'class' => 'form-control'
+                            'class' => 'form-control',
                         ],
                         'countries' => $this->countryChoices,
                         'regions'   => $this->regionChoices,
@@ -94,7 +93,7 @@ class DynamicContentFilterEntryType extends AbstractType
                     'mapped'         => true,
                     'allow_add'      => true,
                     'allow_delete'   => true,
-                    'label'          => false
+                    'label'          => false,
                 ]
             )
         );
@@ -114,10 +113,10 @@ class DynamicContentFilterEntryType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'label'          => false,
-                'error_bubbling' => false
-            )
+                'error_bubbling' => false,
+            ]
         );
     }
 
@@ -126,7 +125,7 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     public function getName()
     {
-        return "dynamic_content_filter_entry";
+        return 'dynamic_content_filter_entry';
     }
 
     private function filterFieldChoices()

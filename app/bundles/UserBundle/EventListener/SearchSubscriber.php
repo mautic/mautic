@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,9 +17,7 @@ use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\UserBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
@@ -40,19 +39,19 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function __construct(UserModel $userModel, RoleModel $roleModel)
     {
-        $this->userModel = $userModel;
+        $this->userModel     = $userModel;
         $this->userRoleModel = $roleModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
@@ -64,31 +63,31 @@ class SearchSubscriber extends CommonSubscriber
 
         if ($this->security->isGranted('user:users:view')) {
             $users = $this->userModel->getEntities(
-                array(
+                [
                     'limit'  => 5,
-                    'filter' => $str
-                ));
+                    'filter' => $str,
+                ]);
 
             if (count($users) > 0) {
-                $userResults = array();
+                $userResults = [];
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
                     $userResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
-                        array(
+                        [
                             'user'    => $user,
-                            'canEdit' => $canEdit
-                        )
+                            'canEdit' => $canEdit,
+                        ]
                     )->getContent();
                 }
                 if (count($users) > 5) {
                     $userResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($users) - 5)
-                        )
+                            'remaining'    => (count($users) - 5),
+                        ]
                     )->getContent();
                 }
                 $userResults['count'] = count($users);
@@ -98,31 +97,31 @@ class SearchSubscriber extends CommonSubscriber
 
         if ($this->security->isGranted('user:roles:view')) {
             $roles = $this->userRoleModel->getEntities(
-                array(
+                [
                     'limit'  => 5,
-                    'filter' => $str
-                ));
+                    'filter' => $str,
+                ]);
             if (count($roles)) {
-                $roleResults = array();
+                $roleResults = [];
                 $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
                     $roleResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
-                        array(
+                        [
                             'role'    => $role,
-                            'canEdit' => $canEdit
-                        )
+                            'canEdit' => $canEdit,
+                        ]
                     )->getContent();
                 }
                 if (count($roles) > 5) {
                     $roleResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($roles) - 5)
-                        )
+                            'remaining'    => (count($roles) - 5),
+                        ]
                     )->getContent();
                 }
                 $roleResults['count'] = count($roles);
@@ -149,5 +148,4 @@ class SearchSubscriber extends CommonSubscriber
             );
         }
     }
-
 }

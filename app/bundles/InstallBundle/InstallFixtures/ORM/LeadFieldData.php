@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +15,13 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Mautic\LeadBundle\Entity\LeadField;
 
 /**
- * Class LeadFieldData
+ * Class LeadFieldData.
  */
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -42,7 +43,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $fieldGroups['lead'] = FieldModel::$coreFields;
+        $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 
         $translator   = $this->container->get('translator');
@@ -83,7 +84,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $indexesToAdd[$object][] = $alias;
 
                 $this->addReference('leadfield-'.$alias, $entity);
-                $order++;
+                ++$order;
             }
 
             $schema->executeChanges();
@@ -106,9 +107,9 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             }
             if ($object == 'lead') {
                 // Add an attribution index
-                $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX . 'contact_attribution');
-
+                $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
             } else {
+                $indexHelper->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
                 $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
             }
             $indexHelper->executeChanges();

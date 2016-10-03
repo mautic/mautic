@@ -1,13 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
  * Modified from
+ *
  * @see         https://github.com/barbushin/php-imap
+ *
  * @author      Barbushin Sergey http://linkedin.com/in/barbushin
  * @copyright   BSD (three-clause)
  */
@@ -22,137 +25,137 @@ use stdClass;
 class Mailbox
 {
     /**
-     * Return all mails matching the rest of the criteria
+     * Return all mails matching the rest of the criteria.
      */
     const CRITERIA_ALL = 'ALL';
 
     /**
-     * Match mails with the \\ANSWERED flag set
+     * Match mails with the \\ANSWERED flag set.
      */
     const CRITERIA_ANSWERED = 'ANSWERED';
 
     /**
-     * CRITERIA_BCC "string" - match mails with "string" in the Bcc: field
+     * CRITERIA_BCC "string" - match mails with "string" in the Bcc: field.
      */
-    const CRITERIA_BCC = "BCC";
+    const CRITERIA_BCC = 'BCC';
 
     /**
-     * CRITERIA_BEFORE "date" - match mails with Date: before "date"
+     * CRITERIA_BEFORE "date" - match mails with Date: before "date".
      */
-    const CRITERIA_BEFORE = "BEFORE";
+    const CRITERIA_BEFORE = 'BEFORE';
 
     /**
-     * CRITERIA_BODY "string" - match mails with "string" in the body of the mail
+     * CRITERIA_BODY "string" - match mails with "string" in the body of the mail.
      */
-    const CRITERIA_BODY = "BODY";
+    const CRITERIA_BODY = 'BODY';
 
     /**
-     * CRITERIA_CC "string" - match mails with "string" in the Cc: field
+     * CRITERIA_CC "string" - match mails with "string" in the Cc: field.
      */
-    const CRITERIA_CC = "CC";
+    const CRITERIA_CC = 'CC';
 
     /**
-     * Match deleted mails
+     * Match deleted mails.
      */
-    const CRITERIA_DELETED = "DELETED";
+    const CRITERIA_DELETED = 'DELETED';
 
     /**
-     * Match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set
+     * Match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set.
      */
-    const CRITERIA_FLAGGED = "FLAGGED";
+    const CRITERIA_FLAGGED = 'FLAGGED';
 
     /**
-     * CRITERIA_FROM "string" - match mails with "string" in the From: field
+     * CRITERIA_FROM "string" - match mails with "string" in the From: field.
      */
-    const CRITERIA_FROM = "FROM";
+    const CRITERIA_FROM = 'FROM';
 
     /**
-     *  CRITERIA_KEYWORD "string" - match mails with "string" as a keyword
+     *  CRITERIA_KEYWORD "string" - match mails with "string" as a keyword.
      */
-    const CRITERIA_KEYWORD = "KEYWORD";
+    const CRITERIA_KEYWORD = 'KEYWORD';
 
     /**
-     * Match new mails
+     * Match new mails.
      */
-    const CRITERIA_NEW = "NEW";
+    const CRITERIA_NEW = 'NEW';
 
     /**
-     * Match old mails
+     * Match old mails.
      */
-    const CRITERIA_OLD = "OLD";
+    const CRITERIA_OLD = 'OLD';
 
     /**
-     * CRITERIA_ON "date" - match mails with Date: matching "date"
+     * CRITERIA_ON "date" - match mails with Date: matching "date".
      */
-    const CRITERIA_ON = "ON";
+    const CRITERIA_ON = 'ON';
 
     /**
-     * Match mails with the \\RECENT flag set
+     * Match mails with the \\RECENT flag set.
      */
-    const CRITERIA_RECENT = "RECENT";
+    const CRITERIA_RECENT = 'RECENT';
 
     /**
-     * Match mails that have been read (the \\SEEN flag is set)
+     * Match mails that have been read (the \\SEEN flag is set).
      */
-    const CRITERIA_SEEN = "SEEN";
+    const CRITERIA_SEEN = 'SEEN';
 
     /**
-     * CRITERIA_SINCE "date" - match mails with Date: after "date"
+     * CRITERIA_SINCE "date" - match mails with Date: after "date".
      */
-    const CRITERIA_SINCE = "SINCE";
+    const CRITERIA_SINCE = 'SINCE';
 
     /**
-     *  CRITERIA_SUBJECT "string" - match mails with "string" in the Subject:
+     *  CRITERIA_SUBJECT "string" - match mails with "string" in the Subject:.
      */
-    const CRITERIA_SUBJECT = "SUBJECT";
+    const CRITERIA_SUBJECT = 'SUBJECT';
 
     /**
-     * CRITERIA_TEXT "string" - match mails with text "string"
+     * CRITERIA_TEXT "string" - match mails with text "string".
      */
-    const CRITERIA_TEXT = "TEXT";
+    const CRITERIA_TEXT = 'TEXT';
 
     /**
-     * CRITERIA_TO "string" - match mails with "string" in the To:
+     * CRITERIA_TO "string" - match mails with "string" in the To:.
      */
-    const CRITERIA_TO = "TO";
+    const CRITERIA_TO = 'TO';
 
     /**
-     *  Match mails that have not been answered
+     *  Match mails that have not been answered.
      */
-    const CRITERIA_UNANSWERED = "UNANSWERED";
+    const CRITERIA_UNANSWERED = 'UNANSWERED';
 
     /**
-     * Match mails that are not deleted
+     * Match mails that are not deleted.
      */
-    const CRITERIA_UNDELETED = "UNDELETED";
+    const CRITERIA_UNDELETED = 'UNDELETED';
 
     /**
-     * Match mails that are not flagged
+     * Match mails that are not flagged.
      */
-    const CRITERIA_UNFLAGGED = "UNFLAGGED";
+    const CRITERIA_UNFLAGGED = 'UNFLAGGED';
 
     /**
-     * CRITERIA_UNKEYWORD "string" - match mails that do not have the keyword "string"
+     * CRITERIA_UNKEYWORD "string" - match mails that do not have the keyword "string".
      */
-    const CRITERIA_UNKEYWORD = "UNKEYWORD";
+    const CRITERIA_UNKEYWORD = 'UNKEYWORD';
 
     /**
-     * Match mails which have not been read yet
+     * Match mails which have not been read yet.
      */
-    const CRITERIA_UNSEEN = "UNSEEN";
+    const CRITERIA_UNSEEN = 'UNSEEN';
 
     /**
-     * Match mails which have not been read yet - alias of CRITERIA_UNSEEN
+     * Match mails which have not been read yet - alias of CRITERIA_UNSEEN.
      */
     const CRITERIA_UNREAD = 'UNSEEN';
 
     protected $imapPath;
     protected $imapFullPath;
     protected $imapStream;
-    protected $imapFolder = 'INBOX';
-    protected $imapOptions = 0;
+    protected $imapFolder     = 'INBOX';
+    protected $imapOptions    = 0;
     protected $imapRetriesNum = 0;
-    protected $imapParams = [];
+    protected $imapParams     = [];
     protected $serverEncoding = 'UTF-8';
     protected $attachmentsDir;
     protected $settings;
@@ -177,7 +180,7 @@ class Mailbox
                 'port'       => '',
                 'password'   => '',
                 'user'       => '',
-                'encryption' => ''
+                'encryption' => '',
             ];
         }
 
@@ -195,12 +198,13 @@ class Mailbox
     }
 
     /**
-     * Returns if a mailbox is configured
+     * Returns if a mailbox is configured.
      *
      * @param null $bundleKey
      * @param null $folderKey
      *
      * @return bool
+     *
      * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null)
@@ -209,19 +213,18 @@ class Mailbox
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
             } catch (MailboxException $e) {
-
                 return false;
             }
         }
 
-        return (
+        return
             !empty($this->settings['host']) && !empty($this->settings['port']) && !empty($this->settings['user'])
             && !empty($this->settings['password'])
-        );
+        ;
     }
 
     /**
-     * Switch to another configured monitored mailbox
+     * Switch to another configured monitored mailbox.
      *
      * @param        $bundle
      * @param string $mailbox
@@ -243,7 +246,7 @@ class Mailbox
     }
 
     /**
-     * Returns if this is a Gmail connection
+     * Returns if this is a Gmail connection.
      *
      * @return mixed
      */
@@ -253,7 +256,7 @@ class Mailbox
     }
 
     /**
-     * Set imap path based on mailbox settings
+     * Set imap path based on mailbox settings.
      *
      * @param null $settings
      */
@@ -274,7 +277,7 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /**
+        /*
          * @var $host
          * @var $port
          * @var $encryption
@@ -297,7 +300,7 @@ class Mailbox
     }
 
     /**
-     * Override mailbox settings
+     * Override mailbox settings.
      *
      * @param array $settings
      */
@@ -311,18 +314,18 @@ class Mailbox
     }
 
     /**
-     * Get settings
+     * Get settings.
      *
      * @param        $bundle
      * @param string $mailbox
      *
      * @return mixed
+     *
      * @throws MailboxException
      */
     public function getMailboxSettings($bundle = null, $mailbox = '')
     {
         if ($bundle == null) {
-
             return $this->settings;
         }
 
@@ -344,7 +347,7 @@ class Mailbox
     }
 
     /**
-     * Set custom connection arguments of imap_open method. See http://php.net/imap_open
+     * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
      *
      * @param int   $options
      * @param int   $retriesNum
@@ -358,7 +361,7 @@ class Mailbox
     }
 
     /**
-     * Switch to another box
+     * Switch to another box.
      *
      * @param $folder
      */
@@ -373,7 +376,7 @@ class Mailbox
     }
 
     /**
-     * Get IMAP mailbox connection stream
+     * Get IMAP mailbox connection stream.
      *
      * @return null|resource
      */
@@ -390,6 +393,7 @@ class Mailbox
 
     /**
      * @return resource
+     *
      * @throws MailboxException
      */
     protected function initImapStream()
@@ -411,13 +415,13 @@ class Mailbox
     }
 
     /**
-     * Check if the stream is connected
+     * Check if the stream is connected.
      *
      * @return bool
      */
     protected function isConnected()
     {
-        return ($this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream));
+        return $this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream);
     }
 
     /**
@@ -461,7 +465,7 @@ class Mailbox
     }
 
     /**
-     * Gets listing the folders
+     * Gets listing the folders.
      *
      * This function returns an object containing listing the folders.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
@@ -473,11 +477,11 @@ class Mailbox
         static $folders = [];
 
         if (!isset($folders[$this->imapFullPath]) && $this->isConfigured()) {
-            $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, "*");
+            $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, '*');
 
             if (!empty($tempFolders)) {
                 foreach ($tempFolders as $key => $folder) {
-                    $folder            = str_replace($this->imapPath, "", imap_utf8($folder));
+                    $folder            = str_replace($this->imapPath, '', imap_utf8($folder));
                     $tempFolders[$key] = $folder;
                 }
             } else {
@@ -491,7 +495,7 @@ class Mailbox
     }
 
     /**
-     * Fetch unread messages
+     * Fetch unread messages.
      *
      * @param null $folder
      *
@@ -558,7 +562,7 @@ class Mailbox
      */
     public function saveMail($mailId, $filename = 'email.eml')
     {
-        return imap_savebody($this->getImapStream(), $filename, $mailId, "", FT_UID);
+        return imap_savebody($this->getImapStream(), $filename, $mailId, '', FT_UID);
     }
 
     /**
@@ -574,7 +578,7 @@ class Mailbox
     }
 
     /**
-     * Move mail to another box
+     * Move mail to another box.
      *
      * @param $mailId
      * @param $mailBox
@@ -672,7 +676,7 @@ class Mailbox
      * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
      *
      * @param array  $mailsIds
-     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060.
+     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -685,7 +689,7 @@ class Mailbox
      * Cause a store to delete the specified flag to the flags set for the mails in the specified sequence.
      *
      * @param array  $mailsIds
-     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060.
+     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -695,7 +699,7 @@ class Mailbox
     }
 
     /**
-     * Fetch mail headers for listed mails ids
+     * Fetch mail headers for listed mails ids.
      *
      * Returns an array of objects describing one mail header each. The object will only define a property if it exists. The possible properties are:
      *  subject - the mails subject
@@ -754,14 +758,13 @@ class Mailbox
      *
      * @return object Object with info | FALSE on failure
      */
-
     public function getMailboxInfo()
     {
         return imap_mailboxmsginfo($this->getImapStream());
     }
 
     /**
-     * Gets mails ids sorted by some criteria
+     * Gets mails ids sorted by some criteria.
      *
      * Criteria can be one (and only one) of the following constants:
      *  SORTDATE - mail Date
@@ -783,7 +786,7 @@ class Mailbox
     }
 
     /**
-     * Get mails count in mail box
+     * Get mails count in mail box.
      *
      * @return int
      */
@@ -793,7 +796,7 @@ class Mailbox
     }
 
     /**
-     * Retrieve the quota settings per user
+     * Retrieve the quota settings per user.
      *
      * @return array - FALSE in the case of call failure
      */
@@ -803,7 +806,7 @@ class Mailbox
     }
 
     /**
-     * Return quota limit in KB
+     * Return quota limit in KB.
      *
      * @return int - FALSE in the case of call failure
      */
@@ -818,7 +821,7 @@ class Mailbox
     }
 
     /**
-     * Return quota usage in KB
+     * Return quota usage in KB.
      *
      * @return int - FALSE in the case of call failure
      */
@@ -833,7 +836,7 @@ class Mailbox
     }
 
     /**
-     * Get mail data
+     * Get mail data.
      *
      * @param      $mailId
      * @param bool $markAsSeen
@@ -845,11 +848,11 @@ class Mailbox
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);
 
-        $mail              = new Message();
-        $mail->id          = $mailId;
-        $mail->date        = date('Y-m-d H:i:s', isset($headObject->date) ? strtotime(preg_replace('/\(.*?\)/', '', $headObject->date)) : time());
-        $mail->subject     = isset($headObject->subject) ? $this->decodeMimeStr($headObject->subject, $this->serverEncoding) : null;
-        $mail->fromName    = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding)
+        $mail           = new Message();
+        $mail->id       = $mailId;
+        $mail->date     = date('Y-m-d H:i:s', isset($headObject->date) ? strtotime(preg_replace('/\(.*?\)/', '', $headObject->date)) : time());
+        $mail->subject  = isset($headObject->subject) ? $this->decodeMimeStr($headObject->subject, $this->serverEncoding) : null;
+        $mail->fromName = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding)
             : null;
         $mail->fromAddress = strtolower($headObject->from[0]->mailbox.'@'.$headObject->from[0]->host);
 
@@ -897,7 +900,7 @@ class Mailbox
         if (is_array($tempArray) && count($tempArray)) {
             $headers = [];
             foreach ($tempArray as $line) {
-                if (preg_match("/^X-(.*?): (.*?)$/is", trim($line), $matches)) {
+                if (preg_match('/^X-(.*?): (.*?)$/is', trim($line), $matches)) {
                     $headers['x-'.strtolower($matches[1])] = $matches[2];
                 }
             }
@@ -908,12 +911,12 @@ class Mailbox
     }
 
     /**
-     * @param Message      $mail
-     * @param              $partStructure
-     * @param              $partNum
-     * @param bool|true    $markAsSeen
-     * @param bool|false   $isDsn
-     * @param bool|false   $isFbl
+     * @param Message    $mail
+     * @param            $partStructure
+     * @param            $partNum
+     * @param bool|true  $markAsSeen
+     * @param bool|false $isDsn
+     * @param bool|false $isFbl
      */
     protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
     {
@@ -943,7 +946,7 @@ class Mailbox
 
         // attachments
         $attachmentId = $partStructure->ifid
-            ? trim($partStructure->id, " <>")
+            ? trim($partStructure->id, ' <>')
             : (isset($params['filename']) || isset($params['name']) ? mt_rand().mt_rand() : null);
 
         if ($attachmentId) {
@@ -958,13 +961,13 @@ class Mailbox
             $attachment->id   = $attachmentId;
             $attachment->name = $fileName;
             if ($this->attachmentsDir) {
-                $replace              = [
+                $replace = [
                     '/\s/'                   => '_',
                     '/[^0-9a-zа-яіїє_\.]/iu' => '',
                     '/_+/'                   => '_',
                     '/(^_)|(_$)/'            => '',
                 ];
-                $fileSysName          = preg_replace(
+                $fileSysName = preg_replace(
                     '~[\\\\/]~',
                     '',
                     $mail->id.'_'.$attachmentId.'_'.preg_replace(array_keys($replace), $replace, $fileName)
@@ -1005,11 +1008,11 @@ class Mailbox
                         switch ($reportType) {
                             case 'delivery-status':
                                 $mail->dsnMessage = trim($data);
-                                $isDsn = true;
+                                $isDsn            = true;
                                 break;
                             case 'feedback-report':
                                 $mail->fblMessage = trim($data);
-                                $isFbl = true;
+                                $isFbl            = true;
                                 break;
                             default:
                                 // Just pass through.
@@ -1018,11 +1021,9 @@ class Mailbox
                     case TYPEMESSAGE:
                         if ($isDsn || ($subtype == 'delivery-status')) {
                             $mail->dsnReport = $data;
-                        }
-                        elseif ($isFbl || ($subtype == 'feedback-report')) {
+                        } elseif ($isFbl || ($subtype == 'feedback-report')) {
                             $mail->fblReport = $data;
-                        }
-                        else {
+                        } else {
                             $mail->textPlain .= trim($data);
                         }
                         break;
@@ -1079,7 +1080,7 @@ class Mailbox
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
-        for ($i = 0; $i < count($elements); $i++) {
+        for ($i = 0; $i < count($elements); ++$i) {
             if ($elements[$i]->charset == 'default') {
                 $elements[$i]->charset = 'iso-8859-1';
             }
@@ -1144,7 +1145,7 @@ class Mailbox
     }
 
     /**
-     * Close IMAP connection
+     * Close IMAP connection.
      */
     protected function disconnect()
     {
@@ -1158,7 +1159,7 @@ class Mailbox
     }
 
     /**
-     * Disconnect on destruct
+     * Disconnect on destruct.
      */
     public function __destruct()
     {

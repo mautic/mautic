@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
     $childrenAttributes = $item->getChildrenAttributes();
     if (!isset($childrenAttributes['class'])) {
@@ -24,15 +24,15 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         //builds the class attributes based on options
         $view['menu']->buildClasses($child, $matcher, $options);
 
-        $showChildren   = ($child->hasChildren() && $child->getDisplayChildren());
-        $liAttributes   = $child->getAttributes();
-        $isAncestor     = $matcher->isAncestor($child, $options["matchingDepth"]);
-        $extras         = $child->getExtras();
+        $showChildren = ($child->hasChildren() && $child->getDisplayChildren());
+        $liAttributes = $child->getAttributes();
+        $isAncestor   = $matcher->isAncestor($child, $options['matchingDepth']);
+        $extras       = $child->getExtras();
 
         if (!empty($extras['divider'])) {
             echo "<li role=\"separator\" class=\"divider\"></li>\n";
         } elseif (!empty($extras['header'])) {
-            echo "<li class=\"dropdown-header\">".$view['translator']->trans($extras['header'])."</li>\n";
+            echo '<li class="dropdown-header">'.$view['translator']->trans($extras['header'])."</li>\n";
         } else {
             echo "<li{$view['menu']->parseAttributes($liAttributes)}>\n";
 

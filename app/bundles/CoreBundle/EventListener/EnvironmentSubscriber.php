@@ -1,41 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\MauticController;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\MenuEvent;
-use Mautic\CoreBundle\Event\RouteEvent;
-use Mautic\CoreBundle\Event\IconEvent;
-use Mautic\ApiBundle\Event as ApiEvents;
-use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\LoginEvent;
-use Mautic\UserBundle\Model\UserModel;
-use Mautic\UserBundle\UserEvents;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
- * Class EnvironmentSubscriber
+ * Class EnvironmentSubscriber.
  */
 class EnvironmentSubscriber extends CommonSubscriber
 {
@@ -61,14 +43,17 @@ class EnvironmentSubscriber extends CommonSubscriber
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequestSetTimezone', 9999],
-                ['onKernelRequestSetLocale', 15], // Must be 15 to load after Symfony's default Locale listener
+                // Cannot be called earlier than priority 128 or the session is not populated leading to Doctrine's UTCDateTimeType leaving
+                // entity DateTime values in UTC
+                ['onKernelRequestSetTimezone', 128],
+                // Must be 15 to load after Symfony's default Locale listener
+                ['onKernelRequestSetLocale', 15],
             ],
         ];
     }
 
     /**
-     * Set timezone
+     * Set timezone.
      *
      * @param GetResponseEvent $event
      */
@@ -90,11 +75,9 @@ class EnvironmentSubscriber extends CommonSubscriber
     }
 
     /**
-     * Set default locale
+     * Set default locale.
      *
      * @param GetResponseEvent $event
-     *
-     * @return void
      */
     public function onKernelRequestSetLocale(GetResponseEvent $event)
     {

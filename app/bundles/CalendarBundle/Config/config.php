@@ -1,41 +1,42 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes' => array(
-        'main' => array(
-            'mautic_calendar_index'  => array(
+return [
+    'routes' => [
+        'main' => [
+            'mautic_calendar_index' => [
                 'path'       => '/calendar',
-                'controller' => 'MauticCalendarBundle:Default:index'
-            ),
-            'mautic_calendar_action' => array(
+                'controller' => 'MauticCalendarBundle:Default:index',
+            ],
+            'mautic_calendar_action' => [
                 'path'       => '/calendar/{objectAction}',
-                'controller' => 'MauticCalendarBundle:Default:execute'
-            )
-        )
-    ),
-    'services' => array(
-        'models' =>  array(
-            'mautic.calendar.model.calendar' => array(
-                'class' => 'Mautic\CalendarBundle\Model\CalendarModel'
-            )
-        )
-    ),
-    'menu'   => array(
-        'main' => array(
+                'controller' => 'MauticCalendarBundle:Default:execute',
+            ],
+        ],
+    ],
+    'services' => [
+        'models' => [
+            'mautic.calendar.model.calendar' => [
+                'class' => 'Mautic\CalendarBundle\Model\CalendarModel',
+            ],
+        ],
+    ],
+    'menu' => [
+        'main' => [
             'priority' => 90,
-            'items'    => array(
-                'mautic.calendar.menu.index' => array(
+            'items'    => [
+                'mautic.calendar.menu.index' => [
                     'route'     => 'mautic_calendar_index',
-                    'iconClass' => 'fa-calendar'
-                )
-            )
-        )
-    )
-);
+                    'iconClass' => 'fa-calendar',
+                ],
+            ],
+        ],
+    ],
+];

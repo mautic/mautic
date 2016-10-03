@@ -1,14 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 
-<div class="tab-pane dynamic-content bdr-w-0<?php echo ($form->vars['name'] === '0' ? ' active' : ' fade'); ?>" id="<?php echo $form->vars['id'] ?>">
+<div class="tab-pane dynamic-content bdr-w-0<?php echo $form->vars['name'] === '0' ? ' active' : ' fade'; ?>" id="<?php echo $form->vars['id'] ?>">
     <div class="row">
         <div class="col-xs-10">
             <?php echo $view['form']->row($form['tokenName']); ?>

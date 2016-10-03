@@ -1,15 +1,15 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'focus');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.focus'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.focus'));
 
 $view['slots']->set(
     'actions',
@@ -19,7 +19,7 @@ $view['slots']->set(
             'templateButtons' => [
                 'new' => $permissions['plugin:focus:items:create'],
             ],
-            'routeBase'       => 'focus',
+            'routeBase' => 'focus',
         ]
     )
 );

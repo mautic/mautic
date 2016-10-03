@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,12 +17,12 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\PluginEvents;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class PluginController
+ * Class PluginController.
  */
 class PluginController extends FormController
 {
@@ -40,7 +41,7 @@ class PluginController extends FormController
         // List of plugins for filter and to show as a single integration
         $plugins = $pluginModel->getEntities(
             [
-                'hydration_mode' => 'hydrate_array'
+                'hydration_mode' => 'hydrate_array',
             ]
         );
 
@@ -52,7 +53,7 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-        $integrations       = $foundPlugins = [];
+        $integrations       = $foundPlugins       = [];
 
         foreach ($integrationObjects as $name => $object) {
             $settings            = $object->getIntegrationSettings();
@@ -62,7 +63,7 @@ class PluginController extends FormController
                 'icon'     => $integrationHelper->getIconPath($object),
                 'enabled'  => $settings->isPublished(),
                 'plugin'   => $settings->getPlugin()->getId(),
-                'isBundle' => false
+                'isBundle' => false,
             ];
 
             $foundPlugins[$settings->getPlugin()->getId()] = true;
@@ -77,7 +78,7 @@ class PluginController extends FormController
                 'enabled'     => true,
                 'plugin'      => $plugin['id'],
                 'description' => $plugin['description'],
-                'isBundle'    => true
+                'isBundle'    => true,
             ];
         }
 
@@ -103,18 +104,18 @@ class PluginController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'items'        => $integrations,
                     'tmpl'         => $tmpl,
                     'pluginFilter' => ($pluginFilter) ? ['id' => $pluginId, 'name' => $pluginName] : false,
-                    'plugins'      => $plugins
+                    'plugins'      => $plugins,
                 ],
                 'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
                     'route'         => $this->generateUrl('mautic_plugin_index'),
-                ]
+                ],
             ]
         );
     }
@@ -153,7 +154,7 @@ class PluginController extends FormController
                 'integration'        => $entity->getName(),
                 'lead_fields'        => $leadFields,
                 'integration_object' => $integrationObject,
-                'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name])
+                'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name]),
             ]
         );
 
@@ -210,7 +211,7 @@ class PluginController extends FormController
                     if ($authorize) {
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-                        $event    = $this->dispatcher->dispatch(
+                        $event = $this->dispatcher->dispatch(
                             PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
@@ -224,7 +225,7 @@ class PluginController extends FormController
                                 'integration'         => $integration,
                                 'authUrl'             => $oauthUrl,
                                 'authorize'           => 1,
-                                'popupBlockerMessage' => $this->translator->trans('mautic.core.popupblocked')
+                                'popupBlockerMessage' => $this->translator->trans('mautic.core.popupblocked'),
                             ]
                         );
                     }
@@ -250,7 +251,7 @@ class PluginController extends FormController
         $themes      = [$default];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
-        } else if ($objectTheme !== $default) {
+        } elseif ($objectTheme !== $default) {
             $themes[] = $objectTheme;
         }
 
@@ -264,26 +265,26 @@ class PluginController extends FormController
             if (!empty($specialInstructions)) {
                 $formNotes[$section] = [
                     'note' => $specialInstructions,
-                    'type' => $alertType
+                    'type' => $alertType,
                 ];
             }
         }
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form'         => $this->setFormTheme($form, $template, $themes),
                     'description'  => $integrationObject->getDescription(),
                     'formSettings' => $formSettings,
                     'formNotes'    => $formNotes,
-                    'callbackUrl'  => $callbackUrl
+                    'callbackUrl'  => $callbackUrl,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
-                    'route'         => false
-                ]
+                    'route'         => false,
+                ],
             ]
         );
     }
@@ -304,7 +305,7 @@ class PluginController extends FormController
 
         $bundle = $pluginModel->getRepository()->findOneBy(
             [
-                'bundle' => InputHelper::clean($name)
+                'bundle' => InputHelper::clean($name),
             ]
         );
 
@@ -317,7 +318,7 @@ class PluginController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
@@ -325,14 +326,14 @@ class PluginController extends FormController
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
-                    'route'         => false
-                ]
+                    'route'         => false,
+                ],
             ]
         );
     }
 
     /**
-     * Scans the addon bundles directly and loads bundles which are not registered to the database
+     * Scans the addon bundles directly and loads bundles which are not registered to the database.
      *
      * @return JsonResponse
      */
@@ -345,7 +346,7 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Model\PluginModel $model */
         $model   = $this->getModel('plugin');
         $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
-        $added   = $disabled = $updated = 0;
+        $added   = $disabled   = $updated   = 0;
 
         // Get the metadata for plugins for installation
         $em             = $this->get('doctrine.orm.entity_manager');
@@ -388,12 +389,12 @@ class PluginController extends FormController
 
         $installedPlugins = $model->getEntities(
             [
-                'index' => 'bundle'
+                'index' => 'bundle',
             ]
         );
 
         /**
-         * @var string $bundle
+         * @var string
          * @var Plugin $plugin
          */
         foreach ($installedPlugins as $bundle => $plugin) {
@@ -402,7 +403,7 @@ class PluginController extends FormController
                 if (!$plugin->getIsMissing()) {
                     //files are no longer found
                     $plugin->setIsMissing(true);
-                    $disabled++;
+                    ++$disabled;
                 }
             } else {
                 if ($plugin->getIsMissing()) {
@@ -421,11 +422,11 @@ class PluginController extends FormController
                     //compare versions to see if an update is necessary
                     $version = isset($details['version']) ? $details['version'] : '';
                     if (!empty($version) && version_compare($plugin->getVersion(), $version) == -1) {
-                        $updated++;
+                        ++$updated;
 
                         //call the update callback
-                        $callback        = $plugins[$bundle]['bundleClass'];
-                        $metadata        = (isset($pluginMetadata[$plugins[$bundle]['namespace']]))
+                        $callback = $plugins[$bundle]['bundleClass'];
+                        $metadata = (isset($pluginMetadata[$plugins[$bundle]['namespace']]))
                             ? $pluginMetadata[$plugins[$bundle]['namespace']] : null;
                         $installedSchema = (isset($pluginInstalledSchemas[$plugins[$bundle]['namespace']]))
                             ? $pluginInstalledSchemas[$plugins[$bundle]['namespace']] : null;
@@ -461,7 +462,7 @@ class PluginController extends FormController
 
         //rest are new
         foreach ($plugins as $plugin) {
-            $added++;
+            ++$added;
             $entity = new Plugin();
             $entity->setBundle($plugin['bundle']);
 
@@ -473,7 +474,7 @@ class PluginController extends FormController
 
                 if (isset($details['version'])) {
                     $entity->setVersion($details['version']);
-                };
+                }
 
                 $entity->setName(
                     isset($details['name']) ? $details['name'] : $plugin['base']
@@ -509,12 +510,12 @@ class PluginController extends FormController
             [
                 '%added%'    => $added,
                 '%disabled%' => $disabled,
-                '%updated%'  => $updated
+                '%updated%'  => $updated,
             ]
         );
 
         $viewParameters = [
-            'page' => $this->get('session')->get('mautic.plugin.page')
+            'page' => $this->get('session')->get('mautic.plugin.page'),
         ];
 
         // Refresh the index contents
@@ -525,8 +526,8 @@ class PluginController extends FormController
                 'contentTemplate' => 'MauticPluginBundle:Plugin:index',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
-                    'mauticContent' => 'plugin'
-                ]
+                    'mauticContent' => 'plugin',
+                ],
             ]
         );
     }

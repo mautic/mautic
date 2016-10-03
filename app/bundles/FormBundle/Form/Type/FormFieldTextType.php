@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +15,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FormFieldTextType
+ * Class FormFieldTextType.
  */
 class FormFieldTextType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -26,22 +26,22 @@ class FormFieldTextType extends AbstractType
     {
         $editor = ($options['editor']) ? ' editor editor-advanced' : '';
 
-        $builder->add('text', 'textarea', array(
+        $builder->add('text', 'textarea', [
             'label'      => 'mautic.form.field.type.freetext',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control' . $editor),
-            'required'   => true
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'.$editor],
+            'required'   => true,
+        ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'editor' => false
-        ));
+        $resolver->setDefaults([
+            'editor' => false,
+        ]);
     }
 
     /**
@@ -49,6 +49,6 @@ class FormFieldTextType extends AbstractType
      */
     public function getName()
     {
-        return "formfield_text";
+        return 'formfield_text';
     }
 }

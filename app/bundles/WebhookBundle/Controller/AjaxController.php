@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -21,15 +22,14 @@ class AjaxController extends CommonAjaxController
         $url = InputHelper::url($request->request->get('url'));
 
         // validate the URL
-        if ($url == '' || ! $url) {
+        if ($url == '' || !$url) {
             // default to an error message
-            $dataArray = array(
+            $dataArray = [
                 'success' => 1,
-                'html' =>
-                    '<div class="has-error"><span class="help-block">'
-                    . $this->translator->trans('mautic.webhook.label.no.url')
-                    . '</span></div>',
-            );
+                'html'    => '<div class="has-error"><span class="help-block">'
+                    .$this->translator->trans('mautic.webhook.label.no.url')
+                    .'</span></div>',
+            ];
 
             return $this->sendJsonResponse($dataArray);
         }
@@ -38,9 +38,9 @@ class AjaxController extends CommonAjaxController
         $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
 
         $payloadPaths = $this->getPayloadPaths($selectedTypes);
-        $payloads = $this->loadPayloads($payloadPaths);
+        $payloads     = $this->loadPayloads($payloadPaths);
 
-        $now = new \DateTime;
+        $now = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
 
@@ -54,20 +54,19 @@ class AjaxController extends CommonAjaxController
         $response = $http->post($url, json_encode($payloads), $headers);
 
         // default to an error message
-        $dataArray = array(
+        $dataArray = [
             'success' => 1,
-            'html' =>
-                '<div class="has-error"><span class="help-block">'
-                . $this->translator->trans('mautic.webhook.label.warning')
-                . '</span></div>',
-        );
+            'html'    => '<div class="has-error"><span class="help-block">'
+                .$this->translator->trans('mautic.webhook.label.warning')
+                .'</span></div>',
+        ];
 
         // if we get a 200 response convert to success message
         if ($response->code == 200) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
-                . $this->translator->trans('mautic.webhook.label.success')
-                . '</span></div>';
+                .$this->translator->trans('mautic.webhook.label.success')
+                .'</span></div>';
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -81,10 +80,9 @@ class AjaxController extends CommonAjaxController
      */
     public function getPayloadPaths($types)
     {
-        $payloadPaths = array();
+        $payloadPaths = [];
 
-        foreach ($types as $type)
-        {
+        foreach ($types as $type) {
             // takes an input like mautic.lead_on_something
             // converts to array pieces using _
             $typePath = explode('_', $type);
@@ -111,7 +109,7 @@ class AjaxController extends CommonAjaxController
 
             $bundleName = (array_pop($prefixParts));
 
-            $payloadPath .= '/' . ucfirst($bundleName) . 'Bundle/Assets/WebhookPayload/' . $bundleName . '_' . $eventName . '.json';
+            $payloadPath .= '/'.ucfirst($bundleName).'Bundle/Assets/WebhookPayload/'.$bundleName.'_'.$eventName.'.json';
 
             $payloadPaths[$type] = $payloadPath;
         }
@@ -127,10 +125,9 @@ class AjaxController extends CommonAjaxController
      */
     public function loadPayloads($paths)
     {
-        $payloads = array();
+        $payloads = [];
 
-        foreach ($paths as $key => $path)
-        {
+        foreach ($paths as $key => $path) {
             if (file_exists($path)) {
                 $payloads[$key] = json_decode(file_get_contents($path), true);
             }

@@ -1,47 +1,43 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 /**
- * Class ReportSubscriber
- *
- * @package Mautic\ReportBundle\EventListener
+ * Class ReportSubscriber.
  */
 class ReportSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
         ];
     }
 
     /**
-     * Add available tables and columns to the report builder lookup
+     * Add available tables and columns to the report builder lookup.
      *
      * @param ReportBuilderEvent $event
-     *
-     * @return void
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -51,13 +47,13 @@ class ReportSubscriber extends CommonSubscriber
             $columns = [
                 $prefix.'alias' => [
                     'label' => 'mautic.core.alias',
-                    'type'  => 'string'
-                ]
+                    'type'  => 'string',
+                ],
             ];
             $columns = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_form_action'), $event->getCategoryColumns());
             $data    = [
                 'display_name' => 'mautic.form.forms',
-                'columns'      => $columns
+                'columns'      => $columns,
             ];
             $event->addTable('forms', $data);
             if ($event->checkContext('form.submissions')) {
@@ -67,25 +63,25 @@ class ReportSubscriber extends CommonSubscriber
                 $submissionColumns = [
                     $submissionPrefix.'date_submitted' => [
                         'label' => 'mautic.form.report.submit.date_submitted',
-                        'type'  => 'datetime'
+                        'type'  => 'datetime',
                     ],
-                    $submissionPrefix.'referer'        => [
+                    $submissionPrefix.'referer' => [
                         'label' => 'mautic.core.referer',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $pagePrefix.'id'                   => [
+                    $pagePrefix.'id' => [
                         'label' => 'mautic.form.report.page_id',
                         'type'  => 'int',
-                        'link'  => 'mautic_page_action'
+                        'link'  => 'mautic_page_action',
                     ],
-                    $pagePrefix.'name'                 => [
+                    $pagePrefix.'name' => [
                         'label' => 'mautic.form.report.page_name',
-                        'type'  => 'string'
-                    ]
+                        'type'  => 'string',
+                    ],
                 ];
-                $data              = [
+                $data = [
                     'display_name' => 'mautic.form.report.submission.table',
-                    'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
+                    'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn()),
                 ];
                 $event->addTable('form.submissions', $data, 'forms');
 
@@ -99,11 +95,9 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGeneratorEvent $event
-     *
-     * @return void
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -131,7 +125,7 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGraphEvent $event
      */

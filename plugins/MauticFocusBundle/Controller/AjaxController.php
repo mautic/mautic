@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
-use League\ColorExtractor\Client as ColorExtractor;
 
 class AjaxController extends CommonAjaxController
 {
@@ -55,7 +55,7 @@ class AjaxController extends CommonAjaxController
                             'buttonColor'     => $palette[1],
                             'buttonTextColor' => FocusModel::isLightColor($palette[1]) ? '#000000' : '#ffffff',
                         ];
-                        $data['success']          = 1;
+                        $data['success'] = 1;
                     }
                 }
             }

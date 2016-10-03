@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
 
@@ -18,7 +18,7 @@ $header = ($activeForm->getId())
     )
     :
     $view['translator']->trans('mautic.form.form.header.new');
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
 $formId = $form['sessionId']->vars['data'];
 ?>
@@ -94,12 +94,12 @@ $formId = $form['sessionId']->vars['data'];
                                     <?php echo $view->render(
                                         'MauticFormBundle:Builder:fieldwrapper.html.php',
                                         [
-                                            'template' => $template,
-                                            'field'    => $field,
-                                            'inForm'   => true,
-                                            'id'       => $field['id'],
-                                            'formId'   => $formId,
-                                            'contactFields' => $contactFields
+                                            'template'      => $template,
+                                            'field'         => $field,
+                                            'inForm'        => true,
+                                            'id'            => $field['id'],
+                                            'formId'        => $formId,
+                                            'contactFields' => $contactFields,
                                         ]
                                     ); ?>
                                 <?php endif; ?>
@@ -132,15 +132,17 @@ $formId = $form['sessionId']->vars['data'];
                                                         'action'       => $e,
                                                         'type'         => $k,
                                                         'isStandalone' => $activeForm->isStandalone(),
-                                                        'formId'       => $form['sessionId']->vars['data']
+                                                        'formId'       => $form['sessionId']->vars['data'],
                                                     ]
                                                 )."\n\n";
-                                                if (!empty($e['allowCampaignForm']))
+                                                if (!empty($e['allowCampaignForm'])) {
                                                     $campaignActionFound = true;
+                                                }
                                             endforeach;
                                             $class = (empty($campaignActionFound)) ? ' action-standalone-only' : '';
-                                            if (!$campaignActionFound && !$activeForm->isStandalone())
+                                            if (!$campaignActionFound && !$activeForm->isStandalone()) {
                                                 $class .= ' hide';
+                                            }
                                             ?>
                                             <li role="presentation" class="dropdown-header<?php echo $class; ?>">
                                                 <?php echo $view['translator']->trans($group); ?>
@@ -152,7 +154,7 @@ $formId = $form['sessionId']->vars['data'];
                             </div>
                             <?php foreach ($formActions as $action): ?>
                                 <?php if (!in_array($action['id'], $deletedActions)) : ?>
-                                    <?php $template     = (isset($actionSettings[$action['type']]['template']))
+                                    <?php $template = (isset($actionSettings[$action['type']]['template']))
                                         ? $actionSettings[$action['type']]['template']
                                         :
                                         'MauticFormBundle:Action:generic.html.php';
@@ -201,8 +203,8 @@ if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
     echo $view->render(
         'MauticCoreBundle:Helper:form_selecttype.html.php',
         [
-            'item'               => $activeForm,
-            'mauticLang'         => [
+            'item'       => $activeForm,
+            'mauticLang' => [
                 'newStandaloneForm' => 'mautic.form.type.standalone.header',
                 'newCampaignForm'   => 'mautic.form.type.campaign.header',
             ],

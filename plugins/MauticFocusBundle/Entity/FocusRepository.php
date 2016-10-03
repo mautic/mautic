@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -28,7 +29,7 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *

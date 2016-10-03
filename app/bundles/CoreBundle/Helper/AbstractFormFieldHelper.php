@@ -1,35 +1,36 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\CoreBundle\Helper;
 
+namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractFormFieldHelper
 {
     /**
-     * Json encoded format
+     * Json encoded format.
      */
     const FORMAT_JSON = 'json';
 
     /**
-     * Bar format value1|value2
+     * Bar format value1|value2.
      */
     const FORMAT_BAR = 'bar';
 
     /**
-     * Simple value => label array
+     * Simple value => label array.
      */
     const FORMAT_SIMPLE_ARRAY = 'simple_array';
 
     /**
-     * Array [['value' => 'value', 'label' => 'label'] ..]
+     * Array [['value' => 'value', 'label' => 'label'] ..].
      */
     const FORMAT_ARRAY = 'array';
 
@@ -62,7 +63,7 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * Set translator
+     * Set translator.
      *
      * @param TranslatorInterface $translator
      */
@@ -94,14 +95,14 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * Format a string into an array
+     * Format a string into an array.
      *
      * @param      $list
      * @param bool $removeEmpty
      *
      * @return array
      */
-    static function parseList($list, $removeEmpty = true, $ignoreNumerical = false)
+    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false)
     {
         // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
         // for BC purposes
@@ -113,7 +114,7 @@ abstract class AbstractFormFieldHelper
             } else {
                 if (strpos($list, '|') !== false) {
                     $checkNumericalKeys = false;
-                    $parts = explode('||', $list);
+                    $parts              = explode('||', $list);
                     if (count($parts) > 1) {
                         $labels = explode('|', $parts[0]);
                         $values = explode('|', $parts[1]);
@@ -163,7 +164,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return array|string
      */
-    static function formatList($format, $choices)
+    public static function formatList($format, $choices)
     {
         switch ($format) {
             case self::FORMAT_JSON:
@@ -177,9 +178,10 @@ abstract class AbstractFormFieldHelper
                 foreach ($choices as $value => $label) {
                     $array[] = [
                         'label' => $label,
-                        'value' => $value
+                        'value' => $value,
                     ];
                 }
+
                 return $array;
         }
     }
@@ -191,7 +193,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return array|string
      */
-    static function parseListStringIntoArray($list)
+    public static function parseListStringIntoArray($list)
     {
         return self::parseList($list);
     }

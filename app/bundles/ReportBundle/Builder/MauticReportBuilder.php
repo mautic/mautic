@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Mautic Report Builder class
+ * Mautic Report Builder class.
  */
 final class MauticReportBuilder implements ReportBuilderInterface
 {
@@ -27,7 +28,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * @var array
      */
     const OPERATORS = [
-        'default'     => [
+        'default' => [
             'eq'       => 'mautic.core.operator.equals',
             'gt'       => 'mautic.core.operator.greaterthan',
             'gte'      => 'mautic.core.operator.greaterthanequals',
@@ -39,27 +40,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
             'empty'    => 'mautic.core.operator.isempty',
             'notEmpty' => 'mautic.core.operator.isnotempty',
         ],
-        'bool'        => [
+        'bool' => [
             'eq'  => 'mautic.core.operator.equals',
             'neq' => 'mautic.core.operator.notequals',
         ],
         'int' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'gt'       => 'mautic.core.operator.greaterthan',
-            'gte'      => 'mautic.core.operator.greaterthanequals',
-            'lt'       => 'mautic.core.operator.lessthan',
-            'lte'      => 'mautic.core.operator.lessthanequals',
-            'neq'      => 'mautic.core.operator.notequals'
+            'eq'  => 'mautic.core.operator.equals',
+            'gt'  => 'mautic.core.operator.greaterthan',
+            'gte' => 'mautic.core.operator.greaterthanequals',
+            'lt'  => 'mautic.core.operator.lessthan',
+            'lte' => 'mautic.core.operator.lessthanequals',
+            'neq' => 'mautic.core.operator.notequals',
         ],
         'multiselect' => [
             'in'    => 'mautic.core.operator.in',
-            'notIn' => 'mautic.core.operator.notin'
+            'notIn' => 'mautic.core.operator.notin',
         ],
-        'select'      => [
-            'eq'       => 'mautic.core.operator.equals',
-            'neq'      => 'mautic.core.operator.notequals',
+        'select' => [
+            'eq'  => 'mautic.core.operator.equals',
+            'neq' => 'mautic.core.operator.notequals',
         ],
-        'text'        => [
+        'text' => [
             'eq'       => 'mautic.core.operator.equals',
             'neq'      => 'mautic.core.operator.notequals',
             'empty'    => 'mautic.core.operator.isempty',
@@ -113,7 +114,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder = $this->configureBuilder($options);
 
         if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
-
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -121,7 +121,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Gets the getContentTemplate path
+     * Gets the getContentTemplate path.
      *
      * @return string
      */
@@ -131,7 +131,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Configures builder
+     * Configures builder.
      *
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
@@ -155,7 +155,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $this->contentTemplate = $event->getContentTemplate();
 
         // Build WHERE clause
-        $filtersApplied =  false;
+        $filtersApplied = false;
         if (isset($options['dynamicFilters'])) {
             $filtersApplied = $this->applyFilters($options['dynamicFilters'], $queryBuilder, $options['filters']);
         }
@@ -237,7 +237,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     if (isset($options['columns'][$field]['alias'])) {
-                        $select .= " AS ".$options['columns'][$field]['alias'];
+                        $select .= ' AS '.$options['columns'][$field]['alias'];
                     }
 
                     $selectColumns[] = $select;
@@ -313,7 +313,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-
 
                         $filterExpr->add(
                             $expr->{$exprFunction}($filter['column'], $columnValue)

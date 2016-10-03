@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,10 +14,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class FormSubscriber
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
@@ -54,14 +54,14 @@ class FormSubscriber extends CommonSubscriber
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
     {
         $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel = $auditLogModel;
-        $this->mailer        = $mailer->getMailer();
+        $this->auditLogModel  = $auditLogModel;
+        $this->mailer         = $mailer->getMailer();
     }
 
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -75,7 +75,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -84,19 +84,19 @@ class FormSubscriber extends CommonSubscriber
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "form",
-                "object"    => "form",
-                "objectId"  => $form->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
+                'bundle'    => 'form',
+                'object'    => 'form',
+                'objectId'  => $form->getId(),
+                'action'    => ($event->isNew()) ? 'create' : 'update',
+                'details'   => $details,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -104,18 +104,18 @@ class FormSubscriber extends CommonSubscriber
     {
         $form = $event->getForm();
         $log  = [
-            "bundle"    => "form",
-            "object"    => "form",
-            "objectId"  => $form->deletedId,
-            "action"    => "delete",
-            "details"   => array('name' => $form->getName()),
-            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
+            'bundle'    => 'form',
+            'object'    => 'form',
+            'objectId'  => $form->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $form->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
     }
 
     /**
-     * Add a simple email form
+     * Add a simple email form.
      *
      * @param Events\FormBuilderEvent $event
      */
@@ -130,8 +130,8 @@ class FormSubscriber extends CommonSubscriber
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
+            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ];
 
         $event->addSubmitAction('form.email', $action);
@@ -147,8 +147,8 @@ class FormSubscriber extends CommonSubscriber
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
+            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ];
 
         $event->addSubmitAction('form.repost', $action);
@@ -290,7 +290,7 @@ class FormSubscriber extends CommonSubscriber
                 $post['array'] = $post;
                 $results       = $this->postToHtml($post);
                 $submission    = $event->getSubmission();
-                $emails        = $emails = $this->getEmailsFromString($email);
+                $emails        = $emails        = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -299,7 +299,7 @@ class FormSubscriber extends CommonSubscriber
                     $this->translator->trans(
                         'mautic.form.action.repost.failed_message',
                         [
-                            '%link%'    => $this->router->generate(
+                            '%link%' => $this->router->generate(
                                 'mautic_form_results',
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -387,7 +387,7 @@ class FormSubscriber extends CommonSubscriber
             } else {
                 $output .= $row;
             }
-            $output .= "</td></tr>";
+            $output .= '</td></tr>';
         }
         $output .= '</table>';
 

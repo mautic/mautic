@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
 $view['slots']->set('mauticContent', 'config');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.config.header.index'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.config.header.index'));
 
 $configKeys = array_keys($form->children);
 ?>
@@ -26,11 +27,13 @@ $configKeys = array_keys($form->children);
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
             <?php foreach ($configKeys as $i => $key) : ?>
-                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) continue; ?>
+                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) {
+    continue;
+} ?>
                 <li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
                     <?php $containsErrors = ($view['form']->containsErrors($form[$key])) ? ' text-danger' : ''; ?>
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps<?php echo $containsErrors; ?>">
-                        <?php echo $view['translator']->trans('mautic.config.tab.' . $key); ?>
+                        <?php echo $view['translator']->trans('mautic.config.tab.'.$key); ?>
                         <?php if ($containsErrors): ?>
                             <i class="fa fa-warning"></i>
                         <?php endif; ?>
@@ -48,7 +51,9 @@ $configKeys = array_keys($form->children);
         <div class="tab-content">
             <?php foreach ($configKeys as $i => $key) : ?>
             <?php
-                if (!isset($formConfigs[$key])) continue;
+                if (!isset($formConfigs[$key])) {
+                    continue;
+                }
                 if (!count($form[$key]->children)):
                     $form[$key]->setRendered();
                     continue;

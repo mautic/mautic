@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 /**
- * Class SchemaHelperFactory
+ * Class SchemaHelperFactory.
  */
 class SchemaHelperFactory
 {
@@ -22,8 +23,8 @@ class SchemaHelperFactory
     /**
      * SchemaHelperFactory constructor.
      *
-     * @param TableSchemaHelper $tableSchemaHelper
-     * @param IndexSchemaHelper $indexSchemaHelper
+     * @param TableSchemaHelper  $tableSchemaHelper
+     * @param IndexSchemaHelper  $indexSchemaHelper
      * @param ColumnSchemaHelper $columnSchemaHelper
      */
     public function __construct(TableSchemaHelper $tableSchemaHelper, IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
@@ -34,7 +35,7 @@ class SchemaHelperFactory
     }
 
     /**
-     * Get a schema helper
+     * Get a schema helper.
      *
      * @param $type
      * @param null $name
@@ -43,10 +44,10 @@ class SchemaHelperFactory
      */
     public function getSchemaHelper($type, $name = null)
     {
-        if (! array_key_exists($type, $this->helpers)) {
+        if (!array_key_exists($type, $this->helpers)) {
             throw new \InvalidArgumentException(sprintf('The requested helper (%s) is not a valid schema helper.', $type));
         }
-        
+
         if ($name && method_exists($this->helpers[$type], 'setName')) {
             $this->helpers[$type]->setName($name);
         }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,15 +14,13 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 /**
- * Class SocialEvent
- *
- * @package MauticPlugin\MauticSocialBundle
+ * Class SocialEvent.
  */
 class SocialEvent extends CommonEvent
 {
     /**
      * @param Monitoring $monitoring
-     * @param bool $isNew
+     * @param bool       $isNew
      */
     public function __construct(Monitoring $monitoring, $isNew = false)
     {
@@ -30,7 +29,7 @@ class SocialEvent extends CommonEvent
     }
 
     /**
-     * Returns the Monitoring entity
+     * Returns the Monitoring entity.
      *
      * @return Monitoring
      */
@@ -40,7 +39,7 @@ class SocialEvent extends CommonEvent
     }
 
     /**
-     * Sets the Monitoring entity
+     * Sets the Monitoring entity.
      *
      * @param Monitoring $monitoring
      */

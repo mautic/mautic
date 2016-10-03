@@ -1,22 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Menu;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class MenuHelper
+ * Class MenuHelper.
  */
 class MenuHelper
 {
@@ -31,12 +30,7 @@ class MenuHelper
     protected $request;
 
     /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * Stores items that are assigned to another parent outside it's bundle
+     * Stores items that are assigned to another parent outside it's bundle.
      *
      * @var array
      */
@@ -51,24 +45,22 @@ class MenuHelper
      * MenuHelper constructor.
      *
      * @param CorePermissions $security
-     * @param UserHelper      $userHelper
      * @param RequestStack    $requestStack
      * @param array           $mauticParameters
      */
-    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters)
     {
         $this->security         = $security;
-        $this->user             = $userHelper->getUser();
         $this->mauticParameters = $mauticParameters;
         $this->request          = $requestStack->getCurrentRequest();
     }
 
     /**
-     * Converts menu config into something KNP menus expects
+     * Converts menu config into something KNP menus expects.
      *
-     * @param      $items
-     * @param int  $depth
-     * @param int  $defaultPriority
+     * @param     $items
+     * @param int $depth
+     * @param int $defaultPriority
      */
     public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
     {
@@ -91,7 +83,7 @@ class MenuHelper
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
-                    if (!$this->user->isAdmin()) {
+                    if (!$this->security->isAdmin()) {
                         unset($items[$k]);
                         continue;
                     }
@@ -137,7 +129,7 @@ class MenuHelper
             if (!isset($i['linkAttributes'])) {
                 $i['linkAttributes'] = [
                     'data-menu-link' => $i['id'],
-                    'id'             => $i['id']
+                    'id'             => $i['id'],
                 ];
             } elseif (!isset($i['linkAttributes']['id'])) {
                 $i['linkAttributes']['id']             = $i['id'];
@@ -193,7 +185,7 @@ class MenuHelper
     }
 
     /**
-     * Get and reset orphaned menu items
+     * Get and reset orphaned menu items.
      *
      * @return array
      */
@@ -206,7 +198,7 @@ class MenuHelper
     }
 
     /**
-     * Give orphaned menu items a home
+     * Give orphaned menu items a home.
      *
      * @param array $menuItems
      * @param bool  $appendOrphans
@@ -248,7 +240,7 @@ class MenuHelper
     }
 
     /**
-     * Sort menu items by priority
+     * Sort menu items by priority.
      *
      * @param $menuItems
      * @param $defaultPriority
@@ -276,7 +268,6 @@ class MenuHelper
             }
         );
     }
-
 
     /**
      * @param $name
