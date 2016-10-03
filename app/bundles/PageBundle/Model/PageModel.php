@@ -119,7 +119,7 @@ class PageModel extends FormModel
     public function getRepository()
     {
         $repo = $this->em->getRepository('MauticPageBundle:Page');
-        $repo->setCurrentUser($this->user);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
     }
@@ -311,7 +311,7 @@ class PageModel extends FormModel
             case 'page':
                 $viewOther = $this->security->isGranted('page:pages:viewother');
                 $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->user);
+                $repo->setCurrentUser($this->userHelper->getUser());
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
         }
@@ -807,7 +807,7 @@ class PageModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
             ->andWhere('p.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -987,7 +987,7 @@ class PageModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('p.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1019,7 +1019,7 @@ class PageModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

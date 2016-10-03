@@ -126,7 +126,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function getUserCompanies()
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
-            $this->user : false;
+            $this->userHelper->getUser() : false;
         $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
         return $companies;
@@ -541,9 +541,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $expr->orX(
                             $expr->andX(
                                 $expr->isNull('comp.owner_id'),
-                                $expr->eq('comp.created_by', (int) $this->user->getId())
+                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
                             ),
-                            $expr->eq('comp.owner_id', (int) $this->user->getId())
+                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
                         )
                     );
                 }

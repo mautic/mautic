@@ -134,7 +134,7 @@ abstract class AbstractCommonModel
      *
      * @param UserHelper $userHelper
      */
-    public function setUser(UserHelper $userHelper)
+    public function setUserHelper(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
     }
@@ -201,7 +201,7 @@ abstract class AbstractCommonModel
 
         if ($repo instanceof CommonRepository) {
             $repo->setTranslator($this->translator);
-            $repo->setCurrentUser($this->user);
+            $repo->setCurrentUser($this->userHelper->getUser());
 
             return $repo->getEntities($args);
         }

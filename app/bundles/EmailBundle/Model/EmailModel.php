@@ -1724,7 +1724,7 @@ class EmailModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -1932,7 +1932,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1971,7 +1971,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1995,7 +1995,7 @@ class EmailModel extends FormModel
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $leadEventLogRepository->setCurrentUser($this->user);
+        $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',

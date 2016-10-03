@@ -29,9 +29,9 @@ class FormModel extends AbstractCommonModel
     {
         //lock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
-            if ($this->user->getId()) {
+            if ($this->userHelper->getUser()->getId()) {
                 $entity->setCheckedOut(new \DateTime());
-                $entity->setCheckedOutBy($this->user);
+                $entity->setCheckedOutBy($this->userHelper->getUser());
                 $this->em->persist($entity);
                 $this->em->flush();
             }
@@ -52,7 +52,7 @@ class FormModel extends AbstractCommonModel
             if (!empty($checkedOut)) {
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
-                if (!empty($checkedOutBy) && $checkedOutBy !== $this->user->getId()) {
+                if (!empty($checkedOutBy) && $checkedOutBy !== $this->userHelper->getUser()->getId()) {
                     return true;
                 }
             }
@@ -205,11 +205,11 @@ class FormModel extends AbstractCommonModel
                 $entity->setDateAdded(new \DateTime());
             }
 
-            if ($this->user instanceof User) {
+            if ($this->userHelper->getUser() instanceof User) {
                 if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
-                    $entity->setCreatedBy($this->user);
+                    $entity->setCreatedBy($this->userHelper->getUser());
                 } elseif (method_exists($entity, 'setCreatedByUser') && !$entity->getCreatedByUser()) {
-                    $entity->setCreatedByUser($this->user->getName());
+                    $entity->setCreatedByUser($this->userHelper->getUser()->getName());
                 }
             }
         } else {
@@ -217,11 +217,11 @@ class FormModel extends AbstractCommonModel
                 $entity->setDateModified(new \DateTime());
             }
 
-            if ($this->user instanceof User) {
+            if ($this->userHelper->getUser() instanceof User) {
                 if (method_exists($entity, 'setModifiedBy')) {
-                    $entity->setModifiedBy($this->user);
+                    $entity->setModifiedBy($this->userHelper->getUser());
                 } elseif (method_exists($entity, 'setModifiedByUser')) {
-                    $entity->setModifiedByUser($this->user->getName());
+                    $entity->setModifiedByUser($this->userHelper->getUser()->getName());
                 }
             }
         }
