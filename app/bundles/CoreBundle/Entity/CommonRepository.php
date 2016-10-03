@@ -599,7 +599,7 @@ class CommonRepository extends EntityRepository
 
         if ($q instanceof QueryBuilder) {
             $xFunc    = 'orX';
-            $exprFunc = 'notLike';
+            $exprFunc = 'like';
         } else {
             $ormQb = false;
             if ($filter->not) {
