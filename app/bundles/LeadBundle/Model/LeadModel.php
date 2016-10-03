@@ -1515,20 +1515,12 @@ class LeadModel extends FormModel
             );
         }
 
-        $booleanTrue  = ['1', 'true', 'yes'];
-        $booleanFalse = ['0', 'false', 'no'];
-
         foreach ($leadFields as $leadField) {
             if (isset($fieldData[$leadField['alias']])) {
 
                 // Adjust the boolean values from text to boolean
                 if ($leadField['type'] == 'boolean') {
-                    $value = strtolower($fieldData[$leadField['alias']]);
-                    if (in_array($value, $booleanTrue)) {
-                        $fieldData[$leadField['alias']] = 1;
-                    } elseif (in_array($value, $booleanFalse)) {
-                        $fieldData[$leadField['alias']] = 0;
-                    }
+                    $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
                 }
 
                 // Skip if the value is in the CSV row
