@@ -755,4 +755,232 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $dnc);
     }
+
+    /**
+     * Test that DoNotContact is honored.
+     */
+    public function testDoNotContactIsHonored()
+    {
+        // Setup dependencies
+        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $themeHelper = $this->getMockBuilder(ThemeHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailHelper = $this->getMockBuilder(MailHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $trackableModel = $this->getMockBuilder(TrackableModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Setup the translator
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(false));
+
+        // Setup the repositories
+        $emailRepository = $this->getMockBuilder(EmailRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailRepository->method('getDoNotEmailList')
+            ->will($this->returnValue([1 => 'someone@domain.com']));
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $frequencyRepository = $this->getMockBuilder(FrequencyRuleRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Setup the EntityManager
+        $entityManager = $this
+            ->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticEmailBundle:Email', $emailRepository],
+                        ['MauticEmailBundle:Stat', $statRepository],
+                        ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
+                    ]
+                )
+            );
+
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // If it makes it to the point of calling getContactCompanies then DNC failed
+        $companyModel->expects($this->exactly(0))
+            ->method('getRepository');
+
+        $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
+            $ipLookupHelper,
+            $themeHelper,
+            $mailboxHelper,
+            $mailHelper,
+            $leadModel,
+            $companyModel,
+            $trackableModel,
+            $userModel,
+            $coreParametersHelper,
+            $messageModel
+        );
+
+        $emailModel->setTranslator($translator);
+        $emailModel->setEntityManager($entityManager);
+
+        $emailEntity = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailEntity->method('getId')
+            ->will($this->returnValue(1));
+
+        $this->assertTrue(count($emailModel->sendEmail($emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])) === 0);
+    }
+
+    /**
+     * Test that message is queued for a frequency rule value.
+     */
+    public function testFrequencyRulesAreAppliedAndMessageGetsQueued()
+    {
+        // Setup dependencies
+        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $themeHelper = $this->getMockBuilder(ThemeHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailboxHelper = $this->getMockBuilder(Mailbox::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailHelper = $this->getMockBuilder(MailHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $trackableModel = $this->getMockBuilder(TrackableModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $userModel = $this->getMockBuilder(UserModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Setup the translator
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(false));
+
+        // Setup the repositories
+        $emailRepository = $this->getMockBuilder(EmailRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailRepository->method('getDoNotEmailList')
+            ->will($this->returnValue([]));
+        $statRepository = $this->getMockBuilder(StatRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $frequencyRepository = $this->getMockBuilder(FrequencyRuleRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $frequencyRepository->method('getAppliedFrequencyRules')
+            ->will($this->returnValue([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]));
+
+        // Setup the EntityManager
+        $entityManager = $this
+            ->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticEmailBundle:Email', $emailRepository],
+                        ['MauticEmailBundle:Stat', $statRepository],
+                        ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
+                    ]
+                )
+            );
+
+        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $messageModel->expects($this->exactly(1))
+            ->method('addToQueue');
+
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
+            $ipLookupHelper,
+            $themeHelper,
+            $mailboxHelper,
+            $mailHelper,
+            $leadModel,
+            $companyModel,
+            $trackableModel,
+            $userModel,
+            $coreParametersHelper,
+            $messageModel
+        );
+
+        $emailModel->setTranslator($translator);
+        $emailModel->setEntityManager($entityManager);
+
+        $emailEntity = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailEntity->method('getId')
+            ->will($this->returnValue(1));
+
+        $result = $emailModel->sendEmail($emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']], ['email_type' => 'marketing']);
+        $this->assertTrue(count($result) === 0);
+    }
 }
