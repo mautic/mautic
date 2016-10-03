@@ -127,7 +127,7 @@
                     div.text(untrimmed_val);
                     $('body').append(div);
                     w = div.width() + 25;
-                    f_width = field.outerWidth();
+                    f_width = field.closest('.chosen-choices').outerWidth();
 
                     // Mautic - only apply container width if not hidden which will result in a bad size
                     if (w > f_width - 10) {
