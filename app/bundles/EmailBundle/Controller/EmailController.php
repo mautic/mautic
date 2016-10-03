@@ -559,10 +559,9 @@ class EmailController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'emailId'      => $entity->getId(),
-                        'emailSubject' => $entity->getSubject(),
-                        'emailName'    => $entity->getName(),
-                        'emailLang'    => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

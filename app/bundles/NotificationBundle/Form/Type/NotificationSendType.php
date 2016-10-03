@@ -66,7 +66,7 @@ class NotificationSendType extends AbstractType
             $builder->add('newNotificationButton', 'button', [
                 'attr' => [
                     'class'   => 'btn btn-primary btn-nospin',
-                    'onclick' => 'Mautic.loadNewNotificationWindow({
+                    'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
                     'icon' => 'fa fa-plus',
@@ -87,7 +87,7 @@ class NotificationSendType extends AbstractType
             $builder->add('editNotificationButton', 'button', [
                 'attr' => [
                     'class'    => 'btn btn-primary btn-nospin',
-                    'onclick'  => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                    'onclick'  => 'Mautic.loadNewWindow(Mautic.standardNotificationUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                     'disabled' => !isset($notification),
                     'icon'     => 'fa fa-edit',
                 ],

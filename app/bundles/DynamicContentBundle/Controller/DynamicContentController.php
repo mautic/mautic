@@ -188,10 +188,10 @@ class DynamicContentController extends FormController
                 $passthrough = array_merge(
                     $passthrough,
                     [
-                        'updateSelect'       => $form['updateSelect']->getData(),
-                        'dynamicContentId'   => $entity->getId(),
-                        'dynamicContentName' => $entity->getName(),
-                        'dynamicContentLang' => $entity->getLanguage(),
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

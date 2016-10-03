@@ -414,9 +414,9 @@ class SmsController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId'        => $entity->getId(),
-                        'smsName'      => $entity->getName(),
-                        'smsLang'      => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

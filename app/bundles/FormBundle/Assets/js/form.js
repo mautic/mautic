@@ -258,7 +258,7 @@ Mautic.selectFormType = function(formType) {
         mQuery('.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
-    console.log(mQuery('li.action-standalone-only').length);
+
     mQuery('#mauticform_formType').val(formType);
 
     mQuery('body').removeClass('noscroll');

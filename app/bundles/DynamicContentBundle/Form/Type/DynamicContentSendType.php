@@ -78,7 +78,7 @@ class DynamicContentSendType extends AbstractType
                     'label' => 'mautic.dynamicContent.send.new.dynamicContent',
                     'attr'  => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewDynamicContentWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
                         'icon' => 'fa fa-plus',
@@ -107,7 +107,7 @@ class DynamicContentSendType extends AbstractType
                     'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
                     'attr'  => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewDynamicContentWindow(Mautic.standardDynamicContentUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardDynamicContentUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($dynamicContent),
                         'icon'     => 'fa fa-edit',
                     ],
