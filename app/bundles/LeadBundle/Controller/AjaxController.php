@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
+    use AjaxLookupControllerTrait;
+
     /**
      * @param Request $request
      *
@@ -101,7 +104,7 @@ class AjaxController extends CommonAjaxController
         $leadField = InputHelper::clean($request->query->get('field'));
         if (!empty($leadField)) {
             if (strpos($leadField, 'company') === 0) {
-                $results = $this->getModel('lead.company')->getLookupResults('company', [$leadField, $filter]);
+                $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
                 foreach ($results as $r) {
                     $dataArray[] = ['value' => $r['label']];
                 }

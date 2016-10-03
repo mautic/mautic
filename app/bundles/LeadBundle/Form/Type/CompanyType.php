@@ -32,7 +32,10 @@ class CompanyType extends AbstractType
     private $em;
 
     /**
-     * @param EntityManager $entityManager
+     * CompanyType constructor.
+     *
+     * @param EntityManager   $entityManager
+     * @param CorePermissions $security
      */
     public function __construct(EntityManager $entityManager, CorePermissions $security)
     {
@@ -69,7 +72,7 @@ class CompanyType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if (empty($options['update_select'])) {
+        if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
                 'form_buttons',
@@ -77,6 +80,7 @@ class CompanyType extends AbstractType
                     'apply_text' => false,
                 ]
             );
+
             $builder->add(
                 'updateSelect',
                 'hidden',

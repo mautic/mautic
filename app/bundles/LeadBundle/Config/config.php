@@ -396,7 +396,13 @@ return [
             ],
             'mautic.company.list.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
-                'arguments' => ['mautic.lead.model.company',  'mautic.helper.user'],
+                'arguments' => [
+                    'mautic.lead.model.company',
+                    'mautic.helper.user',
+                    'translator',
+                    'router',
+                    'database_connection',
+                ],
                 'alias'     => 'company_list',
             ],
         ],

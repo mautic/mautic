@@ -43,14 +43,9 @@ class AddToCompanyActionType extends AbstractType
             'company',
             'company_list',
             [
-                'label'      => 'mautic.company.selectcompany',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.company.choose.company_descr',
-                ],
                 'multiple'    => false,
                 'required'    => true,
+                'modal_route' => false,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.company.choosecompany.notblank']
@@ -74,10 +69,8 @@ class AddToCompanyActionType extends AbstractType
             [
                 'attr' => [
                     'class'   => 'btn btn-primary btn-nospin',
-                    'onclick' => 'Mautic.loadNewCompanyWindow({
-                    "windowUrl": "'.$windowUrl.'"
-                })',
-                    'icon' => 'fa fa-plus',
+                    'onclick' => 'Mautic.loadNewWindow({"windowUrl": "'.$windowUrl.'"})',
+                    'icon'    => 'fa fa-plus',
                 ],
                 'label' => 'mautic.company.new.company',
             ]
