@@ -177,8 +177,6 @@ trait CustomFieldRepositoryTrait
                 $q->orderBy('ORD', 'ASC');
 
                 $results = $q->getQuery()
-                    ->useQueryCache(false)
-                    ->useResultCache(false)
                     ->getResult();
 
                 //assign fields
