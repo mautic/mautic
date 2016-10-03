@@ -140,6 +140,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         [
                             'class'       => 'form-control',
                             'data-toggle' => 'field-lookup',
+                            'data-action' => 'lead:fieldList',
                             'data-target' => $data['field'],
                             'placeholder' => $translator->trans(
                                 'mautic.lead.list.form.filtervalue'
@@ -189,6 +190,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         $attr,
                         [
                             'data-toggle' => 'field-lookup',
+                            'data-action' => 'lead:fieldList',
                             'data-target' => $data['field'],
                             'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                         ]
