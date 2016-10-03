@@ -110,13 +110,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -496,7 +496,7 @@ class ListModel extends FormModel
     public function getUserLists($alias = '')
     {
         $user = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->user : false;
+            $this->userHelper->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
@@ -1056,7 +1056,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1106,7 +1106,7 @@ class ListModel extends FormModel
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1118,7 +1118,7 @@ class ListModel extends FormModel
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
-                    ->setParameter('userId', $this->user->getId());
+                    ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
             if (!empty($dateFrom)) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
@@ -1139,7 +1139,7 @@ class ListModel extends FormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         if (isset($filter['flag'])) {
@@ -1204,7 +1204,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1277,7 +1277,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('l.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();

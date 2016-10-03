@@ -282,7 +282,7 @@ class UserModel extends FormModel
     public function setPreference($key, $value = null, User $user = null)
     {
         if ($user == null) {
-            $user = $this->user;
+            $user = $this->userHelper->getUser();
         }
 
         $preferences       = $user->getPreferences();
@@ -303,7 +303,7 @@ class UserModel extends FormModel
     public function getPreference($key, $default = null, User $user = null)
     {
         if ($user == null) {
-            $user = $this->user;
+            $user = $this->userHelper->getUser();
         }
         $preferences = $user->getPreferences();
 
@@ -318,12 +318,12 @@ class UserModel extends FormModel
         $status = strtolower($status);
 
         if (in_array($status, $this->supportedOnlineStatuses)) {
-            if ($this->user->getId()) {
-                $this->user->setOnlineStatus($status);
-                $this->getRepository()->saveEntity($this->user);
+            if ($this->userHelper->getUser()->getId()) {
+                $this->userHelper->getUser()->setOnlineStatus($status);
+                $this->getRepository()->saveEntity($this->userHelper->getUser());
 
                 if ($this->dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                    $event = new StatusChangeEvent($this->user);
+                    $event = new StatusChangeEvent($this->userHelper->getUser());
                     $this->dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
                 }
             }

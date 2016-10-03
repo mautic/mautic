@@ -379,6 +379,6 @@ class FocusModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 }

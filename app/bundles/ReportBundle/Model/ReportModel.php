@@ -662,7 +662,7 @@ class ReportModel extends FormModel
      */
     public function getReportsWithGraphs()
     {
-        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->user->getId();
+        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
         return $this->getRepository()->findReportsWithGraphs($ownedBy);
     }
