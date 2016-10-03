@@ -25,7 +25,7 @@ class MessageQueue
     const STATUS_SENT        = 'sent';
 
     const PRIORITY_NORMAL = 2;
-    const PRIORITY_HIGH   = 1;
+    const PRIORITY_HIGH = 1;
 
     /**
      * @var int
@@ -75,7 +75,7 @@ class MessageQueue
     /**
      * @var string
      */
-    private $status = self::STATUS_PENDING;
+    private $status = MessageQueue::STATUS_PENDING;
 
     /**
      * @var \DateTime
@@ -110,7 +110,7 @@ class MessageQueue
     private $processed = false;
 
     /**
-     * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes.
+     * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes
      *
      * @var bool
      */
@@ -437,7 +437,7 @@ class MessageQueue
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function isFailed()
     {
@@ -445,7 +445,7 @@ class MessageQueue
     }
 
     /**
-     * @param bool $failed
+     * @param boolean $failed
      *
      * @return MessageQueue
      */

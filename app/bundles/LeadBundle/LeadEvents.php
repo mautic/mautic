@@ -65,6 +65,7 @@ final class LeadEvents
      * @var string
      */
     const LEAD_COMPANY_CHANGE = 'mautic.lead_company_change';
+
     /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
@@ -341,14 +342,4 @@ final class LeadEvents
      * @var string
      */
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
-
-    /**
-     * The mautic.company.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     *
-     * @var string
-     */
-    const ON_CAMPAIGN_TRIGGER_COMPANY_ACTION = 'mautic.company.on_campaign_trigger_action';
 }

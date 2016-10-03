@@ -80,3 +80,8 @@ $container->loadFromExtension('liip_functional_test', [
 ]);
 
 $loader->import('security_test.php');
+
+// Allow overriding config without a requiring a full bundle or hacks
+if (file_exists(__DIR__.'/config_override.php')) {
+    $loader->import('config_override.php');
+}

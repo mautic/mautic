@@ -61,10 +61,23 @@ class CommonEntity
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = [$currentId, $newId];
+                $this->addChange($prop, [$currentId, $newId]);
             }
         } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+            $this->addChange($prop, [$current, $val]);
+        }
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    protected function addChange($key, $value)
+    {
+        if (isset($this->changes[$key]) && is_array($this->changes[$key])) {
+            $this->changes[$key] = array_merge($this->changes[$key], $value);
+        } else {
+            $this->changes[$key] = $value;
         }
     }
 

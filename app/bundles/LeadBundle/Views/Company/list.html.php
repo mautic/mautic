@@ -104,13 +104,11 @@ if ($tmpl == 'index') {
                         </div>
                         </td>
                     <td>
-                            <div class="text-muted mt-4">
-                <?php if (isset($fields['core']['companyemail'])) :?>
-                    <small>
-                        <?php echo $fields['core']['companyemail']['value']; ?>
-                    </small>
-                <?php   endif; ?>
-                            </div>
+                        <div class="text-muted mt-4">
+                            <small>
+                                <?php echo $fields['core']['companyemail']['value']; ?>
+                            </small>
+                        </div>
                     </td>
 
                     <td class="visible-md visible-lg">
