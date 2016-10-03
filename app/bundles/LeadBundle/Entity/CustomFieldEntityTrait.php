@@ -72,6 +72,10 @@ trait CustomFieldEntityTrait
      */
     public function addUpdatedField($alias, $value, $oldValue = '')
     {
+        if (method_exists($this, 'isAnonymous') && $this->wasAnonymous == null) {
+            $this->wasAnonymous = $this->isAnonymous();
+        }
+
         $value = trim($value);
         if ($value == '') {
             // Ensure value is null for consistency

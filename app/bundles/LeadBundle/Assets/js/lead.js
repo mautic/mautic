@@ -1076,7 +1076,7 @@ Mautic.initUniqueIdentifierFields = function() {
             };
             Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
                 if (response.items !== 'undefined' && response.items.length) {
-                    var warning = mQuery('<div/>').text(response.existsMessage);
+                    var warning = mQuery('<div class="exists-warning" />').text(response.existsMessage);
                     mQuery.each(response.items, function(i, item) {
                         if (i > 0) {
                             warning.append(mQuery('<span>, </span>'));
@@ -1089,6 +1089,8 @@ Mautic.initUniqueIdentifierFields = function() {
                         warning.append(link);
                     });
                     warning.appendTo(input.parent());
+                } else {
+                    input.parent().find('div.exists-warning').remove();
                 }
             });
         });

@@ -260,7 +260,7 @@ trait CustomFieldRepositoryTrait
 
         //use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
-        $q->select('*')
+        $q->select($this->getTableAlias().'.*')
             ->where($this->getTableAlias().'.id = :entityId')
             ->setParameter('entityId', $id);
         $values = $q->execute()->fetch();
