@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -73,9 +72,9 @@ abstract class AbstractCommonModel
     protected $translator;
 
     /**
-     * @var User
+     * @var UserHelper
      */
-    protected $user;
+    protected $userHelper;
 
     /**
      * @var LoggerInterface
@@ -137,7 +136,7 @@ abstract class AbstractCommonModel
      */
     public function setUser(UserHelper $userHelper)
     {
-        $this->user = $userHelper->getUser();
+        $this->userHelper = $userHelper;
     }
 
     /**
