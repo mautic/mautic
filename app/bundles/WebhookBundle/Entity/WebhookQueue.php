@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,10 +12,9 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+
 /**
- * Class WebhookQueue
- *
- * @package Mautic\WebhookQueue\Entity
+ * Class WebhookQueue.
  */
 class WebhookQueue
 {
@@ -41,7 +41,7 @@ class WebhookQueue
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_queue')
@@ -68,9 +68,9 @@ class WebhookQueue
             ->build();
     }
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -89,6 +89,7 @@ class WebhookQueue
     public function setWebhook($webhook)
     {
         $this->webhook = $webhook;
+
         return $this;
     }
     /**
@@ -104,6 +105,7 @@ class WebhookQueue
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
+
         return $this;
     }
     /**
@@ -119,6 +121,7 @@ class WebhookQueue
     public function setPayload($payload)
     {
         $this->payload = $payload;
+
         return $this;
     }
     /**
@@ -134,6 +137,7 @@ class WebhookQueue
     public function setEvent($event)
     {
         $this->event = $event;
+
         return $this;
     }
 }

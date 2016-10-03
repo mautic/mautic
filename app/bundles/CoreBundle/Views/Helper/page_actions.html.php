@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $buttonCount = 0;
@@ -23,11 +24,12 @@ echo '<div class="std-toolbar btn-group">';
 
 foreach ($templateButtons as $action => $enabled) {
     if (!$enabled) {
-
         continue;
     }
 
-    if (!$enabled) continue;
+    if (!$enabled) {
+        continue;
+    }
 
     $btnClass = 'btn btn-default';
 
@@ -35,7 +37,7 @@ foreach ($templateButtons as $action => $enabled) {
         case 'clone':
         case 'abtest':
             $actionQuery = [
-                'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent()) ? $item->getVariantParent()->getId() : $item->getId()
+                'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent()) ? $item->getVariantParent()->getId() : $item->getId(),
             ];
             $icon = ($action == 'clone') ? 'copy' : 'sitemap';
             echo '<a class="'.$btnClass.'" href="'.$view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query))
@@ -67,26 +69,24 @@ foreach ($templateButtons as $action => $enabled) {
             echo $view->render(
                 'MauticCoreBundle:Helper:confirm.html.php',
                 [
-                    'message'       => $view["translator"]->trans(
-                        "mautic.".$langVar.".form.confirmdelete",
-                        ["%name%" => $item->$nameGetter()." (".$item->getId().")"]
+                    'message' => $view['translator']->trans(
+                        'mautic.'.$langVar.'.form.confirmdelete',
+                        ['%name%' => $item->$nameGetter().' ('.$item->getId().')']
                     ),
                     'confirmAction' => $view['router']->path(
                         $actionRoute,
                         array_merge(['objectAction' => 'delete', 'objectId' => $item->getId()], $query)
                     ),
-                    'template'      => 'delete',
-                    'btnTextClass'  => 'hidden-xs hidden-sm',
-                    'btnClass'      => $btnClass,
+                    'template'     => 'delete',
+                    'btnTextClass' => 'hidden-xs hidden-sm',
+                    'btnClass'     => $btnClass,
                 ]
             );
             break;
     }
-
 }
 
 if ($buttonCount > 0) {
-
     echo '<div class="dropdown-toolbar btn-group">';
 
     $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
@@ -97,7 +97,6 @@ if ($buttonCount > 0) {
     echo $view['buttons']->renderPostCustomButtons($buttonCount, $dropdownOpenHtml);
 
     echo '</ul></div>';
-
 }
 
 echo '</div>';

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class MandrillTransport
+ * Class MandrillTransport.
  */
 class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
 {
@@ -35,7 +36,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
             $mandrillMergeVars = $mandrillMergePlaceholders = [];
             foreach ($mauticTokens as $token) {
-                $mandrillMergeVars[$token]         = strtoupper(preg_replace("/[^a-z0-9]+/i", "", $token));
+                $mandrillMergeVars[$token]         = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mandrillMergePlaceholders[$token] = '*|'.$mandrillMergeVars[$token].'|*';
             }
         }
@@ -85,7 +86,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                     if (!empty($metadata[$rcpt['email']]['tokens'])) {
                         $mergeVars = [
                             'rcpt' => $rcpt['email'],
-                            'vars' => []
+                            'vars' => [],
                         ];
 
                         // This must not be included for CC and BCCs
@@ -96,8 +97,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                                 $trackingPixelToken = [
                                     [
                                         'name'    => $mandrillMergeVars[$token],
-                                        'content' => $value
-                                    ]
+                                        'content' => $value,
+                                    ],
                                 ];
 
                                 continue;
@@ -105,7 +106,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
                             $mergeVars['vars'][] = [
                                 'name'    => $mandrillMergeVars[$token],
-                                'content' => $value
+                                'content' => $value,
                             ];
                         }
 
@@ -118,12 +119,12 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                                 [
                                     [
                                         'name'    => 'HTMLCCEMAILHEADER',
-                                        'content' => ''
+                                        'content' => '',
                                     ],
                                     [
                                         'name'    => 'TEXTCCEMAILHEADER',
-                                        'content' => ''
-                                    ]
+                                        'content' => '',
+                                    ],
                                 ]
                             );
                         } else {
@@ -144,23 +145,23 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                                         'content' => $translator->trans(
                                                 'mautic.core.email.cc.copy',
                                                 [
-                                                    '%email%' => $rcpt['email']
+                                                    '%email%' => $rcpt['email'],
                                                 ]
-                                            )."<br /><br />"
+                                            ).'<br /><br />',
                                     ],
                                     [
                                         'name'    => 'TEXTCCEMAILHEADER',
                                         'content' => $translator->trans(
                                                 'mautic.core.email.cc.copy',
                                                 [
-                                                    '%email%' => $rcpt['email']
+                                                    '%email%' => $rcpt['email'],
                                                 ]
-                                            )."\n\n"
+                                            )."\n\n",
                                     ],
                                     [
                                         'name'    => 'TRACKINGPIXEL',
-                                        'content' => MailHelper::getBlankPixel()
-                                    ]
+                                        'content' => MailHelper::getBlankPixel(),
+                                    ],
                                 ]
                             );
 
@@ -197,7 +198,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                     if (!empty($metadata[$rcpt['email']])) {
                         $rcptMetadata[] = [
                             'rcpt'   => $rcpt['email'],
-                            'values' => $metadata[$rcpt['email']]
+                            'values' => $metadata[$rcpt['email']],
                         ];
                         unset($metadata[$rcpt['email']]);
                     }
@@ -225,7 +226,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         $payload = json_encode(
             [
                 'key'     => $this->getPassword(),
-                'message' => $message
+                'message' => $message,
             ]
         );
 
@@ -237,7 +238,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      */
     protected function getHeaders()
     {
-
     }
 
     /**
@@ -265,9 +265,9 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                 'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
                 'payload' => json_encode(
                     [
-                        'key' => $key
+                        'key' => $key,
                     ]
-                )
+                ),
             ]
         );
 
@@ -281,6 +281,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      * @param $info
      *
      * @return array
+     *
      * @throws \Swift_TransportException
      */
     protected function handlePostResponse($response, $info)
@@ -310,14 +311,14 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         $return     = [];
         $hasBounces = false;
         $bounces    = [
-            DoNotContact::BOUNCED      => [
-                'emails' => []
+            DoNotContact::BOUNCED => [
+                'emails' => [],
             ],
             DoNotContact::UNSUBSCRIBED => [
-                'emails' => []
-            ]
+                'emails' => [],
+            ],
         ];
-        $metadata   = $this->getMetadata();
+        $metadata = $this->getMetadata();
 
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
@@ -342,7 +343,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
                             $bounces[$type]['emails'][$stat['email']] = [
                                 'leadId' => $leadId,
-                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason'])
+                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason']),
                             ];
                         }
                     }
@@ -370,9 +371,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         return $return;
     }
 
-
     /**
-     * Returns a "transport" string to match the URL path /mailer/{transport}/callback
+     * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
      * @return mixed
      */
@@ -404,7 +404,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     }
 
     /**
-     * Handle response
+     * Handle response.
      *
      * @param Request       $request
      * @param MauticFactory $factory
@@ -416,14 +416,14 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
         $rows           = [
-            DoNotContact::BOUNCED      => [
+            DoNotContact::BOUNCED => [
                 'hashIds' => [],
-                'emails'  => []
+                'emails'  => [],
             ],
             DoNotContact::UNSUBSCRIBED => [
                 'hashIds' => [],
-                'emails'  => []
-            ]
+                'emails'  => [],
+            ],
         ];
 
         if (is_array($mandrillEvents)) {

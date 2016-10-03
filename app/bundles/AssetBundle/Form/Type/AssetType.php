@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -20,9 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class AssetType
- *
- * @package Mautic\AssetBundle\Form\Type
+ * Class AssetType.
  */
 class AssetType extends AbstractType
 {
@@ -36,17 +35,17 @@ class AssetType extends AbstractType
      */
     private $themes;
 
-    /** 
+    /**
      * @var AssetModel
      */
     private $assetModel;
 
     /**
      * AssetType constructor.
-     * 
+     *
      * @param TranslatorInterface $translator
-     * @param ThemeHelper $themeHelper
-     * @param AssetModel $assetModel
+     * @param ThemeHelper         $themeHelper
+     * @param AssetModel          $assetModel
      */
     public function __construct(TranslatorInterface $translator, ThemeHelper $themeHelper, AssetModel $assetModel)
     {
@@ -59,44 +58,44 @@ class AssetType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
         $builder->add('storageLocation', 'button_group', [
-            'label' => 'mautic.asset.asset.form.storageLocation',
+            'label'       => 'mautic.asset.asset.form.storageLocation',
             'choice_list' => new ChoiceList(
                 ['local', 'remote'],
                 ['mautic.asset.asset.form.storageLocation.local', 'mautic.asset.asset.form.storageLocation.remote']
             ),
             'attr' => [
-                'onchange' => 'Mautic.changeAssetStorageLocation();'
-            ]
+                'onchange' => 'Mautic.changeAssetStorageLocation();',
+            ],
         ]);
 
         $maxUploadSize = $this->assetModel->getMaxUploadSize('', true);
         $builder->add('tempName', 'hidden', [
             'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
             'label_attr' => ['class' => 'control-label'],
-            'required'   => false
+            'required'   => false,
         ]);
 
         $builder->add('originalFileName', 'hidden', [
-            'required'   => false
+            'required' => false,
         ]);
 
         $builder->add('remotePath', 'text', [
             'label'      => 'mautic.asset.asset.form.remotePath',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
-            'required'   => false
+            'required'   => false,
         ]);
 
         $builder->add('title', 'text', [
             'label'      => 'mautic.core.title',
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control']
+            'attr'       => ['class' => 'form-control'],
         ]);
 
         $builder->add('alias', 'text', [
@@ -106,18 +105,18 @@ class AssetType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.help.alias',
             ],
-            'required'   => false
+            'required' => false,
         ]);
 
         $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
-            'required'   => false
+            'required'   => false,
         ]);
 
         $builder->add('category', 'category', [
-            'bundle' => 'asset'
+            'bundle' => 'asset',
         ]);
 
         $builder->add('language', 'locale', [
@@ -127,7 +126,7 @@ class AssetType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.asset.asset.form.language.help',
             ],
-            'required'   => false
+            'required' => false,
         ]);
 
         $builder->add('isPublished', 'yesno_button_group');
@@ -138,10 +137,10 @@ class AssetType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
+                'data-toggle' => 'datetime',
             ],
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
         ]);
 
         $builder->add('publishDown', 'datetime', [
@@ -150,20 +149,20 @@ class AssetType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
+                'data-toggle' => 'datetime',
             ],
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
         ]);
 
         $builder->add('tempId', 'hidden', [
-            'required'   => false
+            'required' => false,
         ]);
 
         $builder->add('buttons', 'form_buttons', []);
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -180,6 +179,6 @@ class AssetType extends AbstractType
      */
     public function getName()
     {
-        return "asset";
+        return 'asset';
     }
 }

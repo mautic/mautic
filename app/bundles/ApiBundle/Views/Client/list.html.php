@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
@@ -17,28 +18,28 @@ endif;
         <thead>
         <tr>
             <?php
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'checkall' => 'true',
-                'target'   => '.client-list'
-            ));
+                'target'   => '.client-list',
+            ]);
 
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.name',
                 'text'       => 'mautic.core.name',
                 'default'    => true,
-                'class'      => 'col-client-name'
-            ));
+                'class'      => 'col-client-name',
+            ]);
             ?>
             <th class="visible-md visible-lg col-client-publicid"><?php echo $view['translator']->trans('mautic.api.client.thead.publicid'); ?></th>
             <th class="visible-md visible-lg col-client-secret"><?php echo $view['translator']->trans('mautic.api.client.thead.secret'); ?></th>
             <?php
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.id',
                 'text'       => 'mautic.core.id',
-                'class'      => 'visible-md visible-lg col-client-id'
-            ));
+                'class'      => 'visible-md visible-lg col-client-id',
+            ]);
             ?>
         </tr>
         </thead>
@@ -47,16 +48,16 @@ endif;
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                        'item'      => $item,
-                        'templateButtons' => array(
-                            'edit'      => $permissions['edit'],
-                            'delete'    => $permissions['delete']
-                        ),
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                        'item'            => $item,
+                        'templateButtons' => [
+                            'edit'   => $permissions['edit'],
+                            'delete' => $permissions['delete'],
+                        ],
                         'routeBase' => 'client',
                         'langVar'   => 'api.client',
-                        'pull'      => 'left'
-                    ));
+                        'pull'      => 'left',
+                    ]);
                     ?>
                 </td>
                 <td>
@@ -74,13 +75,13 @@ endif;
         </tbody>
     </table>
     <div class="panel-footer">
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems" => count($items),
-        "page"       => $page,
-        "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->path('mautic_client_index'),
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+        'totalItems' => count($items),
+        'page'       => $page,
+        'limit'      => $limit,
+        'baseUrl'    => $view['router']->path('mautic_client_index'),
         'sessionVar' => 'client',
-        'tmpl'       => $tmpl
-    )); ?>
+        'tmpl'       => $tmpl,
+    ]); ?>
     </div>
 </div>

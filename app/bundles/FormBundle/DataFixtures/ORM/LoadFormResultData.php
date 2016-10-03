@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
-use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -22,11 +22,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadFormResultData
+ * Class LoadFormResultData.
  */
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -49,17 +48,17 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $pageModel = $factory->getModel('page.page');
         $repo      = $factory->getModel('form.submission')->getRepository();
 
-        $fixture =& $this;
-        $importResults = function($results) use ($factory, $pageModel, $repo, &$fixture) {
+        $fixture       = &$this;
+        $importResults = function ($results) use ($factory, $pageModel, $repo, &$fixture) {
             foreach ($results as $count => $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
 
                 foreach ($rows as $col => $val) {
-                    if ($val != "NULL") {
-                        $setter = "set" . ucfirst($col);
-                        if (in_array($col, array('form', 'page', 'ipAddress'))) {
-                            $entity = $fixture->getReference($col . '-' . $val);
+                    if ($val != 'NULL') {
+                        $setter = 'set'.ucfirst($col);
+                        if (in_array($col, ['form', 'page', 'ipAddress'])) {
+                            $entity = $fixture->getReference($col.'-'.$val);
                             if ($col == 'page') {
                                 $submission->setReferer($pageModel->generateUrl($entity));
                             }
@@ -77,12 +76,12 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
             }
         };
 
-        $results = CsvHelper::csv_to_array(__DIR__ . '/fakeresultdata.csv');
+        $results = CsvHelper::csv_to_array(__DIR__.'/fakeresultdata.csv');
         $importResults($results);
 
         sleep(2);
 
-        $results2 = CsvHelper::csv_to_array(__DIR__ . '/fakeresult2data.csv');
+        $results2 = CsvHelper::csv_to_array(__DIR__.'/fakeresult2data.csv');
         $importResults($results2);
     }
 

@@ -1,23 +1,23 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Monitoring
+ * Class Monitoring.
  */
 class Monitoring extends FormEntity
 {
@@ -44,7 +44,7 @@ class Monitoring extends FormEntity
     /**
      * @var array
      */
-    private $lists = array();
+    private $lists = [];
 
     /**
      * @var string
@@ -59,12 +59,12 @@ class Monitoring extends FormEntity
     /**
      * @var array
      */
-    private $stats = array();
+    private $stats = [];
 
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var \DateTime
@@ -106,31 +106,31 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Constraints for required fields
+     * Constraints for required fields.
      *
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new Assert\NotBlank (
-                array('message' => 'mautic.core.title.required')
+        $metadata->addPropertyConstraint('title', new Assert\NotBlank(
+                ['message' => 'mautic.core.title.required']
             ));
 
-        $metadata->addPropertyConstraint('networkType', new Assert\NotBlank (
-                array('message' => 'mautic.social.network.type')
+        $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
+                ['message' => 'mautic.social.network.type']
             ));
     }
 
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -140,9 +140,9 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -150,7 +150,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get lists
+     * Get lists.
      *
      * @return array
      */
@@ -160,7 +160,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get network type
+     * Get network type.
      *
      * @return string
      */
@@ -170,17 +170,17 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get revision
+     * Get revision.
      *
-     * @return integer
+     * @return int
      */
-    public function getRevision ()
+    public function getRevision()
     {
         return $this->revision;
     }
 
     /**
-     * Get statistics
+     * Get statistics.
      *
      * @return array
      */
@@ -190,7 +190,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -200,7 +200,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return array
      */
@@ -210,7 +210,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get publishDown
+     * Get publishDown.
      *
      * @return \DateTime
      */
@@ -220,7 +220,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Get publishUp
+     * Get publishUp.
      *
      * @return \DateTime
      */
@@ -230,20 +230,21 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set the category id
+     * Set the category id.
      *
-     * @param integer $category
+     * @param int $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return Monitoring
      */
     public function setDescription($description)
@@ -255,7 +256,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set the monitor lists
+     * Set the monitor lists.
      *
      * @param $lists
      *
@@ -270,7 +271,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set the network type
+     * Set the network type.
      *
      * @param $networkType
      *
@@ -285,13 +286,13 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set the revision counter
+     * Set the revision counter.
      *
-     * @param integer $revision
+     * @param int $revision
      *
      * @return Monitoring
      */
-    public function setRevision ($revision)
+    public function setRevision($revision)
     {
         $this->isChanged('revision', $revision);
         $this->revision = $revision;
@@ -300,7 +301,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set the statistics
+     * Set the statistics.
      *
      * @param array $stats
      *
@@ -315,7 +316,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $title
      *
@@ -330,9 +331,10 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param array $properties
+     *
      * @return Monitoring
      */
     public function setProperties($properties)
@@ -344,9 +346,10 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set publishDown
+     * Set publishDown.
      *
      * @param \DateTime $publishDown
+     *
      * @return Monitoring
      */
     public function setPublishDown($publishDown)
@@ -358,9 +361,10 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Set publishUp
+     * Set publishUp.
      *
      * @param \DateTime $publishUp
+     *
      * @return Monitoring
      */
     public function setPublishUp($publishUp)
@@ -372,7 +376,7 @@ class Monitoring extends FormEntity
     }
 
     /**
-     * Clear out old properties data
+     * Clear out old properties data.
      */
     public function cleanMonitorData()
     {
@@ -381,34 +385,34 @@ class Monitoring extends FormEntity
         // clean up property array for the twitter handle
         if ($this->getNetworkType() == 'twitter_handle') {
             $this->setProperties(
-                array(
-                    'handle' => $property['handle']
-                )
+                [
+                    'handle' => $property['handle'],
+                ]
             );
         }
 
         // clean up property array for the hashtag
         if ($this->getNetworkType() == 'twitter_hashtag') {
             $this->setProperties(
-                array(
-                    'hashtag' => $property['hashtag']
-                )
+                [
+                    'hashtag' => $property['hashtag'],
+                ]
             );
         }
 
         // clean up clean up property array for the custom action
         if ($this->getNetworkType() == 'twitter_custom') {
             $this->setProperties(
-                array(
-                    'custom' => $property['custom']
-                )
+                [
+                    'custom' => $property['custom'],
+                ]
             );
         }
 
         // if the property is not new and the old property doesn't match the new one
-        if (! $this->isNew() && $property != $this->getProperties()) {
+        if (!$this->isNew() && $property != $this->getProperties()) {
             // reset stats on save of edited
-            $this->setStats(array());
+            $this->setStats([]);
         }
     }
 }

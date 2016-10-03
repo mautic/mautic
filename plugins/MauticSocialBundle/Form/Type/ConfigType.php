@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -38,13 +39,13 @@ class ConfigType extends AbstractType
         $builder->add(
             'twitter_handle_field',
             'choice',
-            array(
+            [
                 'choices'    => $leadFields,
                 'label'      => 'mautic.social.config.twitter.field.label',
                 'required'   => false,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
         );
     }
 
@@ -53,6 +54,6 @@ class ConfigType extends AbstractType
      */
     public function getName()
     {
-        return "social_config";
+        return 'social_config';
     }
 }

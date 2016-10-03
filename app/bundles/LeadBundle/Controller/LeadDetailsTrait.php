@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,9 +17,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 trait LeadDetailsTrait
 {
-
     /**
-     * Get a list of places for the lead based on IP location
+     * Get a list of places for the lead based on IP location.
      *
      * @param Lead $lead
      *
@@ -38,7 +38,7 @@ trait LeadDetailsTrait
                         } elseif (!empty($details['region'])) {
                             $name = $details['region'];
                         }
-                        $place    = [
+                        $place = [
                             'latLng' => [$details['latitude'], $details['longitude']],
                             'name'   => $name,
                         ];
@@ -67,18 +67,18 @@ trait LeadDetailsTrait
             $fromDate->modify('-6 months');
         }
         if (null == $toDate) {
-            $toDate = new \DateTime;
+            $toDate = new \DateTime();
         }
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
         $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
 
         /** @var LeadModel $model */
-        $model = $this->getModel('lead');
+        $model       = $this->getModel('lead');
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
-        $pointStats  = $chartQuery->fetchTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()]);
+        $pointStats = $chartQuery->fetchTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()]);
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
@@ -102,7 +102,7 @@ trait LeadDetailsTrait
                 [
                     'search'        => '',
                     'includeEvents' => [],
-                    'excludeEvents' => []
+                    'excludeEvents' => [],
                 ]
             );
         }
@@ -115,11 +115,11 @@ trait LeadDetailsTrait
 
             $orderBy = [
                 $session->get('mautic.lead.'.$lead->getId().'.timeline.orderby'),
-                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderbydir')
+                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderbydir'),
             ];
         }
         /** @var LeadModel $model */
-        $model  = $this->getModel('lead');
+        $model = $this->getModel('lead');
 
         return $model->getEngagements($lead, $filters, $orderBy, $page);
     }

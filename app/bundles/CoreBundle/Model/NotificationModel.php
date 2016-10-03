@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,12 +23,12 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Class NotificationModel
+ * Class NotificationModel.
  */
 class NotificationModel extends FormModel
 {
     /**
-     * @var boolean
+     * @var bool
      */
     protected $disableUpdates;
 
@@ -103,7 +104,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Write a notification
+     * Write a notification.
      *
      * @param string    $message   Message of the notification
      * @param string    $type      Optional $type to ID the source of the notification
@@ -146,7 +147,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Mark notifications read for a user
+     * Mark notifications read for a user.
      */
     public function markAllRead()
     {
@@ -154,7 +155,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Clears a notification for a user
+     * Clears a notification for a user.
      *
      * @param $id Notification to clear; will clear all if empty
      */
@@ -164,7 +165,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Get content for notifications
+     * Get content for notifications.
      *
      * @param null $afterId
      *
@@ -235,14 +236,13 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Fetch upstream notifications via RSS
+     * Fetch upstream notifications via RSS.
      */
     public function updateUpstreamNotifications()
     {
         $url = $this->coreParametersHelper->getParameter('rss_notification_url');
 
         if (empty($url)) {
-
             return;
         }
 
@@ -262,15 +262,14 @@ class NotificationModel extends FormModel
                     $description = $item->getDescription();
                     if (mb_strlen(strip_tags($description)) > 300) {
                         $description = mb_substr(strip_tags($description), 0, 300);
-                        $description .= "... <a href=\"".$item->getLink()."\" target=\"_blank\">".$this->translator->trans(
+                        $description .= '... <a href="'.$item->getLink().'" target="_blank">'.$this->translator->trans(
                                 'mautic.core.notification.read_more'
-                            )."</a>";
+                            ).'</a>';
                     }
                     $header = $item->getTitle();
 
                     $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
                 }
-
             } catch (\Exception $exception) {
                 $this->logger->addWarning($exception->getMessage());
             }

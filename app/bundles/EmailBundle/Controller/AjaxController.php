@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,19 +13,11 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
-use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
-use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
-use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
-use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
- * Class AjaxController
- *
- * @package Mautic\EmailBundle\Controller
+ * Class AjaxController.
  */
 class AjaxController extends CommonAjaxController
 {
@@ -54,7 +47,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function sendBatchAction(Request $request)
     {
-        $dataArray = array('success' => 0);
+        $dataArray = ['success' => 0];
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
@@ -64,9 +57,9 @@ class AjaxController extends CommonAjaxController
 
         if ($objectId && $entity = $model->getEntity($objectId)) {
             $dataArray['success'] = 1;
-            $session              = $this->factory->getSession();
-            $progress             = $session->get('mautic.email.send.progress', array(0, (int) $pending));
-            $stats                = $session->get('mautic.email.send.stats', array('sent' => 0, 'failed' => 0, 'failedRecipients' => array()));
+            $session              = $this->get('session');
+            $progress             = $session->get('mautic.email.send.progress', [0, (int) $pending]);
+            $stats                = $session->get('mautic.email.send.stats', ['sent' => 0, 'failed' => 0, 'failedRecipients' => []]);
 
             if ($pending && !$inProgress = $session->get('mautic.email.send.active', false)) {
                 $session->set('mautic.email.send.active', true);
@@ -95,7 +88,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Called by parent::getBuilderTokensAction()
+     * Called by parent::getBuilderTokensAction().
      *
      * @param $query
      *
@@ -106,7 +99,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
-        return $model->getBuilderComponents(null, array('tokens'), $query, false);
+        return $model->getBuilderComponents(null, ['tokens'], $query, false);
     }
 
     /**
@@ -116,20 +109,20 @@ class AjaxController extends CommonAjaxController
      */
     protected function generatePlaintTextAction(Request $request)
     {
-        $custom    = $request->request->get('custom');
-        $id        = $request->request->get('id');
+        $custom = $request->request->get('custom');
+        $id     = $request->request->get('id');
 
         $parser = new PlainTextHelper(
-            array(
-                'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath()
-            )
+            [
+                'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+            ]
         );
 
         // Convert placeholders into raw tokens
         BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
 
         $dataArray = [
-            'text' => $parser->setHtml($custom)->getText()
+            'text' => $parser->setHtml($custom)->getText(),
         ];
 
         return $this->sendJsonResponse($dataArray);
@@ -142,7 +135,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getAttachmentsSizeAction(Request $request)
     {
-        $assets = $request->get('assets', array(), true);
+        $assets = $request->get('assets', [], true);
         $size   = 0;
         if ($assets) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
@@ -150,11 +143,11 @@ class AjaxController extends CommonAjaxController
             $size       = $assetModel->getTotalFilesize($assets);
         }
 
-        return $this->sendJsonResponse(array('size' => $size));
+        return $this->sendJsonResponse(['size' => $size]);
     }
 
     /**
-     * Tests monitored email connection settings
+     * Tests monitored email connection settings.
      *
      * @param Request $request
      *
@@ -162,13 +155,13 @@ class AjaxController extends CommonAjaxController
      */
     protected function testMonitoredEmailServerConnectionAction(Request $request)
     {
-        $dataArray = array('success' => 0, 'message' => '');
+        $dataArray = ['success' => 0, 'message' => ''];
 
-        if ($this->factory->getUser()->isAdmin()) {
+        if ($this->user->isAdmin()) {
             $settings = $request->request->all();
 
             if (empty($settings['password'])) {
-                $existingMonitoredSettings = $this->factory->getParameter('monitored_email');
+                $existingMonitoredSettings = $this->coreParametersHelper->getParameter('monitored_email');
                 if (is_array($existingMonitoredSettings) && (!empty($existingMonitoredSettings[$settings['mailbox']]['password']))) {
                     $settings['password'] = $existingMonitoredSettings[$settings['mailbox']]['password'];
                 }
@@ -187,7 +180,7 @@ class AjaxController extends CommonAjaxController
                     }
                 }
                 $dataArray['success'] = 1;
-                $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+                $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (\Exception $e) {
                 $dataArray['message'] = $e->getMessage();
             }
@@ -197,7 +190,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Tests mail transport settings
+     * Tests mail transport settings.
      *
      * @param Request $request
      *
@@ -275,7 +268,6 @@ class AjaxController extends CommonAjaxController
 
                     $dataArray['success'] = 1;
                     $dataArray['message'] = $translator->trans('mautic.core.success');
-
                 } catch (\Exception $e) {
                     $dataArray['message'] = $e->getMessage().'<br />'.$logger->dump();
                 }

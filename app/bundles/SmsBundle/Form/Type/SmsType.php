@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -31,8 +32,8 @@ class SmsType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
-        $this->em = $factory->getEntityManager();
-        $this->request = $factory->getRequest();
+        $this->em         = $factory->getEntityManager();
+        $this->request    = $factory->getRequest();
     }
 
     /**
@@ -48,9 +49,9 @@ class SmsType extends AbstractType
             'name',
             'text',
             [
-                'label' => 'mautic.sms.form.internal.name',
+                'label'      => 'mautic.sms.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -58,10 +59,10 @@ class SmsType extends AbstractType
             'description',
             'textarea',
             [
-                'label' => 'mautic.sms.form.internal.description',
+                'label'      => 'mautic.sms.form.internal.description',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
-                'required' => false,
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -69,11 +70,11 @@ class SmsType extends AbstractType
             'message',
             'textarea',
             [
-                'label' => 'mautic.sms.form.message',
+                'label'      => 'mautic.sms.form.message',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
+                'attr'       => [
                     'class' => 'form-control',
-                    'rows' => 6,
+                    'rows'  => 6,
                 ],
             ]
         );
@@ -84,14 +85,14 @@ class SmsType extends AbstractType
             'publishUp',
             'datetime',
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishup',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishup',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -100,14 +101,14 @@ class SmsType extends AbstractType
             'publishDown',
             'datetime',
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishdown',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishdown',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -116,18 +117,18 @@ class SmsType extends AbstractType
         $builder->add(
              'category',
              'category',
-             array(
-                 'bundle' => 'sms'
-             )
+             [
+                 'bundle' => 'sms',
+             ]
          );
 
         $builder->add(
             'language',
             'locale',
             [
-                'label' => 'mautic.core.language',
+                'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
+                'attr'       => [
                     'class' => 'form-control',
                 ],
                 'required' => false,
@@ -148,7 +149,7 @@ class SmsType extends AbstractType
                 'updateSelect',
                 'hidden',
                 [
-                    'data' => $options['update_select'],
+                    'data'   => $options['update_select'],
                     'mapped' => false,
                 ]
             );

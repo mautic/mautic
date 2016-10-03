@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,11 +16,10 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
 /**
- * Class ThemeHelper
+ * Class ThemeHelper.
  */
 class ThemeHelper
 {
-
     /**
      * @var MauticFactory
      */
@@ -54,29 +54,29 @@ class ThemeHelper
      */
     public function __construct(PathsHelper $pathsHelper, $theme)
     {
-        $this->theme = $theme;
-        $this->themeDir  = $pathsHelper->getSystemPath('themes') . '/' . $this->theme;
-        $this->themePath = $pathsHelper->getSystemPath('themes_root') . '/' . $this->themeDir;
+        $this->theme     = $theme;
+        $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
+        $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
 
         // check to make sure the theme exists
-        if (! file_exists($this->themePath)) {
-            throw new FileNotFoundException($this->theme . ' not found!');
+        if (!file_exists($this->themePath)) {
+            throw new FileNotFoundException($this->theme.' not found!');
         }
 
         // get the config
-        if (file_exists($this->themePath . '/config.json')) {
-            $this->config = json_decode(file_get_contents($this->themePath . '/config.json'), true);
+        if (file_exists($this->themePath.'/config.json')) {
+            $this->config = json_decode(file_get_contents($this->themePath.'/config.json'), true);
         } else {
-            throw new BadConfigurationException($this->theme . ' is missing a required config file');
+            throw new BadConfigurationException($this->theme.' is missing a required config file');
         }
 
-        if (! isset($this->config['name'])) {
-            throw new BadConfigurationException($this->theme . ' does not have a valid config file');
+        if (!isset($this->config['name'])) {
+            throw new BadConfigurationException($this->theme.' does not have a valid config file');
         }
     }
 
     /**
-     * Return  name of the template
+     * Return  name of the template.
      *
      * @return mixed
      */
@@ -86,7 +86,7 @@ class ThemeHelper
     }
 
     /**
-     * Returns the theme folder name
+     * Returns the theme folder name.
      *
      * @return string
      */
@@ -96,7 +96,7 @@ class ThemeHelper
     }
 
     /**
-     * Get the theme's config
+     * Get the theme's config.
      *
      * @return mixed
      */
@@ -106,7 +106,7 @@ class ThemeHelper
     }
 
     /**
-     * Get the theme's slots
+     * Get the theme's slots.
      *
      * @param $type
      *
@@ -114,11 +114,11 @@ class ThemeHelper
      */
     public function getSlots($type)
     {
-        return (isset($this->config['slots'][$type])) ? $this->config['slots'][$type] : array();
+        return (isset($this->config['slots'][$type])) ? $this->config['slots'][$type] : [];
     }
 
     /**
-     * Returns path to this theme
+     * Returns path to this theme.
      *
      * @param bool $relative
      *
@@ -130,7 +130,7 @@ class ThemeHelper
     }
 
     /**
-     * Returns template
+     * Returns template.
      *
      * @param $code
      *

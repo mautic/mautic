@@ -1,16 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 
 <div class="panel-group" id="globalSearchPanel">
 <?php foreach ($results as $header => $result): ?>
-<?php if (isset($result['count'])) { $count = $result['count']; unset($result['count']); } ?>
+<?php if (isset($result['count'])) {
+    $count = $result['count'];
+    unset($result['count']);
+} ?>
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">

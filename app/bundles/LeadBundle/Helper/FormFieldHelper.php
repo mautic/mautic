@@ -1,125 +1,130 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Helper;
 
-use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class FormFieldHelper
+class FormFieldHelper extends AbstractFormFieldHelper
 {
-
     /**
      * @var array
      */
-    static private $types = [
-        'text'     => [
-            'properties' => []
+    private static $types = [
+        'text' => [
+            'properties' => [],
         ],
         'textarea' => [
-            'properties' => []
+            'properties' => [],
         ],
-        'select'   => [
+        'multiselect' => [
             'properties' => [
                 'list' => [
                     'required'  => true,
-                    'error_msg' => 'mautic.lead.field.select.listmissing'
-                ]
-            ]
+                    'error_msg' => 'mautic.lead.field.select.listmissing',
+                ],
+            ],
         ],
-        'boolean'  => [
+        'select' => [
+            'properties' => [
+                'list' => [
+                    'required'  => true,
+                    'error_msg' => 'mautic.lead.field.select.listmissing',
+                ],
+            ],
+        ],
+        'boolean' => [
             'properties' => [
                 'yes' => [
                     'required'  => true,
-                    'error_msg' => 'mautic.lead.field.boolean.yesmissing'
+                    'error_msg' => 'mautic.lead.field.boolean.yesmissing',
                 ],
-                'no'  => [
+                'no' => [
                     'required'  => true,
-                    'error_msg' => 'mautic.lead.field.boolean.nomissing'
-                ]
-            ]
+                    'error_msg' => 'mautic.lead.field.boolean.nomissing',
+                ],
+            ],
         ],
-        'lookup'   => [
+        'lookup' => [
             'properties' => [
-                'list' => []
-            ]
+                'list' => [],
+            ],
         ],
-        'date'     => [
+        'date' => [
             'properties' => [
-                'format' => []
-            ]
+                'format' => [],
+            ],
         ],
         'datetime' => [
             'properties' => [
-                'format' => []
-            ]
+                'format' => [],
+            ],
         ],
-        'time'     => [
-            'properties' => []
+        'time' => [
+            'properties' => [],
         ],
         'timezone' => [
-            'properties' => []
+            'properties' => [],
         ],
-        'email'    => [
-            'properties' => []
+        'email' => [
+            'properties' => [],
         ],
-        'number'   => [
+        'number' => [
             'properties' => [
                 'roundmode' => [],
-                'precision' => []
-            ]
+                'precision' => [],
+            ],
         ],
-        'tel'      => [
-            'properties' => []
+        'tel' => [
+            'properties' => [],
         ],
-        'url'      => [
-            'properties' => []
+        'url' => [
+            'properties' => [],
         ],
-        'country'  => [
-            'properties' => []
+        'country' => [
+            'properties' => [],
         ],
-        'region'   => [
-            'properties' => []
+        'region' => [
+            'properties' => [],
         ],
         'timezone' => [
-            'properties' => []
+            'properties' => [],
         ],
-        'locale'   => [
-            'properties' => []
-        ]
+        'locale' => [
+            'properties' => [],
+        ],
     ];
 
-    private $translator;
-
     /**
-     * Set translator
-     *
-     * @param TranslatorInterface $translator
+     * Set the translation key prefix.
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslationKeyPrefix()
     {
-        $this->translator = $translator;
+        $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
 
     /**
      * @return array
      */
-    public function getChoiceList()
+    public function getTypes()
     {
-        $choices = [];
-        foreach (self::$types as $v => $type) {
-            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.lead.field.type.{$v}");
-        }
-        asort($choices);
+        return self::$types;
+    }
 
-        return $choices;
+    /**
+     * @return array
+     */
+    public static function getListTypes()
+    {
+        return ['select', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
 
     /**
@@ -128,7 +133,7 @@ class FormFieldHelper
      *
      * @return bool
      */
-    static public function validateProperties($type, &$properties)
+    public static function validateProperties($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
             //ensure the field type is supported
@@ -153,7 +158,7 @@ class FormFieldHelper
     /**
      * @return array
      */
-    static public function getCountryChoices()
+    public static function getCountryChoices()
     {
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
@@ -166,7 +171,7 @@ class FormFieldHelper
     /**
      * @return array
      */
-    static public function getRegionChoices()
+    public static function getRegionChoices()
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);
@@ -181,11 +186,11 @@ class FormFieldHelper
 
     /**
      * Symfony deprecated and changed Symfony\Component\Form\Extension\Core\Type\TimezoneType::getTimezones to private
-     * in 3.0 - so duplicated code here
+     * in 3.0 - so duplicated code here.
      *
      * @return array
      */
-    static public function getTimezonesChoices()
+    public static function getTimezonesChoices()
     {
         static $timezones;
 
@@ -214,11 +219,11 @@ class FormFieldHelper
     }
 
     /**
-     * Get locale choices
+     * Get locale choices.
      *
      * @return array
      */
-    static function getLocaleChoices()
+    public static function getLocaleChoices()
     {
         return Intl::getLocaleBundle()->getLocaleNames();
     }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +14,10 @@ use Gaufrette\Adapter;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class CloudStorageIntegration
+ * Class CloudStorageIntegration.
  */
 abstract class CloudStorageIntegration extends AbstractIntegration
 {
-
     /**
      * @var Adapter
      */
@@ -30,12 +30,12 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             $name = strtolower($this->getName());
-            if ($this->factory->serviceExists('mautic.form.type.cloudstorage.' . $name)) {
-                $builder->add('provider', 'cloudstorage_' . $name, array(
+            if ($this->factory->serviceExists('mautic.form.type.cloudstorage.'.$name)) {
+                $builder->add('provider', 'cloudstorage_'.$name, [
                     'label'    => 'mautic.integration.form.provider.settings',
                     'required' => false,
-                    'data'     => (isset($data['provider'])) ? $data['provider'] : array()
-                ));
+                    'data'     => (isset($data['provider'])) ? $data['provider'] : [],
+                ]);
             }
         }
     }
@@ -49,14 +49,14 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     }
 
     /**
-     * Retrieves an Adapter object for this integration
+     * Retrieves an Adapter object for this integration.
      *
      * @return Adapter
      */
     abstract public function getAdapter();
 
     /**
-     * Retrieves the public URL for a given key
+     * Retrieves the public URL for a given key.
      *
      * @param string $key
      *
@@ -69,6 +69,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return array('cloud_storage');
+        return ['cloud_storage'];
     }
 }

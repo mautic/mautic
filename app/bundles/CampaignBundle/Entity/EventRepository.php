@@ -1,31 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\LeadBundle\Entity\Lead as RealLead;
 
 /**
- * EventRepository
+ * EventRepository.
  */
 class EventRepository extends CommonRepository
 {
-
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('e')
@@ -40,11 +39,12 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get array of published events based on type
+     * Get array of published events based on type.
+     *
      * @param       $type
      * @param array $campaigns
-     * @param null  $leadId             If included, only events that have not been triggered by the lead yet will be included
-     * @param bool  $positivePathOnly   If negative, all events including those with a negative path will be returned
+     * @param null  $leadId           If included, only events that have not been triggered by the lead yet will be included
+     * @param bool  $positivePathOnly If negative, all events including those with a negative path will be returned
      *
      * @return array
      */
@@ -99,13 +99,12 @@ class EventRepository extends CommonRepository
                     $q->expr()->isNull('e.decisionPath')
                 )
             );
-
         }
 
         $results = $q->getQuery()->getArrayResult();
 
         //group them by campaign
-        $events = array();
+        $events = [];
         foreach ($results as $r) {
             $events[$r['campaign']['id']][$r['id']] = $r;
         }
@@ -114,7 +113,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get array of events by parent
+     * Get array of events by parent.
      *
      * @param      $parentId
      * @param null $decisionPath
@@ -142,7 +141,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get the top level events for a campaign
+     * Get the top level events for a campaign.
      *
      * @param $id
      * @param $includeDecisions
@@ -174,7 +173,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Gets ids of leads who have already triggered the event
+     * Gets ids of leads who have already triggered the event.
      *
      * @param $events
      * @param $leadId
@@ -200,7 +199,7 @@ class EventRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $log = array();
+        $log = [];
         foreach ($results as $r) {
             $log[] = $r['lead_id'];
         }
@@ -211,7 +210,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get an array of events that have been triggered by this lead
+     * Get an array of events that have been triggered by this lead.
      *
      * @param $leadId
      *
@@ -230,7 +229,7 @@ class EventRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        $return = array();
+        $return = [];
         foreach ($results as $r) {
             $return[$r['id']] = $r;
         }
@@ -239,7 +238,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get a list of scheduled events
+     * Get a list of scheduled events.
      *
      * @param      $campaignId
      * @param bool $count
@@ -284,7 +283,7 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         // Organize by lead
-        $leads = array();
+        $leads = [];
         foreach ($results as $e) {
             $leads[$e['lead_id']][$e['event_id']] = $e;
         }
@@ -311,7 +310,7 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         // Fix the parent ID
-        $events = array();
+        $events = [];
         foreach ($results as $id => $r) {
             $r[0]['parent_id'] = $r[1];
             $events[$id]       = $r[0];
@@ -322,13 +321,13 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get array of events with stats
+     * Get array of events with stats.
      *
      * @param array $args
      *
      * @return array
      */
-    public function getEvents($args = array())
+    public function getEvents($args = [])
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
@@ -352,7 +351,6 @@ class EventRepository extends CommonRepository
                     $q->expr()->isNull('e.decisionPath')
                 )
             );
-
         }
 
         $events = $q->getQuery()->getArrayResult();
@@ -371,7 +369,7 @@ class EventRepository extends CommonRepository
         $q->select('e')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
-            ->andWhere($q->expr()->in('e.eventType', array('action', 'condition')));
+            ->andWhere($q->expr()->in('e.eventType', ['action', 'condition']));
 
         $events = $q->getQuery()->getArrayResult();
 
@@ -379,7 +377,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Get the non-action log
+     * Get the non-action log.
      *
      * @param            $campaignId
      * @param array      $leads
@@ -389,7 +387,7 @@ class EventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEventLog($campaignId, $leads = array(), $havingEvents = array(), $excludeEvents = array(), $excludeScheduledFromHavingEvents = false)
+    public function getEventLog($campaignId, $leads = [], $havingEvents = [], $excludeEvents = [], $excludeScheduledFromHavingEvents = false)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -454,7 +452,7 @@ class EventRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $log = array();
+        $log = [];
         foreach ($results as $r) {
             $leadId  = $r['lead_id'];
             $eventId = $r['event_id'];
@@ -471,7 +469,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * Null event parents in preparation for deleting a campaign
+     * Null event parents in preparation for deleting a campaign.
      *
      * @param $campaignId
      */
@@ -479,13 +477,13 @@ class EventRepository extends CommonRepository
     {
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
-            array('parent_id' => null),
-            array('campaign_id' => (int) $campaignId)
+            ['parent_id'   => null],
+            ['campaign_id' => (int) $campaignId]
         );
     }
 
     /**
-     * Null event parents in preparation for deleting events from a campaign
+     * Null event parents in preparation for deleting events from a campaign.
      *
      * @param $campaignId
      */

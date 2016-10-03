@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +13,7 @@ namespace Mautic\CoreBundle\Controller;
 use Symfony\Component\Form\Form;
 
 /**
- * Class FormController
+ * Class FormController.
  */
 class FormController extends CommonController
 {
@@ -27,7 +28,7 @@ class FormController extends CommonController
     protected $templateBase;
 
     /**
-     * Checks to see if the form was cancelled
+     * Checks to see if the form was cancelled.
      *
      * @param Form $form
      *
@@ -41,7 +42,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Checks to see if the form was applied or saved
+     * Checks to see if the form was applied or saved.
      *
      * @param $form
      *
@@ -55,7 +56,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Binds form data, checks validity, and determines cancel request
+     * Binds form data, checks validity, and determines cancel request.
      *
      * @param Form $form
      *
@@ -75,12 +76,12 @@ class FormController extends CommonController
      *
      * @param object $entity
      *
-     * @return boolean
+     * @return bool
      */
     protected function canEdit($entity = null)
     {
         $security = $this->get('mautic.security');
-        
+
         if ($this->permissionBase) {
             if ($entity && $security->checkPermissionExists($this->permissionBase.':editown')) {
                 return $security->hasEntityAccess(
@@ -99,12 +100,12 @@ class FormController extends CommonController
     }
 
     /**
-     * Returns view to index with a locked out message
+     * Returns view to index with a locked out message.
      *
      * @param array  $postActionVars
      * @param object $entity
      * @param string $model
-     * @param bool   $batch Flag if a batch action is being performed
+     * @param bool   $batch          Flag if a batch action is being performed
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      */
@@ -116,53 +117,53 @@ class FormController extends CommonController
             urlencode($postActionVars['returnUrl'])
             :
             urlencode($this->generateUrl('mautic_dashboard_index'));
-        $override  = '';
+        $override = '';
 
-        $modelClass   = $this->getModel($model);
-        $nameFunction = $modelClass->getNameGetter();
+        $modelClass           = $this->getModel($model);
+        $nameFunction         = $modelClass->getNameGetter();
         $this->permissionBase = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            $override     = $this->get('translator')->trans(
+            $override = $this->get('translator')->trans(
                 'mautic.core.override.lock',
-                array(
+                [
                     '%url%' => $this->generateUrl(
                         'mautic_core_form_action',
-                        array(
+                        [
                             'objectAction' => 'unlock',
                             'objectModel'  => $model,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
-                            'name'         => urlencode($entity->$nameFunction())
-                        )
-                    )
-                )
+                            'name'         => urlencode($entity->$nameFunction()),
+                        ]
+                    ),
+                ]
             );
         }
 
-        $flash = array(
+        $flash = [
             'type'    => 'error',
             'msg'     => 'mautic.core.error.locked',
-            'msgVars' => array(
-                "%name%"       => $entity->$nameFunction(),
-                "%user%"       => $entity->getCheckedOutByUser(),
+            'msgVars' => [
+                '%name%'       => $entity->$nameFunction(),
+                '%user%'       => $entity->getCheckedOutByUser(),
                 '%contactUrl%' => $this->generateUrl(
                     'mautic_user_action',
-                    array(
+                    [
                         'objectAction' => 'contact',
                         'objectId'     => $entity->getCheckedOutBy(),
                         'entity'       => $model,
                         'id'           => $entity->getId(),
                         'subject'      => 'locked',
-                        'returnUrl'    => $returnUrl
-                    )
+                        'returnUrl'    => $returnUrl,
+                    ]
                 ),
-                '%date%'       => $date->format($this->factory->getParameter('date_format_dateonly')),
-                '%time%'       => $date->format($this->factory->getParameter('date_format_timeonly')),
-                '%datetime%'   => $date->format($this->factory->getParameter('date_format_full')),
-                '%override%'   => $override
-            )
-        );
+                '%date%'     => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
+                '%time%'     => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
+                '%datetime%' => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
+                '%override%' => $override,
+            ],
+        ];
         if ($batch) {
             return $flash;
         }
@@ -170,9 +171,9 @@ class FormController extends CommonController
         return $this->postActionRedirect(
             array_merge(
                 $postActionVars,
-                array(
-                    'flashes' => array($flash)
-                )
+                [
+                    'flashes' => [$flash],
+                ]
             )
         );
     }
@@ -185,12 +186,11 @@ class FormController extends CommonController
      */
     public function unlockAction($id, $modelName)
     {
-        $model   = $this->getModel($modelName);
-        $entity  = $model->getEntity($id);
+        $model                = $this->getModel($modelName);
+        $entity               = $model->getEntity($id);
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            
             if ($entity !== null && $entity->getCheckedOutBy() !== null) {
                 $model->unlockEntity($entity);
             }
@@ -201,9 +201,9 @@ class FormController extends CommonController
 
             $this->addFlash(
                 'mautic.core.action.entity.unlocked',
-                array(
-                    '%name%' => urldecode($this->request->get('name'))
-                )
+                [
+                    '%name%' => urldecode($this->request->get('name')),
+                ]
             );
 
             return $this->redirect($returnUrl);
@@ -235,7 +235,7 @@ class FormController extends CommonController
         $this->modelName      = $modelName;
         $this->permissionBase = $permissionBase;
         if (strpos($sessionBase, 'mautic.') !== 0) {
-            $sessionBase = 'mautic.' . $sessionBase;
+            $sessionBase = 'mautic.'.$sessionBase;
         }
         $this->sessionBase    = $sessionBase;
         $this->routeBase      = $routeBase;
@@ -254,7 +254,7 @@ class FormController extends CommonController
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
-            array(
+            [
                 $this->permissionBase.':view',
                 $this->permissionBase.':viewown',
                 $this->permissionBase.':viewother',
@@ -267,9 +267,9 @@ class FormController extends CommonController
                 $this->permissionBase.':deleteother',
                 $this->permissionBase.':publish',
                 $this->permissionBase.':publishown',
-                $this->permissionBase.':publishother'
-            ),
-            "RETURN_ARRAY",
+                $this->permissionBase.':publishother',
+            ],
+            'RETURN_ARRAY',
             null,
             true
         );
@@ -282,10 +282,10 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         //set limits
-        $limit = $session->get($this->sessionBase.'.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get($this->sessionBase.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -294,26 +294,26 @@ class FormController extends CommonController
         $search = $this->request->get('search', $session->get($this->sessionBase.'.filter', ''));
         $session->set($this->sessionBase.'.filter', $search);
 
-        $filter = array('string' => $search, 'force' => array());
+        $filter = ['string' => $search, 'force' => []];
 
         $model = $this->getModel($this->modelName);
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->permissionBase.':viewother']) {
-            $filter['force'] = array('column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         $orderBy    = $session->get($this->sessionBase.'.orderby', $repo->getTableAlias().'.name');
         $orderByDir = $session->get($this->sessionBase.'.orderbydir', 'ASC');
 
         $items = $model->getEntities(
-            array(
+            [
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
-            )
+                'orderByDir' => $orderByDir,
+            ]
         );
 
         $count = count($items);
@@ -323,25 +323,25 @@ class FormController extends CommonController
             $lastPage = ($count === 1) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
 
             $session->set($this->sessionBase.'.page', $lastPage);
-            $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl($this->routeBase.'_index', ['page' => $lastPage]);
 
             return $this->postActionRedirect(
-                array(
+                [
                     'returnUrl'       => $returnUrl,
-                    'viewParameters'  => array('page' => $lastPage),
+                    'viewParameters'  => ['page' => $lastPage],
                     'contentTemplate' => $this->templateBase.':index',
-                    'passthroughVars' => array(
+                    'passthroughVars' => [
                         'activeLink'    => $this->activeLink,
-                        'mauticContent' => $this->mauticContent
-                    )
-                )
+                        'mauticContent' => $this->mauticContent,
+                    ],
+                ]
             );
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
         $session->set($this->sessionBase.'.page', $page);
 
-        $viewParameters = array(
+        $viewParameters = [
             'searchValue' => $search,
             'items'       => $items,
             'totalItems'  => $count,
@@ -349,18 +349,18 @@ class FormController extends CommonController
             'limit'       => $limit,
             'permissions' => $permissions,
             'security'    => $this->get('mautic.security'),
-            'tmpl'        => $this->request->get('tmpl', 'index')
-        );
+            'tmpl'        => $this->request->get('tmpl', 'index'),
+        ];
 
-        $delegateArgs = array(
+        $delegateArgs = [
             'viewParameters'  => $viewParameters,
             'contentTemplate' => $this->templateBase.':list.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl($this->routeBase.'_index', array('page' => $page))
-            )
-        );
+                'route'         => $this->generateUrl($this->routeBase.'_index', ['page' => $page]),
+            ],
+        ];
 
         // Allow inherited class to adjust
         if (method_exists($this, 'customizeViewArguments')) {
@@ -371,7 +371,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Individual item's details page
+     * Individual item's details page.
      *
      * @param      $objectId
      * @param null $logObject
@@ -380,32 +380,32 @@ class FormController extends CommonController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject= null, $logBundle =  null, $listPage = null)
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null)
     {
         $model    = $this->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
         $security = $this->get('mautic.security');
 
         if ($entity === null) {
-            $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+            $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
             return $this->postActionRedirect(
-                array(
-                    'returnUrl'       => $this->generateUrl($this->routeBase.'_index', array('page' => $page)),
-                    'viewParameters'  => array('page' => $page),
+                [
+                    'returnUrl'       => $this->generateUrl($this->routeBase.'_index', ['page' => $page]),
+                    'viewParameters'  => ['page' => $page],
                     'contentTemplate' => $this->templateBase.':index',
-                    'passthroughVars' => array(
+                    'passthroughVars' => [
                         'activeLink'    => $this->activeLink,
-                        'mauticContent' => $this->mauticContent
-                    ),
-                    'flashes'         => array(
-                        array(
+                        'mauticContent' => $this->mauticContent,
+                    ],
+                    'flashes' => [
+                        [
                             'type'    => 'error',
                             'msg'     => $this->langStringBase.'.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
-                        )
-                    )
-                )
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
             );
         } elseif (!$security->hasEntityAccess($this->permissionBase.':viewown', $this->permissionBase.':viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
@@ -417,13 +417,13 @@ class FormController extends CommonController
         }
 
         // Audit log entries
-        $logs = ($logObject) ? $this->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : array();
+        $logs = ($logObject) ? $this->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : [];
 
         // Generate route
-        $routeVars = array(
+        $routeVars = [
             'objectAction' => 'view',
-            'objectId'     => $entity->getId()
-        );
+            'objectId'     => $entity->getId(),
+        ];
         if ($listPage !== null) {
             $routeVars['listPage'] = $listPage;
         }
@@ -432,13 +432,13 @@ class FormController extends CommonController
             $routeVars
         );
 
-        $delegateArgs = array(
-            'viewParameters'  => array(
+        $delegateArgs = [
+            'viewParameters' => [
                 'item'        => $entity,
                 'logs'        => $logs,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => $security->isGranted(
-                    array(
+                    [
                         $this->permissionBase.':view',
                         $this->permissionBase.':viewown',
                         $this->permissionBase.':viewother',
@@ -451,20 +451,20 @@ class FormController extends CommonController
                         $this->permissionBase.':deleteother',
                         $this->permissionBase.':publish',
                         $this->permissionBase.':publishown',
-                        $this->permissionBase.':publishother'
-                    ),
-                    "RETURN_ARRAY",
+                        $this->permissionBase.':publishother',
+                    ],
+                    'RETURN_ARRAY',
                     null,
                     true
                 ),
-            ),
+            ],
             'contentTemplate' => $this->templateBase.':details.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
-                'route'         => $route
-            )
-        );
+                'route'         => $route,
+            ],
+        ];
 
         // Allow inherited class to adjust
         if (method_exists($this, 'customizeViewArguments')) {
@@ -475,7 +475,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Generates new form and processes post data
+     * Generates new form and processes post data.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
@@ -489,9 +489,9 @@ class FormController extends CommonController
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
-        $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'new'));
+        $action = $this->generateUrl($this->routeBase.'_action', ['objectAction' => 'new']);
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -513,58 +513,58 @@ class FormController extends CommonController
                         }
 
                         if (method_exists($this, 'viewAction')) {
-                            $viewParameters = array('objectId' => $entity->getId(), 'objectAction' => 'view');
+                            $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl($this->routeBase.'_action', $viewParameters);
                             $template       = $this->templateBase.':view';
                         } else {
-                            $viewParameters = array('page' => $page);
+                            $viewParameters = ['page' => $page];
                             $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
                             $template       = $this->templateBase.':index';
                         }
                     }
                 }
             } else {
-                $viewParameters = array('page' => $page);
+                $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
                 $template       = $this->templateBase.':index';
             }
 
             if ($cancelled || ($valid && !$this->isFormApplied($form))) {
                 return $this->postActionRedirect(
-                    array(
+                    [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
-                        'passthroughVars' => array(
+                        'passthroughVars' => [
                             'activeLink'    => $this->activeLink,
-                            'mauticContent' => $this->mauticContent
-                        )
-                    )
+                            'mauticContent' => $this->mauticContent,
+                        ],
+                    ]
                 );
             } elseif ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($entity->getId(), true);
             }
         }
 
-        $delegateArgs = array(
-            'viewParameters'  => array(
-                'tmpl'  => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+        $delegateArgs = [
+            'viewParameters' => [
+                'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity' => $entity,
-                'form'  => $form->createView()
-            ),
+                'form'   => $form->createView(),
+            ],
             'contentTemplate' => $this->templateBase.':form.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
                 'route'         => $this->generateUrl(
                     $this->routeBase.'_action',
-                    array(
+                    [
                         'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
-                        'objectId'     => $entity->getId()
-                    )
-                )
-            )
-        );
+                        'objectId'     => $entity->getId(),
+                    ]
+                ),
+            ],
+        ];
 
         // Allow inherited class to adjust
         if (method_exists($this, 'customizeViewArguments')) {
@@ -575,7 +575,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
      * @param int  $objectId
      * @param bool $ignorePost
@@ -585,50 +585,50 @@ class FormController extends CommonController
     protected function editStandard($objectId, $ignorePost = false)
     {
         $isClone = false;
-        $model  = $this->getModel($this->modelName);
+        $model   = $this->getModel($this->modelName);
         if (is_object($objectId)) {
             $entity   = $objectId;
             $isClone  = true;
             $objectId = 'mautic_'.sha1(uniqid(mt_rand(), true));
         } elseif (strpos($objectId, 'mautic_') !== false) {
             $isClone = true;
-            $entity = $model->getEntity();
+            $entity  = $model->getEntity();
         } else {
             $entity = $model->getEntity($objectId);
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
         //set the return URL
-        $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
+        $returnUrl = $this->generateUrl($this->routeBase.'_index', ['page' => $page]);
 
-        $viewParameters = array('page' => $page);
+        $viewParameters = ['page' => $page];
         $template       = $this->templateBase.':index';
-        $postActionVars = array(
+        $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
             'contentTemplate' => $template,
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
-                'mauticContent' => $this->mauticContent
-            )
-        );
+                'mauticContent' => $this->mauticContent,
+            ],
+        ];
 
         //form not found
         if ($entity === null) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
-                    array(
-                        'flashes' => array(
-                            array(
+                    [
+                        'flashes' => [
+                            [
                                 'type'    => 'error',
                                 'msg'     => $this->langStringBase.'.error.notfound',
-                                'msgVars' => array('%id%' => $objectId)
-                            )
-                        )
-                    )
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
                 )
             );
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -643,7 +643,7 @@ class FormController extends CommonController
             return $this->isLocked($postActionVars, $entity, $this->modelName);
         }
 
-        $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl($this->routeBase.'_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -666,21 +666,21 @@ class FormController extends CommonController
 
                         $this->addFlash(
                             'mautic.core.notice.updated',
-                            array(
+                            [
                                 '%name%'      => $entity->getName(),
                                 '%menu_link%' => $this->routeBase.'_index',
                                 '%url%'       => $this->generateUrl(
                                     $this->routeBase.'_action',
-                                    array(
+                                    [
                                         'objectAction' => 'edit',
-                                        'objectId'     => $entity->getId()
-                                    )
-                                )
-                            )
+                                        'objectId'     => $entity->getId(),
+                                    ]
+                                ),
+                            ]
                         );
 
                         if (!$this->isFormApplied($form) && method_exists($this, 'viewAction')) {
-                            $viewParameters = array('objectId' => $entity->getId(), 'objectAction' => 'view');
+                            $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl($this->routeBase.'_action', $viewParameters);
                             $template       = $this->templateBase.':view';
                         }
@@ -692,7 +692,7 @@ class FormController extends CommonController
                     $model->unlockEntity($entity);
                 }
 
-                $viewParameters = array('page' => $page);
+                $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
                 $template       = $this->templateBase.':index';
             }
@@ -701,11 +701,11 @@ class FormController extends CommonController
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
-                        array(
+                        [
                             'returnUrl'       => $returnUrl,
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => $template
-                        )
+                            'contentTemplate' => $template,
+                        ]
                     )
                 );
             } elseif ($valid) {
@@ -717,25 +717,25 @@ class FormController extends CommonController
             $model->lockEntity($entity);
         }
 
-        $delegateArgs = array(
-            'viewParameters'  => array(
-                'tmpl'  => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'entity'  => $entity,
-                'form'  => $form->createView()
-            ),
+        $delegateArgs = [
+            'viewParameters' => [
+                'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'entity' => $entity,
+                'form'   => $form->createView(),
+            ],
             'contentTemplate' => $this->templateBase.':form.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
                 'mauticContent' => $this->mauticContent,
                 'route'         => $this->generateUrl(
                     $this->routeBase.'_action',
-                    array(
+                    [
                         'objectAction' => 'edit',
-                        'objectId'     => $entity->getId()
-                    )
-                )
-            )
-        );
+                        'objectId'     => $entity->getId(),
+                    ]
+                ),
+            ],
+        ];
 
         // Allow inherited class to adjust
         if (method_exists($this, 'customizeViewArguments')) {
@@ -746,7 +746,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Clone an entity
+     * Clone an entity.
      *
      * @param int $objectId
      *
@@ -785,7 +785,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
      * @param int $objectId
      *
@@ -793,30 +793,30 @@ class FormController extends CommonController
      */
     protected function deleteStandard($objectId)
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
-        $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
-        $flashes   = array();
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
+        $returnUrl = $this->generateUrl($this->routeBase.'_index', ['page' => $page]);
+        $flashes   = [];
 
-        $postActionVars = array(
+        $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => $this->templateBase.':index',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
-                'mauticContent' => $this->mauticContent
-            )
-        );
+                'mauticContent' => $this->mauticContent,
+            ],
+        ];
 
         if ($this->request->getMethod() == 'POST') {
             $model  = $this->getModel($this->modelName);
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
-                $flashes[] = array(
+                $flashes[] = [
                     'type'    => 'error',
                     'msg'     => $this->langStringBase.'.error.notfound',
-                    'msgVars' => array('%id%' => $objectId)
-                );
+                    'msgVars' => ['%id%' => $objectId],
+                ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 $this->permissionBase.':deleteown',
                 $this->permissionBase.':deleteother',
@@ -831,62 +831,62 @@ class FormController extends CommonController
             $model->deleteEntity($entity);
 
             $identifier = $this->get('translator')->trans($entity->getName());
-            $flashes[]  = array(
+            $flashes[]  = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
-                'msgVars' => array(
+                'msgVars' => [
                     '%name%' => $identifier,
-                    '%id%'   => $objectId
-                )
-            );
+                    '%id%'   => $objectId,
+                ],
+            ];
         } //else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
                 $postActionVars,
-                array(
-                    'flashes' => $flashes
-                )
+                [
+                    'flashes' => $flashes,
+                ]
             )
         );
     }
 
     /**
-     * Deletes a group of entities
+     * Deletes a group of entities.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function batchDeleteStandard()
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
-        $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
-        $flashes   = array();
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
+        $returnUrl = $this->generateUrl($this->routeBase.'_index', ['page' => $page]);
+        $flashes   = [];
 
-        $postActionVars = array(
+        $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => $this->templateBase.':index',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
-                'mauticContent' => $this->mauticContent
-            )
-        );
+                'mauticContent' => $this->mauticContent,
+            ],
+        ];
 
         if ($this->request->getMethod() == 'POST') {
             $model     = $this->getModel($this->modelName);
             $ids       = json_decode($this->request->query->get('ids', ''));
-            $deleteIds = array();
+            $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
-                    $flashes[] = array(
+                    $flashes[] = [
                         'type'    => 'error',
                         'msg'     => $this->langStringBase.'.error.notfound',
-                        'msgVars' => array('%id%' => $objectId)
-                    );
+                        'msgVars' => ['%id%' => $objectId],
+                    ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     $this->permissionBase.':deleteown',
                     $this->permissionBase.':deleteother',
@@ -905,22 +905,22 @@ class FormController extends CommonController
             if (!empty($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
 
-                $flashes[] = array(
+                $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => $this->langStringBase.'.notice.batch_deleted',
-                    'msgVars' => array(
-                        '%count%' => count($entities)
-                    )
-                );
+                    'msgVars' => [
+                        '%count%' => count($entities),
+                    ],
+                ];
             }
         } //else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
                 $postActionVars,
-                array(
-                    'flashes' => $flashes
-                )
+                [
+                    'flashes' => $flashes,
+                ]
             )
         );
     }

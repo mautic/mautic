@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,53 +15,51 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 
 /**
- * Class FormSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::FORM_ON_BUILD => array('onFormBuilder', 0),
-        );
+        return [
+            FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
+        ];
     }
 
     /**
-     * Add a send email actions to available form submit actions
+     * Add a send email actions to available form submit actions.
      *
      * @param FormBuilderEvent $event
      */
-    public function onFormBuilder (FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event)
     {
         // Add form submit actions
         // Send email to user
-        $action = array(
-            'group'       => 'mautic.email.actions',
-            'label'       => 'mautic.email.form.action.sendemail.admin',
-            'description' => 'mautic.email.form.action.sendemail.admin.descr',
-            'formType'    => 'email_submitaction_useremail',
-            'formTheme'   => 'MauticEmailBundle:FormTheme\EmailSendList',
-            'callback'    => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
-        );
+        $action = [
+            'group'             => 'mautic.email.actions',
+            'label'             => 'mautic.email.form.action.sendemail.admin',
+            'description'       => 'mautic.email.form.action.sendemail.admin.descr',
+            'formType'          => 'email_submitaction_useremail',
+            'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'callback'          => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
+            'allowCampaignForm' => true,
+        ];
 
         $event->addSubmitAction('email.send.user', $action);
 
         // Send email to lead
-        $action = array(
+        $action = [
             'group'           => 'mautic.email.actions',
             'label'           => 'mautic.email.form.action.sendemail.lead',
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'        => 'emailsend_list',
-            'formTypeOptions' => array('update_select' => 'formaction_properties_email'),
+            'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-            'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
-        );
+            'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
+        ];
 
         $event->addSubmitAction('email.send.lead', $action);
     }

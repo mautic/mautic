@@ -1,20 +1,20 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -44,17 +44,14 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory       $factory
      * @param LeadModel           $leadModel
      * @param DynamicContentModel $dynamicContentModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->session = $session;
-
-        parent::__construct($factory);
+        $this->session             = $session;
     }
 
     /**
@@ -63,9 +60,9 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
             DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -83,11 +80,11 @@ class CampaignSubscriber extends CommonSubscriber
                 'timelineTemplate'    => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
                 'hideTriggerMode'     => true,
                 'associatedDecisions' => ['dwc.decision'],
-                'anchorRestrictions'  => ['decision.inaction']
+                'anchorRestrictions'  => ['decision.inaction'],
             ]
         );
 
-        $event->addLeadDecision(
+        $event->addDecision(
             'dwc.decision',
             [
                 'label'           => 'mautic.dynamicContent.campaign.decision_dwc',
@@ -118,9 +115,10 @@ class CampaignSubscriber extends CommonSubscriber
                 $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
             }
 
-            $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
+            $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
 
             $event->stopPropagation();
+
             return $event->setResult(true);
         }
     }
@@ -130,9 +128,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $eventConfig  = $event->getConfig();
-        $lead         = $event->getLead();
-        $slot         = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
+        $eventConfig = $event->getConfig();
+        $lead        = $event->getLead();
+        $slot        = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
 
         $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
 
@@ -147,7 +145,7 @@ class CampaignSubscriber extends CommonSubscriber
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
             $content = $tokenEvent->getContent();
 

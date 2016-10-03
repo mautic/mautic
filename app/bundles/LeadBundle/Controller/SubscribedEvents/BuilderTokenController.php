@@ -1,20 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Controller\SubscribedEvents;
 
 /**
- * Class BuilderTokenController
+ * Class BuilderTokenController.
  */
 class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEvents\BuilderTokenController
 {
-
     /**
      * @return string
      */
@@ -23,9 +23,6 @@ class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEve
         return 'lead.field';
     }
 
-    /**
-     *
-     */
     public function getBundleName()
     {
         return 'MauticLeadBundle';
@@ -36,7 +33,7 @@ class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEve
      */
     public function getPermissionSet()
     {
-        return array('lead:fields:full');
+        return ['lead:fields:full'];
     }
 
     /**
@@ -44,19 +41,19 @@ class BuilderTokenController extends \Mautic\CoreBundle\Controller\SubscribedEve
      */
     public function getEntityArguments()
     {
-        return array(
-            'filter' => array(
-                'force' => array(
-                    array(
+        return [
+            'filter' => [
+                'force' => [
+                    [
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
-                        'value'  => true
-                    )
-                )
-            ),
+                        'value'  => true,
+                    ],
+                ],
+            ],
             'orderBy'        => 'f.label',
             'orderByDir'     => 'ASC',
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        );
+            'hydration_mode' => 'HYDRATE_ARRAY',
+        ];
     }
 }

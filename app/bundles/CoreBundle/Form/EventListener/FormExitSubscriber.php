@@ -1,24 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Form\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class FormExitSubscriber
+ * Class FormExitSubscriber.
  */
 class FormExitSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var \Mautic\CoreBundle\Model\CommonModel
      */
@@ -31,9 +31,9 @@ class FormExitSubscriber implements EventSubscriberInterface
 
     /**
      * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param array $options
+     * @param array                                $options
      */
-    public function __construct($model, $options = array())
+    public function __construct($model, $options = [])
     {
         $this->model   = $model;
         $this->options = $options;
@@ -44,13 +44,11 @@ class FormExitSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::PRE_SET_DATA  => 'preSetData');
+        return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }
 
     /**
      * @param FormEvent $event
-     *
-     * @return void
      */
     public function preSetData(FormEvent $event)
     {
@@ -59,27 +57,27 @@ class FormExitSubscriber implements EventSubscriberInterface
             //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();
 
-            $form->add('unlockModel', 'hidden', array(
+            $form->add('unlockModel', 'hidden', [
                 'data'     => $this->model,
                 'required' => false,
                 'mapped'   => false,
-                'attr'     => array('class' => 'form-exit-unlock-model')
-            ));
+                'attr'     => ['class' => 'form-exit-unlock-model'],
+            ]);
 
-            $form->add('unlockId', 'hidden', array(
+            $form->add('unlockId', 'hidden', [
                 'data'     => $id,
                 'required' => false,
                 'mapped'   => false,
-                'attr'     => array('class' => 'form-exit-unlock-id')
-            ));
+                'attr'     => ['class' => 'form-exit-unlock-id'],
+            ]);
 
             if (isset($this->options['unlockParameter'])) {
-                $form->add('unlockParameter', 'hidden', array(
+                $form->add('unlockParameter', 'hidden', [
                     'data'     => $this->options['unlockParameter'],
                     'required' => false,
                     'mapped'   => false,
-                    'attr'     => array('class' => 'form-exit-unlock-parameter')
-                ));
+                    'attr'     => ['class' => 'form-exit-unlock-parameter'],
+                ]);
             }
         }
     }

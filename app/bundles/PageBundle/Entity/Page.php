@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,16 +19,14 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Page
- *
- * @package Mautic\PageBundle\Entity
+ * Class Page.
  */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
@@ -62,7 +61,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @var array
      */
-    private $content = array();
+    private $content = [];
 
     /**
      * @var \DateTime
@@ -115,7 +114,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $category;
 
     /**
-     * Used to identify the page for the builder
+     * Used to identify the page for the builder.
      *
      * @var
      */
@@ -131,9 +130,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
@@ -142,13 +141,13 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
-            ->addIndex(array('alias'), 'page_alias_search');
+            ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();
 
@@ -207,24 +206,24 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.core.title.required'
-        )));
+        $metadata->addPropertyConstraint('title', new NotBlank([
+            'message' => 'mautic.core.title.required',
+        ]));
 
-        $metadata->addConstraint(new Callback(array(
+        $metadata->addConstraint(new Callback([
             'callback' => function (Page $page, ExecutionContextInterface $context) {
                 $type = $page->getRedirectType();
                 if (!is_null($type)) {
                     $validator = $context->getValidator();
-                    $violations = $validator->validate($page->getRedirectUrl(), array(
+                    $violations = $validator->validate($page->getRedirectUrl(), [
                         new Assert\Url(
-                            array(
-                                'message' => 'mautic.core.value.required'
-                            )
-                        )
-                    ));
+                            [
+                                'message' => 'mautic.core.value.required',
+                            ]
+                        ),
+                    ]);
 
                     if (count($violations) > 0) {
                         $string = (string) $violations;
@@ -251,12 +250,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                             ->addViolation();
                     }
                 }
-            }
-        )));
+            },
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -264,15 +263,15 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     {
         $metadata->setGroupPrefix('page')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'title',
                     'alias',
                     'category',
-                )
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'language',
                     'publishUp',
                     'publishDown',
@@ -288,8 +287,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'variantParent',
                     'variantChildren',
                     'translationParent',
-                    'translationChildren'
-                )
+                    'translationChildren',
+                ]
             )
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
@@ -299,23 +298,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
      *
      * @return Page
      */
-    public function setTitle ($title)
+    public function setTitle($title)
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -324,23 +323,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
-    public function getTitle ()
+    public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     * Set alias
+     * Set alias.
      *
      * @param string $alias
      *
      * @return Page
      */
-    public function setAlias ($alias)
+    public function setAlias($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -349,23 +348,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get alias
+     * Get alias.
      *
      * @return string
      */
-    public function getAlias ()
+    public function getAlias()
     {
         return $this->alias;
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
      *
      * @return Page
      */
-    public function setContent ($content)
+    public function setContent($content)
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -374,23 +373,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get content
+     * Get content.
      *
      * @return string
      */
-    public function getContent ()
+    public function getContent()
     {
         return $this->content;
     }
 
     /**
-     * Set publishUp
+     * Set publishUp.
      *
      * @param \DateTime $publishUp
      *
      * @return Page
      */
-    public function setPublishUp ($publishUp)
+    public function setPublishUp($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -399,23 +398,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishUp
+     * Get publishUp.
      *
      * @return \DateTime
      */
-    public function getPublishUp ()
+    public function getPublishUp()
     {
         return $this->publishUp;
     }
 
     /**
-     * Set publishDown
+     * Set publishDown.
      *
      * @param \DateTime $publishDown
      *
      * @return Page
      */
-    public function setPublishDown ($publishDown)
+    public function setPublishDown($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -424,23 +423,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishDown
+     * Get publishDown.
      *
      * @return \DateTime
      */
-    public function getPublishDown ()
+    public function getPublishDown()
     {
         return $this->publishDown;
     }
 
     /**
-     * Set hits
+     * Set hits.
      *
-     * @param integer $hits
+     * @param int $hits
      *
      * @return Page
      */
-    public function setHits ($hits)
+    public function setHits($hits)
     {
         $this->hits = $hits;
 
@@ -448,25 +447,25 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get hits
+     * Get hits.
      *
      * @param bool $includeVariants
      *
      * @return int|mixed
      */
-    public function getHits ($includeVariants = false)
+    public function getHits($includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getHits') : $this->hits;
     }
 
     /**
-     * Set revision
+     * Set revision.
      *
-     * @param integer $revision
+     * @param int $revision
      *
      * @return Page
      */
-    public function setRevision ($revision)
+    public function setRevision($revision)
     {
         $this->revision = $revision;
 
@@ -474,23 +473,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get revision
+     * Get revision.
      *
-     * @return integer
+     * @return int
      */
-    public function getRevision ()
+    public function getRevision()
     {
         return $this->revision;
     }
 
     /**
-     * Set metaDescription
+     * Set metaDescription.
      *
      * @param string $metaDescription
      *
      * @return Page
      */
-    public function setMetaDescription ($metaDescription)
+    public function setMetaDescription($metaDescription)
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -499,23 +498,24 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get metaDescription
+     * Get metaDescription.
      *
      * @return string
      */
-    public function getMetaDescription ()
+    public function getMetaDescription()
     {
         return $this->metaDescription;
     }
 
     /**
-     * Set redirectType
+     * Set redirectType.
      *
      * @param string $redirectType
      *
      * @return Page
      */
-    public function setRedirectType($redirectType) {
+    public function setRedirectType($redirectType)
+    {
         $this->isChanged('redirectType', $redirectType);
         $this->redirectType = $redirectType;
 
@@ -523,22 +523,24 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get redirectType
+     * Get redirectType.
      *
      * @return string
      */
-    public function getRedirectType() {
+    public function getRedirectType()
+    {
         return $this->redirectType;
     }
 
     /**
-     * Set redirectUrl
+     * Set redirectUrl.
      *
      * @param string $redirectUrl
      *
      * @return Page
      */
-    public function setRedirectUrl($redirectUrl) {
+    public function setRedirectUrl($redirectUrl)
+    {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
 
@@ -546,22 +548,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get redirectUrl
+     * Get redirectUrl.
      *
      * @return string
      */
-    public function getRedirectUrl(){
+    public function getRedirectUrl()
+    {
         return $this->redirectUrl;
     }
 
     /**
-     * Set category
+     * Set category.
      *
      * @param \Mautic\CategoryBundle\Entity\Category $category
      *
      * @return Page
      */
-    public function setCategory (Category $category = null)
+    public function setCategory(Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -570,23 +573,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get category
+     * Get category.
      *
      * @return \Mautic\CategoryBundle\Entity\Category
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
      * @param string $id
      *
      * @return Page
      */
-    public function setSessionId ($id)
+    public function setSessionId($id)
     {
         $this->sessionId = $id;
 
@@ -594,23 +597,23 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
      * @return string
      */
-    public function getSessionId ()
+    public function getSessionId()
     {
         return $this->sessionId;
     }
 
     /**
-     * Set template
+     * Set template.
      *
      * @param string $template
      *
      * @return Page
      */
-    public function setTemplate ($template)
+    public function setTemplate($template)
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -619,11 +622,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get template
+     * Get template.
      *
      * @return string
      */
-    public function getTemplate ()
+    public function getTemplate()
     {
         return $this->template;
     }
@@ -632,16 +635,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @param $prop
      * @param $val
      */
-    protected function isChanged ($prop, $val)
+    protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'translationParent' || $prop == 'variantParent' || $prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
+                $this->changes[$prop] = [$currentId, $newId];
             }
         } else {
             parent::isChanged($prop, $val);
@@ -649,13 +652,13 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set uniqueHits
+     * Set uniqueHits.
      *
-     * @param integer $uniqueHits
+     * @param int $uniqueHits
      *
      * @return Page
      */
-    public function setUniqueHits ($uniqueHits)
+    public function setUniqueHits($uniqueHits)
     {
         $this->uniqueHits = $uniqueHits;
 
@@ -663,11 +666,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get uniqueHits
+     * Get uniqueHits.
      *
-     * @return integer
+     * @return int
      */
-    public function getUniqueHits ($includeVariants = false)
+    public function getUniqueHits($includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getUniqueHits') : $this->uniqueHits;
     }
@@ -677,7 +680,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      *
      * @return int|mixed
      */
-    public function getVariantHits ($includeVariants = false)
+    public function getVariantHits($includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
@@ -685,7 +688,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param mixed $variantHits
      */
-    public function setVariantHits ($variantHits)
+    public function setVariantHits($variantHits)
     {
         $this->variantHits = $variantHits;
     }
@@ -693,7 +696,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @return mixed
      */
-    public function getCustomHtml ()
+    public function getCustomHtml()
     {
         return $this->customHtml;
     }
@@ -701,7 +704,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param mixed $customHtml
      */
-    public function setCustomHtml ($customHtml)
+    public function setCustomHtml($customHtml)
     {
         $this->customHtml = $customHtml;
     }

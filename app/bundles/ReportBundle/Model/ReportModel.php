@@ -1,14 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,16 +25,14 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
- * Class ReportModel
+ * Class ReportModel.
  */
 class ReportModel extends FormModel
 {
@@ -141,16 +141,16 @@ class ReportModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = ReportEvents::REPORT_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = ReportEvents::REPORT_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = ReportEvents::REPORT_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = ReportEvents::REPORT_POST_DELETE;
                 break;
             default:
@@ -172,7 +172,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Build the table and graph data
+     * Build the table and graph data.
      *
      * @param $context
      *
@@ -185,8 +185,8 @@ class ReportModel extends FormModel
         if (empty($data[$context])) {
             // Check to see if all has been obtained
             if (isset($data['all'])) {
-                $data[$context]['tables'] =& $data['all']['tables'][$context];
-                $data[$context]['graphs'] =& $data['all']['graphs'][$context];
+                $data[$context]['tables'] = &$data['all']['tables'][$context];
+                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
@@ -219,7 +219,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Builds the table lookup data for the report forms
+     * Builds the table lookup data for the report forms.
      *
      * @param string $context
      *
@@ -281,8 +281,8 @@ class ReportModel extends FormModel
     {
         $tableData = $this->getTableData($context);
 
-        $return                  = new \stdClass();
-        $filters                 = (isset($tableData['filters'])) ? $tableData['filters']
+        $return  = new \stdClass();
+        $filters = (isset($tableData['filters'])) ? $tableData['filters']
             : (isset($tableData['columns']) ? $tableData['columns'] : []);
         $return->choices         = [];
         $return->choiceHtml      = '';
@@ -322,7 +322,7 @@ class ReportModel extends FormModel
 
         // First sort
         foreach ($graphData as $key => $details) {
-            $return->choices[$key] = $this->translator->trans($key)." (".$this->translator->trans('mautic.report.graph.'.$details['type']).")";
+            $return->choices[$key] = $this->translator->trans($key).' ('.$this->translator->trans('mautic.report.graph.'.$details['type']).')';
         }
         natsort($return->choices);
 
@@ -334,19 +334,20 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Export report
+     * Export report.
      *
      * @param $format
      * @param $report
      * @param $reportData
      *
      * @return StreamedResponse|Response
+     *
      * @throws \Exception
      */
     public function exportResults($format, $report, $reportData)
     {
         $formatter = $this->formatterHelper;
-        $date      = (new DateTimeHelper)->toLocalString();
+        $date      = (new DateTimeHelper())->toLocalString();
         $name      = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
@@ -439,7 +440,6 @@ class ReportModel extends FormModel
                                 unset($row, $reportData['data'][$count]);
                             }
 
-
                             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
                             $objWriter->setPreCalculateFormulas(false);
 
@@ -463,7 +463,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Get report data for view rendering
+     * Get report data for view rendering.
      *
      * @param       $entity
      * @param       $formFactory
@@ -505,11 +505,11 @@ class ReportModel extends FormModel
 
         $paginate        = !empty($options['paginate']);
         $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
-        $data            = $graphs = [];
+        $data            = $graphs            = [];
         $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = $limit = 0;
+        $totalResults    = $limit    = 0;
 
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
@@ -529,7 +529,7 @@ class ReportModel extends FormModel
             'filters'        => (isset($tableDetails['filters'])) ? $tableDetails['filters'] : $tableDetails['columns'],
             'dateFrom'       => (isset($options['dateFrom'])) ? $options['dateFrom'] : null,
             'dateTo'         => (isset($options['dateTo'])) ? $options['dateTo'] : null,
-            'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : []
+            'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
@@ -569,7 +569,7 @@ class ReportModel extends FormModel
                         $graphOptions    = array_merge($defaultGraphOptions, $graphOptions);
                         $eventGraphs[$g] = [
                             'options' => $graphOptions,
-                            'type'    => $availableGraphs[$g]['type']
+                            'type'    => $availableGraphs[$g]['type'],
                         ];
                     }
                 }
@@ -617,9 +617,9 @@ class ReportModel extends FormModel
             if ($queryTime >= 1000) {
                 $queryTime *= 1000;
 
-                $queryTime .= "s";
+                $queryTime .= 's';
             } else {
-                $queryTime .= "ms";
+                $queryTime .= 'ms';
             }
 
             if (!$paginate) {
@@ -640,7 +640,7 @@ class ReportModel extends FormModel
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 
-            $debugData['query_time'] = (isset($queryTime)) ? $queryTime : "N/A";
+            $debugData['query_time'] = (isset($queryTime)) ? $queryTime : 'N/A';
         }
 
         return [
@@ -653,7 +653,7 @@ class ReportModel extends FormModel
             'limit'           => ($paginate) ? $limit : 0,
             'dateFrom'        => $dataOptions['dateFrom'],
             'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData
+            'debug'           => $debugData,
         ];
     }
 
@@ -668,7 +668,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Determine what operators should be used for the filter type
+     * Determine what operators should be used for the filter type.
      *
      * @param array $data
      *

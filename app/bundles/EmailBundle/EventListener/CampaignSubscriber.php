@@ -1,29 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
 /**
- * Class CampaignSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -38,30 +38,41 @@ class CampaignSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
+     * @var EmailModel
+     */
+    protected $messageQueueModel;
+
+    /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel     $leadModel
-     * @param EmailModel    $emailModel
+     * @param LeadModel         $leadModel
+     * @param EmailModel        $emailModel
+     * @param EventModel        $eventModel
+     * @param MessageQueueModel $messageQueueModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, EmailModel $emailModel)
+    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
     {
-        $this->leadModel  = $leadModel;
-        $this->emailModel = $emailModel;
-
-        parent::__construct($factory);
+        $this->leadModel          = $leadModel;
+        $this->emailModel         = $emailModel;
+        $this->campaignEventModel = $eventModel;
+        $this->messageQueueModel  = $messageQueueModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
             EmailEvents::EMAIL_ON_OPEN                => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
+            EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }
 
@@ -76,7 +87,7 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'         => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'associatedActions' => ['email.send'],
         ];
-        $event->addLeadDecision('email.open', $trigger);
+        $event->addDecision('email.open', $trigger);
 
         $action = [
             'label'           => 'mautic.email.campaign.event.send',
@@ -84,13 +95,13 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'        => 'emailsend_list',
             'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
+            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
         ];
         $event->addAction('email.send', $action);
     }
 
     /**
-     * Trigger campaign event for opening of an email
+     * Trigger campaign event for opening of an email.
      *
      * @param EmailOpenEvent $event
      */
@@ -99,7 +110,7 @@ class CampaignSubscriber extends CommonSubscriber
         $email = $event->getEmail();
 
         if ($email !== null) {
-            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email', $email->getId());
+            $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
 
@@ -128,9 +139,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $emailSent       = false;
-        $lead            = $event->getLead();
-        $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
+        $emailSent                   = false;
+        $lead                        = $event->getLead();
+        $leadCredentials             = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
         $leadCredentials['owner_id'] = (
             ($lead instanceof Lead) && ($owner = $lead->getOwner())
         ) ? $owner->getId() : 0;
@@ -139,27 +150,35 @@ class CampaignSubscriber extends CommonSubscriber
             $config  = $event->getConfig();
             $emailId = (int) $config['email'];
 
-            $email = $this->emailModel->getEntity($emailId);
+            $email   = $this->emailModel->getEntity($emailId);
+            $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+            $options = [
+                'source'         => ['campaign.event', $event->getEvent()['id']],
+                'email_attempts' => $config['attempts'],
+                'email_priority' => $config['priority'],
+                'email_type'     => $type,
+            ];
+
+            $event->setChannel('email', $emailId);
 
             if ($email != null && $email->isPublished()) {
                 // Determine if this email is transactional/marketing
-                $type = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+                $stats = [];
                 if ('marketing' == $type) {
                     // Determine if this lead has received the email before
-                    $stats = $this->emailModel->getStatRepository()->findContactEmailStats($leadCredentials['id'], $emailId);
-
-                    if (count($stats)) {
-                        // Already sent
-                        return $event->setResult(true);
-                    }
+                    $leadIds   = implode(',', [$leadCredentials['id']]);
+                    $stats     = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
+                    $emailSent = true; // Assume it was sent to prevent the campaign event from getting rescheduled over and over
                 }
 
-                $eventDetails = $event->getEventDetails();
-                $options      = ['source' => ['campaign', $eventDetails['campaign']['id']]];
-                $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                if (empty($stats)) {
+                    $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                }
+            } else {
+                return $event->setFailed('Email not found or published');
             }
-
-            $event->setChannel('email', $emailId);
+        } else {
+            return $event->setFailed('Contact does not have an email');
         }
 
         return $event->setResult($emailSent);

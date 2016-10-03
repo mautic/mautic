@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,8 +13,9 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+
 /**
- * Class Version20160805000123
+ * Class Version20160805000123.
  */
 class Version20160805000123 extends AbstractMauticMigration
 {
@@ -23,7 +25,6 @@ class Version20160805000123 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->getTable("{$this->prefix}notifications")->hasIndex("{$this->prefix}notification_read_status")) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }

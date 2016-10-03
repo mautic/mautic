@@ -1,29 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Controller;
 
-
 /**
- * Class LeadAccessTrait
+ * Class LeadAccessTrait.
  */
 trait LeadAccessTrait
 {
     /**
-     * Determines if the user has access to the lead the note is for
+     * Determines if the user has access to the lead the note is for.
      *
      * @param $leadId
      * @param $action
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkLeadAccess ($leadId, $action)
+    protected function checkLeadAccess($leadId, $action)
     {
         //make sure the user has view access to this lead
         $leadModel = $this->getModel('lead');
@@ -41,27 +41,25 @@ trait LeadAccessTrait
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadNote'
+                        'mauticContent' => 'leadNote',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.lead.lead.error.notfound',
-                            'msgVars' => ['%id%' => $leadId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $leadId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:'.$action.'own',
             'lead:leads:'.$action.'other',
-            $lead->getOwner()
+            $lead->getPermissionUser()
         )
         ) {
-
             return $this->accessDenied();
         } else {
-
             return $lead;
         }
     }

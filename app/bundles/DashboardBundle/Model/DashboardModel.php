@@ -1,27 +1,27 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\DashboardBundle\Model;
 
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
-use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class DashboardModel
+ * Class DashboardModel.
  */
 class DashboardModel extends FormModel
 {
@@ -29,7 +29,7 @@ class DashboardModel extends FormModel
      * @var Session
      */
     protected $session;
-    
+
     /**
      * @var CoreParametersHelper
      */
@@ -42,14 +42,14 @@ class DashboardModel extends FormModel
 
     /**
      * DashboardModel constructor.
-     * 
+     *
      * @param CoreParametersHelper $coreParametersHelper
-     * @param PathsHelper $pathsHelper
+     * @param PathsHelper          $pathsHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper = $pathsHelper;
+        $this->pathsHelper          = $pathsHelper;
     }
 
     /**
@@ -59,7 +59,7 @@ class DashboardModel extends FormModel
     {
         $this->session = $session;
     }
-    
+
     /**
      * {@inheritdoc}
      *
@@ -81,9 +81,10 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
+     *
      * @return null|object
      */
     public function getEntity($id = null)
@@ -98,35 +99,35 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Load widgets for the current user from database
+     * Load widgets for the current user from database.
      *
      * @return array
      */
     public function getWidgets()
     {
-        $widgets = $this->getEntities(array(
+        $widgets = $this->getEntities([
             'orderBy' => 'w.ordering',
-            'filter' => array(
-                'force' => array(
-                    array(
+            'filter'  => [
+                'force' => [
+                    [
                         'column' => 'w.createdBy',
                         'expr'   => 'eq',
-                        'value'  => $this->user->getId()
-                    )
-                )
-            )
-        ));
+                        'value'  => $this->user->getId(),
+                    ],
+                ],
+            ],
+        ]);
 
         return $widgets;
     }
 
     /**
-     * Fill widgets with their content
+     * Fill widgets with their content.
      *
      * @param array $widgets
      * @param array $filter
      */
-    public function populateWidgetsContent(&$widgets, $filter = array())
+    public function populateWidgetsContent(&$widgets, $filter = [])
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -139,7 +140,7 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Creates a new Widget object from an array data
+     * Creates a new Widget object from an array data.
      *
      * @param array $data
      *
@@ -147,10 +148,10 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetEntity($data)
     {
-        $entity = new Widget;
+        $entity = new Widget();
 
         foreach ($data as $property => $value) {
-            $method = "set".ucfirst($property);
+            $method = 'set'.ucfirst($property);
             if (method_exists($entity, $method)) {
                 $entity->$method($value);
             }
@@ -161,14 +162,14 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Load widget content from the onWidgetDetailGenerate event
+     * Load widget content from the onWidgetDetailGenerate event.
      *
      * @param Widget $widget
      * @param array  $filter
      */
-    public function populateWidgetContent(Widget &$widget, $filter = array())
+    public function populateWidgetContent(Widget &$widget, $filter = [])
     {
-        $cacheDir   = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
             $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
@@ -201,11 +202,11 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Clears the temporary widget cache
+     * Clears the temporary widget cache.
      */
     public function clearDashboardCache()
     {
-        $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheDir     = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
         $cacheStorage = new CacheStorageHelper($cacheDir, $this->user->getId());
         $cacheStorage->clear();
     }
@@ -213,21 +214,22 @@ class DashboardModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Widget                                $entity
+     * @param Widget                              $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param string|null                         $action
      * @param array                               $options
      *
      * @return \Symfony\Component\Form\Form
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Widget) {
-            throw new MethodNotAllowedHttpException(array('Widget'), 'Entity must be of class Widget()');
+            throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
         }
 
-        if (!empty($action))  {
+        if (!empty($action)) {
             $options['action'] = $action;
         }
 
@@ -235,7 +237,7 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Create/edit entity
+     * Create/edit entity.
      *
      * @param object $entity
      * @param bool   $unlock
@@ -244,14 +246,14 @@ class DashboardModel extends FormModel
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {
-            $entity->setName($this->translator->trans('mautic.widget.' . $entity->getType()));
+            $entity->setName($this->translator->trans('mautic.widget.'.$entity->getType()));
         }
 
         parent::saveEntity($entity, $unlock);
     }
 
     /**
-     * Generate default date range filter and time unit
+     * Generate default date range filter and time unit.
      *
      * @return array
      */
@@ -260,13 +262,13 @@ class DashboardModel extends FormModel
         $lastMonth = new \DateTime();
         $lastMonth->sub(new \DateInterval('P30D'));
 
-        $today       = new \DateTime();
-        $dateFrom    = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format('Y-m-d 00:00:00')));
-        $dateTo      = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d H:i:s')));
+        $today    = new \DateTime();
+        $dateFrom = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format('Y-m-d 00:00:00')));
+        $dateTo   = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d H:i:s')));
 
-        return array(
+        return [
             'dateFrom' => $dateFrom,
             'dateTo'   => $dateTo,
-        );
+        ];
     }
 }
