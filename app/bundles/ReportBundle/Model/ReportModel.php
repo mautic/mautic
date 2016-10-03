@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -372,9 +371,9 @@ class ReportModel extends FormModel
                             if ($count === 0) {
                                 //write the row
                                 fputcsv($handle, $header);
-                            } else {
-                                fputcsv($handle, $row);
                             }
+
+                            fputcsv($handle, $row);
 
                             //free memory
                             unset($row, $reportData['data'][$count]);
