@@ -42,7 +42,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if ($entity != null) {
-            $fieldValues = $this->getFieldValues($id);
+            $fieldValues = $this->getFieldValues($id, true, 'company');
             $entity->setFields($fieldValues);
         }
 

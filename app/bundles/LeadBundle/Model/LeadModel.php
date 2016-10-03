@@ -553,8 +553,6 @@ class LeadModel extends FormModel
      */
     public function getLeadDetails($lead)
     {
-        static $details = [];
-
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
             if (!empty($fields)) {
