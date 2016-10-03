@@ -958,7 +958,19 @@ var Mautic = {
             if (mQuery(el).attr('data-new-route')) {
                 // Register method to initiate new
                 mQuery(el).on('change', function () {
-                    Mautic.loadAjaxModalBySelectValue(this, 'new', mQuery(el).attr('data-new-route'), mQuery(el).attr('data-header'));
+                    var url = mQuery(el).attr('data-new-route');
+                    // If the element is already in a modal then use a popup
+                    if (mQuery(el).closest('.modal').length > 0) {
+                        var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
+                        Mautic.loadNewWindow({
+                            "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + mQuery(el).attr('id')
+                        });
+                        // De-select the new select option
+                        mQuery(el).find('option[value="new"]').prop('selected', false);
+                        mQuery(el).trigger('chosen:updated');
+                    } else {
+                        Mautic.loadAjaxModalBySelectValue(this, 'new', url, mQuery(el).attr('data-header'));
+                    }
                 });
             }
 
@@ -968,7 +980,6 @@ var Mautic = {
             var multiPlaceholder = mauticLang['chosenChooseMore'],
                 singlePlaceholder = mauticLang['chosenChooseOne'];
         }
-        ;
 
         mQuery(el).chosen({
             placeholder_text_multiple: multiPlaceholder,

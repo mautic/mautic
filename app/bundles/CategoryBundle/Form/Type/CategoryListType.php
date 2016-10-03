@@ -80,7 +80,7 @@ class CategoryListType extends AbstractType
 
                 return [
                     'class'    => 'form-control category-select',
-                    'onchange' => "Mautic.onCategoryChange(this, '{$newUrl}', '{$modalHeader}');",
+                    'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
                 ];
             },
             'required' => false,
