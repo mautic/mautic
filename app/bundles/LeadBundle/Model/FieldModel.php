@@ -190,7 +190,6 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companycity' => [
-            'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'company',
@@ -201,7 +200,7 @@ class FieldModel extends FormModel
             'object' => 'company',
         ],
         'companyzipcode' => [
-            'type'     => 'tel',
+            'fixed'    => true,
             'listable' => true,
             'object'   => 'company',
         ],
@@ -216,6 +215,7 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companywebsite' => [
+            'fixed'    => true,
             'type'     => 'url',
             'listable' => true,
             'object'   => 'company',
@@ -223,7 +223,6 @@ class FieldModel extends FormModel
         'companynumber_of_employees' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 0],
-            'fixed'      => true,
             'group'      => 'professional',
             'object'     => 'company',
         ],
@@ -236,7 +235,6 @@ class FieldModel extends FormModel
         'companyannual_revenue' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
-            'fixed'      => true,
             'listable'   => true,
             'group'      => 'professional',
             'object'     => 'company',
