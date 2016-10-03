@@ -19,7 +19,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class Company.
  */
-class Company extends FormEntity
+class Company extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 

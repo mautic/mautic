@@ -23,7 +23,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class Lead.
  */
-class Lead extends FormEntity
+class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 

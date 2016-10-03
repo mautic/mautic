@@ -78,8 +78,8 @@ trait CustomFieldEntityTrait
             $value = null;
         }
 
-        $this->changes['fields'][$alias] = [$oldValue, $value];
-        $this->updatedFields[$alias]     = $value;
+        $this->addChange('fields', [$alias => [$oldValue, $value]]);
+        $this->updatedFields[$alias] = $value;
     }
 
     /**
