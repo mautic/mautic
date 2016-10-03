@@ -169,7 +169,7 @@ class EntityLookupType extends AbstractType
             return ($modalRoute) ? ['new' => $this->translator->trans('mautic.core.createnew')] : [];
         }
 
-        array_map(
+        $data = array_map(
             function ($v) {
                 return (int) $v;
             },
