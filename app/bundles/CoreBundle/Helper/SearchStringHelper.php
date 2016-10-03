@@ -180,7 +180,7 @@ class SearchStringHelper
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = strtolower($type);
         } elseif ($setFilter) {
-            $string = strtolower($string);
+            $string = trim(strtolower($string));
 
             //remove operators
             if (in_array($string, ['or', 'and'])) {

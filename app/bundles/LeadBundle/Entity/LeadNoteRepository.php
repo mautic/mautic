@@ -88,19 +88,13 @@ class LeadNoteRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->like('n.text', ":$unique");
-
-        if ($filter->not) {
-            $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'n.text',
+            ]
+        );
     }
 
     /**

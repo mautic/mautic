@@ -75,31 +75,19 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param QueryBuilder $q
      * @param              $filter
-     * @param string       $object name of object using the custom fields
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter, $object = 'lead')
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('f.label',  ':'.$unique),
-            $q->expr()->like('f.alias', ':'.$unique)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'f.label',
+                'f.alias',
+            ]
         );
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        $q->andWhere(
-            $q->expr()->eq('f.object', ':object')
-        )->setParameter('object', $object);
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
     }
 
     /**

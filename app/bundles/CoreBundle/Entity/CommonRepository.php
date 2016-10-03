@@ -299,11 +299,6 @@ class CommonRepository extends EntityRepository
             //parse the filter if set
             if (!empty($string) || !empty($forceExpressions)) {
                 if (!empty($string)) {
-                    //remove wildcards passed by user
-                    if (strpos($string, '%') !== false) {
-                        $string = str_replace('%', '', $string);
-                    }
-
                     $filter                         = $filterHelper->parseSearchString($string);
                     list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
 
@@ -593,17 +588,72 @@ class CommonRepository extends EntityRepository
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
     {
         $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $string = $filter->string;
+        if (!$filter->strict) {
+            if (strpos($string, '%') === false) {
+                $string = "$string%";
+            }
+        }
 
-        $expr = $q->expr()->orX();
+        $ormQb = true;
+
+        if ($q instanceof QueryBuilder) {
+            $xFunc    = 'orX';
+            $exprFunc = 'notLike';
+        } else {
+            $ormQb = false;
+            if ($filter->not) {
+                $xFunc    = 'andX';
+                $exprFunc = 'notLike';
+            } else {
+                $xFunc    = 'orX';
+                $exprFunc = 'like';
+            }
+        }
+
+        $expr = $q->expr()->$xFunc();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->like($col, ":$unique")
+                $q->expr()->$exprFunc($col, ":$unique")
             );
         }
 
-        if ($filter->not) {
+        if ($ormQb && $filter->not) {
             $expr = $q->expr()->not($expr);
+        }
+
+        return [
+            $expr,
+            ["$unique" => $string],
+        ];
+    }
+
+    /**
+     * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
+     *
+     * @param QueryBuilder $q
+     * @param object       $filter
+     * @param array        $columns
+     *
+     * @return array
+     */
+    protected function addDbalCatchAllWhereClause(&$q, $filter, array $columns)
+    {
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "{$filter->string}";
+        if ($filter->not) {
+            $xFunc    = 'andX';
+            $exprFunc = 'notLike';
+        } else {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+        }
+        $expr = $q->expr()->$xFunc();
+
+        foreach ($columns as $column) {
+            $expr->add(
+                $q->expr()->$exprFunc($column, ":$unique")
+            );
         }
 
         return [
@@ -971,6 +1021,8 @@ class CommonRepository extends EntityRepository
      * @param      $alias
      * @param null $catAlias
      * @param null $lang
+     *
+     * @return mixed|null
      */
     public function findOneBySlugs($alias, $catAlias = null, $lang = null)
     {

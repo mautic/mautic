@@ -345,6 +345,7 @@ class CampaignRepository extends CommonRepository
     public function getCampaignLeadsFromLists($id, array $lists, $args = [])
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
+        $withMinId     = (!array_key_exists('withMinId', $args)) ? false : $args['withMinId'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
@@ -354,6 +355,9 @@ class CampaignRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('max(list_leads.lead_id) as max_id, count(distinct(list_leads.lead_id)) as lead_count');
+            if ($withMinId) {
+                $q->addSelect('min(list_leads.lead_id) as min_id');
+            }
         } else {
             $q->select('distinct(list_leads.lead_id) as id');
         }
@@ -371,7 +375,11 @@ class CampaignRepository extends CommonRepository
                 $q->expr()->lte('list_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 
-            if (!empty($batchLimiters['maxId'])) {
+            if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+                $expr->add(
+                    $q->expr()->comparison('list_leads.lead_id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+                );
+            } elseif (!empty($batchLimiters['maxId'])) {
                 // Only leads that existed at the time of count
                 $expr->add(
                     $q->expr()->lte('list_leads.lead_id', $batchLimiters['maxId'])
@@ -414,6 +422,9 @@ class CampaignRepository extends CommonRepository
                     'count' => $r['lead_count'],
                     'maxId' => $r['max_id'],
                 ];
+                if ($withMinId) {
+                    $leads['minId'] = $r['min_id'];
+                }
             } else {
                 $leads[] = $r['id'];
             }
