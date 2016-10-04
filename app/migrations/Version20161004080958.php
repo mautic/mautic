@@ -15,7 +15,9 @@ use Doctrine\DBAL\Types\StringType;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Change referer columns from varchar to longtext because of SQL error:
+ * "Data too long for column 'referer'"
+ * (GH issue #2187).
  */
 class Version20161004080958 extends AbstractMauticMigration
 {
