@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -106,7 +105,7 @@ class Download
 
         $builder->addField('code', 'integer');
 
-        $builder->createField('referer', 'string')
+        $builder->createField('referer', 'text')
             ->nullable()
             ->build();
 
