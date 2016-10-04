@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +14,10 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * Class AuditLogModel
+ * Class AuditLogModel.
  */
 class AuditLogModel extends AbstractCommonModel
 {
-
     /**
      * {@inheritdoc}
      *
@@ -29,18 +29,18 @@ class AuditLogModel extends AbstractCommonModel
     }
 
     /**
-     * Writes an entry to the audit log
+     * Writes an entry to the audit log.
      *
      * @param array $args [bundle, object, objectId, action, details, ipAddress]
      */
     public function writeToLog(array $args)
     {
-        $bundle    = (isset($args["bundle"])) ? $args["bundle"] : "";
-        $object    = (isset($args["object"])) ? $args["object"] : "";
-        $objectId  = (isset($args["objectId"])) ? $args["objectId"] : "";
-        $action    = (isset($args["action"])) ? $args["action"] : "";
-        $details   = (isset($args["details"])) ? $args["details"] : "";
-        $ipAddress = (isset($args["ipAddress"])) ? $args["ipAddress"] : "";
+        $bundle    = (isset($args['bundle'])) ? $args['bundle'] : '';
+        $object    = (isset($args['object'])) ? $args['object'] : '';
+        $objectId  = (isset($args['objectId'])) ? $args['objectId'] : '';
+        $action    = (isset($args['action'])) ? $args['action'] : '';
+        $details   = (isset($args['details'])) ? $args['details'] : '';
+        $ipAddress = (isset($args['ipAddress'])) ? $args['ipAddress'] : '';
 
         $log = new AuditLog();
         $log->setBundle($bundle);
@@ -51,7 +51,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->user : null;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
         $userId   = 0;
         $userName = '';
         if (!$user instanceof User) {
@@ -64,13 +64,13 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository("MauticCoreBundle:AuditLog")->saveEntity($log);
+        $this->em->getRepository('MauticCoreBundle:AuditLog')->saveEntity($log);
 
         $this->em->detach($log);
     }
 
     /**
-     * Get the audit log for specific object
+     * Get the audit log for specific object.
      *
      * @param      $object
      * @param      $id
@@ -82,6 +82,6 @@ class AuditLogModel extends AbstractCommonModel
      */
     public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {
-        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit, $afterDate, $bundle);
+        return $this->em->getRepository('MauticCoreBundle:AuditLog')->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,10 +13,9 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class MaintenanceSubscriber
+ * Class MaintenanceSubscriber.
  */
 class MaintenanceSubscriber extends CommonSubscriber
 {
@@ -27,7 +27,7 @@ class MaintenanceSubscriber extends CommonSubscriber
     /**
      * MaintenanceSubscriber constructor.
      *
-     * @param Connection    $db
+     * @param Connection $db
      */
     public function __construct(Connection $db)
     {
@@ -40,14 +40,14 @@ class MaintenanceSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]
+            CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50],
         ];
     }
 
     /**
      * @param MaintenanceEvent $event
      */
-    public function onDataCleanup (MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event)
     {
         $this->cleanupData($event, 'audit_log');
         $this->cleanupData($event, 'notifications');
@@ -57,7 +57,7 @@ class MaintenanceSubscriber extends CommonSubscriber
      * @param MaintenanceEvent $event
      * @param                  $table
      */
-    private function cleanupData (MaintenanceEvent $event, $table)
+    private function cleanupData(MaintenanceEvent $event, $table)
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));

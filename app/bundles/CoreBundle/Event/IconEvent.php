@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,14 +14,14 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class IconEvent
+ * Class IconEvent.
  */
 class IconEvent extends Event
 {
     /**
      * @var array
      */
-    protected $icons = array();
+    protected $icons = [];
 
     /**
      * @var CorePermissions
@@ -46,8 +47,6 @@ class IconEvent extends Event
     /**
      * @param string $type
      * @param string $icon
-     *
-     * @return void
      */
     public function addIcon($type, $icon)
     {
@@ -55,7 +54,7 @@ class IconEvent extends Event
     }
 
     /**
-     * Return the icons
+     * Return the icons.
      *
      * @return array
      */

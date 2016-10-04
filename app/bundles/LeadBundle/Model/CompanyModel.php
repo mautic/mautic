@@ -1,30 +1,33 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Entity\CompanyLeadRepository;
-use Mautic\LeadBundle\Event\CompanyBuilderEvent;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class CompanyModel
+ * Class CompanyModel.
  */
-class CompanyModel extends CommonFormModel
+class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
     /**
      * @var Session
@@ -35,17 +38,19 @@ class CompanyModel extends CommonFormModel
      * @var FieldModel
      */
     protected $leadFieldModel;
+
     /**
-     * PointModel constructor.
+     * CompanyModel constructor.
      *
-     * @param Session $session
-     *
+     * @param FieldModel $leadFieldModel
+     * @param Session    $session
      */
     public function __construct(FieldModel $leadFieldModel, Session $session)
     {
         $this->leadFieldModel = $leadFieldModel;
-        $this->session = $session;
+        $this->session        = $session;
     }
+
     /**
      * {@inheritdoc}
      *
@@ -66,7 +71,6 @@ class CompanyModel extends CommonFormModel
         return $this->em->getRepository('MauticLeadBundle:CompanyLead');
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -82,7 +86,7 @@ class CompanyModel extends CommonFormModel
      */
     public function getNameGetter()
     {
-        return "getPrimaryIdentifier";
+        return 'getPrimaryIdentifier';
     }
 
     /**
@@ -90,14 +94,15 @@ class CompanyModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Company) {
-            throw new MethodNotAllowedHttpException(array('Company'));
+            throw new MethodNotAllowedHttpException(['Company']);
         }
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
         return $formFactory->create('company', $entity, $options);
     }
 
@@ -116,27 +121,27 @@ class CompanyModel extends CommonFormModel
     }
 
     /**
-     *
      * @return mixed
      */
     public function getUserCompanies()
     {
-        $user  = (!$this->security->isGranted('lead:leads:viewother')) ?
-            $this->user : false;
+        $user = (!$this->security->isGranted('lead:leads:viewother')) ?
+            $this->userHelper->getUser() : false;
         $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
         return $companies;
     }
 
     /**
-     * Reorganizes a field list to be keyed by field's group then alias
+     * Reorganizes a field list to be keyed by field's group then alias.
      *
      * @param $fields
+     *
      * @return array
      */
     public function organizeFieldsByGroup($fields)
     {
-        $array = array();
+        $array = [];
 
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
@@ -150,10 +155,10 @@ class CompanyModel extends CommonFormModel
                     $array[$group][$alias]['type']  = $field->getType();
                 }
             } else {
-                $alias = $field['alias'];
-                $field[]=$alias;
+                $alias   = $field['alias'];
+                $field[] = $alias;
                 if ($field['object'] === 'company') {
-                    $group = $field['group'];
+                    $group                          = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;
                     $array[$group][$alias]['label'] = $field['label'];
@@ -164,10 +169,10 @@ class CompanyModel extends CommonFormModel
         }
 
         //make sure each group key is present
-        $groups = array('core', 'social', 'personal', 'professional');
+        $groups = ['core', 'social', 'personal', 'professional'];
         foreach ($groups as $g) {
             if (!isset($array[$g])) {
-                $array[$g] = array();
+                $array[$g] = [];
             }
         }
 
@@ -195,7 +200,7 @@ class CompanyModel extends CommonFormModel
                 $fields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['object' => 'company'],
-                        'hydration_mode' => 'HYDRATE_ARRAY'
+                        'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
                 $fields = $this->organizeFieldsByGroup($fields);
@@ -224,13 +229,12 @@ class CompanyModel extends CommonFormModel
     }
 
     /** Add lead to company
-     *
-     * @param array|Company     $companies
-     * @param array|Lead        $lead
-     * @param bool              $manuallyAdded
-     * @param bool              $batchProcess
-     * @param int               $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
-     * @param \DateTime         $dateManipulated
+     * @param array|Company $companies
+     * @param array|Lead    $lead
+     * @param bool          $manuallyAdded
+     * @param bool          $batchProcess
+     * @param int           $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
+     * @param \DateTime     $dateManipulated
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -249,12 +253,14 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
-
+        if (!is_array($companies)) {
+            $companies = [$companies];
+        }
         /** @var Company[] $companyLeadAdd */
-        $companyLeadAdd = array();
+        $companyLeadAdd = [];
         if (!$companies instanceof Company) {
             //make sure they are ints
-            $searchForCompanies = array();
+            $searchForCompanies = [];
             foreach ($companies as $k => &$l) {
                 $l = (int) $l;
 
@@ -264,17 +270,17 @@ class CompanyModel extends CommonFormModel
             }
 
             if (!empty($searchForCompanies)) {
-                $companyEntities = $this->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                $companyEntities = $this->getEntities([
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'comp.id',
                                 'expr'   => 'in',
-                                'value'  => $searchForCompanies
-                            )
-                        )
-                    )
-                ));
+                                'value'  => $searchForCompanies,
+                            ],
+                        ],
+                    ],
+                ]);
 
                 foreach ($companyEntities as $company) {
                     $companyLeadAdd[$company->getId()] = $company;
@@ -285,15 +291,11 @@ class CompanyModel extends CommonFormModel
         } else {
             $companyLeadAdd[$companies->getId()] = $companies;
 
-            $companies = array($companies->getId());
+            $companies = [$companies->getId()];
         }
 
-        if (!is_array($companies)) {
-            $companies = array($companies);
-        }
-
-        $persistCompany   = array();
-        $dispatchEvents = array();
+        $persistCompany = [];
+        $dispatchEvents = [];
 
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
@@ -305,17 +307,17 @@ class CompanyModel extends CommonFormModel
                 $companyLead = null;
             } elseif ($searchCompanyLead) {
                 $companyLead = $this->getCompanyLeadRepository()->findOneBy(
-                    array(
-                        'lead' => $lead,
-                        'company' => $companyLeadAdd[$companyId]
-                    )
+                    [
+                        'lead'    => $lead,
+                        'company' => $companyLeadAdd[$companyId],
+                    ]
                 );
             } else {
                 $companyLead = $this->em->getReference('MauticLeadBundle:CompanyLead',
-                    array(
-                        'lead' => $leadId,
-                        'company' => $companyId
-                    )
+                    [
+                        'lead'    => $leadId,
+                        'company' => $companyId,
+                    ]
                 );
             }
 
@@ -326,8 +328,7 @@ class CompanyModel extends CommonFormModel
 
                     $persistLists[]   = $companyLead;
                     $dispatchEvents[] = $companyId;
-                    $companyName = $companyLeadAdd[$companyId]->getName();
-
+                    $companyName      = $companyLeadAdd[$companyId]->getName();
                 } else {
                     // Detach from Doctrine
                     $this->em->detach($companyLead);
@@ -341,9 +342,9 @@ class CompanyModel extends CommonFormModel
                 $companyLead->setManuallyAdded($manuallyAdded);
                 $companyLead->setDateAdded($dateManipulated);
 
-                $persistCompany[]   = $companyLead;
+                $persistCompany[] = $companyLead;
                 $dispatchEvents[] = $companyId;
-                $companyName = $companyLeadAdd[$companyId]->getName();
+                $companyName      = $companyLeadAdd[$companyId]->getName();
             }
         }
 
@@ -355,7 +356,7 @@ class CompanyModel extends CommonFormModel
         $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
 
         if (!empty($companyName)) {
-            $currentCompanyName  = $lead->getCompany();
+            $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
                 $lead->addUpdatedField('company', $companyName);
                 $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
@@ -365,7 +366,7 @@ class CompanyModel extends CommonFormModel
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
@@ -378,13 +379,13 @@ class CompanyModel extends CommonFormModel
     }
 
     /**
-     * Remove a lead from company
+     * Remove a lead from company.
      *
-     * @param           $companies
-     * @param           $lead
-     * @param bool      $manuallyRemoved
-     * @param bool      $batchProcess
-     * @param bool      $skipFindOne
+     * @param      $companies
+     * @param      $lead
+     * @param bool $manuallyRemoved
+     * @param bool $batchProcess
+     * @param bool $skipFindOne
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -397,28 +398,28 @@ class CompanyModel extends CommonFormModel
             $leadId = $lead->getId();
         }
 
-        $companyLeadRemove = array();
+        $companyLeadRemove = [];
         if (!$companies instanceof Company) {
             //make sure they are ints
-            $searchForCompanies = array();
+            $searchForCompanies = [];
             foreach ($companies as $k => &$l) {
-                $l = (int)$l;
+                $l = (int) $l;
                 if (!isset($companyLeadRemove[$l])) {
                     $searchForCompanies[] = $l;
                 }
             }
             if (!empty($searchForCompanies)) {
-                $companyEntities = $this->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                $companyEntities = $this->getEntities([
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'comp.id',
                                 'expr'   => 'in',
-                                'value'  => $searchForCompanies
-                            )
-                        )
-                    )
-                ));
+                                'value'  => $searchForCompanies,
+                            ],
+                        ],
+                    ],
+                ]);
 
                 foreach ($companyEntities as $company) {
                     $companyLeadRemove[$company->getId()] = $company;
@@ -426,34 +427,33 @@ class CompanyModel extends CommonFormModel
             }
 
             unset($companyEntities, $searchForCompanies);
-
         } else {
             $companyLeadRemove[$companies->getId()] = $companies;
 
-            $companies = array($companies->getId());
+            $companies = [$companies->getId()];
         }
 
         if (!is_array($companies)) {
-            $companies = array($companies);
+            $companies = [$companies];
         }
-        $persistCompany   = array();
-        $deleteCompany    = array();
-        $dispatchEvents = array();
+        $persistCompany = [];
+        $deleteCompany  = [];
+        $dispatchEvents = [];
 
         foreach ($companies as $companyId) {
-            if (!isset( $companyLeadRemove[$companyId])) {
+            if (!isset($companyLeadRemove[$companyId])) {
                 continue;
             }
 
             $companyLead = (!$skipFindOne) ?
-                $this->getCompanyLeadRepository()->findOneBy(array(
-                    'lead' => $lead,
-                    'company' => $companyLeadRemove[$companyId]
-                )) :
-                $this->em->getReference('MauticCompanyBundle:CompanyLead', array(
-                    'lead' => $leadId,
-                    'company' => $companyId
-                ));
+                $this->getCompanyLeadRepository()->findOneBy([
+                    'lead'    => $lead,
+                    'company' => $companyLeadRemove[$companyId],
+                ]) :
+                $this->em->getReference('MauticCompanyBundle:CompanyLead', [
+                    'lead'    => $leadId,
+                    'company' => $companyId,
+                ]);
 
             if ($companyLead == null) {
                 // Lead is not part of this list
@@ -462,12 +462,12 @@ class CompanyModel extends CommonFormModel
 
             if (($manuallyRemoved && $companyLead->wasManuallyAdded()) || (!$manuallyRemoved && !$companyLead->wasManuallyAdded())) {
                 //lead was manually added and now manually removed or was not manually added and now being removed
-                $deleteCompanyLead[]    = $companyLead;
-                $dispatchEvents[] = $companyId;
+                $deleteCompanyLead[] = $companyLead;
+                $dispatchEvents[]    = $companyId;
             } elseif ($manuallyRemoved && !$companyLead->wasManuallyAdded()) {
                 $companyLead->setManuallyRemoved(true);
 
-                $persistCompany[]   = $companyLead;
+                $persistCompany[] = $companyLead;
                 $dispatchEvents[] = $companyId;
             }
 
@@ -513,22 +513,93 @@ class CompanyModel extends CommonFormModel
     {
         $results = [];
         switch ($type) {
-            case 'company':
+            case 'companyfield':
+            case 'lead.company':
                 $expr = null;
 
-                if (is_array($filter)) {
-                    $column    = $filter[0];
-                    $filterVal = $filter[1];
-
-                    // @todo: Create a CompositeExpression filter and pass it to getSimpleList
+                if ('lead.company' === $type) {
+                    $column    = 'companyname';
+                    $filterVal = $filter;
                 } else {
-                    $column = $filter;
+                    if (is_array($filter)) {
+                        $column    = $filter[0];
+                        $filterVal = $filter[1];
+                    } else {
+                        $column = $filter;
+                    }
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($expr, [], $column);
+                $expr      = new ExpressionBuilder($this->em->getConnection());
+                $composite = $expr->andX();
+                $composite->add(
+                    $expr->like("comp.$column", ':filterVar')
+                );
+
+                // Validate owner permissions
+                if (!$this->security->isGranted('lead:leads:viewother')) {
+                    $composite->add(
+                        $expr->orX(
+                            $expr->andX(
+                                $expr->isNull('comp.owner_id'),
+                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                            ),
+                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                        )
+                    );
+                }
+
+                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+
                 break;
         }
 
         return $results;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof Company) {
+            throw new MethodNotAllowedHttpException(['Email']);
+        }
+
+        switch ($action) {
+            case 'pre_save':
+                $name = LeadEvents::COMPANY_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = LeadEvents::COMPANY_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = LeadEvents::COMPANY_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = LeadEvents::COMPANY_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new CompanyEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }

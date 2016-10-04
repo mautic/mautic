@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class CommonEvent
+ * Class CommonEvent.
  */
 class TokenReplacementEvent extends CommonEvent
 {
@@ -51,7 +52,7 @@ class TokenReplacementEvent extends CommonEvent
     public function __construct($content, $lead = null, array $clickthrough = [])
     {
         if ($content instanceof CommonEntity) {
-            $this->entity   = $content;
+            $this->entity = $content;
         }
 
         $this->content      = $content;

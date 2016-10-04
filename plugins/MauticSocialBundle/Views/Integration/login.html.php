@@ -1,30 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $defaultInputClass = 'button';
-$containerType = 'div-wrapper';
+$containerType     = 'div-wrapper';
 
-include __DIR__ . '/../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
+include __DIR__.'/../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
 $action   = $app->getRequest()->get('objectAction');
 $settings = $field['properties'];
 
-$integrations=(isset($settings['integrations']) and !empty($settings['integrations'])) ? explode(",",substr($settings['integrations'],0,-1)) : array();
+$integrations = (isset($settings['integrations']) and !empty($settings['integrations'])) ? explode(',', substr($settings['integrations'], 0, -1)) : [];
 
-$formName = str_replace("_", "", $formName);
+$formName    = str_replace('_', '', $formName);
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-	array(
-		'deleted' => false,
-		'id' => $id,
-		'formId' => $formId,
-		'formName' => $formName,
-		'disallowDelete' => false)
+    [
+        'deleted'        => false,
+        'id'             => $id,
+        'formId'         => $formId,
+        'formName'       => $formName,
+        'disallowDelete' => false, ]
 ) : '';
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
@@ -76,11 +76,10 @@ HTML;
 		</script>
 
 		<?php
-		echo $html;
-			foreach($integrations as $integration){
-				echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl("media/images/btn_".$integration.".png").'"></a>';
+        echo $html;
+            foreach ($integrations as $integration) {
+                echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl('media/images/btn_'.$integration.'.png').'"></a>';
+            }
 
-			}
-
-		?>
+        ?>
 </div>

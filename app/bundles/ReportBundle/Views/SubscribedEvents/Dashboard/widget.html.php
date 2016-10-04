@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (isset($chartData['data'])) {
     $chartData = $chartData['data'];
 }
@@ -15,8 +15,8 @@ if ($chartType === 'table') {
     echo $view->render(
         'MauticCoreBundle:Helper:table.html.php',
         [
-            'headItems'   => isset($chartData[0]) ? array_keys($chartData[0]) : [],
-            'bodyItems'   => $chartData
+            'headItems' => isset($chartData[0]) ? array_keys($chartData[0]) : [],
+            'bodyItems' => $chartData,
         ]
     );
 } else {
@@ -25,7 +25,7 @@ if ($chartType === 'table') {
         [
             'chartData'   => $chartData,
             'chartType'   => $chartType,
-            'chartHeight' => $chartHeight
+            'chartHeight' => $chartHeight,
         ]
     );
 }

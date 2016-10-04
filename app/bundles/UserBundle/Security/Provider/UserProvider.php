@@ -1,15 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Security\Provider;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
@@ -21,13 +21,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
- * Class UserProvider
+ * Class UserProvider.
  */
 class UserProvider implements UserProviderInterface
 {
@@ -81,6 +81,7 @@ class UserProvider implements UserProviderInterface
      * @param string $username
      *
      * @return User
+     *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
@@ -147,7 +148,7 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * Create/update user from authentication plugins
+     * Create/update user from authentication plugins.
      *
      * @param User      $user
      * @param bool|true $createIfNotExists
@@ -171,22 +172,18 @@ class UserProvider implements UserProviderInterface
 
         // Validation for User objects returned by a plugin
         if (!$user->getRole()) {
-
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }
 
         if (!$user->getUsername()) {
-
             throw new AuthenticationException('mautic.integration.sso.error.no_username');
         }
 
         if (!$user->getEmail()) {
-
             throw new AuthenticationException('mautic.integration.sso.error.no_email');
         }
 
         if (!$user->getFirstName() || !$user->getLastName()) {
-
             throw new AuthenticationException('mautic.integration.sso.error.no_name');
         }
 

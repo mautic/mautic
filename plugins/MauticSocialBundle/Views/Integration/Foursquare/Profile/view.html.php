@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -25,15 +26,15 @@
 
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="FoursquareProfile">
-        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:profile.html.php', array(
-            'lead'      => $lead,
-            'profile'   => $details['profile']
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:profile.html.php', [
+            'lead'    => $lead,
+            'profile' => $details['profile'],
+        ]); ?>
     </div>
     <div class="tab-pane" id="FoursquareTips">
-        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:tips.html.php', array(
-            'lead'      => $lead,
-            'activity'  => (!empty($details['activity']['tips'])) ? $details['activity']['tips'] : array()
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:tips.html.php', [
+            'lead'     => $lead,
+            'activity' => (!empty($details['activity']['tips'])) ? $details['activity']['tips'] : [],
+        ]); ?>
     </div>
 </div>

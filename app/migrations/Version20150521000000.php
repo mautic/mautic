@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +18,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\PageBundle\Entity\Redirect;
 
 /**
- * Migrate 1.0.5 to 1.0.6
+ * Migrate 1.0.5 to 1.0.6.
  *
  * Class Version20150521000000
  */
@@ -32,7 +33,7 @@ class Version20150521000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         // Test to see if this migration has already been applied
-        $table = $schema->getTable($this->prefix . 'form_fields');
+        $table = $schema->getTable($this->prefix.'form_fields');
         if ($table->hasColumn('lead_field')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
@@ -58,13 +59,13 @@ class Version20150521000000 extends AbstractMauticMigration
             $properties = unserialize($r['properties']);
             if (is_array($properties) && !empty($properties['message'])) {
                 $this->connection->update(MAUTIC_TABLE_PREFIX.'forms',
-                    array(
+                    [
                         'post_action'          => 'message',
-                        'post_action_property' => $properties['message']
-                    ),
-                    array(
-                        'id' => $r['form_id']
-                    )
+                        'post_action_property' => $properties['message'],
+                    ],
+                    [
+                        'id' => $r['form_id'],
+                    ]
                 );
             }
         }
@@ -91,7 +92,7 @@ class Version20150521000000 extends AbstractMauticMigration
             ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
             ->execute()
             ->fetchAll();
-        $fields  = array();
+        $fields = [];
         foreach ($results as $field) {
             $fields[$field['id']] = $field['alias'];
         }
@@ -108,9 +109,9 @@ class Version20150521000000 extends AbstractMauticMigration
             ->execute()
             ->fetchAll();
 
-        $formFieldMatches = array();
-        $actionEntities   = array();
-        $deleteActions    = array();
+        $formFieldMatches = [];
+        $actionEntities   = [];
+        $deleteActions    = [];
         foreach ($actions as $action) {
             try {
                 $properties = unserialize($action['properties']);
@@ -130,19 +131,17 @@ class Version20150521000000 extends AbstractMauticMigration
                     $formAction->setForm($em->getReference('MauticFormBundle:Form', $action['form_id']));
                     $formAction->setOrder($action['action_order']);
                     $formAction->setProperties(
-                        array(
+                        [
                             'operator' => 'plus',
-                            'points'   => $properties['points']
-                        )
+                            'points'   => $properties['points'],
+                        ]
                     );
                     $actionEntities[] = $formAction;
                     unset($formAction);
                 }
 
                 $deleteActions[] = $action['id'];
-
             } catch (\Exception $e) {
-
             }
         }
 
@@ -229,7 +228,7 @@ class Version20150521000000 extends AbstractMauticMigration
             )
             ->execute();
 
-        $q = $this->connection->createQueryBuilder();
+        $q      = $this->connection->createQueryBuilder();
         $clicks = $q->select('ph.url, ph.email_id, count(distinct(ph.tracking_id)) as unique_click_count, count(ph.tracking_id) as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->where(
@@ -242,7 +241,7 @@ class Version20150521000000 extends AbstractMauticMigration
             ->execute()->fetchAll();
 
         // See which already have URLs created as redirects
-        $redirectEntities = array();
+        $redirectEntities = [];
         foreach ($clicks as $click) {
             $redirect = new Redirect();
             $redirect->setDateAdded(new \DateTime());
@@ -292,7 +291,7 @@ class Version20150521000000 extends AbstractMauticMigration
         $results = $q->execute()->fetchAll();
 
         if (!empty($results)) {
-            $templateEmails   = array();
+            $templateEmails = [];
             foreach ($results as $email) {
                 $templateEmails[$email['email_id']] = $email;
             }
@@ -301,21 +300,21 @@ class Version20150521000000 extends AbstractMauticMigration
             $emailModel = $this->factory->getModel('email');
 
             $emails = $emailModel->getEntities(
-                array(
+                [
                     'iterator_mode' => true,
-                    'filter'        => array(
-                        'force' => array(
-                            array(
+                    'filter'        => [
+                        'force' => [
+                            [
                                 'column' => 'e.id',
                                 'expr'   => 'in',
-                                'value'  => $templateEmailIds
-                            )
-                        )
-                    )
-                )
+                                'value'  => $templateEmailIds,
+                            ],
+                        ],
+                    ],
+                ]
             );
 
-            $persistListEmails = $persistTemplateEmails = $variants = array();
+            $persistListEmails = $persistTemplateEmails = $variants = [];
 
             // Clone since the ID may be in a bunch of serialized properties then convert new to a list based email
             while (($row = $emails->next()) !== false) {
@@ -323,7 +322,7 @@ class Version20150521000000 extends AbstractMauticMigration
                 /** @var \Mautic\EmailBundle\Entity\Email $templateEmail */
                 $templateEmail = reset($row);
                 $id            = $templateEmail->getId();
-                $listEmail     = clone($templateEmail);
+                $listEmail     = clone $templateEmail;
                 $listEmail->setEmailType('list');
                 $listEmail->clearVariants();
                 $listEmail->clearStats();
@@ -396,8 +395,8 @@ class Version20150521000000 extends AbstractMauticMigration
             $emailModel->saveEntities($persistListEmails);
 
             // Clone variants
-            $persistVariants   = array();
-            $processedVariants = array();
+            $persistVariants   = [];
+            $processedVariants = [];
 
             foreach ($variants as $templateEmailId) {
                 if ($persistTemplateEmails[$templateEmailId]->isVariant(true)) {
@@ -407,7 +406,7 @@ class Version20150521000000 extends AbstractMauticMigration
                     $templateParent = $persistTemplateEmails[$templateEmailId];
                 }
 
-                if(in_array($templateParent->getId(), $processedVariants)) {
+                if (in_array($templateParent->getId(), $processedVariants)) {
                     continue;
                 }
 
@@ -417,9 +416,9 @@ class Version20150521000000 extends AbstractMauticMigration
                 $children = $templateParent->getVariantChildren();
 
                 // If the parent is not already cloned, then do so
-                /** @var \Mautic\EmailBundle\Entity\Email $listParent */
+                /* @var \Mautic\EmailBundle\Entity\Email $listParent */
                 if (!isset($persistListEmails[$templateParent->getId()])) {
-                    $listParent   = clone($templateParent);
+                    $listParent = clone $templateParent;
                     $listParent->setEmailType('list');
                     $listParent->clearVariants();
                     $listParent->clearStats();
@@ -441,7 +440,7 @@ class Version20150521000000 extends AbstractMauticMigration
                         continue;
                     }
 
-                    $listChild = clone($templateChild);
+                    $listChild = clone $templateChild;
                     $listChild->clearStats();
                     $listChild->setEmailType('list');
 
@@ -473,14 +472,14 @@ class Version20150521000000 extends AbstractMauticMigration
                 $q = $this->connection->createQueryBuilder();
                 $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
                     ->set('email_id', $listEmail->getId())
-                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
+                    ->where('lead_id IN '.sprintf('(%s)', $sq->getSql()).' AND email_id = '.$templateId)
                     ->execute();
 
                 // Update download hits
                 $q = $this->connection->createQueryBuilder();
                 $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
                     ->set('email_id', $listEmail->getId())
-                    ->where('lead_id IN ' . sprintf('(%s)', $sq->getSql()) . ' AND email_id = ' . $templateId)
+                    ->where('lead_id IN '.sprintf('(%s)', $sq->getSql()).' AND email_id = '.$templateId)
                     ->execute();
 
                 $q = $this->connection->createQueryBuilder();
@@ -518,47 +517,47 @@ class Version20150521000000 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // Ensure the render_style column exists to prevent ORM errors
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD COLUMN render_style bool DEFAULT NULL');
 
         $this->addSql(
-            'CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  (email_id), INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  (asset_id), PRIMARY KEY(email_id, asset_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'
+            'CREATE TABLE '.$this->prefix.'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, INDEX '.$this->generatePropertyName('email_assets_xref', 'idx', ['email_id']).'  (email_id), INDEX '.$this->generatePropertyName('email_assets_xref', 'idx', ['asset_id']).'  (asset_id), PRIMARY KEY(email_id, asset_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'
         );
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . '  FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . '  FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_assets_xref ADD CONSTRAINT '.$this->generatePropertyName('email_assets_xref', 'fk', ['email_id']).'  FOREIGN KEY (email_id) REFERENCES '.$this->prefix.'emails (id)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_assets_xref ADD CONSTRAINT '.$this->generatePropertyName('email_assets_xref', 'fk', ['asset_id']).'  FOREIGN KEY (asset_id) REFERENCES '.$this->prefix.'assets (id)');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'assets ADD size INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'assets ADD size INT DEFAULT NULL');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP FOREIGN KEY ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log DROP FOREIGN KEY '.$this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
         $this->addSql(
-            'ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id)'
-        );
-
-        $this->addSql(
-            'ALTER TABLE ' . $this->prefix . 'emails ADD name VARCHAR(255) DEFAULT NULL, ADD description LONGTEXT DEFAULT NULL, ADD from_address VARCHAR(255) DEFAULT NULL, ADD from_name VARCHAR(255) DEFAULT NULL, ADD reply_to_address VARCHAR(255) DEFAULT NULL, ADD bcc_address VARCHAR(255) DEFAULT NULL, ADD email_type VARCHAR(255) DEFAULT NULL, CHANGE subject subject LONGTEXT DEFAULT NULL, CHANGE template template VARCHAR(255) DEFAULT NULL'
-        );
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails CHANGE content_mode content_mode VARCHAR(255) DEFAULT NULL');
-
-        $this->addSql(
-            'ALTER TABLE ' . $this->prefix . 'email_stats ADD copy LONGTEXT DEFAULT NULL, ADD open_count INT DEFAULT NULL, ADD last_opened DATETIME DEFAULT NULL, ADD open_details LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', CHANGE email_id email_id INT DEFAULT NULL'
+            'ALTER TABLE '.$this->prefix.'campaign_lead_event_log ADD CONSTRAINT '.$this->generatePropertyName('campaign_lead_event_log', 'fk', ['campaign_id']).'  FOREIGN KEY (campaign_id) REFERENCES '.$this->prefix.'campaigns (id)'
         );
 
         $this->addSql(
-            'ALTER TABLE ' . $this->prefix . 'form_fields ADD container_attr VARCHAR(255) DEFAULT NULL, ADD lead_field VARCHAR(255) DEFAULT NULL, ADD save_result TINYINT(1) DEFAULT NULL, CHANGE `label` `label` LONGTEXT NOT NULL, CHANGE default_value default_value LONGTEXT DEFAULT NULL, CHANGE validation_message validation_message LONGTEXT DEFAULT NULL, CHANGE help_message help_message LONGTEXT DEFAULT NULL'
+            'ALTER TABLE '.$this->prefix.'emails ADD name VARCHAR(255) DEFAULT NULL, ADD description LONGTEXT DEFAULT NULL, ADD from_address VARCHAR(255) DEFAULT NULL, ADD from_name VARCHAR(255) DEFAULT NULL, ADD reply_to_address VARCHAR(255) DEFAULT NULL, ADD bcc_address VARCHAR(255) DEFAULT NULL, ADD email_type VARCHAR(255) DEFAULT NULL, CHANGE subject subject LONGTEXT DEFAULT NULL, CHANGE template template VARCHAR(255) DEFAULT NULL'
         );
+        $this->addSql('ALTER TABLE '.$this->prefix.'emails CHANGE content_mode content_mode VARCHAR(255) DEFAULT NULL');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages CHANGE template template VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages CHANGE content_mode content_mode VARCHAR(255) DEFAULT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
         $this->addSql(
-            'ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL'
+            'ALTER TABLE '.$this->prefix.'email_stats ADD copy LONGTEXT DEFAULT NULL, ADD open_count INT DEFAULT NULL, ADD last_opened DATETIME DEFAULT NULL, ADD open_details LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', CHANGE email_id email_id INT DEFAULT NULL'
         );
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
+        $this->addSql(
+            'ALTER TABLE '.$this->prefix.'form_fields ADD container_attr VARCHAR(255) DEFAULT NULL, ADD lead_field VARCHAR(255) DEFAULT NULL, ADD save_result TINYINT(1) DEFAULT NULL, CHANGE `label` `label` LONGTEXT NOT NULL, CHANGE default_value default_value LONGTEXT DEFAULT NULL, CHANGE validation_message validation_message LONGTEXT DEFAULT NULL, CHANGE help_message help_message LONGTEXT DEFAULT NULL'
+        );
 
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id')) . ' (campaign_id), INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id')) . ' (form_id), PRIMARY KEY(campaign_id, form_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'pages CHANGE template template VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'pages CHANGE content_mode content_mode VARCHAR(255) DEFAULT NULL');
+
+        $this->addSql('ALTER TABLE '.$this->prefix.'page_redirects ADD email_id INT DEFAULT NULL');
+        $this->addSql(
+            'ALTER TABLE '.$this->prefix.'page_redirects ADD CONSTRAINT '.$this->generatePropertyName('page_redirects', 'fk', ['email_id']).' FOREIGN KEY (email_id) REFERENCES '.$this->prefix.'emails (id) ON DELETE SET NULL'
+        );
+        $this->addSql('CREATE INDEX '.$this->generatePropertyName('page_redirects', 'idx', ['email_id']).' ON '.$this->prefix.'page_redirects (email_id)');
+
+        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD form_type VARCHAR(255) DEFAULT NULL');
+
+        $this->addSql('CREATE TABLE '.$this->prefix.'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, INDEX '.$this->generatePropertyName('campaign_form_xref', 'idx', ['campaign_id']).' (campaign_id), INDEX '.$this->generatePropertyName('campaign_form_xref', 'idx', ['form_id']).' (form_id), PRIMARY KEY(campaign_id, form_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_form_xref ADD CONSTRAINT '.$this->generatePropertyName('campaign_form_xref', 'fk', ['campaign_id']).' FOREIGN KEY (campaign_id) REFERENCES '.$this->prefix.'campaigns (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_form_xref ADD CONSTRAINT '.$this->generatePropertyName('campaign_form_xref', 'fk', ['form_id']).' FOREIGN KEY (form_id) REFERENCES '.$this->prefix.'forms (id) ON DELETE CASCADE');
     }
 }

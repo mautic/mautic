@@ -1,28 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
+use FOS\OAuthServerBundle\Model\ClientInterface;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
-use FOS\OAuthServerBundle\Model\ClientInterface;
 
 /**
- * Class AuthCode
- *
- * @package Mautic\ApiBundle\Entity\oAuth2
+ * Class AuthCode.
  */
 class AuthCode extends BaseAuthCode
 {
-
     /**
      * @var int
      */
@@ -61,7 +59,7 @@ class AuthCode extends BaseAuthCode
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -99,23 +97,23 @@ class AuthCode extends BaseAuthCode
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set client
+     * Set client.
      *
      * @param ClientInterface $client
      *
      * @return RefreshToken
      */
-    public function setClient (ClientInterface $client)
+    public function setClient(ClientInterface $client)
     {
         $this->client = $client;
 
@@ -123,23 +121,23 @@ class AuthCode extends BaseAuthCode
     }
 
     /**
-     * Get client
+     * Get client.
      *
      * @return ClientInterface
      */
-    public function getClient ()
+    public function getClient()
     {
         return $this->client;
     }
 
     /**
-     * Set user
+     * Set user.
      *
      * @param UserInterface $user
      *
      * @return RefreshToken
      */
-    public function setUser (UserInterface $user = null)
+    public function setUser(UserInterface $user = null)
     {
         $this->user = $user;
 
@@ -147,11 +145,11 @@ class AuthCode extends BaseAuthCode
     }
 
     /**
-     * Get user
+     * Get user.
      *
      * @return UserInterface
      */
-    public function getUser ()
+    public function getUser()
     {
         return $this->user;
     }

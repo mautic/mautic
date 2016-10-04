@@ -1,12 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
+$searchBtnClass = (!empty($searchValue)) ? 'fa-eraser' : 'fa-search';
 ?>
     <div class="input-group ma-5">
         <input type="search" class="form-control" id="focusPageTokenSearch" name="search" placeholder="<?php echo $view['translator']->trans(

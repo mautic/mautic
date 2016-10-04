@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
-
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,7 +32,7 @@ class ContentType extends AbstractType
                     'class'   => 'form-control',
                     'onkeyup' => 'Mautic.focusUpdatePreview()',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -47,7 +47,7 @@ class ContentType extends AbstractType
                     'placeholder' => 'mautic.core.optional',
                     'onkeyup'     => 'Mautic.focusUpdatePreview()',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -93,7 +93,7 @@ class ContentType extends AbstractType
             'font',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'Arial, Helvetica, sans-serif'                             => 'Arial',
                     '\'Arial Black\', Gadget, sans-serif'                      => 'Arial Black',
                     '\'Arial Narrow\', sans-serif'                             => 'Arial Narrow',
@@ -110,9 +110,9 @@ class ContentType extends AbstractType
                     '\'Trebuchet MS\', Helvetica, sans-serif'                  => 'Trebuchet MS',
                     'Verdana, Geneva, sans-serif'                              => 'Verdana',
                 ],
-                'label'       => 'mautic.focus.form.font',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.focus.form.font',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],

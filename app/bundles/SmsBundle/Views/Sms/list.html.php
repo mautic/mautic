@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -25,17 +25,17 @@ if (count($items)):
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'sms',
-                'orderBy' => 'e.name',
-                'text' => 'mautic.core.name',
-                'class' => 'col-sms-name',
-                'default' => true,
+                'orderBy'    => 'e.name',
+                'text'       => 'mautic.core.name',
+                'class'      => 'col-sms-name',
+                'default'    => true,
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'sms',
-                'orderBy' => 'c.title',
-                'text' => 'mautic.core.category',
-                'class' => 'visible-md visible-lg col-sms-category',
+                'orderBy'    => 'c.title',
+                'text'       => 'mautic.core.category',
+                'class'      => 'visible-md visible-lg col-sms-category',
             ]);
             ?>
 
@@ -44,9 +44,9 @@ if (count($items)):
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'sms',
-                'orderBy' => 'e.id',
-                'text' => 'mautic.core.id',
-                'class' => 'visible-md visible-lg col-sms-id',
+                'orderBy'    => 'e.id',
+                'text'       => 'mautic.core.id',
+                'class'      => 'visible-md visible-lg col-sms-id',
             ]);
             ?>
         </tr>
@@ -60,7 +60,7 @@ if (count($items)):
             <tr>
                 <td>
                     <?php
-                    $edit = $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $item->getCreatedBy());
+                    $edit          = $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $item->getCreatedBy());
                     $customButtons = [
                         [
                             'attr' => [
@@ -68,18 +68,18 @@ if (count($items)):
                                 'data-target' => '#MauticSharedModal',
                                 'data-header' => $view['translator']->trans('mautic.sms.smses.header.preview'),
                                 'data-footer' => 'false',
-                                'href' => $view['router']->path('mautic_sms_action', ['objectId' => $item->getId(), 'objectAction' => 'preview']),
+                                'href'        => $view['router']->path('mautic_sms_action', ['objectId' => $item->getId(), 'objectAction' => 'preview']),
                             ],
-                            'btnText' => $view['translator']->trans('mautic.sms.preview'),
+                            'btnText'   => $view['translator']->trans('mautic.sms.preview'),
                             'iconClass' => 'fa fa-share',
                         ],
                     ];
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
-                        'item' => $item,
+                        'item'            => $item,
                         'templateButtons' => [
                             'delete' => $view['security']->hasEntityAccess($permissions['sms:smses:deleteown'], $permissions['sms:smses:deleteother'], $item->getCreatedBy()),
                         ],
-                        'routeBase' => 'sms',
+                        'routeBase'     => 'sms',
                         'customButtons' => $customButtons,
                     ]);
                     ?>
@@ -101,8 +101,8 @@ if (count($items)):
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $category = $item->getCategory(); ?>
-                    <?php $catName = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
-                    <?php $color = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
+                    <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                    <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                     <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-sm visible-md visible-lg col-stats">
@@ -117,9 +117,9 @@ if (count($items)):
 <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
         'totalItems' => $totalItems,
-        'page' => $page,
-        'limit' => $limit,
-        'baseUrl' => $view['router']->path('mautic_sms_index'),
+        'page'       => $page,
+        'limit'      => $limit,
+        'baseUrl'    => $view['router']->path('mautic_sms_index'),
         'sessionVar' => 'sms',
     ]); ?>
 </div>

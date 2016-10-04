@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,13 +16,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class Submission
- *
- * @package Mautic\FormBundle\Entity
+ * Class Submission.
  */
 class Submission
 {
-
     /**
      * @var int
      */
@@ -65,12 +63,12 @@ class Submission
     /**
      * @var array
      */
-    private $results = array();
+    private $results = [];
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -108,7 +106,7 @@ class Submission
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -116,7 +114,7 @@ class Submission
     {
         $metadata->setGroupPrefix('submission')
             ->addProperties(
-                array(
+                [
                     'id',
                     'ipAddress',
                     'form',
@@ -125,30 +123,30 @@ class Submission
                     'dateSubmitted',
                     'referer',
                     'page',
-                    'results'
-                )
+                    'results',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set dateSubmitted
+     * Set dateSubmitted.
      *
      * @param \DateTime $dateSubmitted
      *
      * @return Submission
      */
-    public function setDateSubmitted ($dateSubmitted)
+    public function setDateSubmitted($dateSubmitted)
     {
         $this->dateSubmitted = $dateSubmitted;
 
@@ -156,23 +154,23 @@ class Submission
     }
 
     /**
-     * Get dateSubmitted
+     * Get dateSubmitted.
      *
      * @return \DateTime
      */
-    public function getDateSubmitted ()
+    public function getDateSubmitted()
     {
         return $this->dateSubmitted;
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
      * @return Submission
      */
-    public function setReferer ($referer)
+    public function setReferer($referer)
     {
         $this->referer = $referer;
 
@@ -180,23 +178,23 @@ class Submission
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
-    public function getReferer ()
+    public function getReferer()
     {
         return $this->referer;
     }
 
     /**
-     * Set form
+     * Set form.
      *
      * @param Form $form
      *
      * @return Submission
      */
-    public function setForm (Form $form)
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -204,23 +202,23 @@ class Submission
     }
 
     /**
-     * Get form
+     * Get form.
      *
      * @return Form
      */
-    public function getForm ()
+    public function getForm()
     {
         return $this->form;
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return Submission
      */
-    public function setIpAddress (\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null)
+    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null)
     {
         $this->ipAddress = $ipAddress;
 
@@ -228,45 +226,45 @@ class Submission
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
     /**
-     * Get results
+     * Get results.
      *
      * @return array
      */
-    public function getResults ()
+    public function getResults()
     {
         return $this->results;
     }
 
     /**
-     * Get results
+     * Get results.
      *
      * @param $results
      *
      * @return Submission
      */
-    public function setResults ($results)
+    public function setResults($results)
     {
         $this->results = $results;
     }
 
     /**
-     * Set page
+     * Set page.
      *
      * @param \Mautic\PageBundle\Entity\Page $page
      *
      * @return Submission
      */
-    public function setPage (\Mautic\PageBundle\Entity\Page $page = null)
+    public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
     {
         $this->page = $page;
 
@@ -274,11 +272,11 @@ class Submission
     }
 
     /**
-     * Get page
+     * Get page.
      *
      * @return \Mautic\PageBundle\Entity\Page
      */
-    public function getPage ()
+    public function getPage()
     {
         return $this->page;
     }
@@ -286,7 +284,7 @@ class Submission
     /**
      * @return Lead
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -294,7 +292,7 @@ class Submission
     /**
      * @param mixed $lead
      */
-    public function setLead (Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -302,7 +300,7 @@ class Submission
     /**
      * @return mixed
      */
-    public function getTrackingId ()
+    public function getTrackingId()
     {
         return $this->trackingId;
     }
@@ -310,7 +308,7 @@ class Submission
     /**
      * @param mixed $trackingId
      */
-    public function setTrackingId ($trackingId)
+    public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
     }

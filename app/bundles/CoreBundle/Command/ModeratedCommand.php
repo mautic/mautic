@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,7 +23,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $output;
 
     /**
-     * Set moderation options
+     * Set moderation options.
      */
     protected function configure()
     {
@@ -42,9 +43,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $force        = $input->getOption('force');
         $timeout      = $this->getContainer()->hasParameter('mautic.command_timeout') ?
             $this->getContainer()->getParameter('mautic.command_timeout') : 1800;
-        $checkFile    = $this->checkfile = $this->getContainer()->getParameter('kernel.cache_dir').'/../script_executions.json';
-        $command      = $this->getName();
-        $this->key    = $key;
+        $checkFile = $this->checkfile = $this->getContainer()->getParameter('kernel.cache_dir').'/../script_executions.json';
+        $command   = $this->getName();
+        $this->key = $key;
 
         $fp = fopen($checkFile, 'c+');
 
@@ -89,7 +90,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * Complete this run
+     * Complete this run.
      */
     protected function completeRun()
     {

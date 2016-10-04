@@ -1,17 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -37,7 +38,7 @@ class Version20160919204648 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $categoryIdx = $this->generatePropertyName('focus', 'idx', ['category_id']);
-        $sql = <<<SQL
+        $sql         = <<<SQL
 CREATE TABLE {$this->prefix}focus (
   id INT AUTO_INCREMENT NOT NULL, 
   category_id INT DEFAULT NULL, 
@@ -71,7 +72,7 @@ SQL;
         $this->addSql($sql);
 
         $focusIdx = $this->generatePropertyName('focus_stats', 'idx', ['focus_id']);
-        $sql = <<<SQL
+        $sql      = <<<SQL
 CREATE TABLE {$this->prefix}focus_stats (
   id INT AUTO_INCREMENT NOT NULL, 
   focus_id INT NOT NULL, 

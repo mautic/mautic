@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,13 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class ListLead
- *
- * @package Mautic\LeadBundle\Entity
+ * Class ListLead.
  */
 class ListLead
 {
-
     /**
      * @var LeadList
      **/
@@ -48,7 +46,7 @@ class ListLead
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -77,7 +75,7 @@ class ListLead
     /**
      * @return \DateTime
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -85,7 +83,7 @@ class ListLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded ($date)
+    public function setDateAdded($date)
     {
         $this->dateAdded = $date;
     }
@@ -93,7 +91,7 @@ class ListLead
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -101,7 +99,7 @@ class ListLead
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -109,7 +107,7 @@ class ListLead
     /**
      * @return LeadList
      */
-    public function getList ()
+    public function getList()
     {
         return $this->list;
     }
@@ -117,7 +115,7 @@ class ListLead
     /**
      * @param LeadList $leadList
      */
-    public function setList ($leadList)
+    public function setList($leadList)
     {
         $this->list = $leadList;
     }
@@ -125,7 +123,7 @@ class ListLead
     /**
      * @return bool
      */
-    public function getManuallyRemoved ()
+    public function getManuallyRemoved()
     {
         return $this->manuallyRemoved;
     }
@@ -133,7 +131,7 @@ class ListLead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved ($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved)
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -149,7 +147,7 @@ class ListLead
     /**
      * @return bool
      */
-    public function getManuallyAdded ()
+    public function getManuallyAdded()
     {
         return $this->manuallyAdded;
     }
@@ -157,7 +155,7 @@ class ListLead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded ($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded)
     {
         $this->manuallyAdded = $manuallyAdded;
     }

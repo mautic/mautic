@@ -1,33 +1,33 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Event;
 
-use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class UntrackableUrlsEvent
+ * Class UntrackableUrlsEvent.
  */
 class UntrackableUrlsEvent extends Event
 {
     /**
      * @var array
      */
-    private $doNotTrack = array(
+    private $doNotTrack = [
         '{webview_url}',
         '{unsubscribe_url}',
         '{trackable=(.*?)}',
         // Ignore lead fields with URLs for tracking since each is unique
         '^{leadfield=(.*?)}',
-        '^{contactfield=(.*?)}'
-    );
+        '^{contactfield=(.*?)}',
+    ];
 
     /**
      * @var string
@@ -45,7 +45,7 @@ class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * set a URL or token to not convert to trackables
+     * set a URL or token to not convert to trackables.
      *
      * @param $url
      */
@@ -55,7 +55,7 @@ class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * Get array of non-trackables
+     * Get array of non-trackables.
      *
      * @return array
      */

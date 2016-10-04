@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,24 +14,22 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadField;
 
 /**
- * Class LeadFieldEvent
- *
- * @package Mautic\FieldBundle\Event
+ * Class LeadFieldEvent.
  */
 class LeadFieldEvent extends CommonEvent
 {
     /**
      * @param LeadField $field
-     * @param bool $isNew
+     * @param bool      $isNew
      */
     public function __construct(LeadField &$field, $isNew = false)
     {
-        $this->entity  =& $field;
-        $this->isNew   = $isNew;
+        $this->entity = &$field;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Field entity
+     * Returns the Field entity.
      *
      * @return Field
      */
@@ -40,7 +39,7 @@ class LeadFieldEvent extends CommonEvent
     }
 
     /**
-     * Sets the Field entity
+     * Sets the Field entity.
      *
      * @param Field $field
      */

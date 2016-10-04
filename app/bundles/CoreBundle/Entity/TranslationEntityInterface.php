@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,54 +13,54 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Interface TranslationInterface
+ * Interface TranslationInterface.
  */
 interface TranslationEntityInterface
 {
     /**
-     * Get translation parent
+     * Get translation parent.
      *
      * @return TranslationEntityInterface
      */
     public function getTranslationParent();
 
     /**
-     * Set entity this is a translation of
+     * Set entity this is a translation of.
      *
      * @return mixed
      */
     public function setTranslationParent(TranslationEntityInterface $parent = null);
 
     /**
-     * Set this entity as a main content (remove translation parent)
+     * Set this entity as a main content (remove translation parent).
      *
      * @return mixed
      */
     public function removeTranslationParent();
 
     /**
-     * Get ArrayCollection of translated entities
+     * Get ArrayCollection of translated entities.
      *
      * @return ArrayCollection
      */
     public function getTranslationChildren();
 
     /**
-     * Add entity to $translationChildren
+     * Add entity to $translationChildren.
      *
      * @return mixed
      */
     public function addTranslationChild(TranslationEntityInterface $child);
 
     /**
-     * Remove entity from $translationChildren
+     * Remove entity from $translationChildren.
      *
      * @return mixed
      */
     public function removeTranslationChild(TranslationEntityInterface $child);
 
     /**
-     * Get array with entities for this translation
+     * Get array with entities for this translation.
      *
      * If $onlyChildren, then return just $children; otherwise [$parent, $children]
      *
@@ -75,7 +76,7 @@ interface TranslationEntityInterface
     public function isTranslation($isChild = false);
 
     /**
-     * Get the language
+     * Get the language.
      *
      * @return mixed
      */

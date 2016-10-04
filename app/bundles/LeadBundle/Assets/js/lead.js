@@ -31,16 +31,6 @@ Mautic.leadOnLoad = function (container, response) {
         return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
     };
 
-    if (mQuery(container + ' form[name="lead"]').length) {
-        mQuery("*[data-toggle='field-lookup']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            var field  = mQuery(this).attr('id');
-            var options = mQuery(this).attr('data-options');
-            Mautic.activateLeadFieldTypeahead(field, target, options);
-        });
-
-        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
-    }
     // Timeline filters
     var timelineForm = mQuery(container + ' #timeline-filters');
     if (timelineForm.length) {
@@ -213,48 +203,6 @@ Mautic.leadEmailOnLoad = function(container, response) {
     });
 }
 
-Mautic.activateLeadFieldTypeahead = function(field, target, options) {
-    if (typeof options !== 'undefined' && ((!mQuery.isArray(options) && options !== '') || (mQuery.isArray(options) && options.length))) {
-        var keys = [], values = [];
-        //check to see if there is a key/value split
-        if (typeof options == 'string') {
-            options = options.split('||');
-            if (options.length == 2) {
-                keys = options[1].split('|');
-                values = options[0].split('|');
-            } else {
-                values = options[0].split('|');
-            }
-        } else {
-            values = options;
-        }
-
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            dataOptions: values,
-            dataOptionKeys: keys,
-            minLength: 0
-        });
-    } else {
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            prefetch: true,
-            remote: true,
-            action: "lead:fieldList&field=" + target
-        });
-    }
-
-    var filterId = field.replace("display", "filter");
-    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
-
-        if (mQuery("#" + filterId).length && datum["id"]) {
-            mQuery("#" + filterId).val(datum["id"]);
-        }
-    }).on('typeahead:autocompleted', function (event, datum) {
-        if (mQuery("#" + filterId).length && datum["id"]) {
-            mQuery("#" + filterId).val(datum["id"]);
-        }
-    });
-};
-
 Mautic.leadlistOnLoad = function(container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
@@ -287,14 +235,6 @@ Mautic.leadlistOnLoad = function(container) {
             });
         });
     }
-
-    mQuery("*[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field  = mQuery(this).attr('id');
-
-        Mautic.activateLeadFieldTypeahead(field, target, options);
-    });
 };
 
 Mautic.leadlistPopulateChoices = function(el) {
@@ -1136,7 +1076,7 @@ Mautic.initUniqueIdentifierFields = function() {
             };
             Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
                 if (response.items !== 'undefined' && response.items.length) {
-                    var warning = mQuery('<div/>').text(response.existsMessage);
+                    var warning = mQuery('<div class="exists-warning" />').text(response.existsMessage);
                     mQuery.each(response.items, function(i, item) {
                         if (i > 0) {
                             warning.append(mQuery('<span>, </span>'));
@@ -1149,6 +1089,8 @@ Mautic.initUniqueIdentifierFields = function() {
                         warning.append(link);
                     });
                     warning.appendTo(input.parent());
+                } else {
+                    input.parent().find('div.exists-warning').remove();
                 }
             });
         });
@@ -1164,125 +1106,4 @@ Mautic.updateFilterPositioning = function (el) {
     } else {
         $parentEl.removeClass('in-group');
     }
-};
-
-Mautic.loadNewCompanyWindow = function(options) {
-    if (options.windowUrl) {
-        Mautic.startModalLoadingBar();
-
-        setTimeout(function() {
-            var generator = window.open(options.windowUrl, 'newcompanywindow', 'height=600,width=1100');
-
-            if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(mauticLang.popupBlockerMessage);
-            } else {
-                generator.onload = function () {
-                    Mautic.stopModalLoadingBar();
-                    Mautic.stopIconSpinPostEvent();
-                };
-            }
-        }, 100);
-    }
-};
-
-Mautic.companyOnLoad = function (container, response) {
-    if (response && response.updateSelect) {
-        //added email through a popup
-        var newOption = mQuery('<option />').val(response.companyId);
-        newOption.html(response.companyName);
-
-        var opener = window.opener;
-        if(opener) {
-            var el = '#' + response.updateSelect;
-            var optgroup = el + " optgroup";
-            if (opener.mQuery(optgroup).length) {
-                // update option when new option equal with option item in group.
-                var firstOptionGroups = opener.mQuery(el + ' optgroup');
-                var isUpdateOption = false;
-                firstOptionGroups.each(function() {
-                    var firstOptions = mQuery(this).children();
-                    for (var i = 0; i < firstOptions.length; i++) {
-                        if (firstOptions[i].value === response.companyId.toString()) {
-                            firstOptions[i].text = response.companyName;
-                            isUpdateOption = true;
-                            break;
-                        }
-                    }
-                });
-
-                if (!isUpdateOption) {
-                    //the optgroup exist so append to it
-                    opener.mQuery(optgroup + " option:last").prev().before(newOption);
-                }
-            } else {
-                //create the optgroup
-                var newOptgroup = mQuery('<optgroup label= />');
-                newOption.appendTo(newOptgroup);
-                opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
-            }
-
-            var chooseOneOption = opener.mQuery(el + ' option:first');
-
-            var optionGroups = opener.mQuery(el + ' optgroup');
-            optionGroups.sort(function(a, b) {
-                var aLabel = mQuery(a).attr('label');
-                var bLabel = mQuery(b).attr('label');
-
-                if (aLabel > bLabel) {
-                    return 1;
-                } else if (aLabel < bLabel) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
-
-            optionGroups.each(function() {
-                var options = mQuery(this).children();
-                options.sort(function(a, b) {
-                    if (a.text > b.text) {
-                        return 1;
-                    } else if (a.text < b.text) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                });
-                mQuery(this).html(options);
-            });
-
-            if (opener.mQuery(el).prop('disabled')) {
-                opener.mQuery(el).prop('disabled', false);
-                chooseOneOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
-            }
-
-            opener.mQuery(el).html(chooseOneOption);
-            optionGroups.appendTo(opener.mQuery(el));
-
-            newOption.prop('selected', true);
-
-            opener.mQuery(el).trigger("chosen:updated");
-        }
-
-        window.close();
-    }
-
-    var textarea = mQuery('#emailform_customHtml');
-
-    mQuery(document).on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('html.set', textarea.val());
-    });
-
-    mQuery('.btn-builder').on('click', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
-
-    var plaintext = mQuery('#emailform_plainText');
-    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 };

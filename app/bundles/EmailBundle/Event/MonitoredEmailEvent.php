@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -27,7 +28,7 @@ class MonitoredEmailEvent extends Event
     /**
      * @var array
      */
-    private $folders = array();
+    private $folders = [];
 
     /**
      * @param FormBuilder $builder
@@ -40,7 +41,7 @@ class MonitoredEmailEvent extends Event
     }
 
     /**
-     * Get the FormBuilder for monitored_mailboxes FormType
+     * Get the FormBuilder for monitored_mailboxes FormType.
      *
      * @return FormBuilder
      */
@@ -50,7 +51,7 @@ class MonitoredEmailEvent extends Event
     }
 
     /**
-     * Insert a folder to configure
+     * Insert a folder to configure.
      *
      * @param        $bundleKey
      * @param        $folderKey
@@ -61,14 +62,14 @@ class MonitoredEmailEvent extends Event
     {
         $keyName = ($folderKey) ? $bundleKey.'_'.$folderKey : $bundleKey;
 
-        $this->folders[$keyName] = array(
+        $this->folders[$keyName] = [
             'label'   => $label,
-            'default' => $default
-        );
+            'default' => $default,
+        ];
     }
 
     /**
-     * Get the value set for a specific bundle/folder
+     * Get the value set for a specific bundle/folder.
      *
      * @param $bundleKey
      * @param $folderKey
@@ -84,7 +85,7 @@ class MonitoredEmailEvent extends Event
     }
 
     /**
-     * Get array of folders
+     * Get array of folders.
      *
      * @return array
      */

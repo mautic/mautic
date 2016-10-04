@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (!isset($class)) {
     $class = 'table';
 }
@@ -41,12 +41,12 @@ if (!isset($shortenLinkText)) {
                                         data-toggle="ajax"
                                         <?php endif; ?>
                                         >
-                                        <?php $item = str_replace(array('http://', 'https://'), '', $item); ?>
+                                        <?php $item = str_replace(['http://', 'https://'], '', $item); ?>
                                         <?php echo $view['assets']->shortenText($item['value'], $shortenLinkText); ?>
                                     </a>
-                                <?php elseif(isset($item['value'])): ?>
+                                <?php elseif (isset($item['value'])): ?>
                                     <?php echo $item['value']; ?>
-                                <?php elseif(is_string($item)): ?>
+                                <?php elseif (is_string($item)): ?>
                                     <?php echo $item; ?>
                                 <?php endif; ?>
                             </td>

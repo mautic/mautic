@@ -1,14 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -16,19 +19,16 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
-use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointActionEvent;
+use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class PointModel
+ * Class PointModel.
  */
 class PointModel extends CommonFormModel
 {
@@ -57,15 +57,15 @@ class PointModel extends CommonFormModel
     /**
      * PointModel constructor.
      *
-     * @param Session $session
+     * @param Session        $session
      * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel $leadModel
+     * @param LeadModel      $leadModel
      */
     public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
     {
-        $this->session = $session;
+        $this->session        = $session;
         $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel = $leadModel;
+        $this->leadModel      = $leadModel;
     }
 
     /**
@@ -91,14 +91,15 @@ class PointModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+            throw new MethodNotAllowedHttpException(['Point']);
         }
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
         return $formFactory->create('point', $entity, $options);
     }
 
@@ -124,20 +125,20 @@ class PointModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+            throw new MethodNotAllowedHttpException(['Point']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = PointEvents::POINT_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = PointEvents::POINT_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = PointEvents::POINT_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = PointEvents::POINT_POST_DELETE;
                 break;
             default:
@@ -151,6 +152,7 @@ class PointModel extends CommonFormModel
             }
 
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -158,7 +160,7 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD
+     * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD.
      *
      * @return mixed
      */
@@ -168,8 +170,8 @@ class PointModel extends CommonFormModel
 
         if (empty($actions)) {
             //build them
-            $actions = array();
-            $event = new PointBuilderEvent($this->translator);
+            $actions = [];
+            $event   = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
@@ -180,14 +182,13 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * Triggers a specific point change
+     * Triggers a specific point change.
      *
      * @param $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
      *25
-     * @return void
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
@@ -198,7 +199,7 @@ class PointModel extends CommonFormModel
 
         if ($typeId !== null && MAUTIC_ENV === 'prod') {
             //let's prevent some unnecessary DB calls
-            $triggeredEvents = $this->session->get('mautic.triggered.point.actions', array());
+            $triggeredEvents = $this->session->get('mautic.triggered.point.actions', []);
             if (in_array($typeId, $triggeredEvents)) {
                 return;
             }
@@ -216,7 +217,6 @@ class PointModel extends CommonFormModel
             $lead = $this->leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-
                 return;
             }
         }
@@ -227,7 +227,7 @@ class PointModel extends CommonFormModel
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
-        $persist = array();
+        $persist = [];
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
@@ -240,21 +240,21 @@ class PointModel extends CommonFormModel
             }
             $settings = $availableActions['actions'][$action->getType()];
 
-            $args = array(
-                'action'      => array(
+            $args = [
+                'action' => [
                     'id'         => $action->getId(),
                     'type'       => $action->getType(),
                     'name'       => $action->getName(),
                     'properties' => $action->getProperties(),
-                    'points'     => $action->getDelta()
-                ),
-                'lead'        => $lead,
-                'factory'     => $this->factory, // WHAT?
-                'eventDetails' => $eventDetails
-            );
+                    'points'     => $action->getDelta(),
+                ],
+                'lead'         => $lead,
+                'factory'      => $this->factory, // WHAT?
+                'eventDetails' => $eventDetails,
+            ];
 
             $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
+                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
 
             if (is_callable($callback)) {
                 if (is_array($callback)) {
@@ -266,7 +266,7 @@ class PointModel extends CommonFormModel
                     $reflection = new \ReflectionMethod(null, $callback);
                 }
 
-                $pass = array();
+                $pass = [];
                 foreach ($reflection->getParameters() as $param) {
                     if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
@@ -282,7 +282,7 @@ class PointModel extends CommonFormModel
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $action->getId() . ": " . $action->getName(),
+                        $action->getId().': '.$action->getName(),
                         $parsed[1],
                         $delta,
                         $ipAddress
@@ -312,27 +312,27 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * Get line chart data of points
+     * Get line chart data of points.
      *
-     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
      * @param array     $filter
-     * @param boolean   $canViewOthers
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q         = $query->prepareTimeDataQuery('lead_points_change_log', 'date_added', $filter);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $q     = $query->prepareTimeDataQuery('lead_points_change_log', 'date_added', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
                 ->andWhere('l.owner_id = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);

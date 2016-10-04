@@ -1,30 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -33,7 +32,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -68,7 +67,6 @@ class LeadSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -98,7 +96,7 @@ class LeadSubscriber extends CommonSubscriber
                     $eventName = [
                         'label'      => $label,
                         'href'       => $this->router->generate('mautic_email_webview', ['idHash' => $stat['idHash']]),
-                        'isExternal' => true
+                        'isExternal' => true,
                     ];
                 } else {
                     $eventName = $label;
@@ -110,17 +108,17 @@ class LeadSubscriber extends CommonSubscriber
                 }
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => $eventName,
-                        'eventType'       => $eventTypeName,
-                        'timestamp'       => $stat['date'.ucfirst($dateSent)],
-                        'dateSent'        => $stat['dateSent'],
-                        'extra'           => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => $eventName,
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $stat['date'.ucfirst($dateSent)],
+                        'dateSent'   => $stat['dateSent'],
+                        'extra'      => [
                             'stat' => $stat,
-                            'type' => $state
+                            'type' => $state,
                         ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope'
+                        'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
                     ]
                 );
             }

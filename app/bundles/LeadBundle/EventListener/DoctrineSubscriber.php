@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace Mautic\LeadBundle\EventListener;
 
@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Monolog\Logger;
 
 /**
- * Class DoctrineSubscriber
+ * Class DoctrineSubscriber.
  */
 class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 {
@@ -41,9 +41,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return array(
-            ToolEvents::postGenerateSchema
-        );
+        return [
+            ToolEvents::postGenerateSchema,
+        ];
     }
 
     /**
@@ -60,11 +60,11 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
             $objects = [
                 'lead'    => 'leads',
-                'company' => 'companies'
+                'company' => 'companies',
             ];
 
             foreach ($objects as $object => $tableName) {
-                $table    = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
+                $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
                 //get a list of fields
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
@@ -115,11 +115,11 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                         $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
                         break;
                     case 'company':
+                        $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
                         $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
                         break;
                 }
             }
-
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
             $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());

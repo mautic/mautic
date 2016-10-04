@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,12 +19,11 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CoreSubscriber
+ * Class CoreSubscriber.
  */
 class CommonSubscriber implements EventSubscriberInterface
 {
@@ -34,7 +34,7 @@ class CommonSubscriber implements EventSubscriberInterface
      *
      * @param MauticFactory $factory
      *
-     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies.
+     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies
      */
     public function setFactory(MauticFactory $factory)
     {
@@ -44,7 +44,7 @@ class CommonSubscriber implements EventSubscriberInterface
     /**
      * @var MauticFactory
      *
-     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies.
+     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies
      */
     protected $factory;
 
@@ -92,6 +92,11 @@ class CommonSubscriber implements EventSubscriberInterface
      * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
      */
     protected $router;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
 
     /**
      * CommonSubscriber constructor.
@@ -173,26 +178,25 @@ class CommonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Automatic post-construct setup.
-     */
-    public function init()
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents ()
-    {
-        return array();
-    }
-
-    /**
      * @param Logger $logger
      */
     public function setLogger(Logger $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * Automatic post-construct setup.
+     */
+    public function init()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [];
     }
 }

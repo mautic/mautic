@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,17 +14,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class MergeType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class MergeType.
  */
 class ContactFrequencyType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -34,9 +31,9 @@ class ContactFrequencyType extends AbstractType
             'channels',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'sms'   => 'mautic.sms.sms',
-                    'email' => 'mautic.email.email'
+                    'email' => 'mautic.email.email',
                 ],
                 'label'       => 'mautic.lead.contact.channels',
                 'label_attr'  => ['class' => 'control-label'],
@@ -44,13 +41,13 @@ class ContactFrequencyType extends AbstractType
                 'empty_value' => '',
                 'attr'        => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.merge.select.modal.tooltip'
+                    'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
                 ],
                 'required' => false,
             ]
         );
 
-        $formModifier = function(FormEvent $event) {
+        $formModifier = function (FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
 
@@ -59,22 +56,22 @@ class ContactFrequencyType extends AbstractType
                 $constraints = [
                     new NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
+                    ),
                 ];
-            };
+            }
 
             $form->add(
                 'frequency_number',
                 'number',
                 [
-                    'precision'   => 0,
-                    'label'       => 'mautic.lead.list.frequency.number',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'required'    => true,
-                    'attr'        => [
-                        'class' => 'form-control frequency'
+                    'precision'  => 0,
+                    'label'      => 'mautic.lead.list.frequency.number',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => true,
+                    'attr'       => [
+                        'class' => 'form-control frequency',
                     ],
                     'constraints' => $constraints,
                     'required'    => false,
@@ -85,16 +82,16 @@ class ContactFrequencyType extends AbstractType
                 'frequency_time',
                 'choice',
                 [
-                    'choices'     => [
+                    'choices' => [
                         'DAY'   => 'day',
                         'WEEK'  => 'week',
-                        'MONTH' => 'month'
+                        'MONTH' => 'month',
                     ],
-                    'label'       => 'mautic.lead.list.frequency.times',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'multiple'    => false,
-                    'attr'        => [
-                        'class' => 'form-control'
+                    'label'      => 'mautic.lead.list.frequency.times',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => false,
+                    'attr'       => [
+                        'class' => 'form-control',
                     ],
                     'constraints' => $constraints,
                     'required'    => false,
@@ -122,13 +119,13 @@ class ContactFrequencyType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal'
+                    'data-dismiss' => 'modal',
                 ],
             ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -137,7 +134,6 @@ class ContactFrequencyType extends AbstractType
      */
     public function getName()
     {
-        return "lead_contact_frequency_rules";
+        return 'lead_contact_frequency_rules';
     }
 }
-

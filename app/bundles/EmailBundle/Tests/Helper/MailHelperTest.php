@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Tests\Helper;
-
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -29,7 +29,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory']
+                        ['mailer_spool_type', false, 'memory'],
                     ]
                 )
             );
@@ -54,7 +54,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory']
+                        ['mailer_spool_type', false, 'memory'],
                     ]
                 )
             );

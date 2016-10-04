@@ -1,26 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 /**
- * Class MailchimpIntegration
+ * Class MailchimpIntegration.
  */
 class MailchimpIntegration extends EmailAbstractIntegration
 {
-
     /**
      * {@inheritdoc}
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return 'Mailchimp';
     }
@@ -36,27 +36,27 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType ()
+    public function getAuthenticationType()
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }
 
     /**
-     * Get the URL required to obtain an oauth2 access token
+     * Get the URL required to obtain an oauth2 access token.
      *
      * @return string
      */
-    public function getAccessTokenUrl ()
+    public function getAccessTokenUrl()
     {
         return 'https://login.mailchimp.com/oauth2/token';
     }
 
     /**
-     * Get the authentication/login URL for oauth2 access
+     * Get the authentication/login URL for oauth2 access.
      *
      * @return string
      */
-    public function getAuthenticationUrl ()
+    public function getAuthenticationUrl()
     {
         return 'https://login.mailchimp.com/oauth2/authorize';
     }
@@ -67,14 +67,14 @@ class MailchimpIntegration extends EmailAbstractIntegration
     public function getRequiredKeyFields()
     {
         return (empty($this->keys['client_id'])) ?
-            array(
-                'username'      => 'mautic.integration.keyfield.username',
-                'password'      => 'mautic.integration.keyfield.api'
-            ) :
-            array(
-                'client_id'      => 'mautic.integration.keyfield.clientid',
-                'client_secret'  => 'mautic.integration.keyfield.clientsecret'
-            );
+            [
+                'username' => 'mautic.integration.keyfield.username',
+                'password' => 'mautic.integration.keyfield.api',
+            ] :
+            [
+                'client_id'     => 'mautic.integration.keyfield.clientid',
+                'client_secret' => 'mautic.integration.keyfield.clientsecret',
+            ];
     }
 
     /**
@@ -83,7 +83,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
      *
      * @return bool|string
      */
-    public function authCallback($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         $error = parent::authCallback($settings, $parameters);
 
@@ -102,9 +102,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
      *
      * @return mixed
      */
-    public function getAvailableLeadFields ($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        static $leadFields = array();
+        static $leadFields = [];
 
         if (empty($leadFields)) {
             if (isset($settings['list'])) {
@@ -123,11 +123,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
                 if (!empty($fields['data'][0]['merge_vars']) && count($fields['data'][0]['merge_vars'])) {
                     foreach ($fields['data'][0]['merge_vars'] as $field) {
-                        $leadFields[$field['tag']] = array(
+                        $leadFields[$field['tag']] = [
                             'label'    => $field['name'],
                             'type'     => 'string',
-                            'required' => $field['req']
-                        );
+                            'required' => $field['req'],
+                        ];
                     }
                 }
             }
@@ -142,20 +142,17 @@ class MailchimpIntegration extends EmailAbstractIntegration
      *
      * @return bool
      */
-    public function pushLead($lead, $config = array())
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
         $mappedData = $this->populateLeadData($lead, $config);
 
         if (empty($mappedData)) {
-
             return false;
         } elseif (empty($mappedData['EMAIL'])) {
-
             return false;
         } elseif (!isset($config['list_settings'])) {
-
             return false;
         }
 
@@ -164,10 +161,10 @@ class MailchimpIntegration extends EmailAbstractIntegration
                 $email = $mappedData['EMAIL'];
                 unset($mappedData['EMAIL']);
 
-                $options = array();
+                $options                 = [];
                 $options['double_optin'] = $config['list_settings']['doubleOptin'];
                 $options['send_welcome'] = $config['list_settings']['sendWelcome'];
-                $listId = $config['list_settings']['list'];
+                $listId                  = $config['list_settings']['list'];
 
                 $this->getApiHelper()->subscribeLead($email, $listId, $mappedData, $options);
 

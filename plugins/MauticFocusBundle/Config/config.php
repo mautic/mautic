@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,16 +15,16 @@ return [
     'author'      => 'Mautic, Inc',
 
     'routes' => [
-        'main'   => [
+        'main' => [
             'mautic_focus_pagetoken_index' => [
                 'path'       => '/focus/pagetokens/{page}',
                 'controller' => 'MauticFocusBundle:SubscribedEvents\BuilderToken:index',
             ],
-            'mautic_focus_index'           => [
+            'mautic_focus_index' => [
                 'path'       => '/focus/{page}',
                 'controller' => 'MauticFocusBundle:Focus:index',
             ],
-            'mautic_focus_action'          => [
+            'mautic_focus_action' => [
                 'path'       => '/focus/{objectAction}/{objectId}',
                 'controller' => 'MauticFocusBundle:Focus:execute',
             ],
@@ -33,7 +34,7 @@ return [
                 'path'       => '/focus/{id}.js',
                 'controller' => 'MauticFocusBundle:Public:generate',
             ],
-            'mautic_focus_pixel'    => [
+            'mautic_focus_pixel' => [
                 'path'       => '/focus/{id}/viewpixel.gif',
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
@@ -45,45 +46,41 @@ return [
             'mautic.focus.subscriber.form_bundle' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FormSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.subscriber.page_bundle' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                     'router',
                 ],
             ],
-            'mautic.focus.subscriber.stat'        => [
+            'mautic.focus.subscriber.stat' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.focus.model.focus',
                 ],
             ],
-            'mautic.focus.subscriber.focus'       => [
+            'mautic.focus.subscriber.focus' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'router',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
         ],
-        'forms'  => [
-            'mautic.focus.form.type.color'             => [
+        'forms' => [
+            'mautic.focus.form.type.color' => [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\ColorType',
                 'alias' => 'focus_color',
             ],
-            'mautic.focus.form.type.content'           => [
+            'mautic.focus.form.type.content' => [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\ContentType',
                 'alias' => 'focus_content',
             ],
-            'mautic.focus.form.type.focus'             => [
+            'mautic.focus.form.type.focus' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusType',
                 'alias'     => 'focus',
                 'arguments' => 'mautic.security',
@@ -92,7 +89,7 @@ return [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\PropertiesType',
                 'alias' => 'focus_entity_properties',
             ],
-            'mautic.focus.form.type.properties'        => [
+            'mautic.focus.form.type.properties' => [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusPropertiesType',
                 'alias' => 'focus_properties',
             ],

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,18 +13,17 @@ namespace Mautic\CalendarBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class EventGeneratorEvent
+ * Class EventGeneratorEvent.
  */
 class EventGeneratorEvent extends Event
 {
-
     /**
      * @var string
      */
     private $source;
 
     /**
-     * @var integer
+     * @var int
      */
     private $entityId;
 
@@ -53,21 +53,19 @@ class EventGeneratorEvent extends Event
     private $formName;
 
     /**
-     * @param string    $source
-     * @param integer   $id
+     * @param string $source
+     * @param int    $id
      */
     public function __construct($source, $entityId)
     {
-        $this->source    = $source;
-        $this->entityId  = $entityId;
+        $this->source   = $source;
+        $this->entityId = $entityId;
     }
 
     /**
-     * Set content template
+     * Set content template.
      *
      * @param string $contentTemplate
-     *
-     * @return void
      */
     public function setContentTemplate($contentTemplate)
     {
@@ -75,7 +73,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the event source
+     * Fetches the event source.
      *
      * @return string
      */
@@ -85,9 +83,9 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the event entityId
+     * Fetches the event entityId.
      *
-     * @return integer
+     * @return int
      */
     public function getEntityId()
     {
@@ -95,7 +93,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the event model
+     * Fetches the event model.
      *
      * @return \Mautic\CoreBundle\Model\FormModel
      */
@@ -105,7 +103,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Set the event model
+     * Set the event model.
      */
     public function setModel(\Mautic\CoreBundle\Model\FormModel $model)
     {
@@ -113,7 +111,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the event entity
+     * Fetches the event entity.
      *
      * @return \Mautic\CoreBundle\Entity\FormEntity
      */
@@ -123,7 +121,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Set the event entity
+     * Set the event entity.
      */
     public function setEntity(\Mautic\CoreBundle\Entity\FormEntity $entity)
     {
@@ -131,7 +129,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the events content template
+     * Fetches the events content template.
      *
      * @return string
      */
@@ -141,9 +139,9 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Confirmes that user can access the entity
+     * Confirmes that user can access the entity.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasAccess()
     {
@@ -151,7 +149,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Set the event access
+     * Set the event access.
      */
     public function setAccess($access)
     {
@@ -169,7 +167,7 @@ class EventGeneratorEvent extends Event
     }
 
     /**
-     * Set the event formName
+     * Set the event formName.
      */
     public function setFormName($formName)
     {

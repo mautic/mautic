@@ -1,34 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class LeadCompanyChangeEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class LeadCompanyChangeEvent.
  */
 class LeadChangeCompanyEvent extends Event
 {
-
     private $lead;
     private $leads;
     private $company;
     private $added;
 
     /**
-     * @param Lead $lead
+     * @param Lead    $lead
      * @param Company $company
      */
     public function __construct($leads, Company $company, $added = true)
@@ -38,12 +35,12 @@ class LeadChangeCompanyEvent extends Event
         } else {
             $this->lead = $leads;
         }
-        $this->company   = $company;
-        $this->added  = $added;
+        $this->company = $company;
+        $this->added   = $added;
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -53,7 +50,7 @@ class LeadChangeCompanyEvent extends Event
     }
 
     /**
-     * Returns batch array of leads
+     * Returns batch array of leads.
      *
      * @return array
      */

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,19 +15,18 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 
 /**
- * Class FormSubscriber
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::FORM_ON_BUILD  => ['onFormBuild', 0]
-        );
+        return [
+            FormEvents::FORM_ON_BUILD => ['onFormBuild', 0],
+        ];
     }
 
     /**
@@ -34,14 +34,14 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormBuild(FormBuilderEvent $event)
     {
-        $action = array(
+        $action = [
             'group'       => 'mautic.plugin.actions',
             'description' => 'mautic.plugin.actions.tooltip',
             'label'       => 'mautic.plugin.actions.push_lead',
             'formType'    => 'integration_list',
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
-            'callback'    => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
-        );
+            'callback'    => ['\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead'],
+        ];
         $event->addSubmitAction('plugin.leadpush', $action);
     }
 }

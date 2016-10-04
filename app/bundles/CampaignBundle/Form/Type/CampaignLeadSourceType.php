@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignLeadSourceType
+ * Class CampaignLeadSourceType.
  */
 class CampaignLeadSourceType extends AbstractType
 {
@@ -42,44 +43,44 @@ class CampaignLeadSourceType extends AbstractType
                 $builder->add(
                     'lists',
                     'choice',
-                    array(
-                        'choices'     => $options['source_choices'],
-                        'multiple'    => true,
-                        'label'       => 'mautic.campaign.leadsource.lists',
-                        'label_attr'  => array('class' => 'control-label'),
-                        'attr'        => array(
-                            'class'   => 'form-control'
-                        ),
-                        'constraints' => array(
+                    [
+                        'choices'    => $options['source_choices'],
+                        'multiple'   => true,
+                        'label'      => 'mautic.campaign.leadsource.lists',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                        'constraints' => [
                             new NotBlank(
-                                array(
-                                    'message' => 'mautic.core.value.required'
-                                )
-                            )
-                        )
-                    )
+                                [
+                                    'message' => 'mautic.core.value.required',
+                                ]
+                            ),
+                        ],
+                    ]
                 );
                 break;
             case 'forms':
                 $builder->add(
                     'forms',
                     'choice',
-                    array(
-                        'choices'     => $options['source_choices'],
-                        'multiple'    => true,
-                        'label'       => 'mautic.campaign.leadsource.forms',
-                        'label_attr'  => array('class' => 'control-label'),
-                        'attr'        => array(
-                            'class'   => 'form-control'
-                        ),
-                        'constraints' => array(
+                    [
+                        'choices'    => $options['source_choices'],
+                        'multiple'   => true,
+                        'label'      => 'mautic.campaign.leadsource.forms',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                        'constraints' => [
                             new NotBlank(
-                                array(
-                                    'message' => 'mautic.core.value.required'
-                                )
-                            )
-                        )
-                    )
+                                [
+                                    'message' => 'mautic.core.value.required',
+                                ]
+                            ),
+                        ],
+                    ]
                 );
                 break;
             default:
@@ -101,13 +102,13 @@ class CampaignLeadSourceType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', 'form_buttons', array(
-            'save_text' => $btnValue,
-            'save_icon' => $btnIcon,
-            'save_onclick' => 'Mautic.submitCampaignSource(event)',
-            'apply_text' => false,
-            'container_class' => 'bottom-form-buttons'
-        ));
+        $builder->add('buttons', 'form_buttons', [
+            'save_text'       => $btnValue,
+            'save_icon'       => $btnIcon,
+            'save_onclick'    => 'Mautic.submitCampaignSource(event)',
+            'apply_text'      => false,
+            'container_class' => 'bottom-form-buttons',
+        ]);
     }
 
     /**
@@ -115,7 +116,7 @@ class CampaignLeadSourceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('source_choices'));
+        $resolver->setRequired(['source_choices']);
     }
 
     /**
@@ -123,6 +124,6 @@ class CampaignLeadSourceType extends AbstractType
      */
     public function getName()
     {
-        return "campaign_leadsource";
+        return 'campaign_leadsource';
     }
 }

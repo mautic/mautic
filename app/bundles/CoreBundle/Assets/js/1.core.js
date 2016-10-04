@@ -302,6 +302,9 @@ var Mautic = {
         mQuery(Mautic.labelSpinner).remove();
     },
 
+    /**
+     * Activate Froala options
+     */
     activateGlobalFroalaOptions: function() {
         Mautic.basicFroalaOptions = {
             enter: mQuery.FroalaEditor.ENTER_BR,
@@ -323,7 +326,7 @@ var Mautic = {
      * Initiate various functions on page load, manual or ajax
      */
     onPageLoad: function (container, response, inModal) {
-        Mautic.initDateRangePicker('#daterange_date_from', '#daterange_date_to');
+        Mautic.initDateRangePicker(container + ' #daterange_date_from', container + ' #daterange_date_to');
 
         //initiate links
         mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
@@ -332,15 +335,6 @@ var Mautic = {
 
             return Mautic.ajaxifyLink(this, event);
         });
-
-        mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-ltr');
-        });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
-        });
-
-        Mautic.activateGlobalFroalaOptions();
 
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
@@ -417,6 +411,15 @@ var Mautic = {
 
         mQuery(container + " select.multiselect").each(function() {
             Mautic.activateMultiSelect(this);
+        });
+
+        mQuery(container + " *[data-toggle='field-lookup']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            var options = mQuery(this).attr('data-options');
+            var field = mQuery(this).attr('id');
+            var action = mQuery(this).attr('data-action');
+
+            Mautic.activateFieldTypeahead(field, target, options, action);
         });
 
         //initialize tab/hash activation
@@ -541,6 +544,7 @@ var Mautic = {
             }
         }
 
+        Mautic.activateGlobalFroalaOptions();
         if (mQuery(container + ' textarea.editor').length) {
             mQuery(container + ' textarea.editor').each(function () {
                 var textarea = mQuery(this);
@@ -597,8 +601,8 @@ var Mautic = {
         }
 
         //activate shuffles
-        if (mQuery('.shuffle-grid').length) {
-            var grid = mQuery(".shuffle-grid");
+        if (mQuery(container + ' .shuffle-grid').length) {
+            var grid = mQuery(container + " .shuffle-grid");
 
             //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
             setTimeout(function () {
@@ -627,10 +631,14 @@ var Mautic = {
         }
 
         //prevent auto closing dropdowns for dropdown forms
-        if (mQuery('.dropdown-menu-form').length) {
-            mQuery('.dropdown-menu-form').on('click', function (e) {
+        if (mQuery(container + ' .dropdown-menu-form').length) {
+            mQuery(container + ' .dropdown-menu-form').on('click', function (e) {
                 e.stopPropagation();
             });
+        }
+
+        if (response && response.updateSelect) {
+            Mautic.updateEntitySelect(response);
         }
 
         //run specific on loads
@@ -644,6 +652,13 @@ var Mautic = {
         if (container == '#app-content' || container == 'body') {
             //register global keyboard shortcuts
             Mautic.bindGlobalKeyboardShortcuts();
+
+            mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
+                mQuery("html").removeClass('sidebar-open-ltr');
+            });
+            mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
+                mQuery("html").removeClass('sidebar-open-rtl');
+            });
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -691,7 +706,7 @@ var Mautic = {
             }
         }
 
-        Mautic.renderCharts();
+        Mautic.renderCharts(container);
         Mautic.renderMaps(container);
         Mautic.stopIconSpinPostEvent();
 
@@ -792,6 +807,141 @@ var Mautic = {
     },
 
     /**
+     * Inserts a new row into a chosen select box
+     *
+     * @param response
+     */
+    updateEntitySelect: function (response) {
+        // New entity added through a popup so update the chosen
+        var newOption = mQuery('<option />').val(response.id);
+        newOption.html(response.name);
+        var el = '#' + response.updateSelect;
+
+        var mQueryParent = (window.opener) ? window.opener.mQuery : mQuery;
+
+        var sortOptions = function (options) {
+            return options.sort(function (a, b) {
+                var alc = a.text.toLowerCase(), blc = b.text.toLowerCase();
+                return alc > blc ? 1 : alc < blc ? -1 : 0;
+            });
+        }
+
+        if (mQueryParent(el).prop('disabled')) {
+            mQueryParent(el).prop('disabled', false);
+            var defaultOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+        } else {
+            var defaultOption = mQueryParent(el + ' option:first');
+            if (defaultOption.val() !== '' && defaultOption.val() !== 'new') {
+                var defaultOption = false;
+            } else {
+                // Remove the first option and add it back after sorting
+                mQueryParent(el + ' option:first').remove();
+            }
+        }
+
+        if (response.group) {
+            var optgroup = el + " optgroup";
+            if (mQueryParent(optgroup).length) {
+                // update option when new option equal with option item in group.
+                var firstOptionGroups = mQueryParent(el + ' optgroup');
+                var isUpdateOption = false;
+                firstOptionGroups.each(function () {
+                    var firstOptions = mQuery(this).children();
+                    for (var i = 0; i < firstOptions.length; i++) {
+                        if (firstOptions[i].value === response.id.toString()) {
+                            firstOptions[i].text = response.name;
+                            isUpdateOption = true;
+                            break;
+                        }
+                    }
+                });
+
+                if (!isUpdateOption) {
+                    //the optgroup exist so append to it
+                    mQueryParent(optgroup + " option:last").prev().before(newOption);
+                }
+            } else {
+                //create the optgroup
+                var newOptgroup = mQuery('<optgroup label= />');
+                newOption.appendTo(newOptgroup);
+                mQueryParent(newOptgroup).appendTo(mQueryParent(el));
+            }
+
+            var optionGroups = sortOptions(mQueryParent(el + ' optgroup'));
+
+            optionGroups.each(function () {
+                var options = sortOptions(mQuery(this).children());
+                mQuery(this).html(options);
+            });
+
+            var appendOptions = optionGroups;
+        } else {
+            newOption.appendTo(mQueryParent(el));
+
+            var appendOptions = sortOptions(mQueryParent(el).children());
+        }
+
+        mQueryParent(el).html(appendOptions);
+        if (defaultOption) {
+            mQueryParent(el).prepend(defaultOption);
+        }
+
+        newOption.prop('selected', true);
+        mQueryParent(el).trigger("chosen:updated");
+
+        if (window.opener) {
+            window.close();
+        } else {
+            mQueryParent('#MauticSharedModal').modal('hide');
+        }
+    },
+
+    /**
+     * Open modal route when a specific value is selected from a select list
+     *
+     * @param el
+     * @param url
+     * @param header
+     */
+    loadAjaxModalBySelectValue: function (el, value, route, header) {
+        var selectVal = mQuery(el).val();
+        var hasValue = (selectVal == value);
+        if (!hasValue && mQuery.isArray(selectVal)) {
+            hasValue = (mQuery.inArray(value, selectVal) !== -1);
+        }
+        if (hasValue) {
+            // Remove it from the select
+            route = route + (route.indexOf('?') > -1 ? '&' : '?') + 'modal=1&updateSelect=' + mQuery(el).attr('id');
+            mQuery(el).find('option[value="' + value + '"]').prop('selected', false);
+            mQuery(el).trigger("chosen:updated");
+            Mautic.loadAjaxModal('#MauticSharedModal', route, 'get', header);
+        }
+    },
+
+    /**
+     * Open a popup
+     * @param options
+     */
+    loadNewWindow: function (options) {
+        if (options.windowUrl) {
+            Mautic.startModalLoadingBar();
+
+            setTimeout(function () {
+                var opener = window.open(options.windowUrl, 'mauticpopup', 'height=600,width=1100');
+
+                if (!opener || opener.closed || typeof opener.closed == 'undefined') {
+                    alert(mauticLang.popupBlockerMessage);
+                } else {
+                    opener.onload = function () {
+                        Mautic.stopModalLoadingBar();
+                        Mautic.stopIconSpinPostEvent();
+                    };
+                }
+            }, 100);
+        }
+    },
+
+    /**
      * Convert to chosen select
      *
      * @param el
@@ -801,14 +951,111 @@ var Mautic = {
         if (!noResultsText) {
             noResultsText = mauticLang['chosenNoResults'];
         }
+
+        var isLookup = mQuery(el).attr('data-chosen-lookup');
+
+        if (isLookup) {
+            if (mQuery(el).attr('data-new-route')) {
+                // Register method to initiate new
+                mQuery(el).on('change', function () {
+                    var url = mQuery(el).attr('data-new-route');
+                    // If the element is already in a modal then use a popup
+                    if (mQuery(el).closest('.modal').length > 0) {
+                        var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
+                        Mautic.loadNewWindow({
+                            "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + mQuery(el).attr('id')
+                        });
+                        // De-select the new select option
+                        mQuery(el).find('option[value="new"]').prop('selected', false);
+                        mQuery(el).trigger('chosen:updated');
+                    } else {
+                        Mautic.loadAjaxModalBySelectValue(this, 'new', url, mQuery(el).attr('data-header'));
+                    }
+                });
+            }
+
+            var multiPlaceholder = mauticLang['mautic.core.lookup.search_options'],
+                singlePlaceholder = mauticLang['mautic.core.lookup.search_options'];
+        } else {
+            var multiPlaceholder = mauticLang['chosenChooseMore'],
+                singlePlaceholder = mauticLang['chosenChooseOne'];
+        }
+
         mQuery(el).chosen({
-            placeholder_text_multiple: mauticLang['chosenChooseMore'],
-            placeholder_text_single: mauticLang['chosenChooseOne'],
+            placeholder_text_multiple: multiPlaceholder,
+            placeholder_text_single: singlePlaceholder,
             no_results_text: noResultsText,
             width: "100%",
             allow_single_deselect: true,
             include_group_label_in_selected: true,
             search_contains: true
+        });
+
+        if (isLookup) {
+            var searchTerm = mQuery(el).attr('data-model');
+
+            if (searchTerm) {
+                mQuery(el).ajaxChosen({
+                    type: 'GET',
+                    url: mauticAjaxUrl + '?action=' + mQuery(el).attr('data-chosen-lookup'),
+                    dataType: 'json',
+                    afterTypeDelay: 2,
+                    jsonTermKey: searchTerm,
+                    keepTypingMsg: "Keep typing...",
+                    lookingForMsg: "Looking for"
+                }, function (data) {
+                    var results = [];
+
+                    mQuery.each(data, function (i, val) {
+                        results.push({value: val.value, text: val.text});
+                    });
+
+                    return results;
+                });
+            }
+        }
+    },
+
+    /**
+     * Activate a typeahead lookup
+     *
+     * @param field
+     * @param target
+     * @param options
+     */
+    activateFieldTypeahead: function (field, target, options, action) {
+        if (options) {
+            var keys = values = [];
+            //check to see if there is a key/value split
+            options = options.split('||');
+            if (options.length == 2) {
+                keys = options[1].split('|');
+                values = options[0].split('|');
+            } else {
+                values = options[0].split('|');
+            }
+
+            var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+                dataOptions: values,
+                dataOptionKeys: keys,
+                minLength: 0
+            });
+        } else {
+            var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+                prefetch: true,
+                remote: true,
+                action: action + "&field=" + target
+            });
+        }
+
+        mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
+            if (mQuery("#" + field).length && datum["value"]) {
+                mQuery("#" + field).val(datum["value"]);
+            }
+        }).on('typeahead:autocompleted', function (event, datum) {
+            if (mQuery("#" + field).length && datum["value"]) {
+                mQuery("#" + field).val(datum["value"]);
+            }
         });
     },
 

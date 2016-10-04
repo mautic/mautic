@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,18 +12,17 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class DefaultController
+ * Class DefaultController.
  *
  * Almost all other Mautic Bundle controllers extend this default controller
  */
 class DefaultController extends CommonController
 {
     /**
-     * Generates default index.php
+     * Generates default index.php.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -38,7 +38,6 @@ class DefaultController extends CommonController
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
-
                 $this->notFound();
             }
 
@@ -46,7 +45,7 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', array('slug' => $slug));
+            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
         }
     }
 
@@ -55,7 +54,7 @@ class DefaultController extends CommonController
      */
     public function globalSearchAction()
     {
-        $searchStr = $this->request->get("global_search", $this->get('session')->get('mautic.global_search', ''));
+        $searchStr = $this->request->get('global_search', $this->get('session')->get('mautic.global_search', ''));
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
@@ -63,14 +62,14 @@ class DefaultController extends CommonController
             $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
             $results = $event->getResults();
         } else {
-            $results = array();
+            $results = [];
         }
 
         return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
-            array(
+            [
                 'results'      => $results,
-                'searchString' => $searchStr
-            )
+                'searchString' => $searchStr,
+            ]
         );
     }
 
@@ -84,13 +83,13 @@ class DefaultController extends CommonController
 
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
 
-        return $this->delegateView(array(
+        return $this->delegateView([
             'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
-            'viewParameters'  => array(
+            'viewParameters'  => [
                 'showNewIndicator' => $showNewIndicator,
                 'notifications'    => $notifications,
-                'updateMessage'    => $updateMessage
-            )
-        ));
+                'updateMessage'    => $updateMessage,
+            ],
+        ]);
     }
 }

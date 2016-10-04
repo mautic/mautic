@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -24,8 +25,8 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="LinkedInProfile">
-        <?php echo $view->render('MauticSocialBundle:Integration/LinkedIn/Profile:profile.html.php', array(
-            'profile' => $details['profile']
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/LinkedIn/Profile:profile.html.php', [
+            'profile' => $details['profile'],
+        ]); ?>
     </div>
 </div>

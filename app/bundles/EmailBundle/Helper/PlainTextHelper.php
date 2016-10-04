@@ -1,32 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @copyright   2005-2007 Jon Abernathy <jon@chuggnutt.com>
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Helper;
 
-
 class PlainTextHelper
 {
-
     const ENCODING = 'UTF-8';
 
     /**
      * Contains the HTML content to convert.
      *
-     * @type string
+     * @var string
      */
     protected $html;
 
     /**
      * Contains the converted, formatted text.
      *
-     * @type string
+     * @var string
      */
     protected $text;
 
@@ -36,7 +35,7 @@ class PlainTextHelper
      * Set this value to 0 (or less) to ignore word wrapping
      * and not constrain text to a fixed-width column.
      *
-     * @type integer
+     * @var int
      */
     protected $width = 70;
 
@@ -44,10 +43,11 @@ class PlainTextHelper
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $replace.
      *
-     * @type array
+     * @var array
+     *
      * @see $replace
      */
-    protected $search = array(
+    protected $search = [
         "/\r/",                                           // Non-legal carriage return
         "/[\n\t]+/",                                      // Newlines and tabs
         '/<head[^>]*>.*?<\/head>/i',                      // <head>
@@ -70,15 +70,16 @@ class PlainTextHelper
         '/(<tr[^>]*>|<\/tr>)/i',                          // <tr> and </tr>
         '/<td[^>]*>(.*?)<\/td>/i',                        // <td> and </td>
         '/<span class="_html2text_ignore">.+?<\/span>/i', // <span class="_html2text_ignore">...</span>
-    );
+    ];
 
     /**
      * List of pattern replacements corresponding to patterns searched.
      *
-     * @type array
+     * @var array
+     *
      * @see $search
      */
-    protected $replace = array(
+    protected $replace = [
         '',                              // Non-legal carriage return
         ' ',                             // Newlines and tabs
         '',                              // <head>
@@ -100,90 +101,95 @@ class PlainTextHelper
         "\n\n",                          // <table> and </table>
         "\n",                            // <tr> and </tr>
         "\t\t\\1\n",                     // <td> and </td>
-        ""                               // <span class="_html2text_ignore">...</span>
-    );
+        '',                               // <span class="_html2text_ignore">...</span>
+    ];
 
     /**
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $entReplace.
      *
-     * @type array
+     * @var array
+     *
      * @see $entReplace
      */
-    protected $entSearch = array(
+    protected $entSearch = [
         '/&#153;/i',                                     // TM symbol in win-1252
         '/&#151;/i',                                     // m-dash in win-1252
         '/&(amp|#38);/i',                                // Ampersand: see converter()
         '/[ ]{2,}/',                                     // Runs of spaces, post-handling
-    );
+    ];
 
     /**
      * List of pattern replacements corresponding to patterns searched.
      *
-     * @type array
+     * @var array
+     *
      * @see $entSearch
      */
-    protected $entReplace = array(
+    protected $entReplace = [
         '™',         // TM symbol
         '—',         // m-dash
         '|+|amp|+|', // Ampersand: see converter()
         ' ',         // Runs of spaces, post-handling
-    );
+    ];
 
     /**
      * List of preg* regular expression patterns to search for
      * and replace using callback function.
      *
-     * @type array
+     * @var array
      */
-    protected $callbackSearch = array(
+    protected $callbackSearch = [
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',           // h1 - h6
         '/<(b)( [^>]*)?>(.*?)<\/b>/i',                           // <b>
         '/<(strong)( [^>]*)?>(.*?)<\/strong>/i',                 // <strong>
         '/<(th)( [^>]*)?>(.*?)<\/th>/i',                         // <th> and </th>
-        '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/i'  // <a href="">
-    );
+        '/<(a) [^>]*href=("|\')([^"\']+)\2([^>]*)>(.*?)<\/a>/i',  // <a href="">
+    ];
 
     /**
      * List of preg* regular expression patterns to search for in PRE body,
      * used in conjunction with $preReplace.
      *
-     * @type array
+     * @var array
+     *
      * @see $preReplace
      */
-    protected $preSearch = array(
+    protected $preSearch = [
         "/\n/",
         "/\t/",
         '/ /',
         '/<pre[^>]*>/',
-        '/<\/pre>/'
-    );
+        '/<\/pre>/',
+    ];
 
     /**
      * List of pattern replacements corresponding to patterns searched for PRE body.
      *
-     * @type array
+     * @var array
+     *
      * @see $preSearch
      */
-    protected $preReplace = array(
+    protected $preReplace = [
         '<br>',
         '&nbsp;&nbsp;&nbsp;&nbsp;',
         '&nbsp;',
         '',
         '',
-    );
+    ];
 
     /**
      * Temporary workspace used during PRE processing.
      *
-     * @type string
+     * @var string
      */
     protected $preContent = '';
 
     /**
      * Indicates whether content in the $html variable has been converted yet.
      *
-     * @type boolean
+     * @var bool
+     *
      * @see $html, $text
      */
     protected $converted = false;
@@ -191,17 +197,18 @@ class PlainTextHelper
     /**
      * Contains URL addresses from links to be rendered in plain text.
      *
-     * @type array
+     * @var array
+     *
      * @see buildlinkList()
      */
-    protected $linkList = array();
+    protected $linkList = [];
 
     /**
-     * Various configuration options (able to be set in the constructor)
+     * Various configuration options (able to be set in the constructor).
      *
-     * @type array
+     * @var array
      */
-    protected $options = array(
+    protected $options = [
         'do_links' => 'inline', // 'none'
         // 'inline' (show links inline)
         // 'nextline' (show links on the next line)
@@ -211,14 +218,14 @@ class PlainTextHelper
         //  Set this value to 0 (or less) to ignore word wrapping
         //  and not constrain text to a fixed-width column.
 
-        'base_url' => ''
-    );
+        'base_url' => '',
+    ];
 
     /**
      * @param string $html    Source HTML
      * @param array  $options Set configuration options
      */
-    public function __construct($html = '', $options = array())
+    public function __construct($html = '', $options = [])
     {
         if (is_array($html)) {
             // Options were passed in without html
@@ -226,12 +233,12 @@ class PlainTextHelper
             $html    = '';
         }
 
-        $this->html = $html;
+        $this->html    = $html;
         $this->options = array_merge($this->options, $options);
     }
 
     /**
-     * Set the source HTML
+     * Set the source HTML.
      *
      * @param string $html HTML source content
      *
@@ -239,7 +246,7 @@ class PlainTextHelper
      */
     public function setHtml($html)
     {
-        $this->html = $html;
+        $this->html      = $html;
         $this->converted = false;
 
         return $this;
@@ -261,7 +268,7 @@ class PlainTextHelper
 
     protected function convert()
     {
-        $this->linkList = array();
+        $this->linkList = [];
 
         $text = trim(stripslashes($this->html));
 
@@ -270,7 +277,7 @@ class PlainTextHelper
         if ($this->linkList) {
             $text .= "\n\nLinks:\n------\n";
             foreach ($this->linkList as $i => $url) {
-                $text .= '[' . ($i + 1) . '] ' . $url . "\n";
+                $text .= '['.($i + 1).'] '.$url."\n";
             }
         }
 
@@ -284,7 +291,7 @@ class PlainTextHelper
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, $text);
-        $text = preg_replace_callback($this->callbackSearch, array($this, 'pregCallback'), $text);
+        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
@@ -316,9 +323,10 @@ class PlainTextHelper
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param  string $link          URL of the link
-     * @param  string $display       Part of the text to associate number with
-     * @param  null   $linkOverride
+     * @param string $link         URL of the link
+     * @param string $display      Part of the text to associate number with
+     * @param null   $linkOverride
+     *
      * @return string
      */
     protected function buildlinkList($link, $display, $linkOverride = null)
@@ -345,15 +353,15 @@ class PlainTextHelper
 
         if ($linkMethod == 'table') {
             if (($index = array_search($url, $this->linkList)) === false) {
-                $index = count($this->linkList);
+                $index            = count($this->linkList);
                 $this->linkList[] = $url;
             }
 
-            return $display . ' [' . ($index + 1) . ']';
+            return $display.' ['.($index + 1).']';
         } elseif ($linkMethod == 'nextline') {
-            return $display . "\n[" . $url . ']';
+            return $display."\n[".$url.']';
         } else { // link_method defaults to inline
-            return $display . ' [' . $url . ']';
+            return $display.' ['.$url.']';
         }
     }
 
@@ -366,7 +374,7 @@ class PlainTextHelper
             // Run our defined tags search-and-replace with callback
             $this->preContent = preg_replace_callback(
                 $this->callbackSearch,
-                array($this, 'pregCallback'),
+                [$this, 'pregCallback'],
                 $this->preContent
             );
 
@@ -379,7 +387,7 @@ class PlainTextHelper
             // replace the content (use callback because content can contain $0 variable)
             $text = preg_replace_callback(
                 '/<pre[^>]*>.*<\/pre>/ismU',
-                array($this, 'pregPreCallback'),
+                [$this, 'pregPreCallback'],
                 $text,
                 1
             );
@@ -397,13 +405,13 @@ class PlainTextHelper
     protected function convertBlockquotes(&$text)
     {
         if (preg_match_all('/<\/*blockquote[^>]*>/i', $text, $matches, PREG_OFFSET_CAPTURE)) {
-            $start = 0;
+            $start  = 0;
             $taglen = 0;
-            $level = 0;
-            $diff = 0;
+            $level  = 0;
+            $diff   = 0;
             foreach ($matches[0] as $m) {
                 if ($m[0][0] == '<' && $m[0][1] == '/') {
-                    $level--;
+                    --$level;
                     if ($level < 0) {
                         $level = 0; // malformed HTML: go to next blockquote
                     } elseif ($level > 0) {
@@ -416,28 +424,30 @@ class PlainTextHelper
 
                         // Set text width
                         $pWidth = $this->options['width'];
-                        if ($this->options['width'] > 0) $this->options['width'] -= 2;
+                        if ($this->options['width'] > 0) {
+                            $this->options['width'] -= 2;
+                        }
                         // Convert blockquote content
                         $body = trim($body);
                         $this->converter($body);
                         // Add citation markers and create PRE block
                         $body = preg_replace('/((^|\n)>*)/', '\\1> ', trim($body));
-                        $body = '<pre>' . htmlspecialchars($body) . '</pre>';
+                        $body = '<pre>'.htmlspecialchars($body).'</pre>';
                         // Re-set text width
                         $this->options['width'] = $pWidth;
                         // Replace content
                         $text = substr($text, 0, $start - $diff)
-                            . $body . substr($text, $end + strlen($m[0]) - $diff);
+                            .$body.substr($text, $end + strlen($m[0]) - $diff);
 
                         $diff = $len + $taglen + strlen($m[0]) - strlen($body);
                         unset($body);
                     }
                 } else {
                     if ($level == 0) {
-                        $start = $m[1];
+                        $start  = $m[1];
                         $taglen = strlen($m[0]);
                     }
-                    $level++;
+                    ++$level;
                 }
             }
         }
@@ -446,7 +456,8 @@ class PlainTextHelper
     /**
      * Callback function for preg_replace_callback use.
      *
-     * @param  array  $matches PREG matches
+     * @param array $matches PREG matches
+     *
      * @return string
      */
     protected function pregCallback($matches)
@@ -456,9 +467,9 @@ class PlainTextHelper
             case 'strong':
                 return $matches[3];
             case 'th':
-                return $this->toupper("\t\t" . $matches[3] . "\n");
+                return $this->toupper("\t\t".$matches[3]."\n");
             case 'h':
-                return $this->toupper("\n\n" . $matches[3] . "\n\n");
+                return $this->toupper("\n\n".$matches[3]."\n\n");
             case 'a':
                 // override the link method
                 $linkOverride = null;
@@ -477,10 +488,11 @@ class PlainTextHelper
     /**
      * Callback function for preg_replace_callback use in PRE content handler.
      *
-     * @param  array  $matches PREG matches
+     * @param array $matches PREG matches
+     *
      * @return string
      */
-    protected function pregPreCallback(/** @noinspection PhpUnusedParameterInspection */ $matches)
+    protected function pregPreCallback(/* @noinspection PhpUnusedParameterInspection */ $matches)
     {
         return $this->preContent;
     }
@@ -488,7 +500,8 @@ class PlainTextHelper
     /**
      * Strtoupper function with HTML tags and entities handling.
      *
-     * @param  string $str Text to convert
+     * @param string $str Text to convert
+     *
      * @return string Converted text
      */
     private function toupper($str)
@@ -509,7 +522,8 @@ class PlainTextHelper
     /**
      * Strtoupper multibyte wrapper function with HTML entities handling.
      *
-     * @param  string $str Text to convert
+     * @param string $str Text to convert
+     *
      * @return string Converted text
      */
     private function strtoupper($str)

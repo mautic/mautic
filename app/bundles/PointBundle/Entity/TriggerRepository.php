@@ -1,32 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class TriggerRepository
+ * Class TriggerRepository.
  */
 class TriggerRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select($this->getTableAlias() . ', cat')
+            ->select($this->getTableAlias().', cat')
             ->from('MauticPointBundle:Trigger', $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
@@ -36,7 +34,7 @@ class TriggerRepository extends CommonRepository
     }
 
     /**
-     * Get a list of published triggers with color and points
+     * Get a list of published triggers with color and points.
      *
      * @return array
      */
@@ -68,10 +66,10 @@ class TriggerRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, array(
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
             't.name',
-            't.description'
-        ));
+            't.description',
+        ]);
     }
 
     /**

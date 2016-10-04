@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,12 +17,13 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 class PostCountRepository extends CommonRepository
 {
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         return parent::getEntities($args);
     }
@@ -29,11 +31,12 @@ class PostCountRepository extends CommonRepository
     /**
      * Fetch Lead stats for some period of time.
      *
-     * @param integer $quantity of units
-     * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
-     * @param array $options
+     * @param int    $quantity of units
+     * @param string $unit     of time php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param array  $options
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

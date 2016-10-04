@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +16,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
- * Universal DNC Migration
+ * Universal DNC Migration.
  */
 class Version20160426000000 extends AbstractMauticMigration
 {
@@ -34,8 +35,8 @@ class Version20160426000000 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->leadIdIdx = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'idx', array('lead_id'));
-        $this->leadIdFk  = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'fk', array('lead_id'));
+        $this->leadIdIdx = $this->generatePropertyName($this->prefix.'lead_donotcontact', 'idx', ['lead_id']);
+        $this->leadIdFk  = $this->generatePropertyName($this->prefix.'lead_donotcontact', 'fk', ['lead_id']);
     }
 
     /**
@@ -43,7 +44,6 @@ class Version20160426000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-
         $sql = <<<SQL
 CREATE TABLE `{$this->prefix}lead_donotcontact` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -64,14 +64,14 @@ SQL;
     }
 
     /**
-     * Migrate existing email_donotemail entries to the new lead_donotcontact format
+     * Migrate existing email_donotemail entries to the new lead_donotcontact format.
      *
      * @param Schema $schema
      */
     public function postUp(Schema $schema)
     {
         $logger = $this->factory->getLogger();
-        $qb = $this->connection->createQueryBuilder();
+        $qb     = $this->connection->createQueryBuilder();
 
         $qb->select('dne.email_id, dne.lead_id, dne.date_added, dne.unsubscribed, dne.bounced, dne.manual, dne.comments')
             ->from($this->prefix.'email_donotemail', 'dne')
@@ -88,19 +88,19 @@ SQL;
                     continue;
                 }
 
-                $insert = array(
+                $insert = [
                     'lead_id'    => $row['lead_id'],
                     'channel'    => 'email',
                     'channel_id' => $row['email_id'],
                     'date_added' => $row['date_added'],
-                    'comments'   => $row['comments']
-                );
+                    'comments'   => $row['comments'],
+                ];
 
                 switch (true) {
-                    case (!empty($row['unsubscribed'])):
+                    case !empty($row['unsubscribed']):
                         $insert['reason'] = DoNotContact::UNSUBSCRIBED;
                         break;
-                    case (!empty($row['bounced'])):
+                    case !empty($row['bounced']):
                         $insert['reason'] = DoNotContact::BOUNCED;
                         break;
                     default:
@@ -118,7 +118,7 @@ SQL;
             } catch (\Exception $e) {
                 $this->connection->rollBack();
 
-                $logger->addError($e->getMessage(), array('exception' => $e));
+                $logger->addError($e->getMessage(), ['exception' => $e]);
             }
 
             // Increase the start

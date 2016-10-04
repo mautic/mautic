@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,237 +23,234 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class FieldModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class FieldModel extends FormModel
 {
-    static public $coreFields   = [
+    public static $coreFields = [
         // Listed according to $order for installation
-        'title'     => [
+        'title' => [
             'type'       => 'lookup',
             'properties' => ['list' => 'Mr|Mrs|Miss'],
             'fixed'      => true,
-            'object'     => 'lead'
+            'object'     => 'lead',
         ],
         'firstname' => [
-            'fixed' => true,
-            'short' => true,
-            'object'=> 'lead'
+            'fixed'  => true,
+            'short'  => true,
+            'object' => 'lead',
         ],
-        'lastname'  => [
-            'fixed' => true,
-            'short' => true,
-            'object'=> 'lead'
+        'lastname' => [
+            'fixed'  => true,
+            'short'  => true,
+            'object' => 'lead',
         ],
-        'company'          => [
-            'fixed' => true,
-            'object'=> 'lead'
+        'company' => [
+            'fixed'  => true,
+            'object' => 'lead',
         ],
-        'position'         => [
-            'fixed' => true,
-            'object'=> 'lead'
+        'position' => [
+            'fixed'  => true,
+            'object' => 'lead',
         ],
-        'email'            => [
+        'email' => [
             'type'   => 'email',
             'unique' => true,
             'fixed'  => true,
             'short'  => true,
-            'object' => 'lead'
+            'object' => 'lead',
         ],
-        'mobile'           => [
+        'mobile' => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'phone'            => [
+        'phone' => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'fax'              => [
+        'fax' => [
             'type'     => 'tel',
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'address1'         => [
+        'address1' => [
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'address2'         => [
+        'address2' => [
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'city'             => [
-            'fixed' => true,
-            'object'=> 'lead'
+        'city' => [
+            'fixed'  => true,
+            'object' => 'lead',
         ],
-        'state'            => [
-            'type'  => 'region',
-            'fixed' => true,
-            'object'=> 'lead'
+        'state' => [
+            'type'   => 'region',
+            'fixed'  => true,
+            'object' => 'lead',
         ],
-        'zipcode'          => [
-            'fixed' => true,
-            'object'=> 'lead'
+        'zipcode' => [
+            'fixed'  => true,
+            'object' => 'lead',
         ],
-        'country'          => [
-            'type'  => 'country',
-            'fixed' => true,
-            'object'=> 'lead'
+        'country' => [
+            'type'   => 'country',
+            'fixed'  => true,
+            'object' => 'lead',
         ],
         'preferred_locale' => [
             'type'     => 'locale',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'attribution'      => [
+        'attribution' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,
             'listable'   => true,
-            'object'     => 'lead'
+            'object'     => 'lead',
         ],
-        'website'          => [
+        'website' => [
             'type'     => 'url',
             'listable' => true,
-            'object'   => 'lead'
+            'object'   => 'lead',
         ],
-        'facebook'   => [
+        'facebook' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
         'foursquare' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
         'googleplus' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
-        'instagram'  => [
+        'instagram' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
-        'linkedin'   => [
+        'linkedin' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
-        'skype'      => [
+        'skype' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
-        'twitter'    => [
+        'twitter' => [
             'listable' => true,
-            'group' => 'social',
-            'object'=> 'lead'
+            'group'    => 'social',
+            'object'   => 'lead',
         ],
     ];
 
-    static public $coreCompanyFields   = [
+    public static $coreCompanyFields = [
         // Listed according to $order for installation
-        'companyaddress1'          => [
-            'fixed' => true,
+        'companyaddress1' => [
+            'fixed'    => true,
             'listable' => true,
-            'object'=> 'company'
+            'object'   => 'company',
         ],
-        'companyaddress2'         => [
-            'fixed' => true,
+        'companyaddress2' => [
+            'fixed'    => true,
             'listable' => true,
-            'object'=> 'company'
+            'object'   => 'company',
         ],
-        'companyemail'            => [
+        'companyemail' => [
             'type'   => 'email',
             'unique' => true,
             'fixed'  => true,
-            'object' => 'company'
+            'object' => 'company',
         ],
-        'companyphone'           => [
+        'companyphone' => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'company'
+            'object'   => 'company',
         ],
-        'companycity'            => [
-            'type'     => 'tel',
+        'companycity' => [
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'company'
+            'object'   => 'company',
         ],
-        'companystate'            => [
-            'type'  => 'region',
-            'fixed' => true,
-            'object'=> 'company'
+        'companystate' => [
+            'type'   => 'region',
+            'fixed'  => true,
+            'object' => 'company',
         ],
-        'companyzipcode'              => [
-            'type'     => 'tel',
+        'companyzipcode' => [
+            'fixed'    => true,
             'listable' => true,
-            'object'   => 'company'
+            'object'   => 'company',
         ],
-        'companycountry'         => [
-            'type'  => 'country',
-            'fixed' => true,
-            'object'=> 'company'
+        'companycountry' => [
+            'type'   => 'country',
+            'fixed'  => true,
+            'object' => 'company',
         ],
-        'companyname'            => [
-            'fixed' => true,
-            'required' =>true,
-            'object'=> 'company'
+        'companyname' => [
+            'fixed'    => true,
+            'required' => true,
+            'object'   => 'company',
         ],
-        'companywebsite'          => [
+        'companywebsite' => [
+            'fixed'    => true,
             'type'     => 'url',
             'listable' => true,
-            'object'   => 'company'
+            'object'   => 'company',
         ],
         'companynumber_of_employees' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 0],
-            'fixed' => true,
-            'group' => 'professional',
-            'object'=> 'company'
+            'group'      => 'professional',
+            'object'     => 'company',
         ],
         'companyfax' => [
             'type'     => 'tel',
             'listable' => true,
-            'group' => 'professional',
-            'object'   => 'company'
+            'group'    => 'professional',
+            'object'   => 'company',
         ],
-        'companyannual_revenue'      => [
+        'companyannual_revenue' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
-            'fixed'      => true,
             'listable'   => true,
-            'group' => 'professional',
-            'object'     => 'company'
+            'group'      => 'professional',
+            'object'     => 'company',
         ],
-        'companyindustry'  => [
+        'companyindustry' => [
             'type'       => 'select',
-            'group'    => 'professional',
+            'group'      => 'professional',
             'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
             'fixed'      => true,
-            'object'     => 'company'
+            'object'     => 'company',
         ],
-        'companydescription'         => [
-            'fixed'    => true,
-            'group'    => 'professional',
-            'object'   => 'company'
-        ]
+        'companydescription' => [
+            'fixed'  => true,
+            'group'  => 'professional',
+            'object' => 'company',
+        ],
     ];
 
     /**
@@ -289,9 +287,10 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
+     *
      * @return null|object
      */
     public function getEntity($id = null)
@@ -306,26 +305,27 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Returns lead custom fields
+     * Returns lead custom fields.
      *
      * @param $args
      *
      * @return array
      */
-    public function getEntities(array $args = array())
+    public function getEntities(array $args = [])
     {
         return $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities($args);
     }
 
     /**
-     * @param       $entity
-     * @param       $unlock
+     * @param   $entity
+     * @param   $unlock
+     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
         if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(array('LeadEntity'));
+            throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
         $isNew = ($entity->getId()) ? false : true;
@@ -333,8 +333,8 @@ class FieldModel extends FormModel
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
         $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $alias = $entity->getAlias();
-        $object = $objects[$entity->getObject()];
+        $alias   = $entity->getAlias();
+        $object  = $objects[$entity->getObject()];
 
         if ($isNew) {
             if (empty($alias)) {
@@ -352,13 +352,13 @@ class FieldModel extends FormModel
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $aliases   = $repo->getAliases($entity->getId());
-            $count     = (int)in_array($testAlias, $aliases);
+            $count     = (int) in_array($testAlias, $aliases);
             $aliasTag  = $count;
 
             while ($count) {
-                $testAlias = $alias . $aliasTag;
-                $count     = (int)in_array($testAlias, $aliases);
-                $aliasTag++;
+                $testAlias = $alias.$aliasTag;
+                $count     = (int) in_array($testAlias, $aliases);
+                ++$aliasTag;
             }
 
             if ($testAlias != $alias) {
@@ -373,9 +373,9 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+        $event = $this->dispatchEvent('pre_save', $entity, $isNew);
         $this->getRepository()->saveEntity($entity);
-        $this->dispatchEvent("post_save", $entity, $isNew, $event);
+        $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
         $isUnique = $entity->getIsUniqueIdentifier();
 
@@ -431,7 +431,7 @@ class FieldModel extends FormModel
         parent::deleteEntity($entity);
 
         $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $object = $objects[$entity->getObject()];
+        $object  = $objects[$entity->getObject()];
 
         //remove the column from the leads table
         $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
@@ -440,7 +440,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Delete an array of entities
+     * Delete an array of entities.
      *
      * @param array $ids
      *
@@ -459,17 +459,17 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Reorder fields based on passed entity position
+     * Reorder fields based on passed entity position.
      *
      * @param $entity
      */
     public function reorderFieldsByEntity($entity)
     {
         if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(array('LeadEntity'));
+            throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
+        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
         $count  = 1;
         $order  = $entity->getOrder();
         $id     = $entity->getId();
@@ -489,20 +489,20 @@ class FieldModel extends FormModel
             } else {
                 $hit = true;
             }
-            $count++;
+            ++$count;
         }
         $this->em->flush();
     }
 
     /**
-     * Reorders fields by a list of field ids
+     * Reorders fields by a list of field ids.
      *
      * @param array $list
      * @param int   $start Number to start the order by (used for paginated reordering)
      */
     public function reorderFieldsByList(array $list, $start = 1)
     {
-        $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
+        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
                 $order = ((int) array_search($field->getId(), $list) + $start);
@@ -514,11 +514,12 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Get list of custom field values for autopopulate fields
+     * Get list of custom field values for autopopulate fields.
      *
      * @param $type
      * @param $filter
      * @param $limit
+     *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
@@ -529,37 +530,41 @@ class FieldModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
+     * @param       $entity
+     * @param       $formFactory
+     * @param null  $action
      * @param array $options
+     *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(array('LeadField'));
+            throw new MethodNotAllowedHttpException(['LeadField']);
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        $params = (!empty($action)) ? ['action' => $action] : [];
+
         return $formFactory->create('leadfield', $entity, $params);
     }
 
     /**
      * @param $entity
      * @param properties
+     *
      * @return bool
      */
     public function setFieldProperties(&$entity, $properties)
     {
         if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(array('LeadEntity'));
+            throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
         if (!empty($properties) && is_array($properties)) {
             $properties = InputHelper::clean($properties);
         } else {
-            $properties = array();
+            $properties = [];
         }
 
         //validate properties
@@ -567,6 +572,7 @@ class FieldModel extends FormModel
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
             $entity->setProperties($properties);
+
             return true;
         } else {
             return $result[1];
@@ -580,25 +586,26 @@ class FieldModel extends FormModel
      * @param $event
      * @param $entity
      * @param $isNew
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(array('LeadField'));
+            throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = LeadEvents::FIELD_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = LeadEvents::FIELD_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = LeadEvents::FIELD_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = LeadEvents::FIELD_POST_DELETE;
                 break;
             default:
@@ -626,30 +633,30 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = array('isPublished' => true, 'object' => 'lead'))
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
     {
-        $forceFilters = array();
+        $forceFilters = [];
         foreach ($filters as $col => $val) {
-            $forceFilters[] = array(
+            $forceFilters[] = [
                 'column' => "f.{$col}",
                 'expr'   => 'eq',
-                'value'  => $val
-            );
+                'value'  => $val,
+            ];
         }
         // Get a list of custom form fields
-        $fields = $this->getEntities(array(
-            'filter'     => array(
-                'force' => $forceFilters
-            ),
+        $fields = $this->getEntities([
+            'filter' => [
+                'force' => $forceFilters,
+            ],
             'orderBy'    => 'f.order',
-            'orderByDir' => 'asc'
-        ));
+            'orderByDir' => 'asc',
+        ]);
 
-        $leadFields = array();
+        $leadFields = [];
 
         foreach ($fields as $f) {
             if ($byGroup) {
-                $fieldName = $this->translator->trans('mautic.lead.field.group.' . $f->getGroup());
+                $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
                 $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
             } else {
                 $leadFields[$f->getAlias()] = $f->getLabel();
@@ -682,7 +689,7 @@ class FieldModel extends FormModel
             [
                 'object'           => $object,
                 'ignore_paginator' => true,
-                'hydration_mode'   => 'hydrate_array'
+                'hydration_mode'   => 'hydrate_array',
             ]
         );
 
@@ -693,7 +700,7 @@ class FieldModel extends FormModel
                 'alias'        => $contactField['alias'],
                 'type'         => $contactField['type'],
                 'group'        => $contactField['group'],
-                'group_label'  => $this->translator->trans('mautic.lead.field.group.' . $contactField['group']),
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
             ];
@@ -703,39 +710,39 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Get the fields for a specific group
+     * Get the fields for a specific group.
      *
      * @param       $group
      * @param array $filters
      *
      * @return array
      */
-    public function getGroupFields($group, $filters = array('isPublished' => true))
+    public function getGroupFields($group, $filters = ['isPublished' => true])
     {
-        $forceFilters = array(
-            array(
+        $forceFilters = [
+            [
                 'column' => 'f.group',
                 'expr'   => 'eq',
-                'value'  => $group
-            )
-        );
+                'value'  => $group,
+            ],
+        ];
         foreach ($filters as $col => $val) {
-            $forceFilters[] = array(
+            $forceFilters[] = [
                 'column' => "f.{$col}",
                 'expr'   => 'eq',
-                'value'  => $val
-            );
+                'value'  => $val,
+            ];
         }
         // Get a list of custom form fields
-        $fields = $this->getEntities(array(
-            'filter'     => array(
-                'force' => $forceFilters
-            ),
+        $fields = $this->getEntities([
+            'filter' => [
+                'force' => $forceFilters,
+            ],
             'orderBy'    => 'f.order',
-            'orderByDir' => 'asc'
-        ));
+            'orderByDir' => 'asc',
+        ]);
 
-        $leadFields = array();
+        $leadFields = [];
 
         foreach ($fields as $f) {
             $leadFields[$f->getAlias()] = $f->getLabel();
@@ -745,13 +752,13 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Retrieves a list of published fields that are unique identifers
+     * Retrieves a list of published fields that are unique identifers.
      *
      * @return array
      */
     public function getUniqueIdentiferFields()
     {
-        $filters = array ('isPublished' => true, 'isUniqueIdentifer' => true);
+        $filters = ['isPublished' => true, 'isUniqueIdentifer' => true];
 
         $fields = $this->getFieldList(false, true, $filters);
 
@@ -759,7 +766,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Wrapper for misspelled getUniqueIdentiferFields
+     * Wrapper for misspelled getUniqueIdentiferFields.
      *
      * @return array
      */
@@ -771,23 +778,22 @@ class FieldModel extends FormModel
     /**
      * Get the MySQL database type based on the field type
      * Use a static function so that it's accessible from DoctrineSubscriber
-     * without causing a circular service injection error
+     * without causing a circular service injection error.
      *
      * @param $fieldType
      *
      * @return array
      */
-    static public function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition($alias, $type, $isUnique = false)
     {
         // Unique is always a string in order to control index length
         if ($isUnique) {
-
             return [
                 'name'    => $alias,
                 'type'    => 'string',
                 'options' => [
-                    'notnull' => false
-                ]
+                    'notnull' => false,
+                ],
             ];
         }
 
@@ -817,7 +823,7 @@ class FieldModel extends FormModel
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false]
+            'options' => ['notnull' => false],
         ];
     }
 }

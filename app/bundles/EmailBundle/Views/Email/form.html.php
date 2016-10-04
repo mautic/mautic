@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
@@ -15,21 +15,21 @@ $filterBlockPrototype    = $form['dynamicContent']->children[0]['filters']->vars
 $filterSelectPrototype   = $form['dynamicContent']->children[0]['filters']->children[0]['filters']->vars['prototype'];
 
 $variantParent = $email->getVariantParent();
-$isExisting = $email->getId();
+$isExisting    = $email->getId();
 
 $isExisting = $email->getId();
 
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant_of', [
-    '%name%' => $email->getName(),
-    '%parent%' => $variantParent->getName()
-]) . '</span></div>' : '';
+$subheader = ($variantParent) ? '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
+    '%name%'   => $email->getName(),
+    '%parent%' => $variantParent->getName(),
+]).'</span></div>' : '';
 
 $header = $isExisting ?
     $view['translator']->trans('mautic.email.header.edit',
         ['%name%' => $email->getName()]) :
     $view['translator']->trans('mautic.email.header.new');
 
-$view['slots']->set("headerTitle", $header.$subheader);
+$view['slots']->set('headerTitle', $header.$subheader);
 
 $emailType = $form['emailType']->vars['data'];
 
@@ -46,8 +46,8 @@ $templates = [
     'locales'   => 'locale-template',
 ];
 
-$attr = $form->vars['attr'];
-$attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
+$attr                               = $form->vars['attr'];
+$attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
 ?>
 
@@ -58,14 +58,14 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li <?php echo !$isExisting ? "class='active'" : ""; ?>><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
-                    <li <?php echo $isExisting ? "class='active'" : ""; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
+                    <li <?php echo !$isExisting ? "class='active'" : ''; ?>><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
+                    <li <?php echo $isExisting ? "class='active'" : ''; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                     <li><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
                     <li><a href="#dynamic-content-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade <?php echo !$isExisting ? "in active" : ""; ?> bdr-w-0" id="email-container">
+                    <div class="tab-pane fade <?php echo !$isExisting ? 'in active' : ''; ?> bdr-w-0" id="email-container">
                         <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
@@ -74,11 +74,11 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', [
                             'type'   => 'email',
                             'themes' => $themes,
-                            'active' => $form['template']->vars['value']
+                            'active' => $form['template']->vars['value'],
                         ]); ?>
                     </div>
 
-                    <div class="tab-pane fade <?php echo $isExisting ? "in active" : ""; ?> bdr-w-0" id="source-container">
+                    <div class="tab-pane fade <?php echo $isExisting ? 'in active' : ''; ?> bdr-w-0" id="source-container">
                         <div class="row">
                           <div class="col-md-12">
                               <?php echo $view['form']->row($form['subject']); ?>
@@ -144,13 +144,13 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                             <div class="col-md-12">
                                 <div class="row">
                                 <?php
-                                $tabHtml  = '<div class="col-xs-3 dynamicContentFilterContainer">';
+                                $tabHtml = '<div class="col-xs-3 dynamicContentFilterContainer">';
                                 $tabHtml .= '<ul class="nav nav-tabs pr-md pl-md tabs-left" id="dynamicContentTabs">';
                                 $tabHtml .= '<li><a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li>';
                                 $tabContentHtml = '<div class="tab-content pa-md col-xs-9" id="dynamicContentContainer">';
 
                                 foreach ($form['dynamicContent'] as $i => $dynamicContent) {
-                                    $linkText = $dynamicContent['tokenName']->vars['value'] ?: $view['translator']->trans('mautic.core.dynamicContent').' '.($i+1);
+                                    $linkText = $dynamicContent['tokenName']->vars['value'] ?: $view['translator']->trans('mautic.core.dynamicContent').' '.($i + 1);
 
                                     $tabHtml .= '<li class="'.($i === 0 ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$linkText.'</a></li>';
 
@@ -215,7 +215,7 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="' . $view['translator']->trans('mautic.lead.tags.select_or_create') . '" data-no-results-text="' . $view['translator']->trans('mautic.lead.tags.enter_to_create') . '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]" id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
@@ -227,8 +227,9 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId))
+                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
+                        }
                         echo "<option value=\"$value\">$label</option>\n";
                     endif;
                 endforeach;
@@ -243,7 +244,7 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
-    'objectId'      => $email->getSessionId()
+    'objectId'      => $email->getSessionId(),
 ]); ?>
 
 <?php
@@ -251,10 +252,10 @@ $type = $email->getEmailType();
 if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         [
-            'item'               => $email,
-            'mauticLang'         => [
-                'newListEmail' => 'mautic.email.type.list.header',
-                'newTemplateEmail'   => 'mautic.email.type.template.header'
+            'item'       => $email,
+            'mauticLang' => [
+                'newListEmail'     => 'mautic.email.type.list.header',
+                'newTemplateEmail' => 'mautic.email.type.template.header',
             ],
             'typePrefix'         => 'email',
             'cancelUrl'          => 'mautic_email_index',

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,7 @@
 
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
-chdir($baseDir . '/packaging');
+chdir($baseDir.'/packaging');
 
 system('rm -f app/phpunit.*');
 system('rm -f app/tests.bootstrap*');

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,11 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadPageHitData
+ * Class LoadPageHitData.
  */
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -44,15 +44,15 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $factory = $this->container->get('mautic.factory');
         $repo    = $factory->getModel('page.page')->getRepository();
 
-        $hits = CsvHelper::csv_to_array(__DIR__ . '/fakepagehitdata.csv');;
+        $hits = CsvHelper::csv_to_array(__DIR__.'/fakepagehitdata.csv');
         foreach ($hits as $count => $rows) {
             $hit = new Hit();
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('page', 'ipAddress'))) {
-                        $hit->$setter($this->getReference($col.'-' . $val));
-                    } elseif (in_array($col, array('dateHit', 'dateLeft'))) {
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
+                    if (in_array($col, ['page', 'ipAddress'])) {
+                        $hit->$setter($this->getReference($col.'-'.$val));
+                    } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->$setter(new \DateTime($val));
                     } elseif ($col == 'browserLanguages') {
                         $val = unserialize(stripslashes($val));

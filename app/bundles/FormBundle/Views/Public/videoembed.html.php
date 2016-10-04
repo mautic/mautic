@@ -7,12 +7,12 @@
                 if (!isset($fieldSettings[$f->getType()])):
                     continue;
                 endif;
-                $params   = $fieldSettings[$f->getType()];
+                $params = $fieldSettings[$f->getType()];
                 $f->setCustomParameters($params);
 
                 $template = $params['template'];
             else:
-                $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
+                $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
             endif;
 
             echo $view->render($template, ['field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $f->getForm()->generateFormName()]);
