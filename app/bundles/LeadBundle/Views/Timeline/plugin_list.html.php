@@ -81,7 +81,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
 </style>
 <div class="tl-header">
-    Displaying <?= $events['total'] ?> events (<span class="tl-new"><?= $newCount ?></span> new)
+    <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', array('%total%'=>$events['total'])); ?>
+     (<span class="tl-new"><?php echo $newCount; ?></span> <?php echo $view['translator']->trans('mautic.lead.timeline.events_new'); ?>)
 </div>
 <!-- timeline -->
 <div class="event-list" id="timeline-container">
@@ -110,11 +111,11 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo " tr-new";
         }
         ?>">
-            <span class="timeline-row-id hide"><?= $event['timestamp']->format('U') ?></span>
-            <span class="timeline-row-lead-id hide"><?= $event['leadId'] ?></span>
+            <span class="timeline-row-id hide"><?php echo $event['timestamp']->format('U'); ?></span>
+            <span class="timeline-row-lead-id hide"><?php echo $event['leadId']; ?></span>
                 <span class="timeline-icon">
                     <a href="javascript:void(0);"
-                       onclick="jQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
+                       onclick="mQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
                        data-activate-details="<?php echo $counter; ?>"
                        class="btn btn-xs btn-nospin btn-default<?php if (empty($details)) {
                            echo " disabled";
@@ -126,7 +127,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
                 <span class="timeline-icon">
                     <a href="javascript:void(0);" class="btn btn-xs btn-nospin" data-toggle="tooltip"
-                       onclick="jQuery(this).toggleClass('btn-warning')"
+                       onclick="mQuery(this).toggleClass('btn-warning')"
                        title="Mute notifications">
                         <span class="fa fa-fw fa-bell-slash-o"></span>
                     </a>
