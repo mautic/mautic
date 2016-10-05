@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,14 +14,14 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Class ConfigEvent
+ * Class ConfigEvent.
  */
 class ConfigEvent extends CommonEvent
 {
     /**
      * @var array
      */
-    private $preserve = array();
+    private $preserve = [];
 
     /**
      * @param array $config
@@ -33,6 +34,11 @@ class ConfigEvent extends CommonEvent
     private $post;
 
     /**
+     * @var array
+     */
+    private $errors = [];
+
+    /**
      * @param array        $config
      * @param ParameterBag $post
      */
@@ -43,7 +49,7 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * Returns the config array
+     * Returns the config array.
      *
      * @param string $key
      *
@@ -52,14 +58,14 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : array();
+            return (isset($this->config[$key])) ? $this->config[$key] : [];
         }
 
         return $this->config;
     }
 
     /**
-     * Sets the config array
+     * Sets the config array.
      *
      * @param array $config
      * @param null  $key
@@ -74,7 +80,7 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * Returns the POST
+     * Returns the POST.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
      */
@@ -85,14 +91,14 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Set fields such as passwords that will not overwrite existing values
-     * if the current is empty
+     * if the current is empty.
      *
      * @param array|string $fields
      */
     public function unsetIfEmpty($fields)
     {
         if (!is_array($fields)) {
-            $fields = array($fields);
+            $fields = [$fields];
         }
 
         $this->preserve = array_merge($this->preserve, $fields);
@@ -100,12 +106,33 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Return array of fields to unset if empty so that existing values are not
-     * overwritten if empty
+     * overwritten if empty.
      *
      * @return array
      */
     public function getPreservedFields()
     {
         return $this->preserve;
+    }
+
+    /**
+     * Set error message.
+     *
+     * @param string $message     (untranslated)
+     * @param array  $messageVars for translation
+     */
+    public function setError($message, $messageVars = [])
+    {
+        $this->errors[$message] = $messageVars;
+    }
+
+    /**
+     * Get error messages.
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

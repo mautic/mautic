@@ -6,6 +6,7 @@
 Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderMode     = (mQuery('#' + formName + '_template').val() == '') ? 'custom' : 'template';
     Mautic.builderFormName = formName;
+    Mautic.showChangeThemeWarning = true;
 
     mQuery('body').css('overflow-y', 'hidden');
 
@@ -34,144 +35,56 @@ Mautic.launchBuilder = function (formName, actionName) {
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    if (Mautic.builderMode == 'template') {
-        // Template
-        var src = mQuery('#builder_url').val();
-        src += '?template=' + mQuery('#' + formName + '_template').val();
+    // Load the theme from the custom HTML textarea
+    var themeHtml = mQuery('textarea.builder-html').val();
 
-        var builder = mQuery("<iframe />", {
-            css: builderCss,
-            id: "builder-template-content"
-        })
-            .attr('src', src)
-            .appendTo('.builder-content')
-            .load(function () {
-                var contents = mQuery(this).contents();
-                // here, catch the droppable div and create a droppable widget
-                contents.find('.mautic-editable').droppable({
-                    iframeFix: true,
-                    drop: function (event, ui) {
-                        var editorId = mQuery(this).attr("id");
-                        var drop     = mQuery(ui.draggable).data('drop');
-                        var token    = mQuery(ui.draggable).data('token');
+    // Insert the Mautic assets to the header
+    var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
+    themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-                        if (drop) {
-                            Mautic[drop](event, ui, editorId, token);
-                        } else {
-                            Mautic.insertBuilderEditorToken(editorId, token);
-                        }
-                        mQuery(this).removeClass('over-droppable');
-                    },
-                    over: function (e, ui) {
-                        mQuery(this).addClass('over-droppable');
-                    },
-                    out: function (e, ui) {
-                        mQuery(this).removeClass('over-droppable');
-                    }
-                });
-
-                // Activate draggables
-                Mautic.activateBuilderDragTokens();
-
-                mQuery('#builder-overlay').addClass('hide');
-
-                mQuery('.btn-close-builder').prop('disabled', false);
-            });
-    } else {
-        // Custom HTML
-
-        // Add a padding to builder-content
-        mQuery('.builder-content').addClass('pr-10');
-
-        var editorId = 'builder-custom-content';
-        var builder  = mQuery('<textarea />', {
-            id: editorId
-        }).appendTo('.builder-content');
-
-        builder.data('token-callback', actionName + ':getBuilderTokens');
-        builder.data('token-activator', '{');
-
-        mQuery('#customHtmlDropzone').droppable({
-            drop: function (event, ui) {
-                var drop  = mQuery(ui.draggable).data('drop');
-                var token = mQuery(ui.draggable).data('token');
-
-                if (drop) {
-                    Mautic[drop](event, ui, editorId, token);
-                } else {
-                    Mautic.insertBuilderEditorToken(editorId, token);
-                }
-                mQuery('#customHtmlDropzone').removeClass('over-droppable text-danger');
-                mQuery('.custom-drop-message').addClass('hide');
-                mQuery('.custom-general-message').removeClass('hide');
-            }
-        });
-
-        builder.ckeditor(function() {
-                CKEDITOR.instances['builder-custom-content'].resize('100%', mQuery('.builder-content').height());
-
-                var data = CKEDITOR.instances[formName + '_customHtml'].getData();
-                CKEDITOR.instances['builder-custom-content'].setData(data);
-
-                mQuery('.btn-close-builder').prop('disabled', false);
-
-                // Activate draggables
-                Mautic.activateBuilderDragTokens();
-
-                mQuery('#builder-overlay').addClass('hide');
-            },
-            {
-                toolbar: 'fullpage',
-                fullPage: true,
-                extraPlugins: 'sourcedialog,docprops,tokens',
-                width: '100%',
-                allowedContent: true // Do not strip classes and the like
-            }
-        );
-    }
+    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+    });
 };
 
-/**
- * Set builder token draggables
- *
- * @param target
- */
-Mautic.activateBuilderDragTokens = function (target) {
-    if (typeof target == 'undefined') {
-        target = '.builder-panel';
-    }
-
-    if (Mautic.builderMode == 'template') {
-        var settings = {
-            iframeFix: true,
-            iframeId: 'builder-template-content',
-            helper: 'clone',
-            appendTo: '.builder',
-            zIndex: 8000,
-            scroll: true,
-            scrollSensitivity: 100,
-            scrollSpeed: 100,
-            cursorAt: {top: 15, left: 15}
-        }
+Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
+    if (mQuery('iframe#'+id).length) {
+        var builder = mQuery('iframe#'+id);
     } else {
-        var settings = {
-            helper: 'clone',
-            appendTo: '.builder',
-            scroll: false,
-            cursorAt: {top: 15, left: 15},
-            start: function(event, ui ) {
-                mQuery(ui.helper).css('max-width', mQuery(this).css('width'));
-                mQuery(ui.helper).css('max-height', mQuery(this).css('height'));
-
-                mQuery('#customHtmlDropzone').addClass('over-droppable text-danger');
-                mQuery('.custom-drop-message').removeClass('hide');
-                mQuery('.custom-general-message').addClass('hide');
-            }
-        }
+        var builder = mQuery("<iframe />", {
+            css: {
+                margin: "0",
+                padding: "0",
+                border: "none",
+                width: "100%",
+                height: "100%"
+            },
+            id: id
+        }).appendTo('.builder-content');
     }
 
-    //activate builder drag and drop
-    mQuery(target + " *[data-token]").draggable(settings);
+    builder.on('load', function() {
+        if (typeof onLoadCallback === 'function') {
+            onLoadCallback();
+        }
+    });
+
+    // Build the iframe with the theme HTML in it
+    var iframe = document.getElementById(id);
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(themeHtml);
+    doc.close();
+};
+
+Mautic.htmlspecialchars_decode = function(encodedHtml) {
+    encodedHtml = encodedHtml.replace(/&quot;/g, '"');
+    encodedHtml = encodedHtml.replace(/&#039;/g, "'");
+    encodedHtml = encodedHtml.replace(/&amp;/g, '&');
+    encodedHtml = encodedHtml.replace(/&lt;/g, '<');
+    encodedHtml = encodedHtml.replace(/&gt;/g, '>');
+    return encodedHtml;
 };
 
 /**
@@ -191,123 +104,123 @@ Mautic.closeBuilder = function(model) {
     mQuery('#builder-overlay').removeClass('hide');
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    if (Mautic.builderMode == 'template') {
-        // Save content
-        var editors = Mautic.getBuilderEditorInstance();
-        var fields  = Mautic.getBuilderEditorFields();
-        var content = {};
+    // Trigger slot:destroy event
+    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
 
-        var builderContents = mQuery('#builder-template-content').contents();
+    var themeHtml = mQuery('iframe#builder-template-content').contents();
 
-        // Make sure editors have lost focus so the content is updated
-        builderContents.find('.mautic-editable').each(function (index) {
-            mQuery(this).blur();
-        });
+    // Remove Mautic's assets
+    themeHtml.find('[data-source="mautic"]').remove();
+    themeHtml.find('.atwho-container').remove();
 
-        // Get the content of each editor
-        mQuery.each(editors, function (slot, editor) {
-            slot = slot.replace("slot-", "");
-            content[slot] = editor.getData();
-        });
+    // Remove the slot focus highlight
+    themeHtml.find('[data-slot-focus], [data-slot-handle], [data-section-focus]').remove();
 
-        // Get the content of each field
-        mQuery.each(fields, function (key, field) {
-            field = mQuery(field);
-            slot = field.attr('id').replace("slot-", "");
-            content[slot] = field.val();
-        });
+    // Clear the customize forms
+    mQuery('#slot-form-container, #section-form-container').html('');
 
-        Mautic.saveBuilderContent(model, builderContents.find('#builder_entity_id').val(), content, function (response) {
-            if (response.success) {
-                try {
-                    // Kill droppables
-                    builderContents.find('.mautic-editable').droppable('destroy');
+    // Store the HTML content to the HTML textarea
+    mQuery('.builder-html').val(themeHtml.find('html').get(0).outerHTML);
+    mQuery('.builder-html').froalaEditor('html.set', themeHtml.find('html').get(0).outerHTML);
 
-                    // Kill draggables
-                    mQuery(".ui-draggable[data-token]").draggable('destroy');
-                } catch (err) {
-                    console.log(err);
-                }
+    // Kill the overlay
+    mQuery('#builder-overlay').remove();
 
-                // Kill the overlay
-                mQuery('#builder-overlay').remove();
-
-                // Hide builder
-                mQuery('.builder').removeClass('builder-active').addClass('hide');
-                mQuery('.btn-close-builder').prop('disabled', false);
-
-                mQuery('body').css('overflow-y', '');
-
-                // mQuery('.builder').addClass('hide');
-                Mautic.stopIconSpinPostEvent();
-            }
-        });
-
-        mQuery('#builder-template-content').remove();
-    } else {
-        try {
-            // Kill droppable
-            mQuery('#customHtmlDropzone').droppable('destroy');
-
-            // Kill draggables
-            mQuery(".ui-draggable[data-token]").draggable('destroy');
-
-            // Get the contents of the editor
-            var data = CKEDITOR.instances['builder-custom-content'].getData();
-            CKEDITOR.instances[Mautic.builderFormName + '_customHtml'].setData(data);
-
-            // Destroy the editor
-            CKEDITOR.instances['builder-custom-content'].destroy(true);
-        } catch (err) {
-            console.log(err);
-        }
-
-        mQuery('#builder-custom-content').remove();
-
-        // Kill the overlay
-        mQuery('#builder-overlay').remove();
-
-        // Hide builder
-        mQuery('.builder').removeClass('builder-active').addClass('hide');
-        mQuery('.btn-close-builder').prop('disabled', false);
-
-        mQuery('body').css('overflow-y', '');
-
-        Mautic.stopIconSpinPostEvent();
-    }
+    // Hide builder
+    mQuery('.builder').removeClass('builder-active').addClass('hide');
+    mQuery('.btn-close-builder').prop('disabled', false);
+    mQuery('body').css('overflow-y', '');
+    mQuery('.builder').addClass('hide');
+    Mautic.stopIconSpinPostEvent();
+    mQuery('#builder-template-content').remove();
 
     delete Mautic.builderMode;
     delete Mautic.builderFormName;
 };
 
-/**
- * Makes changes based on what builder mode is selected
- *
- * @param el
- */
-Mautic.onBuilderModeSwitch = function(el) {
-    var builderMode = (mQuery(el).val() == '') ? false : true;
-
-    if (builderMode) {
-        mQuery('.custom-html-mask').removeClass('hide');
-        mQuery('.template-dnd-help').removeClass('hide');
-        mQuery('.custom-dnd-help').addClass('hide');
-        mQuery('.template-fields').removeClass('hide');
-        Mautic.toggleBuilderButton(false);
-
-    } else {
-        mQuery('.custom-html-mask').addClass('hide');
-        mQuery('.template-dnd-help').addClass('hide');
-        mQuery('.custom-dnd-help').removeClass('hide');
-        mQuery('.template-fields').addClass('hide');
-        Mautic.toggleBuilderButton(true);
+Mautic.destroySlots = function() {
+    // Trigger destroy slots event
+    if (typeof Mautic.builderSlots !== 'undefined' && Mautic.builderSlots.length) {
+        mQuery.each(Mautic.builderSlots, function(i, slotParams) {
+            mQuery(slotParams.slot).trigger('slot:destroy', slotParams);
+        });
+        delete Mautic.builderSlots;
     }
+
+    // Destroy sortable
+    Mautic.builderContents.find('[data-slot-container]').sortable('destroy');
+
+    // Remove empty class="" attr
+    Mautic.builderContents.find('*[class=""]').removeAttr('class');
+
+    // Remove border highlighted by Froala
+    Mautic.builderContents = Mautic.clearFroalaStyles(Mautic.builderContents);
+
+    // Remove style="z-index: 2501;" which Froala forgets there
+    Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
+
+    // Make sure that the Froala editor is gone
+    Mautic.builderContents.find('.fr-toolbar, .fr-line-breaker').remove();
+
+    // Remove the class attr vrom HTML tag used by Modernizer
+    var htmlTags = document.getElementsByTagName('html');
+    htmlTags[0].removeAttribute('class');
 };
 
-/**
- *
- * @param formName
- */
+Mautic.clearThemeHtmlBeforeSave = function(form, callback) {
+    var form = mQuery(form);
+    var textarea = form.find('textarea.builder-html');
+
+    // update textarea from Froala's CodeMirror view on save
+    textarea.froalaEditor('events.trigger', 'form.submit');
+
+    // Return the styles added by Froala to its original state
+    var editorHtmlString = textarea.val();
+    Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation', function() {
+        var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+        editorHtml = Mautic.clearFroalaStyles(editorHtml);
+        textarea.val(editorHtml.find('html').get(0).outerHTML);
+        callback();
+    });
+
+    var dynamicContent = mQuery('#dynamic-content-container');
+
+    if (dynamicContent.length) {
+        var dynamicContentTextareas = dynamicContent.find('textarea.editor');
+
+        dynamicContentTextareas.each(function() {
+            var $this = mQuery(this);
+
+            $this.val(Mautic.clearFroalaStyles(mQuery($this.val())));
+        });
+    }
+}
+
+Mautic.clearFroalaStyles = function(content) {
+    mQuery.each(content.find('td, th, table, [fr-original-class], [fr-original-style]'), function() {
+        var el = mQuery(this);
+        if (el.attr('fr-original-class')) {
+            el.attr('class', el.attr('fr-original-class'));
+            el.removeAttr('fr-original-class');
+        }
+        if (el.attr('fr-original-style')) {
+            el.attr('style', el.attr('fr-original-style'));
+            el.removeAttr('fr-original-style');
+        }
+        if (el.css('border') === '1px solid rgb(221, 221, 221)') {
+            el.css('border', '');
+        }
+    });
+    content.find('link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]').remove();
+
+    // fix Mautc's tokens in the strong tag
+    content.find('strong[contenteditable="false"]').removeAttr('style');
+
+    // data-atwho-at-query causes not working tokens
+    content.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
+    return content;
+}
+
 Mautic.toggleBuilderButton = function (hide) {
     if (mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder')) {
         if (hide) {
@@ -331,195 +244,398 @@ Mautic.toggleBuilderButton = function (hide) {
         }
     }
 };
+Mautic.initSections = function() {
+    var sectionWrappers = Mautic.builderContents.find('[data-section-wrapper]');
 
-/**
- * Save the builder content
- *
- * @param model
- * @param entityId
- * @param content
- * @param callback
- */
-Mautic.saveBuilderContent = function (model, entityId, content, callback) {
-    mQuery.ajax({
-        url: mauticAjaxUrl + '?action=' + model + ':setBuilderContent',
-        type: "POST",
-        data: {
-            slots: content,
-            entity: entityId
-        },
-        success: function (response) {
-            if (typeof callback === "function") {
-                callback(response);
-            }
+    sectionWrappers.on('click', function(e) {
+        var previouslyFoccused = Mautic.builderContents.find('[data-section-focus]');
+        var sectionWrapper = mQuery(this);
+        var section = sectionWrapper.find('[data-section]');
+        var focusParts = ['top', 'right', 'bottom', 'left'];
+        var sectionForm = mQuery(parent.mQuery('script[data-section-form]').html());
+        var sectionFormContainer = parent.mQuery('#section-form-container');
+
+        if (previouslyFoccused.length) {
+
+            // Unfocus other section
+            previouslyFoccused.remove();
+
+            // Destroy minicolors
+            sectionFormContainer.find('input[data-toggle="color"]').each(function() {
+                mQuery(this).minicolors('destroy');
+            });
         }
+
+        // Highlight the section
+        mQuery.each(focusParts, function (index, value) {
+            sectionWrapper.append(mQuery('<div/>').attr('data-section-focus', value));
+        });
+
+        // Open the section customize form
+        sectionFormContainer.html(sectionForm);
+
+        // Prefill the sectionform with section color
+        if (section.length && section.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+            sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
+        }
+
+        // Prefill the sectionform with section wrapper color
+        if (sectionWrapper.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+            sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
+        }
+
+        // Initialize the color picker
+        sectionFormContainer.find('input[data-toggle="color"]').each(function() {
+            parent.Mautic.activateColorPicker(this);
+        });
+
+        // Handle color change events
+        sectionForm.on('keyup paste change touchmove', function(e) {
+            var field = mQuery(e.target);
+            if (section.length && field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(section, field.val());
+            } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
+                Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+            }
+        });
+
+        parent.mQuery('#section-form-container').on('change.minicolors', function(e, hex) {
+            var field = mQuery(e.target);
+            var focussedSectionWrapper = mQuery('[data-section-focus]').parent();
+            var focussedSection = focussedSectionWrapper.find('[data-section]');
+            if (focussedSection.length && field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(focussedSection, field.val());
+            } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
+                Mautic.sectionBackgroundChanged(focussedSectionWrapper, field.val());
+            }
+        });
     });
 };
 
-/**
- * Get ckeditor instance
- *
- * @param id
- * @returns {*}
- */
-Mautic.getBuilderEditorInstance = function (id) {
-    var editors = (Mautic.builderMode == 'template') ?
-        document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances :
-        CKEDITOR.instances;
-
-    if (id) {
-        return editors[id];
+Mautic.sectionBackgroundChanged = function(element, color) {
+    if (color.length) {
+        color = '#'+color;
     } else {
-        return editors;
+        color = 'transparent';
     }
-};
+    element.css('background-color', color).attr('bgcolor', color);
+}
 
-/**
- * Get ckeditor instance
- *
- * @param id
- * @returns {*}
- */
-Mautic.getBuilderEditorFields = function (id) {
-    return (Mautic.builderMode == 'template') ?
-        mQuery('#builder-template-content').contents().find('input.mautic-editable, textarea.mautic-editable') :
-        [];
-};
+Mautic.rgb2hex = function(orig) {
+    var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
+    return (rgb && rgb.length === 4) ? "#" +
+        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+}
 
-/**
- * Insert token into ckeditor
- *
- * @param editorId
- * @param token
- * @param isHtml
- */
-Mautic.insertBuilderEditorToken = function(editorId, token, isHtml) {
-    var editor = Mautic.getBuilderEditorInstance(editorId);
+Mautic.initSlots = function() {
+    var slotContainers = Mautic.builderContents.find('[data-slot-container]');
 
-    if (typeof isHtml == 'undefined') {
-        var first = token.charAt(0);
-        if (first == '<') {
-            isHtml = true;
+    Mautic.builderContents.find('a').on('click', function(e) {
+        e.preventDefault();
+    });
+
+    // Make slots sortable
+    slotContainers.sortable({
+        items: '[data-slot]',
+        handle: 'div[data-slot-handle]',
+        placeholder: 'slot-placeholder',
+        connectWith: '[data-slot-container]',
+        stop: function(event, ui) {
+            if (ui.item.hasClass('slot-type-handle')) {
+                var slotTypeContent = ui.item.find('script').html();
+                var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
+                Mautic.builderContents.trigger('slot:init', newSlot);
+                ui.item.replaceWith(newSlot);
+            }
         }
-    }
+    });
 
-    if (isHtml) {
-        editor.insertHtml(token);
-    } else {
-        editor.insertText(token);
-    }
-};
-
-/**
- * Show modal to insert a link into ckeditor
- * @param event
- * @param ui
- * @param editorId
- */
-Mautic.showBuilderLinkModal = function (event, ui, editorId) {
-    // Reset in case the modal wasn't closed via cancel
-    mQuery('#BuilderLinkModal input[name="link"]').val('');
-    mQuery('#BuilderLinkModal input[name="text"]').val('');
-    mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
-
-    var token  = mQuery(ui.draggable).data('token');
-    mQuery('#BuilderLinkModal input[name="editor"]').val(editorId);
-    mQuery('#BuilderLinkModal input[name="token"]').val(token);
-
-    var defaultUrl = token.match(/%url=(.*?)%/);
-
-    if (defaultUrl && defaultUrl[1]) {
-        mQuery('#BuilderLinkModal input[name="url"]').val(defaultUrl[1]);
-    }
-
-    var defaultText = token.match(/%text=(.*?)%/);
-    if (defaultText && defaultText[1]) {
-        mQuery('#BuilderLinkModal input[name="text"]').val(defaultText[1]);
-    } else if (!token.match(/%text%/g)) {
-        //hide the text
-        mQuery('#BuilderLinkModal input[name="text"]').parent().addClass('hide');
-    }
-
-    //append the modal to the builder or else it won't display
-    mQuery('#BuilderLinkModal').appendTo('body');
-    mQuery('#BuilderLinkModal').modal('show');
-};
-
-/**
- * Insert link into ckeditor
- */
-Mautic.insertBuilderLink = function () {
-    var editorId = mQuery('#BuilderLinkModal input[name="editor"]').val();
-    var token    = mQuery('#BuilderLinkModal input[name="token"]').val();
-    var url      = mQuery('#BuilderLinkModal input[name="url"]').val();
-    var text     = mQuery('#BuilderLinkModal input[name="text"]').val();
-
-    if (url) {
-        if (!text) {
-            text = url;
+    // Allow to drag&drop new slots from the slot type menu
+    mQuery('#slot-type-container .slot-type-handle', parent.document).draggable({
+        iframeFix: true,
+        iframeId: 'builder-template-content',
+        connectToSortable: slotContainers,
+        revert: 'invalid',
+        appendTo: '.builder',
+        helper: 'clone',
+        zIndex: 8000,
+        scroll: true,
+        scrollSensitivity: 100,
+        scrollSpeed: 100,
+        cursorAt: {top: 15, left: 15},
+        start: function( event, ui ) {
+            mQuery(ui.helper).css({
+                color: '#5d6c7c',
+                background: '#f5f5f5',
+                border: '1px solid #d3d3d3',
+                height: '60px',
+                width: '115px',
+                borderRadius: '4px',
+                fontSize: '16px',
+                padding: '10px 16px',
+                lineHeight: '1.25'
+            });
+        },
+        stop: function(event, ui) {
+            ui.helper = mQuery(event.target).closest('[data-slot-type]');
         }
-        token = token.replace(/%url(.*?)%/g, url).replace(/%text(.*?)%/g, text);
-        Mautic.insertBuilderEditorToken(editorId, token);
+    }).disableSelection();
+
+    // Initialize the slots
+    Mautic.builderContents.find('[data-slot]').each(function() {
+        mQuery(this).trigger('slot:init', this);
+    });
+}
+
+Mautic.initSlotListeners = function() {
+    Mautic.activateGlobalFroalaOptions();
+    Mautic.builderSlots = [];
+    Mautic.selectedSlot = null;
+
+    Mautic.builderContents.on('slot:selected', function(event, slot) {
+        slot = mQuery(slot);
+        Mautic.builderContents.find('[data-slot-focus]').remove();
+        var focus = mQuery('<div/>').attr('data-slot-focus', true);
+        slot.append(focus);
+    });
+
+    Mautic.builderContents.on('slot:init', function(event, slot) {
+        slot = mQuery(slot);
+        var type = slot.attr('data-slot');
+
+        // initialize the drag handle
+        var handle = mQuery('<div/>').attr('data-slot-handle', true);
+        var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
+        var deleteLink = mQuery('<a><i class="fa fa-times"></i></a>')
+            .attr('data-slot-action', 'delete')
+            .attr('alt', 'delete')
+            .addClass('btn btn-delete btn-danger btn-xs');
+        deleteLink.appendTo(slotToolbar);
+        slotToolbar.appendTo(handle);
+        slot.hover(function() {
+            deleteLink.click(function(e) {
+                slot.trigger('slot:destroy', {slot: slot, type: type});
+                mQuery.each(Mautic.builderSlots, function(i, slotParams) {
+                    if (slotParams.slot.is(slot)) {
+                        Mautic.builderSlots.splice(i, 1);
+                        return false; // break the loop
+                    }
+                });
+                slot.remove();
+            });
+            slot.append(handle);
+        }, function() {
+            handle.remove();
+        });
+
+        slot.on('click', function() {
+
+            // Trigger the slot:change event
+            slot.trigger('slot:selected', slot);
+
+            // Destroy previously initiated minicolors
+            var minicolors = parent.mQuery('#slot-form-container .minicolors');
+            if (minicolors.length) {
+                parent.mQuery('#slot-form-container input[data-toggle="color"]').each(function() {
+                    mQuery(this).minicolors('destroy');
+                });
+                parent.mQuery('#slot-form-container').off('change.minicolors');
+            }
+
+            // Update form in the Customize tab to the form of the focused slot type
+            var focusType = mQuery(this).attr('data-slot');
+            var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
+            parent.mQuery('#slot-form-container').html(focusForm);
+
+            // Prefill the form field values with the values from slot attributes if any
+            mQuery.each(slot.get(0).attributes, function(i, attr) {
+                var attrPrefix = 'data-param-';
+                var regex = /data-param-(.*)/;
+                var match = regex.exec(attr.name);
+
+                if (match !== null) {
+                    focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
+                    focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
+                }
+            });
+
+            focusForm.on('keyup', function(e) {
+                var field = mQuery(e.target);
+
+                // Store the slot settings as attributes
+                slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                // Trigger the slot:change event
+                slot.trigger('slot:change', {slot: slot, field: field});
+            });
+
+            focusForm.find('.btn').on('click', function(e) {
+                var field = mQuery(this).find('input:radio');
+
+                if (field.length) {
+                    // Store the slot settings as attributes
+                    slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                    // Trigger the slot:change event
+                    slot.trigger('slot:change', {slot: slot, field: field});
+                }
+            });
+
+            // Initialize the color picker
+            focusForm.find('input[data-toggle="color"]').each(function() {
+                parent.Mautic.activateColorPicker(this);
+            });
+
+            parent.mQuery('#slot-form-container').on('change.minicolors', function(e, hex) {
+                var field = mQuery(e.target);
+
+                // Store the slot settings as attributes
+                slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                // Trigger the slot:change event
+                slot.trigger('slot:change', {slot: slot, field: field});
+            });
+        });
+
+        // Initialize different slot types
+        if (type === 'text') {
+            // init AtWho in a froala editor
+            slot.on('froalaEditor.initialized', function (e, editor) {
+                Mautic.initAtWho(editor.$el, Mautic.getBuilderTokensMethod(), editor);
+            });
+
+            slot.on('froalaEditor.focus', function (e, editor) {
+                slot.froalaEditor('toolbar.show');
+                if (slot.offset().top < 78) {
+                    slot.find('.fr-toolbar').removeClass('fr-top').addClass('fr-bottom');
+                }
+            });
+
+            slot.on('froalaEditor.blur', function (e, editor) {
+                slot.froalaEditor('toolbar.hide');
+            });
+
+            var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertGatedVideo', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
+            var builderEl = parent.mQuery('.builder');
+
+            if (builderEl.length && builderEl.hasClass('email-builder')) {
+                buttons = mQuery.grep(buttons, function(value) {
+                    return value != 'insertGatedVideo';
+                });
+            }
+
+            var inlineFroalaOptions = {
+                toolbarButtons: buttons,
+                toolbarButtonsMD: buttons,
+                toolbarButtonsSM: buttons,
+                toolbarButtonsXS: buttons,
+                linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
+                imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
+            };
+
+            slot.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, inlineFroalaOptions));
+            slot.froalaEditor('toolbar.hide');
+        } else if (type === 'image') {
+            var image = slot.find('img');
+            // fix of badly destroyed image slot
+            image.removeAttr('data-froala.editor');
+            // Init Froala editor
+            image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+                    linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
+                    imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
+                }
+            ));
+        } else if (type === 'button') {
+            slot.find('a').click(function(e) {
+                e.preventDefault();
+            });
+        }
+
+        // Store the slot to a global var
+        Mautic.builderSlots.push({slot: slot, type: type});
+    });
+
+    Mautic.getPredefinedLinks = function(callback) {
+        var linkList = [];
+        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
+            if (tokens.length) {
+                mQuery.each(tokens, function(token, label) {
+                    if (token.startsWith('{pagelink=') ||
+                        token.startsWith('{assetlink=') ||
+                        token.startsWith('{webview_url') ||
+                        token.startsWith('{unsubscribe_url')) {
+
+                        linkList.push({
+                            text: label,
+                            href: token
+                        });
+                    }
+                });
+            }
+            return callback(linkList);
+        });
     }
 
-    mQuery('#BuilderLinkModal').modal('hide');
-    mQuery('#BuilderLinkModal input[name="editor"]').val('');
-    mQuery('#BuilderLinkModal input[name="url"]').val('');
-    mQuery('#BuilderLinkModal input[name="text"]').val('');
-    mQuery('#BuilderLinkModal input[name="text"]').parent().removeClass('hide');
-};
-
-/**
- * Show builder feedback modal (accept input and insert into editor)
- *
- * @param event
- * @param ui
- * @param editorId
- */
-Mautic.showBuilderFeedbackModal = function (event, ui, editorId) {
-    // Reset in case the modal wasn't closed via cancel
-    mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
-    mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', '');
-
-    var token = mQuery(ui.draggable).data('token');
-
-    mQuery('#BuilderFeedbackModal input[name="editor"]').val(editorId);
-    mQuery('#BuilderFeedbackModal input[name="token"]').val(token);
-
-    var placeholder = token.match(/%(.*?)%/);
-    if (placeholder && placeholder[1]) {
-        mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', placeholder[1]);
+    Mautic.getBuilderTokensMethod = function() {
+        var method = 'page:getBuilderTokens';
+        if (parent.mQuery('.builder').hasClass('email-builder')) {
+            method = 'email:getBuilderTokens';
+        }
+        return method;
     }
 
-    //append the modal to the builder or else it won't display
-    mQuery('#BuilderFeedbackModal').appendTo('body');
-    mQuery('#BuilderFeedbackModal').modal('show');
+    Mautic.builderContents.on('slot:change', function(event, params) {
+        // Change some slot styles when the values are changed in the slot edit form
+        var fieldParam = params.field.attr('data-slot-param');
+        if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
+            params.slot.css(fieldParam, params.field.val() + 'px');
+        } else if (fieldParam === 'href') {
+            params.slot.find('a').attr('href', params.field.val());
+        } else if (fieldParam === 'link-text') {
+            params.slot.find('a').text(params.field.val());
+        } else if (fieldParam === 'float') {
+            var values = ['left', 'center', 'right'];
+            params.slot.find('a').parent().attr('align', values[params.field.val()]);
+        } else if (fieldParam === 'button-size') {
+            var values = [
+                {padding: '10px 13px', fontSize: '14px'},
+                {padding: '12px 18px', fontSize: '16px'},
+                {padding: '15px 20px', fontSize: '18px'}
+            ];
+            params.slot.find('a').css(values[params.field.val()]);
+        } else if (fieldParam === 'background-color') {
+            params.slot.find('a').css(fieldParam, '#'+params.field.val());
+            params.slot.find('a').attr('background', '#'+params.field.val());
+        } else if (fieldParam === 'color') {
+            params.slot.find('a').css(fieldParam, '#'+params.field.val());
+        }
+    });
+
+    Mautic.builderContents.on('slot:destroy', function(event, params) {
+        if (params.type === 'text') {
+            params.slot.froalaEditor('destroy');
+            params.slot.find('.atwho-inserted').atwho('destroy');
+        } else if (params.type === 'image') {
+            var image = params.slot.find('img');
+            image.removeAttr('data-froala.editor');
+            image.froalaEditor('destroy');
+        }
+
+        // Remove Symfony toolbar
+        Mautic.builderContents.find('.sf-toolbar').remove();
+    });
 };
 
-/**
- * Insert input feedback into ckeditor
- */
-Mautic.insertBuilderFeedback = function () {
-    var editorId = mQuery('#BuilderFeedbackModal input[name="editor"]').val();
-    var token    = mQuery('#BuilderFeedbackModal input[name="token"]').val();
-    var feedback = mQuery('#BuilderFeedbackModal input[name="feedback"]').val();
 
-    if (feedback) {
-        token = token.replace(/%(.*?)%/, feedback);
-        Mautic.insertBuilderEditorToken(editorId, token);
+// Init inside the builder's iframe
+mQuery(function() {
+    if (parent && parent.mQuery && parent.mQuery('#builder-template-content').length) {
+        Mautic.builderContents = mQuery('body');
+        Mautic.builderContents = Mautic.clearFroalaStyles(Mautic.builderContents);
+        Mautic.initSlotListeners();
+        Mautic.initSections();
+        Mautic.initSlots();
     }
-
-    mQuery('#BuilderFeedbackModal').modal('hide');
-    mQuery('#BuilderFeedbackModal input[name="editor"]').val('');
-    mQuery('#BuilderFeedbackModal input[name="feedback"]').val('');
-    mQuery('#BuilderFeedbackModal input[name="feedback"]').attr('placeholder', '');
-};
-
-/**
- * Prepare builder
- *
- * @param target
- */
-Mautic.builderOnLoad = function (target) {
-    Mautic.activateBuilderDragTokens(target);
-};
+});

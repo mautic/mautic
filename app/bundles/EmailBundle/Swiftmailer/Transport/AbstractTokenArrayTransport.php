@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
- * Class AbstractTokenArrayTransport
+ * Class AbstractTokenArrayTransport.
  */
 abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 {
@@ -53,7 +54,6 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
      */
     public function stop()
     {
-
     }
 
     /**
@@ -61,7 +61,6 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
      */
     public function start()
     {
-
     }
 
     /**
@@ -91,39 +90,41 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
      * @param null                $failedRecipients
      *
      * @return int
+     *
      * @throws \Exception
      */
     abstract public function send(\Swift_Mime_Message $message, &$failedRecipients = null);
 
     /**
-     * Get the metadata from a MauticMessage
+     * Get the metadata from a MauticMessage.
      *
      * @return array
      */
     public function getMetadata()
     {
-        return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : array();
+        return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : [];
     }
 
     /**
-     * Get attachments from a MauticMessage
+     * Get attachments from a MauticMessage.
      *
      * @return array
      */
     public function getAttachments()
     {
-        return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : array();
+        return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : [];
     }
 
     /**
-     * Converts \Swift_Message into associative array
+     * Converts \Swift_Message into associative array.
      *
-     * @param array          $search   If the mailer requires tokens in another format than Mautic's, pass array of Mautic tokens to replace
-     * @param array          $replace  If the mailer requires tokens in another format than Mautic's, pass array of replacement tokens
-     * @param bool|false     $binaryAttachments True to convert file attachments to binary
+     * @param array      $search            If the mailer requires tokens in another format than Mautic's, pass array of Mautic tokens to replace
+     * @param array      $replace           If the mailer requires tokens in another format than Mautic's, pass array of replacement tokens
+     * @param bool|false $binaryAttachments True to convert file attachments to binary
+     *
      * @return array|\Swift_Message
      */
-    protected function messageToArray($search = array(), $replace = array(), $binaryAttachments = false)
+    protected function messageToArray($search = [], $replace = [], $binaryAttachments = false)
     {
         if (!empty($search)) {
             MailHelper::searchReplaceTokens($search, $replace, $this->message);
@@ -133,58 +134,58 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
         $fromEmail = current(array_keys($from));
         $fromName  = $from[$fromEmail];
 
-        $message = array(
-            'html'       => $this->message->getBody(),
-            'text'       => MailHelper::getPlainTextFromMessage($this->message),
-            'subject'    => $this->message->getSubject(),
-            'from'       => array(
+        $message = [
+            'html'    => $this->message->getBody(),
+            'text'    => MailHelper::getPlainTextFromMessage($this->message),
+            'subject' => $this->message->getSubject(),
+            'from'    => [
                 'name'  => $fromName,
-                'email' => $fromEmail
-            )
-        );
+                'email' => $fromEmail,
+            ],
+        ];
 
         // Generate the recipients
-        $message['recipients'] = array(
-            'to' => array(),
-            'cc' => array(),
-            'bcc' => array()
-        );
+        $message['recipients'] = [
+            'to'  => [],
+            'cc'  => [],
+            'bcc' => [],
+        ];
 
         $to = $this->message->getTo();
         foreach ($to as $email => $name) {
-            $message['recipients']['to'][$email] = array(
+            $message['recipients']['to'][$email] = [
                 'email' => $email,
-                'name'  => $name
-            );
+                'name'  => $name,
+            ];
         }
 
         $cc = $this->message->getCc();
         if (!empty($cc)) {
             foreach ($cc as $email => $name) {
-                $message['recipients']['cc'][$email] = array(
+                $message['recipients']['cc'][$email] = [
                     'email' => $email,
-                    'name'  => $name
-                );
+                    'name'  => $name,
+                ];
             }
         }
 
         $bcc = $this->message->getBcc();
         if (!empty($bcc)) {
             foreach ($bcc as $email => $name) {
-                $message['recipients']['bcc'][$email] = array(
+                $message['recipients']['bcc'][$email] = [
                     'email' => $email,
-                    'name'  => $name
-                );
+                    'name'  => $name,
+                ];
             }
         }
 
         $replyTo = $this->message->getReplyTo();
         if (!empty($replyTo)) {
             foreach ($replyTo as $email => $name) {
-                $message['replyTo'] = array(
+                $message['replyTo'] = [
                     'email' => $email,
-                    'name'  => $name
-                );
+                    'name'  => $name,
+                ];
             }
         }
 
@@ -195,14 +196,14 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
         // Attachments
         $children    = $this->message->getChildren();
-        $attachments = array();
+        $attachments = [];
         foreach ($children as $child) {
             if ($child instanceof \Swift_Attachment) {
-                $attachments[] = array(
+                $attachments[] = [
                     'type'    => $child->getContentType(),
                     'name'    => $child->getFilename(),
-                    'content' => $child->getEncoder()->encodeString($child->getBody())
-                );
+                    'content' => $child->getEncoder()->encodeString($child->getBody()),
+                ];
             }
         }
 
@@ -229,11 +230,11 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
                                 $swiftAttachment->setDisposition('inline');
                             }
 
-                            $message['attachments'][] = array(
+                            $message['attachments'][] = [
                                 'type'    => $swiftAttachment->getContentType(),
                                 'name'    => $swiftAttachment->getFilename(),
-                                'content' => $swiftAttachment->getEncoder()->encodeString($swiftAttachment->getBody())
-                            );
+                                'content' => $swiftAttachment->getEncoder()->encodeString($swiftAttachment->getBody()),
+                            ];
                         } catch (\Exception $e) {
                             error_log($e);
                         }
@@ -245,8 +246,8 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
             $message['file_attachments']   = $this->getAttachments();
         }
 
-        $message['headers'] = array();
-        $headers = $this->message->getHeaders()->getAll();
+        $message['headers'] = [];
+        $headers            = $this->message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
             if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT) {

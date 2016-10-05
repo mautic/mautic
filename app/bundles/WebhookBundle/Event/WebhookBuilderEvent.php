@@ -1,60 +1,59 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * Class WebhookBuilderEvent
- *
- * @package Mautic\WebhookBundle\Event
+ * Class WebhookBuilderEvent.
  */
 class WebhookBuilderEvent extends Event
 {
-    private $events = array();
+    private $events = [];
 
     /**
      * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
-    public function __construct ($translator)
+    public function __construct($translator)
     {
         $this->translator = $translator;
     }
 
     /**
-     * Add an event for the event list
+     * Add an event for the event list.
      *
-     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param string $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $event - can contain the following keys:
-     *                 'label'       => (required) what to display in the list
-     *                 'description' => (optional) short description of event
+     *                      'label'       => (required) what to display in the list
+     *                      'description' => (optional) short description of event
      */
-    public function addEvent ($key, array $event)
+    public function addEvent($key, array $event)
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another webhook event. Please use a different key.");
         }
 
         $event['label']       = $this->translator->trans($event['label']);
-        $event['description'] =  (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
+        $event['description'] = (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
 
         $this->events[$key] = $event;
     }
 
     /**
-     * Get webhook events
+     * Get webhook events.
      *
      * @return array
      */
-    public function getEvents ()
+    public function getEvents()
     {
         static $sorted = false;
 

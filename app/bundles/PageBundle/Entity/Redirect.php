@@ -1,28 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class Redirect
- *
- * @package Mautic\PageBundle\Entity
+ * Class Redirect.
  */
 class Redirect extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -49,14 +47,22 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var Email
+     * @var ArrayCollection
      */
-    private $email;
+    private $trackables;
+
+    /**
+     * Redirect constructor.
+     */
+    public function __construct()
+    {
+        $this->trackables = new ArrayCollection();
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -78,13 +84,14 @@ class Redirect extends FormEntity
             ->columnName('unique_hits')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+        $builder->createOneToMany('trackables', 'Trackable')
+            ->mappedBy('redirect')
+            ->fetchExtraLazy()
             ->build();
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -92,23 +99,23 @@ class Redirect extends FormEntity
     {
         $metadata->setGroupPrefix('redirect')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'redirectId',
-                    'url'
-                )
+                    'url',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'hits',
-                    'uniqueHits'
-                )
+                    'uniqueHits',
+                ]
             )
             ->build();
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -151,9 +158,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set hits
+     * Set hits.
      *
-     * @param integer $hits
+     * @param int $hits
      *
      * @return Page
      */
@@ -165,9 +172,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get hits
+     * Get hits.
      *
-     * @return integer
+     * @return int
      */
     public function getHits()
     {
@@ -175,9 +182,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set uniqueHits
+     * Set uniqueHits.
      *
-     * @param integer $uniqueHits
+     * @param int $uniqueHits
      *
      * @return Page
      */
@@ -189,9 +196,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get uniqueHits
+     * Get uniqueHits.
      *
-     * @return integer
+     * @return int
      */
     public function getUniqueHits()
     {
@@ -199,21 +206,21 @@ class Redirect extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getEmail()
+    public function getTrackableList()
     {
-        return $this->email;
+        return $this->trackables;
     }
 
     /**
-     * @param Email $email
+     * @param ArrayCollection $trackables
      *
      * @return Redirect
      */
-    public function setEmail(Email $email = null)
+    public function setTrackables($trackables)
     {
-        $this->email = $email;
+        $this->trackables = $trackables;
 
         return $this;
     }

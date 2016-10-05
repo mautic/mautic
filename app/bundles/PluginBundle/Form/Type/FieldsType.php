@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,53 +15,54 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class SocialMediaServiceType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class SocialMediaServiceType.
  */
 class FieldsType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['integration_fields'] as $field => $details) {
             $label = (is_array($details)) ? $details['label'] : $details;
             $field = InputHelper::alphanum($field, false, '_');
 
-            $builder->add($field, 'choice', array(
+            $builder->add($field, 'choice', [
                 'choices'    => $options['lead_fields'],
                 'label'      => $label,
                 'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control', 'data-placeholder' => ' ')
-            ));
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' '],
+            ]);
         }
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(array('integration_fields', 'lead_fields'));
-        $resolver->setDefaults(array(
-            'special_instructions' => '',
-            'alert_type'           => ''
-        ));
+        $resolver->setRequired(['integration_fields', 'lead_fields']);
+        $resolver->setDefaults(
+            [
+                'special_instructions' => '',
+                'alert_type'           => '',
+                'allow_extra_fields'   => true,
+            ]
+        );
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "integration_fields";
+    public function getName()
+    {
+        return 'integration_fields';
     }
 
     /**

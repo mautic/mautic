@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
  * Bounce parsing modified from:
@@ -21,7 +22,7 @@
  * | This program is distributed in the hope that it will be useful - WITHOUT  |
  * | ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     |
  * | FITNESS FOR A PARTICULAR PURPOSE.                                         |
- * .---------------------------------------------------------------------------.
+ * .---------------------------------------------------------------------------
  */
 
 namespace Mautic\EmailBundle\Helper;
@@ -29,9 +30,10 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
- * Class MessageHelper
+ * Class MessageHelper.
  */
 class MessageHelper
 {
@@ -58,7 +60,6 @@ class MessageHelper
         $this->factory = $factory;
         $this->db      = $factory->getDatabase();
         $this->logger  = $this->factory->getLogger();
-
     }
 
     /**
@@ -75,6 +76,7 @@ class MessageHelper
         // Assume is an unsubscribe
         $isUnsubscribe = $allowUnsubscribe;
         $isBounce      = false;
+        $isFbl         = false;
         $toEmail       = reset($message->to);
 
         // Check for bounce emails via + notation if applicable
@@ -82,18 +84,40 @@ class MessageHelper
             if (strpos($to, '+bounce') !== false) {
                 $isBounce      = true;
                 $isUnsubscribe = false;
+                $isFbl         = false;
                 $toEmail       = $to;
                 break;
             } elseif (strpos($to, '+unsubscribe')) {
                 $isBounce      = false;
                 $isUnsubscribe = true;
+                $isFbl         = false;
                 $toEmail       = $to;
                 break;
             }
         }
+        // Detect FBL-report.
+        if (preg_match('/.*feedback-type: abuse.*/is', $message->fblReport, $match)) {
+            $isBounce      = false;
+            $isUnsubscribe = false;
+            $isFbl         = true;
+        }
 
         $this->logger->debug("Analyzing message to {$message->toString}");
-
+        // If message from Amazon SNS collect bounces and complaints
+        if ($message->fromAddress == 'no-reply@sns.amazonaws.com') {
+            $message = json_decode(strtok($message->textPlain, "\n"), true);
+            if ($message['notificationType'] == 'Bounce') {
+                $isBounce      = true;
+                $isUnsubscribe = false;
+                $toEmail       = $message['mail']['source'];
+                $amazonEmail   = $message['bounce']['bouncedRecipients'][0]['emailAddress'];
+            } elseif ($message['notificationType'] == 'Complaint') {
+                $isBounce      = false;
+                $isUnsubscribe = true;
+                $toEmail       = $message['mail']['source'];
+                $amazonEmail   = $message['complaint']['complainedRecipients'][0]['emailAddress'];
+            }
+        }
         // Parse the to email if applicable
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
             if (strstr($parts[2], '_')) {
@@ -102,43 +126,59 @@ class MessageHelper
             }
         }
 
-        $messageDetails = array();
+        $messageDetails = [];
 
         if ($allowBounce) {
-            if (!empty($message->dsnReport)) {
-                // Parse the bounce
-                $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
-                $dsnReport  = $message->dsnReport;
+            // If message from Amazon SNS fill details and don't process further
+            if (isset($amazonEmail)) {
+                $messageDetails['email']       = $amazonEmail;
+                $messageDetails['rule_cat']    = 'unknown';
+                $messageDetails['rule_no']     = '0013';
+                $messageDetails['bounce_type'] = 'hard';
+                $messageDetails['remove']      = 1;
+            } else {
+                if (!empty($message->dsnReport)) {
+                    // Parse the bounce
+                    $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+                    $dsnReport  = $message->dsnReport;
 
-                $this->logger->addDebug('Delivery report found in message.');
+                    $this->logger->addDebug('Delivery report found in message.');
 
-                // Try parsing the report
-                $messageDetails = $this->parseDsn($dsnMessage, $dsnReport);
-            }
+                    // Try parsing the report
+                    $messageDetails = $this->parseDsn($dsnMessage, $dsnReport);
+                }
 
-            if (empty($messageDetails['email']) || $messageDetails['rule_cat'] == 'unrecognized') {
-                $this->logger->debug('Bounce email or reason not found so attempting to parse the body.');
+                if (empty($messageDetails['email']) || $messageDetails['rule_cat'] == 'unrecognized') {
+                    // Check for the X-Failed-Recipients header
+                    $bouncedEmail = (isset($message->xHeaders['x-failed-recipients'])) ? $message->xHeaders['x-failed-recipients'] : null;
 
-                // Let's try parsing through the body parser
-                $messageDetails = $this->parseBody($message->textPlain);
-            }
+                    if ($bouncedEmail) {
+                        // Definitely a bounced email but need to find the reason
+                        $this->logger->debug('Email found through x-failed-recipients header but need to search for a reason.');
+                    } else {
+                        $this->logger->debug('Bounce email or reason not found so attempting to parse the body.');
+                    }
 
-            if (!$isBounce && !empty($messageDetails['email'])) {
-                // Bounce was found in message content
-                $isBounce      = true;
-                $isUnsubscribe = false;
+                    // Let's try parsing through the body parser
+                    $messageDetails = $this->parseBody($message->textPlain, $bouncedEmail);
+                }
+
+                if (!$isBounce && !empty($messageDetails['email'])) {
+                    // Bounce was found in message content
+                    $isBounce      = true;
+                    $isUnsubscribe = false;
+                }
             }
         }
 
-        $this->logger->debug(print_r($messageDetails, true));
-
-        if (!$isBounce && !$isUnsubscribe) {
+        if (!$isBounce && !$isUnsubscribe && !$isFbl) {
             $this->logger->debug('No reason found to process.');
+
             return false;
         }
 
         // Search for the lead
-        $stat = $leadId = $emailId = null;
+        $stat = $leadId = $leadEmail = $emailId = null;
         if (!empty($hashId)) {
             $q = $this->db->createQueryBuilder();
 
@@ -169,19 +209,29 @@ class MessageHelper
                     $leadEmail = $messageDetails['email'];
                 } else {
                     // Email not found for the bounce so abort
-                    $this->logger->error('BOUNCE ERROR: A lead could be found from the bounce email. From: ' . $message->fromAddress . '; To: ' . $message->toString . '; Subject: ' . $message->subject);
+                    $this->logger->error('BOUNCE ERROR: A lead could be found from the bounce email. From: '.$message->fromAddress.'; To: '.$message->toString.'; Subject: '.$message->subject);
+
+                    return false;
+                }
+            } elseif ($isFbl) {
+                if (preg_match('/Received:.*for (.*);.*?/isU', $message->textPlain, $match)) {
+                    if ($parsedAddressList = self::parseAddressList($match[1])) {
+                        $leadEmail = key($parsedAddressList);
+                    }
+                } else {
+                    $this->logger->error("Parsing of FBL-report failed for message #{$message->id}");
 
                     return false;
                 }
             } else {
                 $leadEmail = $message->fromAddress;
-                $this->logger->debug('From address used: ' . $leadEmail);
+                $this->logger->debug('From address used: '.$leadEmail);
             }
 
             // Search by first part and domain of email to find cases like me+mautic@domain.com
             list($email, $domain) = explode('@', strtolower($leadEmail));
-            $email                = $email . '%';
-            $domain               = '%@' . $domain;
+            $email                = $email.'%';
+            $domain               = '%@'.$domain;
 
             $q = $this->db->createQueryBuilder();
             $q->select('l.id, l.email')
@@ -199,7 +249,6 @@ class MessageHelper
                 ->setParameter('email', strtolower($email))
                 ->setParameter('domain', strtolower($domain));
             $foundLeads = $q->execute()->fetchAll();
-;
             foreach ($foundLeads as $lead) {
                 if (strtolower($lead['email']) == strtolower($leadEmail)) {
                     // Exact match
@@ -213,10 +262,10 @@ class MessageHelper
                 }
 
                 if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $lead['email'], $parts)) {
-                    $email = $parts[1] . '@' . $parts[3];
+                    $email = $parts[1].'@'.$parts[3];
 
                     if (strtolower($email) == strtolower($leadEmail)) {
-                        $this->logger->debug('Lead found through + alias: '. $lead['email']);
+                        $this->logger->debug('Lead found through + alias: '.$lead['email']);
 
                         $leadId    = $lead['id'];
                         $leadEmail = $lead['email'];
@@ -224,47 +273,46 @@ class MessageHelper
                 }
             }
 
-            $this->logger->debug('Lead ID: ' . ($leadId ? $leadId : 'not found'));
+            $this->logger->debug('Lead ID: '.($leadId ? $leadId : 'not found'));
         }
 
         if (!$leadId) {
             // A lead still could not be found
-
             return false;
         }
 
         // Set message details for unsubscribe requests
-        if ($isUnsubscribe) {
-            $messageDetails = array(
+        if ($isUnsubscribe || $isFbl) {
+            $messageDetails = [
                 'remove'   => true,
                 'email'    => $leadEmail,
                 'rule_cat' => 'unsubscribed',
-                'rule_no'  => '0000'
-            );
+                'rule_no'  => '0000',
+            ];
         }
 
         if ($isBounce && $stat) {
             // Update the stat with some details
             $openDetails = unserialize($stat['open_details']);
             if (!is_array($openDetails)) {
-                $openDetails = array();
+                $openDetails = [];
             }
 
-            $openDetails['bounces'][] = array(
+            $openDetails['bounces'][] = [
                 'datetime' => $dtHelper->toUtcString(),
                 'reason'   => $messageDetails['rule_cat'],
                 'code'     => $messageDetails['rule_no'],
-                'type'     => ($messageDetails['bounce_type'] === false) ? 'unknown' : $messageDetails['bounce_type']
-            );
+                'type'     => ($messageDetails['bounce_type'] === false) ? 'unknown' : $messageDetails['bounce_type'],
+            ];
 
             $this->db->update(
                 MAUTIC_TABLE_PREFIX.'email_stats',
-                array(
+                [
                     'open_details' => serialize($openDetails),
-                    'retry_count'  => $stat['retry_count']++,
-                    'is_failed'    => ($messageDetails['remove'] || $stat['retry_count'] == 5) ? 1 : 0
-                ),
-                array('id' => $stat['id'])
+                    'retry_count'  => ++$stat['retry_count'],
+                    'is_failed'    => ($messageDetails['remove'] || $stat['retry_count'] == 5) ? 1 : 0,
+                ],
+                ['id' => $stat['id']]
             );
 
             $this->logger->debug('Stat updated');
@@ -272,16 +320,17 @@ class MessageHelper
 
         // Is this a hard bounce or AN unsubscribe?
         if ($messageDetails['remove'] || ($stat && $stat['retry_count'] >= 5)) {
-            $this->logger->debug('Adding DNC entry for ' . $leadEmail);
+            $this->logger->debug('Adding DNC entry for '.$leadEmail);
 
             // Check for an existing DNC entry
             $q = $this->db->createQueryBuilder();
-            $q->select('d.id')
-                ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'd')
+            $q->select('dnc.id')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+                ->where('dnc.channel = "email"')
                 ->where(
-                    $q->expr()->eq('LOWER(d.address)', ':email')
+                    $q->expr()->eq('dnc.lead_id', ':leadId')
                 )
-                ->setParameter('email', strtolower($leadEmail));
+                ->setParameter('leadId', $leadId);
 
             try {
                 $exists = $q->execute()->fetchColumn();
@@ -296,18 +345,16 @@ class MessageHelper
                 // Create a DNC entry
                 try {
                     $this->db->insert(
-                        MAUTIC_TABLE_PREFIX.'email_donotemail',
-                        array(
-                            'email_id'     => $emailId,
-                            'lead_id'      => $leadId,
-                            'address'      => $leadEmail,
-                            'date_added'   => $dtHelper->toUtcString(),
-                            'bounced'      => ($isUnsubscribe) ? 0 : 1,
-                            'unsubscribed' => ($isUnsubscribe) ? 1 : 0,
-                            'comments'     => $this->factory->getTranslator()->trans('mautic.email.bounce.reason.'.$messageDetails['rule_cat'])
-                        )
+                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                        [
+                            'lead_id'    => $leadId,
+                            'channel'    => 'email',
+                            'channel_id' => $emailId,
+                            'date_added' => $dtHelper->toUtcString(),
+                            'reason'     => ($isUnsubscribe || $isFbl) ? DoNotContact::UNSUBSCRIBED : DoNotContact::BOUNCED,
+                            'comments'   => $this->factory->getTranslator()->trans('mautic.email.bounce.reason.'.$messageDetails['rule_cat']),
+                        ]
                     );
-
                 } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
@@ -320,58 +367,164 @@ class MessageHelper
     /**
      * next rule number (BODY): 0238 <br />
      * default category:        unrecognized: <br />
-     * default rule no.:        0000 <br />
+     * default rule no.:        0000 <br />.
      */
-
-    static $rule_categories = array(
-        'antispam'       => array('remove' => 0, 'bounce_type' => 'blocked'),
-        'autoreply'      => array('remove' => 0, 'bounce_type' => 'autoreply'),
-        'concurrent'     => array('remove' => 0, 'bounce_type' => 'soft'),
-        'content_reject' => array('remove' => 0, 'bounce_type' => 'soft'),
-        'command_reject' => array('remove' => 1, 'bounce_type' => 'hard'),
-        'internal_error' => array('remove' => 0, 'bounce_type' => 'temporary'),
-        'defer'          => array('remove' => 0, 'bounce_type' => 'soft'),
-        'delayed'        => array('remove' => 0, 'bounce_type' => 'temporary'),
-        'dns_loop'       => array('remove' => 1, 'bounce_type' => 'hard'),
-        'dns_unknown'    => array('remove' => 1, 'bounce_type' => 'hard'),
-        'full'           => array('remove' => 0, 'bounce_type' => 'soft'),
-        'inactive'       => array('remove' => 1, 'bounce_type' => 'hard'),
-        'latin_only'     => array('remove' => 0, 'bounce_type' => 'soft'),
-        'other'          => array('remove' => 1, 'bounce_type' => 'generic'),
-        'oversize'       => array('remove' => 0, 'bounce_type' => 'soft'),
-        'outofoffice'    => array('remove' => 0, 'bounce_type' => 'soft'),
-        'unknown'        => array('remove' => 1, 'bounce_type' => 'hard'),
-        'unrecognized'   => array('remove' => 0, 'bounce_type' => false,),
-        'user_reject'    => array('remove' => 1, 'bounce_type' => 'hard'),
-        'warning'        => array('remove' => 0, 'bounce_type' => 'soft')
-    );
+    public static $rule_categories = [
+        'antispam'       => ['remove' => 0, 'bounce_type' => 'blocked'],
+        'autoreply'      => ['remove' => 0, 'bounce_type' => 'autoreply'],
+        'concurrent'     => ['remove' => 0, 'bounce_type' => 'soft'],
+        'content_reject' => ['remove' => 0, 'bounce_type' => 'soft'],
+        'command_reject' => ['remove' => 1, 'bounce_type' => 'hard'],
+        'internal_error' => ['remove' => 0, 'bounce_type' => 'temporary'],
+        'defer'          => ['remove' => 0, 'bounce_type' => 'soft'],
+        'delayed'        => ['remove' => 0, 'bounce_type' => 'temporary'],
+        'dns_loop'       => ['remove' => 1, 'bounce_type' => 'hard'],
+        'dns_unknown'    => ['remove' => 1, 'bounce_type' => 'hard'],
+        'full'           => ['remove' => 0, 'bounce_type' => 'soft'],
+        'inactive'       => ['remove' => 1, 'bounce_type' => 'hard'],
+        'latin_only'     => ['remove' => 0, 'bounce_type' => 'soft'],
+        'other'          => ['remove' => 1, 'bounce_type' => 'generic'],
+        'oversize'       => ['remove' => 0, 'bounce_type' => 'soft'],
+        'outofoffice'    => ['remove' => 0, 'bounce_type' => 'soft'],
+        'unknown'        => ['remove' => 1, 'bounce_type' => 'hard'],
+        'unrecognized'   => ['remove' => 0, 'bounce_type' => false],
+        'user_reject'    => ['remove' => 1, 'bounce_type' => 'hard'],
+        'warning'        => ['remove' => 0, 'bounce_type' => 'soft'],
+    ];
 
     /*
      * var for new line ending
      */
-    static $bmh_newline = "<br />\n";
+    public static $bmh_newline = "<br />\n";
 
     /**
-     * Defined bounce parsing rules for non-standard DSN
+     * Defined bounce parsing rules for non-standard DSN.
      *
-     * @param string  $body       body of the email
-     * @param boolean $debug_mode show debug info. or not
+     * @param string      $body       body of the email
+     * @param string|null $knownEmail Bounced email if known through a x-failed-recipient header or the like and need to parse the body for a reason
+     * @param bool        $debug_mode show debug info. or not
      *
-     * @return array    $result an array include the following fields: 'email', 'bounce_type','remove','rule_no','rule_cat'
-     *                      if we could NOT detect the type of bounce, return rule_no = '0000'
+     * @return array $result an array include the following fields: 'email', 'bounce_type','remove','rule_no','rule_cat'
+     *               if we could NOT detect the type of bounce, return rule_no = '0000'
      */
-    static public function parseBody($body, $debug_mode = false)
+    public static function parseBody($body, $knownEmail = '', $debug_mode = false)
     {
         // initialize the result array
-        $result = array(
-            'email'       => '',
+        $result = [
+            'email'       => $knownEmail,
             'bounce_type' => false,
             'remove'      => 0,
             'rule_cat'    => 'unrecognized',
-            'rule_no'     => '0000'
-        );
+            'rule_no'     => '0000',
+        ];
 
         // ======== rule =========
+
+        /*
+         * Email is already known likely for a x-failed-recipients header; most likely Gmail bounce
+         */
+        if ('' !== $knownEmail) {
+            /*
+             * rule: mailbox unknown;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.1.1 The email account that you tried to reach does not exist.
+             */
+            if (preg_match('/email.*?does not exist/i', $body, $match)) {
+                $result['rule_cat'] = 'unknown';
+                $result['rule_no']  = '0237';
+            }
+
+            /*
+             * rule: mailbox unknown;
+             * sample:
+             * The error that the other server returned was:
+             * 553-5.1.2 We weren't able to find the recipient domain.
+             */
+            elseif (preg_match('/find the recipient domain/i', $body, $match)) {
+                $result['rule_cat'] = 'unknown';
+                $result['rule_no']  = '0237';
+            }
+
+            /*
+             * rule: mailbox inactive;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.2.1 The email account that you tried to reach is disabled.
+             */
+            elseif (preg_match('/email.*?disabled/i', $body, $match)) {
+                $result['rule_cat'] = 'inactive';
+                $result['rule_no']  = '0171';
+            }
+
+            /*
+             * rule: mailbox warning;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.2.1 The user you are trying to contact is receiving mail at a rate that prevents additional messages from being delivered.
+             */
+            elseif (preg_match('/user.*?rate that prevents/i', $body, $match)) {
+                $result['rule_cat'] = 'warning';
+                $result['rule_no']  = '0000';
+            }
+
+            /*
+            * rule: mailbox full;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 Email quota exceeded.
+            */
+            elseif (preg_match('/email quota exceeded/i', $body, $match)) {
+                $result['rule_cat'] = 'full';
+                $result['rule_no']  = '0219';
+            }
+
+            /*
+            * rule: mailbox full;
+            * sample:
+            * The error that the other server returned was:
+            * 552-5.2.2 The email account that you tried to reach is over quota.
+            */
+            if (preg_match('/email.*?over quota/i', $body, $match)) {
+                $result['rule_cat'] = 'full';
+                $result['rule_no']  = '0219';
+            }
+
+            /*
+            * rule: mailbox antispam;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 Our system has detected an unusual rate of unsolicited mail originating from your IP address. To protect our users from spam,
+            * mail sent from your IP address has been blocked.
+            */
+            elseif (preg_match('/unsolicited mail/i', $body, $match)) {
+                $result['rule_cat'] = 'antispam';
+                $result['rule_no']  = '0230';
+            }
+
+            /*
+            * rule: mailbox antispam;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 The user or domain that you are sending to (or from) has a policy that prohibited the mail that you sent.
+            */
+            elseif (preg_match('/policy that prohibited/i', $body, $match)) {
+                $result['rule_cat'] = 'antispam';
+                $result['rule_no']  = '0230';
+            }
+
+            /*
+            * rule: mailbox oversize;
+            * sample:
+            * The error that the other server returned was:
+            * 552-5.2.3 Your message exceeded Google's message size limits.
+            */
+            elseif (preg_match('/message size limits/i', $body, $match)) {
+                $result['rule_cat'] = 'oversize';
+                $result['rule_no']  = '0146';
+            }
+        }
+
         /*
         * rule: mailbox unknown;
         * sample:
@@ -382,14 +535,13 @@ class MessageHelper
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0237';
             $result['email']    = $match[1];
-
         }
 
         /*
-            * <xxxxx@yourdomain.com>:
-            * 111.111.111.111 does not like recipient.
-            * Remote host said: 550 User unknown
-            */
+        * <xxxxx@yourdomain.com>:
+        * 111.111.111.111 does not like recipient.
+        * Remote host said: 550 User unknown
+        */
         elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*user unknown/i", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0236';
@@ -403,21 +555,18 @@ class MessageHelper
          * Sorry, no mailbox here by that name. vpopmail (#5.1.1)
          */
         elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*no mailbox/i", $body, $match)) {
-
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0157';
             $result['email']    = $match[1];
-
         }
 
-/*
+       /*
         * rule: mailbox unknown;
         * sample:
         * xxxxx@yourdomain.com<br>
         * local: Sorry, can't find user's mailbox. (#5.1.1)<br>
         */
         elseif (preg_match("/(\S+@\S+\w)<br>.*\n?.*\n?.*can't find.*mailbox/i", $body, $match)) {
-
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0164';
             $result['email']    = $match[1];
@@ -467,17 +616,16 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * Delivery to the following recipients failed.
         * xxxxx@yourdomain.com
         */
-        elseif (preg_match("/delivery[^\n\r]+failed\S*\s+(\S+@\S+\w)\s/is", $body, $match)) {
+        elseif (preg_match("/delivery[^\n\r]+failed[ \S]*\s+(\S+@\S+\w)\s/is", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0013';
             $result['email']    = $match[1];
         }
-        
 
         /*
         * rule: mailbox error (Amazon SES);
@@ -486,16 +634,16 @@ class MessageHelper
         * xxxxx@yourdomain.com
         */
         elseif (preg_match("/an\s+error\s+occurred\s+while\s+trying\s+to\s+deliver\s+the\s+mail\s+to\s+the\s+following\s+recipients:\r\n\s*(\S+@\S+\w)/is", $body, $match)) {
-            $result['rule_cat'] = 'unknown';
-            $result['rule_no']  = '0013';
+            $result['rule_cat']    = 'unknown';
+            $result['rule_no']     = '0013';
             $result['bounce_type'] = 'hard';
-            $result['remove']      = 1;                 
-            $result['email']    = $match[1];
-            $result['email'] = preg_replace("/Reporting\-MTA/","",$result['email']);
-        } 
+            $result['remove']      = 1;
+            $result['email']       = $match[1];
+            $result['email']       = preg_replace("/Reporting\-MTA/", '', $result['email']);
+        }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * A message that you sent could not be delivered to one or more of its^M
         * recipients. This is a permanent error. The following address(es) failed:^M
@@ -510,7 +658,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * <xxxxx@yourdomain.com>:^M
         * 111.111.111.11 does not like recipient.^M
@@ -523,7 +671,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * Sent >>> RCPT TO: <xxxxx@yourdomain.com>^M
         * Received <<< 550 xxxxx@yourdomain.com... No such user^M
@@ -539,7 +687,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * <xxxxx@yourdomain.com>:^M
         * This address no longer accepts mail.
@@ -718,44 +866,42 @@ class MessageHelper
     }
 
     /**
-     * Defined bounce parsing rules for standard DSN (Delivery Status Notification)
+     * Defined bounce parsing rules for standard DSN (Delivery Status Notification).
      *
-     * @param string  $dsn_msg    human-readable explanation
-     * @param string  $dsn_report delivery-status report
-     * @param boolean $debug_mode show debug info. or not
+     * @param string $dsn_msg    human-readable explanation
+     * @param string $dsn_report delivery-status report
+     * @param bool   $debug_mode show debug info. or not
      *
-     * @return array    $result an array include the following fields: 'email', 'bounce_type','remove','rule_no','rule_cat'
-     *                      if we could NOT detect the type of bounce, return rule_no = '0000'
+     * @return array $result an array include the following fields: 'email', 'bounce_type','remove','rule_no','rule_cat'
+     *               if we could NOT detect the type of bounce, return rule_no = '0000'
      */
-    static public function parseDsn($dsn_msg, $dsn_report, $debug_mode = false)
+    public static function parseDsn($dsn_msg, $dsn_report, $debug_mode = false)
     {
         // initialize the result array
-        $result      = array(
+        $result = [
             'email'       => '',
             'bounce_type' => false,
             'remove'      => 0,
             'rule_cat'    => 'unrecognized',
-            'rule_no'     => '0000'
-        );
+            'rule_no'     => '0000',
+        ];
         $action      = false;
         $status_code = false;
         $diag_code   = false;
 
         // ======= parse $dsn_report ======
         // get the recipient email
-        if (preg_match("/Original-Recipient: rfc822;(.*)/i", $dsn_report, $match)) {
-            $email_arr = imap_rfc822_parse_adrlist($match[1], 'default.domain.name');
-            if (isset($email_arr[0]->host) && $email_arr[0]->host != '.SYNTAX-ERROR.' && $email_arr[0]->host != 'default.domain.name') {
-                $result['email'] = $email_arr[0]->mailbox.'@'.$email_arr[0]->host;
-            }
-        } else if (preg_match("/Final-Recipient: rfc822;(.*)/i", $dsn_report, $match)) {
-            $email_arr = imap_rfc822_parse_adrlist($match[1], 'default.domain.name');
-            if (isset($email_arr[0]->host) && $email_arr[0]->host != '.SYNTAX-ERROR.' && $email_arr[0]->host != 'default.domain.name') {
-                $result['email'] = $email_arr[0]->mailbox.'@'.$email_arr[0]->host;
+        if (
+            preg_match('/Original-Recipient: rfc822;(.*)/i', $dsn_report, $match)
+            ||
+            preg_match('/Final-Recipient: rfc822;(.*)/i', $dsn_report, $match)
+        ) {
+            if ($parsedAddressList = self::parseAddressList($match[1])) {
+                $result['email'] = key($parsedAddressList);
             }
         }
 
-        if (preg_match("/Action: (.+)/i", $dsn_report, $match)) {
+        if (preg_match('/Action: (.+)/i', $dsn_report, $match)) {
             $action = strtolower(trim($match[1]));
         }
 
@@ -790,7 +936,7 @@ class MessageHelper
                      * Diagnostic-Code: X-Postfix; me.domain.com platform: said: 552 5.2.2 Over
                      *   quota (in reply to RCPT TO command)
                      */
-                    if (preg_match("/over.*quota/is", $diag_code)) {
+                    if (preg_match('/over.*quota/is', $diag_code)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0105';
                     }
@@ -799,7 +945,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 552 Requested mailbox exceeds quota.
                      */
-                    elseif (preg_match("/exceed.*quota/is", $diag_code)) {
+                    elseif (preg_match('/exceed.*quota/is', $diag_code)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0129';
                     }
@@ -816,7 +962,7 @@ class MessageHelper
                      *   100.1.ZmxEL.720k.1140313037.xxxxx@yourdomain.com (in reply to end of
                      *   DATA command)
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*full/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*full/is', $diag_code)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0145';
                     }
@@ -825,7 +971,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 452 Insufficient system storage
                      */
-                    elseif (preg_match("/Insufficient system storage/is", $diag_code)) {
+                    elseif (preg_match('/Insufficient system storage/is', $diag_code)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0134';
                     }
@@ -838,7 +984,7 @@ class MessageHelper
                      * Diagnostic-Code: X-Postfix; cannot access mailbox /var/spool/mail/b8843022 for^M
                      *   user xxxxx. error writing message: File too large
                      */
-                    elseif (preg_match("/File too large/is", $diag_code)) {
+                    elseif (preg_match('/File too large/is', $diag_code)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0192';
                     }
@@ -847,7 +993,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp;552 5.2.2 This message is larger than the current system limit or the recipient's mailbox is full. Create a shorter message body or remove attachments and try sending it again.
                      */
-                    elseif (preg_match("/larger than.*limit/is", $diag_code)) {
+                    elseif (preg_match('/larger than.*limit/is', $diag_code)) {
                         $result['rule_cat'] = 'oversize';
                         $result['rule_no']  = '0146';
                     }
@@ -856,7 +1002,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: X-Notes; User xxxxx (xxxxx@yourdomain.com) not listed in public Name & Address Book
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user)(.*)not(.*)list/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user)(.*)not(.*)list/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0103';
                     }
@@ -865,7 +1011,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp; 450 user path no exist
                      */
-                    elseif (preg_match("/user path no exist/is", $diag_code)) {
+                    elseif (preg_match('/user path no exist/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0106';
                     }
@@ -878,7 +1024,7 @@ class MessageHelper
                      * sample 3:
                      * Diagnostic-Code: SMTP; 550 relaying to <xxxxx@yourdomain.com> prohibited by administrator
                      */
-                    elseif (preg_match("/Relay.*(?:denied|prohibited)/is", $diag_code)) {
+                    elseif (preg_match('/Relay.*(?:denied|prohibited)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0108';
                     }
@@ -887,7 +1033,7 @@ class MessageHelper
                     * sample:
                     * Diagnostic-Code: SMTP; 554 qq Sorry, no valid recipients (#5.1.3)
                     */
-                    elseif (preg_match("/no.*valid.*(?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/no.*valid.*(?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0185';
                     }
@@ -900,7 +1046,7 @@ class MessageHelper
                      * sample 3:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>: Invalid User
                      */
-                    elseif (preg_match("/Invalid.*(?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/Invalid.*(?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0111';
                     }
@@ -909,7 +1055,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 delivery error: dd Sorry your message to xxxxx@yourdomain.com cannot be delivered. This account has been disabled or discontinued [#102]. - mta173.mail.tpe.domain.com
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*(?:disabled|discontinued)/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*(?:disabled|discontinued)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0114';
                     }
@@ -927,7 +1073,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 5.1.1 unknown or illegal alias: xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/(?:unknown|illegal).*(?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/(?:unknown|illegal).*(?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0128';
                     }
@@ -947,7 +1093,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 sorry, no mailbox here by that name (#5.7.1)
                      */
-                    elseif (preg_match("/no (?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/no (?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0123';
                     }
@@ -958,7 +1104,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 553 5.3.0 <xxxxx@yourdomain.com>... Addressee unknown, relay=[111.111.111.000]
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*unknown/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*unknown/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0125';
                     }
@@ -969,7 +1115,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 452 4.2.1 mailbox temporarily disabled: xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*disabled/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*disabled/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0133';
                     }
@@ -978,7 +1124,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>: Recipient address rejected: No such user (xxxxx@yourdomain.com)
                      */
-                    elseif (preg_match("/No such (?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/No such (?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0143';
                     }
@@ -989,7 +1135,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 550 Mailbox ( xxxxx@yourdomain.com ) not found or inactivated
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*NOT FOUND/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*NOT FOUND/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0136';
                     }
@@ -1000,7 +1146,7 @@ class MessageHelper
                      * <xxxxx@yourdomain.com> is a deactivated mailbox (in reply to RCPT TO
                      * command)
                      */
-                    elseif (preg_match("/deactivated (?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/deactivated (?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0138';
                     }
@@ -1012,7 +1158,7 @@ class MessageHelper
                      * <<< 550 <xxxxx@yourdomain.com> recipient rejected
                      * 550 5.1.1 xxxxx@yourdomain.com... User unknown
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*reject/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*reject/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0148';
                     }
@@ -1021,7 +1167,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp; 5.x.0 - Message bounced by administrator  (delivery attempts: 0)
                      */
-                    elseif (preg_match("/bounce.*administrator/is", $diag_code)) {
+                    elseif (preg_match('/bounce.*administrator/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0151';
                     }
@@ -1030,7 +1176,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <maxqin> is now disabled with MTA service.
                      */
-                    elseif (preg_match("/<.*>.*disabled/is", $diag_code)) {
+                    elseif (preg_match('/<.*>.*disabled/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0152';
                     }
@@ -1039,7 +1185,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 551 not our customer
                      */
-                    elseif (preg_match("/not our customer/is", $diag_code)) {
+                    elseif (preg_match('/not our customer/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0154';
                     }
@@ -1048,7 +1194,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp; 5.1.0 - Unknown address error 540-'Error: Wrong recipients' (delivery attempts: 0)
                      */
-                    elseif (preg_match("/Wrong (?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/Wrong (?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0159';
                     }
@@ -1059,7 +1205,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 501 #5.1.1 bad address xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/(?:unknown|bad).*(?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/(?:unknown|bad).*(?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0160';
                     }
@@ -1068,7 +1214,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Command RCPT User <xxxxx@yourdomain.com> not OK
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*not OK/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*not OK/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0186';
                     }
@@ -1077,7 +1223,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 5.7.1 Access-Denied-XM.SSR-001
                      */
-                    elseif (preg_match("/Access.*Denied/is", $diag_code)) {
+                    elseif (preg_match('/Access.*Denied/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0189';
                     }
@@ -1086,7 +1232,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 5.1.1 <xxxxx@yourdomain.com>... email address lookup in domain map failed^M
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*lookup.*fail/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*lookup.*fail/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0195';
                     }
@@ -1095,7 +1241,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 User not a member of domain: <xxxxx@yourdomain.com>^M
                      */
-                    elseif (preg_match("/(?:recipient|address|email|mailbox|user).*not.*member of domain/is", $diag_code)) {
+                    elseif (preg_match('/(?:recipient|address|email|mailbox|user).*not.*member of domain/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0198';
                     }
@@ -1104,7 +1250,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550-"The recipient cannot be verified.  Please check all recipients of this^M
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*cannot be verified/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*cannot be verified/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0202';
                     }
@@ -1113,7 +1259,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Unable to relay for xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/Unable to relay/is", $diag_code)) {
+                    elseif (preg_match('/Unable to relay/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0203';
                     }
@@ -1133,7 +1279,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550-I'm sorry but xxxxx@yourdomain.com does not have an account here. I will not
                      */
-                    elseif (preg_match("/not have an account/is", $diag_code)) {
+                    elseif (preg_match('/not have an account/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0207';
                     }
@@ -1142,7 +1288,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 This account is not allowed...xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*is not allowed/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*is not allowed/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0220';
                     }
@@ -1151,7 +1297,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>: inactive user
                      */
-                    elseif (preg_match("/inactive.*(?:alias|account|recipient|address|email|mailbox|user)/is", $diag_code)) {
+                    elseif (preg_match('/inactive.*(?:alias|account|recipient|address|email|mailbox|user)/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0135';
                     }
@@ -1160,7 +1306,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 xxxxx@yourdomain.com Account Inactive
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*Inactive/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*Inactive/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0155';
                     }
@@ -1169,7 +1315,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>: Recipient address rejected: Account closed due to inactivity. No forwarding information is available.
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user) closed due to inactivity/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user) closed due to inactivity/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0170';
                     }
@@ -1178,7 +1324,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>... User account not activated
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user) not activated/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user) not activated/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0177';
                     }
@@ -1189,7 +1335,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 550 account expired
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*(?:suspend|expire)/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*(?:suspend|expire)/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0183';
                     }
@@ -1198,7 +1344,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 5.3.0 <xxxxx@yourdomain.com>... Recipient address no longer exists
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*no longer exist/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*no longer exist/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0184';
                     }
@@ -1207,7 +1353,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 VS10-RT Possible forgery or deactivated due to abuse (#5.1.1) 111.111.111.211^M
                      */
-                    elseif (preg_match("/(?:forgery|abuse)/is", $diag_code)) {
+                    elseif (preg_match('/(?:forgery|abuse)/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0196';
                     }
@@ -1216,7 +1362,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 mailbox xxxxx@yourdomain.com is restricted
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*restrict/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*restrict/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0209';
                     }
@@ -1225,7 +1371,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 <xxxxx@yourdomain.com>: User status is locked.
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*locked/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*locked/is', $diag_code)) {
                         $result['rule_cat'] = 'inactive';
                         $result['rule_no']  = '0228';
                     }
@@ -1234,7 +1380,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 User refused to receive this mail.
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user) refused/is", $diag_code)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user) refused/is', $diag_code)) {
                         $result['rule_cat'] = 'user_reject';
                         $result['rule_no']  = '0156';
                     }
@@ -1243,7 +1389,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 501 xxxxx@yourdomain.com Sender email is not in my domain
                      */
-                    elseif (preg_match("/sender.*not/is", $diag_code)) {
+                    elseif (preg_match('/sender.*not/is', $diag_code)) {
                         $result['rule_cat'] = 'user_reject';
                         $result['rule_no']  = '0206';
                     }
@@ -1252,7 +1398,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 Message refused
                      */
-                    elseif (preg_match("/Message refused/is", $diag_code)) {
+                    elseif (preg_match('/Message refused/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0175';
                     }
@@ -1261,7 +1407,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 5.0.0 <xxxxx@yourdomain.com>... No permit
                      */
-                    elseif (preg_match("/No permit/is", $diag_code)) {
+                    elseif (preg_match('/No permit/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0190';
                     }
@@ -1279,7 +1425,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 AUTH FAILED - xxxxx@yourdomain.com^M
                      */
-                    elseif (preg_match("/AUTH FAILED/is", $diag_code)) {
+                    elseif (preg_match('/AUTH FAILED/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0197';
                     }
@@ -1290,7 +1436,7 @@ class MessageHelper
                      * sample 2:
                      * Diagnostic-Code: SMTP; 530 5.7.1 Relaying not allowed: xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/relay.*not.*(?:permit|allow)/is", $diag_code)) {
+                    elseif (preg_match('/relay.*not.*(?:permit|allow)/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0201';
                     }
@@ -1300,7 +1446,7 @@ class MessageHelper
                      *
                      * Diagnostic-Code: SMTP; 550 not local host domain.com, not a gateway
                      */
-                    elseif (preg_match("/not local host/is", $diag_code)) {
+                    elseif (preg_match('/not local host/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0204';
                     }
@@ -1309,7 +1455,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 500 Unauthorized relay msg rejected
                      */
-                    elseif (preg_match("/Unauthorized relay/is", $diag_code)) {
+                    elseif (preg_match('/Unauthorized relay/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0215';
                     }
@@ -1318,7 +1464,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 Transaction failed
                      */
-                    elseif (preg_match("/Transaction.*fail/is", $diag_code)) {
+                    elseif (preg_match('/Transaction.*fail/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0221';
                     }
@@ -1327,7 +1473,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp;554 5.5.2 Invalid data in message
                      */
-                    elseif (preg_match("/Invalid data/is", $diag_code)) {
+                    elseif (preg_match('/Invalid data/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0223';
                     }
@@ -1336,7 +1482,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Local user only or Authentication mechanism
                      */
-                    elseif (preg_match("/Local user only/is", $diag_code)) {
+                    elseif (preg_match('/Local user only/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0224';
                     }
@@ -1348,7 +1494,7 @@ class MessageHelper
                      * server in the last 30 minutes or do not have SMTP Authentication turned on
                      * in your email client.
                      */
-                    elseif (preg_match("/not.*permit.*to/is", $diag_code)) {
+                    elseif (preg_match('/not.*permit.*to/is', $diag_code)) {
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0225';
                     }
@@ -1357,7 +1503,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Content reject. FAAAANsG60M9BmDT.1
                      */
-                    elseif (preg_match("/Content reject/is", $diag_code)) {
+                    elseif (preg_match('/Content reject/is', $diag_code)) {
                         $result['rule_cat'] = 'content_reject';
                         $result['rule_no']  = '0165';
                     }
@@ -1375,7 +1521,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: smtp; 554 5.6.0 Message with invalid header rejected, id=13462-01 - MIME error: error: UnexpectedBound: part didn't end with expected boundary [in multipart message]; EOSToken: EOF; EOSType: EOF
                      */
-                    elseif (preg_match("/MIME error/is", $diag_code)) {
+                    elseif (preg_match('/MIME error/is', $diag_code)) {
                         $result['rule_cat'] = 'content_reject';
                         $result['rule_no']  = '0217';
                     }
@@ -1384,7 +1530,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 Mail data refused by AISP, rule [169648].
                      */
-                    elseif (preg_match("/Mail data refused.*AISP/is", $diag_code)) {
+                    elseif (preg_match('/Mail data refused.*AISP/is', $diag_code)) {
                         $result['rule_cat'] = 'content_reject';
                         $result['rule_no']  = '0218';
                     }
@@ -1393,7 +1539,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Host unknown
                      */
-                    elseif (preg_match("/Host unknown/is", $diag_code)) {
+                    elseif (preg_match('/Host unknown/is', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     }
@@ -1402,7 +1548,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 Specified domain is not allowed.
                      */
-                    elseif (preg_match("/Specified domain.*not.*allow/is", $diag_code)) {
+                    elseif (preg_match('/Specified domain.*not.*allow/is', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0180';
                     }
@@ -1412,7 +1558,7 @@ class MessageHelper
                      * Diagnostic-Code: X-Postfix; delivery temporarily suspended: connect to
                      * 111.111.11.112[111.111.11.112]: No route to host
                      */
-                    elseif (preg_match("/No route to host/is", $diag_code)) {
+                    elseif (preg_match('/No route to host/is', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0188';
                     }
@@ -1421,7 +1567,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 unrouteable address
                      */
-                    elseif (preg_match("/unrouteable address/is", $diag_code)) {
+                    elseif (preg_match('/unrouteable address/is', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0208';
                     }
@@ -1430,7 +1576,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 451 System(u) busy, try again later.
                      */
-                    elseif (preg_match("/System.*busy/is", $diag_code)) {
+                    elseif (preg_match('/System.*busy/is', $diag_code)) {
                         $result['rule_cat'] = 'defer';
                         $result['rule_no']  = '0112';
                     }
@@ -1439,7 +1585,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 451 mta172.mail.tpe.domain.com Resources temporarily unavailable. Please try again later.  [#4.16.4:70].
                      */
-                    elseif (preg_match("/Resources temporarily unavailable/is", $diag_code)) {
+                    elseif (preg_match('/Resources temporarily unavailable/is', $diag_code)) {
                         $result['rule_cat'] = 'defer';
                         $result['rule_no']  = '0116';
                     }
@@ -1448,7 +1594,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 sender is rejected: 0,mx20,wKjR5bDrnoM2yNtEZVAkBg==.32467S2
                      */
-                    elseif (preg_match("/sender is rejected/is", $diag_code)) {
+                    elseif (preg_match('/sender is rejected/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0101';
                     }
@@ -1457,7 +1603,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 <unknown[111.111.111.000]>: Client host rejected: Access denied
                      */
-                    elseif (preg_match("/Client host rejected/is", $diag_code)) {
+                    elseif (preg_match('/Client host rejected/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0102';
                     }
@@ -1466,7 +1612,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 Connection refused(mx). MAIL FROM [xxxxx@yourdomain.com] mismatches client IP [111.111.111.000].
                      */
-                    elseif (preg_match("/MAIL FROM(.*)mismatches client IP/is", $diag_code)) {
+                    elseif (preg_match('/MAIL FROM(.*)mismatches client IP/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0104';
                     }
@@ -1475,7 +1621,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 Please visit http:// antispam.domain.com/denyip.php?IP=111.111.111.000 (#5.7.1)
                      */
-                    elseif (preg_match("/denyip/is", $diag_code)) {
+                    elseif (preg_match('/denyip/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0144';
                     }
@@ -1484,7 +1630,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 Service unavailable; Client host [111.111.111.211] blocked using dynablock.domain.com; Your message could not be delivered due to complaints we received regarding the IP address you're using or your ISP. See http:// blackholes.domain.com/ Error: WS-02^M
                      */
-                    elseif (preg_match("/client host.*blocked/is", $diag_code)) {
+                    elseif (preg_match('/client host.*blocked/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0201';
                     }
@@ -1493,7 +1639,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Requested action not taken: mail IsCNAPF76kMDARUY.56621S2 is rejected,mx3,BM
                      */
-                    elseif (preg_match("/mail.*reject/is", $diag_code)) {
+                    elseif (preg_match('/mail.*reject/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0147';
                     }
@@ -1502,7 +1648,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 552 sorry, the spam message is detected (#5.6.0)
                      */
-                    elseif (preg_match("/spam.*detect/is", $diag_code)) {
+                    elseif (preg_match('/spam.*detect/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0162';
                     }
@@ -1511,7 +1657,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 5.7.1 Rejected as Spam see: http:// rejected.domain.com/help/spam/rejected.html
                      */
-                    elseif (preg_match("/reject.*spam/is", $diag_code)) {
+                    elseif (preg_match('/reject.*spam/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0216';
                     }
@@ -1520,7 +1666,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 5.7.1 <xxxxx@yourdomain.com>... SpamTrap=reject mode, dsn=5.7.1, Message blocked by BOX Solutions (www.domain.com) SpamTrap Technology, please contact the domain.com site manager for help: (ctlusr8012).^M
                      */
-                    elseif (preg_match("/SpamTrap/is", $diag_code)) {
+                    elseif (preg_match('/SpamTrap/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0200';
                     }
@@ -1529,7 +1675,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Verify mailfrom failed,blocked
                      */
-                    elseif (preg_match("/Verify mailfrom failed/is", $diag_code)) {
+                    elseif (preg_match('/Verify mailfrom failed/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0210';
                     }
@@ -1538,7 +1684,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 Error: MAIL FROM is mismatched with message header from address!
                      */
-                    elseif (preg_match("/MAIL.*FROM.*mismatch/is", $diag_code)) {
+                    elseif (preg_match('/MAIL.*FROM.*mismatch/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0226';
                     }
@@ -1547,7 +1693,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 5.7.1 Message scored too high on spam scale.  For help, please quote incident ID 22492290.
                      */
-                    elseif (preg_match("/spam scale/is", $diag_code)) {
+                    elseif (preg_match('/spam scale/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0211';
                     }
@@ -1564,7 +1710,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 550 sorry, it seems as a junk mail
                      */
-                    elseif (preg_match("/junk mail/is", $diag_code)) {
+                    elseif (preg_match('/junk mail/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0230';
                     }
@@ -1573,7 +1719,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553-Message filtered. Please see the FAQs section on spam
                      */
-                    elseif (preg_match("/message filtered/is", $diag_code)) {
+                    elseif (preg_match('/message filtered/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0227';
                     }
@@ -1582,7 +1728,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 554 5.7.1 The message from (<xxxxx@yourdomain.com>) with the subject of ( *(ca2639) 7|-{%2E* : {2"(%EJ;y} (SBI$#$@<K*:7s1!=l~) matches a profile the Internet community may consider spam. Please revise your message before resending.
                      */
-                    elseif (preg_match("/subject.*consider.*spam/is", $diag_code)) {
+                    elseif (preg_match('/subject.*consider.*spam/is', $diag_code)) {
                         $result['rule_cat'] = 'antispam';
                         $result['rule_no']  = '0222';
                     }
@@ -1591,7 +1737,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 451 Temporary local problem - please try later
                      */
-                    elseif (preg_match("/Temporary local problem/is", $diag_code)) {
+                    elseif (preg_match('/Temporary local problem/is', $diag_code)) {
                         $result['rule_cat'] = 'internal_error';
                         $result['rule_no']  = '0142';
                     }
@@ -1600,7 +1746,7 @@ class MessageHelper
                      * sample:
                      * Diagnostic-Code: SMTP; 553 5.3.5 system config error
                      */
-                    elseif (preg_match("/system config error/is", $diag_code)) {
+                    elseif (preg_match('/system config error/is', $diag_code)) {
                         $result['rule_cat'] = 'internal_error';
                         $result['rule_no']  = '0153';
                     }
@@ -1611,7 +1757,7 @@ class MessageHelper
                      * 111.111.111.11[111.111.111.11] timed out while sending end of data -- message may be^M
                      * sent more than once
                      */
-                    elseif (preg_match("/delivery.*suspend/is", $diag_code)) {
+                    elseif (preg_match('/delivery.*suspend/is', $diag_code)) {
                         $result['rule_cat'] = 'delayed';
                         $result['rule_no']  = '0213';
                     }
@@ -1627,7 +1773,7 @@ class MessageHelper
                      * <<< 503 All recipients are invalid
                      * 554 5.0.0 Service unavailable
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user)(.*)invalid/i", $dsn_msg)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user)(.*)invalid/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0107';
                     }
@@ -1637,7 +1783,7 @@ class MessageHelper
                      * ----- Transcript of session follows -----
                      * xxxxx@yourdomain.com... Deferred: No such file or directory
                      */
-                    elseif (preg_match("/Deferred.*No such.*(?:file|directory)/i", $dsn_msg)) {
+                    elseif (preg_match('/Deferred.*No such.*(?:file|directory)/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0141';
                     }
@@ -1648,7 +1794,7 @@ class MessageHelper
                      * LOCAL module(account xxxx) reports:^M
                      * mail receiving disabled^M
                      */
-                    elseif (preg_match("/mail receiving disabled/i", $dsn_msg)) {
+                    elseif (preg_match('/mail receiving disabled/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0194';
                     }
@@ -1658,7 +1804,7 @@ class MessageHelper
                      * - These recipients of your message have been processed by the mail server:^M
                      * xxxxx@yourdomain.com; Failed; 5.1.1 (bad destination mailbox address)
                      */
-                    elseif (preg_match("/bad.*(?:alias|account|recipient|address|email|mailbox|user)/i", $dsn_msg)) {
+                    elseif (preg_match('/bad.*(?:alias|account|recipient|address|email|mailbox|user)/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '227';
                     }
@@ -1672,7 +1818,7 @@ class MessageHelper
                      *  Recipient address: xxxxx@yourdomain.com
                      *  Reason: Over quota
                      */
-                    elseif (preg_match("/over.*quota/i", $dsn_msg)) {
+                    elseif (preg_match('/over.*quota/i', $dsn_msg)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0131';
                     }
@@ -1682,7 +1828,7 @@ class MessageHelper
                      * Sorry the recipient quota limit is exceeded.
                      * This message is returned as an error.
                      */
-                    elseif (preg_match("/quota.*exceeded/i", $dsn_msg)) {
+                    elseif (preg_match('/quota.*exceeded/i', $dsn_msg)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0150';
                     }
@@ -1708,7 +1854,7 @@ class MessageHelper
                      * that member's mailbox is full
                      * 550 5.0.0 <xxxxx@yourdomain.com>... Can't create output
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*full/i", $dsn_msg)) {
+                    elseif (preg_match('/(?:alias|account|recipient|address|email|mailbox|user).*full/i', $dsn_msg)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0132';
                     }
@@ -1717,7 +1863,7 @@ class MessageHelper
                      * sample:
                      * gaosong "(0), ErrMsg=Mailbox space not enough (space limit is 10240KB)
                      */
-                    elseif (preg_match("/space.*not.*enough/i", $dsn_msg)) {
+                    elseif (preg_match('/space.*not.*enough/i', $dsn_msg)) {
                         $result['rule_cat'] = 'full';
                         $result['rule_no']  = '0219';
                     }
@@ -1732,7 +1878,7 @@ class MessageHelper
                      * 451 4.4.1 reply: read error from www.domain.com.
                      * xxxxx@yourdomain.com... Deferred: Connection reset by www.domain.com.
                      */
-                    elseif (preg_match("/Deferred.*Connection (?:refused|reset)/i", $dsn_msg)) {
+                    elseif (preg_match('/Deferred.*Connection (?:refused|reset)/i', $dsn_msg)) {
                         $result['rule_cat'] = 'defer';
                         $result['rule_no']  = '0115';
                     }
@@ -1744,7 +1890,7 @@ class MessageHelper
                      * ----- Transcript of session follows -----
                      * 553 5.1.2 XXXX SSSS <xxxxx@yourdomain..com>... Invalid host name
                      */
-                    elseif (preg_match("/Invalid host name/i", $dsn_msg)) {
+                    elseif (preg_match('/Invalid host name/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0109';
                     }
@@ -1754,7 +1900,7 @@ class MessageHelper
                      * ----- Transcript of session follows -----
                      * xxxxx@yourdomain.com... Deferred: mail.domain.com.: No route to host
                      */
-                    elseif (preg_match("/Deferred.*No route to host/i", $dsn_msg)) {
+                    elseif (preg_match('/Deferred.*No route to host/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0109';
                     }
@@ -1764,7 +1910,7 @@ class MessageHelper
                      * ----- Transcript of session follows -----
                      * 550 5.1.2 xxxxx@yourdomain.com... Host unknown (Name server: .: no data known)
                      */
-                    elseif (preg_match("/Host unknown/i", $dsn_msg)) {
+                    elseif (preg_match('/Host unknown/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0140';
                     }
@@ -1776,7 +1922,7 @@ class MessageHelper
                      * Message could not be delivered for 5 days
                      * Message will be deleted from queue
                      */
-                    elseif (preg_match("/Name server timeout/i", $dsn_msg)) {
+                    elseif (preg_match('/Name server timeout/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0118';
                     }
@@ -1788,7 +1934,7 @@ class MessageHelper
                      * Message could not be delivered for 5 days
                      * Message will be deleted from queue
                      */
-                    elseif (preg_match("/Deferred.*Connection.*tim(?:e|ed).*out/i", $dsn_msg)) {
+                    elseif (preg_match('/Deferred.*Connection.*tim(?:e|ed).*out/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0119';
                     }
@@ -1798,7 +1944,7 @@ class MessageHelper
                      * ----- Transcript of session follows -----
                      * xxxxx@yourdomain.com... Deferred: Name server: domain.com.: host name lookup failure
                      */
-                    elseif (preg_match("/Deferred.*host name lookup failure/i", $dsn_msg)) {
+                    elseif (preg_match('/Deferred.*host name lookup failure/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0121';
                     }
@@ -1809,7 +1955,7 @@ class MessageHelper
                      * 554 5.0.0 MX list for znet.ws. points back to mail01.domain.com^M
                      * 554 5.3.5 Local configuration error^M
                      */
-                    elseif (preg_match("/MX list.*point.*back/i", $dsn_msg)) {
+                    elseif (preg_match('/MX list.*point.*back/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_loop';
                         $result['rule_no']  = '0199';
                     }
@@ -1830,7 +1976,7 @@ class MessageHelper
                      * SMTP module(domain domain.com) reports:^M
                      * connection with mx1.mail.domain.com is broken^M
                      */
-                    elseif (preg_match("/connection.*broken/i", $dsn_msg)) {
+                    elseif (preg_match('/connection.*broken/i', $dsn_msg)) {
                         $result['rule_cat'] = 'internal_error';
                         $result['rule_no']  = '0231';
                     }
@@ -1840,7 +1986,7 @@ class MessageHelper
                      * Delivery to the following recipients failed.
                      * xxxxx@yourdomain.com
                      */
-                    elseif (preg_match("/Delivery to the following recipients failed.*\n.*\n.*".$result['email']."/i", $dsn_msg)) {
+                    elseif (preg_match("/Delivery to the following recipients failed.*\n.*\n.*".$result['email'].'/i', $dsn_msg)) {
                         $result['rule_cat'] = 'other';
                         $result['rule_no']  = '0176';
                     }
@@ -1857,7 +2003,7 @@ class MessageHelper
                      * sample 2:
                      * 550 5.1.1 xxxxx@yourdomain.com... User unknown^M
                      */
-                    elseif (preg_match("/User unknown/i", $dsn_msg)) {
+                    elseif (preg_match('/User unknown/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0193';
                     }
@@ -1866,7 +2012,7 @@ class MessageHelper
                      * sample:
                      * 554 5.0.0 Service unavailable
                      */
-                    elseif (preg_match("/Service unavailable/i", $dsn_msg)) {
+                    elseif (preg_match('/Service unavailable/i', $dsn_msg)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0214';
                     }
@@ -1879,20 +2025,20 @@ class MessageHelper
                 case 'relayed':
                 case 'expanded': // unhandled cases
                     break;
-                default :
+                default:
                     break;
             }
         }
 
         if ($result['rule_no'] == '0000') {
             if ($debug_mode) {
-                $result['debug'] = array(
+                $result['debug'] = [
                     'email '          => $result['email'].self::$bmh_newline,
                     'Action '         => $action.self::$bmh_newline,
                     'Status '         => $status_code.self::$bmh_newline,
                     'Diagnostic-Code' => $diag_code.self::$bmh_newline,
-                    'DSN Message'     => $dsn_msg.self::$bmh_newline
-                );
+                    'DSN Message'     => $dsn_msg.self::$bmh_newline,
+                ];
             }
         } else {
             if ($result['bounce_type'] === false) {
@@ -1902,5 +2048,26 @@ class MessageHelper
         }
 
         return $result;
+    }
+
+    public static function parseAddressList($addresses)
+    {
+        $results         = [];
+        $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');
+        foreach ($parsedAddresses as $parsedAddress) {
+            if (
+                isset($parsedAddress->host)
+                &&
+                $parsedAddress->host != '.SYNTAX-ERROR.'
+                &&
+                $parsedAddress->host != 'default.domain.name'
+            ) {
+                $email           = $parsedAddress->mailbox.'@'.$parsedAddress->host;
+                $name            = isset($parsedAddress->personal) ? $parsedAddress->personal : null;
+                $results[$email] = $name;
+            }
+        }
+
+        return $results;
     }
 }

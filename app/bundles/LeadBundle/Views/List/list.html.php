@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
@@ -19,14 +20,31 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             <thead>
             <tr>
                 <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'checkall' => 'true',
-                    'target'   => '#leadListTable'
-                ));
+                    'target'   => '#leadListTable',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'segment',
+                    'orderBy'    => 'l.name',
+                    'text'       => 'mautic.core.name',
+                    'class'      => 'col-leadlist-name',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'segment',
+                    'text'       => 'mautic.lead.list.thead.leadcount',
+                    'class'      => 'visible-md visible-lg col-leadlist-leadcount',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'segment',
+                    'orderBy'    => 'l.id',
+                    'text'       => 'mautic.core.id',
+                    'class'      => 'visible-md visible-lg col-leadlist-id',
+                ]);
                 ?>
-                <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.core.name'); ?></th>
-                <th class="visible-md visible-lg col-leadlist-leadcount"><?php echo $view['translator']->trans('mautic.lead.list.thead.leadcount'); ?></th>
-                <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.core.id'); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -34,33 +52,33 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                            'item'      => $item,
-                            'templateButtons' => array(
-                                'delete'    => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
-                            ),
-                            'routeBase' => 'leadlist',
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                            'item'            => $item,
+                            'templateButtons' => [
+                                'delete' => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
+                            ],
+                            'routeBase' => 'segment',
                             'langVar'   => 'lead.list',
-                            'custom'    => array(
-                                array(
-                                    'attr' => array(
+                            'custom'    => [
+                                [
+                                    'attr' => [
                                         'data-toggle' => 'ajax',
-                                        'href'        => $view['router']->generate('mautic_lead_index', array(
-                                            'search' => "$listCommand:{$item->getAlias()}"
-                                        )),
-                                    ),
-                                    'icon' => 'fa-users',
-                                    'label' => 'mautic.lead.list.view_leads'
-                                )
-                            )
-                        ));
+                                        'href'        => $view['router']->path('mautic_contact_index', [
+                                            'search' => "$listCommand:{$item->getAlias()}",
+                                        ]),
+                                    ],
+                                    'icon'  => 'fa-users',
+                                    'label' => 'mautic.lead.list.view_leads',
+                                ],
+                            ],
+                        ]);
                         ?>
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'lead.list')); ?>
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'lead.list']); ?>
                             <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
-                                <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+                                <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                                 </a>
                             <?php else : ?>
@@ -79,8 +97,8 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':' . $item->getAlias())); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
-                            <?php echo $view['translator']->transChoice('mautic.lead.list.viewleads_count', $leadCounts[$item->getId()], array('%count%' => $leadCounts[$item->getId()])); ?>
+                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->transChoice('mautic.lead.list.viewleads_count', $leadCounts[$item->getId()], ['%count%' => $leadCounts[$item->getId()]]); ?>
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
@@ -89,13 +107,13 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             </tbody>
         </table>
         <div class="panel-footer">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-                "totalItems" => count($items),
-                "page"       => $page,
-                "limit"      => $limit,
-                "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
-                'sessionVar' => 'leadlist'
-            )); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+                'totalItems' => count($items),
+                'page'       => $page,
+                'limit'      => $limit,
+                'baseUrl'    => $view['router']->path('mautic_segment_index'),
+                'sessionVar' => 'segment',
+            ]); ?>
         </div>
     </div>
 <?php else: ?>

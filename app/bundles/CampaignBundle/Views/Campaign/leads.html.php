@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -23,7 +24,7 @@
                                         <?php $img = $view['gravatar']->getImage($item['email'], '250'); ?>
                                     <?php else : ?>
                                         <?php $socialData = unserialize($item['social_cache']); ?>
-                                        <?php $img = (!empty($socialData[$preferred]['profile']['profileImage'])) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($item['email'], '250'); ?>
+                                        <?php $img        = (!empty($socialData[$preferred]['profile']['profileImage'])) ? $socialData[$preferred]['profile']['profileImage'] : $view['gravatar']->getImage($item['email'], '250'); ?>
                                     <?php endif; ?>
                                     <img class="img img-responsive" src="<?php echo $img; ?>" />
                                 </span>
@@ -35,11 +36,11 @@
                                     <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                                 <?php endif; ?>
                                 <h4 class="fw-sb mb-xs">
-                                    <a href="<?php echo $view['router']->generate('mautic_lead_action', array("objectAction" => "view", "objectId" => $item['id'])); ?>" data-toggle="ajax">
+                                    <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item['id']]); ?>" data-toggle="ajax">
                                         <span>
                                             <?php
                                             if (!empty($item['firstname']) && !empty($item['lastname'])):
-                                                echo $item['lastname'] . ', ' . $item['firstname'];
+                                                echo $item['lastname'].', '.$item['firstname'];
                                             elseif (!empty($item['lastname'])):
                                                 echo $item['lastname'];
                                             elseif (!empty($item['firstname'])):
@@ -58,8 +59,8 @@
                                 </div>
                                 <div class="text-muted mb-1">
                                     <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
-                                    $available = array('city', 'state');
-                                    $location = array();
+                                    $available = ['city', 'state'];
+                                    $location  = [];
                                     foreach ($available as $a):
                                         if (!empty($item[$a])):
                                             $location[] = $a;
@@ -86,17 +87,17 @@
 <?php if (count($items)): ?>
 <div class="panel-footer">
     <?php
-    $link = (isset($link))? $link : 'mautic_lead_index';
-    echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        'totalItems'      => $totalItems,
-        'page'            => $page,
-        'limit'           => $limit,
-        'menuLinkId'      => $link,
-        'baseUrl'         => (isset($objectId)) ? $view['router']->generate($link, array('objectId' => $objectId)) : $view['router']->generate($link),
-        'tmpl'            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
-        'sessionVar'      => (isset($sessionVar)) ? $sessionVar : 'lead',
-        'target'          => (isset($target)) ? $target : '.page-list'
-    ));
+    $link = (isset($link)) ? $link : 'mautic_contact_index';
+    echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+        'totalItems' => $totalItems,
+        'page'       => $page,
+        'limit'      => $limit,
+        'menuLinkId' => $link,
+        'baseUrl'    => (isset($objectId)) ? $view['router']->path($link, ['objectId' => $objectId]) : $view['router']->path($link),
+        'tmpl'       => (!in_array($tmpl, ['grid', 'index'])) ? $tmpl : $indexMode,
+        'sessionVar' => (isset($sessionVar)) ? $sessionVar : 'lead',
+        'target'     => (isset($target)) ? $target : '.page-list',
+    ]);
     ?>
 </div>
 <?php endif; ?>

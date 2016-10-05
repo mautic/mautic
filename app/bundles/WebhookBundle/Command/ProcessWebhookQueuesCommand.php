@@ -1,30 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\RuntimeException;
-use Mautic\WebhookBundle\Model\WebhookModel;
 
 /**
- * CLI Command to process queued webhook payloads
+ * CLI Command to process queued webhook payloads.
  */
 class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 {
-    /** @var \Mautic\CoreBundle\Factory\MauticFactory  $factory */
+    /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
     protected $factory;
 
     /**
@@ -33,11 +29,6 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:webhooks:process')
-            ->setAliases(
-                array(
-                    'mautic:process:webhooks'
-                )
-            )
             ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',
@@ -60,6 +51,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         // check to make sure we are in queue mode
         if ($queueMode != 'command_process') {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
+
             return 0;
         }
 
@@ -70,26 +62,27 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 
         if ($id) {
             $webhook  = $model->getEntity($id);
-            $webhooks = ($webhook !== null && $webhook->isPublished()) ? array($id => $webhook) : array();
+            $webhooks = ($webhook !== null && $webhook->isPublished()) ? [$id => $webhook] : [];
         } else {
             // make sure we only get published webhook entities
             $webhooks = $model->getEntities(
-                array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'e.isPublished',
                                 'expr'   => 'eq',
-                                'value'  => 1
-                            )
-                        )
-                    )
-                )
+                                'value'  => 1,
+                            ],
+                        ],
+                    ],
+                ]
             );
         }
 
-        if (!count ($webhooks)) {
+        if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
+
             return;
         }
 
@@ -98,7 +91,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         try {
             $model->processWebhooks($webhooks);
         } catch (\Exception $e) {
-            $output->writeLn('<error>' . $e->getMessage() . '</error>');
+            $output->writeLn('<error>'.$e->getMessage().'</error>');
         }
         $output->writeLn('<info>Webhook Processing Complete</info>');
     }

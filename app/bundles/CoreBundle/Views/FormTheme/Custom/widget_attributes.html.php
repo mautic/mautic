@@ -5,9 +5,11 @@ id="<?php echo $view->escape($id) ?>" name="<?php echo $view->escape($full_name)
 <?php if ($pattern): ?>pattern="<?php echo $view->escape($pattern) ?>" <?php endif ?>
 <?php
 foreach ($attr as $k => $v):
-if (in_array($k, array("tooltip", "preaddon", "preaddon_attr", "postaddon_attr"))) continue;
-if (in_array($k, array('placeholder', 'title'), true)):
-printf('%s="%s" ', $view->escape($k), $view->escape($view['translator']->trans($v, array(), $translation_domain)));
+if (in_array($k, ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr'])) {
+    continue;
+}
+if (in_array($k, ['placeholder', 'title'], true)):
+printf('%s="%s" ', $view->escape($k), $view->escape($view['translator']->trans($v, [], $translation_domain)));
 elseif ($v === true):
 printf('%s="%s" ', $view->escape($k), $view->escape($k));
 elseif ($v !== false):
@@ -17,4 +19,3 @@ endforeach;
 if (!isset($attr['autocomplete'])): // Disable by default and use false for chrome support
 printf('autocomplete="false" ');
 endif;
-

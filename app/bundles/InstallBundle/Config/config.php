@@ -1,78 +1,86 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes'   => array(
-        'public' => array(
-            'mautic_installer_home'  => array(
+return [
+    'routes' => [
+        'public' => [
+            'mautic_installer_home' => [
                 'path'       => '/installer',
-                'controller' => 'MauticInstallBundle:Install:step'
-            ),
-            'mautic_installer_remove_slash'  => array(
+                'controller' => 'MauticInstallBundle:Install:step',
+            ],
+            'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash'
-            ),
-            'mautic_installer_step'  => array(
+                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash',
+            ],
+            'mautic_installer_step' => [
                 'path'       => '/installer/step/{index}',
-                'controller' => 'MauticInstallBundle:Install:step'
-            ),
-            'mautic_installer_final' => array(
+                'controller' => 'MauticInstallBundle:Install:step',
+            ],
+            'mautic_installer_final' => [
                 'path'       => '/installer/final',
-                'controller' => 'MauticInstallBundle:Install:final'
-            )
-        )
-    ),
+                'controller' => 'MauticInstallBundle:Install:final',
+            ],
+            'mautic_installer_catchcall' => [
+                'path'         => '/installer/{noerror}',
+                'controller'   => 'MauticInstallBundle:Install:step',
+                'requirements' => [
+                    'noerror' => '^(?).+',
+                ],
+            ],
+        ],
+    ],
 
-    'services' => array(
-        'other' => array(
-            'mautic.install.configurator.step.check'    => array(
-                'class'        => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
-                'arguments'    => array(
+    'services' => [
+        'other' => [
+            'mautic.install.configurator.step.check' => [
+                'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'arguments' => [
                     'mautic.configurator',
                     '%kernel.root_dir%',
                     'request_stack',
-                ),
+                ],
                 'tag'          => 'mautic.configurator.step',
-                'tagArguments' => array(
+                'tagArguments' => [
                     'priority' => 0,
-                ),
-            ),
-            'mautic.install.configurator.step.doctrine' => array(
-                'class'        => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
-                'arguments'    => array(
+                ],
+            ],
+            'mautic.install.configurator.step.doctrine' => [
+                'class'     => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'arguments' => [
                     'mautic.configurator',
-                ),
+                ],
                 'tag'          => 'mautic.configurator.step',
-                'tagArguments' => array(
+                'tagArguments' => [
                     'priority' => 1,
-                ),
-            ),
-            'mautic.install.configurator.step.email'    => array(
-                'class'        => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
-                'arguments'    => array(
+                ],
+            ],
+            'mautic.install.configurator.step.email' => [
+                'class'     => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'arguments' => [
                     'session',
-                ),
+                ],
                 'tag'          => 'mautic.configurator.step',
-                'tagArguments' => array(
+                'tagArguments' => [
                     'priority' => 3,
-                ),
-            ),
-            'mautic.install.configurator.step.user'     => array(
-                'class'        => 'Mautic\InstallBundle\Configurator\Step\UserStep',
-                'arguments'    => array(
+                ],
+            ],
+            'mautic.install.configurator.step.user' => [
+                'class'     => 'Mautic\InstallBundle\Configurator\Step\UserStep',
+                'arguments' => [
                     'session',
-                ),
+                ],
                 'tag'          => 'mautic.configurator.step',
-                'tagArguments' => array(
+                'tagArguments' => [
                     'priority' => 2,
-                ),
-            ),
-        )
-    )
-);
+                ],
+            ],
+        ],
+    ],
+];

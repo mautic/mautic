@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class EmailSendEvent
- *
- * @package Mautic\EmailBundle\Event
+ * Class EmailSendEvent.
  */
 class EmailSendEvent extends CommonEvent
 {
@@ -59,7 +58,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * @var array
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * @var internalSend
@@ -69,13 +68,13 @@ class EmailSendEvent extends CommonEvent
     /**
      * @var array
      */
-    private $textHeaders = array();
+    private $textHeaders = [];
 
     /**
      * @param MailHelper $helper
      * @param array      $args
      */
-    public function __construct(MailHelper $helper = null, $args = array())
+    public function __construct(MailHelper $helper = null, $args = [])
     {
         $this->helper = $helper;
 
@@ -89,6 +88,10 @@ class EmailSendEvent extends CommonEvent
 
         if (isset($args['subject'])) {
             $this->subject = $args['subject'];
+        }
+
+        if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
+            $this->subject = $args['email']->getSubject();
         }
 
         if (isset($args['idHash'])) {
@@ -118,9 +121,8 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-
     /**
-     * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking
+     * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking.
      *
      * @return internalSend
      */
@@ -130,7 +132,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Return if the transport and mailer is in batch mode (tokenized emails)
+     * Return if the transport and mailer is in batch mode (tokenized emails).
      *
      * @return bool
      */
@@ -140,7 +142,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Returns the Email entity
+     * Returns the Email entity.
      *
      * @return Email
      */
@@ -150,7 +152,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Get email content
+     * Get email content.
      *
      * @param $replaceTokens
      *
@@ -161,7 +163,6 @@ class EmailSendEvent extends CommonEvent
         if ($this->helper !== null) {
             $content = $this->helper->getBody();
         } else {
-
             $content = $this->content;
         }
 
@@ -169,31 +170,29 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Set email content
+     * Set email content.
      *
      * @param $content
      */
     public function setContent($content)
     {
         if ($this->helper !== null) {
-            $this->helper->setBody($content, 'text/html', null, true);
+            $this->helper->setBody($content, 'text/html', null, true, true);
         } else {
             $this->content = $content;
         }
     }
 
     /**
-     * Get email content
+     * Get email content.
      *
      * @return array
      */
     public function getPlainText()
     {
         if ($this->helper !== null) {
-
             return $this->helper->getPlainText();
         } else {
-
             return $this->plainText;
         }
     }
@@ -216,10 +215,8 @@ class EmailSendEvent extends CommonEvent
     public function getSubject()
     {
         if ($this->helper !== null) {
-
             return $this->helper->getSubject();
         } else {
-
             return $this->subject;
         }
     }
@@ -239,7 +236,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Get the MailHelper object
+     * Get the MailHelper object.
      *
      * @return MailHelper
      */
@@ -290,7 +287,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Get token array
+     * Get token array.
      *
      * @return array
      */
@@ -321,12 +318,50 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it
+     * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it.
      *
      * @return bool
      */
     public function shouldAppendClickthrough()
     {
-        return (!$this->isInternalSend() && null === $this->getEmail());
+        return !$this->isInternalSend() && null === $this->getEmail();
+    }
+
+    /**
+     * Generate a clickthrough array for URLs.
+     *
+     * @return array
+     */
+    public function generateClickthrough()
+    {
+        $source       = $this->getSource();
+        $email        = $this->getEmail();
+        $clickthrough = [
+            //what entity is sending the email?
+            'source' => $source,
+            //the email being sent to be logged in page hit if applicable
+            'email' => ($email != null) ? $email->getId() : null,
+            'stat'  => $this->getIdHash(),
+        ];
+        $lead = $this->getLead();
+        if ($lead !== null) {
+            $clickthrough['lead'] = $lead['id'];
+        }
+
+        return $clickthrough;
+    }
+
+    /**
+     * Get the content hash to note if the content has been changed.
+     *
+     * @return string
+     */
+    public function getContentHash()
+    {
+        if (null !== $this->helper) {
+            return $this->helper->getContentHash();
+        } else {
+            return md5($this->getContent().$this->getPlainText());
+        }
     }
 }

@@ -25,6 +25,7 @@
 @import "app/less/components/calendar";
 @import "app/less/components/editor";
 @import "app/less/components/media";
+@import "app/less/components/menu";
 @import "app/less/components/list-group";
 @import "app/less/components/dropdowns";
 @import "app/less/components/navs";
@@ -167,11 +168,8 @@ label.required:after {
   z-index: 9999;
 }
 
-body.noscroll
-{
-  position: fixed;
-  overflow-y: scroll;
-  width: 100%;
+body.noscroll {
+  overflow: hidden;
 }
 
 .form-select-modal .panel-body {
@@ -194,4 +192,46 @@ body.noscroll
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
+}
+
+.input-group {
+  .input-group-btn {
+    button {
+      height: 32px;
+    }
+  }
+}
+
+.theme-selected {
+  border: 1px solid #4e5e9e;
+  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
+  box-shadow: 0px 0px 40px #f3f3f3;
+}
+
+#app-content.content-only {
+  .toolbar-form-buttons.pull-right {
+    padding-right:20px;
+  }
+}
+
+.fr-toolbar {
+    border-top: 2px solid #4e5d9d;
+}
+.modal-body-content iframe.fr-iframe {
+  min-height:300px;
+}
+
+.CodeMirror {
+  border: 1px solid #d5d5d5;
+  border-radius: 3px;
+}
+
+table.table > tbody > tr > td.long-text {
+  max-width: 500px;
+  min-width: 300px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
 }

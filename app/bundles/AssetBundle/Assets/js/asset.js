@@ -1,48 +1,14 @@
 //AssetBundle
 Mautic.assetOnLoad = function (container) {
-    if (typeof Mautic.renderDownloadChartObject === 'undefined') {
-        Mautic.renderDownloadChart();
-    }
-
-    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length)
-    {
+    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length) {
         Mautic.initializeDropzone();
     }
 };
 
 Mautic.assetOnUnload = function(id) {
     if (id === '#app-content') {
-        delete Mautic.renderDownloadChartObject;
         delete Mautic.assetDropzone;
     }
-};
-
-Mautic.renderDownloadChart = function (chartData) {
-    if (!mQuery('#download-chart').length) {
-        return;
-    }
-    if (!chartData) {
-        chartData = mQuery.parseJSON(mQuery('#download-chart-data').text());
-    } else if (chartData.stats) {
-        chartData = chartData.stats;
-    }
-
-    var ctx = document.getElementById("download-chart").getContext("2d");
-    var options = {};
-
-    if (typeof Mautic.renderDownloadChartObject === 'undefined') {
-        Mautic.renderDownloadChartObject = new Chart(ctx).Line(chartData, options);
-    } else {
-        Mautic.renderDownloadChartObject.destroy();
-        Mautic.renderDownloadChartObject = new Chart(ctx).Line(chartData, options);
-    }
-};
-
-Mautic.updateDownloadChart = function(element, amount, unit) {
-    var assetId = Mautic.getEntityId();
-    var query = "amount=" + amount + "&unit=" + unit + "&assetId=" + assetId;
-
-    Mautic.getChartData(element, 'asset:updateDownloadChart', query, 'renderDownloadChart');
 };
 
 Mautic.updateRemoteBrowser = function(provider, path) {

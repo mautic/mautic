@@ -1,52 +1,51 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Event;
 
-use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class UntrackableUrlsEvent
+ * Class UntrackableUrlsEvent.
  */
 class UntrackableUrlsEvent extends Event
 {
     /**
      * @var array
      */
-    private $doNotTrack = array(
+    private $doNotTrack = [
         '{webview_url}',
         '{unsubscribe_url}',
-        '{trackedlink=(.*?)}',
+        '{trackable=(.*?)}',
         // Ignore lead fields with URLs for tracking since each is unique
         '^{leadfield=(.*?)}',
-        // @todo - remove in 2.0
-        '{externallink=(.*?)}'
-    );
+        '^{contactfield=(.*?)}',
+    ];
 
     /**
-     * @var Email
+     * @var string
      */
-    private $email;
+    private $content;
 
     /**
      * TrackableEvent constructor.
      *
-     * @param Email $email
+     * @param $content
      */
-    public function __construct(Email $email = null)
+    public function __construct($content)
     {
-        $this->email = $email;
+        $this->content = $content;
     }
 
     /**
-     * set a URL or token to not convert to trackables
+     * set a URL or token to not convert to trackables.
      *
      * @param $url
      */
@@ -56,22 +55,20 @@ class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * Get affected email
-     *
-     * @return Email
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Get array of non-trackables
+     * Get array of non-trackables.
      *
      * @return array
      */
     public function getDoNotTrackList()
     {
         return $this->doNotTrack;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
     }
 }

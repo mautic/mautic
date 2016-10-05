@@ -1,13 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticLeadBundle:Field:index.html.php');
+}
 ?>
 <?php if (count($items)): ?>
 <div class="table-responsive">
@@ -16,10 +18,10 @@ if ($tmpl == 'index')
             <tr>
                 <th class="col-leadfield-orderhandle"></th>
                 <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'checkall' => 'true',
-                    'target'   => '#leadFieldTable'
-                ));
+                    'target'   => '#leadFieldTable',
+                ]);
                 ?>
                 <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.label'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.core.alias'); ?></th>
@@ -35,23 +37,23 @@ if ($tmpl == 'index')
                 <td><i class="fa fa-fw fa-ellipsis-v"></i></td>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                        'item'      => $item,
-                        'templateButtons' => array(
-                            'edit'      => true,
-                            'clone'     => true,
-                            'delete'    => $item->isFixed() ? false : true,
-                        ),
-                        'routeBase' => 'leadfield',
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                        'item'            => $item,
+                        'templateButtons' => [
+                            'edit'   => true,
+                            'clone'  => true,
+                            'delete' => $item->isFixed() ? false : true,
+                        ],
+                        'routeBase' => 'contactfield',
                         'langVar'   => 'lead.field',
-                        'pull'      => 'left'
-                    ));
+                        'pull'      => 'left',
+                    ]);
                     ?>
                 </td>
                 <td>
                     <span class="ellipsis">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field')); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"><?php echo $item->getLabel(); ?></a>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'lead.field', 'disableToggle' => ($item->getAlias() == 'email')]); ?>
+                        <a href="<?php echo $view['router']->path('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $item->getId()]); ?>"><?php echo $item->getLabel(); ?></a>
                     </span>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
@@ -85,13 +87,13 @@ if ($tmpl == 'index')
     </table>
 </div>
 <div class="panel-footer">
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        'totalItems'      => $totalItems,
-        'page'            => $page,
-        'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_leadfield_index'),
-        'sessionVar'      => 'leadfield'
-    )); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+        'totalItems' => $totalItems,
+        'page'       => $page,
+        'limit'      => $limit,
+        'baseUrl'    => $view['router']->path('mautic_contactfield_index'),
+        'sessionVar' => 'leadfield',
+    ]); ?>
 </div>
 <?php else: ?>
 <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>

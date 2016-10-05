@@ -1,0 +1,190 @@
+//Froala
+@import "froala/froala_editor";
+//@import "froala/froala_style";
+@import "froala/plugins/char_counter";
+@import "froala/plugins/draggable";
+@import "froala/plugins/fullscreen";
+@import "froala/plugins/line_breaker";
+@import "froala/plugins/video";
+@import "froala/plugins/code_view";
+@import "froala/plugins/emoticons";
+@import "froala/plugins/image";
+@import "froala/plugins/quick_insert";
+@import "froala/plugins/image_manager";
+@import "froala/plugins/colors";
+@import "froala/plugins/file";
+@import "froala/plugins/table";
+@import "froala/plugins/gated_video";
+
+//Font-awesome
+@import "font-awesome/font-awesome";
+
+//Other
+@import "other/at";
+
+/* BUILDER CSS */
+div[data-slot-handle] {
+    cursor: move!important;
+    bottom: -1px;
+    content: '';
+    left: -15px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: -15px;
+    top: -1px;
+    border: 1px solid #4e5e9e;
+}
+
+div[data-slot-focus] {
+    cursor: move!important;
+    bottom: -1px;
+    content: '';
+    left: -15px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: -15px;
+    top: -1px;
+    border: 1px solid #4e5e9e;
+}
+
+div[data-section-focus] {
+    content: '';
+    position: absolute;
+    border: 1px solid #fdb933;
+}
+
+div[data-section-focus="top"] {
+    left: 0px;
+    right: 0px;
+    top: 0px;
+}
+
+div[data-section-focus="right"] {
+    bottom: 0px;
+    right: 0px;
+    top: 0px;
+}
+
+div[data-section-focus="bottom"] {
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+}
+
+div[data-section-focus="left"] {
+    bottom: 0px;
+    top: 0px;
+    left: 0px;
+}
+
+div[data-slot-toolbar] {
+    position: absolute;
+    right: -10px;
+    top: -12px;
+    z-index: 10;
+    cursor: pointer;
+    cursor: hand;
+}
+
+div[data-slot-toolbar] .btn {
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    line-height: 1.3856;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 11px;
+    line-height: 1.456;
+}
+
+div[data-slot-toolbar] .btn .fa {
+    padding-top: 4px;
+}
+
+div[data-slot-toolbar] .btn-danger {
+    color: #ffffff;
+    background-color: #f86b4f;
+    border-color: #fff;
+}
+
+div[data-slot], [data-section-wrapper] {
+    position: relative;
+}
+
+div[data-slot="image"] img {
+    z-index: 1;
+}
+
+.slot-placeholder {
+    border-top: 1px solid #4e5e9e;
+    margin-top: -1px;
+}
+
+[data-slot="text"] {
+    &.fr-box {
+        padding: initial;
+
+        .fr-toolbar {
+            border-top: 2px solid #4e5e9e;
+            position: absolute;
+            left: -15px;
+            bottom: initial !important;
+            min-width: 385px;
+
+            &.fr-top {
+                top: -78px !important;
+                bottom: initial !important;
+            }
+            &.fr-bottom {
+                bottom: -78px !important;
+                top: initial !important;
+            }
+        }
+        .fr-wrapper {
+            border-radius: 0 0 0px 0px;
+            -moz-border-radius: 0 0 0px 0px;
+            -webkit-border-radius: 0 0 0px 0px;
+            -webkit-box-shadow: none  !important;
+            -moz-box-shadow: none  !important;
+            box-shadow: none  !important;
+            background: transparent !important;
+
+            .fr-element {
+                text-align: inherit !important;
+                padding: 0 !important;
+                overflow-x: initial !important;
+                color: inherit !important;
+                min-height: inherit !important;
+            }
+        }
+    }
+}
+
+.slot-type-handle.btn {
+    float: left;
+    width: 106px;
+    margin: 2px;
+}
+
+.theme-list {
+    .panel-body {
+        height: 350px;
+    }
+    .select-theme-link {
+        margin-top: 5px;
+    }
+}

@@ -1,68 +1,71 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\ReportBundle\Entity\Report;
 
 /**
- * Class ReportGeneratorEvent
+ * Class ReportGeneratorEvent.
  */
-class ReportGeneratorEvent extends Event
+class ReportGeneratorEvent extends AbstractReportEvent
 {
-
     /**
-     * Event context
-     *
-     * @var string
+     * @var array
      */
-    private $context;
+    private $selectColumns = [];
 
     /**
-     * QueryBuilder object
+     * QueryBuilder object.
      *
      * @var QueryBuilder
      */
     private $queryBuilder;
 
     /**
-     * contentTemplate
+     * contentTemplate.
      *
      * @var string
      */
     private $contentTemplate;
 
     /**
-     * Constructor
+     * @var array
+     */
+    private $options = [];
+
+    /**
+     * @var ExpressionBuilder|null
+     */
+    private $filterExpression = null;
+
+    /**
+     * Constructor.
      *
      * @param string $context Event context
      */
-    public function __construct($context)
+    public function __construct(Report $report, array $options, QueryBuilder $qb)
     {
-        $this->context = $context;
+        $this->report       = $report;
+        $this->context      = $report->getSource();
+        $this->options      = $options;
+        $this->queryBuilder = $qb;
     }
 
     /**
-     * Retrieve the event context
-     *
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * Fetch the QueryBuilder object
+     * Fetch the QueryBuilder object.
      *
      * @return QueryBuilder
+     *
      * @throws \RuntimeException
      */
     public function getQueryBuilder()
@@ -75,11 +78,9 @@ class ReportGeneratorEvent extends Event
     }
 
     /**
-     * Set the QueryBuilder object
+     * Set the QueryBuilder object.
      *
      * @param QueryBuilder $queryBuilder
-     *
-     * @return void
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder)
     {
@@ -87,9 +88,10 @@ class ReportGeneratorEvent extends Event
     }
 
     /**
-     * Fetch the ContentTemplate path
+     * Fetch the ContentTemplate path.
      *
      * @return QueryBuilder
+     *
      * @throws \RuntimeException
      */
     public function getContentTemplate()
@@ -103,11 +105,9 @@ class ReportGeneratorEvent extends Event
     }
 
     /**
-     * Set the ContentTemplate path
+     * Set the ContentTemplate path.
      *
      * @param string $contentTemplate
-     *
-     * @return void
      */
     public function setContentTemplate($contentTemplate)
     {
@@ -115,37 +115,200 @@ class ReportGeneratorEvent extends Event
     }
 
     /**
-     * Add category left join
+     * @return array
+     */
+    public function getSelectColumns()
+    {
+        return $this->selectColumns;
+    }
+
+    /**
+     * Set custom select columns with aliases based on report settings.
+     *
+     * @param array $selectColumns
+     *
+     * @return ReportGeneratorEvent
+     */
+    public function setSelectColumns(array $selectColumns)
+    {
+        $this->selectColumns = $selectColumns;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return ReportGeneratorEvent
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
+    }
+
+    /**
+     * @return ExpressionBuilder|null
+     */
+    public function getFilterExpression()
+    {
+        return $this->filterExpression;
+    }
+
+    /**
+     * @param ExpressionBuilder $filterExpression
+     *
+     * @return ReportGeneratorEvent
+     */
+    public function setFilterExpression(ExpressionBuilder $filterExpression)
+    {
+        $this->filterExpression = $filterExpression;
+    }
+
+    /**
+     * Add category left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      */
-    public function addCategoryLeftJoin(QueryBuilder &$queryBuilder, $prefix, $categoryPrefix = 'c')
+    public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = 'c')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'categories', $categoryPrefix, 'c.id = ' . $prefix . '.category_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, 'c.id = '.$prefix.'.category_id');
     }
 
     /**
-     * Add lead left join
+     * Add lead left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      * @param string       $leadPrefix
      */
-    public function addLeadLeftJoin(QueryBuilder &$queryBuilder, $prefix, $leadPrefix = 'l')
+    public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = 'l')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'leads', $leadPrefix, 'l.id = ' . $prefix . '.lead_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, 'l.id = '.$prefix.'.lead_id');
     }
 
     /**
-     * Add IP left join
+     * Add IP left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      * @param string       $ipPrefix
      */
-    public function addIpAddressLeftJoin(QueryBuilder &$queryBuilder, $prefix, $ipPrefix = 'i')
+    public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = 'i')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'ip_addresses', $ipPrefix, 'i.id = ' . $prefix . '.ip_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, 'i.id = '.$prefix.'.ip_id');
+    }
+
+    /**
+     * Apply date filters to the query.
+     *
+     * @param QueryBuilder $query
+     * @param string       $dateColumn
+     * @param string       $tablePrefix
+     */
+    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
+    {
+        if ($tablePrefix) {
+            $tablePrefix .= '.';
+        }
+
+        if (empty($this->options['dateFrom'])) {
+            $this->options['dateFrom'] = new \DateTime();
+            $this->options['dateFrom']->modify('-30 days');
+        }
+
+        if (empty($this->options['dateTo'])) {
+            $this->options['dateTo'] = new \DateTime();
+        }
+
+        if ($dateOnly) {
+            $queryBuilder->andWhere('DATE('.$tablePrefix.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
+        } else {
+            $queryBuilder->andWhere($tablePrefix.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
+        }
+    }
+
+    /**
+     * Check if the report has a specific column.
+     *
+     * @param $column
+     *
+     * @return bool
+     */
+    public function hasColumn($column)
+    {
+        static $sorted;
+
+        if (null == $sorted) {
+            $columns = $this->getReport()->getColumns();
+
+            foreach ($columns as $field) {
+                $sorted[$field] = true;
+            }
+        }
+
+        if (is_array($column)) {
+            foreach ($column as $checkMe) {
+                if (isset($sorted[$checkMe])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return isset($sorted[$column]);
+    }
+
+    /**
+     * Check if the report has a specific filter.
+     *
+     * @param $column
+     *
+     * @return bool
+     */
+    public function hasFilter($column)
+    {
+        static $sorted;
+
+        if (null == $sorted) {
+            $filters = $this->getReport()->getFilters();
+
+            foreach ($filters as $field) {
+                $sorted[$field['column']] = true;
+            }
+        }
+
+        if (is_array($column)) {
+            foreach ($column as $checkMe) {
+                if (isset($sorted[$checkMe])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return isset($sorted[$column]);
+    }
+
+    /**
+     * @return string
+     */
+    public function createParameterName()
+    {
+        $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+        return substr(str_shuffle($alpha_numeric), 0, 8);
     }
 }

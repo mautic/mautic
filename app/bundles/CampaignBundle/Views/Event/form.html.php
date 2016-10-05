@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -24,19 +25,21 @@
     <?php echo $view['form']->row($form['name']); ?>
 
     <?php if (isset($form['triggerMode'])): ?>
-    <?php echo $view['form']->row($form['triggerMode']); ?>
-
-    <div<?php echo ($form['triggerMode']->vars['data'] != 'date') ? ' class="hide"' : ''; ?> id="triggerDate">
-        <?php echo $view['form']->row($form['triggerDate']); ?>
-    </div>
-
-    <div<?php echo ($form['triggerMode']->vars['data'] != 'interval') ? ' class="hide"' : ''; ?> id="triggerInterval">
-        <div class="row">
-            <div class="col-sm-4">
-                <?php echo $view['form']->row($form['triggerInterval']); ?>
-            </div>
-            <div class="col-sm-8">
-                <?php echo $view['form']->row($form['triggerIntervalUnit']); ?>
+    <div<?php echo $hideTriggerMode ? ' class="hide"' : ''; ?>>
+        <?php echo $view['form']->row($form['triggerMode']); ?>
+    
+        <div<?php echo ($form['triggerMode']->vars['data'] != 'date') ? ' class="hide"' : ''; ?> id="triggerDate">
+            <?php echo $view['form']->row($form['triggerDate']); ?>
+        </div>
+    
+        <div<?php echo ($form['triggerMode']->vars['data'] != 'interval') ? ' class="hide"' : ''; ?> id="triggerInterval">
+            <div class="row">
+                <div class="col-sm-4">
+                    <?php echo $view['form']->row($form['triggerInterval']); ?>
+                </div>
+                <div class="col-sm-8">
+                    <?php echo $view['form']->row($form['triggerIntervalUnit']); ?>
+                </div>
             </div>
         </div>
     </div>

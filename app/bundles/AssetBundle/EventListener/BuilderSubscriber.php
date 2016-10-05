@@ -1,44 +1,69 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class BuilderSubscriber
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class BuilderSubscriber.
  */
 class BuilderSubscriber extends CommonSubscriber
 {
+    /**
+     * @var string
+     */
+    protected $assetToken = '{assetlink=(.*?)}';
 
-    private $assetToken = '{assetlink=(.*?)}';
+    /**
+     * @var TokenHelper
+     */
+    protected $tokenHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * BuilderSubscriber constructor.
+     *
+     * @param TokenHelper $tokenHelper
+     * @param LeadModel   $leadModel
+     */
+    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel)
+    {
+        $this->tokenHelper = $tokenHelper;
+        $this->leadModel   = $leadModel;
+    }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onBuilderBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0),
-            PageEvents::PAGE_ON_BUILD     => array('onBuilderBuild', 0),
-            PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0)
-        );
+        return [
+            EmailEvents::EMAIL_ON_BUILD   => ['onBuilderBuild', 0],
+            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
+            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
+            PageEvents::PAGE_ON_BUILD     => ['onBuilderBuild', 0],
+            PageEvents::PAGE_ON_DISPLAY   => ['onPageDisplay', 0],
+        ];
     }
 
     /**
@@ -75,8 +100,8 @@ class BuilderSubscriber extends CommonSubscriber
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $page   = $event->getPage();
-        $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;
-        $tokens = $this->generateTokensFromContent($event, $leadId, array('page', $page->getId()));
+        $leadId = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead()->getId() : null;
+        $tokens = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
 
         $content = $event->getContent();
         if (!empty($tokens)) {
@@ -103,16 +128,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return array
      */
-    private function generateTokensFromContent($event, $leadId, $source = array(), $emailId = null)
+    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
     {
         $content = $event->getContent();
 
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('asset');
-
-        $clickthrough = array();
+        $clickthrough = [];
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
-            $clickthrough = array('source' => $source);
+            $clickthrough = ['source' => $source];
 
             if ($leadId !== null) {
                 $clickthrough['lead'] = $leadId;
@@ -123,22 +145,6 @@ class BuilderSubscriber extends CommonSubscriber
             }
         }
 
-        $tokens = array();
-
-        preg_match_all('/'.$this->assetToken.'/', $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $assetId) {
-                $token = $matches[0][$key];
-
-                if (isset($tokens[$token])) {
-                    continue;
-                }
-
-                $asset          = $model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $model->generateUrl($asset, true, $clickthrough) : '';
-            }
-        }
-
-        return $tokens;
+        return $this->tokenHelper->findAssetTokens($content, $clickthrough);
     }
 }

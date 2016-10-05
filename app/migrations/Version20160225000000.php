@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +15,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20160225000000
+ * Class Version20160225000000.
  */
-
 class Version20160225000000 extends AbstractMauticMigration
 {
     /**
@@ -36,16 +36,8 @@ class Version20160225000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix.'users ADD signature LONGTEXT DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ADD signature TEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'users ADD signature LONGTEXT DEFAULT NULL');
     }
 }

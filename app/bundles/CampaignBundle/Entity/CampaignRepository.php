@@ -1,34 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CampaignRepository
- *
- * @package Mautic\CampaignBundle\Entity
+ * Class CampaignRepository.
  */
 class CampaignRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
-            ->select($this->getTableAlias() . ', cat')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias() . '.id')
+            ->select($this->getTableAlias().', cat')
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -53,34 +50,34 @@ class CampaignRepository extends CommonRepository
     public function deleteEntity($entity, $flush = true)
     {
         // Null parents of associated events first
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_events')
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('parent_id', ':null')
             ->setParameter('null', null)
-            ->where('campaign_id = ' . $entity->getId())
+            ->where('campaign_id = '.$entity->getId())
             ->execute();
 
         // Delete events
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->delete(MAUTIC_TABLE_PREFIX . 'campaign_events')
-            ->where('campaign_id = ' . $entity->getId())
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->delete(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->where('campaign_id = '.$entity->getId())
             ->execute();
 
         parent::deleteEntity($entity, $flush);
     }
 
     /**
-     * Returns a list of all published (and active) campaigns (optionally for a specific lead)
+     * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
      * @param null $specificId
      * @param null $leadId
-     * @param bool $forList If true, returns ID and name only
+     * @param bool $forList    If true, returns ID and name only
      *
      * @return array
      */
     public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false)
     {
-        $q   = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
         if ($forList && $leadId) {
@@ -116,11 +113,12 @@ class CampaignRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getArrayResult();
+
         return $results;
     }
 
     /**
-     * Returns a list of all published (and active) campaigns that specific lead lists are part of
+     * Returns a list of all published (and active) campaigns that specific lead lists are part of.
      *
      * @param int|array $leadLists
      *
@@ -129,7 +127,7 @@ class CampaignRepository extends CommonRepository
     public function getPublishedCampaignsByLeadLists($leadLists)
     {
         if (!is_array($leadLists)) {
-            $leadLists = array( (int) $leadLists);
+            $leadLists = [(int) $leadLists];
         } else {
             foreach ($leadLists as &$id) {
                 $id = (int) $id;
@@ -148,26 +146,26 @@ class CampaignRepository extends CommonRepository
         );
         $results = $q->execute()->fetchAll();
 
-        $campaigns = array();
+        $campaigns = [];
         foreach ($results as $result) {
             if (!isset($campaigns[$result['id']])) {
-                $campaigns[$result['id']] = array(
+                $campaigns[$result['id']] = [
                     'id'    => $result['id'],
                     'name'  => $result['name'],
-                    'lists' => array()
-                );
+                    'lists' => [],
+                ];
             }
 
-            $campaigns[$result['id']]['lists'][$result['list_id']] = array(
-                'id' => $result['list_id']
-            );
+            $campaigns[$result['id']]['lists'][$result['list_id']] = [
+                'id' => $result['list_id'],
+            ];
         }
 
         return $campaigns;
     }
 
     /**
-     * Get array of list IDs assigned to this campaign
+     * Get array of list IDs assigned to this campaign.
      *
      * @param null $id
      *
@@ -175,7 +173,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignListIds($id = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
 
         if ($id) {
@@ -188,7 +186,7 @@ class CampaignRepository extends CommonRepository
             $q->select('DISTINCT cl.leadlist_id');
         }
 
-        $lists  = array();
+        $lists   = [];
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
@@ -199,7 +197,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get array of list IDs => name assigned to this campaign
+     * Get array of list IDs => name assigned to this campaign.
      *
      * @param null $id
      *
@@ -207,7 +205,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignListSources($id)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.leadlist_id, l.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
@@ -215,7 +213,7 @@ class CampaignRepository extends CommonRepository
             $q->expr()->eq('cl.campaign_id', $id)
         );
 
-        $lists  = array();
+        $lists   = [];
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
@@ -226,7 +224,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get array of form IDs => name assigned to this campaign
+     * Get array of form IDs => name assigned to this campaign.
      *
      * @param $id
      *
@@ -234,7 +232,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignFormSources($id)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cf.form_id, f.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'cf')
             ->join('cf', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = cf.form_id');
@@ -242,7 +240,7 @@ class CampaignRepository extends CommonRepository
             $q->expr()->eq('cf.campaign_id', $id)
         );
 
-        $forms   = array();
+        $forms   = [];
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
@@ -281,19 +279,21 @@ class CampaignRepository extends CommonRepository
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, array(
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.name',
-            'c.description'
-        ));
+            'c.description',
+        ]);
     }
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
@@ -310,14 +310,15 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get a list of popular (by logs) campaigns
+     * Get a list of popular (by logs) campaigns.
      *
-     * @param integer $limit
+     * @param int $limit
+     *
      * @return array
      */
     public function getPopularCampaigns($limit = 10)
     {
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.ip_id) as hits, c.id AS campaign_id, c.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
@@ -333,7 +334,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Returns leads that are part of a lead list that belongs to a campaign
+     * Returns leads that are part of a lead list that belongs to a campaign.
      *
      * @param       $id
      * @param array $lists
@@ -341,18 +342,22 @@ class CampaignRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCampaignLeadsFromLists($id, array $lists, $args = array())
+    public function getCampaignLeadsFromLists($id, array $lists, $args = [])
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
+        $withMinId     = (!array_key_exists('withMinId', $args)) ? false : $args['withMinId'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
-        $leads = ($countOnly) ? 0 : array();
+        $leads = ($countOnly) ? 0 : [];
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('max(list_leads.lead_id) as max_id, count(distinct(list_leads.lead_id)) as lead_count');
+            if ($withMinId) {
+                $q->addSelect('min(list_leads.lead_id) as min_id');
+            }
         } else {
             $q->select('distinct(list_leads.lead_id) as id');
         }
@@ -370,7 +375,11 @@ class CampaignRepository extends CommonRepository
                 $q->expr()->lte('list_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 
-            if (!empty($batchLimiters['maxId'])) {
+            if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+                $expr->add(
+                    $q->expr()->comparison('list_leads.lead_id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+                );
+            } elseif (!empty($batchLimiters['maxId'])) {
                 // Only leads that existed at the time of count
                 $expr->add(
                     $q->expr()->lte('list_leads.lead_id', $batchLimiters['maxId'])
@@ -398,18 +407,24 @@ class CampaignRepository extends CommonRepository
 
         // Set limits if applied
         if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+            $q->setMaxResults($limit);
+        }
+
+        if ($start) {
+            $q->setFirstResult($start);
         }
 
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
             if ($countOnly) {
-                $leads = array(
+                $leads = [
                     'count' => $r['lead_count'],
-                    'maxId' => $r['max_id']
-                );
+                    'maxId' => $r['max_id'],
+                ];
+                if ($withMinId) {
+                    $leads['minId'] = $r['min_id'];
+                }
             } else {
                 $leads[] = $r['id'];
             }
@@ -421,7 +436,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get leads that do not belong based on lead lists
+     * Get leads that do not belong based on lead lists.
      *
      * @param       $id
      * @param array $lists
@@ -429,16 +444,16 @@ class CampaignRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCampaignOrphanLeads($id, array $lists, $args = array())
+    public function getCampaignOrphanLeads($id, array $lists, $args = [])
     {
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $countOnly     = (!array_key_exists('countOnly', $args)) ? false : $args['countOnly'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
 
-        $leads = ($countOnly) ? 0 : array();
+        $leads = ($countOnly) ? 0 : [];
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('max(campaign_leads.lead_id) as max_id, count(campaign_leads.lead_id) as lead_count');
         } else {
@@ -496,10 +511,10 @@ class CampaignRepository extends CommonRepository
 
         foreach ($results as $r) {
             if ($countOnly) {
-                $leads = array(
+                $leads = [
                     'count' => $r['lead_count'],
-                    'maxId' => $r['max_id']
-                );
+                    'maxId' => $r['max_id'],
+                ];
             } else {
                 $leads[] = $r['id'];
             }
@@ -511,17 +526,17 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get a count of leads that belong to the campaign
+     * Get a count of leads that belong to the campaign.
      *
      * @param       $campaignId
-     * @param int   $leadId         Optional lead ID to check if lead is part of campaign
-     * @param array $pendingEvents  List of specific events to rule out
+     * @param int   $leadId        Optional lead ID to check if lead is part of campaign
+     * @param array $pendingEvents List of specific events to rule out
      *
      * @return mixed
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = array())
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -540,7 +555,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->_em->getConnection()->createQueryBuilder();
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
@@ -562,18 +577,18 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get lead IDs of a campaign
+     * Get lead IDs of a campaign.
      *
-     * @param       $campaignId
-     * @param int   $start
-     * @param bool|false  $limit
+     * @param            $campaignId
+     * @param int        $start
+     * @param bool|false $limit
      * @param bool|false  getCampaignLeadIds
      *
      * @return array
      */
     public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $pendingOnly = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -588,7 +603,7 @@ class CampaignRepository extends CommonRepository
 
         if ($pendingOnly) {
             // Only leads that have not started the campaign
-            $sq = $this->_em->getConnection()->createQueryBuilder();
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
@@ -605,13 +620,16 @@ class CampaignRepository extends CommonRepository
         }
 
         if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+            $q->setMaxResults($limit);
+        }
+
+        if (!$pendingOnly && $start) {
+            $q->setFirstResult($start);
         }
 
         $results = $q->execute()->fetchAll();
 
-        $leads = array();
+        $leads = [];
         foreach ($results as $r) {
             $leads[] = $r['lead_id'];
         }
@@ -622,7 +640,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get lead data of a campaign
+     * Get lead data of a campaign.
      *
      * @param            $campaignId
      * @param int        $start
@@ -631,9 +649,9 @@ class CampaignRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = array('cl.lead_id'))
+    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id'])
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')

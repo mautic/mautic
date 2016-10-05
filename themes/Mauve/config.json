@@ -1,5 +1,6 @@
 {
   "name": "Mauve",
+  "onlyForBC": true,
   "features": [
     "page",
     "email",

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,7 +23,7 @@ if (empty($pull)) {
 
 //Custom query parameters for URLs
 if (!isset($query)) {
-    $query = array();
+    $query = [];
 }
 
 if (isset($tmpl)) {
@@ -31,13 +32,13 @@ if (isset($tmpl)) {
 
 //Edit mode for edit/actions (allows use of ajaxmodal)
 if (!isset($editMode)) {
-    $editMode = "ajax";
+    $editMode = 'ajax';
 }
 
 if (!isset($editAttr)) {
     $editAttr = '';
 } elseif (is_array($editAttr)) {
-    $string = "";
+    $string = '';
     foreach ($editAttr as $attr => $val) {
         $string .= " $attr=\"$val\"";
     }
@@ -48,12 +49,22 @@ if (!isset($editAttr)) {
 
 //Template/common buttons
 if (!isset($templateButtons)) {
-    $templateButtons = array();
+    $templateButtons = [];
 }
 
 //Set langVar to routeBase if not set
 if (!isset($langVar) && isset($routeBase)) {
     $langVar = $routeBase;
+}
+
+// Set index and action routes
+if (isset($route) && !isset($actionRoute)) {
+    $actionRoute = $route;
+} elseif (!isset($actionRoute)) {
+    $actionRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_action' : '';
+}
+if (!isset($indexRoute)) {
+    $indexRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_index' : '';
 }
 
 //Set a default button type (group or dropdown)
@@ -74,19 +85,19 @@ if (!isset($wrapOpeningTag)) {
 $view['buttons']->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
 
 //Builder for custom buttons
-$menuLink  = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
+$menuLink = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
 $view['buttons']->setMenuLink($menuLink);
 
 //Build pre template custom buttons
 if (!isset($preCustomButtons)) {
-    $preCustomButtons = array();
+    $preCustomButtons = [];
 }
 
 //Build post template custom buttons
 if (isset($customButtons)) {
     $postCustomButtons = $customButtons;
 } elseif (!isset($postCustomButtons)) {
-    $postCustomButtons = array();
+    $postCustomButtons = [];
 }
 
 $view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);

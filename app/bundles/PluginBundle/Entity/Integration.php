@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,19 +15,17 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
- * Class Integration
+ * Class Integration.
  */
 class Integration extends CommonEntity
 {
-
     /**
      * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Plugin", inversedBy="integrations")
-     * @ORM\JoinColumn(name="plugin_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @var Plugin
      */
     private $plugin;
 
@@ -43,22 +42,22 @@ class Integration extends CommonEntity
     /**
      * @var array
      */
-    private $supportedFeatures = array();
+    private $supportedFeatures = [];
 
     /**
      * @var array
      */
-    private $apiKeys = array();
+    private $apiKeys = [];
 
     /**
      * @var array
      */
-    private $featureSettings = array();
+    private $featureSettings = [];
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -99,13 +98,13 @@ class Integration extends CommonEntity
     /**
      * @return mixed
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return Plugin
      */
     public function getPlugin()
     {
@@ -139,6 +138,8 @@ class Integration extends CommonEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
+
         $this->name = $name;
 
         return $this;
@@ -159,6 +160,8 @@ class Integration extends CommonEntity
      */
     public function setIsPublished($isPublished)
     {
+        $this->isChanged('isPublished', $isPublished);
+
         $this->isPublished = $isPublished;
 
         return $this;
@@ -179,6 +182,8 @@ class Integration extends CommonEntity
      */
     public function setSupportedFeatures($supportedFeatures)
     {
+        $this->isChanged('supportedFeatures', $supportedFeatures);
+
         $this->supportedFeatures = $supportedFeatures;
 
         return $this;
@@ -219,6 +224,8 @@ class Integration extends CommonEntity
      */
     public function setFeatureSettings($featureSettings)
     {
+        $this->isChanged('featureSettings', $featureSettings);
+
         $this->featureSettings = $featureSettings;
 
         return $this;
