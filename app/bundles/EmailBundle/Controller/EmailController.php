@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -100,6 +99,7 @@ class EmailController extends FormController
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $this->request->get('filters', false);
+        $ignoreListJoin = true;
 
         if ($updatedFilters) {
             // Filters have been updated
@@ -156,6 +156,7 @@ class EmailController extends FormController
 
             if (!empty($listIds)) {
                 $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $ignoreListJoin    = false;
             }
 
             if (!empty($catIds)) {
@@ -177,7 +178,7 @@ class EmailController extends FormController
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
-                'ignoreListJoin' => true,
+                'ignoreListJoin' => $ignoreListJoin,
             ]
         );
 

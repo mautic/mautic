@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
@@ -236,10 +235,10 @@ class FormSubscriber extends CommonSubscriber
             'mautic_form'    => [
                 'id'   => $post['formId'],
                 'name' => $post['formName'],
-                'url'  => $post['return']
-            ]
+                'url'  => $post['return'],
+            ],
         ];
-        $fieldTypes    = [];
+        $fieldTypes = [];
         foreach ($fields as $field) {
             $fieldTypes[$field['alias']] = $field['type'];
             if (!isset($post[$field['alias']]) || 'button' == $field['type']) {
@@ -269,7 +268,6 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            throw new \Exception('hi');
             $client   = new Client(['timeout' => 15]);
             $response = $client->post(
                 $config['post_url'],
@@ -308,7 +306,7 @@ class FormSubscriber extends CommonSubscriber
 
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $emails     = $emails = $this->getEmailsFromString($email);
+                $emails     = $emails     = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -317,7 +315,7 @@ class FormSubscriber extends CommonSubscriber
                     $this->translator->trans(
                         'mautic.form.action.repost.failed_message',
                         [
-                            '%link%'    => $this->router->generate(
+                            '%link%' => $this->router->generate(
                                 'mautic_form_results',
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
