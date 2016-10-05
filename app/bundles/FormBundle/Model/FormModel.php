@@ -339,6 +339,32 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * @param Form  $entity
+     * @param array $actions
+     */
+    public function deleteActions(Form $entity, $actions)
+    {
+        if (empty($actions)) {
+            return;
+        }
+
+        $existingActions = $entity->getActions()->toArray();
+        $deleteActions   = [];
+        foreach ($actions as $actionId) {
+            if (isset($existingActions[$actionId])) {
+                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $entity->removeAction($actionEntity);
+                $deleteActions[] = $actionId;
+            }
+        }
+
+        // Delete actions from db
+        if (count($deleteActions)) {
+            $this->formActionModel->deleteEntities($deleteActions);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function saveEntity($entity, $unlock = true)
@@ -799,7 +825,7 @@ class FormModel extends CommonFormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

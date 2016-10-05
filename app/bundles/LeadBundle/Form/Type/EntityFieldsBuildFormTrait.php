@@ -208,6 +208,7 @@ trait EntityFieldsBuildFormTrait
                     if ($type == 'lookup') {
                         $type                = 'text';
                         $attr['data-toggle'] = 'field-lookup';
+                        $attr['data-action'] = 'lead:fieldList';
                         $attr['data-target'] = $alias;
 
                         if (!empty($properties['list'])) {

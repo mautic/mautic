@@ -53,6 +53,8 @@ class FieldModel extends CommonFormModel
      * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param null                                $action
      * @param array                               $options
+     *
+     * @return \Symfony\Component\Form\FormInterface
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {

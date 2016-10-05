@@ -138,7 +138,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (!isset($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
         }
@@ -370,22 +370,10 @@ class EmailRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('e.name',  ":$unique"),
-            $q->expr()->like('e.subject', ":$unique")
-        );
-
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'e.name',
+            'e.subject',
+        ]);
     }
 
     /**

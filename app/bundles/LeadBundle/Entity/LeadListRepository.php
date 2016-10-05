@@ -27,6 +27,14 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class LeadListRepository extends CommonRepository
 {
+    use OperatorListTrait;
+    use ExpressionHelperTrait;
+
+    /**
+     * @var bool
+     */
+    protected $listFiltersInnerJoinCompany = false;
+
     /**
      * {@inheritdoc}
      *
@@ -259,6 +267,7 @@ class LeadListRepository extends CommonRepository
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
+        $withMinId     = (!array_key_exists('withMinId', $args)) ? false : $args['withMinId'];
 
         if (!$lists instanceof PersistentCollection && !is_array($lists) || isset($lists['id'])) {
             $lists = [$lists];
@@ -279,19 +288,22 @@ class LeadListRepository extends CommonRepository
                 $filters = [];
             }
 
-            $objectFilters = $this->arrangeFilters($filters);
+            $objectFilters         = $this->arrangeFilters($filters);
+            $includesContactFields = isset($objectFilters['lead']);
+            $includesCompanyFields = isset($objectFilters['company']);
 
             if ($dynamic && count($filters)) {
                 $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $parameters = [];
 
-                if (isset($objectFilters['lead'])) {
-                    $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, 'lead');
+                if ($includesContactFields) {
+                    $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, null, 'lead');
                 } else {
                     $expr = $q->expr()->andX();
                 }
-                if (isset($objectFilters['company'])) {
-                    $exprCompany = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, 'company');
+                if ($includesCompanyFields) {
+                    $this->listFiltersInnerJoinCompany = false;
+                    $exprCompany                       = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, null, 'company');
                 }
 
                 foreach ($parameters as $k => $v) {
@@ -300,23 +312,27 @@ class LeadListRepository extends CommonRepository
                             $paramType = 'boolean';
                             break;
 
-                    case is_int($v):
-                        $paramType = 'integer';
-                        break;
+                        case is_int($v):
+                            $paramType = 'integer';
+                            break;
 
-                    case is_float($v):
-                        $paramType = 'float';
-                        break;
+                        case is_float($v):
+                            $paramType = 'float';
+                            break;
 
-                    default:
-                        $paramType = null;
-                        break;
-                }
+                        default:
+                            $paramType = null;
+                            break;
+                    }
                     $q->setParameter($k, $v, $paramType);
                 }
 
                 if ($countOnly) {
-                    $select = 'count(l.id) as lead_count, max(l.id) as max_id';
+                    $count  = ($includesCompanyFields) ? 'count(distinct(l.id))' : 'count(l.id)';
+                    $select = $count.' as lead_count, max(l.id) as max_id';
+                    if ($withMinId) {
+                        $select .= ', min(l.id) as min_id';
+                    }
                 } elseif ($idOnly) {
                     $select = 'l.id';
                 } else {
@@ -326,78 +342,77 @@ class LeadListRepository extends CommonRepository
                 $q->select($select)
                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                    // Only leads that existed at the time of count
-                    if ($batchLimiters && !empty($batchLimiters['maxId'])) {
+                // Only leads that existed at the time of count
+                if ($batchLimiters) {
+                    if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
+                        $expr->add(
+                            $q->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
+                        );
+                    } elseif (!empty($batchLimiters['maxId'])) {
                         $expr->add(
                             $q->expr()->lte('l.id', $batchLimiters['maxId'])
                         );
                     }
+                }
 
                 if ($newOnly) {
-                    // Leads that do not have any record in the lead_lists_leads table for this lead list
-                        $subqb = $this->_em->getConnection()->createQueryBuilder()
-                            ->select('null')
-                            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-                            ->where(
-                                $q->expr()->andX(
-                                    $q->expr()->eq('ll.leadlist_id', $id),
-                                    $q->expr()->eq('ll.lead_id', 'l.id')
-                                )
-                            );
-
-                    $expr->add(
-                                sprintf('NOT EXISTS (%s)', $subqb->getSQL())
-                            );
-                    if (isset($objectFilters['lead'])) {
-                        $q->andWhere($expr);
-                    } else {
-                        $q->andWhere(sprintf('NOT EXISTS (%s)', $subqb->getSQL()));
+                    if ($includesCompanyFields) {
+                        $this->applyCompanyFieldFilters($q, $exprCompany);
                     }
+
+                    // Leads that do not have any record in the lead_lists_leads table for this lead list
+                    // For non null fields - it's apparently better to use left join over not exists due to not using nullable
+                    // fields - https://explainextended.com/2009/09/18/not-in-vs-not-exists-vs-left-join-is-null-mysql/
+                    $q->leftJoin(
+                        'l',
+                        MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                        'll',
+                        $q->expr()->andX(
+                            $q->expr()->eq('ll.leadlist_id', $id),
+                            $q->expr()->eq('ll.lead_id', 'l.id')
+                        )
+                    );
+                    $expr->add($q->expr()->isNull('ll.lead_id'));
+
+                    $q->andWhere($expr);
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
-                        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+                    $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
 
                     $mainExpr = $q->expr()->andX();
                     if ($batchLimiters && !empty($batchLimiters['dateTime'])) {
                         // Only leads in the list at the time of count
-                            $mainExpr->add(
-                                $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                            );
+                        $mainExpr->add(
+                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                        );
                     }
 
-                        // Ignore those that have been manually added
-                        $mainExpr->addMultiple(
-                            [
-                                $q->expr()->eq('ll.manually_added', ':false'),
-                                $q->expr()->eq('ll.leadlist_id', (int) $id),
-                            ]
-                        );
+                    // Ignore those that have been manually added
+                    $mainExpr->addMultiple(
+                        [
+                            $q->expr()->eq('ll.manually_added', ':false'),
+                            $q->expr()->eq('ll.leadlist_id', (int) $id),
+                        ]
+                    );
                     $q->setParameter('false', false, 'boolean');
 
-                        // Use an exists statement for better performance?? - https://dev.mysql.com/doc/refman/5.5/en/-existssubquery-optimization-with.html
-                        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-                    $sq->select('null')
-                            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                            ->where('l.id = ll.lead_id');
-                    if (isset($objectFilters['lead'])) {
+                    // Find the contacts that are in the segment but no longer have filters that are applicable
+                    $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                    $sq->select('l.id')
+                        ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+                    if ($includesContactFields) {
                         $sq->andWhere($expr);
                     }
-                    $q->andWhere(
-                            sprintf('NOT EXISTS (%s)', $sq->getSQL())
-                        )
-                            ->andWhere($mainExpr);
-                }
-                if (isset($objectFilters['company'])) {
-                    $compq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-                    $compq->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
-                        ->where($exprCompany);
 
-                    $clq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-                    $clq->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
-                        ->where('cl.lead_id = l.id')
-                        ->andWhere(sprintf('cl.company_id in (%s)', $compq->getSQL()));
+                    if ($includesCompanyFields) {
+                        $this->applyCompanyFieldFilters($sq, $exprCompany);
+                    }
+
+                    $mainExpr->add(
+                        sprintf('l.id NOT IN (%s)', $sq->getSQL())
+                    );
+                    $q->andWhere($mainExpr);
                 }
 
                 // Set limits if applied
@@ -405,18 +420,23 @@ class LeadListRepository extends CommonRepository
                     $q->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-                if (isset($objectFilters['company'])) {
-                    $q->andWhere(
-                        sprintf('EXISTS (%s)', $clq->getSQL())
-                    );
+
+                if ($countOnly) {
+                    // remove any possible group by
+                    $q->resetQueryPart('groupBy');
                 }
+
                 $results = $q->execute()->fetchAll();
+
                 foreach ($results as $r) {
                     if ($countOnly) {
                         $leads = [
                             'count' => $r['lead_count'],
                             'maxId' => $r['max_id'],
                         ];
+                        if ($withMinId) {
+                            $leads['minId'] = $r['min_id'];
+                        }
                     } elseif ($idOnly) {
                         $leads[$r['id']] = $r['id'];
                     } else {
@@ -478,6 +498,11 @@ class LeadListRepository extends CommonRepository
         return $return;
     }
 
+    /**
+     * @param $filters
+     *
+     * @return array
+     */
     public function arrangeFilters($filters)
     {
         $objectFilters = [];
@@ -500,15 +525,16 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param                                   $filters
-     * @param                                   $parameters
-     * @param \Doctrine\DBAL\Query\QueryBuilder $q
-     * @param bool|false                        $not
-     * @param null|int                          $leadId
+     * @param              $filters
+     * @param              $parameters
+     * @param QueryBuilder $q
+     * @param bool         $not
+     * @param null         $leadId
+     * @param string       $object
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $object = 'lead', $leadId = null)
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead')
     {
         static $leadTable;
         static $companyTable;
@@ -517,7 +543,8 @@ class LeadListRepository extends CommonRepository
             return $q->expr()->andX();
         }
 
-        $schema = $this->_em->getConnection()->getSchemaManager();
+        $isCompany = ('company' === $object);
+        $schema    = $this->_em->getConnection()->getSchemaManager();
         // Get table columns
         if (null === $leadTable) {
             /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
@@ -747,7 +774,6 @@ class LeadListRepository extends CommonRepository
                         $date->modify($string);
                         $dateTime = $date->format('Y-m-d H:i:s');
                         $dtHelper->setDateTime($dateTime, null);
-                        $key        = $string;
                         $isRelative = true;
                     }
 
@@ -953,21 +979,14 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 default:
+                    if ($isCompany) {
+                        // Must tell getLeadsByList how to best handle the relationship with the companies table
+                        if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
+                            $this->listFiltersInnerJoinCompany = true;
+                        }
+                    }
+
                     switch ($func) {
-                        case 'in':
-                        case 'notIn':
-                            foreach ($details['filter'] as &$value) {
-                                $value = $q->expr()->literal(
-                                    InputHelper::clean($value)
-                                );
-                            }
-                            $groupExpr->add(
-                                $q->expr()->$func($field, $details['filter'])
-                            );
-
-                            $ignoreAutoFilter = true;
-
-                            break;
                         case 'between':
                         case 'notBetween':
                             // Filter should be saved with double || to separate options
@@ -992,8 +1011,8 @@ class LeadListRepository extends CommonRepository
                                     )
                                 );
                             }
-
                             break;
+
                         case 'notEmpty':
                             $groupExpr->add(
                                 $q->expr()->andX(
@@ -1001,34 +1020,49 @@ class LeadListRepository extends CommonRepository
                                     $q->expr()->neq($field, $q->expr()->literal(''))
                                 )
                             );
-
+                            $ignoreAutoFilter = true;
                             break;
+
                         case 'empty':
+                            $details['filter'] = '';
                             $groupExpr->add(
-                                $q->expr()->orX(
-                                    $q->expr()->isNull($field),
-                                    $q->expr()->eq($field, $q->expr()->literal(''))
-                                )
+                                $this->generateFilterExpression($q, $field, 'eq', $exprParameter, true)
+                            );
+                            break;
+
+                        case 'in':
+                        case 'notIn':
+                            foreach ($details['filter'] as &$value) {
+                                $value = $q->expr()->literal(
+                                    InputHelper::clean($value)
+                                );
+                            }
+                            $groupExpr->add(
+                                $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
                             );
 
+                            $ignoreAutoFilter = true;
                             break;
+
                         case 'neq':
                             $groupExpr->add(
-                                $q->expr()->orX(
-                                    $q->expr()->isNull($field),
-                                    $q->expr()->neq($field, $exprParameter)
-                                )
+                                $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
                             );
-
                             break;
+
                         case 'like':
                         case 'notLike':
                             if (strpos($details['filter'], '%') === false) {
                                 $details['filter'] = '%'.$details['filter'].'%';
                             }
+
+                            $groupExpr->add(
+                                $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
+                            );
+                            break;
+
                         default:
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
-                            break;
                     }
             }
 
@@ -1070,93 +1104,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param null $operator
-     *
-     * @return array
-     */
-    public function getFilterExpressionFunctions($operator = null)
-    {
-        $operatorOptions = [
-            '=' => [
-                    'label'       => 'mautic.lead.list.form.operator.equals',
-                    'expr'        => 'eq',
-                    'negate_expr' => 'neq',
-                ],
-            '!=' => [
-                    'label'       => 'mautic.lead.list.form.operator.notequals',
-                    'expr'        => 'neq',
-                    'negate_expr' => 'eq',
-                ],
-            'gt' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
-                    'expr'        => 'gt',
-                    'negate_expr' => 'lt',
-                ],
-            'gte' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'expr'        => 'gte',
-                    'negate_expr' => 'lt',
-                ],
-            'lt' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthan',
-                    'expr'        => 'lt',
-                    'negate_expr' => 'gt',
-                ],
-            'lte' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-                    'expr'        => 'lte',
-                    'negate_expr' => 'gt',
-                ],
-            'empty' => [
-                    'label'       => 'mautic.lead.list.form.operator.isempty',
-                    'expr'        => 'empty', //special case
-                    'negate_expr' => 'notEmpty',
-                ],
-            '!empty' => [
-                    'label'       => 'mautic.lead.list.form.operator.isnotempty',
-                    'expr'        => 'notEmpty', //special case
-                    'negate_expr' => 'empty',
-                ],
-            'like' => [
-                    'label'       => 'mautic.lead.list.form.operator.islike',
-                    'expr'        => 'like',
-                    'negate_expr' => 'notLike',
-                ],
-            '!like' => [
-                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
-                    'expr'        => 'notLike',
-                    'negate_expr' => 'like',
-                ],
-            'between' => [
-                    'label'       => 'mautic.lead.list.form.operator.between',
-                    'expr'        => 'between', //special case
-                    'negate_expr' => 'notBetween',
-                    // @todo implement in list UI
-                    'hide' => true,
-                ],
-            '!between' => [
-                    'label'       => 'mautic.lead.list.form.operator.notbetween',
-                    'expr'        => 'notBetween', //special case
-                    'negate_expr' => 'between',
-                    // @todo implement in list UI
-                    'hide' => true,
-                ],
-            'in' => [
-                    'label'       => 'mautic.lead.list.form.operator.in',
-                    'expr'        => 'in',
-                    'negate_expr' => 'notIn',
-                ],
-            '!in' => [
-                    'label'       => 'mautic.lead.list.form.operator.notin',
-                    'expr'        => 'notIn',
-                    'negate_expr' => 'in',
-                ],
-        ];
-
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
-    }
-
-    /**
      * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
      * @param                                                              $filter
      *
@@ -1164,21 +1111,14 @@ class LeadListRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('l.name', ':'.$unique),
-            $q->expr()->like('l.alias', ':'.$unique)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'l.name',
+                'l.alias',
+            ]
         );
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
     }
 
     /**
@@ -1296,5 +1236,29 @@ class LeadListRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'l';
+    }
+
+    /**
+     * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
+     * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
+     *
+     * @param $q
+     * @param $exprCompany
+     */
+    private function applyCompanyFieldFilters($q, $exprCompany)
+    {
+        $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
+        // Join company tables for query optimization
+        $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
+            ->$joinType(
+                'cl',
+                MAUTIC_TABLE_PREFIX.'companies',
+                'comp',
+                'cl.company_id = comp.id'
+            )
+            ->andWhere($exprCompany);
+
+        // Return only unique contacts
+        $q->groupBy('l.id');
     }
 }

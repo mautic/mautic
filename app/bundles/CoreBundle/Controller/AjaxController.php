@@ -63,14 +63,15 @@ class AjaxController extends CommonController
     public function delegateAjaxAction()
     {
         //process ajax actions
-        $securityContext = $this->factory->getSecurityContext();
-        $action          = $this->request->get('action');
+        $authenticationChecker = $this->get('security.authorization_checker');
+        $action                = $this->request->get('action');
+        $bundleName            = null;
         if (empty($action)) {
             //check POST
             $action = $this->request->request->get('action');
         }
 
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        if ($authenticationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (strpos($action, ':') !== false) {
                 //call the specified bundle's ajax action
                 $parts     = explode(':', $action);
@@ -84,8 +85,9 @@ class AjaxController extends CommonController
                 }
 
                 if (count($parts) == 2) {
-                    $bundle = ucfirst($parts[0]);
-                    $action = $parts[1];
+                    $bundleName = $parts[0];
+                    $bundle     = ucfirst($bundleName);
+                    $action     = $parts[1];
                     if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
@@ -101,28 +103,30 @@ class AjaxController extends CommonController
                                 'action' => $action,
                                 //forward the request as well as Symfony creates a subrequest without GET/POST
                                 'request' => $this->request,
+                                'bundle'  => $bundleName,
                             ]
                         );
                     }
                 }
             }
 
-            return $this->executeAjaxAction($action, $this->request);
+            return $this->executeAjaxAction($action, $this->request, $bundleName);
         }
 
         return $this->sendJsonResponse(['success' => 0]);
     }
 
     /**
-     * @param string  $action
+     * @param         $action
      * @param Request $request
+     * @param null    $bundle
      *
      * @return JsonResponse
      */
-    public function executeAjaxAction($action, Request $request)
+    public function executeAjaxAction($action, Request $request, $bundle = null)
     {
         if (method_exists($this, "{$action}Action")) {
-            return $this->{"{$action}Action"}($request);
+            return $this->{"{$action}Action"}($request, $bundle);
         }
 
         return $this->sendJsonResponse(['success' => 0]);
@@ -167,13 +171,13 @@ class AjaxController extends CommonController
                     $command = $translator->trans($k);
                     $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
-                    $dataArray[] = ['value' => $command.$translator->trans($subc)];
+                    $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
                 $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
-                $dataArray[] = ['value' => $command];
+                $dataArray[$command] = ['value' => $command];
             }
         }
         sort($dataArray);

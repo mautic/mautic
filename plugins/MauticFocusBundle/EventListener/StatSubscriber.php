@@ -11,7 +11,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -32,13 +31,10 @@ class StatSubscriber extends CommonSubscriber
     /**
      * FormSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param FocusModel    $model
+     * @param FocusModel $model
      */
-    public function __construct(MauticFactory $factory, FocusModel $model)
+    public function __construct(FocusModel $model)
     {
-        parent::__construct($factory);
-
         $this->model = $model;
     }
 

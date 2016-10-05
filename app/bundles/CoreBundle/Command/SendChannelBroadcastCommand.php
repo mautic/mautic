@@ -60,8 +60,10 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $channel   = $input->getOption('channel');
         $channelId = $input->getOption('id');
-        if (!$this->checkRunStatus($input, $output, ($channelId) ? $channelId : 'all')) {
+        $key       = $channel.$channelId;
+        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
             return 0;
         }
 
@@ -71,7 +73,7 @@ EOT
         $dispatcher = $this->getContainer()->get('event_dispatcher');
         $event      = $dispatcher->dispatch(
             CoreEvents::CHANNEL_BROADCAST,
-            new ChannelBroadcastEvent($input->getOption('channel'), $channelId, $output)
+            new ChannelBroadcastEvent($channel, $channelId, $output)
         );
 
         $results = $event->getResults();

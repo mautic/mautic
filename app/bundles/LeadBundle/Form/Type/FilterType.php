@@ -191,6 +191,7 @@ class FilterType extends AbstractType
                             'class'       => 'form-control',
                             'data-toggle' => 'field-lookup',
                             'data-target' => $data['field'],
+                            'data-action' => 'lead:fieldList',
                             'placeholder' => $translator->trans(
                                 'mautic.lead.list.form.filtervalue'
                             ),
@@ -240,6 +241,7 @@ class FilterType extends AbstractType
                         [
                             'data-toggle' => 'field-lookup',
                             'data-target' => $data['field'],
+                            'data-action' => 'lead:fieldList',
                             'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                         ]
                     );

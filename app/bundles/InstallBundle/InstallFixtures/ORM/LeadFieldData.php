@@ -109,6 +109,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 // Add an attribution index
                 $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
             } else {
+                $indexHelper->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
                 $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
             }
             $indexHelper->executeChanges();

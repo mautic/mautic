@@ -79,22 +79,10 @@ class CategoryRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('c.title',  ':'.$unique),
-            $q->expr()->like('c.description',  ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'c.title',
+            'c.description',
+        ]);
     }
 
     /**

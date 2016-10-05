@@ -17,10 +17,10 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class CommonRepository.
@@ -41,6 +41,13 @@ class CommonRepository extends EntityRepository
      * @var User
      */
     protected $currentUser;
+
+    /**
+     * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
+     *
+     * @var array
+     */
+    protected $advancedFilterCommands = [];
 
     /**
      * @param TranslatorInterface $translator
@@ -248,89 +255,78 @@ class CommonRepository extends EntityRepository
      */
     protected function buildWhereClause(&$q, array $args)
     {
-        $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
-        $filterHelper = new SearchStringHelper();
-        $string       = '';
+        $filter                    = array_key_exists('filter', $args) ? $args['filter'] : '';
+        $filterHelper              = new SearchStringHelper();
+        $advancedFilters           = new \stdClass();
+        $advancedFilters->root     = [];
+        $advancedFilters->commands = [];
+        // Reset advanced filter commands to be used in search query building
+        $this->advancedFilterCommands = [];
+        $advancedFilterStrings        = [];
+        $queryParameters              = [];
+        $queryExpression              = $q->expr()->andX();
 
         if (!empty($filter)) {
             if (is_array($filter)) {
                 if (!empty($filter['force'])) {
                     if (is_array($filter['force'])) {
                         //defined columns with keys of column, expr, value
-                        $forceParameters  = [];
-                        $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
                             if ($f instanceof Query\Expr || $f instanceof CompositeExpression) {
-                                $expr = $f;
+                                $queryExpression->add($f);
 
-                                if (isset($expr->parameters)) {
-                                    $forceParameters = $expr->parameters;
-                                    unset($expr->parameters);
+                                if (isset($f->parameters) && is_array($f->parameters)) {
+                                    $queryParameters = array_merge($queryParameters, $f->parameters);
+                                    unset($f->parameters);
                                 }
                             } elseif (is_array($f)) {
                                 list($expr, $parameters) = $this->getFilterExpr($q, $f);
-                                $forceExpressions->add($expr);
-                                if (!empty($parameters) && is_array($parameters)) {
-                                    $forceParameters = array_merge($forceParameters, $parameters);
+                                $queryExpression->add($expr);
+                                if (is_array($parameters)) {
+                                    $queryParameters = array_merge($queryParameters, $parameters);
                                 }
                             } else {
                                 //string so parse as advanced search
-                                $parsed                  = $filterHelper->parseSearchString($f);
-                                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
-                                $forceExpressions->add($expr);
-                                if (!empty($parameters) && is_array($parameters)) {
-                                    $forceParameters = array_merge($forceParameters, $parameters);
-                                }
+                                $advancedFilterStrings[] = $f;
                             }
                         }
                     } else {
                         //string so parse as advanced search
-                        $parsed                                   = $filterHelper->parseSearchString($filter['force']);
-                        list($forceExpressions, $forceParameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
+                        $advancedFilterStrings[] = $filter['force'];
                     }
                 }
 
                 if (!empty($filter['string'])) {
-                    $string = $filter['string'];
+                    $advancedFilterStrings[] = $filter['string'];
                 }
             } else {
-                $string = $filter;
+                $advancedFilterStrings[] = $filter;
+            }
+
+            if (!empty($advancedFilterStrings)) {
+                foreach ($advancedFilterStrings as $parseString) {
+                    $parsed = $filterHelper->parseString($parseString);
+
+                    $advancedFilters->root = array_merge($advancedFilters->root, $parsed->root);
+                    $filterHelper->mergeCommands($advancedFilters, $parsed->commands);
+                }
+                $this->advancedFilterCommands = $advancedFilters->commands;
+
+                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
+                $queryExpression->add($expr);
+                if (is_array($parameters)) {
+                    $queryParameters = array_merge($queryParameters, $parameters);
+                }
             }
 
             //parse the filter if set
-            if (!empty($string) || !empty($forceExpressions)) {
-                if (!empty($string)) {
-                    //remove wildcards passed by user
-                    if (strpos($string, '%') !== false) {
-                        $string = str_replace('%', '', $string);
-                    }
-
-                    $filter                         = $filterHelper->parseSearchString($string);
-                    list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
-
-                    if (!empty($forceExpressions)) {
-                        $parameters = array_merge($parameters, $forceParameters);
-                    }
-                } elseif (!empty($forceExpressions)) {
-                    $parameters = $forceParameters;
-                }
-
-                $filterCount = 0;
-                if (!empty($expressions) && $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts())) {
-                    $q->andWhere($expressions);
-                }
-
-                if (!empty($forceExpressions) && $forcedFilterCount = ($forceExpressions instanceof \Countable) ? count($forceExpressions) : count($forceExpressions->getParts())) {
-                    $q->andWhere($forceExpressions);
-                }
-
-                if (!empty($filterCount) || !empty($forceExpressions)) {
-                    foreach ($parameters as $k => $v) {
-                        if ($v === true || $v === false) {
-                            $q->setParameter($k, $v, 'boolean');
-                        } else {
-                            $q->setParameter($k, $v);
-                        }
+            if ($queryExpression->count()) {
+                $q->andWhere($queryExpression);
+                foreach ($queryParameters as $k => $v) {
+                    if ($v === true || $v === false) {
+                        $q->setParameter($k, $v, 'boolean');
+                    } else {
+                        $q->setParameter($k, $v);
                     }
                 }
             }
@@ -416,6 +412,16 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Array of search commands supported by the repository.
+     *
+     * @return array
+     */
+    public function getSearchCommands()
+    {
+        return [];
+    }
+
+    /**
      * @param \Doctrine\ORM\QueryBuilder $qb
      * @param array                      $filter
      *
@@ -437,14 +443,15 @@ class CommonRepository extends EntityRepository
      */
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
+        $parseFilters = [];
         if (isset($filters->root)) {
-            //function is determined by the second clause type
+            // Function is determined by the second clause type
             $type         = (isset($filters->root[1])) ? $filters->root[1]->type : $filters->root[0]->type;
             $parseFilters = &$filters->root;
         } elseif (isset($filters->children)) {
             $type         = (isset($filters->children[1])) ? $filters->children[1]->type : $filters->children[0]->type;
             $parseFilters = &$filters->children;
-        } else {
+        } elseif (is_array($filters)) {
             $type         = (isset($filters[1])) ? $filters[1]->type : $filters[0]->type;
             $parseFilters = &$filters;
         }
@@ -452,6 +459,20 @@ class CommonRepository extends EntityRepository
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
+        if ($parseFilters) {
+            $this->parseSearchFitlers($parseFilters, $qb, $expressions, $parameters);
+        }
+
+        return [$expressions, $parameters];
+    }
+
+    /**
+     * @param $parseFilters
+     * @param $expr
+     * @param $parameters
+     */
+    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
                 list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
@@ -478,18 +499,17 @@ class CommonRepository extends EntityRepository
                 $expressions->add($expr);
             }
         }
-
-        return [$expressions, $parameters];
     }
 
     /**
-     * Array of search commands supported by the repository.
+     * @param $qb
+     * @param $filter
      *
      * @return array
      */
-    public function getSearchCommands()
+    protected function addSearchCommandWhereClause(&$qb, $filter)
     {
-        return [];
+        return [false, false];
     }
 
     /**
@@ -599,17 +619,73 @@ class CommonRepository extends EntityRepository
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
     {
         $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $string = $filter->string;
 
-        $expr = $q->expr()->orX();
+        if (!$filter->strict) {
+            if (strpos($string, '%') === false) {
+                $string = "$string%";
+            }
+        }
+
+        $ormQb = true;
+
+        if ($q instanceof QueryBuilder) {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+        } else {
+            $ormQb = false;
+            if ($filter->not) {
+                $xFunc    = 'andX';
+                $exprFunc = 'notLike';
+            } else {
+                $xFunc    = 'orX';
+                $exprFunc = 'like';
+            }
+        }
+
+        $expr = $q->expr()->$xFunc();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->like($col, ":$unique")
+                $q->expr()->$exprFunc($col, ":$unique")
             );
         }
 
-        if ($filter->not) {
+        if ($ormQb && $filter->not) {
             $expr = $q->expr()->not($expr);
+        }
+
+        return [
+            $expr,
+            ["$unique" => $string],
+        ];
+    }
+
+    /**
+     * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
+     *
+     * @param QueryBuilder $q
+     * @param object       $filter
+     * @param array        $columns
+     *
+     * @return array
+     */
+    protected function addDbalCatchAllWhereClause(&$q, $filter, array $columns)
+    {
+        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string = ($filter->strict) ? $filter->string : "{$filter->string}";
+        if ($filter->not) {
+            $xFunc    = 'andX';
+            $exprFunc = 'notLike';
+        } else {
+            $xFunc    = 'orX';
+            $exprFunc = 'like';
+        }
+        $expr = $q->expr()->$xFunc();
+
+        foreach ($columns as $column) {
+            $expr->add(
+                $q->expr()->$exprFunc($column, ":$unique")
+            );
         }
 
         return [
@@ -685,7 +761,13 @@ class CommonRepository extends EntityRepository
         } elseif (!$returnParameter) {
             $parameters = [];
         } else {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $string = $filter->string;
+            if (!$filter->strict) {
+                if (strpos($string, '%') === false) {
+                    $string = "$string%";
+                }
+            }
+
             $parameters = ["$unique" => $string];
         }
 
@@ -977,6 +1059,8 @@ class CommonRepository extends EntityRepository
      * @param      $alias
      * @param null $catAlias
      * @param null $lang
+     *
+     * @return mixed|null
      */
     public function findOneBySlugs($alias, $catAlias = null, $lang = null)
     {

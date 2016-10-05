@@ -233,19 +233,21 @@ class CoreSubscriber extends CommonSubscriber
                     $this->userModel->getRepository()->setLastActive($user);
                 }
 
-                $session = $this->request->getSession();
+                $session = $request->getSession();
 
-                $delay = new \DateTime();
-                $delay->setTimestamp(strtotime('15 minutes ago'));
+                if ($session) {
+                    $delay = new \DateTime();
+                    $delay->setTimestamp(strtotime('15 minutes ago'));
 
-                $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
+                    $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
 
-                if ($lastOnlineStatusCleanup <= $delay) {
-                    $this->userModel->getRepository()->updateOnlineStatuses();
-                    $session->set('mautic.online.status.cleanup', new \DateTime());
+                    if ($lastOnlineStatusCleanup <= $delay) {
+                        $this->userModel->getRepository()->updateOnlineStatuses();
+                        $session->set('mautic.online.status.cleanup', new \DateTime());
+                    }
+
+                    define('MAUTIC_ACTIVITY_CHECKED', 1);
                 }
-
-                define('MAUTIC_ACTIVITY_CHECKED', 1);
             }
         }
     }

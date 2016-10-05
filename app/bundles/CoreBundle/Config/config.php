@@ -256,6 +256,15 @@ return [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.form.type.entity_lookup' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
+                'arguments' => [
+                    'mautic.model.factory',
+                    'translator',
+                    'database_connection',
+                    'router',
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.menu' => [
@@ -523,7 +532,6 @@ return [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
                 'arguments' => [
                     'mautic.security',
-                    'mautic.helper.user',
                     'request_stack',
                     '%mautic.parameters%',
                 ],

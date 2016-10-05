@@ -151,12 +151,14 @@ class CompanyController extends FormController
 
         $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
 
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('company[updateSelect]', false, true)
-            : $this->request->get(
+        $updateSelect = InputHelper::clean(
+            ($this->request->getMethod() == 'POST')
+                ? $this->request->request->get('company[updateSelect]', false, true)
+                : $this->request->get(
                 'updateSelect',
                 false
-            );
+            )
+        );
 
         $fields = $this->getModel('lead.field')->getEntities(
             [
@@ -225,14 +227,14 @@ class CompanyController extends FormController
             ];
 
             // Check to see if this is a popup
-            if (empty($form['updateSelect'])) {
+            if (!empty($form['updateSelect'])) {
                 $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'companyId'    => $entity->getId(),
-                        'companyName'  => $entity->getName(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
                     ]
                 );
             }
@@ -249,21 +251,25 @@ class CompanyController extends FormController
             }
         }
 
-        $themes = ['MauticLeadBundle:FormTheme\Action'];
+        $fields = $model->organizeFieldsByGroup($fields);
+        $groups = array_keys($fields);
+        sort($groups);
+        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
-                    'fields' => $model->organizeFieldsByGroup($fields),
+                    'form'   => $form->createView(),
+                    'fields' => $fields,
+                    'groups' => $groups,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
+                'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'updateSelect'  => ($this->request->getMethod() == 'POST') ? $updateSelect : null,
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         [
@@ -330,7 +336,7 @@ class CompanyController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'company');
+            return $this->isLocked($postActionVars, $entity, 'lead.company');
         }
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -423,11 +429,27 @@ class CompanyController extends FormController
                 'mauticContent' => 'company',
             ];
 
+            // Check to see if this is a popup
+            if (!empty($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    [
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                    ]
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
-
-                        $postActionVars
-
+                    [
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => $template,
+                        'passthroughVars' => $passthrough,
+                    ]
                 );
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
@@ -439,17 +461,21 @@ class CompanyController extends FormController
             $model->lockEntity($entity);
         }
 
-        $themes = ['MauticLeadBundle:FormTheme\Action'];
+        $fields = $model->organizeFieldsByGroup($fields);
+        $groups = array_keys($fields);
+        sort($groups);
+        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
-                    'fields' => $entity->getFields(), //pass in the lead fields as they are already organized by ['group']['alias']
+                    'form'   => $form->createView(),
+                    'fields' => $fields,
+                    'groups' => $groups,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
+                'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -525,7 +551,7 @@ class CompanyController extends FormController
             } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'company');
+                return $this->isLocked($postActionVars, $entity, 'lead.company');
             }
 
             $model->deleteEntity($entity);
@@ -589,7 +615,7 @@ class CompanyController extends FormController
                 } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'company', true);
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.company', true);
                 } else {
                     $deleteIds[] = $objectId;
                 }
@@ -598,14 +624,14 @@ class CompanyController extends FormController
             // Delete everything we are able to
             if (!empty($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.company.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
+                $deleted  = count($entities);
+                $this->addFlash(
+                    'mautic.company.notice.batch_deleted',
+                    [
+                        'pluralCount' => $deleted,
+                        '%count%'     => $deleted,
+                    ]
+                );
             }
         } //else don't do anything
 

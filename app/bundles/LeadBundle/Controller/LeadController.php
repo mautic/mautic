@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -438,8 +439,11 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $data[$f->getName()] = $f->getData();
+                        if ('companies' !== $f->getName()) {
+                            $data[$f->getName()] = $f->getData();
+                        }
                     }
+
                     $companies = [];
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
@@ -635,9 +639,8 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
+                        if ('companies' !== $f->getName()) {
+                            $data[$f->getName()] = $f->getData();
                         }
                     }
 

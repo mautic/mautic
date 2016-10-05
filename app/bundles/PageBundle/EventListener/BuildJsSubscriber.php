@@ -60,7 +60,7 @@ class BuildJsSubscriber extends CommonSubscriber
             $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
-        $contactIdUrl = $router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $contactIdUrl = $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
 (function(m, l, n, d) {

@@ -124,7 +124,7 @@ class NotificationModel extends FormModel
         User $user = null
     ) {
         if ($user === null) {
-            $user = $this->user;
+            $user = $this->userHelper->getUser();
         }
 
         if ($user === null || !$user->getId()) {
@@ -151,7 +151,7 @@ class NotificationModel extends FormModel
      */
     public function markAllRead()
     {
-        $this->getRepository()->markAllReadForUser($this->user->getId());
+        $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
     }
 
     /**
@@ -161,7 +161,7 @@ class NotificationModel extends FormModel
      */
     public function clearNotification($id)
     {
-        $this->getRepository()->clearNotificationsForUser($this->user->getId(), $id);
+        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id);
     }
 
     /**
@@ -173,13 +173,13 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null, $includeRead = false)
     {
-        if ($this->user->isGuest) {
+        if ($this->userHelper->getUser()->isGuest) {
             return [[], false, ''];
         }
 
         $this->updateUpstreamNotifications();
 
-        $userId        = ($this->user) ? $this->user->getId() : 0;
+        $userId        = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
         $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead);
 
         $showNewIndicator = false;
@@ -196,7 +196,7 @@ class NotificationModel extends FormModel
         $updateMessage = '';
         $newUpdate     = false;
 
-        if (!$this->disableUpdates && $this->user->isAdmin()) {
+        if (!$this->disableUpdates && $this->userHelper->getUser()->isAdmin()) {
             $updateData = [];
             $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 

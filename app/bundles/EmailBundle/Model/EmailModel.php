@@ -12,7 +12,6 @@ namespace Mautic\EmailBundle\Model;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -128,6 +127,7 @@ class EmailModel extends FormModel
      * @param TrackableModel       $pageTrackableModel
      * @param UserModel            $userModel
      * @param CoreParametersHelper $coreParametersHelper
+     * @param MessageQueueModel    $messageQueueModel
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -1114,17 +1114,16 @@ class EmailModel extends FormModel
     /**
      * Send an email to lead(s).
      *
-     * @param              $email
-     * @param              $leads
-     * @param              $options = array()
-     *                              array source array('model', 'id')
-     *                              array emailSettings
-     *                              int   listId
-     *                              bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                              bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                              bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
-     *                              array assetAttachments Array of optional Asset IDs to attach
-     * @param MessageQueue $queue
+     * @param   $email
+     * @param   $leads
+     * @param   $options = array()
+     *                   array source array('model', 'id')
+     *                   array emailSettings
+     *                   int   listId
+     *                   bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                   bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                   bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
+     *                   array assetAttachments Array of optional Asset IDs to attach
      *
      * @return mixed
      *
@@ -1140,9 +1139,10 @@ class EmailModel extends FormModel
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
-        $isMarketing      = ('marketing' === $emailType);
+        $isMarketing      = (in_array($emailType, ['marketing']) || !empty($listId));
         $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
         $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
+        $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
         if (!$email->getId()) {
             return false;
@@ -1158,6 +1158,8 @@ class EmailModel extends FormModel
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
         //get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
@@ -1165,50 +1167,53 @@ class EmailModel extends FormModel
         $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
         $defaultFrequencyTime   = $this->coreParameters->getParameter('email_frequency_time');
 
-        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-        $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
-
         $sendTo  = $leads;
         $leadIds = array_keys($leads);
-        $leadIds = implode(',', $leadIds);
-
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
-        if (!empty($dontSendTo)) {
-            foreach ($dontSendTo as $frequencyRuleMet) {
-                unset($leads[$frequencyRuleMet['lead_id']]);
-            }
-        }
+        $leadIds = array_combine($leadIds, $leadIds);
 
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
             if (!empty($dnc)) {
                 foreach ($dnc as $removeMeId => $removeMeEmail) {
-                    unset($leads[$removeMeId]);
+                    unset($sendTo[$removeMeId]);
+                    unset($leadIds[$removeMeId]);
                 }
             }
         }
 
-        $leadIds         = array_keys($sendTo);
-        $leadIds         = implode(',', $leadIds);
-        $campaignEventId = ($isMarketing && is_array($source) && 'campaign.event' === $source[0] && !empty($source[1])) ? $source[1] : null;
-        $dontSendTo      = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+        // Only check for frequency rules if there are leads to check - otherwise it goes into fetching frequency rules
+        // for all leads
+        if ($isMarketing && count($sendTo)) {
+            $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
+                'email',
+                $leadIds,
+                $listId,
+                $defaultFrequencyNumber,
+                $defaultFrequencyTime
+            );
 
-        if (!empty($dontSendTo) && $isMarketing) {
-            foreach ($dontSendTo as $frequencyRuleMet) {
-                // Queue this message to be processed by frequency and priority
-                $this->messageQueueModel->addToQueue(
-                    [$sendTo[$frequencyRuleMet['lead_id']]],
-                    'email',
-                    $email->getId(),
-                    $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'], 0, 1),
-                    $emailAttempts,
-                    $emailPriority,
-                    $campaignEventId
-                );
+            if (!empty($dontSendTo)) {
+                $campaignEventId = (is_array($source) && 'campaign.event' === $source[0] && !empty($source[1])) ? $source[1] : null;
+                foreach ($dontSendTo as $frequencyRuleMet) {
+                    $scheduleInterval = $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'], 0, 1);
+                    if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
+                        $this->messageQueueModel->rescheduleMessage($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
+                    } else {
+                        // Queue this message to be processed by frequency and priority
+                        $this->messageQueueModel->addToQueue(
+                            [$sendTo[$frequencyRuleMet['lead_id']]],
+                            'email',
+                            $email->getId(),
+                            $scheduleInterval,
+                            $emailAttempts,
+                            $emailPriority,
+                            $campaignEventId
+                        );
+                    }
 
-                unset($sendTo[$frequencyRuleMet['lead_id']]);
+                    unset($sendTo[$frequencyRuleMet['lead_id']]);
+                }
             }
         }
 
@@ -1719,7 +1724,7 @@ class EmailModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -1927,7 +1932,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1966,7 +1971,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1990,7 +1995,7 @@ class EmailModel extends FormModel
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $leadEventLogRepository->setCurrentUser($this->user);
+        $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',
@@ -2007,7 +2012,7 @@ class EmailModel extends FormModel
     /**
      * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
      *
-     * @param Page $entity
+     * @param Email $entity
      *
      * @return array
      */

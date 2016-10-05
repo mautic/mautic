@@ -77,7 +77,7 @@ class SmsSendType extends AbstractType
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewSmsWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
                         'icon' => 'fa fa-plus',
@@ -105,7 +105,7 @@ class SmsSendType extends AbstractType
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewSmsWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($sms),
                         'icon'     => 'fa fa-edit',
                     ],

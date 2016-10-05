@@ -18,9 +18,11 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FrequencyRuleRepository extends CommonRepository
 {
     /**
-     * @param string    $channel
-     * @param array|int $ids
-     * @param int       $listId
+     * @param $channel
+     * @param $leadIds
+     * @param $listId
+     * @param $defaultFrequencyNumber
+     * @param $defaultFrequencyTime
      *
      * @return array
      */
@@ -62,10 +64,13 @@ class FrequencyRuleRepository extends CommonRepository
                     end)');
         }
 
-        if ($leadIds) {
-            $q->andWhere('es.lead_id in (:lead_ids)')
-                ->setParameter('lead_ids', $leadIds);
+        if (empty($leadIds)) {
+            // Preventative for fetching every single email stat
+            $leadIds = [0];
         }
+        $q->andWhere(
+            $q->expr()->in('es.lead_id', $leadIds)
+        );
 
         $q->groupBy('es.lead_id, fr.frequency_time, fr.frequency_number');
 
@@ -82,9 +87,8 @@ class FrequencyRuleRepository extends CommonRepository
     }
 
     /**
-     * @param string    $channel
-     * @param array|int $ids
-     * @param int       $listId
+     * @param null $channel
+     * @param null $leadId
      *
      * @return array
      */

@@ -10,6 +10,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -94,7 +95,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewEmailWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
                         'icon' => 'fa fa-plus',
@@ -120,7 +121,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-edit',
                     ],
@@ -137,7 +138,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
                         'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-external-link',
                     ],
@@ -151,8 +152,8 @@ class EmailSendType extends AbstractType
                     'choice',
                     [
                         'choices' => [
-                            2 => 'mautic.core.message.send.priority.normal',
-                            1 => 'mautic.core.message.send.priority.high',
+                            MessageQueue::PRIORITY_NORMAL => 'mautic.core.message.send.priority.normal',
+                            MessageQueue::PRIORITY_HIGH   => 'mautic.core.message.send.priority.high',
                         ],
                         'label'    => 'mautic.core.message.send.priority',
                         'required' => false,

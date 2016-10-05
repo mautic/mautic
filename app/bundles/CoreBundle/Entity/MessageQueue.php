@@ -20,6 +20,13 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class MessageQueue
 {
+    const STATUS_RESCHEDULED = 'rescheduled';
+    const STATUS_PENDING     = 'pending';
+    const STATUS_SENT        = 'sent';
+
+    const PRIORITY_NORMAL = 2;
+    const PRIORITY_HIGH   = 1;
+
     /**
      * @var int
      */
@@ -68,7 +75,7 @@ class MessageQueue
     /**
      * @var string
      */
-    private $status = 'pending';
+    private $status = self::STATUS_PENDING;
 
     /**
      * @var \DateTime
@@ -103,16 +110,18 @@ class MessageQueue
     private $processed = false;
 
     /**
+     * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes.
+     *
+     * @var bool
+     */
+    private $failed = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->isPrimaryKey()
-            ->generatedValue()
-            ->build();
 
         $builder->setTable('message_queue')
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\MessageQueueRepository')
@@ -122,6 +131,8 @@ class MessageQueue
             ->addIndex(['priority'], 'message_priority')
             ->addIndex(['success'], 'message_success')
             ->addIndex(['channel', 'channel_id'], 'message_channel_search');
+
+        $builder->addId();
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
@@ -320,6 +331,7 @@ class MessageQueue
     {
         $this->lastAttempt = $lastAttempt;
     }
+
     /**
      * @return Lead
      */
@@ -369,7 +381,7 @@ class MessageQueue
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getScheduledDate()
     {
@@ -422,6 +434,26 @@ class MessageQueue
     public function setSuccess($success = true)
     {
         $this->success = $success;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->failed;
+    }
+
+    /**
+     * @param bool $failed
+     *
+     * @return MessageQueue
+     */
+    public function setFailed($failed = true)
+    {
+        $this->failed = $failed;
+
+        return $this;
     }
 
     /**

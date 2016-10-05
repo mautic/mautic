@@ -100,6 +100,7 @@ class EmailController extends FormController
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $this->request->get('filters', false);
+        $ignoreListJoin = true;
 
         if ($updatedFilters) {
             // Filters have been updated
@@ -156,6 +157,7 @@ class EmailController extends FormController
 
             if (!empty($listIds)) {
                 $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $ignoreListJoin    = false;
             }
 
             if (!empty($catIds)) {
@@ -177,7 +179,7 @@ class EmailController extends FormController
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
-                'ignoreListJoin' => true,
+                'ignoreListJoin' => $ignoreListJoin,
             ]
         );
 
@@ -559,10 +561,9 @@ class EmailController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'emailId'      => $entity->getId(),
-                        'emailSubject' => $entity->getSubject(),
-                        'emailName'    => $entity->getName(),
-                        'emailLang'    => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

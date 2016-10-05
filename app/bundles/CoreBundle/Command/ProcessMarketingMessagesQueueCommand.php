@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -8,9 +8,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Command;
+namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class ProcessMarketingMessagesQueueCommand.
  */
-class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
+class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     /**
      * {@inheritdoc}
@@ -26,9 +25,10 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:messagequeue')
+            ->setName('mautic:messages:send')
             ->setAliases(
                 [
+                    'mautic:campaigns:messagequeue',
                     'mautic:campaigns:messages',
                 ]
             )
@@ -37,16 +37,11 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
                 '--channel',
                 '-c',
                 InputOption::VALUE_OPTIONAL,
-                'Channel to use for sending messages ie. email, sms.',
+                'Channel to use for sending messages i.e. email, sms.',
                 null
             )
-            ->addOption('--channelid', '-i', InputOption::VALUE_REQUIRED, 'channel id, is the id of the message ie email id, sms id.')
-            ->addOption(
-                '--end-date',
-                '-t',
-                InputOption::VALUE_OPTIONAL,
-                'Set end date for updated values.'
-            );
+            ->addOption('--channel-id', '-i', InputOption::VALUE_REQUIRED, 'The ID of the message i.e. email ID, sms ID.')
+            ->addOption('--message-id', '-m', InputOption::VALUE_REQUIRED, 'ID of a specific queued message');
 
         parent::configure();
     }
@@ -56,23 +51,34 @@ class ProcessMarketingMessagesQueueCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-        $processed = 0;
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
-        $translator = $factory->getTranslator();
+        $processed  = 0;
+        $container  = $this->getContainer();
+        $translator = $container->get('translator');
         $channel    = $input->getOption('channel');
-        $channelId  = $input->getOption('channelid');
+        $channelId  = $input->getOption('channel-id');
+        $messageId  = $input->getOption('message-id');
+        $key        = $channel.$channelId.$messageId;
+
+        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
+            return 0;
+        }
 
         /** @var \Mautic\CoreBundle\Model\MessageQueueModel $model */
-        $model = $factory->getModel('core.messagequeue');
+        $model = $container->get('mautic.core.model.messagequeue');
 
         $output->writeln('<info>'.$translator->trans('mautic.campaign.command.process.messages').'</info>');
 
-        $processed = intval($model->sendMessages($channel, $channelId));
+        if ($messageId) {
+            if ($message = $model->getEntity($messageId)) {
+                $processed = intval($model->processMessageQueue($message));
+            }
+        } else {
+            $processed = intval($model->sendMessages($channel, $channelId));
+        }
 
         $output->writeln('<comment>'.$translator->trans('mautic.campaign.command.messages.sent', ['%events%' => $processed]).'</comment>'."\n");
+
+        $this->completeRun();
 
         return 0;
     }

@@ -594,9 +594,7 @@ class FormController extends CommonFormController
                         }
 
                         // Delete deleted actions
-                        if (count($deletedActions)) {
-                            $this->getModel('form.action')->deleteEntities($deletedActions);
-                        }
+                        $model->deleteActions($entity, $deletedActions);
 
                         // Persist and execute listeners
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());

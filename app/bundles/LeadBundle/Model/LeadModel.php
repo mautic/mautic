@@ -328,6 +328,7 @@ class LeadModel extends FormModel
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
         $updatedFields       = $entity->getUpdatedFields();
+        $company             = null;
 
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company'] = $updatedFields['company'];
@@ -359,7 +360,7 @@ class LeadModel extends FormModel
         if (!empty($companyFieldMatches)) {
             list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company->getName(), $company->getId());
+                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
 
@@ -367,7 +368,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company, $entity, true);
+            $this->companyModel->addLeadToCompany($company['id'], $entity, true, true);
         }
     }
 
@@ -552,8 +553,6 @@ class LeadModel extends FormModel
      */
     public function getLeadDetails($lead)
     {
-        static $details = [];
-
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
             if (!empty($fields)) {
@@ -1421,7 +1420,7 @@ class LeadModel extends FormModel
             $log->setType('lead');
             $log->setEventName($this->translator->trans('mautic.lead.import.event.name'));
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', [
-                '%name%' => $this->user->getUsername(),
+                '%name%' => $this->userHelper->getUser()->getUsername(),
             ]));
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
@@ -1454,7 +1453,7 @@ class LeadModel extends FormModel
                 $this->translator->trans(
                     'mautic.lead.import.action.name',
                     [
-                        '%name%' => $this->user->getUsername(),
+                        '%name%' => $this->userHelper->getUser()->getUsername(),
                     ]
                 )
             );
@@ -1468,7 +1467,7 @@ class LeadModel extends FormModel
             $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
             if ($doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
-                    '%user%' => $this->user->getUsername(),
+                    '%user%' => $this->userHelper->getUser()->getUsername(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
@@ -1821,7 +1820,7 @@ class LeadModel extends FormModel
         }
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $chart                              = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -1900,7 +1899,7 @@ class LeadModel extends FormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
@@ -1925,7 +1924,7 @@ class LeadModel extends FormModel
     public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
     {
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $q = $this->em->getConnection()->createQueryBuilder();
@@ -2029,7 +2028,7 @@ class LeadModel extends FormModel
     public function getLeadList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = [])
     {
         if (!empty($options['canViewOthers'])) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $q = $this->em->getConnection()->createQueryBuilder();

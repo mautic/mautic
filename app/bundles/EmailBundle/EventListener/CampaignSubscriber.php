@@ -50,9 +50,10 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param LeadModel  $leadModel
-     * @param EmailModel $emailModel
-     * @param EventModel $eventModel
+     * @param LeadModel         $leadModel
+     * @param EmailModel        $emailModel
+     * @param EventModel        $eventModel
+     * @param MessageQueueModel $messageQueueModel
      */
     public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
     {
@@ -149,20 +150,19 @@ class CampaignSubscriber extends CommonSubscriber
             $config  = $event->getConfig();
             $emailId = (int) $config['email'];
 
-            $email = $this->emailModel->getEntity($emailId);
-
+            $email   = $this->emailModel->getEntity($emailId);
+            $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
             $options = [
                 'source'         => ['campaign.event', $event->getEvent()['id']],
-                'email_type'     => $config['email_type'],
                 'email_attempts' => $config['attempts'],
                 'email_priority' => $config['priority'],
-                'email_type'     => $config['email_type'],
+                'email_type'     => $type,
             ];
+
             $event->setChannel('email', $emailId);
 
             if ($email != null && $email->isPublished()) {
                 // Determine if this email is transactional/marketing
-                $type  = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
                 $stats = [];
                 if ('marketing' == $type) {
                     // Determine if this lead has received the email before
@@ -170,10 +170,15 @@ class CampaignSubscriber extends CommonSubscriber
                     $stats     = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
                     $emailSent = true; // Assume it was sent to prevent the campaign event from getting rescheduled over and over
                 }
+
                 if (empty($stats)) {
                     $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
                 }
+            } else {
+                return $event->setFailed('Email not found or published');
             }
+        } else {
+            return $event->setFailed('Contact does not have an email');
         }
 
         return $event->setResult($emailSent);

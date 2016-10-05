@@ -10,9 +10,7 @@
 
 namespace Mautic\CoreBundle\Menu;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -32,11 +30,6 @@ class MenuHelper
     protected $request;
 
     /**
-     * @var User
-     */
-    protected $user;
-
-    /**
      * Stores items that are assigned to another parent outside it's bundle.
      *
      * @var array
@@ -52,14 +45,12 @@ class MenuHelper
      * MenuHelper constructor.
      *
      * @param CorePermissions $security
-     * @param UserHelper      $userHelper
      * @param RequestStack    $requestStack
      * @param array           $mauticParameters
      */
-    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters)
     {
         $this->security         = $security;
-        $this->user             = $userHelper->getUser();
         $this->mauticParameters = $mauticParameters;
         $this->request          = $requestStack->getCurrentRequest();
     }
@@ -92,7 +83,7 @@ class MenuHelper
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
-                    if (!$this->user->isAdmin()) {
+                    if (!$this->security->isAdmin()) {
                         unset($items[$k]);
                         continue;
                     }

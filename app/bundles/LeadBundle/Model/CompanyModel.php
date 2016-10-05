@@ -10,6 +10,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
@@ -25,7 +27,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class CompanyModel.
  */
-class CompanyModel extends CommonFormModel
+class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
     /**
      * @var Session
@@ -36,16 +38,19 @@ class CompanyModel extends CommonFormModel
      * @var FieldModel
      */
     protected $leadFieldModel;
+
     /**
-     * PointModel constructor.
+     * CompanyModel constructor.
      *
-     * @param Session $session
+     * @param FieldModel $leadFieldModel
+     * @param Session    $session
      */
     public function __construct(FieldModel $leadFieldModel, Session $session)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
     }
+
     /**
      * {@inheritdoc}
      *
@@ -121,7 +126,7 @@ class CompanyModel extends CommonFormModel
     public function getUserCompanies()
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
-            $this->user : false;
+            $this->userHelper->getUser() : false;
         $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
         return $companies;
@@ -248,7 +253,9 @@ class CompanyModel extends CommonFormModel
         } else {
             $leadId = $lead->getId();
         }
-
+        if (!is_array($companies)) {
+            $companies = [$companies];
+        }
         /** @var Company[] $companyLeadAdd */
         $companyLeadAdd = [];
         if (!$companies instanceof Company) {
@@ -285,10 +292,6 @@ class CompanyModel extends CommonFormModel
             $companyLeadAdd[$companies->getId()] = $companies;
 
             $companies = [$companies->getId()];
-        }
-
-        if (!is_array($companies)) {
-            $companies = [$companies];
         }
 
         $persistCompany = [];
@@ -510,19 +513,43 @@ class CompanyModel extends CommonFormModel
     {
         $results = [];
         switch ($type) {
-            case 'company':
+            case 'companyfield':
+            case 'lead.company':
                 $expr = null;
 
-                if (is_array($filter)) {
-                    $column    = $filter[0];
-                    $filterVal = $filter[1];
-
-                    // @todo: Create a CompositeExpression filter and pass it to getSimpleList
+                if ('lead.company' === $type) {
+                    $column    = 'companyname';
+                    $filterVal = $filter;
                 } else {
-                    $column = $filter;
+                    if (is_array($filter)) {
+                        $column    = $filter[0];
+                        $filterVal = $filter[1];
+                    } else {
+                        $column = $filter;
+                    }
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($expr, [], $column);
+                $expr      = new ExpressionBuilder($this->em->getConnection());
+                $composite = $expr->andX();
+                $composite->add(
+                    $expr->like("comp.$column", ':filterVar')
+                );
+
+                // Validate owner permissions
+                if (!$this->security->isGranted('lead:leads:viewother')) {
+                    $composite->add(
+                        $expr->orX(
+                            $expr->andX(
+                                $expr->isNull('comp.owner_id'),
+                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                            ),
+                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                        )
+                    );
+                }
+
+                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+
                 break;
         }
 

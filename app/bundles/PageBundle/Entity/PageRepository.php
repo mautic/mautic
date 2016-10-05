@@ -109,21 +109,14 @@ class PageRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('p.title',  ":$unique"),
-            $q->expr()->like('p.alias',  ":$unique")
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'p.title',
+                'p.alias',
+            ]
         );
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
     }
 
     /**
