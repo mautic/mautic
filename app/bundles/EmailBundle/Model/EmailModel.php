@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Model;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -1140,8 +1141,8 @@ class EmailModel extends FormModel
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
         $isMarketing      = (in_array($emailType, ['marketing']) || !empty($listId));
-        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
-        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
         if (!$email->getId()) {
@@ -1188,7 +1189,6 @@ class EmailModel extends FormModel
             $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
                 'email',
                 $leadIds,
-                $listId,
                 $defaultFrequencyNumber,
                 $defaultFrequencyTime
             );
