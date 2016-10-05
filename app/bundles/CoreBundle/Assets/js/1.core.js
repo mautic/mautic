@@ -570,7 +570,7 @@ var Mautic = {
                 }
 
                 if (textarea.hasClass('editor-dynamic-content')) {
-                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'clearFormatting', 'insertLink', 'insertImage'];
+                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
                 }
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
