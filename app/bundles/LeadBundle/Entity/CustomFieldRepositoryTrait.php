@@ -10,11 +10,15 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+
 /**
  * Class CustomFieldRepositoryTrait.
  */
 trait CustomFieldRepositoryTrait
 {
+    protected $useDistinctCount = false;
+
     /**
      * Gets a list of unique values from fields for autocompletes.
      *
@@ -88,9 +92,15 @@ trait CustomFieldRepositoryTrait
         $args = $this->convertOrmProperties($this->getClassName(), $args);
 
         //DBAL
+        /** @var QueryBuilder $dq */
         $dq = $this->getEntitiesDbalQueryBuilder();
+        // Generate where clause first to know if we need to use distinct on primary ID or not
+        $this->useDistinctCount = false;
+        $this->buildWhereClause($dq, $args);
+
         // Distinct is required here to get the correct count when group by is used due to applied filters
-        $dq->select('COUNT(DISTINCT('.$this->getTableAlias().'.id)) as count');
+        $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+        $dq->select($countSelect.' as count');
 
         // Filter by an entity query
         if (isset($args['entity_query'])) {
@@ -105,7 +115,10 @@ trait CustomFieldRepositoryTrait
             }
         }
 
-        $this->buildWhereClause($dq, $args);
+        // Advanced search filters may have set a group by and if so, let's remove it for the count.
+        if ($groupBy = $dq->getQueryPart('groupBy')) {
+            $dq->resetQueryPart('groupBy');
+        }
 
         //get a total count
         $result = $dq->execute()->fetchAll();
@@ -114,12 +127,16 @@ trait CustomFieldRepositoryTrait
         if (!$total) {
             $results = [];
         } else {
+            if ($groupBy) {
+                $dq->groupBy($groupBy);
+            }
             //now get the actual paginated results
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
 
             $dq->resetQueryPart('select')
                 ->select($this->getTableAlias().'.*');
+
             $results = $dq->execute()->fetchAll();
 
             //loop over results to put fields in something that can be assigned to the entities
