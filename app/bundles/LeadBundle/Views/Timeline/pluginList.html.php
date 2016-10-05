@@ -1,20 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (isset($tmpl) && $tmpl == 'index') {
-    $view->extend('MauticLeadBundle:Timeline:pluginIndex.html.php');
+    $view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
 }
 
 $baseUrl = isset($lead) ? $view['router']->path(
-    'mautic_plugin_timeline_view',['leadId' => $lead->getId(), 'integration'=>$integration]
+    'mautic_plugin_timeline_view', ['leadId' => $lead->getId(), 'integration' => $integration]
 ) :
-    $view['router']->path('mautic_plugin_timeline_index', ['integration'=>$integration]);
+    $view['router']->path('mautic_plugin_timeline_index', ['integration' => $integration]);
 ?>
 <style>
     .col-xs-6 {
@@ -89,10 +89,10 @@ $baseUrl = isset($lead) ? $view['router']->path(
     <?php foreach ($events['events'] as $counter => $event): ?>
         <?php
         $counter += 1; // prevent 0
-        $icon = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
+        $icon       = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
         $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
         if (is_array($eventLabel)):
-            $linkType = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
+            $linkType   = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
             $eventLabel = "<a href=\"{$eventLabel['href']}\" $linkType>{$eventLabel['label']}</a>";
         endif;
 
@@ -107,7 +107,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo ' timeline-featured';
         }
         if ($newCount-- > 0) {
-            echo " tr-new";
+            echo ' tr-new';
         }
         ?>">
             <span class="timeline-row-id hide"><?= $event['timestamp']->format('U') ?></span>
@@ -117,8 +117,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
                        onclick="jQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
                        data-activate-details="<?php echo $counter; ?>"
                        class="btn btn-xs btn-nospin btn-default<?php if (empty($details)) {
-                           echo " disabled";
-                       } ?>" data-toggle="tooltip"
+            echo ' disabled';
+        } ?>" data-toggle="tooltip"
                        title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
                         <span class="fa fa-fw <?php echo $icon ?>"></span>
                     </a>
@@ -133,8 +133,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
                 </span>
 
                 <span class="timeline-type"><?php if (isset($event['eventType'])) {
-                        echo $event['eventType'];
-                    } ?>: </span>
+            echo $event['eventType'];
+        } ?>: </span>
 
             <span class="timeline-lead ellipsis"><a href="mailto:<?php echo $event['leadEmail']; ?>"
                                                     title="<?php echo $event['leadEmail']; ?>"
@@ -159,12 +159,12 @@ $baseUrl = isset($lead) ? $view['router']->path(
 <?php echo $view->render(
     'MauticCoreBundle:Helper:pagination.html.php',
     [
-        'page' => $events['page'],
+        'page'       => $events['page'],
         'fixedPages' => $events['maxPages'],
         'fixedLimit' => true,
-        'baseUrl' => $baseUrl,
-        'target' => '#timeline-table',
-        'totalItems'=>$events['total']
+        'baseUrl'    => $baseUrl,
+        'target'     => '#timeline-table',
+        'totalItems' => $events['total'],
     ]
 ); ?>
 

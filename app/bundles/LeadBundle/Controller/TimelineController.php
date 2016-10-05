@@ -75,7 +75,6 @@ class TimelineController extends CommonController
         $leads = $this->checkAllAccess('view', $limit);
 
         if ($leads instanceof Response) {
-
             return $leads;
         }
 
@@ -86,14 +85,14 @@ class TimelineController extends CommonController
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', []))
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', [])),
             ];
             $session->set('mautic.plugin.timeline.filters', $filters);
         } else {
             $filters = null;
         }
 
-        $order  = [
+        $order = [
             $session->get('mautic.plugin.timeline.orderby'),
             $session->get('mautic.plugin.timeline.orderbydir'),
         ];
@@ -102,25 +101,25 @@ class TimelineController extends CommonController
         $events = $this->getAllEngagements($leads, $filters, $order, $page, $limit);
 
         $str = $this->request->server->get('QUERY_STRING');
-        $str = substr($str, strpos($str, '?')+1);
+        $str = substr($str, strpos($str, '?') + 1);
         parse_str($str, $query);
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
-                    'leads'        => $leads,
+                'viewParameters' => [
+                    'leads'       => $leads,
                     'page'        => $page,
                     'events'      => $events,
-                    'integration'      => $integration,
-                    'tmpl'   => (!$this->request->isXmlHttpRequest())?'index':'',
-                    'newCount' => (array_key_exists('count', $query) && $query['count'])?$query['count']:0
+                    'integration' => $integration,
+                    'tmpl'        => (!$this->request->isXmlHttpRequest()) ? 'index' : '',
+                    'newCount'    => (array_key_exists('count', $query) && $query['count']) ? $query['count'] : 0,
                 ],
                 'passthroughVars' => [
                     'route'         => false,
                     'mauticContent' => 'pluginTimeline',
-                    'timelineCount' => $events['total']
+                    'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:pluginList.html.php'
+                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
             ]
         );
     }
@@ -128,13 +127,11 @@ class TimelineController extends CommonController
     public function pluginViewAction(Request $request, $integration, $leadId, $page = 1)
     {
         if (empty($leadId)) {
-
             return $this->notFound();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view', true, $integration);
         if ($lead instanceof Response) {
-
             return $lead;
         }
 
@@ -145,14 +142,14 @@ class TimelineController extends CommonController
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', []))
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', [])),
             ];
             $session->set('mautic.plugin.timeline.'.$leadId.'.filters', $filters);
         } else {
             $filters = null;
         }
 
-        $order  = [
+        $order = [
             $session->get('mautic.plugin.timeline.'.$leadId.'.orderby'),
             $session->get('mautic.plugin.timeline.'.$leadId.'.orderbydir'),
         ];
@@ -161,18 +158,18 @@ class TimelineController extends CommonController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'lead'        => $lead,
                     'page'        => $page,
-                    'integration'      => $integration,
-                    'events'      => $events
+                    'integration' => $integration,
+                    'events'      => $events,
                 ],
                 'passthroughVars' => [
                     'route'         => false,
                     'mauticContent' => 'pluginTimeline',
-                    'timelineCount' => $events['total']
+                    'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:pluginList.html.php'
+                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
             ]
         );
     }
