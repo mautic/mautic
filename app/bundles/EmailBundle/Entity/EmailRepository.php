@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -138,7 +137,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (!isset($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
         }
