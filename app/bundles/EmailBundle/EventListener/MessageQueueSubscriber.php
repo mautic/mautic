@@ -72,7 +72,6 @@ class MessageQueueSubscriber extends CommonSubscriber
             $contact = $message->getLead()->getProfileFields();
             if (empty($contact['email'])) {
                 // No email so just let this slide
-                die('nope');
                 $message->setProcessed();
                 $message->setSuccess();
             }
