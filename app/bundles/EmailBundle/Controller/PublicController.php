@@ -558,7 +558,7 @@ class PublicController extends CommonFormController
     private function addStat($lead, $email, $query, $idHash)
     {
         if ($lead !== null) {
-            $mailer = $this->get('monolog.logger.mautic');
+            $mailer = $this->get('mautic.helper.mailer');
 
             // To lead
             $mailer->addTo($email);
