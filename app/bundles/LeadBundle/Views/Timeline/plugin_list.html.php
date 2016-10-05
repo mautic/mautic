@@ -81,7 +81,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
 </style>
 <div class="tl-header">
-    <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', array('%total%'=>$events['total'])); ?>
+    <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', ['%total%' => $events['total']]); ?>
      (<span class="tl-new"><?php echo $newCount; ?></span> <?php echo $view['translator']->trans('mautic.lead.timeline.events_new'); ?>)
 </div>
 <!-- timeline -->
