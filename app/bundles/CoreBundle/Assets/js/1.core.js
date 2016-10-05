@@ -1183,10 +1183,10 @@ var Mautic = {
         if( -1 !== route.indexOf('view') ){
             //loading view of module title
             var currentModule = route.split('/')[3];
-            mQuery('title').html( 'Mautic - ' + currentModule[0].toUpperCase() + currentModule.slice(1) + ' - ' + mQuery('.page-header h3').html() );
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + mQuery('.page-header h3').html() + ' | Mautic' );
         } else {
             //loading basic title
-            mQuery('title').html( 'Mautic - ' + mQuery('.page-header h3').html() );
+            mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
         }
     },
 

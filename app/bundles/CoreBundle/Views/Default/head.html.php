@@ -10,10 +10,10 @@
 ?>
 <head>
     <meta charset="UTF-8" />
-    <title><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?>
-	<?php if( !empty($view['slots']->get('headerTitle', '')) ): ?>
-		- <?php echo $view['slots']->get('headerTitle', ''); ?>
+    <title><?php if( !empty($view['slots']->get('headerTitle', '')) ): ?>
+		<?php echo $view['slots']->get('headerTitle', ''); ?> | 
 	<?php endif; ?>
+	<?php echo $view['slots']->get('pageTitle', 'Mautic'); ?>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
