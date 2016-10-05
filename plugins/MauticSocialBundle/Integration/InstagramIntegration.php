@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
- * Class InstagramIntegration
+ * Class InstagramIntegration.
  */
 class InstagramIntegration extends SocialIntegration
 {
@@ -27,10 +28,10 @@ class InstagramIntegration extends SocialIntegration
      */
     public function getSupportedFeatures()
     {
-        return array(
+        return [
             'public_profile',
-            'public_activity'
-        );
+            'public_activity',
+        ];
     }
 
     /**
@@ -94,41 +95,43 @@ class InstagramIntegration extends SocialIntegration
         $socialCache['has']['activity'] = false;
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             //get more than 10 so we can weed out videos
-            $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), array('count' => 20));
+            $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), ['count' => 20]);
 
-            $socialCache['activity'] = array(
-                "photos" => array(),
-                "tags"   => array()
-            );
+            $socialCache['activity'] = [
+                'photos' => [],
+                'tags'   => [],
+            ];
 
             if (!empty($data->data)) {
                 $socialCache['has']['activity'] = true;
-                $count = 1;
+                $count                          = 1;
                 foreach ($data->data as $m) {
-                    if ($count > 10) break;
+                    if ($count > 10) {
+                        break;
+                    }
 
                     if ($m->type == 'image') {
-                        $socialCache['activity']['photos'][] = array(
-                            'url' => $m->images->standard_resolution->url
-                        );
+                        $socialCache['activity']['photos'][] = [
+                            'url' => $m->images->standard_resolution->url,
+                        ];
 
                         if (!empty($m->caption->text)) {
                             preg_match_all("/#(\w+)/", $m->caption->text, $tags);
                             if (!empty($tags[1])) {
                                 foreach ($tags[1] as $tag) {
                                     if (isset($socialCache['activity']['tags'][$tag])) {
-                                        $socialCache['activity']['tags'][$tag]['count']++;
+                                        ++$socialCache['activity']['tags'][$tag]['count'];
                                     } else {
-                                        $socialCache['activity']['tags'][$tag] = array(
+                                        $socialCache['activity']['tags'][$tag] = [
                                             'count' => 1,
-                                            'url'   => 'http://searchinstagram.com/' . $tag
-                                        );
+                                            'url'   => 'http://searchinstagram.com/'.$tag,
+                                        ];
                                     }
                                 }
                             }
                         }
                     }
-                    $count++;
+                    ++$count;
                 }
             }
         }
@@ -137,13 +140,13 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        return array(
-            "full_name" => array("type" => "string"),
-            "bio"       => array("type" => "string"),
-            "website"   => array("type" => "string")
-        );
+        return [
+            'full_name' => ['type' => 'string'],
+            'bio'       => ['type' => 'string'],
+            'website'   => ['type' => 'string'],
+        ];
     }
 
     /**
@@ -157,7 +160,7 @@ class InstagramIntegration extends SocialIntegration
             return false;
         }
 
-        $data = $this->makeRequest($this->getApiUrl('users/search'), array('q' => $identifier));
+        $data = $this->makeRequest($this->getApiUrl('users/search'), ['q' => $identifier]);
 
         if (!empty($data->data)) {
             foreach ($data->data as $user) {

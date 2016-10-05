@@ -1,41 +1,55 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\StageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\StageBundle\Model\StageModel;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\StageBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var StageModel
+     */
+    protected $stageModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param StageModel $stageModel
+     */
+    public function __construct(StageModel $stageModel)
+    {
+        $this->stageModel = $stageModel;
+    }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     /**
      * @param MauticEvents\GlobalSearchEvent $event
      */
-    public function onGlobalSearch (MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('stage:stages:view')) {
             $str = $event->getSearchString();
@@ -43,32 +57,32 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $items      = $this->factory->getModel('stage')->getEntities(
-                array(
+            $items = $this->stageModel->getEntities(
+                [
                     'limit'  => 5,
-                    'filter' => $str
-                ));
+                    'filter' => $str,
+                ]);
             $stageCount = count($items);
             if ($stageCount > 0) {
-                $stagesResults = array();
+                $stagesResults = [];
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
                     $stagesResults[] = $this->templating->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'item'    => $item,
-                            'canEdit' => $canEdit
-                        )
+                            'canEdit' => $canEdit,
+                        ]
                     )->getContent();
                 }
                 if ($stageCount > 5) {
                     $stagesResults[] = $this->templating->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => ($stageCount - 5)
-                        )
+                            'remaining'    => ($stageCount - 5),
+                        ]
                     )->getContent();
                 }
                 $stagesResults['count'] = $stageCount;
@@ -80,13 +94,12 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @param MauticEvents\CommandListEvent $event
      */
-    public function onBuildCommandList (MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security = $this->security;
-        if ($security->isGranted('stage:stages:view')) {
+        if ($this->security->isGranted('stage:stages:view')) {
             $event->addCommands(
                 'mautic.stage.actions.header.index',
-                $this->factory->getModel('stage')->getCommandList()
+                $this->stageModel->getCommandList()
             );
         }
     }

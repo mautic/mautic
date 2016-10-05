@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
- * Class LinkedInIntegration
+ * Class LinkedInIntegration.
  */
 class LinkedInIntegration extends SocialIntegration
 {
@@ -27,11 +28,11 @@ class LinkedInIntegration extends SocialIntegration
      */
     public function getSupportedFeatures()
     {
-        return array(
+        return [
             'share_button',
             'login_button',
-            'public_profile'
-        );
+            'public_profile',
+        ];
     }
 
     /**
@@ -73,9 +74,9 @@ class LinkedInIntegration extends SocialIntegration
      */
     public function getIdentifierFields()
     {
-        return array(
-            'linkedin'
-        );
+        return [
+            'linkedin',
+        ];
     }
 
     /**
@@ -83,14 +84,14 @@ class LinkedInIntegration extends SocialIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             'client_id'     => 'mautic.integration.keyfield.clientid',
-            'client_secret' => 'mautic.integration.keyfield.clientsecret'
-        );
+            'client_secret' => 'mautic.integration.keyfield.clientsecret',
+        ];
     }
 
     /**
-     * Get public data
+     * Get public data.
      *
      * @param $identifier
      * @param $socialCache
@@ -103,7 +104,6 @@ class LinkedInIntegration extends SocialIntegration
         $accessToken = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
-
             return;
         } elseif (isset($accessToken['persist_lead'])) {
             $persistLead = $accessToken['persist_lead'];
@@ -111,24 +111,23 @@ class LinkedInIntegration extends SocialIntegration
         }
 
         $fields        = $this->getFieldNames($this->getAvailableLeadFields());
-        $profileFields = implode(",", array_keys($fields));
-        $url           = $this->getApiUrl("v1/people/~:(id,picture-url,".$profileFields.")");
-        $parameters    = array(
+        $profileFields = implode(',', array_keys($fields));
+        $url           = $this->getApiUrl('v1/people/~:(id,picture-url,'.$profileFields.')');
+        $parameters    = [
             'oauth2_access_token' => $accessToken['access_token'],
-            'format'              => 'json'
-        );
+            'format'              => 'json',
+        ];
 
-        $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
+        $data = $this->makeRequest($url, $parameters, 'GET', ['auth_type' => 'rest']);
 
         if (true) {
             $info = $this->matchUpData($data);
 
             if (isset($data->publicProfileUrl)) {
-                $info['profileHandle'] = str_replace("https://www.linkedin.com/", '', $data->publicProfileUrl);
+                $info['profileHandle'] = str_replace('https://www.linkedin.com/', '', $data->publicProfileUrl);
             }
 
             $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
-
 
             $socialCache['profile']     = $info;
             $socialCache['lastRefresh'] = new \DateTime();
@@ -143,7 +142,7 @@ class LinkedInIntegration extends SocialIntegration
     }
 
     /**
-     * gets the name of field to sent to linked in API to fetch social profile data
+     * gets the name of field to sent to linked in API to fetch social profile data.
      *
      * @param $leadFields
      *
@@ -151,7 +150,7 @@ class LinkedInIntegration extends SocialIntegration
      */
     protected function getFieldNames($leadFields)
     {
-        $fields = array();
+        $fields = [];
         foreach ($leadFields as $leadField) {
             $fields[$leadField['fieldName']] = $leadField['fieldName'];
         }
@@ -170,35 +169,35 @@ class LinkedInIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
         // Until lead profile support is restored
         //return array();
 
-        return array(
-            'firstName'        => array('type' => 'string', 'fieldName' => 'first-name'),
-            'lastName'         => array('type' => 'string', 'fieldName' => 'last-name'),
-            'maidenName'       => array('type' => 'string', 'fieldName' => 'maiden-name'),
-            'formattedName'    => array('type' => 'string', 'fieldName' => 'formatted-name'),
-            'headline'         => array('type' => 'string', 'fieldName' => 'headline'),
-            'location'         => array(
-                'type'      => 'object',
-                'fields'    => array(
-                    'name'
-                ),
-                'fieldName' => 'location'
-            ),
-            'summary'          => array('type' => 'string', 'fieldName' => 'summary'),
-            'specialties'      => array('type' => 'string', 'fieldName' => 'specialties'),
-            'positions'        => array(
-                'type'      => 'array_object',
-                'fields'    => array(
-                    'values'
-                ),
-                'fieldName' => 'positions'
-            ),
-            'publicProfileUrl' => array('type' => 'string', 'fieldName' => 'public-profile-url'),
-            'emailAddress'     => array('type' => 'string', 'fieldName' => 'email-address')
-        );
+        return [
+            'firstName'     => ['type' => 'string', 'fieldName' => 'first-name'],
+            'lastName'      => ['type' => 'string', 'fieldName' => 'last-name'],
+            'maidenName'    => ['type' => 'string', 'fieldName' => 'maiden-name'],
+            'formattedName' => ['type' => 'string', 'fieldName' => 'formatted-name'],
+            'headline'      => ['type' => 'string', 'fieldName' => 'headline'],
+            'location'      => [
+                'type'   => 'object',
+                'fields' => [
+                    'name',
+                ],
+                'fieldName' => 'location',
+            ],
+            'summary'     => ['type' => 'string', 'fieldName' => 'summary'],
+            'specialties' => ['type' => 'string', 'fieldName' => 'specialties'],
+            'positions'   => [
+                'type'   => 'array_object',
+                'fields' => [
+                    'values',
+                ],
+                'fieldName' => 'positions',
+            ],
+            'publicProfileUrl' => ['type' => 'string', 'fieldName' => 'public-profile-url'],
+            'emailAddress'     => ['type' => 'string', 'fieldName' => 'email-address'],
+        ];
     }
 }

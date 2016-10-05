@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,27 +13,26 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 /**
- * Class EntityContactsTrait
+ * Class EntityContactsTrait.
  */
 trait EntityContactsTrait
 {
     /**
-     * @param      $objectId
-     * @param      $page
-     * @param      $permission
-     * @param      $sessionVar
-     * @param      $joinTable           Table to join to obtain list of related contacts
-     * @param null $channel             Channel for this entity
-     * @param null $contactColumnName   If the entity ID in $joinTable is not "id", set the column name here
-     * @param array $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
-     * @param null $route               Route for this view's contact list
+     * @param       $objectId
+     * @param       $page
+     * @param       $permission
+     * @param       $sessionVar
+     * @param       $joinTable         Table to join to obtain list of related contacts
+     * @param null  $channel           Channel for this entity
+     * @param null  $contactColumnName If the entity ID in $joinTable is not "id", set the column name here
+     * @param array $contactFilter     Array of additional filters for the getEntityContactsWithFields() function
+     * @param null  $route             Route for this view's contact list
      *
      * @return mixed
      */
     protected function generateContactsGrid($objectId, $page, $permission, $sessionVar, $joinTable, $channel = null, $contactColumnName = null, array $contactFilter = null, $route = null)
     {
         if ($permission && !$this->get('mautic.security')->isGranted($permission)) {
-
             return $this->accessDenied();
         }
 
@@ -43,7 +43,6 @@ trait EntityContactsTrait
 
         // Apply filters
         if ($this->request->getMethod() == 'POST') {
-
             $this->setListFilters();
         }
 
@@ -62,7 +61,7 @@ trait EntityContactsTrait
         }
 
         /** @var LeadRepository $repo */
-        $repo = $this->getModel('lead')->getRepository();
+        $repo     = $this->getModel('lead')->getRepository();
         $contacts = $repo->getEntityContacts(
             [
                 'withTotalCount' => true,
@@ -70,7 +69,7 @@ trait EntityContactsTrait
                 'limit'          => $limit,
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir
+                'orderByDir'     => $orderByDir,
             ],
             $joinTable,
             $objectId,
@@ -91,8 +90,8 @@ trait EntityContactsTrait
                     'viewParameters'  => ['page' => $lastPage, 'objectId' => $objectId],
                     'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
                     'passthroughVars' => [
-                        'mauticContent' => $sessionVar.'Contacts'
-                    ]
+                        'mauticContent' => $sessionVar.'Contacts',
+                    ],
                 ]
             );
         }
@@ -105,7 +104,7 @@ trait EntityContactsTrait
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'page'          => $page,
                     'items'         => $contacts['results'],
                     'totalItems'    => $contacts['count'],
@@ -115,13 +114,13 @@ trait EntityContactsTrait
                     'sessionVar'    => $sessionVar.'.contact',
                     'limit'         => $limit,
                     'objectId'      => $objectId,
-                    'noContactList' => $dnc
+                    'noContactList' => $dnc,
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
                 'passthroughVars' => [
                     'mauticContent' => $sessionVar.'Contacts',
-                    'route'         => false
-                ]
+                    'route'         => false,
+                ],
             ]
         );
     }

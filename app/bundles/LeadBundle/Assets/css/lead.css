@@ -200,3 +200,9 @@ ul.tag-cloud li {
     width: 45px;
 
 }
+.fa-user:before, .fa-building:before{
+    margin-right: 6px;
+}
+.inline-spacer {
+    text-transform: capitalize;
+}

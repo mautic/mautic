@@ -1,23 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 
 <?php if ($tmpl == 'index'): ?>
 <div class="lead-merge-form">
-    <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
-        'searchId'      => (empty($searchId)) ? null : $searchId,
-        'searchValue'   => $searchValue,
-        'action'        => $currentRoute,
-        'searchHelp'    => false,
-        'target'        => '.lead-merge-options',
-        'tmpl'          => 'update'
-    )); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
+        'searchId'    => (empty($searchId)) ? null : $searchId,
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'searchHelp'  => false,
+        'target'      => '.lead-merge-options',
+        'tmpl'        => 'update',
+    ]); ?>
     <div class="lead-merge-options mt-sm">
 <?php endif; ?>
 

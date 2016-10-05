@@ -20,18 +20,18 @@ $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']
 
 // Determine if there is an asset prefix
 $root = __DIR__;
-include $root . '/app/config/paths.php';
+include $root.'/app/config/paths.php';
 $assetPrefix = $paths['asset_prefix'];
 if (!empty($assetPrefix)) {
     if (substr($assetPrefix, -1) == '/') {
         $assetPrefix = substr($assetPrefix, 0, -1);
     }
 }
-$assetBase = $assetPrefix . $base . $paths['assets'];
+$assetBase = $assetPrefix.$base.$paths['assets'];
 
 // Allow a custom error page
-if (file_exists(__DIR__ . '/custom_offline.php')) {
-    include __DIR__ . '/custom_offline.php';
+if (file_exists(__DIR__.'/custom_offline.php')) {
+    include __DIR__.'/custom_offline.php';
 
     exit;
 }
@@ -48,9 +48,9 @@ if (file_exists(__DIR__ . '/custom_offline.php')) {
     <title>Site is offline</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="icon" type="image/x-icon" href="<?php echo $assetBase . '/images/favicon.ico'; ?>" />
-    <link rel="stylesheet" href="<?php echo $assetBase . '/css/libraries.css'; ?>" />
-    <link rel="stylesheet" href="<?php echo $assetBase . '/css/app.css'; ?>" />
+    <link rel="icon" type="image/x-icon" href="<?php echo $assetBase.'/images/favicon.ico'; ?>" />
+    <link rel="stylesheet" href="<?php echo $assetBase.'/css/libraries.css'; ?>" />
+    <link rel="stylesheet" href="<?php echo $assetBase.'/css/app.css'; ?>" />
 </head>
 
 <body>

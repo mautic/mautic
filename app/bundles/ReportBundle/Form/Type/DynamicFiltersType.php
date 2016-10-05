@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,12 +12,11 @@ namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class DynamicFiltersType
+ * Class DynamicFiltersType.
  */
 class DynamicFiltersType extends AbstractType
 {
@@ -34,22 +34,22 @@ class DynamicFiltersType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this.value,'list','.report-content');"
+                    'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this.value,'list','.report-content');",
                 ],
-                'required'   => false
+                'required' => false,
             ];
 
             switch ($definition['type']) {
                 case 'bool':
                 case 'boolean':
-                    $type = 'button_group';
+                    $type                      = 'button_group';
                     $args['choices_as_values'] = true;
-                    $args['choices'] = [
+                    $args['choices']           = [
                         [
                             'mautic.core.form.no'    => false,
                             'mautic.core.form.yes'   => true,
-                            'mautic.core.form.reset' => ''
-                        ]
+                            'mautic.core.form.reset' => '',
+                        ],
                     ];
 
                     if (isset($options['data'][$definition['alias']])) {
@@ -61,7 +61,7 @@ class DynamicFiltersType extends AbstractType
                     break;
                 case 'multiselect':
                 case 'select':
-                    $type = 'choice';
+                    $type            = 'choice';
                     $args['choices'] = $definition['list'];
                     break;
                 default:
@@ -89,7 +89,7 @@ class DynamicFiltersType extends AbstractType
         $resolver->setDefaults(
             [
                 'filterDefinitions' => [],
-                'report'            => new Report()
+                'report'            => new Report(),
             ]
         );
     }

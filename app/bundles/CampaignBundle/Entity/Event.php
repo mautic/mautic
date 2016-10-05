@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,13 +16,10 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class Event
- *
- * @package Mautic\CampaignBundle\Entity
+ * Class Event.
  */
 class Event
 {
-
     /**
      * @var int
      */
@@ -55,7 +53,7 @@ class Event
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var null|\DateTime
@@ -112,14 +110,14 @@ class Event
      */
     private $changes;
 
-    public function __construct ()
+    public function __construct()
     {
         $this->log      = new ArrayCollection();
         $this->children = new ArrayCollection();
     }
 
     /**
-     * Clean up after clone
+     * Clean up after clone.
      */
     public function __clone()
     {
@@ -131,7 +129,7 @@ class Event
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -186,7 +184,7 @@ class Event
 
         $builder->createOneToMany('children', 'Event')
             ->setIndexBy('id')
-            ->setOrderBy(array('order' => 'ASC'))
+            ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('parent')
             ->build();
 
@@ -212,12 +210,10 @@ class Event
             ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
-
-
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -225,7 +221,7 @@ class Event
     {
         $metadata->setGroupPrefix('campaign')
             ->addProperties(
-                array(
+                [
                     'id',
                     'name',
                     'description',
@@ -239,8 +235,8 @@ class Event
                     'triggerMode',
                     'children',
                     'parent',
-                    'decisionPath'
-                )
+                    'decisionPath',
+                ]
             )
             ->setMaxDepth(1, 'parent')
             ->build();
@@ -249,50 +245,48 @@ class Event
     /**
      * @param string $prop
      * @param mixed  $val
-     *
-     * @return void
      */
-    private function isChanged ($prop, $val)
+    private function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'category' || $prop == 'parent') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
+                $this->changes[$prop] = [$currentId, $newId];
             }
         } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+            $this->changes[$prop] = [$this->$prop, $val];
         }
     }
 
     /**
      * @return mixed
      */
-    public function getChanges ()
+    public function getChanges()
     {
         return $this->changes;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set order
+     * Set order.
      *
-     * @param integer $order
+     * @param int $order
      *
      * @return Event
      */
-    public function setOrder ($order)
+    public function setOrder($order)
     {
         $this->isChanged('order', $order);
 
@@ -302,23 +296,23 @@ class Event
     }
 
     /**
-     * Get order
+     * Get order.
      *
-     * @return integer
+     * @return int
      */
-    public function getOrder ()
+    public function getOrder()
     {
         return $this->order;
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param array $properties
      *
      * @return Event
      */
-    public function setProperties ($properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -328,23 +322,23 @@ class Event
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return array
      */
-    public function getProperties ()
+    public function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * Set campaign
+     * Set campaign.
      *
      * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
      *
      * @return Event
      */
-    public function setCampaign (\Mautic\CampaignBundle\Entity\Campaign $campaign)
+    public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
     {
         $this->campaign = $campaign;
 
@@ -352,23 +346,23 @@ class Event
     }
 
     /**
-     * Get campaign
+     * Get campaign.
      *
      * @return \Mautic\CampaignBundle\Entity\Campaign
      */
-    public function getCampaign ()
+    public function getCampaign()
     {
         return $this->campaign;
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return Event
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -377,11 +371,11 @@ class Event
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
@@ -389,19 +383,19 @@ class Event
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return Event
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -410,23 +404,23 @@ class Event
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Event
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -435,23 +429,23 @@ class Event
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Add log
+     * Add log.
      *
      * @param LeadEventLog $log
      *
      * @return Event
      */
-    public function addLog (LeadEventLog $log)
+    public function addLog(LeadEventLog $log)
     {
         $this->log[] = $log;
 
@@ -459,33 +453,33 @@ class Event
     }
 
     /**
-     * Remove log
+     * Remove log.
      *
      * @param LeadEventLog $log
      */
-    public function removeLog (LeadEventLog $log)
+    public function removeLog(LeadEventLog $log)
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log
+     * Get log.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog ()
+    public function getLog()
     {
         return $this->log;
     }
 
     /**
-     * Add children
+     * Add children.
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
      *
      * @return Event
      */
-    public function addChild (\Mautic\CampaignBundle\Entity\Event $children)
+    public function addChild(\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children[] = $children;
 
@@ -493,33 +487,33 @@ class Event
     }
 
     /**
-     * Remove children
+     * Remove children.
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
      */
-    public function removeChild (\Mautic\CampaignBundle\Entity\Event $children)
+    public function removeChild(\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children->removeElement($children);
     }
 
     /**
-     * Get children
+     * Get children.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getChildren ()
+    public function getChildren()
     {
         return $this->children;
     }
 
     /**
-     * Set parent
+     * Set parent.
      *
      * @param \Mautic\CampaignBundle\Entity\Event $parent
      *
      * @return Event
      */
-    public function setParent (\Mautic\CampaignBundle\Entity\Event $parent = null)
+    public function setParent(\Mautic\CampaignBundle\Entity\Event $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -528,20 +522,20 @@ class Event
     }
 
     /**
-     * Remove parent
+     * Remove parent.
      */
-    public function removeParent ()
+    public function removeParent()
     {
         $this->isChanged('parent', '');
         $this->parent = null;
     }
 
     /**
-     * Get parent
+     * Get parent.
      *
      * @return \Mautic\CampaignBundle\Entity\Event
      */
-    public function getParent ()
+    public function getParent()
     {
         return $this->parent;
     }
@@ -549,7 +543,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getTriggerDate ()
+    public function getTriggerDate()
     {
         return $this->triggerDate;
     }
@@ -557,24 +551,24 @@ class Event
     /**
      * @param mixed $triggerDate
      */
-    public function setTriggerDate ($triggerDate)
+    public function setTriggerDate($triggerDate)
     {
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getTriggerInterval ()
+    public function getTriggerInterval()
     {
         return $this->triggerInterval;
     }
 
     /**
-     * @param integer $triggerInterval
+     * @param int $triggerInterval
      */
-    public function setTriggerInterval ($triggerInterval)
+    public function setTriggerInterval($triggerInterval)
     {
         $this->isChanged('triggerInterval', $triggerInterval);
         $this->triggerInterval = $triggerInterval;
@@ -583,7 +577,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getTriggerIntervalUnit ()
+    public function getTriggerIntervalUnit()
     {
         return $this->triggerIntervalUnit;
     }
@@ -591,7 +585,7 @@ class Event
     /**
      * @param mixed $triggerIntervalUnit
      */
-    public function setTriggerIntervalUnit ($triggerIntervalUnit)
+    public function setTriggerIntervalUnit($triggerIntervalUnit)
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
@@ -600,7 +594,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getEventType ()
+    public function getEventType()
     {
         return $this->eventType;
     }
@@ -608,7 +602,7 @@ class Event
     /**
      * @param mixed $eventType
      */
-    public function setEventType ($eventType)
+    public function setEventType($eventType)
     {
         $this->eventType = $eventType;
     }
@@ -616,7 +610,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getTriggerMode ()
+    public function getTriggerMode()
     {
         return $this->triggerMode;
     }
@@ -624,7 +618,7 @@ class Event
     /**
      * @param mixed $triggerMode
      */
-    public function setTriggerMode ($triggerMode)
+    public function setTriggerMode($triggerMode)
     {
         $this->triggerMode = $triggerMode;
     }
@@ -632,7 +626,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getDecisionPath ()
+    public function getDecisionPath()
     {
         return $this->decisionPath;
     }
@@ -640,7 +634,7 @@ class Event
     /**
      * @param mixed $decisionPath
      */
-    public function setDecisionPath ($decisionPath)
+    public function setDecisionPath($decisionPath)
     {
         $this->decisionPath = $decisionPath;
     }
@@ -648,7 +642,7 @@ class Event
     /**
      * @return mixed
      */
-    public function getTempId ()
+    public function getTempId()
     {
         return $this->tempId;
     }
@@ -656,7 +650,7 @@ class Event
     /**
      * @param mixed $tempId
      */
-    public function setTempId ($tempId)
+    public function setTempId($tempId)
     {
         $this->tempId = $tempId;
     }

@@ -1,30 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * Class BuilderEvent
- *
- * @package Mautic\PageBundle\Event
+ * Class BuilderEvent.
  */
 class BuilderEvent extends Event
 {
-    protected $slotTypes = array();
-    protected $tokens = array();
-    protected $visualTokens = array();
-    protected $tokenSections = array();
-    protected $abTestWinnerCriteria = array();
+    protected $slotTypes            = [];
+    protected $tokens               = [];
+    protected $visualTokens         = [];
+    protected $tokenSections        = [];
+    protected $abTestWinnerCriteria = [];
     protected $translator;
     protected $entity = null;
     protected $requested;
@@ -38,7 +37,7 @@ class BuilderEvent extends Event
         $this->entity            = $entity;
         $this->requested         = $requested;
         $this->tokenFilterTarget = (strpos($tokenFilter, '{@') === 0) ? 'label' : 'token';
-        $this->tokenFilterText   = str_replace(array('{@', '{', '}'), '', $tokenFilter);
+        $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ($this->tokenFilterTarget == 'label') ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
 
@@ -52,23 +51,23 @@ class BuilderEvent extends Event
      */
     public function addSlotType($key, $header, $icon, $content, $form, $priority = 0)
     {
-        $this->slotTypes[$key] = array(
+        $this->slotTypes[$key] = [
             'header'   => $this->translator->trans($header),
             'icon'     => $icon,
             'content'  => $content,
             'form'     => $form,
-            'priority' => $priority
-        );
+            'priority' => $priority,
+        ];
     }
 
     /**
-     * Get slot types
+     * Get slot types.
      *
      * @return array
      */
     public function getSlotTypes()
     {
-        $sort = array('priority' => array(), 'header' => array());
+        $sort = ['priority' => [], 'header' => []];
         foreach ($this->slotTypes as $k => $v) {
             $sort['priority'][$k] = $v['priority'];
             $sort['header'][$k]   = $v['header'];
@@ -93,22 +92,22 @@ class BuilderEvent extends Event
 
         if (!empty($content)) {
             $header                    = $this->translator->trans($header);
-            $this->tokenSections[$key] = array(
+            $this->tokenSections[$key] = [
                 'header'   => $header,
                 'content'  => $content,
-                'priority' => $priority
-            );
+                'priority' => $priority,
+            ];
         }
     }
 
     /**
-     * Get tokenSections
+     * Get tokenSections.
      *
      * @return array
      */
     public function getTokenSections()
     {
-        $sort = array();
+        $sort = [];
         foreach ($this->tokenSections as $k => $v) {
             $sort['priority'][$k] = $v['priority'];
             $sort['header'][$k]   = $v['header'];
@@ -119,9 +118,8 @@ class BuilderEvent extends Event
         return $this->tokenSections;
     }
 
-
     /**
-     * Get list of AB Test winner criteria
+     * Get list of AB Test winner criteria.
      *
      * @return array
      */
@@ -136,9 +134,9 @@ class BuilderEvent extends Event
                 );
             }
         );
-        $array = array('criteria' => $this->abTestWinnerCriteria);
+        $array = ['criteria' => $this->abTestWinnerCriteria];
 
-        $choices = array();
+        $choices = [];
         foreach ($this->abTestWinnerCriteria as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }
@@ -148,7 +146,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Adds an A/B test winner criteria option
+     * Adds an A/B test winner criteria option.
      *
      * @param string $key      - a unique identifier; it is recommended that it be namespaced i.e. lead.points
      * @param array  $criteria - can contain the following keys:
@@ -173,8 +171,8 @@ class BuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyCriteria(
-            array('group', 'label', 'callback'),
-            array('callback'),
+            ['group', 'label', 'callback'],
+            ['callback'],
             $criteria
         );
 
@@ -213,8 +211,8 @@ class BuilderEvent extends Event
     public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
     {
         if ($convertToLinks) {
-            array_walk($tokens, function(&$val, $key) {
-                $val = 'a:' . $val;
+            array_walk($tokens, function (&$val, $key) {
+                $val = 'a:'.$val;
             });
         }
 
@@ -240,7 +238,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Get token array
+     * Get token array.
      *
      * @return array
      */
@@ -253,6 +251,7 @@ class BuilderEvent extends Event
                     $tokens[$key] = $value;
                 }
             }
+
             return $tokens;
         }
 
@@ -277,10 +276,9 @@ class BuilderEvent extends Event
     public function tokensRequested($tokenKeys = null)
     {
         if ($requested = $this->getRequested('tokens')) {
-
             if (!empty($this->tokenFilter) && $this->tokenFilterTarget == 'token') {
                 if (!is_array($tokenKeys)) {
-                    $tokenKeys = array($tokenKeys);
+                    $tokenKeys = [$tokenKeys];
                 }
 
                 $found = false;
@@ -301,20 +299,20 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Get text of the search filter
+     * Get text of the search filter.
      *
      * @return array
      */
     public function getTokenFilter()
     {
-        return array(
+        return [
             'target' => $this->tokenFilterTarget,
-            'filter' => $this->tokenFilterText
-        );
+            'filter' => $this->tokenFilterText,
+        ];
     }
 
     /**
-     * Simple token filtering
+     * Simple token filtering.
      *
      * @param array $tokens array('token' => 'label')
      *
@@ -333,7 +331,7 @@ class BuilderEvent extends Event
             $tokens = array_filter(
                 $tokens,
                 function ($v) use ($filter) {
-                    return (stripos($v, $filter) === 0);
+                    return stripos($v, $filter) === 0;
                 }
             );
         } else {
@@ -341,7 +339,7 @@ class BuilderEvent extends Event
             $found = array_filter(
                 array_keys($tokens),
                 function ($k) use ($filter) {
-                    return (stripos($k, $filter) === 0);
+                    return stripos($k, $filter) === 0;
                 }
             );
 
@@ -352,7 +350,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Add tokens from a BuilderTokenHelper
+     * Add tokens from a BuilderTokenHelper.
      *
      * @param BuilderTokenHelper $tokenHelper
      * @param                    $tokens
@@ -360,7 +358,6 @@ class BuilderEvent extends Event
      * @param string             $valueColumn
      * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
      * @param bool               $convertToLinks         If true, the tokens will be converted to links
-     *
      */
     public function addTokensFromHelper(
         BuilderTokenHelper $tokenHelper,
@@ -370,20 +367,20 @@ class BuilderEvent extends Event
         $allowVisualPlaceholder = false,
         $convertToLinks = false
     ) {
-    	$tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
-		if ( $tokens == null ) {
-			$tokens = array();
-		}
-		
+        $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
+        if ($tokens == null) {
+            $tokens = [];
+        }
+
         $this->addTokens(
-        	$tokens,
+            $tokens,
             $allowVisualPlaceholder,
             $convertToLinks
         );
     }
 
     /**
-     * Get tokens from a BuilderTokenHelper
+     * Get tokens from a BuilderTokenHelper.
      *
      * @param BuilderTokenHelper $tokenHelper
      * @param                    $tokens
@@ -403,7 +400,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if token sections have been requested
+     * Check if token sections have been requested.
      *
      * @return bool
      */
@@ -413,7 +410,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if AB Test Winner Criteria has been requested
+     * Check if AB Test Winner Criteria has been requested.
      *
      * @return bool
      */
@@ -423,7 +420,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if AB Test Winner Criteria has been requested
+     * Check if AB Test Winner Criteria has been requested.
      *
      * @return bool
      */
@@ -443,6 +440,6 @@ class BuilderEvent extends Event
             return in_array($type, $this->requested);
         }
 
-        return ($this->requested == $type || $this->requested == 'all');
+        return $this->requested == $type || $this->requested == 'all';
     }
 }

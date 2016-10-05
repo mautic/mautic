@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,13 +19,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class LeadField
- *
- * @package Mautic\LeadBundle\Entity
+ * Class LeadField.
  */
 class LeadField extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -91,7 +89,7 @@ class LeadField extends FormEntity
     private $isUniqueIdentifer = false;
 
     /**
-     * Workaround for incorrectly spelled $isUniqueIdentifer
+     * Workaround for incorrectly spelled $isUniqueIdentifer.
      *
      * @var bool
      */
@@ -101,6 +99,11 @@ class LeadField extends FormEntity
      * @var int
      */
     private $order = 0;
+
+    /**
+     * @var string
+     */
+    private $object = 'lead';
 
     /**
      * @var array
@@ -117,13 +120,14 @@ class LeadField extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
 
         $builder->setTable('lead_fields')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository')
+            ->addIndex(['object'], 'search_by_object');
 
         $builder->addId();
 
@@ -176,6 +180,8 @@ class LeadField extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->addField('object', 'string');
+
         $builder->createField('properties', 'array')
             ->nullable()
             ->build();
@@ -184,20 +190,20 @@ class LeadField extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
-            array('message' => 'mautic.lead.field.label.notblank')
+            ['message' => 'mautic.lead.field.label.notblank']
         ));
 
-        $metadata->addConstraint(new UniqueEntity(array(
-            'fields'  => array('alias'),
-            'message' => 'mautic.lead.field.alias.unique'
-        )));
+        $metadata->addConstraint(new UniqueEntity([
+            'fields'  => ['alias'],
+            'message' => 'mautic.lead.field.alias.unique',
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -205,45 +211,46 @@ class LeadField extends FormEntity
     {
         $metadata->setGroupPrefix('leadField')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'label',
                     'alias',
                     'type',
                     'group',
-                    'order'
-                )
+                    'order',
+                    'object',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'defaultValue',
                     'isRequired',
                     'isPubliclyUpdatable',
                     'isUniqueIdentifier',
-                    'properties'
-                )
+                    'properties',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set label
+     * Set label.
      *
      * @param string $label
      *
      * @return LeadField
      */
-    public function setLabel ($label)
+    public function setLabel($label)
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -252,24 +259,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get label
+     * Get label.
      *
      * @return string
      */
-    public function getLabel ()
+    public function getLabel()
     {
         return $this->label;
     }
 
-
     /**
-     * Proxy function to setLabel()
+     * Proxy function to setLabel().
      *
      * @param string $label
      *
      * @return LeadField
      */
-    public function setName ($label)
+    public function setName($label)
     {
         $this->isChanged('label', $label);
 
@@ -277,23 +283,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Proxy function for getLabel()
+     * Proxy function for getLabel().
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->getLabel();
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return LeadField
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -302,23 +308,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
 
     /**
-     * Set defaultValue
+     * Set defaultValue.
      *
      * @param string $defaultValue
      *
      * @return LeadField
      */
-    public function setDefaultValue ($defaultValue)
+    public function setDefaultValue($defaultValue)
     {
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
@@ -327,23 +333,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get defaultValue
+     * Get defaultValue.
      *
      * @return string
      */
-    public function getDefaultValue ()
+    public function getDefaultValue()
     {
         return $this->defaultValue;
     }
 
     /**
-     * Set isRequired
+     * Set isRequired.
      *
-     * @param boolean $isRequired
+     * @param bool $isRequired
      *
      * @return LeadField
      */
-    public function setIsRequired ($isRequired)
+    public function setIsRequired($isRequired)
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -352,33 +358,33 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get isRequired
+     * Get isRequired.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsRequired ()
+    public function getIsRequired()
     {
         return $this->isRequired;
     }
 
     /**
-     * Proxy to getIsRequired()
+     * Proxy to getIsRequired().
      *
      * @return bool
      */
-    public function isRequired ()
+    public function isRequired()
     {
         return $this->getIsRequired();
     }
 
     /**
-     * Set isFixed
+     * Set isFixed.
      *
-     * @param boolean $isFixed
+     * @param bool $isFixed
      *
      * @return LeadField
      */
-    public function setIsFixed ($isFixed)
+    public function setIsFixed($isFixed)
     {
         $this->isFixed = $isFixed;
 
@@ -386,33 +392,33 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get isFixed
+     * Get isFixed.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsFixed ()
+    public function getIsFixed()
     {
         return $this->isFixed;
     }
 
     /**
-     * Proxy to getIsFixed()
+     * Proxy to getIsFixed().
      *
      * @return bool
      */
-    public function isFixed ()
+    public function isFixed()
     {
         return $this->getIsFixed();
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param string $properties
      *
      * @return LeadField
      */
-    public function setProperties ($properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -421,23 +427,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return string
      */
-    public function getProperties ()
+    public function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * Set order
+     * Set order.
      *
-     * @param integer $order
+     * @param int $order
      *
      * @return LeadField
      */
-    public function setOrder ($order)
+    public function setOrder($order)
     {
         $this->isChanged('order', $order);
         $this->order = $order;
@@ -446,23 +452,46 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get order
+     * Get object.
      *
-     * @return integer
+     * @return string
      */
-    public function getOrder ()
+    public function getObject()
     {
-        return $this->order;
+        return $this->object;
     }
-
     /**
-     * Set isVisible
+     * Set object.
      *
-     * @param boolean $isVisible
+     * @param int $object
      *
      * @return LeadField
      */
-    public function setIsVisible ($isVisible)
+    public function setObject($object)
+    {
+        $this->isChanged('object', $object);
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * Get order.
+     *
+     * @return int
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+    /**
+     * Set isVisible.
+     *
+     * @param bool $isVisible
+     *
+     * @return LeadField
+     */
+    public function setIsVisible($isVisible)
     {
         $this->isChanged('isVisible', $isVisible);
         $this->isVisible = $isVisible;
@@ -471,33 +500,33 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get isVisible
+     * Get isVisible.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsVisible ()
+    public function getIsVisible()
     {
         return $this->isVisible;
     }
 
     /**
-     * Proxy to getIsVisible()
+     * Proxy to getIsVisible().
      *
      * @return bool
      */
-    public function isVisible ()
+    public function isVisible()
     {
         return $this->getIsVisible();
     }
 
     /**
-     * Set isShortVisible
+     * Set isShortVisible.
      *
-     * @param boolean $isShortVisible
+     * @param bool $isShortVisible
      *
      * @return LeadField
      */
-    public function setIsShortVisible ($isShortVisible)
+    public function setIsShortVisible($isShortVisible)
     {
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
@@ -506,29 +535,29 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get isShortVisible
+     * Get isShortVisible.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsShortVisible ()
+    public function getIsShortVisible()
     {
         return $this->isShortVisible;
     }
 
     /**
-     * Proxy to getIsShortVisible()
+     * Proxy to getIsShortVisible().
      *
-     * @return boolean
+     * @return bool
      */
-    public function isShortVisible ()
+    public function isShortVisible()
     {
         return $this->getIsShortVisible();
     }
 
     /**
-     * Get the unique identifer state of the field
+     * Get the unique identifer state of the field.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsUniqueIdentifer()
     {
@@ -536,7 +565,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set the unique identifer state of the field
+     * Set the unique identifer state of the field.
      *
      * @param mixed $isUniqueIdentifer
      *
@@ -550,9 +579,9 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Wrapper for incorrectly spelled setIsUniqueIdentifer
+     * Wrapper for incorrectly spelled setIsUniqueIdentifer.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsUniqueIdentifier()
     {
@@ -560,7 +589,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Wrapper for incorrectly spelled setIsUniqueIdentifer
+     * Wrapper for incorrectly spelled setIsUniqueIdentifer.
      *
      * @param mixed $isUniqueIdentifier
      *
@@ -572,13 +601,13 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set alias
+     * Set alias.
      *
      * @param string $alias
      *
      * @return LeadField
      */
-    public function setAlias ($alias)
+    public function setAlias($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -587,23 +616,23 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get alias
+     * Get alias.
      *
      * @return string
      */
-    public function getAlias ()
+    public function getAlias()
     {
         return $this->alias;
     }
 
     /**
-     * Set isListable
+     * Set isListable.
      *
-     * @param boolean $isListable
+     * @param bool $isListable
      *
      * @return LeadField
      */
-    public function setIsListable ($isListable)
+    public function setIsListable($isListable)
     {
         $this->isChanged('isListable', $isListable);
         $this->isListable = $isListable;
@@ -612,21 +641,21 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get isListable
+     * Get isListable.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsListable ()
+    public function getIsListable()
     {
         return $this->isListable;
     }
 
     /**
-     * Proxy to getIsListable()
+     * Proxy to getIsListable().
      *
      * @return bool
      */
-    public function isListable ()
+    public function isListable()
     {
         return $this->getIsListable();
     }
@@ -634,7 +663,7 @@ class LeadField extends FormEntity
     /**
      * @return mixed
      */
-    public function getGroup ()
+    public function getGroup()
     {
         return $this->group;
     }
@@ -642,7 +671,7 @@ class LeadField extends FormEntity
     /**
      * @param mixed $group
      */
-    public function setGroup ($group)
+    public function setGroup($group)
     {
         $this->group = $group;
     }
@@ -650,7 +679,7 @@ class LeadField extends FormEntity
     /**
      * @return mixed
      */
-    public function getIsPubliclyUpdatable ()
+    public function getIsPubliclyUpdatable()
     {
         return $this->isPubliclyUpdatable;
     }
@@ -658,13 +687,13 @@ class LeadField extends FormEntity
     /**
      * @param mixed $isPubliclyUpdatable
      */
-    public function setIsPubliclyUpdatable ($isPubliclyUpdatable)
+    public function setIsPubliclyUpdatable($isPubliclyUpdatable)
     {
-        $this->isPubliclyUpdatable = (bool)$isPubliclyUpdatable;
+        $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;
     }
 
     /**
-     * Workaround for mispelled isUniqueIdentifer
+     * Workaround for mispelled isUniqueIdentifer.
      */
     public function identifierWorkaround()
     {

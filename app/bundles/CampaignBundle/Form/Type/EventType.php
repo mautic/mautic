@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,13 +16,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class EventType
- *
- * @package Mautic\CampaignBundle\Form\Type
+ * Class EventType.
  */
 class EventType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -37,7 +35,7 @@ class EventType extends AbstractType
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => false
+                'required'   => false,
             ]
         );
 
@@ -45,27 +43,30 @@ class EventType extends AbstractType
             'anchor',
             'hidden',
             [
-                'label'  => false
+                'label' => false,
             ]
         );
 
-        if ($options['data']['eventType'] == 'action' || $options['data']['eventType'] == 'condition') {
+        if (in_array($options['data']['eventType'], ['action', 'condition'])) {
             $label = 'mautic.campaign.form.type';
-            if ('no' == $options['data']['anchor']) {
+
+            $choices = [
+                'immediate' => 'mautic.campaign.form.type.immediate',
+                'interval'  => 'mautic.campaign.form.type.interval',
+                'date'      => 'mautic.campaign.form.type.date',
+            ];
+
+            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['eventType']) {
                 $label .= '_inaction';
-                $choices = [
-                    'interval' => 'mautic.campaign.form.type.interval_inaction',
-                    'date'     => 'mautic.campaign.form.type.date_inaction'
-                ];
-                $default = 'interval';
-            } else {
-                $choices = [
-                    'immediate' => 'mautic.campaign.form.type.immediate',
-                    'interval'  => 'mautic.campaign.form.type.interval',
-                    'date'      => 'mautic.campaign.form.type.date'
-                ];
-                $default = 'immediate';
+
+                unset($choices['immediate']);
+                $choices['interval'] = $choices['interval'].'_inaction';
+                $choices['date']     = $choices['date'].'_inaction';
             }
+
+            reset($choices);
+            $default = key($choices);
+
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
                 'triggerMode',
@@ -79,9 +80,9 @@ class EventType extends AbstractType
                     'empty_value' => false,
                     'required'    => false,
                     'attr'        => [
-                        'onchange' => 'Mautic.campaignToggleTimeframes();'
+                        'onchange' => 'Mautic.campaignToggleTimeframes();',
                     ],
-                    'data'        => $triggerMode
+                    'data' => $triggerMode,
                 ]
             );
 
@@ -89,14 +90,14 @@ class EventType extends AbstractType
                 'triggerDate',
                 'datetime',
                 [
-                    'label'  => false,
-                    'attr'   => [
+                    'label' => false,
+                    'attr'  => [
                         'class'       => 'form-control',
                         'preaddon'    => 'fa fa-calendar',
-                        'data-toggle' => 'datetime'
+                        'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
-                    'format' => 'yyyy-MM-dd HH:mm'
+                    'format' => 'yyyy-MM-dd HH:mm',
                 ]
             );
 
@@ -108,34 +109,34 @@ class EventType extends AbstractType
                     'label' => false,
                     'attr'  => [
                         'class'    => 'form-control',
-                        'preaddon' => 'symbol-hashtag'
+                        'preaddon' => 'symbol-hashtag',
                     ],
-                    'data'  => $data
+                    'data' => $data,
                 ]
             );
 
-            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';;
+            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
 
             $builder->add(
                 'triggerIntervalUnit',
                 'choice',
                 [
-                    'choices'     => [
+                    'choices' => [
                         'i' => 'mautic.campaign.event.intervalunit.choice.i',
                         'h' => 'mautic.campaign.event.intervalunit.choice.h',
                         'd' => 'mautic.campaign.event.intervalunit.choice.d',
                         'm' => 'mautic.campaign.event.intervalunit.choice.m',
                         'y' => 'mautic.campaign.event.intervalunit.choice.y',
                     ],
-                    'multiple'    => false,
-                    'label_attr'  => ['class' => 'control-label'],
-                    'label'       => false,
-                    'attr'        => [
-                        'class' => 'form-control'
+                    'multiple'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'label'      => false,
+                    'attr'       => [
+                        'class' => 'form-control',
                     ],
                     'empty_value' => false,
                     'required'    => false,
-                    'data'        => $data
+                    'data'        => $data,
                 ]
             );
         }
@@ -144,7 +145,7 @@ class EventType extends AbstractType
             $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
             $formTypeOptions = [
                 'label' => false,
-                'data'  => $properties
+                'data'  => $properties,
             ];
             if (isset($options['settings']['formTypeCleanMasks'])) {
                 $masks['properties'] = $options['settings']['formTypeCleanMasks'];
@@ -162,7 +163,7 @@ class EventType extends AbstractType
             'canvasSettings',
             'campaignevent_canvassettings',
             [
-                'label' => false
+                'label' => false,
             ]
         );
 
@@ -183,7 +184,7 @@ class EventType extends AbstractType
                 'save_icon'       => $btnIcon,
                 'save_onclick'    => 'Mautic.submitCampaignEvent(event)',
                 'apply_text'      => false,
-                'container_class' => 'bottom-form-buttons'
+                'container_class' => 'bottom-form-buttons',
             ]
         );
 
@@ -191,17 +192,16 @@ class EventType extends AbstractType
             'campaignId',
             'hidden',
             [
-                'mapped' => false
+                'mapped' => false,
             ]
         );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
-
 
     /**
      * @param OptionsResolver $resolver
@@ -216,6 +216,6 @@ class EventType extends AbstractType
      */
     public function getName()
     {
-        return "campaignevent";
+        return 'campaignevent';
     }
 }

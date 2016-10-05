@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,13 +13,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\FormEntity;
-use Symfony\Component\Validator\Constraints as Assert;
-
 
 class UtmTag
 {
-
     /**
      * @var int
      */
@@ -37,7 +34,7 @@ class UtmTag
     /**
      * @var array
      */
-    private $query = array();
+    private $query = [];
 
     /**
      * @var string
@@ -87,7 +84,7 @@ class UtmTag
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -108,9 +105,9 @@ class UtmTag
 
         $builder->addNullableField('url', 'string');
 
-        $builder->addNullableField('userAgent', 'text','user_agent');
+        $builder->addNullableField('userAgent', 'text', 'user_agent');
 
-        $builder->addNullableField('utmCampaign', 'string','utm_campaign');
+        $builder->addNullableField('utmCampaign', 'string', 'utm_campaign');
 
         $builder->addNullableField('utmContent', 'string', 'utm_content');
 
@@ -122,7 +119,7 @@ class UtmTag
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -130,7 +127,7 @@ class UtmTag
     {
         $metadata->setGroupPrefix('tmutmtag')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'lead',
                     'query',
@@ -142,24 +139,24 @@ class UtmTag
                     'utmContent',
                     'utmMedium',
                     'utmSource',
-                    'utmTerm'
-                )
+                    'utmTerm',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set dateHit
+     * Set dateHit.
      *
      * @param \DateTime $dateHit
      *
@@ -173,7 +170,7 @@ class UtmTag
     }
 
     /**
-     * Get dateHit
+     * Get dateHit.
      *
      * @return \DateTime
      */
@@ -223,13 +220,13 @@ class UtmTag
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
      * @return Action
      */
-    public function setReferer ($referer)
+    public function setReferer($referer)
     {
         $this->referer = $referer;
 
@@ -237,17 +234,17 @@ class UtmTag
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
-    public function getReferer ()
+    public function getReferer()
     {
         return $this->referer;
     }
 
     /**
-     * Set remoteHost
+     * Set remoteHost.
      *
      * @param string $remoteHost
      *
@@ -261,7 +258,7 @@ class UtmTag
     }
 
     /**
-     * Get remoteHost
+     * Get remoteHost.
      *
      * @return string
      */
@@ -271,7 +268,7 @@ class UtmTag
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
      *
@@ -285,7 +282,7 @@ class UtmTag
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */
@@ -295,7 +292,7 @@ class UtmTag
     }
 
     /**
-     * Set userAgent
+     * Set userAgent.
      *
      * @param string $userAgent
      *
@@ -309,7 +306,7 @@ class UtmTag
     }
 
     /**
-     * Get userAgent
+     * Get userAgent.
      *
      * @return string
      */
@@ -318,7 +315,7 @@ class UtmTag
         return $this->userAgent;
     }
 
-     /**
+    /**
      * @return array
      */
     public function getUtmCampaign()
@@ -417,5 +414,4 @@ class UtmTag
 
         return $this;
     }
-
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +13,7 @@ namespace Mautic\StageBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class EventHelper
+ * Class EventHelper.
  */
 class EventHelper
 {
@@ -24,7 +25,7 @@ class EventHelper
      */
     public static function engageStageAction($lead, $action)
     {
-        static $initiated = array();
+        static $initiated = [];
 
         $stagesChange = 0;
 

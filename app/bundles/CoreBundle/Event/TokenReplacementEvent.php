@@ -1,21 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class CommonEvent
+ * Class CommonEvent.
  */
 class TokenReplacementEvent extends CommonEvent
 {
+    /**
+     * @var CommonEntity|string
+     */
+    protected $entity;
+
     /**
      * @var string
      */
@@ -32,13 +39,22 @@ class TokenReplacementEvent extends CommonEvent
     protected $clickthrough = [];
 
     /**
+     * @var array
+     */
+    protected $tokens = [];
+
+    /**
      * TokenReplacementEvent constructor.
      *
-     * @param string $content
-     * @param Lead   $lead
+     * @param string|CommonEntity $content
+     * @param Lead|array          $lead
      */
-    public function __construct($content, Lead $lead = null, array $clickthrough = [])
+    public function __construct($content, $lead = null, array $clickthrough = [])
     {
+        if ($content instanceof CommonEntity) {
+            $this->entity = $content;
+        }
+
         $this->content      = $content;
         $this->lead         = $lead;
         $this->clickthrough = $clickthrough;
@@ -74,7 +90,7 @@ class TokenReplacementEvent extends CommonEvent
     public function getClickthrough()
     {
         if (!in_array('lead', $this->clickthrough)) {
-            $this->clickthrough['lead'] = $this->lead->getId();
+            $this->clickthrough['lead'] = is_array($this->lead) ? $this->lead['id'] : $this->lead->getId();
         }
 
         return $this->clickthrough;
@@ -86,5 +102,30 @@ class TokenReplacementEvent extends CommonEvent
     public function setClickthrough($clickthrough)
     {
         $this->clickthrough = $clickthrough;
+    }
+
+    /**
+     * @return CommonEntity|string
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    /**
+     * @param $token
+     * @param $value
+     */
+    public function addToken($token, $value)
+    {
+        $this->tokens[$token] = $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTokens()
+    {
+        return $this->tokens;
     }
 }

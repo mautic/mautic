@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle;
 
 /**
- * Class FormEvents
+ * Class FormEvents.
  *
  * Events available for FormBundle
  */
@@ -54,7 +55,7 @@ final class FormEvents
 
     /**
      * The mautic.form_on_build event is dispatched before displaying the form builder form to allow adding of custom form
-     * fields and submit actions
+     * fields and submit actions.
      *
      * The event listener receives a Mautic\FormBundle\Event\FormBuilderEvent instance.
      *
@@ -63,7 +64,7 @@ final class FormEvents
     const FORM_ON_BUILD = 'mautic.form_on_build';
 
     /**
-     * The mautic.form_on_submit event is dispatched when a new submission is fired
+     * The mautic.form_on_submit event is dispatched when a new submission is fired.
      *
      * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
      *
@@ -90,4 +91,14 @@ final class FormEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.form.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.form.on_execute_submit_action event is dispatched to excecute the form submit actions.
+     *
+     * The event listener receives a
+     * Mautic\FormBundle\Event\SubmissionEvent
+     *
+     * @var string
+     */
+    const ON_EXECUTE_SUBMIT_ACTION = 'matuic.form.on_execute_submit_action';
 }

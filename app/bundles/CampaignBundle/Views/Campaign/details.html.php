@@ -1,15 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
-$view['slots']->set("headerTitle", $campaign->getName());
+$view['slots']->set('headerTitle', $campaign->getName());
 
 $view['slots']->set(
     'actions',
@@ -23,7 +23,7 @@ $view['slots']->set(
                 'delete' => $permissions['campaign:campaigns:delete'],
                 'close'  => $permissions['campaign:campaigns:view'],
             ],
-            'routeBase'       => 'campaign',
+            'routeBase' => 'campaign',
         ]
     )
 );
@@ -37,13 +37,13 @@ $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php'
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
 
 switch (true) {
-    case (!empty($decisions)):
+    case !empty($decisions):
         $firstTab = 'decision';
         break;
-    case (!empty($actions)):
+    case !empty($actions):
         $firstTab = 'action';
         break;
-    case (!empty($conditions)):
+    case !empty($conditions):
         $firstTab = 'condition';
         break;
 }
@@ -140,8 +140,8 @@ switch (true) {
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($decisions): ?>
                     <li class="<?php if ('decision' == $firstTab) {
-                        echo 'active';
-                    } ?>">
+                                    echo 'active';
+                                } ?>">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                         </a>
@@ -149,8 +149,8 @@ switch (true) {
                 <?php endif; ?>
                 <?php if ($actions): ?>
                     <li class="<?php if ('action' == $firstTab) {
-                        echo 'active';
-                    } ?>">
+                                    echo 'active';
+                                } ?>">
                         <a href="#actions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
@@ -158,8 +158,8 @@ switch (true) {
                 <?php endif; ?>
                 <?php if ($conditions): ?>
                     <li class="<?php if ('condition' == $firstTab) {
-                        echo 'active';
-                    } ?>">
+                                    echo 'active';
+                                } ?>">
                         <a href="#conditions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.conditions.header'); ?>
                         </a>
@@ -179,22 +179,22 @@ switch (true) {
             <!-- #events-container -->
             <?php if ($decisions): ?>
                 <div class="<?php if ('decision' == $firstTab) {
-                    echo 'active ';
-                } ?>tab-pane fade in bdr-w-0" id="decisions-container">
+                                    echo 'active ';
+                                } ?>tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
                 <div class="<?php if ('action' == $firstTab) {
-                    echo 'active ';
-                } ?>tab-pane fade in bdr-w-0" id="actions-container">
+                                    echo 'active ';
+                                } ?>tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
                 <div class="<?php if ('condition' == $firstTab) {
-                    echo 'active ';
-                } ?>tab-pane fade in bdr-w-0" id="conditions-container">
+                                    echo 'active ';
+                                } ?>tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>
             <?php endif; ?>

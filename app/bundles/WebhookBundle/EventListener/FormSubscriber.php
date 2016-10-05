@@ -1,33 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\FormBundle\Event as Events;
-use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\FormEvents;
 
 /**
- * Class FormSubscriber
+ * Class FormSubscriber.
  */
 class FormSubscriber extends WebhookSubscriberBase
 {
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::FORM_ON_SUBMIT   => array('onFormSubmit', 0),
-        );
+        return [
+            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
+        ];
     }
 
     /*
@@ -37,15 +35,15 @@ class FormSubscriber extends WebhookSubscriberBase
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
-        $types    = array(FormEvents::FORM_ON_SUBMIT);
+        $types = [FormEvents::FORM_ON_SUBMIT];
 
-        $groups = array('submissionDetails', 'ipAddress', 'leadList', 'pageList', 'formList');
+        $groups = ['submissionDetails', 'ipAddress', 'leadList', 'pageList', 'formList'];
 
         $form = $event->getSubmission();
 
-        $payload = array(
-            'submission'  => $form,
-        );
+        $payload = [
+            'submission' => $form,
+        ];
 
         $webhooks = $this->getEventWebooksByType($types);
         $this->webhookModel->QueueWebhooks($webhooks, $payload, $groups, true);

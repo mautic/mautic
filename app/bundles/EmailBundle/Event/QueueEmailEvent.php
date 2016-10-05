@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +13,10 @@ namespace Mautic\EmailBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class QueueEmailEvent
+ * Class QueueEmailEvent.
  */
 class QueueEmailEvent extends Event
 {
-
     /**
      * @var \Swift_Message
      */
@@ -44,9 +44,7 @@ class QueueEmailEvent extends Event
     }
 
     /**
-     * Sets whether the sending of the message should be tried again
-     *
-     * @return void
+     * Sets whether the sending of the message should be tried again.
      */
     public function tryAgain()
     {

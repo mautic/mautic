@@ -1,28 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\StageBundle\Model\StageModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\StageBundle\StageEvents;
-use Mautic\StageBundle\Event\StageEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\StageEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package Mautic\StageBundle\EventListener
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -39,27 +37,24 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
+     * @param LeadModel  $leadModel
      * @param StageModel $stageModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, StageModel $stageModel)
+    public function __construct(LeadModel $leadModel, StageModel $stageModel)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel  = $leadModel;
         $this->stageModel = $stageModel;
-
-        parent::__construct($factory);
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerActionChangeStage', 0]
-        );
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            StageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerActionChangeStage', 0],
+        ];
     }
 
     /**
@@ -67,13 +62,13 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $action = array(
-            'label'           => 'mautic.stage.campaign.event.change',
-            'description'     => 'mautic.stage.campaign.event.change_descr',
-            'eventName'       => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'stageaction_change',
-            'formTheme'       => 'MauticStageBundle:FormTheme\StageActionChange'
-        );
+        $action = [
+            'label'       => 'mautic.stage.campaign.event.change',
+            'description' => 'mautic.stage.campaign.event.change_descr',
+            'eventName'   => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'    => 'stageaction_change',
+            'formTheme'   => 'MauticStageBundle:FormTheme\StageActionChange',
+        ];
         $event->addAction('stage.change', $action);
     }
 
@@ -83,31 +78,29 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
     {
         $stageChange = false;
-        $lead = $event->getLead();
-        $leadStage = null;
+        $lead        = $event->getLead();
+        $leadStage   = null;
 
         if ($lead instanceof Lead) {
             $leadStage = $lead->getStage();
         }
 
-        $stageId = (int) $event->getConfig()['stage'];
+        $stageId         = (int) $event->getConfig()['stage'];
         $stageToChangeTo = $this->stageModel->getEntity($stageId);
 
         if ($stageToChangeTo != null && $stageToChangeTo->isPublished()) {
-            if($leadStage && $leadStage->getWeight() <= $stageToChangeTo->getWeight()){
+            if ($leadStage && $leadStage->getWeight() <= $stageToChangeTo->getWeight()) {
                 $stageChange = true;
-            }
-            elseif(!$leadStage){
-
+            } elseif (!$leadStage) {
                 $stageChange = true;
             }
         }
 
-        if ($stageChange){
+        if ($stageChange) {
             $parsed = explode('.', $stageToChangeTo->getName());
             $lead->stageChangeLogEntry(
                 $parsed[0],
-                $stageToChangeTo->getId() . ": " . $stageToChangeTo->getName(),
+                $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
                 $event->getName()
             );
             $lead->setStage($stageToChangeTo);

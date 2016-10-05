@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -34,27 +35,27 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="TwitterProfile">
-        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:profile.html.php', array(
-            'lead'      => $lead,
-            'profile'   => $details['profile']
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:profile.html.php', [
+            'lead'    => $lead,
+            'profile' => $details['profile'],
+        ]); ?>
     </div>
     <div class="tab-pane" id="TwitterTweets">
-        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tweets.html.php', array(
-            'lead'        => $lead,
-            'activity'    => (!empty($details['activity']['tweets'])) ? $details['activity']['tweets'] : array()
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tweets.html.php', [
+            'lead'     => $lead,
+            'activity' => (!empty($details['activity']['tweets'])) ? $details['activity']['tweets'] : [],
+        ]); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterPhotos">
-        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:photos.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:photos.html.php', [
             'lead'      => $lead,
-             'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
-        )); ?>
+             'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : [],
+        ]); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterTags">
-        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tags.html.php', array(
-            'lead'      => $lead,
-            'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : array()
-        )); ?>
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tags.html.php', [
+            'lead'     => $lead,
+            'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : [],
+        ]); ?>
     </div>
 </div>

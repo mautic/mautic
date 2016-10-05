@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -26,23 +27,23 @@ if ($tmpl == 'index') {
                 </h3>
             </div>
             <div class="panel-body alert-warning">
-                <p><?php echo $view['translator']->trans('mautic.install.sentence.major.problems', array('%majors%' => count($majors))); ?></p>
+                <p><?php echo $view['translator']->trans('mautic.install.sentence.major.problems', ['%majors%' => count($majors)]); ?></p>
             </div>
             <ul class="list-group">
                 <?php foreach ($majors as $message) : ?>
                     <?php switch ($message) :
                         case 'mautic.install.cache.unwritable': ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/cache')); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $appRoot.'/cache']); ?></li>
                             <?php break;
                         case 'mautic.install.config.unwritable': ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%path%' => $configFile)); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%path%' => $configFile]); ?></li>
                             <?php break;
                         case 'mautic.install.logs.unwritable': ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/logs')); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $appRoot.'/logs']); ?></li>
                             <?php break;
                         case 'mautic.install.apc.version': ?>
                             <?php $minAPCverison = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17'; ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%minapc%' => $minAPCverison, '%currentapc%' => phpversion('apc'))); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%minapc%' => $minAPCverison, '%currentapc%' => phpversion('apc')]); ?></li>
                             <?php break;
                         default: ?>
                             <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>
@@ -78,13 +79,13 @@ if ($tmpl == 'index') {
                     <?php foreach ($minors as $message) : ?>
                         <?php switch ($message) :
                             case 'mautic.install.pcre.version': ?>
-                                <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%pcreversion%' => (float) PCRE_VERSION]); ?></li>
                                 <?php break;
                             case 'mautic.install.php.version.not.supported': ?>
-                                <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%phpversion%' => PHP_VERSION)); ?></li>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%phpversion%' => PHP_VERSION]); ?></li>
                                 <?php break;
                             case 'mautic.install.php.version.has.only.security.support': ?>
-                                <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%phpversion%' => PHP_VERSION)); ?></li>
+                                <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%phpversion%' => PHP_VERSION]); ?></li>
                                 <?php break;
                             default: ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>

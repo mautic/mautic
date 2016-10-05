@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,7 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TagType extends AbstractType
 {
-
     /**
      * @var
      */
@@ -53,10 +53,10 @@ class TagType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'label'           => 'mautic.lead.tags',
-                'class'           => 'MauticLeadBundle:Tag',
-                'query_builder'   => function (EntityRepository $er) {
+            [
+                'label'         => 'mautic.lead.tags',
+                'class'         => 'MauticLeadBundle:Tag',
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')
                         ->orderBy('t.tag', 'ASC');
                 },
@@ -64,8 +64,8 @@ class TagType extends AbstractType
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,
-                'add_transformer' => false
-            )
+                'add_transformer' => false,
+            ]
         );
     }
 

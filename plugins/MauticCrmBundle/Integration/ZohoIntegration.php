@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,17 +13,16 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
- * Class ZohoIntegration
+ * Class ZohoIntegration.
  */
 class ZohoIntegration extends CrmAbstractIntegration
 {
-
     /**
-     * Returns the name of the social integration that must match the name of the file
+     * Returns the name of the social integration that must match the name of the file.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return 'Zoho';
     }
@@ -32,18 +32,18 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function getRequiredKeyFields ()
+    public function getRequiredKeyFields()
     {
-        return array(
+        return [
             $this->getClientIdKey()     => 'mautic.zoho.form.email',
-            $this->getClientSecretKey() => 'mautic.zoho.form.password'
-        );
+            $this->getClientSecretKey() => 'mautic.zoho.form.password',
+        ];
     }
 
     /**
      * @return string
      */
-    public function getClientIdKey ()
+    public function getClientIdKey()
     {
         return 'EMAIL_ID';
     }
@@ -51,7 +51,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return string
      */
-    public function getClientSecretKey ()
+    public function getClientSecretKey()
     {
         return 'PASSWORD';
     }
@@ -59,7 +59,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return string
      */
-    public function getAuthTokenKey ()
+    public function getAuthTokenKey()
     {
         return 'AUTHTOKEN';
     }
@@ -77,28 +77,28 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
-        return array(
+        return [
             'requires_callback'      => false,
-            'requires_authorization' => true
-        );
+            'requires_authorization' => true,
+        ];
     }
 
     /**
      * @return bool
      */
-    public function authCallback($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         $request_url = 'https://accounts.zoho.com/apiauthtoken/nb/create';
-        $parameters  = array(
+        $parameters  = [
             'SCOPE'    => 'ZohoCRM/crmapi',
             'EMAIL_ID' => $this->keys[$this->getClientIdKey()],
-            'PASSWORD' => $this->keys[$this->getClientSecretKey()]
-        );
+            'PASSWORD' => $this->keys[$this->getClientSecretKey()],
+        ];
 
-        $response = $this->makeRequest($request_url, $parameters, 'GET', array('authorize_session' => true));
+        $response = $this->makeRequest($request_url, $parameters, 'GET', ['authorize_session' => true]);
 
         if ($response['RESULT'] == 'FALSE') {
-            return $this->factory->getTranslator()->trans("mautic.zoho.auth_error", array('%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')));
+            return $this->factory->getTranslator()->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
         }
 
         return $this->extractAuthKeys($response);
@@ -127,9 +127,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $parts                 = explode('=', $string_attribute);
                     $attributes[$parts[0]] = $parts[1];
                 }
+
                 return $attributes;
             } else {
-                return array();
+                return [];
             }
         } else {
             return parent::parseCallbackResponse($data, $postAuthorization);
@@ -139,35 +140,36 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function getAvailableLeadFields ($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        $zohoFields        = array();
+        $zohoFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
                 $leadObject = $this->getApiHelper()->getLeadFields();
 
                 if ($leadObject == null || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
-                    return array();
+                    return [];
                 }
 
-                $zohoFields = array();
+                $zohoFields = [];
                 foreach ($leadObject['Leads']['section'] as $optgroup) {
                     //$zohoFields[$optgroup['dv']] = array();
-                    if (!array_key_exists(0, $optgroup['FL']))
-                        $optgroup['FL'] = array($optgroup['FL']);
+                    if (!array_key_exists(0, $optgroup['FL'])) {
+                        $optgroup['FL'] = [$optgroup['FL']];
+                    }
                     foreach ($optgroup['FL'] as $field) {
-                        if (!(bool)$field['isreadonly'] || in_array($field['type'], array('Lookup', 'OwnerLookup', 'Boolean'))) {
+                        if (!(bool) $field['isreadonly'] || in_array($field['type'], ['Lookup', 'OwnerLookup', 'Boolean'])) {
                             continue;
                         }
 
                         $key              = InputHelper::alphanum(InputHelper::transliterate($field['dv']));
-                        $zohoFields[$key] = array(
+                        $zohoFields[$key] = [
                             'type'     => 'string',
                             'label'    => $field['label'],
                             'dv'       => $field['dv'],
-                            'required' => ($field['req'] == 'true')
-                        );
+                            'required' => ($field['req'] == 'true'),
+                        ];
                     }
                 }
             }
@@ -205,7 +207,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function populateLeadData ($lead, $config = array())
+    public function populateLeadData($lead, $config = [])
     {
         $mappedData = parent::populateLeadData($lead, $config);
 

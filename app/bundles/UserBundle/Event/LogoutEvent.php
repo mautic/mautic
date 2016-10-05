@@ -1,20 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class LogoutEvent
+ * Class LogoutEvent.
  */
 class LogoutEvent extends Event
 {
@@ -26,7 +27,7 @@ class LogoutEvent extends Event
     /**
      * @var array
      */
-    private $session = array();
+    private $session = [];
 
     /**
      * @var Request
@@ -54,7 +55,7 @@ class LogoutEvent extends Event
     }
 
     /**
-     * Add value to session after it's been cleared
+     * Add value to session after it's been cleared.
      *
      * @param $key
      * @param $value
@@ -65,7 +66,7 @@ class LogoutEvent extends Event
     }
 
     /**
-     * Get session items to be added after session has been cleared
+     * Get session items to be added after session has been cleared.
      *
      * @return array
      */
