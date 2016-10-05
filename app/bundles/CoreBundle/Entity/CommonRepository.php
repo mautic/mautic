@@ -17,6 +17,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -552,7 +553,10 @@ class CommonRepository extends EntityRepository
     protected function buildOrderByClause(&$q, array $args)
     {
         $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
-        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : '';
+        $orderByDir = InputHelper::alphanum(
+            array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
+        );
+
         if (empty($orderBy)) {
             $defaultOrder = $this->getDefaultOrder();
 
@@ -563,6 +567,8 @@ class CommonRepository extends EntityRepository
             //add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
+                $order = InputHelper::alphanum($order, false, false, ['_', '.']);
+
                 $q->addOrderBy($order, $orderByDir);
             }
         }

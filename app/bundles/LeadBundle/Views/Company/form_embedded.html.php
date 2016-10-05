@@ -16,8 +16,8 @@
             <?php foreach ($groups as $g): ?>
                 <?php if (!empty($fields[$g])): ?>
                     <li class="<?php if ($step === 1) {
-                        echo 'active';
-                    } ?>">
+    echo 'active';
+} ?>">
                         <a href="#company-<?php echo $g; ?>" class="steps" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                         </a>

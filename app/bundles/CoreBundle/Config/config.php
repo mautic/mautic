@@ -240,7 +240,7 @@ return [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
                 'alias' => 'dynamic_content_filter',
             ],
-            'mautic.form.type.dynamic_content_filter_entry'         => [
+            'mautic.form.type.dynamic_content_filter_entry' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
                 'alias'     => 'dynamic_content_filter_entry',
                 'arguments' => [
@@ -256,7 +256,7 @@ return [
                     'mautic.lead.model.list',
                 ],
             ],
-            'mautic.form.type.entity_lookup'                        => [
+            'mautic.form.type.entity_lookup' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
                 'arguments' => [
                     'mautic.model.factory',

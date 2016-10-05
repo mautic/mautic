@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Model;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Interface AjaxLookupModelInterface
+ * Interface AjaxLookupModelInterface.
  *
  * Defines methods required by AjaxLookupControllerTrait to find matching records
  */
@@ -27,10 +27,10 @@ interface AjaxLookupModelInterface
      *
      * @return mixed
      */
-    function getLookupResults($type, $filter = '', $limit = 10, $start = 0);
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0);
 
     /**
      * @return CommonRepository
      */
-    function getRepository();
+    public function getRepository();
 }

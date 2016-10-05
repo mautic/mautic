@@ -811,6 +811,8 @@ class FieldModel extends FormModel
             case 'country':
             case 'email':
             case 'lookup':
+            case 'select':
+            case 'multiselect':
             case 'region':
             case 'tel':
             case 'text':

@@ -418,7 +418,7 @@ return [
                     'router',
                     'database_connection',
                 ],
-                'alias'     => 'company_list',
+                'alias' => 'company_list',
             ],
         ],
         'other' => [

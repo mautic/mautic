@@ -80,7 +80,7 @@ class EntityLookupType extends AbstractType
                     return;
                 }
 
-                $options            = $form->getConfig()->getOptions();
+                $options = $form->getConfig()->getOptions();
                 $options['choices'] = $this->getChoices($data, $options);
 
                 $form->getParent()->add(
@@ -110,17 +110,17 @@ class EntityLookupType extends AbstractType
 
                     return $this->getChoices($data, $options);
                 },
-                'expanded'               => false,
-                'multiple'               => false,
-                'required'               => false,
-                'empty_value'            => function (Options $options) {
+                'expanded'    => false,
+                'multiple'    => false,
+                'required'    => false,
+                'empty_value' => function (Options $options) {
                     if (empty($options['modal_route'])) {
                         return $this->translator->trans('mautic.core.lookup.search_options', [], 'javascript');
                     }
 
                     return false;
                 },
-                'attr'                   => function (Options $options) {
+                'attr' => function (Options $options) {
                     $attr =
                         [
                             'class'              => "form-control {$options['model']}-select",
@@ -181,14 +181,14 @@ class EntityLookupType extends AbstractType
         }
         $model = $this->modelFactory->getModel($model);
         if (!$model instanceof AjaxLookupModelInterface) {
-            throw new \InvalidArgumentException(get_class($model)." must implement ".AjaxLookupModelInterface::class);
+            throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
         }
 
         $alias     = $model->getRepository()->getTableAlias();
         $expr      = new ExpressionBuilder($this->connection);
         $composite = $expr->andX();
         $composite->add(
-            $expr->in($alias.".id", $data)
+            $expr->in($alias.'.id', $data)
         );
 
         $validChoices = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn);
