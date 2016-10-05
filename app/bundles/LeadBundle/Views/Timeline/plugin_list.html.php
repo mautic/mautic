@@ -102,6 +102,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
             $details = trim($view->render($event['contentTemplate'], ['event' => $event]));
         endif;
 
+        $details = preg_replace('/a\s+href/', 'a target="_new" href', $details);
+
         $rowStripe = ($counter % 2 === 0) ? ' timeline-row-highlighted' : '';
         ?>
         <div class="timeline-row<?php echo $rowStripe; ?><?php if (!empty($event['featured'])) {
@@ -157,17 +159,17 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
 </div>
 
-<?php echo $view->render(
-    'MauticCoreBundle:Helper:pagination.html.php',
-    [
-        'page'       => $events['page'],
-        'fixedPages' => $events['maxPages'],
-        'fixedLimit' => true,
-        'baseUrl'    => $baseUrl,
-        'target'     => '#timeline-table',
-        'totalItems' => $events['total'],
-    ]
-); ?>
+<?php //echo $view->render(
+//    'MauticCoreBundle:Helper:pagination.html.php',
+//    [
+//        'page'       => $events['page'],
+//        'fixedPages' => $events['maxPages'],
+//        'fixedLimit' => true,
+//        'baseUrl'    => $baseUrl,
+//        'target'     => '#timeline-table',
+//        'totalItems' => $events['total'],
+//    ]
+//); ?>
 
 <!--/ timeline -->
 
