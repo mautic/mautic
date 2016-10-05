@@ -40,7 +40,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li <?php echo !$isExisting ? "class='active'" : ''; ?>><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
-                    <li <?php echo $isExisting ? "class='active'" : ''; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
+                    <li <?php echo $isExisting ? "class='active'" : ''; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.source'); ?></a></li>
                 </ul>
 
                 <!--/ tabs controls -->

@@ -17,8 +17,6 @@ $filterSelectPrototype   = $form['dynamicContent']->children[0]['filters']->chil
 $variantParent = $email->getVariantParent();
 $isExisting    = $email->getId();
 
-$isExisting = $email->getId();
-
 $subheader = ($variantParent) ? '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
     '%name%'   => $email->getName(),
     '%parent%' => $variantParent->getName(),
@@ -46,8 +44,7 @@ $templates = [
     'locales'   => 'locale-template',
 ];
 
-$attr                               = $form->vars['attr'];
-$attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
+$attr = $form->vars['attr'];
 
 ?>
 
@@ -58,14 +55,30 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li <?php echo !$isExisting ? "class='active'" : ''; ?>><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
-                    <li <?php echo $isExisting ? "class='active'" : ''; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
-                    <li><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
-                    <li><a href="#dynamic-content-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?></a></li>
+                    <li <?php echo !$isExisting || $email->getTemplate() !== 'mautic_code_mode' ? "class='active'" : ''; ?>>
+                        <a href="#email-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.form.theme'); ?>
+                        </a>
+                    </li>
+                    <li class="source-tab<?php echo $isExisting && $email->getTemplate() === 'mautic_code_mode' ? ' active' : ''; ?><?php echo $email->getTemplate() !== 'mautic_code_mode' ? ' hide' : ''; ?>">
+                        <a href="#source-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.source'); ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#advanced-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.advanced'); ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#dynamic-content-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
+                        </a>
+                    </li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade <?php echo !$isExisting ? 'in active' : ''; ?> bdr-w-0" id="email-container">
+                    <div class="tab-pane fade <?php echo !$isExisting || $email->getTemplate() !== 'mautic_code_mode' ? 'in active' : ''; ?> bdr-w-0" id="email-container">
                         <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
@@ -78,29 +91,10 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                         ]); ?>
                     </div>
 
-                    <div class="tab-pane fade <?php echo $isExisting ? 'in active' : ''; ?> bdr-w-0" id="source-container">
-                        <div class="row">
-                          <div class="col-md-12">
-                              <?php echo $view['form']->row($form['subject']); ?>
-                          </div>
-                        </div>
+                    <div class="tab-pane fade <?php echo $isExisting && $email->getTemplate() === 'mautic_code_mode' ? 'in active' : ''; ?> bdr-w-0" id="source-container">
                         <div class="row">
                             <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
                                 <?php echo $view['form']->row($form['customHtml']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <?php echo $view['form']->label($form['plainText']); ?>
-                                </div>
-                                <div class="text-right pr-10">
-                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                                </div>
-                                <div class="clearfix"></div>
-                                <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
                     </div>
@@ -135,6 +129,21 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                                 </div>
                                 <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['plainText']); ?>
+                                </div>
+                                <div class="text-right pr-10">
+                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                                </div>
+                                <div class="clearfix"></div>
+                                <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
                     </div>
@@ -173,6 +182,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['subject']); ?>
             <?php echo $view['form']->row($form['name']); ?>
             <?php if ($isVariant): ?>
                 <?php echo $view['form']->row($form['variantSettings']); ?>

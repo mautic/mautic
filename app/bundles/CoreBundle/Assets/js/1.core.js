@@ -600,6 +600,20 @@ var Mautic = {
             });
         }
 
+        if (mQuery(container + ' textarea.editor-code').length) {
+            mQuery('textarea.editor-code').each(function () {
+                var textarea = mQuery(this);
+                var editor = CodeMirror.fromTextArea(this, {
+                    lineNumbers: true,
+                    mode: 'htmlmixed',
+                    setSize: {height: 40}
+                });
+                editor.on('change', function(cm, change) {
+                    textarea.val(cm.getValue());
+                });
+            });
+        }
+
         //activate shuffles
         if (mQuery(container + ' .shuffle-grid').length) {
             var grid = mQuery(container + " .shuffle-grid");
@@ -3790,13 +3804,6 @@ var Mautic = {
         }
 
         if (customHtml.length) {
-
-            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
-
-            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
-                Mautic.setThemeHtml(themeField.val());
-            }
-
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
@@ -3813,8 +3820,14 @@ var Mautic = {
                 // Set the theme field value
                 themeField.val(currentLink.attr('data-theme'));
 
-                // Load the theme HTML to the source textarea
-                Mautic.setThemeHtml(currentLink.attr('data-theme'));
+                // Code Mode
+                if (currentLink.attr('data-theme') === 'mautic_code_mode') {
+                    mQuery('.source-tab').removeClass('hide').show('fast');
+                    mQuery('#emailform_buttons_builder_toolbar').hide('fast');
+                } else {
+                    mQuery('.source-tab').hide('fast');
+                    mQuery('#emailform_buttons_builder_toolbar').removeClass('hide').show('fast');
+                }
 
                 // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
@@ -3825,19 +3838,6 @@ var Mautic = {
                 currentLink.addClass('hide');
             });
         }
-    },
-
-    /**
-     * Set theme's HTML
-     *
-     * @param theme
-     */
-    setThemeHtml: function(theme) {
-        mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
-            var textarea = mQuery('textarea.builder-html');
-            textarea.val(themeHtml);
-            textarea.froalaEditor('html.set', themeHtml);
-        });
     },
 
     /**
