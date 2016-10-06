@@ -98,7 +98,11 @@ if ($tmpl == 'index') {
                         </div>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $view['translator']->trans($categoryTypes[$item->getBundle()]); ?></td>
+                    <td class="visible-md visible-lg">
+                    <?php if (isset($categoryTypes[$item->getBundle()])) : ?>
+                        <?php echo $view['translator']->trans($categoryTypes[$item->getBundle()]); ?>
+                    <?php endif; ?>
+                    </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
