@@ -454,6 +454,8 @@ class CommonRepository extends EntityRepository
         } elseif (is_array($filters)) {
             $type         = (isset($filters[1])) ? $filters[1]->type : $filters[0]->type;
             $parseFilters = &$filters;
+        } else {
+            $type = "and";
         }
 
         $parameters  = [];
