@@ -1,21 +1,21 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    var plaintext = mQuery('#emailform_plainText');
+    var textarea = mQuery('#emailform_customHtml');
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
-
-    var plaintext = mQuery('#emailform_plainText');
-    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-
-    var textarea = mQuery('#emailform_customHtml');
     mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
         textarea.data('CodeMirror').setValue(textarea.val());
     });
 
+    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
+    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.keepPreviewAlive(textarea.data('CodeMirror'));
     Mautic.initEmailDynamicContent();
 };
 

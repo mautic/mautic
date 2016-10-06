@@ -70,12 +70,7 @@ Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
         }
     });
 
-    // Build the iframe with the theme HTML in it
-    var iframe = document.getElementById(id);
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(themeHtml);
-    doc.close();
+    Mautic.updateIframeContent(id, themeHtml);
 };
 
 Mautic.htmlspecialchars_decode = function(encodedHtml) {

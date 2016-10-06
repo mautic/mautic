@@ -93,8 +93,13 @@ $attr = $form->vars['attr'];
 
                     <div class="tab-pane fade <?php echo $isExisting && $email->getTemplate() === 'mautic_code_mode' ? 'in active' : ''; ?> bdr-w-0" id="source-container">
                         <div class="row">
-                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+                            <div class="col-md-12" id="customHtmlContainer">
                                 <?php echo $view['form']->row($form['customHtml']); ?>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <iframe style="height: 525px; width: 100%;" id="live-preview"></iframe>
                             </div>
                         </div>
                     </div>

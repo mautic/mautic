@@ -3819,7 +3819,7 @@ var Mautic = {
                 var theme = currentLink.attr('data-theme');
                 var isCodeMode = (theme === 'mautic_code_mode');
 
-                if (Mautic.showChangeThemeWarning && customHtml.val().length || !isCodeMode) {
+                if (Mautic.showChangeThemeWarning && customHtml.val().length && !isCodeMode) {
                     if (confirm('You will lose the current content if you switch the theme.')) {
                         customHtml.val('');
                         Mautic.showChangeThemeWarning = false;
@@ -3867,6 +3867,33 @@ var Mautic = {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
         });
+    },
+
+    /**
+     * Creates an iframe and keeps its content live from textarea (CodeMirror) changes
+     *
+     * @param codeMirror
+     */
+    keepPreviewAlive: function(codeMirror) {
+        if (mQuery('#live-preview').length) {
+            codeMirror.on('change', function() {
+                Mautic.updateIframeContent('live-preview', codeMirror.getValue());
+            });
+        }
+    },
+
+    /**
+     * Updates content of an iframe
+     *
+     * @param iframe ID
+     * @param HTML content
+     */
+    updateIframeContent: function(iframeId, content) {
+        var iframe = document.getElementById(iframeId);
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(content);
+        doc.close();
     },
 
     /**
