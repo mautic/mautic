@@ -3542,7 +3542,11 @@ var Mautic = {
             options: {
                 scales: {
                     xAxes: [{
-                        barPercentage: 35
+                        barPercentage: 35,
+                        stacked: true,
+                    }],
+                    yAxes: [{
+                        stacked: false,
                     }]
                 }
             }
