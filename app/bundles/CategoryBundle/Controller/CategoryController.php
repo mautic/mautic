@@ -90,9 +90,11 @@ class CategoryController extends FormController
 
         if ($bundle != 'category') {
             $filter['force'] = [
-                'column' => 'c.bundle',
-                'expr'   => 'eq',
-                'value'  => $bundle,
+                [
+                    'column' => 'c.bundle',
+                    'expr'   => 'eq',
+                    'value'  => $bundle,
+                ],
             ];
         }
 
