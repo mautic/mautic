@@ -250,8 +250,8 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-                heightMin: 300
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                heightMin: 100
             }));
 
             tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
@@ -315,8 +315,8 @@ Mautic.initDynamicContentItem = function (tabId) {
 
         altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-            heightMin: 300
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+            heightMin: 100
         }));
 
         Mautic.initRemoveEvents(removeButton);

@@ -138,7 +138,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (!isset($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
         }

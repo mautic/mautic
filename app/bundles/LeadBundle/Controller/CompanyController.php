@@ -162,7 +162,7 @@ class CompanyController extends FormController
 
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'filter'         => [
+                'filter' => [
                     'force' => [
                         [
                             'column' => 'f.object',
@@ -174,7 +174,7 @@ class CompanyController extends FormController
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]
         );
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -255,9 +255,10 @@ class CompanyController extends FormController
         $groups = array_keys($fields);
         sort($groups);
         $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -464,9 +465,10 @@ class CompanyController extends FormController
         $groups = array_keys($fields);
         sort($groups);
         $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),

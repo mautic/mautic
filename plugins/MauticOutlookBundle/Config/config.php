@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,15 +12,5 @@ return [
     'name'        => 'Outlook',
     'description' => 'Enables integrations with Outlook for email tracking',
     'version'     => '1.0',
-    'author'      => 'Werner Garcia',
-
-    'routes' => [
-        'public' => [
-            'mautic_outlook_tracker' => [
-                'path'       => '/outlook/tracking.gif',
-                'controller' => 'MauticOutlookBundle:Public:trackingImage',
-            ],
-        ],
-    ],
-
+    'author'      => 'Mautic',
 ];
