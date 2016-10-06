@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CategoryBundle\CategoryEvents;
@@ -87,17 +86,17 @@ class CategoryController extends FormController
             $start = 0;
         }
 
-        if ($bundle == 'category') {
-            $bundleFilter = null;
-        } else {
-            $bundleFilter = [
-                'column' => 'c.bundle',
-                'expr'   => 'eq',
-                'value'  => $bundle,
+        $filter = ['string' => $search];
+
+        if ($bundle != 'category') {
+            $filter['force'] = [
+                [
+                    'column' => 'c.bundle',
+                    'expr'   => 'eq',
+                    'value'  => $bundle,
+                ],
             ];
         }
-
-        $filter = ['string' => $search, 'force' => [$bundleFilter]];
 
         $orderBy    = $this->get('session')->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->get('session')->get('mautic.category.orderbydir', 'DESC');
