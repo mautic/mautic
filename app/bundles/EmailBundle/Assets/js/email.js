@@ -11,6 +11,11 @@ Mautic.emailOnLoad = function (container, response) {
     var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 
+    var textarea = mQuery('#emailform_customHtml');
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.data('CodeMirror').setValue(textarea.val());
+    });
+
     Mautic.initEmailDynamicContent();
 };
 

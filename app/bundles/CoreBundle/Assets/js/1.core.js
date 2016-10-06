@@ -615,6 +615,9 @@ var Mautic = {
                 editor.on('change', function(cm, change) {
                     textarea.val(cm.getValue());
                 });
+
+                // Store the CodeMirror instance to the textarea element
+                textarea.data('CodeMirror', editor);
             });
         }
 
@@ -3801,6 +3804,8 @@ var Mautic = {
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
+        var textarea = mQuery('textarea.builder-html');
+        var codeMirror = textarea.data('CodeMirror');
         Mautic.showChangeThemeWarning = true;
 
         if (isNew) {
@@ -3811,8 +3816,10 @@ var Mautic = {
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
+                var theme = currentLink.attr('data-theme');
+                var isCodeMode = (theme === 'mautic_code_mode');
 
-                if (Mautic.showChangeThemeWarning && customHtml.val().length) {
+                if (Mautic.showChangeThemeWarning && customHtml.val().length || !isCodeMode) {
                     if (confirm('You will lose the current content if you switch the theme.')) {
                         customHtml.val('');
                         Mautic.showChangeThemeWarning = false;
@@ -3822,15 +3829,21 @@ var Mautic = {
                 }
 
                 // Set the theme field value
-                themeField.val(currentLink.attr('data-theme'));
+                themeField.val(theme);
 
                 // Code Mode
-                if (currentLink.attr('data-theme') === 'mautic_code_mode') {
+                if (isCodeMode) {
                     mQuery('.source-tab').removeClass('hide').show('fast');
                     mQuery('#emailform_buttons_builder_toolbar').hide('fast');
+
+                    // Update CodeMirror from textarea
+                    codeMirror.setValue(textarea.val());
                 } else {
                     mQuery('.source-tab').hide('fast');
                     mQuery('#emailform_buttons_builder_toolbar').removeClass('hide').show('fast');
+
+                    // Load the theme HTML to the source textarea
+                    Mautic.setThemeHtml(theme);
                 }
 
                 // Manipulate classes to achieve the theme selection illusion
@@ -3842,6 +3855,18 @@ var Mautic = {
                 currentLink.addClass('hide');
             });
         }
+    },
+
+    /**
+     * Set theme's HTML
+     *
+     * @param theme
+     */
+    setThemeHtml: function(theme) {
+        mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
+            var textarea = mQuery('textarea.builder-html');
+            textarea.val(themeHtml);
+        });
     },
 
     /**
