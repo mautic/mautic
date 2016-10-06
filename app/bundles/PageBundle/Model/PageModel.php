@@ -954,8 +954,15 @@ class PageModel extends FormModel
 
         $chart = new PieChart($data['labels']);
 
+        if (empty($results)) {
+            $results[] = [
+                'device' => $this->translator->trans('mautic.report.report.noresults'),
+                'count'  => 0,
+            ];
+        }
+
         foreach ($results as $result) {
-            $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
+            $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
             // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
             $chart->setDataset($label,  $result['count']);

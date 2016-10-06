@@ -1902,6 +1902,14 @@ class EmailModel extends FormModel
             $dateTo
         );
 
+        if (empty($deviceStats)) {
+            $deviceStats[] = [
+                'count'   => 0,
+                'device'  => $this->translator->trans('mautic.report.report.noresults'),
+                'list_id' => 0,
+            ];
+        }
+
         foreach ($deviceStats as $device) {
             $chart->setDataset($device['device'], $device['count']);
         }
