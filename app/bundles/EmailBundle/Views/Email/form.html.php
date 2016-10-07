@@ -46,6 +46,8 @@ $templates = [
 
 $attr = $form->vars['attr'];
 
+$isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
+
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
@@ -55,14 +57,9 @@ $attr = $form->vars['attr'];
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li <?php echo !$isExisting || $email->getTemplate() !== 'mautic_code_mode' ? "class='active'" : ''; ?>>
+                    <li class="active">
                         <a href="#email-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.form.theme'); ?>
-                        </a>
-                    </li>
-                    <li class="source-tab<?php echo $isExisting && $email->getTemplate() === 'mautic_code_mode' ? ' active' : ''; ?><?php echo $email->getTemplate() !== 'mautic_code_mode' ? ' hide' : ''; ?>">
-                        <a href="#source-container" role="tab" data-toggle="tab">
-                            <?php echo $view['translator']->trans('mautic.core.source'); ?>
                         </a>
                     </li>
                     <li>
@@ -78,7 +75,7 @@ $attr = $form->vars['attr'];
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade <?php echo !$isExisting || $email->getTemplate() !== 'mautic_code_mode' ? 'in active' : ''; ?> bdr-w-0" id="email-container">
+                    <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
@@ -89,19 +86,6 @@ $attr = $form->vars['attr'];
                             'themes' => $themes,
                             'active' => $form['template']->vars['value'],
                         ]); ?>
-                    </div>
-
-                    <div class="tab-pane fade <?php echo $isExisting && $email->getTemplate() === 'mautic_code_mode' ? 'in active' : ''; ?> bdr-w-0" id="source-container">
-                        <div class="row">
-                            <div class="col-md-12" id="customHtmlContainer">
-                                <?php echo $view['form']->row($form['customHtml']); ?>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <iframe style="height: 525px; width: 100%;" id="live-preview"></iframe>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="advanced-container">
@@ -222,6 +206,7 @@ $attr = $form->vars['attr'];
     </div>
 </div>
 
+<?php echo $view['form']->row($form['customHtml']); ?>
 <?php echo $view['form']->end($form); ?>
 
 <div id="dynamicContentPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($dynamicContentPrototype)); ?>"></div>
@@ -256,6 +241,7 @@ $attr = $form->vars['attr'];
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'email',
+    'isCodeMode'    => $isCodeMode,
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,

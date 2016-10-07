@@ -9,13 +9,8 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.data('CodeMirror').setValue(textarea.val());
-    });
-
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
-    Mautic.keepPreviewAlive(textarea.data('CodeMirror'));
     Mautic.initEmailDynamicContent();
 };
 

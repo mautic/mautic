@@ -604,23 +604,6 @@ var Mautic = {
             });
         }
 
-        if (mQuery(container + ' textarea.editor-code').length) {
-            mQuery('textarea.editor-code').each(function () {
-                var textarea = mQuery(this);
-                var editor = CodeMirror.fromTextArea(this, {
-                    lineNumbers: true,
-                    mode: 'htmlmixed',
-                    setSize: {height: 40}
-                });
-                editor.on('change', function(cm, change) {
-                    textarea.val(cm.getValue());
-                });
-
-                // Store the CodeMirror instance to the textarea element
-                textarea.data('CodeMirror', editor);
-            });
-        }
-
         //activate shuffles
         if (mQuery(container + ' .shuffle-grid').length) {
             var grid = mQuery(container + " .shuffle-grid");
@@ -3833,15 +3816,11 @@ var Mautic = {
 
                 // Code Mode
                 if (isCodeMode) {
-                    mQuery('.source-tab').removeClass('hide').show('fast');
-                    mQuery('#emailform_buttons_builder_toolbar').hide('fast');
-
+                    mQuery('.builder').addClass('code-mode');
                     // Update CodeMirror from textarea
                     codeMirror.setValue(textarea.val());
                 } else {
-                    mQuery('.source-tab').hide('fast');
-                    mQuery('#emailform_buttons_builder_toolbar').removeClass('hide').show('fast');
-
+                    mQuery('.builder').removeClass('code-mode');
                     // Load the theme HTML to the source textarea
                     Mautic.setThemeHtml(theme);
                 }
@@ -3867,19 +3846,6 @@ var Mautic = {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
         });
-    },
-
-    /**
-     * Creates an iframe and keeps its content live from textarea (CodeMirror) changes
-     *
-     * @param codeMirror
-     */
-    keepPreviewAlive: function(codeMirror) {
-        if (mQuery('#live-preview').length) {
-            codeMirror.on('change', function() {
-                Mautic.updateIframeContent('live-preview', codeMirror.getValue());
-            });
-        }
     },
 
     /**

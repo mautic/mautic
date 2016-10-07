@@ -230,7 +230,7 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
-                        'class'                => 'form-control editor-code editor-builder-tokens builder-html editor-email',
+                        'class'                => 'form-control editor-builder-tokens builder-html editor-email',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{',
                     ],
@@ -435,18 +435,12 @@ class EmailType extends AbstractType
         $builder->add('sessionId', 'hidden');
         $builder->add('emailType', 'hidden');
 
-        $hideBuilder = '';
-
-        if ($options['data']->getTemplate() === 'mautic_code_mode') {
-            $hideBuilder = ' hide';
-        }
-
         $customButtons = [
             [
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder'.$hideBuilder,
+                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
                     'icon'    => 'fa fa-cube',
                     'style'   => 'test',
                     'onclick' => "Mautic.launchBuilder('emailform', 'email');",
