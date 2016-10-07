@@ -3807,6 +3807,11 @@ var Mautic = {
                     } else {
                         return;
                     }
+                } else if (customHtml.val().length && isCodeMode) {
+                    if (confirm('By switching to the Code Mode you will be able to edit the content only in HTML code. No way back.')) {
+                    } else {
+                        return;
+                    }
                 }
 
                 // Set the theme field value
@@ -3821,7 +3826,7 @@ var Mautic = {
                     mQuery('.builder').removeClass('code-mode');
                     mQuery('.builder .code-editor').addClass('hide');
                     mQuery('.builder .builder-toolbar').removeClass('hide');
-                    
+
                     // Load the theme HTML to the source textarea
                     Mautic.setThemeHtml(theme);
                 }
