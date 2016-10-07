@@ -81,6 +81,11 @@ Mautic.killLivePreview = function() {
     window.clearInterval(Mautic.livePreviewInterval);
 };
 
+Mautic.destroyCodeMirror = function() {
+    delete Mautic.builderCodeMirror;
+    mQuery('#customHtmlContainer').empty();
+};
+
 Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
     if (mQuery('iframe#'+id).length) {
         var builder = mQuery('iframe#'+id);
@@ -136,8 +141,8 @@ Mautic.closeBuilder = function(model) {
     if (Mautic.codeMode) {
         customHtml = Mautic.builderCodeMirror.getValue();
         Mautic.killLivePreview();
+        Mautic.destroyCodeMirror();
         delete Mautic.codeMode;
-        delete Mautic.builderCodeMirror;
     } else {
         // Trigger slot:destroy event
         document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
