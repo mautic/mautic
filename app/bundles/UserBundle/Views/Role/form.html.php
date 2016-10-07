@@ -1,30 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'role');
 
-$view['assets']->addScriptDeclaration("MauticVars.permissionList = " . json_encode($permissionsConfig['list']), 'bodyClose');
+$view['assets']->addScriptDeclaration('MauticVars.permissionList = '.json_encode($permissionsConfig['list']), 'bodyClose');
 
 $objectId = $form->vars['data']->getId();
 if (!empty($objectId)) {
     $name   = $form->vars['data']->getName();
-    $header = $view['translator']->trans('mautic.user.role.header.edit', array("%name%" => $name));
+    $header = $view['translator']->trans('mautic.user.role.header.edit', ['%name%' => $name]);
 } else {
     $header = $view['translator']->trans('mautic.user.role.header.new');
 }
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 ?>
 
 <?php echo $view['form']->start($form); ?>
-
-<div class="row">
+<div class="box-layout">
 	<div class="col-xs-12 bg-white height-auto">
 		<!-- tabs controls -->
 		<ul class="bg-auto nav nav-tabs pr-md pl-md">
@@ -56,7 +55,9 @@ $view['slots']->set("headerTitle", $header);
 
 			<?php $hidePerms = $form['isAdmin']->vars['data']; ?>
 			<div class="tab-pane fade bdr-w-0" id="permissions-container">
-				<div id="rolePermissions"<?php if ($hidePerms) echo ' class="hide"'; ?>>
+				<div id="rolePermissions"<?php if ($hidePerms) {
+    echo ' class="hide"';
+} ?>>
 					<!-- start: box layout -->
 					<div class="box-layout">
 						<!-- step container -->
@@ -73,7 +74,7 @@ $view['slots']->set("headerTitle", $header);
 												<span class="permission-ratio"> (<span class="<?php echo $bundle; ?>_granted"><?php echo $config['ratio'][0]; ?></span> / <span class="<?php echo $bundle; ?>_total"><?php echo $config['ratio'][1]; ?></span>)</span>
 											</a>
 										</li>
-										<?php $i++; ?>
+										<?php ++$i; ?>
 									<?php endforeach; ?>
 								</ul>
 							</div>
@@ -83,30 +84,32 @@ $view['slots']->set("headerTitle", $header);
 						<div class="col-md-7 bg-auto height-auto bdr-l">
 							<div class="tab-content">
 								<?php
-								$permissions = $form['permissions']->children;
-								$i = 0;
-								foreach ($permissions as $child):
-									if ($child->vars['value'] == 'newbundle'):
-										if ($i > 0): // Close tab panel
-											echo "</div>\n</div>\n";
-										endif;
-										echo '<div role="tabpanel" class="tab-pane fade' . ($i === 0 ? ' in active' : '') .' bdr-w-0" id="' . $child->vars['name'] . 'PermissionTab">' . "\n";
-										echo '<div class="pt-md pr-md pl-md pb-md">' . "\n";
-										$child->setRendered();
-									else:
-										echo $view['form']->row($child);
-									endif;
-									$i++;
-								endforeach;
-								//close last tab
-								echo "</div>\n</div>\n";
-								$form['permissions']->setRendered();
-								?>
+                                $permissions = $form['permissions']->children;
+                                $i           = 0;
+                                foreach ($permissions as $child):
+                                    if ($child->vars['value'] == 'newbundle'):
+                                        if ($i > 0): // Close tab panel
+                                            echo "</div>\n</div>\n";
+                                        endif;
+                                        echo '<div role="tabpanel" class="tab-pane fade'.($i === 0 ? ' in active' : '').' bdr-w-0" id="'.$child->vars['name'].'PermissionTab">'."\n";
+                                        echo '<div class="pt-md pr-md pl-md pb-md">'."\n";
+                                        $child->setRendered();
+                                    else:
+                                        echo $view['form']->row($child);
+                                    endif;
+                                    ++$i;
+                                endforeach;
+                                //close last tab
+                                echo "</div>\n</div>\n";
+                                $form['permissions']->setRendered();
+                                ?>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div id="isAdminMessage"<?php if (!$hidePerms) echo ' class="hide"'; ?>>
+				<div id="isAdminMessage"<?php if (!$hidePerms) {
+                                    echo ' class="hide"';
+                                } ?>>
 					<div class="alert alert-warning">
 						<h4><?php echo $view['translator']->trans('mautic.user.role.permission.isadmin.header'); ?></h4>
 						<p><?php echo $view['translator']->trans('mautic.user.role.permission.isadmin.message'); ?></p>

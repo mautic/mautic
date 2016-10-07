@@ -1,62 +1,75 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes' => array(
-        'main' => array(
-            'mautic_config_action' => array(
-                'path' => '/config/{objectAction}',
-                'controller' => 'MauticConfigBundle:Config:execute'
-            ),
-            'mautic_sysinfo_index' => array(
-                'path' => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index'
-            )
-        )
-    ),
+return [
+    'routes' => [
+        'main' => [
+            'mautic_config_action' => [
+                'path'       => '/config/{objectAction}',
+                'controller' => 'MauticConfigBundle:Config:execute',
+            ],
+            'mautic_sysinfo_index' => [
+                'path'       => '/sysinfo',
+                'controller' => 'MauticConfigBundle:Sysinfo:index',
+            ],
+        ],
+    ],
 
-    'menu' => array(
-        'admin' => array(
-            'mautic.config.menu.index' => array(
+    'menu' => [
+        'admin' => [
+            'mautic.config.menu.index' => [
                 'route'           => 'mautic_config_action',
-                'routeParameters' => array('objectAction' => 'edit'),
+                'routeParameters' => ['objectAction' => 'edit'],
                 'iconClass'       => 'fa-cogs',
                 'id'              => 'mautic_config_index',
-                'access'          => 'admin'
-            ),
-            'mautic.sysinfo.menu.index' => array(
-                'route'           => 'mautic_sysinfo_index',
-                'iconClass'       => 'fa-life-ring',
-                'id'              => 'mautic_sysinfo_index',
                 'access'          => 'admin',
-                'checks'    => array(
-                   'parameters' => array(
-                       'sysinfo_disabled' => false
-                   )
-                )
-            )
-        )
-    ),
+            ],
+            'mautic.sysinfo.menu.index' => [
+                'route'     => 'mautic_sysinfo_index',
+                'iconClass' => 'fa-life-ring',
+                'id'        => 'mautic_sysinfo_index',
+                'access'    => 'admin',
+                'checks'    => [
+                   'parameters' => [
+                       'sysinfo_disabled' => false,
+                   ],
+                ],
+            ],
+        ],
+    ],
 
-    'services' => array(
-        'events' => array(
-            'mautic.config.subscriber' => array(
-                'class' => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber'
-            )
-        ),
+    'services' => [
+        'events' => [
+            'mautic.config.subscriber' => [
+                'class' => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
+            ],
+        ],
 
-        'forms' => array(
-            'mautic.form.type.config' => array(
-                'class' => 'Mautic\ConfigBundle\Form\Type\ConfigType',
+        'forms' => [
+            'mautic.form.type.config' => [
+                'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'config'
-            )
-        )
-    )
-);
+                'alias'     => 'config',
+            ],
+        ],
+        'models' => [
+            'mautic.config.model.config' => [
+                'class' => 'Mautic\ConfigBundle\Model\ConfigModel',
+            ],
+            'mautic.config.model.sysinfo' => [
+                'class'     => 'Mautic\ConfigBundle\Model\SysinfoModel',
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+    ],
+];

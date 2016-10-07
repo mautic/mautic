@@ -1,41 +1,53 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
- * Class DoctrineEventsSubscriber
+ * Class DoctrineEventsSubscriber.
  */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
+    protected $tablePrefix;
+
+    /**
+     * DoctrineEventsSubscriber constructor.
+     *
+     * @param $tablePrefix
+     */
+    public function __construct($tablePrefix)
+    {
+        $this->tablePrefix = $tablePrefix;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getSubscribedEvents()
     {
-        return array('loadClassMetadata');
+        return ['loadClassMetadata'];
     }
 
     /**
      * @param LoadClassMetadataEventArgs $args
-     *
-     * @return void
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
+        if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
+        } elseif (empty($this->tablePrefix)) {
+            $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata */
@@ -46,43 +58,46 @@ class DoctrineEventsSubscriber implements EventSubscriber
             return;
         }
 
-        if (FALSE !== strpos($classMetadata->namespace, 'Mautic')) {
+        if (false !== strpos($classMetadata->namespace, 'Mautic')) {
             //if in the installer, use the prefix set by it rather than what is cached
-            $prefix = MAUTIC_TABLE_PREFIX;
 
             // Prefix indexes
-            $uniqueConstraints = array();
+            $uniqueConstraints = [];
             if (isset($classMetadata->table['uniqueConstraints'])) {
                 foreach ($classMetadata->table['uniqueConstraints'] as $name => $uc) {
-                    $uniqueConstraints[$prefix . $name] = $uc;
+                    $uniqueConstraints[$this->tablePrefix.$name] = $uc;
                 }
             }
 
-            $indexes = array();
+            $indexes = [];
             if (isset($classMetadata->table['indexes'])) {
                 foreach ($classMetadata->table['indexes'] as $name => $uc) {
-                    $indexes[$prefix . $name] = $uc;
+                    $indexes[$this->tablePrefix.$name] = $uc;
                 }
             }
 
             // Prefix the table
-            $classMetadata->setPrimaryTable(array(
-                'name'              => $prefix . $classMetadata->getTableName(),
-                'indexes'           => $indexes,
-                'uniqueConstraints' => $uniqueConstraints
-            ));
+            $classMetadata->setPrimaryTable(
+                [
+                    'name'              => $this->tablePrefix.$classMetadata->getTableName(),
+                    'indexes'           => $indexes,
+                    'uniqueConstraints' => $uniqueConstraints,
+                ]
+            );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
-                    $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $prefix . $mappedTableName;
+                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                    && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
+                ) {
+                    $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->tablePrefix.$mappedTableName;
                 }
             }
 
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
                 $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
-                $newDefinition['sequenceName'] = $prefix . $newDefinition['sequenceName'];
+                $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
 
                 $classMetadata->setSequenceGeneratorDefinition($newDefinition);
                 $em = $args->getEntityManager();
@@ -91,7 +106,8 @@ class DoctrineEventsSubscriber implements EventSubscriber
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
                             $newDefinition,
                             $classMetadata,
-                            $em->getConnection()->getDatabasePlatform()),
+                            $em->getConnection()->getDatabasePlatform()
+                        ),
                         $newDefinition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);

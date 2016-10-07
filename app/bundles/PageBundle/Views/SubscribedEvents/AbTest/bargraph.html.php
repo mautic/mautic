@@ -1,16 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $support = $results['support'];
 $label   = $view['translator']->trans($variants['criteria'][$results['basedOn']]['label']);
+$chart   = new \Mautic\CoreBundle\Helper\Chart\BarChart($support['labels']);
 
-$barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['labels'], $support['data']);
+if ($support['data']) {
+    foreach ($support['data'] as $datasetLabel => $values) {
+        $chart->setDataset($datasetLabel, $values);
+    }
+}
 
 ?>
 
@@ -26,11 +31,8 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-7">
+        <div class="col-sm-12">
             <canvas id="abtest-bar-chart" height="300"></canvas>
-        </div>
-        <div class="col-sm-5">
-            <div class="abtest-bar-legend legend-container"></div>
         </div>
     </div>
 </div>
@@ -39,23 +41,8 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
     mQuery(document).ready(function() {
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo json_encode($barData); ?>');
-            var barGraph = new Chart(canvas.getContext("2d")).Bar(barData, {
-                responsive: true,
-                animation: false,
-                tooltipTitleFontSize: 0,
-                scaleOverride: true,
-                <?php if (isset($support['step_width'])) : ?>
-                scaleSteps: <?php echo ($support['step_width'] > 10) ? 11 : 10; ?>,
-                scaleStepWidth: <?php echo ($support['step_width'] > 10) ? (ceil($support['step_width']/10)) : 1; ?>,
-                <?php endif; ?>
-                scaleStartValue: 0
-            });
-
-            var legendHolder = document.createElement('div');
-            legendHolder.innerHTML = barGraph.generateLegend();
-            mQuery('.abtest-bar-legend').html(legendHolder.firstChild);
-            barGraph.update();
+            var barData = mQuery.parseJSON('<?php echo str_replace('\'', '\\\'', json_encode($chart->render())); ?>');
+            var barGraph = new Chart(canvas, {type: 'bar', data: barData});
         });
     });
 </script>

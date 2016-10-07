@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic, Na. All rights reserved.
+ * @copyright   2014 Mautic, Na. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,20 +14,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class AssetRepository
- *
- * @package Mautic\AssetBundle\Entity
+ * Class AssetRepository.
  */
 class AssetRepository extends CommonRepository
 {
-
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('a')
@@ -69,52 +68,44 @@ class AssetRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getArrayResult();
+
         return $results;
     }
-
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('a.title',  ":$unique"),
-            $q->expr()->like('a.alias',  ":$unique")
-        );
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-        return array(
-            $expr,
-            array("$unique" => $string)
-        );
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'a.title',
+            'a.alias',
+        ]);
     }
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field = $filter->command;
+        $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("a.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('a.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("a.isPublished", ":$unique");
-                $forceParameters = array($unique => false);
+                $expr            = $q->expr()->eq('a.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
@@ -125,20 +116,20 @@ class AssetRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq("IDENTITY(a.createdBy)", $this->currentUser->getId());
+                $expr            = $q->expr()->eq('IDENTITY(a.createdBy)', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('c.alias', ":$unique");
+                $expr           = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.lang'):
-                $langUnique       = $this->generateRandomParameterName();
-                $langValue        = $filter->string . "_%";
-                $forceParameters = array(
+                $langUnique      = $this->generateRandomParameterName();
+                $langValue       = $filter->string.'_%';
+                $forceParameters = [
                     $langUnique => $langValue,
-                    $unique     => $filter->string
-                );
+                    $unique     => $filter->string,
+                ];
                 $expr = $q->expr()->orX(
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
@@ -153,13 +144,13 @@ class AssetRepository extends CommonRepository
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif (!$returnParameter) {
-            $parameters = array();
+            $parameters = [];
         } else {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array( $expr, $parameters );
+        return [$expr, $parameters];
     }
 
     /**
@@ -167,34 +158,14 @@ class AssetRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
-            'mautic.asset.asset.searchcommand.lang'
-        );
-    }
-
-    /**
-     * Get a list of popular (by downloads) assets
-     *
-     * @param integer $limit
-     * @return array
-     */
-    public function getPopularAssets($limit = 10)
-    {
-        $q  = $this->createQueryBuilder('a');
-        $q->select("partial a.{id, title, downloadCount}")
-            ->orderBy('a.downloadCount', 'DESC')
-            ->where('a.downloadCount > 0')
-            ->setMaxResults($limit);
-
-        $expr = $this->getPublishedByDateExpression($q, 'a');
-        $q->andWhere($expr);
-
-        return $q->getQuery()->getResult();
+            'mautic.asset.asset.searchcommand.lang',
+        ];
     }
 
     /**
@@ -202,9 +173,9 @@ class AssetRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('a.title', 'ASC')
-        );
+        return [
+            ['a.title', 'ASC'],
+        ];
     }
 
     /**
@@ -218,7 +189,7 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * Gets the sum size of assets
+     * Gets the sum size of assets.
      *
      * @param array $assets
      *
@@ -248,11 +219,11 @@ class AssetRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'assets')
-            ->set('download_count', 'download_count + ' . (int) $increaseBy)
-            ->where('id = ' . (int) $id);
+            ->set('download_count', 'download_count + '.(int) $increaseBy)
+            ->where('id = '.(int) $id);
 
         if ($unique) {
-            $q->set('unique_download_count', 'unique_download_count + ' . (int) $increaseBy);
+            $q->set('unique_download_count', 'unique_download_count + '.(int) $increaseBy);
         }
 
         $q->execute();

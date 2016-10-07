@@ -1,43 +1,34 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Command;
 
-use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * CLI Command to fetch updated Maxmind database
+ * CLI Command to fetch updated Maxmind database.
  */
 class UpdateIpDataStoreCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setName('mautic:iplookup:download')
-            ->setAliases(
-                array(
-                    'mautic:fetch:ipdata',
-                    'mautic:ipdata:fetch',
-                    'mautic:ipdata:update',
-                    'mautic:update:ipdata'
-                )
-            )
-            ->setDescription('Fetch remote datastores for IP lookup services that leveral local lookups')
+            ->setDescription('Fetch remote datastores for IP lookup services that leverage local lookups')
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
 
 <info>php %command.full_name%</info>
@@ -64,10 +55,10 @@ EOT
                 if ($remoteUrl && $localPath) {
                     $output->writeln('<error>'.$translator->trans(
                         'mautic.core.ip_lookup.remote_fetch_error',
-                        array(
+                        [
                             '%remoteUrl%' => $remoteUrl,
-                            '%localPath%' => $localPath
-                        )
+                            '%localPath%' => $localPath,
+                        ]
                     ).'</error>');
                 } else {
                     $output->writeln('<error>'.$translator->trans(

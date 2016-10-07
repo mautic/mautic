@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +15,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class Download
- *
- * @package Mautic\AssetBundle\Entity
+ * Class Download.
  */
 class Download
 {
-
     /**
      * @var int
      */
@@ -79,14 +77,15 @@ class Download
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('asset_downloads')
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository')
-            ->addIndex(array('tracking_id'), 'download_tracking_search')
-            ->addIndex(array('source', 'source_id'), 'download_source_search');
+            ->addIndex(['tracking_id'], 'download_tracking_search')
+            ->addIndex(['source', 'source_id'], 'download_source_search')
+            ->addIndex(['date_download'], 'asset_date_download');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -130,23 +129,23 @@ class Download
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set dateDownload
+     * Set dateDownload.
      *
      * @param \DateTime $dateDownload
      *
      * @return Download
      */
-    public function setDateDownload ($dateDownload)
+    public function setDateDownload($dateDownload)
     {
         $this->dateDownload = $dateDownload;
 
@@ -154,23 +153,23 @@ class Download
     }
 
     /**
-     * Get dateDownload
+     * Get dateDownload.
      *
      * @return \DateTime
      */
-    public function getDateDownload ()
+    public function getDateDownload()
     {
         return $this->dateDownload;
     }
 
     /**
-     * Set code
+     * Set code.
      *
-     * @param integer $code
+     * @param int $code
      *
      * @return Download
      */
-    public function setCode ($code)
+    public function setCode($code)
     {
         $this->code = $code;
 
@@ -178,23 +177,23 @@ class Download
     }
 
     /**
-     * Get code
+     * Get code.
      *
-     * @return integer
+     * @return int
      */
-    public function getCode ()
+    public function getCode()
     {
         return $this->code;
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
      * @return Download
      */
-    public function setReferer ($referer)
+    public function setReferer($referer)
     {
         $this->referer = $referer;
 
@@ -202,23 +201,23 @@ class Download
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
-    public function getReferer ()
+    public function getReferer()
     {
         return $this->referer;
     }
 
     /**
-     * Set asset
+     * Set asset.
      *
      * @param Asset $asset
      *
      * @return Download
      */
-    public function setAsset (Asset $asset = null)
+    public function setAsset(Asset $asset = null)
     {
         $this->asset = $asset;
 
@@ -226,23 +225,23 @@ class Download
     }
 
     /**
-     * Get asset
+     * Get asset.
      *
      * @return Asset
      */
-    public function getAsset ()
+    public function getAsset()
     {
         return $this->asset;
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return Download
      */
-    public function setIpAddress (\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -250,23 +249,23 @@ class Download
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
     /**
-     * Set trackingId
+     * Set trackingId.
      *
-     * @param integer $trackingId
+     * @param int $trackingId
      *
      * @return Download
      */
-    public function setTrackingId ($trackingId)
+    public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
 
@@ -274,11 +273,11 @@ class Download
     }
 
     /**
-     * Get trackingId
+     * Get trackingId.
      *
-     * @return integer
+     * @return int
      */
-    public function getTrackingId ()
+    public function getTrackingId()
     {
         return $this->trackingId;
     }
@@ -286,7 +285,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -294,7 +293,7 @@ class Download
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -302,7 +301,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
@@ -310,15 +309,15 @@ class Download
     /**
      * @param mixed $source
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->source = $source;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getSourceId ()
+    public function getSourceId()
     {
         return $this->sourceId;
     }
@@ -326,15 +325,15 @@ class Download
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId ($sourceId)
+    public function setSourceId($sourceId)
     {
-        $this->sourceId = (int)$sourceId;
+        $this->sourceId = (int) $sourceId;
     }
 
     /**
      * @return mixed
      */
-    public function getEmail ()
+    public function getEmail()
     {
         return $this->email;
     }
@@ -342,7 +341,7 @@ class Download
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email)
+    public function setEmail(Email $email)
     {
         $this->email = $email;
     }

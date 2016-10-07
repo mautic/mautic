@@ -1,156 +1,222 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.renderDashboardMap();
-    Mautic.renderReturnRateDoughnut();
-    Mautic.renderClickRateDoughnut();
-    Mautic.updateActiveVisitorCount();
-
-    // Refresh page visits every 5 sec
-    Mautic.setModeratedInterval('ActiveVisitorsLoop', 'updateActiveVisitorCount', 5000);
+    Mautic.initWidgetSorting();
+    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 
 Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
     mQuery('.jvectormap-tip').remove();
-    if (id === '#app-content') {
-        delete Mautic.dashboardMapData;
-        Mautic.dashboardMap.remove();
-        delete Mautic.dashboardClickRateDoughnutObject;
-        delete Mautic.dashboardReturnRateDoughnutObject;
-        delete Mautic.ActiveVisitorsCount;
-    }
-    Mautic.clearModeratedInterval('ActiveVisitorsLoop');
 };
 
-Mautic.renderDashboardMap = function () {
-    // Initilize map only for first time
-    if (typeof Mautic.dashboardMapData === 'object') {
-        return;
-    }
+Mautic.widgetOnLoad = function(container, response) {
+    if (!response.widgetId) return;
+    var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
+    var widgetHtml = mQuery(response.widgetHtml);
 
-    Mautic.dashboardMapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
-    var element = mQuery('#dashboard-map');
-    element.vectorMap({
-        backgroundColor: 'transparent',
-        zoomOnScroll: false,
-        regionStyle: {
-            initial: {
-                fill: '#dce0e5',
-                "fill-opacity": 1,
-                stroke: 'none',
-                "stroke-width": 0,
-                "stroke-opacity": 1
-            },
-            hover: {
-                "fill-opacity": 0.7,
-                cursor: 'pointer'
-            }
-        },
-        map: 'world_mill_en',
-        series: {
-            regions: [{
-                values: Mautic.dashboardMapData,
-                scale: ['#C8EEFF', '#006491'],
-                normalizeFunction: 'polynomial'
-            }]
-        },
-        onRegionTipShow: function (event, label, index) {
-            if(Mautic.dashboardMapData[index] > 0) {
-                label.html(
-                    '<b>'+label.html()+'</b></br>'+
-                    Mautic.dashboardMapData[index]+' Leads'
-                );
-            }
-        }
+    // initialize edit button modal again
+    widgetHtml.find("*[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        event.preventDefault();
+        Mautic.ajaxifyModal(this, event);
     });
-    Mautic.dashboardMap = element.vectorMap('get', 'mapObject');
-}
 
-Mautic.renderReturnRateDoughnut = function () {
-    // Initilize chart only for first time
-    if (typeof Mautic.dashboardReturnRateDoughnutObject === 'object') {
-        return;
+    // Create the new widget wrapper and add it to the 0 position if doesn't exist (probably a new one)
+    if (!widget.length) {
+        widget = mQuery('<div/>')
+            .addClass('widget')
+            .attr('data-widget-id', response.widgetId);
+        mQuery('#dashboard-widgets').prepend(widget);
     }
-    var element = mQuery('#return-rate');
-    var visitCount = +element.attr('data-visit-count');
-    var returnCount = +element.attr('data-return-count');
-    var options = {percentageInnerCutout: 65, responsive: false}
-    var data = [
-        {
-            value: returnCount,
-            color:"#4E5D9D",
-            highlight: "#353F6A",
-            label: "Returned"
-        },
-        {
-            value: visitCount - returnCount,
-            color: "#efeeec",
-            highlight: "#EBEBEB",
-            label: "Unique"
-        }
-    ];
-    data = Mautic.emulateNoDataForPieChart(data);
-    var ctx = document.getElementById("return-rate").getContext("2d");
-    Mautic.dashboardReturnRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
+
+    widget.html(widgetHtml)
+        .css('width', response.widgetWidth + '%')
+        .css('height', response.widgetHeight + '%');
+    Mautic.renderCharts(widgetHtml);
+    Mautic.renderMaps(widgetHtml);
+    Mautic.initWidgetRemoveButtons(widgetHtml);
+    Mautic.saveWidgetSorting();
 }
 
-Mautic.renderClickRateDoughnut = function () {
-    // Initilize chart only for first time
-    if (typeof Mautic.dashboardClickRateDoughnutObject === 'object') {
-        return;
-    }
-    var element = mQuery('#click-rate');
-    var readCount = +element.attr('data-sent-count');
-    var clickCount = +element.attr('data-click-count');
-    var options = {percentageInnerCutout: 65, responsive: false}
-    var data = [
-        {
-            value: clickCount,
-            color:"#35B4B9",
-            highlight: "#227276",
-            label: "Clicked"
-        },
-        {
-            value: readCount - clickCount,
-            color: "#efeeec",
-            highlight: "#EBEBEB",
-            label: "Not clicked"
-        }
-    ];
-    data = Mautic.emulateNoDataForPieChart(data);
-    var ctx = document.getElementById("click-rate").getContext("2d");
-    Mautic.dashboardClickRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
-}
+Mautic.initWidgetSorting = function () {
+    var widgetsWrapper = mQuery('#dashboard-widgets');
+    var bodyOverflow = {};
 
-Mautic.updateActiveVisitorCount = function () {
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: "action=dashboard:viewingVisitors",
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-                var element = mQuery('#active-visitors');
-                element.text(response.viewingVisitors);
-                if (response.viewingVisitors != Mautic.ActiveVisitorsCount) {
-                    var color = '#34D43B';
-                    if (Mautic.ActiveVisitorsCount > response.viewingVisitors) {
-                        color = '#BC2525';
-                    }
-                    element.css('text-shadow', color+' 0px 0px 50px');
-                    setTimeout(function() {
-                        element.css('text-shadow', '#fff 0px 0px 50px');
-                    }, 3000);
+    widgetsWrapper.sortable({
+        handle: '.card-header h4',
+        placeholder: 'sortable-placeholder',
+        items: '.widget',
+        opacity: 0.9,
+        scroll: true,
+        scrollSpeed: 10,
+        tolerance: "pointer",
+        cursor: 'move',
+        appendTo: '#dashboard-widgets',
+
+        helper: function(e, ui) {
+            // Ensure the draggable retains it's original size and that the margin doesn't cause things to bounce around
+            ui.children().each(function() {
+                mQuery(this).width(mQuery(this).width());
+                mQuery(this).height(mQuery(this).height());
+            });
+
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+            mQuery('body').css({
+                overflowX: 'visible',
+                overflowY: 'visible'
+            });
+
+            mQuery("#dashboard-widgets .widget").each(function(i) {
+                var item = mQuery(this);
+                var item_clone = item.clone();
+
+                var canvas = item.find('canvas').first();
+                if (canvas.length) {
+                    // Copy the canvas
+                    var destCanvas = item_clone.find('canvas').first();
+                    var destCtx = destCanvas[0].getContext('2d');
+                    destCtx.drawImage(canvas[0], 0, 0);
                 }
-                Mautic.ActiveVisitorsCount = response.viewingVisitors;
-            }
 
-            Mautic.moderatedIntervalCallbackIsComplete('ActiveVisitorsLoop');
+                item.data("clone", item_clone);
+                var position = item.position();
+                item_clone
+                    .css({
+                        left: position.left,
+                        top: position.top,
+                        width: item.width(),
+                        visibility: "visible",
+                        position: "absolute",
+                        zIndex: 1
+                    });
+
+                item.css('visibility', 'hidden');
+                mQuery("#cloned-widgets").append(item_clone);
+            });
+
+            return ui;
         },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
+        start: function(e, ui) {
+            ui.helper.css('visibility', 'visible');
+            ui.helper.data("clone").hide();
+        },
+        sort: function(e, ui) {
+            var card = ui.item.find('.card').first();
+            // Keep the placeholder width and height of the same as that of the inner card's width to prevent the jump effect
+            ui.placeholder.width(card.width());
+            ui.placeholder.height(card.height());
+            // Prevent margin from pushing the elements out of the way
+            ui.placeholder.css({
+                marginTop: "5px",
+                marginBottom: "5px",
+                marginLeft: 0,
+                marginRight: 0
+            });
+        },
+        stop: function() {
+            // Restore original overflow
+            mQuery('body').css(bodyOverflow);
 
-            Mautic.moderatedIntervalCallbackIsComplete('ActiveVisitorsLoop');
+            mQuery("#dashboard-widgets .widget.exclude-me").each(function() {
+                var item = mQuery(this);
+                var clone = item.data("clone");
+                var position = item.position();
+
+                clone.css("left", position.left);
+                clone.css("top", position.top);
+                clone.show();
+                item.removeClass("exclude-me");
+            });
+
+            mQuery("#dashboard-widgets .widget").css("visibility", "visible");
+            mQuery("#cloned-widgets .widget").remove();
+
+            Mautic.saveWidgetSorting();
+        },
+        change: function(e, ui) {
+            mQuery("#dashboard-widgets .widget:not(.exclude-me)").each(function() {
+                var item = mQuery(this);
+                var clone = item.data("clone");
+                clone.stop(true, false);
+                var position = item.position();
+                clone.animate({
+                    left: position.left,
+                    top: position.top
+                }, 200);
+            });
         }
+    }).disableSelection();
+}
+
+Mautic.saveWidgetSorting = function () {
+    var widgetsWrapper = mQuery('#dashboard-widgets');
+    var widgets = widgetsWrapper.children();
+    var ordering = [];
+    widgets.each(function(index, value) {
+        ordering.push(mQuery(this).attr('data-widget-id'));
+    });
+
+    Mautic.ajaxActionRequest('dashboard:updateWidgetOrdering', {'ordering': ordering}, function(response) {
+        // @todo handle errors
     });
 }
+
+Mautic.updateWidgetForm = function (element) {
+    Mautic.activateLabelLoadingIndicator('widget_type');
+    var formWrapper = mQuery(element).closest('form');
+    var WidgetFormValues = formWrapper.serializeArray();
+    Mautic.ajaxActionRequest('dashboard:updateWidgetForm', WidgetFormValues, function(response) {
+        if (response.formHtml) {
+            var formHtml = mQuery(response.formHtml);
+            formHtml.find('#widget_buttons').addClass('hide hidden');
+            formWrapper.html(formHtml.children());
+            Mautic.onPageLoad('#widget_params');
+        }
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.initWidgetRemoveButtons = function (scope) {
+    scope.find('.remove-widget').on('click', function(e) {
+        e.preventDefault();
+        var button = mQuery(this);
+        var wrapper = button.closest('.widget');
+        var widgetId = wrapper.attr('data-widget-id');
+        wrapper.hide('slow');
+        Mautic.ajaxActionRequest('dashboard:delete', {widget: widgetId}, function(response) {
+            if (!response.success) {
+                wrapper.show('slow');
+            }
+        });
+    });
+
+};
+
+Mautic.exportDashboardLayout = function(text, baseUrl, save) {
+    var name = prompt(text, "");
+
+    if (name !== null) {
+        if (name) {
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
+        }
+
+        window.location = baseUrl;
+    }
+};
+
+Mautic.confirmDeleteDashboard = function(text, baseUrl, save) {
+    var name = prompt(text, "");
+
+    if (name !== null) {
+        if (name) {
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
+        }
+
+        window.location = baseUrl;
+    }
+};

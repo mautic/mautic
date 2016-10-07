@@ -1,22 +1,34 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$required = true;
+$type     = 'text';
+if (empty($field['properties']['captcha'])) {
+    $required = false;
+    if (empty($inForm)) {
+        // Use as a honeypot
+        $field['containerAttributes'] .= ' style="display: none;"';
+    } else {
+        // Hide the input
+        $type = 'hidden';
+    }
+}
 
 echo $view->render(
     'MauticFormBundle:Field:text.html.php',
-    array(
+    [
         'field'    => $field,
         'inForm'   => (isset($inForm)) ? $inForm : false,
-        'type'     => 'text',
+        'type'     => $type,
         'id'       => $id,
-        'deleted'  => (!empty($deleted)) ? true : false,
-        'required' => true,
+        'required' => $required,
         'formId'   => (isset($formId)) ? $formId : 0,
-        'formName'  => (isset($formName)) ? $formName : ''
-    )
+        'formName' => (isset($formName)) ? $formName : '',
+    ]
 );

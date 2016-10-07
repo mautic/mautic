@@ -1,35 +1,43 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Security\Provider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
- * Class UserProvider
+ * Class UserProvider.
  */
 class UserProvider implements UserProviderInterface
 {
-
     /**
-     * @var ObjectRepository
+     * @var UserRepository
      */
     protected $userRepository;
 
     /**
-     * @var ObjectRepository
+     * @var PermissionRepository
      */
     protected $permissionRepository;
 
@@ -39,18 +47,42 @@ class UserProvider implements UserProviderInterface
     protected $session;
 
     /**
-     * @param ObjectRepository $userRepository
-     * @param ObjectRepository $permissionRepository
-     * @param Session          $session
+     * @var EventDispatcherInterface
      */
-    public function __construct(ObjectRepository $userRepository, ObjectRepository $permissionRepository, Session $session){
+    protected $dispatcher;
+
+    /**
+     * @var EncoderFactory
+     */
+    protected $encoder;
+
+    /**
+     * @param UserRepository           $userRepository
+     * @param PermissionRepository     $permissionRepository
+     * @param Session                  $session
+     * @param EventDispatcherInterface $dispatcher
+     * @param EncoderFactory           $encoder
+     */
+    public function __construct(
+        UserRepository $userRepository,
+        PermissionRepository $permissionRepository,
+        Session $session,
+        EventDispatcherInterface $dispatcher,
+        EncoderFactory $encoder
+    ) {
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
         $this->session              = $session;
+        $this->dispatcher           = $dispatcher;
+        $this->encoder              = $encoder;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $username
+     *
+     * @return User
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
     {
@@ -59,10 +91,17 @@ class UserProvider implements UserProviderInterface
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->where('u.username = :username OR u.email = :username')
-            ->setParameter('username', $username)
-            ->getQuery();
+            ->setParameter('username', $username);
 
-        $user = $q->getOneOrNullResult();
+        if (func_num_args() > 1 && $email = func_get_arg(1)) {
+            // Checking email from an auth plugin
+            $q->orWhere(
+                'u.email = :email'
+            )
+                ->setParameter('email', $email);
+        }
+
+        $user = $q->getQuery()->getOneOrNullResult();
 
         if (empty($user)) {
             $message = sprintf(
@@ -74,16 +113,12 @@ class UserProvider implements UserProviderInterface
 
         //load permissions
         if ($user->getId()) {
-            $permissions = $this->session->get('mautic.user.permissions', false);
-            if ($permissions === false) {
-                $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
-                $this->session->set('mautic.user.permissions', $permissions);
-            }
+            $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
             $user->setActivePermissions($permissions);
         }
+
         return $user;
     }
-
 
     /**
      * {@inheritdoc}
@@ -110,5 +145,74 @@ class UserProvider implements UserProviderInterface
     {
         return $this->userRepository->getClassName() === $class
         || is_subclass_of($class, $this->userRepository->getClassName());
+    }
+
+    /**
+     * Create/update user from authentication plugins.
+     *
+     * @param User      $user
+     * @param bool|true $createIfNotExists
+     *
+     * @return User
+     */
+    public function saveUser(User $user, $createIfNotExists = true)
+    {
+        $isNew = !$user->getId();
+
+        if ($isNew) {
+            // Check if user exists and create one if applicable
+            try {
+                $user = $this->loadUserByUsername($user->getUsername(), $user->getEmail());
+            } catch (UsernameNotFoundException $exception) {
+                if (!$createIfNotExists) {
+                    throw new BadCredentialsException();
+                }
+            }
+        }
+
+        // Validation for User objects returned by a plugin
+        if (!$user->getRole()) {
+            throw new AuthenticationException('mautic.integration.sso.error.no_role');
+        }
+
+        if (!$user->getUsername()) {
+            throw new AuthenticationException('mautic.integration.sso.error.no_username');
+        }
+
+        if (!$user->getEmail()) {
+            throw new AuthenticationException('mautic.integration.sso.error.no_email');
+        }
+
+        if (!$user->getFirstName() || !$user->getLastName()) {
+            throw new AuthenticationException('mautic.integration.sso.error.no_name');
+        }
+
+        // Check for plain password
+        $plainPassword = $user->getPlainPassword();
+        if ($plainPassword) {
+            // Encode plain text
+            $user->setPassword(
+                $this->encoder->getEncoder($user)->encodePassword($plainPassword, $user->getSalt())
+            );
+        } elseif (!$password = $user->getPassword()) {
+            // Generate and encode a random password
+            $user->setPassword(
+                $this->encoder->getEncoder($user)->encodePassword(EncryptionHelper::generateKey(), $user->getSalt())
+            );
+        }
+
+        $event = new UserEvent($user, $isNew);
+
+        if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
+            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+        }
+
+        $this->userRepository->saveEntity($user);
+
+        if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
+            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+        }
+
+        return $user;
     }
 }

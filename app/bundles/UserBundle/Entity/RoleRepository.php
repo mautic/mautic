@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,19 +14,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * RoleRepository
+ * RoleRepository.
  */
 class RoleRepository extends CommonRepository
 {
-
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->createQueryBuilder('r');
 
@@ -35,7 +35,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param string $search
      * @param int    $limit
@@ -70,21 +70,13 @@ class RoleRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('r.name',  ':'.$unique),
-            $q->expr()->like('r.description', ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $q->expr()->not($expr);
-        }
-
-        return array(
-            $expr,
-            array("$unique" => $string)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'r.name',
+                'r.description',
+            ]
         );
     }
 
@@ -98,24 +90,66 @@ class RoleRepository extends CommonRepository
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                $expr = $q->expr()->eq("r.isAdmin", 1);
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+                $expr            = $q->expr()->eq('r.isAdmin', 1);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like("r.name", ':'.$unique);
+                $expr = $q->expr()->like('r.name', ':'.$unique);
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
-            $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
 
+        return [
+            $expr,
+            ($returnParameter) ? ["$unique" => $string] : [],
+        ];
+    }
+
+    /**
+     * Get a count of users that belong to the role.
+     *
+     * @param $roleIds
+     *
+     * @return array
+     */
+    public function getUserCount($roleIds)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(u.id) as thecount, u.role_id')
+            ->from(MAUTIC_TABLE_PREFIX.'users', 'u');
+
+        $returnArray = (is_array($roleIds));
+
+        if (!$returnArray) {
+            $roleIds = [$roleIds];
+        }
+
+        $q->where(
+            $q->expr()->in('u.role_id', $roleIds)
+        )
+            ->groupBy('u.role_id');
+
+        $result = $q->execute()->fetchAll();
+
+        $return = [];
+        foreach ($result as $r) {
+            $return[$r['role_id']] = $r['thecount'];
+        }
+
+        // Ensure lists without leads have a value
+        foreach ($roleIds as $r) {
+            if (!isset($return[$r])) {
+                $return[$r] = 0;
+            }
+        }
+
+        return ($returnArray) ? $return : $return[$roleIds[0]];
     }
 
     /**
@@ -123,10 +157,10 @@ class RoleRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.user.user.searchcommand.isadmin',
-            'mautic.core.searchcommand.name'
-        );
+            'mautic.core.searchcommand.name',
+        ];
     }
 
     /**
@@ -134,9 +168,9 @@ class RoleRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('r.name', 'ASC')
-        );
+        return [
+            ['r.name', 'ASC'],
+        ];
     }
 
     /**

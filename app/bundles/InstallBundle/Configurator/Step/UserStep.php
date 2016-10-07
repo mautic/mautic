@@ -1,17 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User Step.
@@ -19,27 +20,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserStep implements StepInterface
 {
     /**
-     * User's first name
+     * User's first name.
      */
     public $firstname;
 
     /**
-     * User's last name
+     * User's last name.
      */
     public $lastname;
 
     /**
-     * User's e-mail address
+     * User's e-mail address.
      */
     public $email;
 
     /**
-     * User's username
+     * User's username.
      */
     public $username;
 
     /**
-     * User's password
+     * User's password.
      */
     public $password;
 
@@ -66,7 +67,7 @@ class UserStep implements StepInterface
      */
     public function checkRequirements()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -74,7 +75,7 @@ class UserStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -90,6 +91,6 @@ class UserStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        return array();
+        return [];
     }
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,48 +18,48 @@ endif;
         <thead>
         <tr>
             <?php
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'checkall' => 'true',
-                'target'   => '#userTable'
-            ));
+                'target'   => '#userTable',
+            ]);
             ?>
             <th class="visible-md visible-lg col-user-avatar"></th>
             <?php
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.lastName, u.firstName, u.username',
                 'text'       => 'mautic.core.name',
                 'class'      => 'col-user-name',
-                'default'    => true
-            ));
+                'default'    => true,
+            ]);
 
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.username',
                 'text'       => 'mautic.core.username',
                 'class'      => 'col-user-username',
-            ));
+            ]);
 
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.email',
                 'text'       => 'mautic.core.type.email',
-                'class'      => 'visible-md visible-lg col-user-email'
-            ));
+                'class'      => 'visible-md visible-lg col-user-email',
+            ]);
 
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'user',
                 'orderBy'    => 'r.name',
                 'text'       => 'mautic.user.role',
-                'class'      => 'visible-md visible-lg col-user-role'
-            ));
+                'class'      => 'visible-md visible-lg col-user-role',
+            ]);
 
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.id',
                 'text'       => 'mautic.core.id',
-                'class'      => 'visible-md visible-lg col-user-id'
-            ));
+                'class'      => 'visible-md visible-lg col-user-id',
+            ]);
             ?>
         </tr>
         </thead>
@@ -67,23 +68,31 @@ endif;
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                        'item'      => $item,
-                        'templateButtons' => array(
-                            'edit'      => $permissions['edit'],
-                            'delete'    => $permissions['delete'],
-                        ),
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                        'item'            => $item,
+                        'templateButtons' => [
+                            'edit'   => $permissions['edit'],
+                            'delete' => $permissions['delete'],
+                        ],
                         'routeBase' => 'user',
                         'langVar'   => 'user.user',
-                        'pull'      => 'left'
-                    ));
+                        'pull'      => 'left',
+                    ]);
                     ?>
                 </td>
                 <td class="visible-md visible-lg">
                     <img class="img img-responsive img-thumbnail w-44" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
-                    <div><?php echo $item->getName(true); ?></div>
+                    <div>
+                        <?php if ($permissions['edit']) : ?>
+                            <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
+                                <?php echo $item->getName(true); ?>
+                            </a>
+                        <?php else : ?>
+                            <?php echo $item->getName(true); ?>
+                        <?php endif; ?>
+                    </div>
                     <div class="small"><em><?php echo $item->getPosition(); ?></em></div>
                 </td>
                 <td><?php echo $item->getUsername(); ?></td>
@@ -97,12 +106,12 @@ endif;
         </tbody>
     </table>
     <div class="panel-footer">
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems" => count($items),
-        "page"       => $page,
-        "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->generate('mautic_user_index'),
-        'sessionVar' => 'user'
-    )); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+        'totalItems' => count($items),
+        'page'       => $page,
+        'limit'      => $limit,
+        'baseUrl'    => $view['router']->path('mautic_user_index'),
+        'sessionVar' => 'user',
+    ]); ?>
     </div>
 </div>

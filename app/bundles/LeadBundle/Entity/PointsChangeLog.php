@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class PointsChangeLog
- *
- * @package Mautic\LeadBundle\Entity
+ * Class PointsChangeLog.
  */
 class PointsChangeLog
 {
@@ -62,12 +61,13 @@ class PointsChangeLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_points_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository')
+            ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addId();
 
@@ -93,9 +93,9 @@ class PointsChangeLog
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -103,9 +103,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return PointsChangeLog
      */
     public function setType($type)
@@ -116,7 +117,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -126,9 +127,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set eventName
+     * Set eventName.
      *
      * @param string $eventName
+     *
      * @return PointsChangeLog
      */
     public function setEventName($eventName)
@@ -139,7 +141,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get eventName
+     * Get eventName.
      *
      * @return string
      */
@@ -149,9 +151,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set actionName
+     * Set actionName.
      *
      * @param string $actionName
+     *
      * @return PointsChangeLog
      */
     public function setActionName($actionName)
@@ -162,7 +165,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get actionName
+     * Get actionName.
      *
      * @return string
      */
@@ -172,9 +175,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set delta
+     * Set delta.
      *
-     * @param integer $delta
+     * @param int $delta
+     *
      * @return PointsChangeLog
      */
     public function setDelta($delta)
@@ -185,9 +189,9 @@ class PointsChangeLog
     }
 
     /**
-     * Get delta
+     * Get delta.
      *
-     * @return integer
+     * @return int
      */
     public function getDelta()
     {
@@ -195,9 +199,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set dateAdded
+     * Set dateAdded.
      *
      * @param \DateTime $dateAdded
+     *
      * @return PointsChangeLog
      */
     public function setDateAdded($dateAdded)
@@ -208,7 +213,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get dateAdded
+     * Get dateAdded.
      *
      * @return \DateTime
      */
@@ -218,9 +223,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set lead
+     * Set lead.
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
+     *
      * @return PointsChangeLog
      */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
@@ -231,7 +237,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get lead
+     * Get lead.
      *
      * @return \Mautic\LeadBundle\Entity\Lead
      */
@@ -241,9 +247,10 @@ class PointsChangeLog
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     *
      * @return PointsChangeLog
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -254,7 +261,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,14 +15,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * Class Notification
- *
- * @package Mautic\CoreBundle\Entity
+ * Class Notification.
  */
 class Notification
 {
-
-    /** @var  int */
+    /** @var int */
     protected $id;
 
     /**
@@ -62,12 +60,15 @@ class Notification
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('notifications')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository');
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository')
+            ->addIndex(['is_read'], 'notification_read_status')
+            ->addIndex(['type'], 'notification_type')
+            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status');
 
         $builder->addId();
 
@@ -101,7 +102,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -109,7 +110,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getUser ()
+    public function getUser()
     {
         return $this->user;
     }
@@ -117,7 +118,7 @@ class Notification
     /**
      * @param mixed $user
      */
-    public function setUser (User $user)
+    public function setUser(User $user)
     {
         $this->user = $user;
     }
@@ -125,7 +126,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
@@ -133,7 +134,7 @@ class Notification
     /**
      * @param mixed $type
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->type = $type;
     }
@@ -141,7 +142,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getMessage ()
+    public function getMessage()
     {
         return $this->message;
     }
@@ -149,7 +150,7 @@ class Notification
     /**
      * @param mixed $message
      */
-    public function setMessage ($message)
+    public function setMessage($message)
     {
         $this->message = $message;
     }
@@ -157,7 +158,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -165,7 +166,7 @@ class Notification
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded ($dateAdded)
+    public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
     }
@@ -173,7 +174,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getIconClass ()
+    public function getIconClass()
     {
         return $this->iconClass;
     }
@@ -181,7 +182,7 @@ class Notification
     /**
      * @param mixed $iconClass
      */
-    public function setIconClass ($iconClass)
+    public function setIconClass($iconClass)
     {
         $this->iconClass = $iconClass;
     }
@@ -189,7 +190,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getIsRead ()
+    public function getIsRead()
     {
         return $this->isRead;
     }
@@ -197,7 +198,7 @@ class Notification
     /**
      * @param mixed $isRead
      */
-    public function setIsRead ($isRead)
+    public function setIsRead($isRead)
     {
         $this->isRead = (bool) $isRead;
     }
@@ -205,7 +206,7 @@ class Notification
     /**
      * @return mixed
      */
-    public function getHeader ()
+    public function getHeader()
     {
         return $this->header;
     }
@@ -213,7 +214,7 @@ class Notification
     /**
      * @param mixed $header
      */
-    public function setHeader ($header)
+    public function setHeader($header)
     {
         $this->header = $header;
     }

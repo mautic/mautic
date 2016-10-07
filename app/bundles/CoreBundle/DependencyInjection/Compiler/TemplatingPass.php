@@ -18,12 +18,12 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class TemplatingPass
+ * Class TemplatingPass.
  */
 class TemplatingPass implements CompilerPassInterface
 {
@@ -39,9 +39,11 @@ class TemplatingPass implements CompilerPassInterface
         if ($container->hasDefinition('templating.helper.assets')) {
             //Add a addMethodCall to set factory
             $container->getDefinition('templating.helper.assets')->addMethodCall(
-                'setFactory', array(new Reference('mautic.factory'))
+                'setFactory', [new Reference('mautic.factory')]
             )->addMethodCall(
-                'setAssetHelper', array(new Reference('mautic.helper.assetgeneration'))
+                'setAssetHelper', [new Reference('mautic.helper.assetgeneration')]
+            )->addMethodCall(
+                'setParamsHelper', [new Reference('mautic.helper.core_parameters')]
             );
         }
     }

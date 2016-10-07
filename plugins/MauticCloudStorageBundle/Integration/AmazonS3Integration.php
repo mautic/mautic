@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,7 @@ use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3;
 
 /**
- * Class AmazonS3Integration
+ * Class AmazonS3Integration.
  */
 class AmazonS3Integration extends CloudStorageIntegration
 {
@@ -34,7 +35,7 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
@@ -44,7 +45,7 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
@@ -58,11 +59,11 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             'client_id'     => 'mautic.integration.keyfield.clientid',
             'client_secret' => 'mautic.integration.keyfield.clientsecret',
-            'bucket'        => 'mautic.integration.keyfield.amazons3.bucket'
-        );
+            'bucket'        => 'mautic.integration.keyfield.amazons3.bucket',
+        ];
     }
 
     /**
@@ -75,7 +76,7 @@ class AmazonS3Integration extends CloudStorageIntegration
         if (!$this->adapter) {
             $keys = $this->getDecryptedApiKeys();
 
-            $service = S3Client::factory(array('key' => $keys['client_id'], 'secret' => $keys['client_secret']));
+            $service = S3Client::factory(['key' => $keys['client_id'], 'secret' => $keys['client_secret']]);
 
             $this->adapter = new AwsS3($service, $keys['bucket']);
         }

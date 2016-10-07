@@ -1,0 +1,10 @@
+{
+  "name": "Oxygen",
+  "author": "Mautic team based on a theme by Sendwithus",
+  "authorUrl": "https://www.sendwithus.com/resources/templates/oxygen",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}

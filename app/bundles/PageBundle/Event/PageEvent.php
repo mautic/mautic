@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,23 +14,22 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Page;
 
 /**
- * Class PageEvent
+ * Class PageEvent.
  */
 class PageEvent extends CommonEvent
 {
-
     /**
      * @param Page $page
      * @param bool $isNew
      */
     public function __construct(Page $page, $isNew = false)
     {
-        $this->entity  = $page;
-        $this->isNew   = $isNew;
+        $this->entity = $page;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Page entity
+     * Returns the Page entity.
      *
      * @return Page
      */
@@ -39,7 +39,7 @@ class PageEvent extends CommonEvent
     }
 
     /**
-     * Sets the Page entity
+     * Sets the Page entity.
      *
      * @param Page $page
      */

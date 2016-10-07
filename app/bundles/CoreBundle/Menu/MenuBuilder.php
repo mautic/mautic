@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,15 +17,12 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
- * Class MenuBuilder
+ * Class MenuBuilder.
  */
 class MenuBuilder
 {
-
     /**
      * @var FactoryInterface
      */
@@ -50,60 +48,29 @@ class MenuBuilder
      * @param MatcherInterface $matcher
      * @param MauticFactory    $factory
      */
-    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, MauticFactory $factory)
+    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
         $this->factory    = $knpFactory;
         $this->matcher    = $matcher;
-        $this->dispatcher = $factory->getDispatcher();
-        $this->menuHelper = $factory->getHelper('menu');
+        $this->dispatcher = $dispatcher;
+        $this->menuHelper = $menuHelper;
     }
 
     /**
-     * Generate menu navigation object
+     * @param $name
+     * @param $arguments
      *
-     * @return \Knp\Menu\ItemInterface
+     * @return mixed
      */
-    public function mainMenu()
+    public function __call($name, $arguments)
     {
-        static $menu;
+        $name = str_replace('Menu', '', $name);
 
-        if (empty($menu)) {
-            $loader = new ArrayLoader($this->factory);
-
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->menuHelper, 'main');
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
-            $menuItems = $event->getMenuItems();
-            $menu      = $loader->load($menuItems);
-        }
-
-        return $menu;
+        return $this->buildMenu($name);
     }
 
     /**
-     * Generate admin menu navigation object
-     *
-     * @return \Knp\Menu\ItemInterface
-     */
-    public function adminMenu()
-    {
-        static $adminMenu;
-
-        if (empty($adminMenu)) {
-            $loader = new ArrayLoader($this->factory);
-
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->menuHelper, 'admin');
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
-            $menuItems = $event->getMenuItems();
-            $adminMenu = $loader->load($menuItems);
-        }
-
-        return $adminMenu;
-    }
-
-    /**
-     * Used by breadcrumbs to determine active link
+     * Used by breadcrumbs to determine active link.
      *
      * @param \Knp\Menu\ItemInterface $menu
      * @param string                  $forRouteUri
@@ -116,13 +83,13 @@ class MenuBuilder
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
+                if ($forRouteUri == 'current' && $this->matcher->isCurrent($item)) {
                     //current match
                     return $item;
-                } else if ($forRouteUri != "current" && $item->getUri() == $forRouteUri) {
+                } elseif ($forRouteUri != 'current' && $item->getUri() == $forRouteUri) {
                     //route uri match
                     return $item;
-                } else if (!empty($forRouteName) && $forRouteName == $item->getExtra("routeName")) {
+                } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
                     //route name match
                     return $item;
                 }
@@ -136,5 +103,28 @@ class MenuBuilder
         }
 
         return null;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
+    private function buildMenu($name)
+    {
+        static $menus = [];
+
+        if (!isset($menus[$name])) {
+            $loader = new ArrayLoader($this->factory);
+
+            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            $event = new MenuEvent($this->menuHelper, $name);
+            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+
+            $menuItems    = $event->getMenuItems();
+            $menus[$name] = $loader->load($menuItems);
+        }
+
+        return $menus[$name];
     }
 }

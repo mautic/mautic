@@ -1,7 +1,7 @@
 <?php
 
 /**
- *    Filemanager PHP class
+ *    Filemanager PHP class.
  *
  *    filemanager.class.php
  *    class for the filemanager.php connector
@@ -13,39 +13,38 @@
  */
 class Filemanager
 {
-
-    protected $config = array();
-    protected $language = array();
-    protected $get = array();
-    protected $post = array();
-    protected $properties = array();
-    protected $item = array();
-    protected $languages = array();
-    protected $allowed_actions = array();
-    protected $root = '';                // Filemanager root folder
-    protected $doc_root = '';        // root folder known by JS : $this->config['options']['fileRoot'] (filepath or '/') or $_SERVER['DOCUMENT_ROOT'] - overwritten by setFileRoot() method
+    protected $config           = [];
+    protected $language         = [];
+    protected $get              = [];
+    protected $post             = [];
+    protected $properties       = [];
+    protected $item             = [];
+    protected $languages        = [];
+    protected $allowed_actions  = [];
+    protected $root             = '';                // Filemanager root folder
+    protected $doc_root         = '';        // root folder known by JS : $this->config['options']['fileRoot'] (filepath or '/') or $_SERVER['DOCUMENT_ROOT'] - overwritten by setFileRoot() method
     protected $dynamic_fileroot = ''; // Only set if setFileRoot() is called. Second part of the path : '/Filemanager/assets/' ( doc_root - $_SERVER['DOCUMENT_ROOT'])
-    protected $path_to_files = ''; // path to FM userfiles folder - automatically computed by the PHP class, something like '/var/www/Filemanager/userfiles'
-    protected $logger = false;
-    protected $logfile = '';
-    protected $cachefolder = '_thumbs/';
-    protected $thumbnail_width = 64;
+    protected $path_to_files    = ''; // path to FM userfiles folder - automatically computed by the PHP class, something like '/var/www/Filemanager/userfiles'
+    protected $logger           = false;
+    protected $logfile          = '';
+    protected $cachefolder      = '_thumbs/';
+    protected $thumbnail_width  = 64;
     protected $thumbnail_height = 64;
-    protected $separator = 'userfiles'; // @todo fix keep it or not?
+    protected $separator        = 'userfiles'; // @todo fix keep it or not?
 
     public function __construct($extraConfig = '')
     {
 
         // getting default config file
-        $content        = file_get_contents("../../scripts/filemanager.config.js.default");
+        $content        = file_get_contents('../../scripts/filemanager.config.js.default');
         $config_default = json_decode($content, true);
 
         // getting user config file
-        $content = file_get_contents("../../scripts/filemanager.config.js");
+        $content = file_get_contents('../../scripts/filemanager.config.js');
         $config  = json_decode($content, true);
 
         if (!$config) {
-            $this->error("Error parsing the settings file! Please check your JSON syntax.");
+            $this->error('Error parsing the settings file! Please check your JSON syntax.');
         }
         $this->config = array_replace_recursive($config_default, $config);
 
@@ -60,13 +59,13 @@ class Filemanager
         }
 
         $this->root       = dirname(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR;
-        $this->properties = array(
+        $this->properties = [
             'Date Created'  => null,
             'Date Modified' => null,
             'Height'        => null,
             'Width'         => null,
-            'Size'          => null
-        );
+            'Size'          => null,
+        ];
 
         // Log actions or not?
         if ($this->config['options']['logger'] == true) {
@@ -108,7 +107,6 @@ class Filemanager
     // $extraconfig should be formatted as json config array.
     public function setup($extraconfig)
     {
-
         $this->config = array_replace_recursive($this->config, $extraconfig);
     }
 
@@ -144,11 +142,11 @@ class Filemanager
 
     public function error($string, $textarea = false)
     {
-        $array = array(
+        $array = [
             'Error'      => $string,
             'Code'       => '-1',
-            'Properties' => $this->properties
-        );
+            'Properties' => $this->properties,
+        ];
 
         $this->__log(__METHOD__.' - error message : '.$string);
 
@@ -201,7 +199,7 @@ class Filemanager
 
     public function getinfo()
     {
-        $this->item               = array();
+        $this->item               = [];
         $this->item['properties'] = $this->properties;
         $this->get_file_info('', false);
 
@@ -214,29 +212,29 @@ class Filemanager
             $path = $this->get['path'];
         }
 
-        $array = array(
+        $array = [
             'Path'       => $path,
             'Filename'   => $this->item['filename'],
             'File Type'  => $this->item['filetype'],
             'Protected'  => $this->item['protected'],
             'Preview'    => $this->item['preview'],
             'Properties' => $this->item['properties'],
-            'Error'      => "",
-            'Code'       => 0
-        );
+            'Error'      => '',
+            'Code'       => 0,
+        ];
 
         return $array;
     }
 
     public function getfolder()
     {
-        $array    = array();
-        $filesDir = array();
+        $array    = [];
+        $filesDir = [];
 
         $current_path = $this->getFullPath();
 
         if (!$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         if (!is_dir($current_path)) {
@@ -244,7 +242,7 @@ class Filemanager
         }
 
         // check if file is readable
-        if (!$this->has_system_permission($current_path, array('r'))) {
+        if (!$this->has_system_permission($current_path, ['r'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')));
         }
 
@@ -252,7 +250,7 @@ class Filemanager
             $this->error(sprintf($this->lang('UNABLE_TO_OPEN_DIRECTORY'), $this->get['path']));
         } else {
             while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..") {
+                if ($file != '.' && $file != '..') {
                     array_push($filesDir, $file);
                 }
             }
@@ -263,7 +261,6 @@ class Filemanager
             natcasesort($filesDir);
 
             foreach ($filesDir as $file) {
-
                 if (is_dir($current_path.$file)) {
                     if (!in_array($file, $this->config['exclude']['unallowed_dirs'])
                         && !preg_match(
@@ -273,7 +270,7 @@ class Filemanager
                     ) {
 
                         // check if file is writable and readable
-                        if (!$this->has_system_permission($current_path.$file, array('w', 'r'))) {
+                        if (!$this->has_system_permission($current_path.$file, ['w', 'r'])) {
                             $protected   = 1;
                             $previewPath = $this->config['icons']['path'].'locked_'.$this->config['icons']['directory'];
                         } else {
@@ -281,14 +278,14 @@ class Filemanager
                             $previewPath = $this->config['icons']['path'].$this->config['icons']['directory'];
                         }
 
-                        $array[$this->get['path'].$file.'/'] = array(
+                        $array[$this->get['path'].$file.'/'] = [
                             'Path'       => $this->get['path'].$file.'/',
                             'Filename'   => $file,
                             'File Type'  => 'dir',
                             'Protected'  => $protected,
                             'Preview'    => $previewPath,
-                            'Properties' => array(
-                                'Date Created'  => date(
+                            'Properties' => [
+                                'Date Created' => date(
                                     $this->config['options']['dateFormat'],
                                     filectime($this->getFullPath($this->get['path'].$file.'/'))
                                 ),
@@ -296,25 +293,24 @@ class Filemanager
                                     $this->config['options']['dateFormat'],
                                     filemtime($this->getFullPath($this->get['path'].$file.'/'))
                                 ),
-                                'filemtime'     => filemtime($this->getFullPath($this->get['path'].$file.'/')),
-                                'Height'        => null,
-                                'Width'         => null,
-                                'Size'          => null
-                            ),
-                            'Error'      => "",
-                            'Code'       => 0
-                        );
+                                'filemtime' => filemtime($this->getFullPath($this->get['path'].$file.'/')),
+                                'Height'    => null,
+                                'Width'     => null,
+                                'Size'      => null,
+                            ],
+                            'Error' => '',
+                            'Code'  => 0,
+                        ];
                     }
-                } else if (!in_array($file, $this->config['exclude']['unallowed_files'])
+                } elseif (!in_array($file, $this->config['exclude']['unallowed_files'])
                     && !preg_match(
                         $this->config['exclude']['unallowed_files_REGEXP'],
                         $file
                     )
                 ) {
-                    $this->item               = array();
+                    $this->item               = [];
                     $this->item['properties'] = $this->properties;
                     $this->get_file_info($this->get['path'].$file, true);
-
 
                     if (!isset($this->params['type'])
                         || (isset($this->params['type']) && strtolower($this->params['type']) == 'images'
@@ -330,16 +326,16 @@ class Filemanager
                                     array_map('strtolower', $this->config['images']['imagesExt'])
                                 ))
                         ) {
-                            $array[$this->get['path'].$file] = array(
+                            $array[$this->get['path'].$file] = [
                                 'Path'       => $this->get['path'].$file,
                                 'Filename'   => $this->item['filename'],
                                 'File Type'  => $this->item['filetype'],
                                 'Protected'  => $this->item['protected'],
                                 'Preview'    => $this->item['preview'],
                                 'Properties' => $this->item['properties'],
-                                'Error'      => "",
-                                'Code'       => 0
-                            );
+                                'Error'      => '',
+                                'Code'       => 0,
+                            ];
                         }
                     }
                 }
@@ -351,19 +347,17 @@ class Filemanager
         return $array;
     }
 
-
     public function editfile()
     {
-
         $current_path = $this->getFullPath();
 
         // check if file is writable
-        if (!$this->has_system_permission($current_path, array('w'))) {
+        if (!$this->has_system_permission($current_path, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')));
         }
 
         if (!$this->has_permission('edit') || !$this->is_valid_path($current_path) || !$this->is_editable($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         $this->__log(__METHOD__.' - editing file '.$current_path);
@@ -375,26 +369,25 @@ class Filemanager
             $this->error(sprintf($this->lang('ERROR_OPENING_FILE')));
         }
 
-        $array = array(
-            'Error'   => "",
+        $array = [
+            'Error'   => '',
             'Code'    => 0,
             'Path'    => $this->get['path'],
-            'Content' => $this->formatPath($content)
-        );
+            'Content' => $this->formatPath($content),
+        ];
 
         return $array;
     }
 
     public function savefile()
     {
-
         $current_path = $this->getFullPath($this->post['path']);
 
         if (!$this->has_permission('edit') || !$this->is_valid_path($current_path) || !$this->is_editable($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
-        if (!$this->has_system_permission($current_path, array('w'))) {
+        if (!$this->has_system_permission($current_path, ['w'])) {
             $this->error(sprintf($this->lang('ERROR_WRITING_PERM')));
         }
 
@@ -407,18 +400,17 @@ class Filemanager
             $this->error(sprintf($this->lang('ERROR_SAVING_FILE')));
         }
 
-        $array = array(
-            'Error' => "",
+        $array = [
+            'Error' => '',
             'Code'  => 0,
-            'Path'  => $this->formatPath($this->post['path'])
-        );
+            'Path'  => $this->formatPath($this->post['path']),
+        ];
 
         return $array;
     }
 
     public function rename()
     {
-
         $suffix = '';
 
         if (substr($this->get['old'], -1, 1) == '/') {
@@ -433,11 +425,11 @@ class Filemanager
         $old_file = $this->getFullPath($this->get['old']).$suffix;
 
         if (!$this->has_permission('rename') || !$this->is_valid_path($old_file)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         // check if file is writable
-        if (!$this->has_system_permission($old_file, array('w'))) {
+        if (!$this->has_system_permission($old_file, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')));
         }
 
@@ -469,14 +461,14 @@ class Filemanager
                 $this->error(sprintf($this->lang('ERROR_RENAMING_FILE'), $filename, $this->get['new']));
             }
         }
-        $array = array(
-            'Error'    => "",
+        $array = [
+            'Error'    => '',
             'Code'     => 0,
             'Old Path' => $this->formatPath($this->get['old'].$suffix),
             'Old Name' => $filename,
             'New Path' => $this->formatPath($path.'/'.$this->get['new'].$suffix),
-            'New Name' => $this->get['new']
-        );
+            'New Name' => $this->get['new'],
+        ];
 
         return $array;
     }
@@ -496,10 +488,9 @@ class Filemanager
         $oldPath = $this->getFullPath($this->get['old']);
 
         // check if file is writable
-        if (!$this->has_system_permission($oldPath, array('w'))) {
+        if (!$this->has_system_permission($oldPath, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')), true);
         }
-
 
         // check if not requesting main FM userfiles folder
         if ($this->is_root_folder($oldPath)) {
@@ -512,7 +503,7 @@ class Filemanager
         $path     = '/'.implode('/', $tmp).'/';
 
         // new path
-        if (substr($this->get['new'], 0, 1) != "/") {
+        if (substr($this->get['new'], 0, 1) != '/') {
             // make path relative from old dir
             $newPath = $path.'/'.$this->get['new'].'/';
         } else {
@@ -526,7 +517,7 @@ class Filemanager
         $newPath         = $this->getFullPath($newPath);
 
         if (!$this->has_permission('move') || !$this->is_valid_path($oldPath) || !$this->is_valid_path($newPath)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         // check if file already exists
@@ -556,31 +547,29 @@ class Filemanager
             }
         }
 
-        $array = array(
-            'Error'    => "",
+        $array = [
+            'Error'    => '',
             'Code'     => 0,
             'Old Path' => $path,
             'Old Name' => $fileName,
             'New Path' => $this->formatPath($newRelativePath),
             'New Name' => $fileName,
-        );
+        ];
 
         return $array;
     }
 
     public function delete()
     {
-
         $current_path   = $this->getFullPath();
         $thumbnail_path = $this->get_thumbnail_path($current_path);
 
-
         if (!$this->has_permission('delete') || !$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         // check if file is writable
-        if (!$this->has_system_permission($current_path, array('w'))) {
+        if (!$this->has_system_permission($current_path, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')));
         }
 
@@ -590,25 +579,22 @@ class Filemanager
         }
 
         if (is_dir($current_path)) {
-
             $this->unlinkRecursive($current_path);
 
             // we remove thumbnails if needed
             $this->__log(__METHOD__.' - deleting thumbnails folder '.$thumbnail_path);
             $this->unlinkRecursive($thumbnail_path);
 
-            $array = array(
-                'Error' => "",
+            $array = [
+                'Error' => '',
                 'Code'  => 0,
-                'Path'  => $this->formatPath($this->get['path'])
-            );
+                'Path'  => $this->formatPath($this->get['path']),
+            ];
 
             $this->__log(__METHOD__.' - deleting folder '.$current_path);
 
             return $array;
-
-        } else if (file_exists($current_path)) {
-
+        } elseif (file_exists($current_path)) {
             unlink($current_path);
 
             // delete thumbail if exists
@@ -617,16 +603,15 @@ class Filemanager
                 unlink($thumbnail_path);
             }
 
-            $array = array(
-                'Error' => "",
+            $array = [
+                'Error' => '',
                 'Code'  => 0,
-                'Path'  => $this->formatPath($this->get['path'])
-            );
+                'Path'  => $this->formatPath($this->get['path']),
+            ];
 
             $this->__log(__METHOD__.' - deleting file '.$current_path);
 
             return $array;
-
         } else {
             $this->error(sprintf($this->lang('INVALID_DIRECTORY_OR_FILE')));
         }
@@ -634,7 +619,6 @@ class Filemanager
 
     public function replace()
     {
-
         $this->setParams();
 
         if (!isset($_FILES['fileR']) || !is_uploaded_file($_FILES['fileR']['tmp_name'])) {
@@ -691,7 +675,7 @@ class Filemanager
             if (!($size = @getimagesize($_FILES['fileR']['tmp_name']))) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_ONLY')), true);
             }
-            if (!in_array($size[2], array(1, 2, 3, 7, 8))) {
+            if (!in_array($size[2], [1, 2, 3, 7, 8])) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_TYPE_JPEG_GIF_PNG')), true);
             }
         }
@@ -699,12 +683,12 @@ class Filemanager
         $current_path = $this->getFullPath($this->post['newfilepath']);
 
         // check if file is writable
-        if (!$this->has_system_permission($current_path, array('w'))) {
+        if (!$this->has_system_permission($current_path, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')), true);
         }
 
         if (!$this->has_permission('replace') || !$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         move_uploaded_file($_FILES['fileR']['tmp_name'], $current_path);
@@ -719,7 +703,7 @@ class Filemanager
         if ($this->is_image($imagePath) && $this->config['images']['resize']['enabled']) {
             if ($size = @getimagesize($imagePath)) {
                 if ($size[0] > $this->config['images']['resize']['maxWidth'] || $size[1] > $this->config['images']['resize']['maxHeight']) {
-                    require_once('./inc/wideimage/lib/WideImage.php');
+                    require_once './inc/wideimage/lib/WideImage.php';
 
                     $image   = WideImage::load($imagePath);
                     $resized = $image->resize(
@@ -736,12 +720,12 @@ class Filemanager
 
         chmod($current_path, 0644);
 
-        $response = array(
+        $response = [
             'Path'  => dirname($this->post['newfilepath']),
             'Name'  => basename($this->post['newfilepath']),
-            'Error' => "",
-            'Code'  => 0
-        );
+            'Error' => '',
+            'Code'  => 0,
+        ];
 
         $this->__log(__METHOD__.' - replacing file '.$current_path);
 
@@ -751,7 +735,6 @@ class Filemanager
 
     public function add()
     {
-
         $this->setParams();
 
         if (!isset($_FILES['newfile']) || !is_uploaded_file($_FILES['newfile']['tmp_name'])) {
@@ -796,16 +779,16 @@ class Filemanager
             if (!($size = @getimagesize($_FILES['newfile']['tmp_name']))) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_ONLY')), true);
             }
-            if (!in_array($size[2], array(1, 2, 3, 7, 8))) {
+            if (!in_array($size[2], [1, 2, 3, 7, 8])) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_TYPE_JPEG_GIF_PNG')), true);
             }
         }
-        $_FILES['newfile']['name'] = $this->cleanString($_FILES['newfile']['name'], array('.', '-'));
+        $_FILES['newfile']['name'] = $this->cleanString($_FILES['newfile']['name'], ['.', '-']);
 
         $current_path = $this->getFullPath($this->post['currentpath']);
 
         if (!$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         if (!$this->config['upload']['overwrite']) {
@@ -818,7 +801,7 @@ class Filemanager
         if ($this->is_image($imagePath) && $this->config['images']['resize']['enabled']) {
             if ($size = @getimagesize($imagePath)) {
                 if ($size[0] > $this->config['images']['resize']['maxWidth'] || $size[1] > $this->config['images']['resize']['maxHeight']) {
-                    require_once('./inc/wideimage/lib/WideImage.php');
+                    require_once './inc/wideimage/lib/WideImage.php';
 
                     $image   = WideImage::load($imagePath);
                     $resized = $image->resize(
@@ -835,12 +818,12 @@ class Filemanager
 
         chmod($current_path.$_FILES['newfile']['name'], 0644);
 
-        $response = array(
+        $response = [
             'Path'  => $this->post['currentpath'],
             'Name'  => $_FILES['newfile']['name'],
-            'Error' => "",
-            'Code'  => 0
-        );
+            'Error' => '',
+            'Code'  => 0,
+        ];
 
         $this->__log(__METHOD__.' - adding file '.$_FILES['newfile']['name'].' into '.$current_path);
 
@@ -850,39 +833,38 @@ class Filemanager
 
     public function addfolder()
     {
-
         $current_path = $this->getFullPath();
 
         if (!$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
         if (is_dir($current_path.$this->get['name'])) {
             $this->error(sprintf($this->lang('DIRECTORY_ALREADY_EXISTS'), $this->get['name']));
-
         }
         $newdir = $this->cleanString($this->get['name']);
         if (!mkdir($current_path.$newdir, 0755)) {
             $this->error(sprintf($this->lang('UNABLE_TO_CREATE_DIRECTORY'), $newdir));
         }
-        $array = array(
+        $array = [
             'Parent' => $this->get['path'],
             'Name'   => $this->get['name'],
-            'Error'  => "",
-            'Code'   => 0
-        );
+            'Error'  => '',
+            'Code'   => 0,
+        ];
         $this->__log(__METHOD__.' - adding folder '.$current_path.$newdir);
 
         return $array;
     }
 
     /**
-     * function zipFile.  Creates a zip file from source to destination
+     * function zipFile.  Creates a zip file from source to destination.
      *
-     * @param  string         $source      Source path for zip
-     * @param  string         $destination Destination path for zip
-     * @param  string|boolean $flag        OPTIONAL If true includes the folder also
+     * @param string      $source      Source path for zip
+     * @param string      $destination Destination path for zip
+     * @param string|bool $flag        OPTIONAL If true includes the folder also
      *
-     * @return boolean
+     * @return bool
+     *
      * @link     http://stackoverflow.com/questions/17584869/zip-main-folder-with-sub-folder-inside
      */
     public function zipFile($source, $destination, $flag = '')
@@ -912,11 +894,11 @@ class Filemanager
 
                 if (is_dir($file) === true) {
                     $zip->addEmptyDir(str_replace($source.'/', '', $flag.$file.'/'));
-                } else if (is_file($file) === true) {
+                } elseif (is_file($file) === true) {
                     $zip->addFromString(str_replace($source.'/', '', $flag.$file), file_get_contents($file));
                 }
             }
-        } else if (is_file($source) === true) {
+        } elseif (is_file($source) === true) {
             $zip->addFromString($flag.basename($source), file_get_contents($source));
         }
 
@@ -925,15 +907,14 @@ class Filemanager
 
     public function download()
     {
-
         $current_path = $this->getFullPath();
 
         if (!$this->has_permission('download') || !$this->is_valid_path($current_path)) {
-            $this->error("No way.");
+            $this->error('No way.');
         }
 
         // check if file is writable
-        if (!$this->has_system_permission($current_path, array('w'))) {
+        if (!$this->has_system_permission($current_path, ['w'])) {
             $this->error(sprintf($this->lang('NOT_ALLOWED_SYSTEM')), true);
         }
 
@@ -942,7 +923,6 @@ class Filemanager
             if (!$this->is_allowed_file_type(basename($current_path))) {
                 $this->error(sprintf($this->lang('INVALID_FILE_TYPE')), true);
             }
-
         } else {
 
             // check if permission is granted
@@ -963,14 +943,13 @@ class Filemanager
             } else {
                 $this->error($this->lang('ERROR_CREATING_ZIP'));
             }
-
         }
 
         if (isset($this->get['path']) && file_exists($current_path)) {
-            header("Content-type: application/force-download");
+            header('Content-type: application/force-download');
             header('Content-Disposition: inline; filename="'.basename($current_path).'"');
-            header("Content-Transfer-Encoding: Binary");
-            header("Content-length: ".filesize($current_path));
+            header('Content-Transfer-Encoding: Binary');
+            header('Content-length: '.filesize($current_path));
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="'.basename($current_path).'"');
             readfile($current_path);
@@ -983,7 +962,6 @@ class Filemanager
 
     public function preview($thumbnail)
     {
-
         $current_path = $this->getFullPath();
 
         if (isset($this->get['path']) && file_exists($current_path)) {
@@ -996,15 +974,14 @@ class Filemanager
                 $returned_path = $current_path;
             }
 
-            header("Content-type: image/".strtolower(pathinfo($returned_path, PATHINFO_EXTENSION)));
-            header("Content-Transfer-Encoding: Binary");
-            header("Content-length: ".filesize($returned_path));
+            header('Content-type: image/'.strtolower(pathinfo($returned_path, PATHINFO_EXTENSION)));
+            header('Content-Transfer-Encoding: Binary');
+            header('Content-length: '.filesize($returned_path));
             header('Content-Disposition: inline; filename="'.basename($returned_path).'"');
 
             readfile($returned_path);
 
             exit();
-
         } else {
             $this->error(sprintf($this->lang('FILE_DOES_NOT_EXIST'), $current_path));
         }
@@ -1016,7 +993,7 @@ class Filemanager
         $max_post     = \Mautic\AssetBundle\Entity\Asset::getIniValue('post_max_size');
         $memory_limit = \Mautic\AssetBundle\Entity\Asset::getIniValue('memory_limit');
 
-        $upload_mb =  min(array_filter(array($max_upload, $max_post, $memory_limit)));
+        $upload_mb = min(array_filter([$max_upload, $max_post, $memory_limit]));
 
         $this->__log(__METHOD__.' - max upload file size is '.$upload_mb.'Mb');
 
@@ -1027,7 +1004,7 @@ class Filemanager
     {
         $tmp    = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/');
         $tmp    = explode('?', $tmp);
-        $params = array();
+        $params = [];
         if (isset($tmp[1]) && $tmp[1] != '') {
             $params_tmp = explode('&', $tmp[1]);
             if (is_array($params_tmp)) {
@@ -1044,19 +1021,16 @@ class Filemanager
 
     private function setPermissions()
     {
-
         $this->allowed_actions = $this->config['options']['capabilities'];
 
         if ($this->config['edit']['enabled']) {
             array_push($this->allowed_actions, 'edit');
         }
-
     }
 
     // check if system permission is granted
     private function has_system_permission($filepath, $perms)
     {
-
         if (in_array('r', $perms)) {
             if (!is_readable($filepath)) {
                 return false;
@@ -1069,9 +1043,7 @@ class Filemanager
         }
 
         return true;
-
     }
-
 
     private function get_file_info($path = '', $thumbnail = false)
     {
@@ -1092,23 +1064,20 @@ class Filemanager
         $this->item['filectime'] = filectime($this->getFullPath($current_path));
 
         // check if file is writable and readable
-        if (!$this->has_system_permission($this->getFullPath($current_path), array('w', 'r'))) {
+        if (!$this->has_system_permission($this->getFullPath($current_path), ['w', 'r'])) {
             $this->item['protected'] = 1;
             $this->item['preview']   = $this->config['icons']['path'].'locked_'.$this->config['icons']['default'];
             // prevent Internal Server Error HTTP_CODE 500 on non readable files/folders
             // without returning errors
             return;
-
         } else {
             $this->item['protected'] = 0;
             $this->item['preview']   = $this->config['icons']['path'].$this->config['icons']['default'];
         }
 
         if (is_dir($current_path)) {
-
             $this->item['preview'] = $this->config['icons']['path'].$this->config['icons']['directory'];
-
-        } else if (in_array(strtolower($this->item['filetype']), array_map('strtolower', $this->config['images']['imagesExt']))) {
+        } elseif (in_array(strtolower($this->item['filetype']), array_map('strtolower', $this->config['images']['imagesExt']))) {
 
             // svg should not be previewed as raster formats images
             if ($this->item['filetype'] == 'svg') {
@@ -1125,21 +1094,18 @@ class Filemanager
                 list($width, $height, $type, $attr) = getimagesize($this->getFullPath($current_path));
             } else {
                 $this->item['properties']['Size'] = 0;
-                list($width, $height) = array(0, 0);
+                list($width, $height)             = [0, 0];
             }
             $this->item['properties']['Height'] = $height;
             $this->item['properties']['Width']  = $width;
             $this->item['properties']['Size']   = filesize($this->getFullPath($current_path));
             //}
-
-        } else if (file_exists($this->root.$this->config['icons']['path'].strtolower($this->item['filetype']).'.png')) {
-
+        } elseif (file_exists($this->root.$this->config['icons']['path'].strtolower($this->item['filetype']).'.png')) {
             $this->item['preview']            = $this->config['icons']['path'].strtolower($this->item['filetype']).'.png';
             $this->item['properties']['Size'] = filesize($this->getFullPath($current_path));
             if (!$this->item['properties']['Size']) {
                 $this->item['properties']['Size'] = 0;
             }
-
         }
 
         $this->item['properties']['Date Modified'] = date($this->config['options']['dateFormat'], $this->item['filemtime']);
@@ -1149,7 +1115,6 @@ class Filemanager
 
     private function getFullPath($path = '')
     {
-
         if ($path == '') {
             if (isset($this->get['path'])) {
                 $path = $this->get['path'];
@@ -1167,34 +1132,27 @@ class Filemanager
             $full_path = $this->doc_root.rawurldecode($path);
         }
 
-        $full_path = str_replace("//", "/", $full_path);
+        $full_path = str_replace('//', '/', $full_path);
 
         // $this->__log("getFullPath() returned path : " . $full_path);
 
         return $full_path;
-
     }
 
     /**
-     * format path regarding the initial configuration
+     * format path regarding the initial configuration.
      *
      * @param string $path
      */
     private function formatPath($path)
     {
-
         if ($this->dynamic_fileroot != '') {
-
             $a = explode($this->separator, $path);
 
             return end($a);
-
         } else {
-
             return $path;
-
         }
-
     }
 
     private function sortFiles($array)
@@ -1207,12 +1165,11 @@ class Filemanager
 
         // handle 'TYPE_ASC' and 'TYPE_DESC'
         if (strpos($this->config['options']['fileSorting'], 'TYPE_') !== false || $this->config['options']['fileSorting'] == 'default') {
-
-            $a = array();
-            $b = array();
+            $a = [];
+            $b = [];
 
             foreach ($array as $key => $item) {
-                if (strcmp($item["File Type"], "dir") == 0) {
+                if (strcmp($item['File Type'], 'dir') == 0) {
                     $a[$key] = $item;
                 } else {
                     $b[$key] = $item;
@@ -1230,8 +1187,7 @@ class Filemanager
 
         // handle 'MODIFIED_ASC' and 'MODIFIED_DESC'
         if (strpos($this->config['options']['fileSorting'], 'MODIFIED_') !== false) {
-
-            $modified_order_array = array();  // new array as a column to sort collector
+            $modified_order_array = [];  // new array as a column to sort collector
 
             foreach ($array as $item) {
                 $modified_order_array[] = $item['Properties']['filemtime'];
@@ -1245,11 +1201,9 @@ class Filemanager
             }
 
             return $array;
-
         }
 
         return $array;
-
     }
 
 // @todo to remove
@@ -1260,24 +1214,7 @@ class Filemanager
 
     private function is_valid_path($path)
     {
-
-        //  @todo to remove
-        // if(!$this->startsWith(realpath($path), realpath($this->path_to_files))) return false;
-        // @see https://github.com/simogeo/Filemanager/issues/332
-        // @see http://stackoverflow.com/questions/5642785/php-a-good-way-to-universalize-paths-across-oss-slash-directions
-
-        // $givenpath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        // $rootpath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->path_to_files);
-        // $this->__log('substr doc_root : ' . substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->doc_root)));
-        // $this->__log('doc_root : ' . realpath($this->doc_root) . DIRECTORY_SEPARATOR);
-
-        // return $this->startsWith($givenpath, $rootpath);
-
-        $this->__log('substr path_to_files : '.substr(realpath($path).DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)));
-        $this->__log('path_to_files : '.realpath($this->path_to_files).DIRECTORY_SEPARATOR);
-
-        return substr(realpath($path).DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) == (realpath($this->path_to_files).DIRECTORY_SEPARATOR);
-
+        return file_exists($path);
     }
 
     private function unlinkRecursive($dir, $deleteRootToo = true)
@@ -1306,17 +1243,16 @@ class Filemanager
 
     /**
      * is_allowed_file_type()
-     * check if extension is allowed regarding the security Policy / Restrictions settings
+     * check if extension is allowed regarding the security Policy / Restrictions settings.
      *
      * @param string $file
      */
     private function is_allowed_file_type($file)
     {
-
         $path_parts = pathinfo($file);
 
         // if there is no extension
-        if (!isset ($path_parts ['extension'])) {
+        if (!isset($path_parts ['extension'])) {
             // we check if no extension file are allowed
             return (bool) $this->config['security']['allowNoExtension'];
         }
@@ -1324,23 +1260,20 @@ class Filemanager
         $exts = array_map('strtolower', $this->config['security']['uploadRestrictions']);
 
         if ($this->config['security']['uploadPolicy'] == 'DISALLOW_ALL') {
-
             if (!in_array(strtolower($path_parts['extension']), $exts)) {
                 return false;
             }
         }
         if ($this->config['security']['uploadPolicy'] == 'ALLOW_ALL') {
-
             if (in_array(strtolower($path_parts['extension']), $exts)) {
                 return false;
             }
         }
 
         return true;
-
     }
 
-    private function cleanString($string, $allowed = array())
+    private function cleanString($string, $allowed = [])
     {
         $allow = null;
 
@@ -1350,7 +1283,7 @@ class Filemanager
             }
         }
 
-        $mapping = array(
+        $mapping = [
             'Š' => 'S',
             'š' => 's',
             'Đ' => 'Dj',
@@ -1431,12 +1364,11 @@ class Filemanager
             'ŕ' => 'r',
             ' ' => '_',
             "'" => '_',
-            '/' => ''
-        );
+            '/' => '',
+        ];
 
         if (is_array($string)) {
-
-            $cleaned = array();
+            $cleaned = [];
 
             foreach ($string as $key => $clean) {
                 $clean = strtr($clean, $mapping);
@@ -1454,18 +1386,17 @@ class Filemanager
                 // $clean = preg_replace("/[^{$allow}_a-zA-Z0-9\x{0430}-\x{044F}\x{0410}-\x{042F}]/u", '', $string); // allow only latin alphabet with cyrillic
             }
             $cleaned = preg_replace('/[_]+/', '_', $clean); // remove double underscore
-
         }
 
         return $cleaned;
     }
 
     /**
-     * Checking if permission is set or not for a given action
+     * Checking if permission is set or not for a given action.
      *
      * @param string $action
      *
-     * @return boolean
+     * @return bool
      */
     private function has_permission($action)
     {
@@ -1474,13 +1405,12 @@ class Filemanager
 
     /**
      * Return Thumbnail path from given path
-     * works for both file and dir path
+     * works for both file and dir path.
      *
      * @param string $path
      */
     private function get_thumbnail_path($path)
     {
-
         $pos  = strrpos($path, $this->separator);
         $a[0] = substr($path, 0, $pos);
         $a[1] = substr($path, $pos + strlen($this->separator));
@@ -1499,20 +1429,18 @@ class Filemanager
         }
 
         return $thumbnail_fullpath;
-
     }
 
     /**
      * For debugging just call
      * the direct URL http://localhost/Filemanager/connectors/php/filemanager.php?mode=preview&path=%2FFilemanager%2Fuserfiles%2FMy%20folder3%2Fblanches_neiges.jPg&thumbnail=true
-     * and echo vars below
+     * and echo vars below.
      *
      * @param string $path
      */
     private function get_thumbnail($path)
     {
-
-        require_once('./inc/wideimage/lib/WideImage.php');
+        require_once './inc/wideimage/lib/WideImage.php';
 
         $thumbnail_fullpath = $this->get_thumbnail_path($path);
 
@@ -1535,7 +1463,6 @@ class Filemanager
             $resized->saveToFile($thumbnail_fullpath);
 
             $this->__log(__METHOD__.' - generating thumbnail :  '.$thumbnail_fullpath);
-
         }
 
         return $thumbnail_fullpath;
@@ -1543,7 +1470,6 @@ class Filemanager
 
     private function sanitize($var)
     {
-
         $sanitized = strip_tags($var);
         $sanitized = str_replace('http://', '', $sanitized);
         $sanitized = str_replace('https://', '', $sanitized);
@@ -1565,7 +1491,7 @@ class Filemanager
             if ($i == '') {
                 $i = 1;
             } else {
-                $i++;
+                ++$i;
             }
             $filename = str_replace($_i.'.'.$tmp[(sizeof($tmp) - 1)], $i.'.'.$tmp[(sizeof($tmp) - 1)], $filename);
 
@@ -1594,10 +1520,9 @@ class Filemanager
 
     private function availableLanguages()
     {
-
         if ($handle = opendir($this->root.'/scripts/languages/')) {
             while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..") {
+                if ($file != '.' && $file != '..') {
                     array_push($this->languages, pathinfo($file, PATHINFO_FILENAME));
                 }
             }
@@ -1607,28 +1532,25 @@ class Filemanager
 
     private function is_image($path)
     {
-
         $a          = getimagesize($path);
         $image_type = $a[2];
 
-        return in_array($image_type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_BMP));
+        return in_array($image_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_BMP]);
     }
 
     private function is_root_folder($path)
     {
-        return rtrim($this->path_to_files, "/") == rtrim($path, "/");
+        return rtrim($this->path_to_files, '/') == rtrim($path, '/');
     }
 
     private function is_editable($file)
     {
-
         $path_parts = pathinfo($file);
 
         $exts = array_map('strtolower', $this->config['edit']['editExt']);
 
         return in_array($path_parts['extension'], $exts);
     }
-
 
     private function get_user_ip()
     {
@@ -1647,23 +1569,18 @@ class Filemanager
         return $ip;
     }
 
-
     private function __log($msg)
     {
-
         if ($this->logger == true) {
-
-            $fp  = fopen($this->logfile, "a");
-            $str = "[".date("d/m/Y h:i:s", time())."]#".$this->get_user_ip()."#".$msg;
+            $fp  = fopen($this->logfile, 'a');
+            $str = '['.date('d/m/Y h:i:s', time()).']#'.$this->get_user_ip().'#'.$msg;
             fwrite($fp, $str.PHP_EOL);
             fclose($fp);
         }
-
     }
 
     public function enableLog($logfile = '')
     {
-
         $this->logger = true;
 
         if ($logfile != '') {
@@ -1671,19 +1588,17 @@ class Filemanager
         }
 
         $this->__log(__METHOD__.' - Log enabled (in '.$this->logfile.' file)');
-
     }
 
     public function disableLog()
     {
-
         $this->logger = false;
 
         $this->__log(__METHOD__.' - Log disabled');
     }
 
     /**
-     * Remove "../" from path
+     * Remove "../" from path.
      *
      * @param string path to be converted
      * @param bool   if dir names should be cleaned
@@ -1693,7 +1608,7 @@ class Filemanager
     public function expandPath($path, $clean = false)
     {
         $todo     = explode('/', $path);
-        $fullPath = array();
+        $fullPath = [];
 
         foreach ($todo as $dir) {
             if ($dir == '..') {
@@ -1712,5 +1627,3 @@ class Filemanager
         return implode('/', $fullPath);
     }
 }
-
-?>

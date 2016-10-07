@@ -1,38 +1,38 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class PointBuilderEvent
+ * Class PointBuilderEvent.
  */
 class PointBuilderEvent extends Event
 {
-
     /**
      * @var array
      */
-    private $actions = array();
+    private $actions = [];
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -42,26 +42,25 @@ class PointBuilderEvent extends Event
      *
      * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array  $action - can contain the following keys:
-     *  'label'           => (required) what to display in the list
-     *  'description'     => (optional) short description of event
-     *  'template'        => (optional) template to use for the action's HTML in the point builder
-     *      i.e AcmeMyBundle:PointAction:theaction.html.php
-     *  'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with point change only
-     *  'formTypeOptions' => (optional) array of options to pass to formType
-     *  'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
+     *                       'label'           => (required) what to display in the list
+     *                       'description'     => (optional) short description of event
+     *                       'template'        => (optional) template to use for the action's HTML in the point builder
+     *                       i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                       'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with point change only
+     *                       'formTypeOptions' => (optional) array of options to pass to formType
+     *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
      *                       change the configured points or false to ignore the action
-     *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          Mautic\LeadBundle\Entity\Lead $lead
-     *          $eventDetails - variable sent from firing function to call back function
-     *          array $action = array(
-     *              'id' => int
-     *              'type' => string
-     *              'name' => string
-     *              'properties' => array()
-     *         )
+     *                       The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *                       Mautic\CoreBundle\Factory\MauticFactory $factory
+     *                       Mautic\LeadBundle\Entity\Lead $lead
+     *                       $eventDetails - variable sent from firing function to call back function
+     *                       array $action = array(
+     *                       'id' => int
+     *                       'type' => string
+     *                       'name' => string
+     *                       'properties' => array()
+     *                       )
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function addAction($key, array $action)
@@ -72,8 +71,8 @@ class PointBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label'),
-            array('callback'),
+            ['group', 'label'],
+            ['callback'],
             $action
         );
 
@@ -85,7 +84,7 @@ class PointBuilderEvent extends Event
     }
 
     /**
-     * Get actions
+     * Get actions.
      *
      * @return array
      */
@@ -95,31 +94,34 @@ class PointBuilderEvent extends Event
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });
+
         return $this->actions;
     }
 
     /**
-     * Gets a list of actions supported by the choice form field
+     * Gets a list of actions supported by the choice form field.
      *
      * @return array
      */
     public function getActionList()
     {
-        $list = array();
+        $list    = [];
         $actions = $this->getActions();
         foreach ($actions as $k => $a) {
             $list[$k] = $a['label'];
         }
+
         return $list;
     }
 
     public function getActionChoices()
     {
-        $choices = array();
+        $choices = [];
         $actions = $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }
+
         return $choices;
     }
 
@@ -128,7 +130,6 @@ class PointBuilderEvent extends Event
      * @param array $methods
      * @param array $component
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
@@ -141,7 +142,7 @@ class PointBuilderEvent extends Event
 
         foreach ($methods as $m) {
             if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException($component[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
+                throw new InvalidArgumentException($component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }
     }

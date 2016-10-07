@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -19,14 +20,14 @@
         <tr>
             <td>
                 <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php',
-                    array(
+                    [
                         'btnClass'      => 'btn btn-danger btn-xs',
-                        'message'       => $view["translator"]->trans("mautic.api.client.form.confirmrevoke", array("%name%" => $k->getName())),
-                        'confirmText'   => $view["translator"]->trans("mautic.api.client.form.revoke"),
-                        'confirmAction' => $view['router']->generate('mautic_client_action',array("objectAction" => "revoke", "objectId" => $k->getId())),
+                        'message'       => $view['translator']->trans('mautic.api.client.form.confirmrevoke', ['%name%' => $k->getName()]),
+                        'confirmText'   => $view['translator']->trans('mautic.api.client.form.revoke'),
+                        'confirmAction' => $view['router']->path('mautic_client_action', ['objectAction' => 'revoke', 'objectId' => $k->getId()]),
                         'iconClass'     => 'fa fa-trash-o',
-                        'btnText'       => $view["translator"]->trans("mautic.api.client.form.revoke")
-                    )
+                        'btnText'       => $view['translator']->trans('mautic.api.client.form.revoke'),
+                    ]
                 ); ?>
             </td>
             <td><?php echo $k->getName(); ?></td>

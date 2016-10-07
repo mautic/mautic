@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,11 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadReportData
+ * Class LoadReportData.
  */
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -41,14 +41,14 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public function load(ObjectManager $manager)
     {
-        $reports = CsvHelper::csv_to_array(__DIR__ . '/fakereportdata.csv');
+        $reports = CsvHelper::csv_to_array(__DIR__.'/fakereportdata.csv');
         foreach ($reports as $count => $rows) {
             $report = new Report();
             $key    = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('columns', 'filters', 'graphs', 'tableOrder'))) {
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
+                    if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
                         $val = unserialize(stripslashes($val));
                     }
                     $report->$setter($val);
@@ -57,7 +57,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
 
             $manager->persist($report);
 
-            $this->setReference('report-' . $key, $report);
+            $this->setReference('report-'.$key, $report);
         }
         $manager->flush();
     }

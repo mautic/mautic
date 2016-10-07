@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,23 +23,27 @@ class CheckStepType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('buttons', 'form_buttons', array(
-            'pre_extra_buttons' => array(
-                array(
-                    'name'  => 'next',
-                    'label' => 'mautic.install.next.step',
-                    'type'  => 'submit',
-                    'attr'  => array(
-                        'class' => 'btn btn-success pull-right btn-next',
-                        'icon'  => 'fa fa-arrow-circle-right',
-                        'onclick' => 'MauticInstaller.showWaitMessage(event);'
-                    )
-                )
-            ),
-            'apply_text'        => '',
-            'save_text'         => '',
-            'cancel_text'       => ''
-        ));
+        $builder->add(
+            'buttons',
+            'form_buttons',
+            [
+                'pre_extra_buttons' => [
+                    [
+                        'name'  => 'next',
+                        'label' => 'mautic.install.next.step',
+                        'type'  => 'submit',
+                        'attr'  => [
+                            'class'   => 'btn btn-success pull-right btn-next',
+                            'icon'    => 'fa fa-arrow-circle-right',
+                            'onclick' => 'MauticInstaller.showWaitMessage(event);',
+                        ],
+                    ],
+                ],
+                'apply_text'  => '',
+                'save_text'   => '',
+                'cancel_text' => '',
+            ]
+        );
 
         $builder->add('site_url', 'hidden');
         $builder->add('cache_path', 'hidden');

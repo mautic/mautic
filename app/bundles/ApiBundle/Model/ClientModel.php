@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,30 +12,58 @@ namespace Mautic\ApiBundle\Model;
 
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth1\Consumer;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class ClientModel
+ * Class ClientModel.
  */
 class ClientModel extends FormModel
 {
-
     /**
      * @var string
      */
-    private $apiMode;
+    private $apiMode = 'oauth1a';
 
     /**
-     * @return void
+     * @var Session
      */
-    public function initialize()
+    protected $session;
+
+    /**
+     * ClientModel constructor.
+     *
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
     {
-        $this->apiMode = $this->factory->getRequest()->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $request = $requestStack->getCurrentRequest();
+
+        if ($request) {
+            $this->apiMode = $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        }
+    }
+
+    /**
+     * @param $apiMode
+     */
+    public function setApiMode($apiMode)
+    {
+        $this->apiMode = $apiMode;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
     }
 
     /**
@@ -64,13 +93,14 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Client && !$entity instanceof Consumer) {
-            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
+            throw new MethodNotAllowedHttpException(['Client', 'Consumer']);
         }
 
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        $params = (!empty($action)) ? ['action' => $action] : [];
+
         return $formFactory->create('client', $entity, $params);
     }
 
@@ -88,7 +118,6 @@ class ClientModel extends FormModel
         return parent::getEntity($id);
     }
 
-
     /**
      * {@inheritdoc}
      *
@@ -97,14 +126,14 @@ class ClientModel extends FormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Client && !$entity instanceof Consumer) {
-            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
+            throw new MethodNotAllowedHttpException(['Client', 'Consumer']);
         }
 
         switch ($action) {
-            case "post_save":
+            case 'post_save':
                 $name = ApiEvents::CLIENT_POST_SAVE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = ApiEvents::CLIENT_POST_DELETE;
                 break;
             default:
@@ -117,6 +146,7 @@ class ClientModel extends FormModel
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -135,23 +165,19 @@ class ClientModel extends FormModel
 
     /**
      * @param $entity
-     *
-     * @return void
      */
     public function revokeAccess($entity)
     {
         if (!$entity instanceof Client && !$entity instanceof Consumer) {
-            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
+            throw new MethodNotAllowedHttpException(['Client', 'Consumer']);
         }
-
-        $me = $this->factory->getUser();
 
         //remove the user from the client
         if ($this->apiMode == 'oauth2') {
-            $entity->removeUser($me);
+            $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
         } else {
-            $this->getRepository()->deleteAccessTokens($entity, $me);
+            $this->getRepository()->deleteAccessTokens($entity, $this->userHelper->getUser());
         }
     }
 }

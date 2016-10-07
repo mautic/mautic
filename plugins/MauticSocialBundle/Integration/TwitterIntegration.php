@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,22 +13,14 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
- * Class TwitterIntegration
+ * Class TwitterIntegration.
  */
 class TwitterIntegration extends SocialIntegration
 {
-
-    /**
-     * Used in getUserData to prevent a double user search call with getUserId
-     *
-     * @var bool
-     */
-    private $preventDoubleCall = false;
-
     /**
      * {@inheritdoc}
      */
-    public function getName ()
+    public function getName()
     {
         return 'Twitter';
     }
@@ -35,7 +28,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority ()
+    public function getPriority()
     {
         return 5000;
     }
@@ -43,7 +36,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields ()
+    public function getIdentifierFields()
     {
         return 'twitter';
     }
@@ -51,23 +44,27 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures ()
+    public function getSupportedFeatures()
     {
-        return array(
+        return [
             'public_profile',
             'public_activity',
-            'share_button'
-        );
+            'share_button',
+            'login_button',
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenUrl ()
+    public function getAccessTokenUrl()
     {
         return 'https://api.twitter.com/oauth/access_token';
     }
 
+    /**
+     * @return string
+     */
     public function getAuthLoginUrl()
     {
         $url = 'https://api.twitter.com/oauth/authorize';
@@ -93,7 +90,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType ()
+    public function getAuthenticationType()
     {
         return 'oauth1a';
     }
@@ -112,7 +109,7 @@ class TwitterIntegration extends SocialIntegration
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;
 
-        if (empty($settings['authorize_session'])) {
+        if (empty($settings['authorize_session']) && $authType != 'access_token') {
             // Twitter requires oauth_token_secret to be part of composite key
             $settings['token_secret'] = $this->keys['oauth_token_secret'];
 
@@ -128,7 +125,7 @@ class TwitterIntegration extends SocialIntegration
      *
      * @return string
      */
-    public function getApiUrl ($endpoint)
+    public function getApiUrl($endpoint)
     {
         return "https://api.twitter.com/1.1/$endpoint.json";
     }
@@ -136,96 +133,122 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserData ($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache)
     {
-        //tell getUserId to return a user array if it obtains it
-        $this->preventDoubleCall = true;
+        $accessToken = $this->getContactAccessToken($socialCache);
 
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-            if (is_array($id)) {
-                //getUserId has alread obtained the data
-                $data = $id;
-            } else {
-                $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
-                    'user_id'          => $id,
-                    'include_entities' => 'false'
-                ));
-            }
+        // Contact SSO
+        if (isset($accessToken['oauth_token'])) {
+            // note twitter requires params to be passed as strings
+            $data = $this->makeRequest(
+                $this->getApiUrl('account/verify_credentials'),
+                [
+                    'include_email'    => 'true',
+                    'include_entities' => 'false',
+                    'oauth_token'      => $accessToken['oauth_token'],
+                ],
+                'GET',
+                ['auth_type' => 'oauth1a']
+            );
+        }
+
+        if (empty($data)) {
+            // Try via user lookup
+            $data = $this->makeRequest(
+                $this->getApiUrl('users/lookup'),
+                [
+                    'screen_name'      => $this->cleanIdentifier($identifier),
+                    'include_entities' => 'false',
+                ]
+            );
 
             if (isset($data[0])) {
-                $info                  = $this->matchUpData($data[0]);
-                $info['profileHandle'] = $data[0]['screen_name'];
-                //remove the size variant
-                $image                = $data[0]['profile_image_url_https'];
-                $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
-                $info['profileImage'] = $image;
-
-                $socialCache['profile'] = $info;
+                $data = $data[0];
             }
-            $this->preventDoubleCall = false;
+        }
+
+        if (isset($data['id'])) {
+            $socialCache['id'] = $data['id'];
+
+            $info                  = $this->matchUpData($data);
+            $info['profileHandle'] = $data['screen_name'];
+            //remove the size variant
+            $image                = $data['profile_image_url_https'];
+            $image                = str_replace(['_normal', '_bigger', '_mini'], '', $image);
+            $info['profileImage'] = $image;
+
+            $socialCache['profile'] = $info;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPublicActivity ($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-            //due to the way Twitter filters, get more than 10 tweets
-            $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
-                'user_id'         => $id,
-                'exclude_replies' => 'true',
-                'count'           => 25,
-                'trim_user'       => 'true'
-            ));
+        if (!isset($socialCache['id'])) {
+            $this->getUserData($identifier, $socialCache);
 
-            if (!empty($data) && count($data)) {
-                $socialCache['has']['activity'] = true;
-                $socialCache['activity']        = array(
-                    'tweets' => array(),
-                    'photos' => array(),
-                    'tags'   => array()
-                );
+            if (!isset($socialCache['id'])) {
+                return;
+            }
+        }
 
-                foreach ($data as $k => $d) {
-                    if ($k == 10) {
-                        break;
-                    }
+        $id = $socialCache['id'];
 
-                    $tweet = array(
-                        'tweet'       => EmojiHelper::toHtml($d['text']),
-                        'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
-                        'coordinates' => $d['coordinates'],
-                        'published'   => $d['created_at'],
-                    );
+        //due to the way Twitter filters, get more than 10 tweets
+        $data = $this->makeRequest($this->getApiUrl('/statuses/user_timeline'), [
+            'user_id'         => $id,
+            'exclude_replies' => 'true',
+            'count'           => 25,
+            'trim_user'       => 'true',
+        ]);
 
-                    $socialCache['activity']['tweets'][] = $tweet;
+        if (!empty($data) && count($data)) {
+            $socialCache['has']['activity'] = true;
+            $socialCache['activity']        = [
+                'tweets' => [],
+                'photos' => [],
+                'tags'   => [],
+            ];
 
-                    //images
-                    if (isset($d['entities']['media'])) {
-                        foreach ($d['entities']['media'] as $m) {
-                            if ($m['type'] == 'photo') {
-                                $photo = array(
-                                    'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url'])
-                                );
+            foreach ($data as $k => $d) {
+                if ($k == 10) {
+                    break;
+                }
 
-                                $socialCache['activity']['photos'][] = $photo;
-                            }
+                $tweet = [
+                    'tweet'       => EmojiHelper::toHtml($d['text']),
+                    'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
+                    'coordinates' => $d['coordinates'],
+                    'published'   => $d['created_at'],
+                ];
+
+                $socialCache['activity']['tweets'][] = $tweet;
+
+                //images
+                if (isset($d['entities']['media'])) {
+                    foreach ($d['entities']['media'] as $m) {
+                        if ($m['type'] == 'photo') {
+                            $photo = [
+                                'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
+                            ];
+
+                            $socialCache['activity']['photos'][] = $photo;
                         }
                     }
+                }
 
-                    //hastags
-                    if (isset($d['entities']['hashtags'])) {
-                        foreach ($d['entities']['hashtags'] as $h) {
-                            if (isset($socialCache['activity']['tags'][$h['text']])) {
-                                $socialCache['activity']['tags'][$h['text']]['count']++;
-                            } else {
-                                $socialCache['activity']['tags'][$h['text']] = array(
-                                    'count' => 1,
-                                    'url'   => 'https://twitter.com/search?q=%23' . $h['text']
-                                );
-                            }
+                //hastags
+                if (isset($d['entities']['hashtags'])) {
+                    foreach ($d['entities']['hashtags'] as $h) {
+                        if (isset($socialCache['activity']['tags'][$h['text']])) {
+                            ++$socialCache['activity']['tags'][$h['text']]['count'];
+                        } else {
+                            $socialCache['activity']['tags'][$h['text']] = [
+                                'count' => 1,
+                                'url'   => 'https://twitter.com/search?q=%23'.$h['text'],
+                            ];
                         }
                     }
                 }
@@ -236,60 +259,30 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        return array(
-            "profileHandle" => array("type" => "string"),
-            "name"          => array("type" => "string"),
-            "location"      => array("type" => "string"),
-            "description"   => array("type" => "string"),
-            "url"           => array("type" => "string"),
-            "time_zone"     => array("type" => "string"),
-            "lang"          => array("type" => "string")
-        );
-    }
-
-    /**
-     * Gets the ID of the user for the network
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return mixed|null
-     */
-    public function getUserId ($identifier, &$socialCache)
-    {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
-        // note twitter requires params to be passed as strings
-        $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
-            'screen_name'      => $identifier,
-            'include_entities' => 'false',
-
-        ));
-
-        if (isset($data[0])) {
-            $socialCache['id'] = $data[0]['id'];
-
-            //return the entire data set if the function has been called from getUserData()
-            return ($this->preventDoubleCall) ? $data : $socialCache['id'];
-        }
-
-        return false;
+        return [
+            'profileHandle' => ['type' => 'string'],
+            'name'          => ['type' => 'string'],
+            'location'      => ['type' => 'string'],
+            'description'   => ['type' => 'string'],
+            'url'           => ['type' => 'string'],
+            'time_zone'     => ['type' => 'string'],
+            'lang'          => ['type' => 'string'],
+            'email'         => ['type' => 'string'],
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function cleanIdentifier ($identifier)
+    public function cleanIdentifier($identifier)
     {
-        if (strpos($identifier, 'http') !== false) {
+        if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             //extract the handle
-            $identifier = substr(strrchr(rtrim($identifier, '/'), '/'), 1);
+            $identifier = $match[1];
+        } elseif (substr($identifier, 0, 1) == '@') {
+            $identifier = substr($identifier, 1);
         }
 
         return urlencode($identifier);
@@ -303,13 +296,14 @@ class TwitterIntegration extends SocialIntegration
      *
      * @return mixed
      */
-    public function parseCallbackResponse ($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, $postAuthorization = false)
     {
         if ($postAuthorization) {
             parse_str($data, $parsed);
 
             return $parsed;
         }
+
         return json_decode($data, true);
     }
 }

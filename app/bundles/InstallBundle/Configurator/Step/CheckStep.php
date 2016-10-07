@@ -1,15 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -18,51 +20,50 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CheckStep implements StepInterface
 {
-
     /**
-     * Flag if the configuration file is writable
+     * Flag if the configuration file is writable.
      *
      * @var bool
      */
     private $configIsWritable;
 
     /**
-     * Path to the kernel root
+     * Path to the kernel root.
      *
      * @var string
      */
     private $kernelRoot;
 
     /**
-     * Absolute path to cache directory
+     * Absolute path to cache directory.
      *
      * @var string
      */
     public $cache_path = '%kernel.root_dir%/cache';
 
     /**
-     * Absolute path to log directory
+     * Absolute path to log directory.
      *
      * @var string
      */
-    public $log_path   = '%kernel.root_dir%/logs';
+    public $log_path = '%kernel.root_dir%/logs';
 
     /**
-     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
      *
      * @var string
      */
     public $site_url;
 
     /**
-     * Set the name of the source that installed Mautic
+     * Set the name of the source that installed Mautic.
      *
      * @var string
      */
     public $install_source = 'Mautic';
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Configurator $configurator Configurator service
      * @param string       $kernelRoot   Kernel root path
@@ -90,13 +91,13 @@ class CheckStep implements StepInterface
      */
     public function checkRequirements()
     {
-        $messages = array();
+        $messages = [];
 
-        if (version_compare(PHP_VERSION, '5.3.16', '==')) {
-            $messages[] = 'mautic.install.buggy.php.version';
+        if (version_compare(PHP_VERSION, '5.6.19', '<')) {
+            $messages[] = 'mautic.install.php.version.not.supported';
         }
 
-        if (!is_dir(dirname($this->kernelRoot) . '/vendor/composer')) {
+        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 
@@ -104,15 +105,15 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot . '/cache')) {
+        if (!is_writable($this->kernelRoot.'/cache')) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot . '/logs')) {
+        if (!is_writable($this->kernelRoot.'/logs')) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
-        $timezones = array();
+        $timezones = [];
 
         foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
             foreach ($abbreviations as $abbreviation) {
@@ -126,6 +127,16 @@ class CheckStep implements StepInterface
 
         if (get_magic_quotes_gpc()) {
             $messages[] = 'mautic.install.magic_quotes_enabled';
+        }
+
+        if (
+            version_compare(PHP_VERSION, '5.6.0', '>=')
+            &&
+            version_compare(PHP_VERSION, '7', '<')
+            &&
+            ini_get('always_populate_raw_post_data') != -1
+        ) {
+            $messages[] = 'mautic.install.always_populate_raw_post_data_enabled';
         }
 
         if (!function_exists('json_encode')) {
@@ -156,25 +167,22 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.fileinfo';
         }
 
-        if (function_exists('apc_store') && ini_get('apc.enabled')) {
-            $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
+        if (!function_exists('mb_strtolower')) {
+            $messages[] = 'mautic.install.extension.mbstring';
+        }
 
-            if (!version_compare(phpversion('apc'), $minimumAPCversion, '>=')) {
+        if (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable')) {
+            $messages[] = 'mautic.install.extension.eaccelerator';
+        }
+
+        if (function_exists('apc_store') && ini_get('apc.enabled')) {
+            if (!version_compare(phpversion('apc'), '3.1.13', '>=')) {
                 $messages[] = 'mautic.install.apc.version';
             }
         }
 
-        $unicodeIni = version_compare(PHP_VERSION, '5.4.0', '>=') ? 'zend.detect_unicode' : 'detect_unicode';
-
-        // Commented for now, no idea what this check was actually supposed to be doing in the distro bundle
-        /*if (ini_get($unicodeIni)) {
-            $messages[] = 'mautic.install.detect.unicode';
-        }*/
-
         if (extension_loaded('suhosin')) {
-            $cfgValue = ini_get('suhosin.executor.include.whitelist');
-
-            if (!call_user_func(create_function('$cfgValue', 'return false !== stripos($cfgValue, "phar");'), $cfgValue)) {
+            if (stripos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
                 $messages[] = 'mautic.install.suhosin.whitelist';
             }
         }
@@ -203,59 +211,7 @@ class CheckStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
-        $phpSupportData = array(
-            '5.3' => array(
-                'security' => '2013-07-11',
-                'eos'      => '2014-08-14',
-            ),
-            '5.4' => array(
-                'security' => '2014-09-14',
-                'eos'      => '2015-09-14',
-            ),
-            '5.5' => array(
-                'security' => '2015-07-10',
-                'eos'      => '2016-07-10'
-            ),
-            '5.6' => array(
-                'security' => '2016-08-28',
-                'eos'      => '2017-08-28'
-            ),
-        );
-
-        $messages = array();
-
-        // Check the PHP version's support status
-        $activePhpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
-
-        // Do we have the PHP version's data?
-        if (isset($phpSupportData[$activePhpVersion])) {
-            // First check if the version has reached end of support
-            $today = new \DateTime();
-            $phpEndOfSupport = new \DateTime($phpSupportData[$activePhpVersion]['eos']);
-
-            if ($phpNotSupported = $today > $phpEndOfSupport) {
-                $messages[] = 'mautic.install.php.version.not.supported';
-            }
-
-            // If the version is still supported, check if it has reached security support only
-            $phpSecurityOnlyDate = new \DateTime($phpSupportData[$activePhpVersion]['security']);
-
-            if (!$phpNotSupported && $today > $phpSecurityOnlyDate) {
-                $messages[] = 'mautic.install.php.version.has.only.security.support';
-            }
-        }
-
-        if (version_compare(PHP_VERSION, '5.3.8', '<')) {
-            $messages[] = 'mautic.install.php.version.annotations';
-        }
-
-        if (version_compare(PHP_VERSION, '5.4.0', '=')) {
-            $messages[] = 'mautic.install.php.version.dump';
-        }
-
-        if ((PHP_MINOR_VERSION == 3 && PHP_RELEASE_VERSION < 18) || (PHP_MINOR_VERSION == 4 && PHP_RELEASE_VERSION < 8)) {
-            $messages[] = 'mautic.install.php.version.pretty.error';
-        }
+        $messages = [];
 
         $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
 
@@ -286,10 +242,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.module.phpxml';
         }
 
-        if (!function_exists('mb_strlen')) {
-            $messages[] = 'mautic.install.function.mbstring';
-        }
-
         if (!function_exists('iconv')) {
             $messages[] = 'mautic.install.function.iconv';
         }
@@ -308,7 +260,7 @@ class CheckStep implements StepInterface
             }
         }
 
-        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $memoryLimit    = $this->toBytes(ini_get('memory_limit'));
         $suggestedLimit = 128 * 1024 * 1024;
 
         if ($memoryLimit < $suggestedLimit) {
@@ -355,22 +307,6 @@ class CheckStep implements StepInterface
             }
         }
 
-        $accelerator =
-            (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-            ||
-            (extension_loaded('apc') && ini_get('apc.enabled'))
-            ||
-            (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
-            ||
-            (extension_loaded('xcache') && ini_get('xcache.cacher'))
-            ||
-            (extension_loaded('wincache') && ini_get('wincache.ocenabled'))
-        ;
-
-        if (!$accelerator) {
-            $messages[] = 'mautic.install.accelerator';
-        }
-
         return $messages;
     }
 
@@ -387,11 +323,11 @@ class CheckStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        $parameters = array();
+        $parameters = [];
 
         foreach ($data as $key => $value) {
             // Exclude keys from the config
-            if (!in_array($key, array('configIsWritable', 'kernelRoot'))) {
+            if (!in_array($key, ['configIsWritable', 'kernelRoot'])) {
                 $parameters[$key] = $value;
             }
         }
@@ -404,17 +340,18 @@ class CheckStep implements StepInterface
      *
      * @param string $val
      *
-     * @return integer
+     * @return int
      */
-    public function toBytes($val) {
+    public function toBytes($val)
+    {
         $val = trim($val);
 
         if ($val == -1) {
             return PHP_INT_MAX;
         }
 
-        $last = strtolower($val[strlen($val)-1]);
-        switch($last) {
+        $last = strtolower($val[strlen($val) - 1]);
+        switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $val *= 1024;

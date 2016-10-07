@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,40 +16,39 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class ActionType
+ * Class ActionType.
  */
 class ActionType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $masks = array('description' => 'html');
+        $masks = ['description' => 'html'];
 
-        $builder->add('name', 'text', array(
+        $builder->add('name', 'text', [
             'label'      => 'mautic.core.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+        ]);
 
-        $builder->add('description', 'textarea', array(
+        $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control editor'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+        ]);
 
         $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $formType        = $options['settings']['formType'];
-        $formTypeOptions = array(
-            'label'  => false,
-            'data'   => $properties,
-            'attr'   => array(
-                'data-formid' => $options['formId'] //sneaky way of feeding the formId without requiring the option
-            ));
+        $formTypeOptions = [
+            'label' => false,
+            'data'  => $properties,
+            'attr'  => [
+                'data-formid' => $options['formId'], //sneaky way of feeding the formId without requiring the option
+            ], ];
         if (isset($options['settings']['formTypeCleanMasks'])) {
             $masks['properties'] = $options['settings']['formTypeCleanMasks'];
         }
@@ -72,21 +72,21 @@ class ActionType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', 'form_buttons', array(
-            'save_text' => $btnValue,
-            'save_icon' => $btnIcon,
-            'apply_text' => false,
-            'container_class' => 'bottom-form-buttons'
-        ));
+        $builder->add('buttons', 'form_buttons', [
+            'save_text'       => $btnValue,
+            'save_icon'       => $btnIcon,
+            'apply_text'      => false,
+            'container_class' => 'bottom-form-buttons',
+        ]);
 
-        $builder->add('formId', 'hidden', array(
-            'mapped' => false
-        ));
+        $builder->add('formId', 'hidden', [
+            'mapped' => false,
+        ]);
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -95,11 +95,11 @@ class ActionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'settings' => false
-        ));
+        $resolver->setDefaults([
+            'settings' => false,
+        ]);
 
-        $resolver->setRequired(array('settings', 'formId'));
+        $resolver->setRequired(['settings', 'formId']);
     }
 
     /**
@@ -107,6 +107,6 @@ class ActionType extends AbstractType
      */
     public function getName()
     {
-        return "formaction";
+        return 'formaction';
     }
 }
