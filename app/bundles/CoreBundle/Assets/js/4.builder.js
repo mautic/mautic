@@ -42,7 +42,7 @@ Mautic.launchBuilder = function (formName, actionName) {
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
@@ -200,35 +200,6 @@ Mautic.destroySlots = function() {
     var htmlTags = document.getElementsByTagName('html');
     htmlTags[0].removeAttribute('class');
 };
-
-Mautic.clearThemeHtmlBeforeSave = function(form, callback) {
-    var form = mQuery(form);
-    var textarea = form.find('textarea.builder-html');
-
-    // update textarea from Froala's CodeMirror view on save
-    textarea.froalaEditor('events.trigger', 'form.submit');
-
-    // Return the styles added by Froala to its original state
-    var editorHtmlString = textarea.val();
-    Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation', function() {
-        var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
-        editorHtml = Mautic.clearFroalaStyles(editorHtml);
-        textarea.val(editorHtml.find('html').get(0).outerHTML);
-        callback();
-    });
-
-    var dynamicContent = mQuery('#dynamic-content-container');
-
-    if (dynamicContent.length) {
-        var dynamicContentTextareas = dynamicContent.find('textarea.editor');
-
-        dynamicContentTextareas.each(function() {
-            var $this = mQuery(this);
-
-            $this.val(Mautic.clearFroalaStyles(mQuery($this.val())));
-        });
-    }
-}
 
 Mautic.clearFroalaStyles = function(content) {
     mQuery.each(content.find('td, th, table, [fr-original-class], [fr-original-style]'), function() {
@@ -667,9 +638,10 @@ Mautic.initSlotListeners = function() {
 mQuery(function() {
     if (parent && parent.mQuery && parent.mQuery('#builder-template-content').length) {
         Mautic.builderContents = mQuery('body');
-        Mautic.builderContents = Mautic.clearFroalaStyles(Mautic.builderContents);
-        Mautic.initSlotListeners();
-        Mautic.initSections();
-        Mautic.initSlots();
+        if (!parent.Mautic.codeMode) {
+            Mautic.initSlotListeners();
+            Mautic.initSections();
+            Mautic.initSlots();
+        }
     }
 });

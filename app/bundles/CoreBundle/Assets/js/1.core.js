@@ -3787,8 +3787,6 @@ var Mautic = {
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
-        var textarea = mQuery('textarea.builder-html');
-        var codeMirror = textarea.data('CodeMirror');
         Mautic.showChangeThemeWarning = true;
 
         if (isNew) {
@@ -3817,10 +3815,13 @@ var Mautic = {
                 // Code Mode
                 if (isCodeMode) {
                     mQuery('.builder').addClass('code-mode');
-                    // Update CodeMirror from textarea
-                    codeMirror.setValue(textarea.val());
+                    mQuery('.builder .code-editor').removeClass('hide');
+                    mQuery('.builder .builder-toolbar').addClass('hide');
                 } else {
                     mQuery('.builder').removeClass('code-mode');
+                    mQuery('.builder .code-editor').addClass('hide');
+                    mQuery('.builder .builder-toolbar').removeClass('hide');
+                    
                     // Load the theme HTML to the source textarea
                     Mautic.setThemeHtml(theme);
                 }
