@@ -14,9 +14,9 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FocusPermissions.
+ * Class MauticFocusPermissions.
  */
-class FocusPermissions extends AbstractPermissions
+class MauticFocusPermissions extends AbstractPermissions
 {
     /**
      * {@inheritdoc}
@@ -46,7 +46,7 @@ class FocusPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('focus', 'categories', $builder, $data);
-        $this->addExtendedFormFields('focus', 'items', $builder, $data);
+        $this->addStandardFormFields('mauticFocus', 'categories', $builder, $data);
+        $this->addExtendedFormFields('mauticFocus', 'items', $builder, $data);
     }
 }

@@ -12,6 +12,9 @@ namespace MauticPlugin\MauticFocusBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
+/**
+ * Class MauticFocusBundle.
+ */
 class MauticFocusBundle extends PluginBundleBase
 {
 }
