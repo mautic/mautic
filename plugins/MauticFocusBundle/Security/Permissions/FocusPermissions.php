@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class MauticFocusPermissions.
+ * Class FocusPermissions.
  */
 class FocusPermissions extends AbstractPermissions
 {
