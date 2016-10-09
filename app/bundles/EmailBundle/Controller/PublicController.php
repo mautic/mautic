@@ -29,6 +29,26 @@ class PublicController extends CommonFormController
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'email:emails:viewown',
+                'email:emails:viewother',
+                'email:emails:create',
+                'email:emails:editown',
+                'email:emails:editother',
+                'email:emails:deleteown',
+                'email:emails:deleteother',
+                'email:emails:publishown',
+                'email:emails:publishother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
+            return $this->accessDenied();
+        }
+
         if (!empty($stat)) {
             if ($this->get('mautic.security')->isAnonymous()) {
                 $model->hitEmail($stat, $this->request, true);
