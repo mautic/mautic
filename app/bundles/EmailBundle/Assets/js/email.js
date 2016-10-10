@@ -1,7 +1,6 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
     var plaintext = mQuery('#emailform_plainText');
-    var textarea = mQuery('#emailform_customHtml');
 
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
@@ -18,7 +17,6 @@ Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
-    mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
