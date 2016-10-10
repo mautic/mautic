@@ -248,10 +248,8 @@ class CorePermissions
             $parts = explode(':', $permission);
 
             if ($parts[0] == 'plugin' && count($parts) == 4) {
-                $isPlugin = true;
+                // @deprecated - no longer used; to be removed in 3.0
                 array_shift($parts);
-            } else {
-                $isPlugin = null;
             }
 
             if (count($parts) != 3) {
@@ -270,7 +268,7 @@ class CorePermissions
                 $activePermissions = ($userEntity instanceof User) ? $userEntity->getActivePermissions() : [];
 
                 //check against bundle permissions class
-                $permissionObject = $this->getPermissionObject($parts[0], true, $isPlugin);
+                $permissionObject = $this->getPermissionObject($parts[0]);
 
                 //Is the permission supported?
                 if (!$permissionObject->isSupported($parts[1], $parts[2])) {
@@ -337,17 +335,15 @@ class CorePermissions
             $parts = explode(':', $p);
 
             if ($parts[0] == 'plugin' && count($parts) == 4) {
-                $isPlugin = true;
+                // @deprecated - no longer used; to be removed in 3.0
                 array_shift($parts);
-            } else {
-                $isPlugin = null;
             }
 
             if (count($parts) != 3) {
                 $result[$p] = false;
             } else {
                 //check against bundle permissions class
-                $permissionObject = $this->getPermissionObject($parts[0], false, $isPlugin);
+                $permissionObject = $this->getPermissionObject($parts[0], false);
                 $result[$p]       = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
             }
         }
