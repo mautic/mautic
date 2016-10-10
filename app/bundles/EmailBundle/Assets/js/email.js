@@ -357,6 +357,8 @@ Mautic.initDynamicContentItem = function (tabId) {
     });
 
     Mautic.initRemoveEvents($el.find('.remove-item'));
+
+
 };
 
 Mautic.updateDynamicContentDropdown = function () {
