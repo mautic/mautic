@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -19,53 +20,53 @@ if ($tmpl == 'index') {
                 <?php
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'checkall' => 'true',
-                        'target'   => '#pointTable'
-                    )
+                        'target'   => '#pointTable',
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'point',
                         'orderBy'    => 'p.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-point-name',
-                        'default'    => true
-                    )
+                        'default'    => true,
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'point',
                         'orderBy'    => 'cat.title',
                         'text'       => 'mautic.core.category',
-                        'class'      => 'visible-md visible-lg col-point-category'
-                    )
+                        'class'      => 'visible-md visible-lg col-point-category',
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'point',
                         'orderBy'    => 'p.delta',
                         'text'       => 'mautic.point.thead.delta',
-                        'class'      => 'visible-md visible-lg col-point-delta'
-                    )
+                        'class'      => 'visible-md visible-lg col-point-delta',
+                    ]
                 );
 
                 echo '<th class="col-point-action">'.$view['translator']->trans('mautic.point.thead.action').'</th>';
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'point',
                         'orderBy'    => 'p.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-point-id'
-                    )
+                        'class'      => 'visible-md visible-lg col-point-id',
+                    ]
                 );
                 ?>
             </tr>
@@ -77,15 +78,15 @@ if ($tmpl == 'index') {
                         <?php
                         echo $view->render(
                             'MauticCoreBundle:Helper:list_actions.html.php',
-                            array(
+                            [
                                 'item'            => $item,
-                                'templateButtons' => array(
+                                'templateButtons' => [
                                     'edit'   => $permissions['point:points:edit'],
                                     'clone'  => $permissions['point:points:create'],
                                     'delete' => $permissions['point:points:delete'],
-                                ),
-                                'routeBase'       => 'point'
-                            )
+                                ],
+                                'routeBase' => 'point',
+                            ]
                         );
                         ?>
                     </td>
@@ -94,11 +95,11 @@ if ($tmpl == 'index') {
 
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                array('item' => $item, 'model' => 'point')
+                                ['item' => $item, 'model' => 'point']
                             ); ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_point_action',
-                                array("objectAction" => "edit", "objectId" => $item->getId())
+                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -111,7 +112,7 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
-                        <?php $catName = ($category)
+                        <?php $catName  = ($category)
                             ? $category->getTitle()
                             : $view['translator']->trans(
                                 'mautic.core.form.uncategorized'
@@ -135,19 +136,19 @@ if ($tmpl == 'index') {
     <div class="panel-footer">
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
-            array(
-                "totalItems" => count($items),
-                "page"       => $page,
-                "limit"      => $limit,
-                "menuLinkId" => 'mautic_point_index',
-                "baseUrl"    => $view['router']->path('mautic_point_index'),
-                'sessionVar' => 'point'
-            )
+            [
+                'totalItems' => count($items),
+                'page'       => $page,
+                'limit'      => $limit,
+                'menuLinkId' => 'mautic_point_index',
+                'baseUrl'    => $view['router']->path('mautic_point_index'),
+                'sessionVar' => 'point',
+            ]
         ); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render(
         'MauticCoreBundle:Helper:noresults.html.php',
-        array('tip' => 'mautic.point.action.noresults.tip')
+        ['tip' => 'mautic.point.action.noresults.tip']
     ); ?>
 <?php endif; ?>

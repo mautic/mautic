@@ -1,35 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Form\Type\EntityFieldsBuildFormTrait;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class LeadType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class LeadType.
  */
 class LeadType extends AbstractType
 {
@@ -44,8 +37,8 @@ class LeadType extends AbstractType
      */
     public function __construct(MauticFactory $factory, CompanyModel $companyModel)
     {
-        $this->translator = $factory->getTranslator();
-        $this->factory    = $factory;
+        $this->translator   = $factory->getTranslator();
+        $this->factory      = $factory;
         $this->companyModel = $companyModel;
     }
 
@@ -61,7 +54,7 @@ class LeadType extends AbstractType
         if (!$options['isShortForm']) {
             $imageChoices = [
                 'gravatar' => 'Gravatar',
-                'custom'   => 'mautic.lead.lead.field.custom_avatar'
+                'custom'   => 'mautic.lead.lead.field.custom_avatar',
             ];
 
             $cache = $options['data']->getSocialCache();
@@ -81,8 +74,8 @@ class LeadType extends AbstractType
                     'required'   => true,
                     'multiple'   => false,
                     'attr'       => [
-                        'class' => 'form-control'
-                    ]
+                        'class' => 'form-control',
+                    ],
                 ]
             );
 
@@ -94,21 +87,21 @@ class LeadType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
-                        'class' => 'form-control'
+                        'class' => 'form-control',
                     ],
-                    'mapped'     => false,
+                    'mapped'      => false,
                     'constraints' => [
                         new File(
                             [
                                 'mimeTypes' => [
                                     'image/gif',
                                     'image/jpeg',
-                                    'image/png'
+                                    'image/png',
                                 ],
-                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid'
+                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
                             ]
-                        )
-                    ]
+                        ),
+                    ],
                 ]
             );
         }
@@ -121,17 +114,17 @@ class LeadType extends AbstractType
             [
                 'by_reference' => false,
                 'attr'         => [
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadTag(this)'
-                ]
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.createLeadTag(this)',
+                ],
             ]
         );
 
         $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-        $companies = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
-        $leadCompanies = [];
+        $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
+        $leadCompanies   = [];
         foreach ($companies as $company) {
             $leadCompanies[$company['company_id']] = $company['company_id'];
         }
@@ -140,16 +133,12 @@ class LeadType extends AbstractType
         'companies',
             'company_list',
             [
-                'label'       => 'mautic.company.selectcompany',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                        'class'    => 'form-control',
-                        'tooltip'  => 'mautic.company.choose.company_descr',
-                     ],
-                'multiple'    => true,
-                'required'    => false,
+                'label'      => 'mautic.company.selectcompany',
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => true,
+                'required'   => false,
                 'mapped'     => false,
-                'data'      => $leadCompanies
+                'data'       => $leadCompanies,
             ]
         );
 
@@ -166,10 +155,10 @@ class LeadType extends AbstractType
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class' => 'form-control'
+                        'class' => 'form-control',
                     ],
-                    'required'   => false,
-                    'multiple'   => false
+                    'required' => false,
+                    'multiple' => false,
                 ]
             )
             ->addModelTransformer($transformer)
@@ -188,10 +177,10 @@ class LeadType extends AbstractType
                     'label'      => 'mautic.lead.lead.field.stage',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class' => 'form-control'
+                        'class' => 'form-control',
                     ],
-                    'required'   => false,
-                    'multiple'   => false
+                    'required' => false,
+                    'multiple' => false,
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -205,13 +194,13 @@ class LeadType extends AbstractType
                 'form_buttons',
                 [
                     'apply_text' => false,
-                    'save_text'  => 'mautic.core.form.save'
+                    'save_text'  => 'mautic.core.form.save',
                 ]
             );
         }
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -223,7 +212,7 @@ class LeadType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
-                'isShortForm' => false
+                'isShortForm' => false,
             ]
         );
 
@@ -235,6 +224,6 @@ class LeadType extends AbstractType
      */
     public function getName()
     {
-        return "lead";
+        return 'lead';
     }
 }

@@ -1,11 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
@@ -19,7 +21,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 
 /**
- * Class LeadSubscriber
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -43,7 +45,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function __construct(PageModel $pageModel, VideoModel $pageVideoModel)
     {
-        $this->pageModel = $pageModel;
+        $this->pageModel      = $pageModel;
         $this->pageVideoModel = $pageVideoModel;
     }
 
@@ -55,7 +57,7 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::TIMELINE_ON_GENERATE => [
                 ['onTimelineGenerate', 0],
-                ['onTimelineGenerateVideo', 0]
+                ['onTimelineGenerateVideo', 0],
             ],
             LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
@@ -63,7 +65,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -75,15 +77,14 @@ class LeadSubscriber extends CommonSubscriber
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
         $lead = $event->getLead();
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');;
-        $hits = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
+        $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');
+        $hits          = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $hits);
@@ -110,7 +111,7 @@ class LeadSubscriber extends CommonSubscriber
                             }
                         }
 
-                        /** @deprecated - BC support to be removed in 3.0 */
+                        /* @deprecated - BC support to be removed in 3.0 */
                         // Allow a custom template if applicable
                         if (method_exists($channelModel, 'getPageHitLeadTimelineTemplate')) {
                             $template = $channelModel->getPageHitLeadTimelineTemplate($hit);
@@ -121,7 +122,7 @@ class LeadSubscriber extends CommonSubscriber
                         if (method_exists($channelModel, 'getPageHitLeadTimelineIcon')) {
                             $icon = $channelModel->getPageHitLeadTimelineIcon($hit);
                         }
-                        /** end deprecation */
+                        /* end deprecation */
 
                         if (!empty($hit['sourceId'])) {
                             if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
@@ -136,27 +137,27 @@ class LeadSubscriber extends CommonSubscriber
                     $page       = $this->pageModel->getEntity($hit['page_id']);
                     $eventLabel = [
                         'label' => $page->getTitle(),
-                        'href'  => $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $hit['page_id']])
+                        'href'  => $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $hit['page_id']]),
                     ];
                 } else {
                     $eventLabel = [
                         'label'      => (isset($hit['urlTitle'])) ? $hit['urlTitle'] : $hit['url'],
                         'href'       => $hit['url'],
-                        'isExternal' => true
+                        'isExternal' => true,
                     ];
                 }
 
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => $eventLabel,
-                        'eventType'       => $eventTypeName,
-                        'timestamp'       => $hit['dateHit'],
-                        'extra'           => [
-                            'hit' => $hit
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => $eventLabel,
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $hit['dateHit'],
+                        'extra'      => [
+                            'hit' => $hit,
                         ],
                         'contentTemplate' => $template,
-                        'icon'            => $icon
+                        'icon'            => $icon,
                     ]
                 );
             }
@@ -164,7 +165,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -194,15 +195,15 @@ class LeadSubscriber extends CommonSubscriber
 
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => $eventLabel,
-                        'eventType'       => $eventTypeName,
-                        'timestamp'       => $hit['date_hit'],
-                        'extra'           => [
-                            'hit' => $hit
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => $eventLabel,
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $hit['date_hit'],
+                        'extra'      => [
+                            'hit' => $hit,
                         ],
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-video-camera'
+                        'icon'            => 'fa-video-camera',
                     ]
                 );
             }

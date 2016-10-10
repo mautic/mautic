@@ -1,26 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class CompanyLead
- *
- * @package Mautic\LeadBundle\Entity
+ * Class CompanyLead.
  */
 class CompanyLead
 {
-
     /**
      * @var Company
      **/
@@ -46,11 +43,10 @@ class CompanyLead
      */
     private $manuallyAdded = false;
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -79,7 +75,7 @@ class CompanyLead
     /**
      * @return \DateTime
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -87,7 +83,7 @@ class CompanyLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded ($date)
+    public function setDateAdded($date)
     {
         $this->dateAdded = $date;
     }
@@ -95,7 +91,7 @@ class CompanyLead
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -103,7 +99,7 @@ class CompanyLead
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -111,7 +107,7 @@ class CompanyLead
     /**
      * @return Company
      */
-    public function getCompany ()
+    public function getCompany()
     {
         return $this->company;
     }
@@ -119,7 +115,7 @@ class CompanyLead
     /**
      * @return Company
      */
-    public function getCompanies ()
+    public function getCompanies()
     {
         return $this->company;
     }
@@ -127,7 +123,7 @@ class CompanyLead
     /**
      * @param Company $company
      */
-    public function setCompany ($company)
+    public function setCompany($company)
     {
         $this->company = $company;
     }
@@ -135,7 +131,7 @@ class CompanyLead
     /**
      * @return bool
      */
-    public function getManuallyRemoved ()
+    public function getManuallyRemoved()
     {
         return $this->manuallyRemoved;
     }
@@ -143,7 +139,7 @@ class CompanyLead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved ($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved)
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -159,7 +155,7 @@ class CompanyLead
     /**
      * @return bool
      */
-    public function getManuallyAdded ()
+    public function getManuallyAdded()
     {
         return $this->manuallyAdded;
     }
@@ -167,7 +163,7 @@ class CompanyLead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded ($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded)
     {
         $this->manuallyAdded = $manuallyAdded;
     }

@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -79,7 +80,7 @@ class DynamicContentType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -94,8 +95,8 @@ class DynamicContentType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
@@ -110,8 +111,8 @@ class DynamicContentType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
@@ -126,7 +127,7 @@ class DynamicContentType extends AbstractType
                     'class'   => 'form-control editor editor-advanced editor-builder-tokens',
                     'rows'    => '15',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -136,9 +137,9 @@ class DynamicContentType extends AbstractType
                 'translationParent',
                 'dwc_list',
                 [
-                    'label'       => 'mautic.core.form.translation_parent',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
+                    'label'      => 'mautic.core.form.translation_parent',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.form.translation_parent.help',
                     ],
@@ -169,7 +170,7 @@ class DynamicContentType extends AbstractType
                 'hidden',
                 [
                     'data'   => $options['update_select'],
-                    'mapped' => false
+                    'mapped' => false,
                 ]
             );
         } else {

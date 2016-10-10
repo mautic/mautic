@@ -1,25 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class EmailSendType
- *
- * @package Mautic\EmailBundle\Form\Type
+ * Class EmailSendType.
  */
 class EmailSendType extends AbstractType
 {
@@ -43,20 +42,20 @@ class EmailSendType extends AbstractType
             'email',
             'email_list',
             [
-                'label'       => 'mautic.email.send.selectemails',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.email.send.selectemails',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.choose.emails_descr',
-                    'onchange' => 'Mautic.disabledEmailAction()'
+                    'onchange' => 'Mautic.disabledEmailAction()',
                 ],
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.email.chooseemail.notblank']
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -65,17 +64,17 @@ class EmailSendType extends AbstractType
                 'email_type',
                 'button_group',
                 [
-                    'choices'    => [
+                    'choices' => [
                         'transactional' => 'mautic.email.send.emailtype.transactional',
                         'marketing'     => 'mautic.email.send.emailtype.marketing',
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
+                        'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data'       => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type']
+                    'data' => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type'],
                 ]
             );
         }
@@ -86,7 +85,7 @@ class EmailSendType extends AbstractType
                 [
                     'objectAction' => 'new',
                     'contentOnly'  => 1,
-                    'updateSelect' => $options['update_select']
+                    'updateSelect' => $options['update_select'],
                 ]
             );
 
@@ -94,14 +93,14 @@ class EmailSendType extends AbstractType
                 'newEmailButton',
                 'button',
                 [
-                    'attr'  => [
+                    'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewEmailWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
-                        'icon'    => 'fa fa-plus'
+                        'icon' => 'fa fa-plus',
                     ],
-                    'label' => 'mautic.email.send.new.email'
+                    'label' => 'mautic.email.send.new.email',
                 ]
             );
 
@@ -112,7 +111,7 @@ class EmailSendType extends AbstractType
                     'objectAction' => 'edit',
                     'objectId'     => 'emailId',
                     'contentOnly'  => 1,
-                    'updateSelect' => $options['update_select']
+                    'updateSelect' => $options['update_select'],
                 ]
             );
 
@@ -120,13 +119,13 @@ class EmailSendType extends AbstractType
                 'editEmailButton',
                 'button',
                 [
-                    'attr'  => [
+                    'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($options['data']['email']),
-                        'icon'     => 'fa fa-edit'
+                        'icon'     => 'fa fa-edit',
                     ],
-                    'label' => 'mautic.email.send.edit.email'
+                    'label' => 'mautic.email.send.edit.email',
                 ]
             );
 
@@ -137,15 +136,54 @@ class EmailSendType extends AbstractType
                 'previewEmailButton',
                 'button',
                 [
-                    'attr'  => [
+                    'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
                         'disabled' => !isset($options['data']['email']),
-                        'icon'     => 'fa fa-external-link'
+                        'icon'     => 'fa fa-external-link',
                     ],
-                    'label' => 'mautic.email.send.preview.email'
+                    'label' => 'mautic.email.send.preview.email',
                 ]
             );
+            if (!empty($options['with_email_types'])) {
+                $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
+                $builder->add(
+                    'priority',
+                    'choice',
+                    [
+                        'choices' => [
+                            MessageQueue::PRIORITY_NORMAL => 'mautic.core.message.send.priority.normal',
+                            MessageQueue::PRIORITY_HIGH   => 'mautic.core.message.send.priority.high',
+                        ],
+                        'label'    => 'mautic.core.message.send.priority',
+                        'required' => false,
+                        'attr'     => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.core.message.send.priority.tooltip',
+                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                        ],
+                        'data'        => $data,
+                        'empty_value' => false,
+                    ]
+                );
+
+                $data = (!isset($options['data']['attempts'])) ? 3 : (int) $options['data']['attempts'];
+                $builder->add(
+                    'attempts',
+                    'number',
+                    [
+                        'label' => 'mautic.core.message.send.attempts',
+                        'attr'  => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.core.message.send.attempts.tooltip',
+                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                        ],
+                        'data'       => $data,
+                        'empty_data' => 0,
+                        'required'   => false,
+                    ]
+                );
+            }
         }
     }
 
@@ -156,7 +194,7 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types' => false
+                'with_email_types' => false,
             ]
         );
 
@@ -168,6 +206,6 @@ class EmailSendType extends AbstractType
      */
     public function getName()
     {
-        return "emailsend_list";
+        return 'emailsend_list';
     }
 }

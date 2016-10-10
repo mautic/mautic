@@ -1,26 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class Permission
- *
- * @package Mautic\UserBundle\Entity
+ * Class Permission.
  */
 class Permission
 {
-
     /**
      * @var int
      */
@@ -49,13 +46,13 @@ class Permission
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
             ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
-            ->addUniqueConstraint(array('bundle', 'name', 'role_id'), 'unique_perm');
+            ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();
 
@@ -76,23 +73,23 @@ class Permission
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set bundle
+     * Set bundle.
      *
      * @param string $bundle
      *
      * @return Permission
      */
-    public function setBundle ($bundle)
+    public function setBundle($bundle)
     {
         $this->bundle = $bundle;
 
@@ -100,23 +97,23 @@ class Permission
     }
 
     /**
-     * Get bundle
+     * Get bundle.
      *
      * @return string
      */
-    public function getBundle ()
+    public function getBundle()
     {
         return $this->bundle;
     }
 
     /**
-     * Set bitwise
+     * Set bitwise.
      *
-     * @param integer $bitwise
+     * @param int $bitwise
      *
      * @return Permission
      */
-    public function setBitwise ($bitwise)
+    public function setBitwise($bitwise)
     {
         $this->bitwise = $bitwise;
 
@@ -124,23 +121,23 @@ class Permission
     }
 
     /**
-     * Get bitwise
+     * Get bitwise.
      *
-     * @return integer
+     * @return int
      */
-    public function getBitwise ()
+    public function getBitwise()
     {
         return $this->bitwise;
     }
 
     /**
-     * Set role
+     * Set role.
      *
      * @param Role $role
      *
      * @return Permission
      */
-    public function setRole (Role $role = null)
+    public function setRole(Role $role = null)
     {
         $this->role = $role;
 
@@ -148,23 +145,23 @@ class Permission
     }
 
     /**
-     * Get role
+     * Get role.
      *
      * @return Role
      */
-    public function getRole ()
+    public function getRole()
     {
         return $this->role;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Permission
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -172,11 +169,11 @@ class Permission
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }

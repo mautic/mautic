@@ -1,11 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CalendarBundle\CalendarEvents;
@@ -16,9 +18,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PageBundle\Model\PageModel;
 
 /**
- * Class CalendarSubscriber
- *
- * @package Mautic\PageBundle\EventListener
+ * Class CalendarSubscriber.
  */
 class CalendarSubscriber extends CommonSubscriber
 {
@@ -40,35 +40,34 @@ class CalendarSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0),
-            CalendarEvents::CALENDAR_EVENT_ON_GENERATE => array('onCalendarEventGenerate', 0)
-        );
+        return [
+            CalendarEvents::CALENDAR_ON_GENERATE       => ['onCalendarGenerate', 0],
+            CalendarEvents::CALENDAR_EVENT_ON_GENERATE => ['onCalendarEventGenerate', 0],
+        ];
     }
 
     /**
-     * Adds events to the calendar
+     * Adds events to the calendar.
      *
      * @param CalendarGeneratorEvent $event
      *
-     * @return void
      * @todo   This method is only a model and should be removed when actual data is being populated
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
-        $dates  = $event->getDates();
+        $dates = $event->getDates();
 
         $commonSelect = 'p.title, p.id as page_id, c.color';
-        $eventTypes = array(
-            'publish.up'   => array('dateName' => 'publish_up', 'setter' => 'PublishUp'),
-            'publish.down' => array('dateName' => 'publish_down', 'setter' => 'PublishDown')
-        );
+        $eventTypes   = [
+            'publish.up'   => ['dateName' => 'publish_up', 'setter' => 'PublishUp'],
+            'publish.down' => ['dateName' => 'publish_down', 'setter' => 'PublishDown'],
+        ];
 
         $query = $this->em->getConnection()->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
-            ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'categories', 'c', 'c.id = p.category_id AND c.bundle=:bundle')
+        $query->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
+            ->leftJoin('p', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = p.category_id AND c.bundle=:bundle')
             ->setParameter('bundle', 'page')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
@@ -76,37 +75,37 @@ class CalendarSubscriber extends CommonSubscriber
             ->setMaxResults(50);
 
         foreach ($eventTypes as $eventKey => $eventType) {
-            $query->select($commonSelect . ', ' . $eventType['dateName'] . ' AS start')
+            $query->select($commonSelect.', '.$eventType['dateName'].' AS start')
                 ->where($query->expr()->andX(
-                    $query->expr()->gte('p.' . $eventType['dateName'], ':start'),
-                    $query->expr()->lte('p.' . $eventType['dateName'], ':end')
+                    $query->expr()->gte('p.'.$eventType['dateName'], ':start'),
+                    $query->expr()->lte('p.'.$eventType['dateName'], ':end')
                 ));
 
             $results = $query->execute()->fetchAll();
 
             // We need to convert the date to a ISO8601 compliant string
             foreach ($results as &$object) {
-                $date = new DateTimeHelper($object['start']);
-                $eventTitle = $this->translator->trans('mautic.page.event.' . $eventKey, array('%page%' => $object['title']));
-                $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-                $object['setter'] = $eventType['setter'];
-                $object['entityId'] = $object['page_id'];
+                $date                 = new DateTimeHelper($object['start']);
+                $eventTitle           = $this->translator->trans('mautic.page.event.'.$eventKey, ['%page%' => $object['title']]);
+                $object['start']      = $date->toLocalString(\DateTime::ISO8601);
+                $object['setter']     = $eventType['setter'];
+                $object['entityId']   = $object['page_id'];
                 $object['entityType'] = 'page';
-                $object['editable'] = true;
-                $object['url']   = $this->router->generate('mautic_calendar_action', array(
+                $object['editable']   = true;
+                $object['url']        = $this->router->generate('mautic_calendar_action', [
                     'objectAction' => 'edit',
-                    'source' => 'page',
-                    'objectId' => $object['page_id'],
-                    'startDate' => $date->toLocalString()
-                ), true);
-                $object['viewUrl']   = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $object['page_id']), true);
-                $object['attr']  = array(
+                    'source'       => 'page',
+                    'objectId'     => $object['page_id'],
+                    'startDate'    => $date->toLocalString(),
+                ], true);
+                $object['viewUrl'] = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $object['page_id']], true);
+                $object['attr']    = [
                     'data-toggle' => 'ajaxmodal',
                     'data-target' => '#CalendarEditModal',
-                    'data-header' => $eventTitle
-                );
-                $object['description'] = $this->translator->trans('mautic.page.event.' . $eventKey . '.description', array('%page%' => $object['title']));
-                $object['title'] = $eventTitle;
+                    'data-header' => $eventTitle,
+                ];
+                $object['description'] = $this->translator->trans('mautic.page.event.'.$eventKey.'.description', ['%page%' => $object['title']]);
+                $object['title']       = $eventTitle;
             }
 
             $event->addEvents($results);
@@ -114,22 +113,20 @@ class CalendarSubscriber extends CommonSubscriber
     }
 
     /**
-     * Let the calendar to edit / create new entities
+     * Let the calendar to edit / create new entities.
      *
      * @param EventGeneratorEvent $event
-     *
-     * @return void
      */
     public function onCalendarEventGenerate(EventGeneratorEvent $event)
     {
-        $source     = $event->getSource();
+        $source = $event->getSource();
 
         if ($source != 'page') {
             return;
         }
 
-        $entityId   = $event->getEntityId();
-        $entity     = $this->pageModel->getEntity($entityId);
+        $entityId = $event->getEntityId();
+        $entity   = $this->pageModel->getEntity($entityId);
 
         $event->setModel($this->pageModel);
         $event->setEntity($entity);

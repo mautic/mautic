@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Event;
 
 /**
- * Class ComponentValidationTrait
+ * Class ComponentValidationTrait.
  */
 trait ComponentValidationTrait
 {
@@ -35,7 +36,7 @@ trait ComponentValidationTrait
         if ($callbacks) {
             foreach ($callbacks as $m) {
                 if (isset($component[$m]) && !is_callable($component[$m])) {
-                    throw new InvalidArgumentException($component[$m] . ' is not callable.');
+                    throw new InvalidArgumentException($component[$m].' is not callable.');
                 }
             }
         }

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +13,10 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class ArrayLinebreakTransformer
+ * Class ArrayLinebreakTransformer.
  */
 class ArrayLinebreakTransformer implements DataTransformerInterface
 {
-
     /**
      * {@inheritdoc}
      *
@@ -25,7 +25,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
     public function transform($array)
     {
         if ($array === null) {
-            return "";
+            return '';
         }
 
         return implode("\n", $array);
@@ -39,7 +39,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
     public function reverseTransform($string)
     {
         if (!$string) {
-            return array();
+            return [];
         }
 
         return array_map('trim', explode("\n", $string));

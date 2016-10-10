@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -62,7 +63,7 @@ class PageSubscriber extends CommonSubscriber
             return;
         }
 
-        $appId = $this->coreParametersHelper->getParameter('notification_app_id');
+        $appId       = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId = $this->coreParametersHelper->getParameter('notification_safari_web_id');
 
         $this->assetsHelper->addScript($this->router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');

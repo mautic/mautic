@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -12,7 +13,7 @@
         <?php echo htmlspecialchars($builderAssets); ?>
     </script>
     <div class="builder-content">
-        <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_'.$type.'_action', array('objectAction' => 'builder', 'objectId' => $objectId)); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_'.$type.'_action', ['objectAction' => 'builder', 'objectId' => $objectId]); ?>" />
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">

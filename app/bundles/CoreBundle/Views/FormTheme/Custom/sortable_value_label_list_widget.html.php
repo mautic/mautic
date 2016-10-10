@@ -1,16 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 
 <div class="input-group sortable-no-reorder">
     <?php if (!empty($preaddon)): ?>
-    <span class="input-group-addon preaddon" <?php foreach ($preaddonAttr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
+    <span class="input-group-addon preaddon" <?php foreach ($preaddonAttr as $k => $v) {
+    printf('%s="%s" ', $view->escape($k), $view->escape($v));
+}?>>
     <i class="<?php echo $preaddon; ?>"></i>
     </span>
     <?php endif; ?>
@@ -25,7 +28,9 @@
         </div>
     </div>
     <?php if (!empty($postaddon)): ?>
-    <span class="input-group-addon postaddon" <?php foreach ($postaddonAttr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
+    <span class="input-group-addon postaddon" <?php foreach ($postaddonAttr as $k => $v) {
+    printf('%s="%s" ', $view->escape($k), $view->escape($v));
+}?>>
         <i class="<?php echo $postaddon; ?>"></i>
     </span>
     <?php endif; ?>

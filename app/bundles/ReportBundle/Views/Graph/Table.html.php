@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -20,7 +21,7 @@
         </div>
         <?php if (count($graph['data']) > 0) : ?>
             <div class="table-responsive panel-collapse pull out">
-                <?php // We need to dynamically create the table headers based on the result set ?>
+                <?php // We need to dynamically create the table headers based on the result set?>
                 <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
                     <thead>
                         <tr>
@@ -37,7 +38,7 @@
                             <?php foreach ($row as $cellName => $cell) : ?>
                                 <?php if (array_key_exists('id', $graph['data'][0]) && $cellName == 'title' && isset($graph['link'])) : ?>
                                     <td>
-                                        <a href="<?php echo $view['router']->path($graph['link'], array("objectAction" => "view", "objectId" => $row['id'])); ?>" data-toggle="ajax">
+                                        <a href="<?php echo $view['router']->path($graph['link'], ['objectAction' => 'view', 'objectId' => $row['id']]); ?>" data-toggle="ajax">
                                             <?php echo $cell; ?>
                                         </a>
                                     </td>

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,20 +16,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * Class OAuthProvider
+ * Class OAuthProvider.
  */
 class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification\Provider\OAuthProvider
 {
-
     /**
-     * @var MauticFactory $factory
+     * @var MauticFactory
      */
     private $factory;
 
     /**
      * @param MauticFactory $factory
-     *
-     * @return void
      */
     public function setFactory(MauticFactory $factory)
     {
@@ -74,6 +72,6 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
      */
     public function supports(TokenInterface $token)
     {
-        return ($token instanceof OAuthToken);
+        return $token instanceof OAuthToken;
     }
 }

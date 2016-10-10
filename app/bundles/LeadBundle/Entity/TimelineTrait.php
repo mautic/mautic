@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,13 +17,13 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 trait TimelineTrait
 {
     /**
-     * @param QueryBuilder $query                   DBAL QueryBuilder
-     * @param array        $options                 Query optons from LeadTimelineEvent
-     * @param              $eventNameColumn         Name of column to sort event name by
-     * @param              $timestampColumn         Name of column to sort timestamp by
-     * @param array        $serializedColumns       Array of columns to unserialize
-     * @param array        $dateTimeColumns         Array of columns to be converted to \DateTime
-     * @param null         $resultsParserCallback   Callback to custom parse results
+     * @param QueryBuilder $query                 DBAL QueryBuilder
+     * @param array        $options               Query optons from LeadTimelineEvent
+     * @param              $eventNameColumn       Name of column to sort event name by
+     * @param              $timestampColumn       Name of column to sort timestamp by
+     * @param array        $serializedColumns     Array of columns to unserialize
+     * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
+     * @param null         $resultsParserCallback Callback to custom parse results
      *
      * @return array
      */
@@ -71,7 +72,7 @@ trait TimelineTrait
         }
 
         if (isset($options['order'])) {
-            list ($orderBy, $orderByDir) = $options['order'];
+            list($orderBy, $orderByDir) = $options['order'];
 
             switch ($orderBy) {
                 case 'eventLabel':
@@ -129,7 +130,7 @@ trait TimelineTrait
 
             return [
                 'total'   => $total,
-                'results' => $results
+                'results' => $results,
             ];
         }
 

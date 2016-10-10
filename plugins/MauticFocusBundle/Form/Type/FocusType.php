@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -73,7 +74,7 @@ class FocusType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.focus.form.website.tooltip',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -117,8 +118,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
@@ -133,8 +134,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
@@ -157,8 +158,8 @@ class FocusType extends AbstractType
             ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
 
         $builder->add(
@@ -172,14 +173,13 @@ class FocusType extends AbstractType
                         'attr'  => [
                             'class'   => 'btn btn-default btn-dnd btn-nospin',
                             'icon'    => 'fa fa-cube',
-                            'onclick' => "Mautic.launchFocusBuilder();",
+                            'onclick' => 'Mautic.launchFocusBuilder();',
                         ],
                     ],
                 ],
             ]
         );
     }
-
 
     /**
      * {@inheritdoc}

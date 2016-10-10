@@ -1,28 +1,27 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'mauticWebhook');
 
-/** @var \Mautic\WebhookBundle\Entity\Webhook $item */
-$view['slots']->set("headerTitle", $item->getName());
+/* @var \Mautic\WebhookBundle\Entity\Webhook $item */
+$view['slots']->set('headerTitle', $item->getName());
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
     'item'            => $item,
-    'templateButtons' => array(
+    'templateButtons' => [
         'edit'   => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
         'clone'  => $permissions['webhook:webhooks:create'],
         'delete' => $view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteown'], $item->getCreatedBy()),
-    ),
-    'routeBase' => 'webhook'
-)));
+    ],
+    'routeBase' => 'webhook',
+]));
 ?>
 
 <!-- start: box layout -->
@@ -37,7 +36,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <div class="text-muted"><?php echo $item->getDescription(); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $item)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item]); ?>
                     </div>
                 </div>
             </div>
@@ -47,7 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="row">
                 <div class="col-md-12">
                     <?php $hookLog = $item->getLogs(); ?>
-                    <?php if (! count($hookLog)): ?>
+                    <?php if (!count($hookLog)): ?>
                         <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
                             <h4>
                                 <?php echo $view['translator']->trans('mautic.webhook.no.logs'); ?>
@@ -76,9 +75,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <tr>
                                         <td><?php echo $log->getId(); ?></td>
                                         <td><?php
-                                            echo $view->render('MauticWebhookBundle:Helper:labelcode.html.php', array(
+                                            echo $view->render('MauticWebhookBundle:Helper:labelcode.html.php', [
                                                 'code' => $log->getStatusCode(),
-                                            ));
+                                            ]);
                                             ?>
                                         </td>
                                         <td><?php echo $view['date']->toFull($log->getDateAdded()); ?></td>
@@ -122,7 +121,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <hr class="hr-w-2" style="width:50%">
 
             <!-- recent activity -->
-            <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
         </div>
     </div>
     <!--/ right section -->

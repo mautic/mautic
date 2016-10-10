@@ -1,29 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
 /**
- * Class StatDevice
- *
- * @package Mautic\EmailBundle\Entity
+ * Class StatDevice.
  */
 class StatDevice
 {
-
     /**
      * @var int
      */
@@ -49,11 +46,10 @@ class StatDevice
      */
     private $dateOpened;
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -69,7 +65,7 @@ class StatDevice
 
         $builder->createManyToOne('stat', 'Stat')
             ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
-            ->build();;
+            ->build();
 
         $builder->addIpAddress(true);
 
@@ -79,7 +75,7 @@ class StatDevice
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -87,12 +83,12 @@ class StatDevice
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
-                array(
+                [
                     'id',
                     'device',
                     'ipAddress',
-                    'stat'
-                )
+                    'stat',
+                ]
             )
             ->build();
     }
@@ -100,7 +96,7 @@ class StatDevice
     /**
      * @return mixed
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -108,7 +104,7 @@ class StatDevice
     /**
      * @return IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -116,7 +112,7 @@ class StatDevice
     /**
      * @param mixed $ip
      */
-    public function setIpAddress (IpAddress $ip)
+    public function setIpAddress(IpAddress $ip)
     {
         $this->ipAddress = $ip;
     }
@@ -124,7 +120,7 @@ class StatDevice
     /**
      * @return Stat
      */
-    public function getStat ()
+    public function getStat()
     {
         return $this->stat;
     }
@@ -132,7 +128,7 @@ class StatDevice
     /**
      * @param Stat
      */
-    public function setStat (Stat $stat)
+    public function setStat(Stat $stat)
     {
         $this->stat = $stat;
     }
@@ -140,7 +136,7 @@ class StatDevice
     /**
      * @return mixed
      */
-    public function getDateOpened ()
+    public function getDateOpened()
     {
         return $this->dateOpened;
     }
@@ -148,7 +144,7 @@ class StatDevice
     /**
      * @param mixed $dateOpened
      */
-    public function setDateOpened ($dateOpened)
+    public function setDateOpened($dateOpened)
     {
         $this->dateOpened = $dateOpened;
     }
@@ -156,7 +152,7 @@ class StatDevice
     /**
      * @return mixed
      */
-    public function getDevice ()
+    public function getDevice()
     {
         return $this->device;
     }
@@ -164,7 +160,7 @@ class StatDevice
     /**
      * @param mixed $device
      */
-    public function setDevice (LeadDevice $device)
+    public function setDevice(LeadDevice $device)
     {
         $this->device = $device;
     }

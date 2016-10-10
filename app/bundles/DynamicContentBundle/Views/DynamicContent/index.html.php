@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -28,10 +28,10 @@ $view['slots']->set(
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue' => $searchValue,
-        'searchHelp' => 'mautic.page.help.searchcommands',
-        'action' => $currentRoute,
-        'routeBase' => 'dynamicContent',
+        'searchValue'     => $searchValue,
+        'searchHelp'      => 'mautic.page.help.searchcommands',
+        'action'          => $currentRoute,
+        'routeBase'       => 'dynamicContent',
         'templateButtons' => [
             'delete' => $permissions['dynamicContent:dynamicContents:deleteown'] || $permissions['dynamicContent:dynamicContents:deleteother'],
         ],

@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
@@ -47,61 +46,61 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     /**
      * @param MauticEvents\GlobalSearchEvent $event
      */
-    public function onGlobalSearch (MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
         if (empty($str)) {
             return;
         }
 
-        $filter      = array("string" => $str, "force" => array());
+        $filter      = ['string' => $str, 'force' => []];
         $permissions = $this->security->isGranted(
-            array('email:emails:viewown', 'email:emails:viewother'),
+            ['email:emails:viewown', 'email:emails:viewother'],
             'RETURN_ARRAY'
         );
         if ($permissions['email:emails:viewown'] || $permissions['email:emails:viewother']) {
             if (!$permissions['email:emails:viewother']) {
-                $filter['force'][] = array(
+                $filter['force'][] = [
                     'column' => 'IDENTITY(e.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->userHelper->getUser()->getId()
-                );
+                    'value'  => $this->userHelper->getUser()->getId(),
+                ];
             }
 
             $emails = $this->emailModel->getEntities(
-                array(
+                [
                     'limit'  => 5,
-                    'filter' => $filter
-                ));
+                    'filter' => $filter,
+                ]);
 
             if (count($emails) > 0) {
-                $emailResults = array();
+                $emailResults = [];
 
                 foreach ($emails as $email) {
                     $emailResults[] = $this->templating->renderResponse(
                         'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
-                        array('email' => $email)
+                        ['email' => $email]
                     )->getContent();
                 }
                 if (count($emails) > 5) {
                     $emailResults[] = $this->templating->renderResponse(
                         'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($emails) - 5)
-                        )
+                            'remaining'    => (count($emails) - 5),
+                        ]
                     )->getContent();
                 }
                 $emailResults['count'] = count($emails);
@@ -113,9 +112,9 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * @param MauticEvents\CommandListEvent $event
      */
-    public function onBuildCommandList (MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        if ($this->security->isGranted(array('email:emails:viewown', 'email:emails:viewother'), "MATCH_ONE")) {
+        if ($this->security->isGranted(['email:emails:viewown', 'email:emails:viewother'], 'MATCH_ONE')) {
             $event->addCommands(
                 'mautic.email.emails',
                 $this->emailModel->getCommandList()

@@ -1,38 +1,38 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\DashboardBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * WidgetRepository
+ * WidgetRepository.
  */
 class WidgetRepository extends CommonRepository
 {
     /**
-     * Update widget ordering
+     * Update widget ordering.
      *
-     * @param  array   $ordering
-     * @param  integer $userId
+     * @param array $ordering
+     * @param int   $userId
      *
      * @return string
      */
     public function updateOrdering($ordering, $userId)
     {
         $widgets = $this->getEntities(
-            array(
-                'filter' => array(
-                    'createdBy' => $userId
-                )
-            )
+            [
+                'filter' => [
+                    'createdBy' => $userId,
+                ],
+            ]
         );
 
         foreach ($widgets as &$widget) {
@@ -49,9 +49,9 @@ class WidgetRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('w.ordering', 'ASC')
-        );
+        return [
+            ['w.ordering', 'ASC'],
+        ];
     }
 
     /**

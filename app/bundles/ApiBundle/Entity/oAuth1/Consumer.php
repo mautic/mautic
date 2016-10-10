@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,13 +19,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Consumer
- *
- * @package Mautic\ApiBundle\Entity\oAuth1
+ * Class Consumer.
  */
 class Consumer implements ConsumerInterface
 {
-
     /**
      * @var int
      */
@@ -56,9 +54,9 @@ class Consumer implements ConsumerInterface
     protected $accessTokens;
 
     /**
-     * Construct
+     * Construct.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->accessTokens = new ArrayCollection();
     }
@@ -66,14 +64,14 @@ class Consumer implements ConsumerInterface
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth1_consumers')
             ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository')
             ->addLifecycleEvent('createConsumerKeys', 'prePersist')
-            ->addIndex(array('consumer_key'), 'consumer_search');
+            ->addIndex(['consumer_key'], 'consumer_search');
 
         $builder->addIdColumns('name', false);
 
@@ -97,47 +95,47 @@ class Consumer implements ConsumerInterface
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.core.name.required')
+            ['message' => 'mautic.core.name.required']
         ));
     }
 
     /**
-     * Proxy to get consumer key
+     * Proxy to get consumer key.
      *
      * @return mixed
      */
-    public function getRandomId ()
+    public function getRandomId()
     {
         return $this->consumerKey;
     }
 
     /**
-     * Proxy to consumer key
+     * Proxy to consumer key.
      *
      * @return mixed
      */
-    public function getPublicId ()
+    public function getPublicId()
     {
         return $this->consumerKey;
     }
 
     /**
-     * Proxy to consumer secret
+     * Proxy to consumer secret.
      *
      * @return mixed
      */
-    public function getSecret ()
+    public function getSecret()
     {
         return $this->consumerSecret;
     }
 
     /**
-     * Create consumer keys
+     * Create consumer keys.
      */
-    public function createConsumerKeys ()
+    public function createConsumerKeys()
     {
         if (empty($this->consumerKey)) {
             $this->consumerKey    = Random::generateToken();
@@ -146,35 +144,35 @@ class Consumer implements ConsumerInterface
     }
 
     /**
-     * Proxy to callback
+     * Proxy to callback.
      *
      * @return array
      */
-    public function getRedirectUris ()
+    public function getRedirectUris()
     {
-        return array($this->callback);
+        return [$this->callback];
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -182,17 +180,17 @@ class Consumer implements ConsumerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getConsumerKey ()
+    public function getConsumerKey()
     {
         return $this->consumerKey;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setConsumerKey ($consumerKey)
+    public function setConsumerKey($consumerKey)
     {
         $this->consumerKey = $consumerKey;
 
@@ -200,17 +198,17 @@ class Consumer implements ConsumerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getConsumerSecret ()
+    public function getConsumerSecret()
     {
         return $this->consumerSecret;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setConsumerSecret ($consumerSecret)
+    public function setConsumerSecret($consumerSecret)
     {
         $this->consumerSecret = $consumerSecret;
 
@@ -218,17 +216,17 @@ class Consumer implements ConsumerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getCallback ()
+    public function getCallback()
     {
         return $this->callback;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setCallback ($callback)
+    public function setCallback($callback)
     {
         $this->callback = $callback;
 

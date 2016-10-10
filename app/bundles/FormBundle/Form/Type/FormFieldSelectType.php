@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +13,9 @@ namespace Mautic\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Class FormFieldSelectType
+ * Class FormFieldSelectType.
  */
 class FormFieldSelectType extends AbstractType
 {
@@ -38,7 +37,7 @@ class FormFieldSelectType extends AbstractType
                 'label'      => 'mautic.form.field.form.emptyvalue',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => false
+                'required'   => false,
             ]
         );
 
@@ -52,7 +51,7 @@ class FormFieldSelectType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.form.field.form.multiple',
-                'data'  => $default
+                'data'  => $default,
             ]
         );
     }
@@ -65,7 +64,7 @@ class FormFieldSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'field_type' => 'select',
-                'parentData' => []
+                'parentData' => [],
             ]
         );
     }
@@ -75,6 +74,6 @@ class FormFieldSelectType extends AbstractType
      */
     public function getName()
     {
-        return "formfield_select";
+        return 'formfield_select';
     }
 }

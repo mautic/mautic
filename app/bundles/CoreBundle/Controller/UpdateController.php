@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,14 +14,13 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-
 /**
- * Class UpdateController
+ * Class UpdateController.
  */
 class UpdateController extends CommonController
 {
     /**
-     * Generates the update view
+     * Generates the update view.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -34,17 +34,17 @@ class UpdateController extends CommonController
         $updateHelper = $this->factory->getHelper('update');
         $updateData   = $updateHelper->fetchData();
 
-        return $this->delegateView(array(
-            'viewParameters'  =>  array(
+        return $this->delegateView([
+            'viewParameters' => [
                 'updateData'     => $updateData,
-                'currentVersion' => $this->factory->getVersion()
-            ),
+                'currentVersion' => $this->factory->getVersion(),
+            ],
             'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
-            'passthroughVars' => array(
-                'mauticContent'  => 'update',
-                'route'          => $this->generateUrl('mautic_core_update')
-            )
-        ));
+            'passthroughVars' => [
+                'mauticContent' => 'update',
+                'route'         => $this->generateUrl('mautic_core_update'),
+            ],
+        ]);
     }
 
     /**
@@ -59,11 +59,11 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $env  = $this->factory->getEnvironment();
-            $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env);
+            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
 
             if ($env == 'prod') {
                 $args[] = '--no-debug';
@@ -83,30 +83,30 @@ class UpdateController extends CommonController
 
         if ($result !== 0) {
             // Log the output
-            $outputBuffer = trim(preg_replace('/\n\s*\n/s', " \\ ", $outputBuffer));
+            $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $outputBuffer));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code ' . $result . '; ' . $outputBuffer);
+            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $failed = true;
         } elseif ($this->request->get('update', 0)) {
             // This was a retry from the update so call up the finalizeAction to finish the process
             $this->forward('MauticCoreBundle:Ajax:updateFinalization',
-                array(
-                    'request'  => $this->request
-                )
+                [
+                    'request' => $this->request,
+                ]
             );
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  =>  array(
+        return $this->delegateView([
+            'viewParameters' => [
                 'failed'       => $failed,
-                'noMigrations' => $noMigrations
-            ),
+                'noMigrations' => $noMigrations,
+            ],
             'contentTemplate' => 'MauticCoreBundle:Update:schema.html.php',
-            'passthroughVars' => array(
-                'mauticContent'  => 'update',
-                'route'          => $this->generateUrl('mautic_core_update_schema')
-            )
-        ));
+            'passthroughVars' => [
+                'mauticContent' => 'update',
+                'route'         => $this->generateUrl('mautic_core_update_schema'),
+            ],
+        ]);
     }
 }

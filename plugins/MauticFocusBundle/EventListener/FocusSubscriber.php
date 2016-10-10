@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class FocusSubscriber
+ * Class FocusSubscriber.
  */
 class FocusSubscriber extends CommonSubscriber
 {
@@ -44,15 +44,12 @@ class FocusSubscriber extends CommonSubscriber
     /**
      * FocusSubscriber constructor.
      *
-     * @param MauticFactory   $factory
      * @param RouterInterface $router
      * @param IpLookupHelper  $ipLookupHelper
      * @param AuditLogModel   $auditLogModel
      */
-    public function __construct(MauticFactory $factory, RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
-        parent::__construct($factory);
-
         $this->router        = $router;
         $this->ipHelper      = $ipLookupHelper;
         $this->auditLogModel = $auditLogModel;
@@ -61,7 +58,7 @@ class FocusSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST    => ['onKernelRequest', 0],
@@ -95,7 +92,7 @@ class FocusSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param FocusEvent $event
      */
@@ -104,7 +101,7 @@ class FocusSubscriber extends CommonSubscriber
         $entity = $event->getFocus();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle'    => 'plugin.focus',
+                'bundle'    => 'focus',
                 'object'    => 'focus',
                 'objectId'  => $entity->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
@@ -116,7 +113,7 @@ class FocusSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param FocusEvent $event
      */

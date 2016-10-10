@@ -1,26 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\Internal\Hydration\ObjectHydrator;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class TokenSubscriber
+ * Class TokenSubscriber.
  */
 class TokenSubscriber extends CommonSubscriber
 {
@@ -29,17 +27,15 @@ class TokenSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            EmailEvents::EMAIL_ON_SEND     => array('decodeTokens', 254),
-            EmailEvents::EMAIL_ON_DISPLAY  => array('decodeTokens', 254),
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 254]
-        );
+        return [
+            EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
+            EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 254],
+            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 254],
+        ];
     }
 
     /**
      * @param EmailSendEvent $event
-     *
-     * @return void
      */
     public function decodeTokens(EmailSendEvent $event)
     {
@@ -53,11 +49,11 @@ class TokenSubscriber extends CommonSubscriber
             $event->setPlainText($plainText);
         }
 
-        $lead = $event->getLead();
-        $email = $event->getEmail();
+        $lead                  = $event->getLead();
+        $email                 = $event->getEmail();
         $dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null;
 
-        if (! empty($dynamicContentAsArray)) {
+        if (!empty($dynamicContentAsArray)) {
             $tokenEvent = new TokenReplacementEvent(null, $lead, ['lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
@@ -71,7 +67,7 @@ class TokenSubscriber extends CommonSubscriber
     {
         $clickthrough = $event->getClickthrough();
 
-        if (! array_key_exists('dynamicContent', $clickthrough)) {
+        if (!array_key_exists('dynamicContent', $clickthrough)) {
             return;
         }
 
@@ -115,17 +111,17 @@ class TokenSubscriber extends CommonSubscriber
                 continue;
             }
 
-            /**
+            /*
              * Split the filters into groups based on the glue.
              * The first filter and any filters whose glue is
              * "or" will start a new group.
              */
             if ($groupNum === 0 || $data['glue'] === 'or') {
-                $groupNum++;
+                ++$groupNum;
                 $groups[$groupNum] = null;
             }
 
-            /**
+            /*
              * If the group has been marked as false, there
              * is no need to continue checking the others
              * in the group.
@@ -142,7 +138,7 @@ class TokenSubscriber extends CommonSubscriber
             }
 
             if (in_array($data['operator'], ['like', '!like'])) {
-                $leadVal = (string) $leadVal;
+                $leadVal   = (string) $leadVal;
                 $filterVal = (string) $filterVal;
             }
 

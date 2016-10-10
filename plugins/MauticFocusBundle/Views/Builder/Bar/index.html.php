@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic Focus Bundle
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $props   = $focus['properties'];
@@ -34,8 +35,8 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 </div>
 <?php if ($props['bar']['allow_hide']): ?>
     <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-<?php echo $props['bar']['placement']; ?> mf-bar-collapser-<?php echo $props['bar']['size']; ?><?php if ($props['bar']['sticky']) {
-        echo ' mf-bar-collapser-sticky';
-    } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
+                    echo ' mf-bar-collapser-sticky';
+                } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
         <style scoped>
             .mf-bar-collapser-icon {
                 color: #<?php  echo $color; ?>;
@@ -46,12 +47,12 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
             }
         </style>
         <a class="mf-bar-collapser-icon" href="javascript:void(0)"<?php if (!empty($preview)) {
-            echo ' onclick="Mautic.toggleBarCollapse()"';
-        } ?>>
-            <?php $size = ($props['bar']['size'] == 'large') ? 40 : 24; ?>
+                    echo ' onclick="Mautic.toggleBarCollapse()"';
+                } ?>>
+            <?php $size          = ($props['bar']['size'] == 'large') ? 40 : 24; ?>
             <?php $transformSize = ($props['bar']['size'] == 'large') ? 20 : 20; ?>
-            <?php $scale = ($props['bar']['size'] == 'large') ? 1 : 0.6; ?>
-            <?php $direction = ($props['bar']['placement'] == 'top') ? '-90' : '90'; ?>
+            <?php $scale         = ($props['bar']['size'] == 'large') ? 1 : 0.6; ?>
+            <?php $direction     = ($props['bar']['placement'] == 'top') ? '-90' : '90'; ?>
             <svg style="overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="<?php echo $size; ?>" version="1.1"
                  height="<?php echo $size; ?>" data-transform-size="<?php echo $transformSize; ?>" data-transform-direction="<?php echo $direction; ?>" data-transform-scale="<?php echo $scale; ?>">
                 <g transform="scale(<?php echo $scale; ?>) rotate(<?php echo $direction; ?> <?php echo $transformSize; ?> <?php echo $transformSize; ?>)">

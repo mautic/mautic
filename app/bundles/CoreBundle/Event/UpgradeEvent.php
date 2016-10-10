@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,16 +13,14 @@ namespace Mautic\CoreBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class BuilderEvent
- *
- * @package Mautic\PageBundle\Event
+ * Class BuilderEvent.
  */
 class UpgradeEvent extends Event
 {
     /**
      * @var array
      */
-    protected $status = array();
+    protected $status = [];
 
     public function __construct(array $status)
     {

@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
-use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 
 /**
- * Class ConfigSubscriber
- *
- * @package Mautic\CoreBundle\EventListener
+ * Class ConfigSubscriber.
  */
 class ConfigSubscriber extends CommonSubscriber
 {
@@ -40,29 +39,29 @@ class ConfigSubscriber extends CommonSubscriber
      */
     public function __construct(LanguageHelper $languageHelper, CoreParametersHelper $coreParametersHelper)
     {
-        $this->languageHelper = $languageHelper;
+        $this->languageHelper       = $languageHelper;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            ConfigEvents::CONFIG_ON_GENERATE    => array('onConfigGenerate', 0),
-            ConfigEvents::CONFIG_PRE_SAVE       => array('onConfigBeforeSave', 0)
-        );
+        return [
+            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
+            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigBeforeSave', 0],
+        ];
     }
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $event->addForm(array(
-            'bundle'        => 'CoreBundle',
-            'formAlias'     => 'coreconfig',
-            'formTheme'     => 'MauticCoreBundle:FormTheme\Config',
-            'parameters'    => $event->getParametersFromConfig('MauticCoreBundle')
-        ));
+        $event->addForm([
+            'bundle'     => 'CoreBundle',
+            'formAlias'  => 'coreconfig',
+            'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticCoreBundle'),
+        ]);
     }
 
     public function onConfigBeforeSave(ConfigEvent $event)
@@ -81,8 +80,8 @@ class ConfigSubscriber extends CommonSubscriber
             // If there is an error, fall back to 'en_US' as it is our system default
             if ($fetchLanguage['error']) {
                 $values['coreconfig']['locale'] = 'en_US';
-                $message = 'mautic.core.could.not.set.language';
-                $messageVars = array();
+                $message                        = 'mautic.core.could.not.set.language';
+                $messageVars                    = [];
 
                 if (isset($fetchLanguage['message'])) {
                     $message = $fetchLanguage['message'];

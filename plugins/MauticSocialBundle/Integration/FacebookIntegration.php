@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
- * Class FacebookIntegration
+ * Class FacebookIntegration.
  */
 class FacebookIntegration extends SocialIntegration
 {
@@ -27,9 +28,9 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getIdentifierFields()
     {
-        return array(
-            'facebook'
-        );
+        return [
+            'facebook',
+        ];
     }
 
     /**
@@ -37,11 +38,11 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getSupportedFeatures()
     {
-        return array(
+        return [
             'share_button',
             'login_button',
-            'public_profile'
-        );
+            'public_profile',
+        ];
     }
 
     /**
@@ -93,7 +94,7 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * Get public data
+     * Get public data.
      *
      * @param $identifier
      * @param $socialCache
@@ -106,19 +107,18 @@ class FacebookIntegration extends SocialIntegration
         $accessToken          = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
-
             return;
         }
 
-        $url    = $this->getApiUrl("v2.5/me");
+        $url    = $this->getApiUrl('v2.5/me');
         $fields = array_keys($this->getAvailableLeadFields());
 
-        $parameters = array(
+        $parameters = [
             'access_token' => $accessToken['access_token'],
-            'fields'       => implode(",", $fields)
-        );
+            'fields'       => implode(',', $fields),
+        ];
 
-        $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
+        $data = $this->makeRequest($url, $parameters, 'GET', ['auth_type' => 'rest']);
 
         if (is_object($data) && isset($data->id)) {
             $info = $this->matchUpData($data);
@@ -150,25 +150,25 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        return array(
-            'about'       => array('type' => 'string'),
-            'bio'         => array('type' => 'string'),
-            'birthday'    => array('type' => 'string'),
-            'email'       => array('type' => 'string'),
-            'first_name'  => array('type' => 'string'),
-            'gender'      => array('type' => 'string'),
-            'last_name'   => array('type' => 'string'),
-            'link'        => array('type' => 'string'),
-            'locale'      => array('type' => 'string'),
-            'middle_name' => array('type' => 'string'),
-            'name'        => array('type' => 'string'),
-            'political'   => array('type' => 'string'),
-            'quotes'      => array('type' => 'string'),
-            'religion'    => array('type' => 'string'),
-            'timezone'    => array('type' => 'string'),
-            'website'     => array('type' => 'string')
-        );
+        return [
+            'about'       => ['type' => 'string'],
+            'bio'         => ['type' => 'string'],
+            'birthday'    => ['type' => 'string'],
+            'email'       => ['type' => 'string'],
+            'first_name'  => ['type' => 'string'],
+            'gender'      => ['type' => 'string'],
+            'last_name'   => ['type' => 'string'],
+            'link'        => ['type' => 'string'],
+            'locale'      => ['type' => 'string'],
+            'middle_name' => ['type' => 'string'],
+            'name'        => ['type' => 'string'],
+            'political'   => ['type' => 'string'],
+            'quotes'      => ['type' => 'string'],
+            'religion'    => ['type' => 'string'],
+            'timezone'    => ['type' => 'string'],
+            'website'     => ['type' => 'string'],
+        ];
     }
 }

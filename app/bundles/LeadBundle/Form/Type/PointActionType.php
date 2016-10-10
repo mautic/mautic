@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 /**
- * Class PointsActionType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class PointsActionType.
  */
 class PointActionType extends AbstractType
 {
@@ -39,10 +38,10 @@ class PointActionType extends AbstractType
                     new NotEqualTo(
                         [
                             'value'   => '0',
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
@@ -52,6 +51,6 @@ class PointActionType extends AbstractType
      */
     public function getName()
     {
-        return "leadpoints_action";
+        return 'leadpoints_action';
     }
 }

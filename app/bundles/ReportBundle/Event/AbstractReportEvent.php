@@ -1,13 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\ReportBundle\Event;
 
+namespace Mautic\ReportBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
@@ -19,7 +20,7 @@ class AbstractReportEvent extends Event
     protected $context = '';
 
     /**
-     * Report entity
+     * Report entity.
      *
      * @var Report
      */
@@ -34,7 +35,7 @@ class AbstractReportEvent extends Event
     }
 
     /**
-     * Get the context
+     * Get the context.
      *
      * @return string
      */
@@ -51,18 +52,14 @@ class AbstractReportEvent extends Event
     public function checkContext($context)
     {
         if (empty($this->context)) {
-
             return true;
         }
 
         if (is_array($context)) {
-
             return in_array($this->context, $context);
-        } else if ($this->context == $context) {
-
+        } elseif ($this->context == $context) {
             return true;
         } else {
-
             return false;
         }
     }

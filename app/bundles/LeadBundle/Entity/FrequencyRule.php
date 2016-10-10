@@ -1,23 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class FrequencyRule
- *
- * @package Mautic\LeadBundle\Entity
+ * Class FrequencyRule.
  */
 class FrequencyRule
 {
@@ -51,11 +48,10 @@ class FrequencyRule
      */
     private $channel;
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -155,7 +151,7 @@ class FrequencyRule
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getFrequencyNumber()
     {
@@ -163,7 +159,7 @@ class FrequencyRule
     }
 
     /**
-     * @param integer $frequencyNumber
+     * @param int $frequencyNumber
      */
     public function setFrequencyNumber($frequencyNumber)
     {

@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\CoreBundle\Doctrine\Helper;
 
+namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 class IndexSchemaHelper
@@ -46,22 +46,22 @@ class IndexSchemaHelper
     /**
      * @var array
      */
-    protected $allowedColumns = array();
+    protected $allowedColumns = [];
 
     /**
      * @var array
      */
-    protected $changedIndexes = array();
+    protected $changedIndexes = [];
 
     /**
      * @var array
      */
-    protected $addedIndexes = array();
+    protected $addedIndexes = [];
 
     /**
      * @var array
      */
-    protected $dropIndexes = array();
+    protected $dropIndexes = [];
 
     /**
      * @param Connection $db
@@ -97,7 +97,7 @@ class IndexSchemaHelper
     }
 
     /**
-     * Add or update an index to the table
+     * Add or update an index to the table.
      *
      * @param       $columns
      * @param       $name
@@ -105,17 +105,17 @@ class IndexSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addIndex($columns, $name, $options = array())
+    public function addIndex($columns, $name, $options = [])
     {
         if (!is_array($columns)) {
-            $columns = array($columns);
+            $columns = [$columns];
         }
         foreach ($columns as $column) {
             if (!in_array($column, $this->allowedColumns)) {
                 $columnSchema = $this->table->getColumn($column);
 
                 $type = $columnSchema->getType();
-                if ($type instanceof StringType) {
+                if (!$type instanceof TextType) {
                     $this->allowedColumns[] = $columnSchema->getName();
                 }
             }
@@ -125,7 +125,6 @@ class IndexSchemaHelper
         $columns = array_intersect($columns, $this->allowedColumns);
 
         if (!empty($columns)) {
-
             $index = new Index($this->prefix.$name, $columns, false, false, $options);
 
             if ($this->table->hasIndex($this->prefix.$name)) {
@@ -137,7 +136,7 @@ class IndexSchemaHelper
     }
 
     /**
-     * Execute changes
+     * Execute changes.
      */
     public function executeChanges()
     {
@@ -149,7 +148,6 @@ class IndexSchemaHelper
                 $sql[] = $platform->getDropIndexSQL($index);
                 $sql[] = $platform->getCreateIndexSQL($index, $this->table);
             }
-
         }
 
         if (count($this->dropIndexes)) {

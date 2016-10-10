@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -31,13 +32,13 @@ if (isset($tmpl)) {
 
 //Edit mode for edit/actions (allows use of ajaxmodal)
 if (!isset($editMode)) {
-    $editMode = "ajax";
+    $editMode = 'ajax';
 }
 
 if (!isset($editAttr)) {
     $editAttr = '';
 } elseif (is_array($editAttr)) {
-    $string = "";
+    $string = '';
     foreach ($editAttr as $attr => $val) {
         $string .= " $attr=\"$val\"";
     }

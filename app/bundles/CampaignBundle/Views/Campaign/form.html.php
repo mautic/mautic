@@ -1,20 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 
 $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.campaign.menu.edit',
-        array('%name%' => $view['translator']->trans($entity->getName()))) :
+        ['%name%' => $view['translator']->trans($entity->getName())]) :
     $view['translator']->trans('mautic.campaign.menu.new');
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -52,10 +52,10 @@ $view['slots']->set("headerTitle", $header);
 </div>
 
 <?php echo $view['form']->end($form); ?>
-<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array(
+<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', [
     'campaignId'      => $form['sessionId']->vars['data'],
     'campaignEvents'  => $campaignEvents,
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
-    'canvasSettings'  => $entity->getCanvasSettings()
-)); ?>
+    'canvasSettings'  => $entity->getCanvasSettings(),
+]); ?>

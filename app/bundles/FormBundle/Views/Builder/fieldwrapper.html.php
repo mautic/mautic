@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
     <?php
@@ -15,10 +15,10 @@
             'id'             => $field['id'],
             'formId'         => $formId,
             'formName'       => '',
-            'disallowDelete' => ('button' == $field['type'])
+            'disallowDelete' => ('button' == $field['type']),
         ]);
     ?>
-    <div class="row ml-0 mr-0"><?php // wrap in a row to keep bootstrap container classes from affecting builder layout ?>
+    <div class="row ml-0 mr-0"><?php // wrap in a row to keep bootstrap container classes from affecting builder layout?>
     <?php echo $view->render(
         $template,
         [
