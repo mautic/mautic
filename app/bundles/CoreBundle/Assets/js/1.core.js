@@ -116,6 +116,8 @@ var Mautic = {
 
     builderTokens: {},
 
+    dynamicContentTokens: {},
+
     builderTokensRequestInProgress: false,
 
     addKeyboardShortcut: function (sequence, description, func, section) {
@@ -568,6 +570,10 @@ var Mautic = {
                     textarea.on('froalaEditor.initialized', function (e, editor) {
                         Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
                     });
+
+                    textarea.on('froalaEditor.focus', function (e, editor) {
+                        Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
+                    });
                 }
 
                 textarea.on('froalaEditor.blur', function (e, editor) {
@@ -737,9 +743,9 @@ var Mautic = {
     /**
      * Initialize AtWho dropdown in a Froala editor.
      *
-     * @param jQuery element
-     * @param method to get the tokens from
-     * @param Froala Editor
+     * @param element jQuery element
+     * @param method  method to get the tokens from
+     * @param froala  Froala Editor
      */
     initAtWho: function(element, method, froala) {
         // Avoid to request the tokens if not necessary
@@ -759,12 +765,19 @@ var Mautic = {
     /**
      * Initialize AtWho dropdown in a Froala editor.
      *
-     * @param jQuery element
-     * @param method to get the tokens from
-     * @param Froala Editor
+     * @param element jQuery element
+     * @param method  method to get the tokens from
+     * @param froala  Froala Editor
      */
     configureAtWho: function(element, method, froala) {
         Mautic.getTokens(method, function(tokens) {
+            element.atwho('destroy');
+
+            Mautic.configureDynamicContentAtWhoTokens();
+
+            // Add the dynamic content tokens
+            mQuery.extend(tokens, Mautic.dynamicContentTokens);
+
             element.atwho({
                 at: '{',
                 displayTpl: '<li>${name} <small>${id}</small></li>',
@@ -822,6 +835,26 @@ var Mautic = {
                 Mautic.builderTokensRequestInProgress = false;
             }
         });
+    },
+
+    configureDynamicContentAtWhoTokens: function() {
+        Mautic.dynamicContentTokens = {};
+
+        var dynamicContentTabs = mQuery('#dynamicContentTabs');
+
+        if (dynamicContentTabs.length === 0 && window.parent) {
+            dynamicContentTabs = mQuery(window.parent.document.getElementById('dynamicContentTabs'));
+        }
+
+        if (dynamicContentTabs.length) {
+            dynamicContentTabs.find('a[data-toggle="tab"]').each(function () {
+                var tokenText = mQuery(this).text();
+                var prototype = '{dynamiccontent="__tokenName__"}';
+                var newOption = prototype.replace(/__tokenName__/g, tokenText);
+
+                Mautic.dynamicContentTokens[newOption] = tokenText;
+            });
+        }
     },
 
     /**
