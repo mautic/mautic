@@ -414,6 +414,9 @@ class EmailModel extends FormModel
             return;
         }
 
+        $referer = $request->server->get('HTTP_REFERER');
+        $this->logger->error(print_r($referer, true));
+
         $email = $stat->getEmail();
 
         if ((int) $stat->isRead()) {
