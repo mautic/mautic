@@ -17,6 +17,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\ApiBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
