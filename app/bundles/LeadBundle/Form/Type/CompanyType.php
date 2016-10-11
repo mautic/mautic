@@ -60,7 +60,7 @@ class CompanyType extends AbstractType
                 'owner',
                 'user_list',
                 [
-                    'label'      => 'mautic.lead.lead.field.owner',
+                    'label'      => 'mautic.lead.company.field.owner',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',

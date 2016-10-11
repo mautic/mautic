@@ -154,8 +154,8 @@ class CampaignSubscriber extends CommonSubscriber
             $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
             $options = [
                 'source'         => ['campaign.event', $event->getEvent()['id']],
-                'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 'normal',
-                'email_priority' => (isset($config['priority'])) ? $config['priority'] : 1,
+                'email_attempts' => $config['attempts'],
+                'email_priority' => $config['priority'],
                 'email_type'     => $type,
             ];
 
