@@ -24,7 +24,6 @@
  * | FITNESS FOR A PARTICULAR PURPOSE.                                         |
  * .---------------------------------------------------------------------------
  */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;

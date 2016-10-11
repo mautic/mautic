@@ -11,20 +11,20 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_plugin_timeline_index'       => [
+            'mautic_plugin_timeline_index' => [
                 'path'         => '/plugin/{integration}/timeline/{page}',
                 'controller'   => 'MauticLeadBundle:Timeline:pluginIndex',
                 'requirements' => [
                     'integration' => '.+',
-                ]
+                ],
             ],
-            'mautic_plugin_timeline_view'        => [
+            'mautic_plugin_timeline_view' => [
                 'path'         => '/plugin/{integration}/timeline/view/{leadId}/{page}',
                 'controller'   => 'MauticLeadBundle:Timeline:pluginView',
                 'requirements' => [
                     'integration' => '.+',
-                    'leadId' => '\d+'
-                ]
+                    'leadId'      => '\d+',
+                ],
             ],
             'mautic_contact_emailtoken_index' => [
                 'path'       => '/contacts/emailtokens/{page}',

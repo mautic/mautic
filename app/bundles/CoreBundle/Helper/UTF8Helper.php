@@ -48,7 +48,6 @@ POSSIBILITY OF SUCH DAMAGE.
  *
  * @license  Revised BSD
  */
-
 namespace Mautic\CoreBundle\Helper;
 
 class UTF8Helper

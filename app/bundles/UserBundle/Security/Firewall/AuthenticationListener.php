@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Security\Firewall;
 
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
