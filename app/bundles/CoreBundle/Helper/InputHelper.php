@@ -439,9 +439,10 @@ class InputHelper
      */
     public static function transliterate($value)
     {
-        if (function_exists('transliterator_transliterate')) {
+        $transId = 'Any-Latin; Latin-ASCII';
+        if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
             // Use intl by default
-            return transliterator_transliterate('Any-Latin; Latin-ASCII', $value);
+            return $trans->transliterate($value);
         }
 
         return \URLify::transliterate($value);
