@@ -4329,6 +4329,7 @@ lesshat-selector { -lh-property: 0 ;
     padding-left: 30px !important;
     padding-right: 30px !important;
     border-top: 1px solid #757575;
+    position: fixed;
   }
   .builder .builder-content {
     right: 0;
@@ -4339,9 +4340,6 @@ lesshat-selector { -lh-property: 0 ;
   }
   .builder .builder-tokens {
     margin-top: 10px;
-  }
-  .builder-active {
-    position: fixed;
   }
 }
 .mautic-editable {
