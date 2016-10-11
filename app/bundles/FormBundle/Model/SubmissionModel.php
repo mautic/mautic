@@ -441,7 +441,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                 $s['ipAddress']['ipAddress'],
                                 $s['referer'],
                             ];
@@ -518,7 +518,7 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                     $s['ipAddress']['ipAddress'],
                                     $s['referer'],
                                 ];
