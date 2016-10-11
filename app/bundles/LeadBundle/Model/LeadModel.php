@@ -435,7 +435,7 @@ class LeadModel extends FormModel
             $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
             $lead->stageChangeLogEntry(
                 $stage,
-                $data['stage'].':'.$stage->getName(),
+                $stage->getId().':'.$stage->getName(),
                 $this->translator->trans('mautic.stage.event.changed')
           );
         }
