@@ -422,6 +422,20 @@ var Mautic = {
             Mautic.activateFieldTypeahead(field, target, options, action);
         });
 
+        // Fix dropdowns in responsive tables - https://github.com/twbs/bootstrap/issues/11037#issuecomment-163746965
+        mQuery(container + " .table-responsive").on('shown.bs.dropdown', function (e) {
+            var table = mQuery(this),
+                menu = mQuery(e.target).find(".dropdown-menu"),
+                tableOffsetHeight = table.offset().top + table.height(),
+                menuOffsetHeight = menu.offset().top + menu.outerHeight(true);
+
+            if (menuOffsetHeight > tableOffsetHeight)
+                table.css("padding-bottom", menuOffsetHeight - tableOffsetHeight + 16)
+        });
+        mQuery(container + " .table-responsive").on("hide.bs.dropdown", function () {
+            mQuery(this).css("padding-bottom", 0);
+        })
+
         //initialize tab/hash activation
         mQuery(container + " .nav-tabs[data-toggle='tab-hash']").each(function() {
             // Show tab based on hash
