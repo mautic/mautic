@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\ORM\Query\Expr;
@@ -230,20 +229,16 @@ class BuilderTokenHelper
         if (is_array($content)) {
             foreach ($content as &$slot) {
                 self::replaceVisualPlaceholdersWithTokens($slot);
-                if ($encodeTokensInUrls) {
-                    self::encodeUrlTokens($slot, $encodeTokensInUrls);
-                }
             }
         } else {
             $content = preg_replace('/'.self::getVisualTokenHtml(null, null, true).'/smi', '$1', $content);
-            if ($encodeTokensInUrls) {
-                self::encodeUrlTokens($content, $encodeTokensInUrls);
-            }
         }
     }
 
     /**
      * Prevent tokens in URLs from being converted to visual tokens by encoding the brackets.
+     *
+     * @deprecated 2.2.1 - to be removed in 3.0
      *
      * @param string $content
      * @param array  $tokenKeys
