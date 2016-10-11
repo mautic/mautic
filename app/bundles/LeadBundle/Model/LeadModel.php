@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -362,13 +361,14 @@ class LeadModel extends FormModel
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
+            unset($updatedFields['company']);
         }
 
         parent::saveEntity($entity, $unlock);
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company['id'], $entity, true, true);
+            $this->companyModel->addLeadToCompany($company['id'], $entity, true);
         }
     }
 
@@ -721,7 +721,6 @@ class LeadModel extends FormModel
                     $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
                 }
             }
-
             $this->currentLead = $lead;
             $this->setLeadCookie($leadId);
         }

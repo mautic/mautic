@@ -9,7 +9,6 @@
  *
  * This class will kill some IDEs so best to not parse these as PHP
  */
-
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
 class ShortToUnicodeEmojiMap

@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -342,14 +341,15 @@ class LeadListRepository extends CommonRepository
                 $q->select($select)
                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
+                $batchExpr = $q->expr()->andX();
                 // Only leads that existed at the time of count
                 if ($batchLimiters) {
                     if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-                        $expr->add(
+                        $batchExpr->add(
                             $q->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
                         );
                     } elseif (!empty($batchLimiters['maxId'])) {
-                        $expr->add(
+                        $batchExpr->add(
                             $q->expr()->lte('l.id', $batchLimiters['maxId'])
                         );
                     }
@@ -363,16 +363,29 @@ class LeadListRepository extends CommonRepository
                     // Leads that do not have any record in the lead_lists_leads table for this lead list
                     // For non null fields - it's apparently better to use left join over not exists due to not using nullable
                     // fields - https://explainextended.com/2009/09/18/not-in-vs-not-exists-vs-left-join-is-null-mysql/
+                    $listOnExpr = $q->expr()->andX(
+                        $q->expr()->eq('ll.leadlist_id', $id),
+                        $q->expr()->eq('ll.lead_id', 'l.id')
+                    );
+
+                    if (!empty($batchLimiters['dateTime'])) {
+                        // Only leads in the list at the time of count
+                        $listOnExpr->add(
+                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                        );
+                    }
+
                     $q->leftJoin(
                         'l',
                         MAUTIC_TABLE_PREFIX.'lead_lists_leads',
                         'll',
-                        $q->expr()->andX(
-                            $q->expr()->eq('ll.leadlist_id', $id),
-                            $q->expr()->eq('ll.lead_id', 'l.id')
-                        )
+                        $listOnExpr
                     );
                     $expr->add($q->expr()->isNull('ll.lead_id'));
+
+                    if ($batchExpr->count()) {
+                        $expr->add($batchExpr);
+                    }
 
                     $q->andWhere($expr);
                 } elseif ($nonMembersOnly) {
@@ -412,6 +425,11 @@ class LeadListRepository extends CommonRepository
                     $mainExpr->add(
                         sprintf('l.id NOT IN (%s)', $sq->getSQL())
                     );
+
+                    if ($batchExpr->count()) {
+                        $mainExpr->add($batchExpr);
+                    }
+
                     $q->andWhere($mainExpr);
                 }
 

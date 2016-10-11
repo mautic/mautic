@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -640,6 +639,9 @@ class ListModel extends FormModel
             }
         }
 
+        // Unset max ID to prevent capping at newly added max ID
+        unset($batchLimiters['maxId']);
+
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
             $list,
@@ -650,6 +652,9 @@ class ListModel extends FormModel
                 'batchLimiters'  => $batchLimiters,
             ]
         );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;

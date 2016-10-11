@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -75,7 +74,7 @@ class EventHelper
         if (key_exists('utm_medium', $query)) {
             $utmValues->setUtmCampaign($query['utm_medium']);
         } elseif (key_exists('utm_medium', $queryReferer)) {
-            $utmValues['utm_medium'] = $queryReferer['utm_medium'];
+            $utmValues->setUtmMedium($queryReferer['utm_medium']);
         }
 
         if (key_exists('utm_source', $query)) {
