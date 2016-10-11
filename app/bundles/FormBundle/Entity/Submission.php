@@ -86,7 +86,7 @@ class Submission
 
         $builder->addIpAddress();
 
-        $builder->addLead(false, 'SET NULL');
+        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('trackingId', 'string')
             ->columnName('tracking_id')

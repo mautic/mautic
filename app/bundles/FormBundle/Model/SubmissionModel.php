@@ -326,19 +326,18 @@ class SubmissionModel extends CommonFormModel
         if (!empty($leadFieldMatches)) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
             $submission->setLead($lead);
-        } else {
-            // Get updated lead if applicable with tracking ID
-            if ($form->isInKioskMode()) {
-                $lead = $this->leadModel->getCurrentLead();
-            } else {
-                list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
-
-                //set tracking ID for stats purposes to determine unique hits
-                $submission->setTrackingId($trackingId);
-            }
-
-            $submission->setLead($lead);
         }
+
+        // Get updated lead if applicable with tracking ID
+        if ($form->isInKioskMode()) {
+            $lead = $this->leadModel->getCurrentLead();
+        } else {
+            list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
+
+            //set tracking ID for stats purposes to determine unique hits
+            $submission->setTrackingId($trackingId);
+        }
+        $submission->setLead($lead);
 
         // Save the submission
         $this->saveEntity($submission);

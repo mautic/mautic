@@ -140,6 +140,7 @@ class MessageQueueModel extends FormModel
             if (!$queue instanceof MessageQueue) {
                 throw new \InvalidArgumentException('$queue must be an instance of '.MessageQueue::class);
             }
+
             $queue = [$queue->getId() => $queue];
         }
 

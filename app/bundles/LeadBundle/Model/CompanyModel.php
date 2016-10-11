@@ -238,7 +238,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $searchCompanyLead = 1, $dateManipulated = null)
+    public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $batchProcess = false, $searchCompanyLead = 1, $dateManipulated = null)
     {
         // Primary company name to be peristed to the lead's contact company field
         $companyName = '';
@@ -363,7 +363,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
+        if ($batchProcess) {
+            // Detach for batch processing to preserve memory
+            $this->em->detach($lead);
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
@@ -453,6 +456,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 ]);
 
             if ($companyLead == null) {
+
                 // Lead is not part of this list
                 continue;
             }
@@ -471,11 +475,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             unset($companyLead);
         }
 
-        if (!empty($persistcompany)) {
-            $this->getRepository()->saveEntities($persistCompany);
+        if (!empty($persistCompany)) {
+            $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
         if (!empty($deleteCompanyLead)) {
-            $this->getRepository()->deleteEntities($deleteCompanyLead);
+            $this->getCompanyLeadRepository()->deleteEntities($deleteCompanyLead);
         }
 
         // Clear CompanyLead entities from Doctrine memory
