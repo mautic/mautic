@@ -4340,6 +4340,9 @@ lesshat-selector { -lh-property: 0 ;
   .builder .builder-tokens {
     margin-top: 10px;
   }
+  .builder-active {
+    position: fixed;
+  }
 }
 .mautic-editable {
   min-height: 75px;
