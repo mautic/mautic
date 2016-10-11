@@ -1183,7 +1183,18 @@ var Mautic = {
         if( -1 !== route.indexOf('view') ){
             //loading view of module title
             var currentModule = route.split('/')[3];
-            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + mQuery('.page-header h3').html() + ' | Mautic' );
+
+            //check if we find spans
+            var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+            var currentModuleItem = '';
+
+            if( 1 < titleWithHTML.length ){
+                currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
+            } else {
+                currentModuleItem = mQuery('.page-header h3').text();
+            }
+
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );    
         } else {
             //loading basic title
             mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
@@ -1460,6 +1471,9 @@ var Mautic = {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
+
+                //update Title
+                Mautic.generatePageTitle( response.route );
             }
 
             if (response.target == '#app-content') {
