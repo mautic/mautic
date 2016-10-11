@@ -1644,7 +1644,7 @@ if($.inArray(value+"-"+text,selected_values)===-1){return $("<option />").attr('
 if($.inArray(value+"-"+text,selected_values)===-1){return $("<option />").attr('value',value).html(text).appendTo(select);}}});if(nbItems){if(hasNew){hasNew.prependTo(select);}
 select.trigger("chosen:updated");}else{select.data().chosen.no_results_clear();select.data().chosen.no_results(field.val());}
 if(settings.success!=null){settings.success(data);}
-var returnVar=field.val(untrimmed_val);div=$('<div />');div.text(untrimmed_val);$('body').append(div);w=div.width()+25;f_width=field.outerWidth();if(w>f_width-10){w=f_width;}
+var returnVar=field.val(untrimmed_val);div=$('<div />');div.text(untrimmed_val);$('body').append(div);w=div.width()+25;f_width=field.closest('.chosen-choices').outerWidth();if(w>f_width-10){w=f_width;}
 div.remove();field.css({'width':w+'px'});return returnVar;};return this.timer=setTimeout(function(){if(chosenXhr){chosenXhr.abort();}
 return chosenXhr=$.ajax(options);},options.afterTypeDelay);});});};})(jQuery);;
 /*! jQuery UI - v1.11.4 - 2016-05-18

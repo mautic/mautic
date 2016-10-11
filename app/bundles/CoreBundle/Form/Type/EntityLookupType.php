@@ -11,12 +11,10 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
+use Mautic\CoreBundle\Form\ChoiceLoader\EntityLookupChoiceLoader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,24 +27,19 @@ use Symfony\Component\Translation\TranslatorInterface;
 class EntityLookupType extends AbstractType
 {
     /**
-     * @var ModelFactory
-     */
-    private $modelFactory;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * @var Router
      */
     private $router;
+
+    /**
+     * @var EntityLookupChoiceLoader
+     */
+    private $choiceLoader;
 
     /**
      * EntityLookupType constructor.
@@ -58,10 +51,9 @@ class EntityLookupType extends AbstractType
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, Router $router)
     {
-        $this->modelFactory = $modelFactory;
         $this->translator   = $translator;
-        $this->connection   = $connection;
         $this->router       = $router;
+        $this->choiceLoader = new EntityLookupChoiceLoader($modelFactory, $translator, $connection);
     }
 
     /**
@@ -70,25 +62,15 @@ class EntityLookupType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // Let the form builder notify us about initial/submitted choices
         $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
+            FormEvents::POST_SET_DATA,
+            [$this->choiceLoader, 'onFormPostSetData']
+        );
 
-                if (!$data) {
-                    return;
-                }
-
-                $options = $form->getConfig()->getOptions();
-                $options['choices'] = $this->getChoices($data, $options);
-
-                $form->getParent()->add(
-                    $form->getName(),
-                    $form->getConfig()->getType()->getName(),
-                    $options
-                );
-            }
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            [$this->choiceLoader, 'onFormPostSetData']
         );
     }
 
@@ -105,10 +87,10 @@ class EntityLookupType extends AbstractType
                 'entity_label_column'    => 'name',
                 'entity_id_column'       => 'id',
                 'modal_route_parameters' => ['objectAction' => 'new'],
-                'choices'                => function (Options $options) {
-                    $data = (isset($options['data'])) ? $options['data'] : [];
+                'choice_loader'          => function (Options $options) {
+                    $this->choiceLoader->setOptions($options);
 
-                    return $this->getChoices($data, $options);
+                    return $this->choiceLoader;
                 },
                 'expanded'    => false,
                 'multiple'    => false,

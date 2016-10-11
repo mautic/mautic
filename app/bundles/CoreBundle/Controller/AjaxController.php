@@ -171,13 +171,13 @@ class AjaxController extends CommonController
                     $command = $translator->trans($k);
                     $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
-                    $dataArray[] = ['value' => $command.$translator->trans($subc)];
+                    $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
                 $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
-                $dataArray[] = ['value' => $command];
+                $dataArray[$command] = ['value' => $command];
             }
         }
         sort($dataArray);

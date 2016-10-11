@@ -269,7 +269,6 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            throw new \Exception('hi');
             $client   = new Client(['timeout' => 15]);
             $response = $client->post(
                 $config['post_url'],
