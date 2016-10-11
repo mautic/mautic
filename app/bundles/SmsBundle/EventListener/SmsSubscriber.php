@@ -110,7 +110,7 @@ class SmsSubscriber extends CommonSubscriber
         $log    = [
             'bundle'   => 'sms',
             'object'   => 'sms',
-            'objectId' => $entity->getId(),
+            'objectId' => $entity->deletedId,
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];
