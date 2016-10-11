@@ -1542,6 +1542,9 @@ class MessageHelper
                     elseif (preg_match('/Host unknown/is', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
+                    } elseif (preg_match('/Host not found/i', $diag_code)) {
+                        $result['rule_cat'] = 'dns_unknown';
+                        $result['rule_no']  = '0130';
                     }
 
                     /* rule: dns_unknown
