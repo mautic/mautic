@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -331,6 +330,10 @@ class PublicController extends CommonFormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
+
+        if ($emailEntity === null) {
+            return $this->notFound();
+        }
 
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
