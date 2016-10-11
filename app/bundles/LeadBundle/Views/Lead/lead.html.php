@@ -218,7 +218,7 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                     <?php else: ?>
-                                                        <?php if (!empty($field['value']) && 'multiselect' === $field['type']): ?>
+                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
