@@ -453,6 +453,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 ]);
 
             if ($companyLead == null) {
+
                 // Lead is not part of this list
                 continue;
             }
@@ -471,11 +472,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             unset($companyLead);
         }
 
-        if (!empty($persistcompany)) {
-            $this->getRepository()->saveEntities($persistCompany);
+        if (!empty($persistCompany)) {
+            $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
         if (!empty($deleteCompanyLead)) {
-            $this->getRepository()->deleteEntities($deleteCompanyLead);
+            $this->getCompanyLeadRepository()->deleteEntities($deleteCompanyLead);
         }
 
         // Clear CompanyLead entities from Doctrine memory

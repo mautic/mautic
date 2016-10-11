@@ -7,7 +7,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -26,8 +25,9 @@ class ThemeUploadType extends AbstractType
     {
         $builder->add('file', 'file', [
             'attr' => [
-                'accept' => '.zip',
-                'class'  => 'form-control',
+                'accept'   => '.zip',
+                'class'    => 'form-control',
+                'required' => true,
             ],
         ]);
         $constraints = [
