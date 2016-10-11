@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Templating;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateReference;
 
 /**
- * Class TemplateReference
+ * Class TemplateReference.
  */
 class TemplateReference extends BaseTemplateReference
 {
@@ -50,7 +50,7 @@ class TemplateReference extends BaseTemplateReference
     }
 
     /**
-     * Set a template specific theme override
+     * Set a template specific theme override.
      *
      * @param $theme
      */
@@ -70,7 +70,8 @@ class TemplateReference extends BaseTemplateReference
             try {
                 $theme    = $this->themeHelper->getTheme($this->themeOverride);
                 $themeDir = $theme->getThemePath();
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         } else {
             $theme    = $this->themeHelper->getTheme();
             $themeDir = $theme->getThemePath();

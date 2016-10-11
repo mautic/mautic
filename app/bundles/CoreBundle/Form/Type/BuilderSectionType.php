@@ -1,23 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 
 /**
- * Class BuilderSectionType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class BuilderSectionType.
  */
 class BuilderSectionType extends AbstractType
 {
@@ -34,7 +30,7 @@ class BuilderSectionType extends AbstractType
             'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'background-color',
-                'data-toggle'     => 'color'
+                'data-toggle'     => 'color',
             ],
         ]);
 
@@ -45,7 +41,7 @@ class BuilderSectionType extends AbstractType
             'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'background-color',
-                'data-toggle'     => 'color'
+                'data-toggle'     => 'color',
             ],
         ]);
     }
@@ -55,6 +51,6 @@ class BuilderSectionType extends AbstractType
      */
     public function getName()
     {
-        return "builder_section";
+        return 'builder_section';
     }
 }

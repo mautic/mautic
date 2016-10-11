@@ -1,13 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\CoreBundle\Controller;
-
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,16 +26,16 @@ trait VariantAjaxControllerTrait
      */
     private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $parentFormName, $abFormTemplate, $formThemes = [])
     {
-        $dataArray = array(
+        $dataArray = [
             'success' => 0,
-            'html'    => ''
-        );
-        $type      = InputHelper::clean($request->request->get('abKey'));
+            'html'    => '',
+        ];
+        $type = InputHelper::clean($request->request->get('abKey'));
         $id   = InputHelper::int($request->request->get('id'));
 
         if (!empty($type)) {
             //get the HTML for the form
-            $model = $this->getModel($modelName);
+            $model  = $this->getModel($modelName);
             $entity = $model->getEntity($id);
 
             $abTestComponents = $model->getBuilderComponents($entity, 'abTestWinnerCriteria');
@@ -45,31 +45,31 @@ trait VariantAjaxControllerTrait
                 $html     = '';
                 $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
                 if (!empty($formType)) {
-                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : array();
+                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : [];
                     $form        = $this->get('form.factory')->create(
                         $abSettingsFormName,
-                        array(),
-                        array('formType' => $formType, 'formTypeOptions' => $formOptions)
+                        [],
+                        ['formType' => $formType, 'formTypeOptions' => $formOptions]
                     );
-                    $html        = $this->renderView(
+                    $html = $this->renderView(
                         $abFormTemplate,
-                        array(
-                            'form' => $this->setFormTheme($form, $formThemes)
-                        )
+                        [
+                            'form' => $this->setFormTheme($form, $formThemes),
+                        ]
                     );
                 }
 
-                $html                 = str_replace(
-                    array(
+                $html = str_replace(
+                    [
                         "{$abSettingsFormName}[",
                         "{$abSettingsFormName}_",
-                        $abSettingsFormName
-                    ),
-                    array(
+                        $abSettingsFormName,
+                    ],
+                    [
                         "{$parentFormName}[variantSettings][",
                         "{$parentFormName}_variantSettings_",
-                        $parentFormName
-                    ),
+                        $parentFormName,
+                    ],
                     $html
                 );
                 $dataArray['html']    = $html;

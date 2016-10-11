@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -39,7 +39,7 @@ class SmsSendEvent extends CommonEvent
     public function __construct($content, Lead $lead)
     {
         $this->content = $content;
-        $this->lead = $lead;
+        $this->lead    = $lead;
     }
 
     /**

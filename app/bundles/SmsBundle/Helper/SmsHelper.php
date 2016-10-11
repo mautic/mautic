@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -55,12 +55,11 @@ class SmsHelper
      */
     public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper, SmsModel $smsModel, $smsFrequencyNumber)
     {
-        $this->em = $em;
-        $this->leadModel = $leadModel;
-        $this->phoneNumberHelper = $phoneNumberHelper;
-        $this->smsModel = $smsModel;
+        $this->em                 = $em;
+        $this->leadModel          = $leadModel;
+        $this->phoneNumberHelper  = $phoneNumberHelper;
+        $this->smsModel           = $smsModel;
         $this->smsFrequencyNumber = $smsFrequencyNumber;
-
     }
 
     public function unsubscribe($number)
@@ -75,8 +74,8 @@ class SmsHelper
                 'force' => [
                     [
                         'column' => 'mobile',
-                        'expr' => 'eq',
-                        'value' => $number,
+                        'expr'   => 'eq',
+                        'value'  => $number,
                     ],
                 ],
             ],
@@ -105,22 +104,22 @@ class SmsHelper
     public function applyFrequencyRules(Lead $lead)
     {
         $frequencyRule = $lead->getFrequencyRules();
-        $statRepo = $this->smsModel->getStatRepository();
-        $now = new \DateTime();
-        $channels = $frequencyRule['channels'];
+        $statRepo      = $this->smsModel->getStatRepository();
+        $now           = new \DateTime();
+        $channels      = $frequencyRule['channels'];
 
         $frequencyTime = $frequencyNumber = null;
 
         if (!empty($frequencyRule) && in_array('sms', $channels, true)) {
-            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
             $frequencyNumber = $frequencyRule['frequency_number'];
-        } elseif($this->smsFrequencyNumber > 0) {
-            $frequencyTime = new \DateInterval('P'.$frequencyRule['sms_frequency_time']);
+        } elseif ($this->smsFrequencyNumber > 0) {
+            $frequencyTime   = new \DateInterval('P'.$frequencyRule['sms_frequency_time']);
             $frequencyNumber = $this->smsFrequencyNumber;
         }
 
         $now->sub($frequencyTime);
-        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
 
         if (!empty($sentQuery) && count($sentQuery) < $frequencyNumber) {
             return true;

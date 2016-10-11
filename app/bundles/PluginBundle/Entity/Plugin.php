@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,11 +15,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
- * Class Plugin
+ * Class Plugin.
  */
 class Plugin extends CommonEntity
 {
-
     /**
      * @var int
      */
@@ -60,7 +59,7 @@ class Plugin extends CommonEntity
      */
     private $integrations;
 
-    public function __construct ()
+    public function __construct()
     {
         $this->integrations = new ArrayCollection();
     }
@@ -68,13 +67,13 @@ class Plugin extends CommonEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugins')
             ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\PluginRepository')
-            ->addUniqueConstraint(array('bundle'), 'unique_bundle');
+            ->addUniqueConstraint(['bundle'], 'unique_bundle');
 
         $builder->addIdColumns();
 
@@ -101,32 +100,29 @@ class Plugin extends CommonEntity
             ->build();
     }
 
-    /**
-     * @return void
-     */
-    public function __clone ()
+    public function __clone()
     {
         $this->id = null;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Addon
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->name = $name;
 
@@ -134,33 +130,33 @@ class Plugin extends CommonEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Set bundle
+     * Set bundle.
      *
      * @param string $bundle
      *
      * @return Addon
      */
-    public function setBundle ($bundle)
+    public function setBundle($bundle)
     {
         $this->bundle = $bundle;
     }
 
     /**
-     * Get bundle
+     * Get bundle.
      *
      * @return string
      */
-    public function getBundle ()
+    public function getBundle()
     {
         return $this->bundle;
     }
@@ -168,7 +164,7 @@ class Plugin extends CommonEntity
     /**
      * @return mixed
      */
-    public function getIntegrations ()
+    public function getIntegrations()
     {
         return $this->integrations;
     }
@@ -176,7 +172,7 @@ class Plugin extends CommonEntity
     /**
      * @return mixed
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
@@ -184,7 +180,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $description
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -192,7 +188,7 @@ class Plugin extends CommonEntity
     /**
      * @return mixed
      */
-    public function getVersion ()
+    public function getVersion()
     {
         return $this->version;
     }
@@ -200,7 +196,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $version
      */
-    public function setVersion ($version)
+    public function setVersion($version)
     {
         $this->version = $version;
     }
@@ -208,7 +204,7 @@ class Plugin extends CommonEntity
     /**
      * @return mixed
      */
-    public function getIsMissing ()
+    public function getIsMissing()
     {
         return $this->isMissing;
     }
@@ -216,7 +212,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $isMissing
      */
-    public function setIsMissing ($isMissing)
+    public function setIsMissing($isMissing)
     {
         $this->isMissing = $isMissing;
     }
@@ -224,7 +220,7 @@ class Plugin extends CommonEntity
     /**
      * @return mixed
      */
-    public function getAuthor ()
+    public function getAuthor()
     {
         return $this->author;
     }
@@ -232,7 +228,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $author
      */
-    public function setAuthor ($author)
+    public function setAuthor($author)
     {
         $this->author = $author;
     }

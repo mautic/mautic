@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,12 +9,12 @@
  */
 namespace Mautic\NotificationBundle\EventListener;
 
+use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
@@ -43,24 +43,28 @@ class CampaignSubscriber extends CommonSubscriber
     protected $notificationApi;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory           $factory
+     * @param CoreParametersHelper    $coreParametersHelper
      * @param LeadModel               $leadModel
      * @param NotificationModel       $notificationModel
      * @param AbstractNotificationApi $notificationApi
      */
     public function __construct(
-        MauticFactory $factory,
+        CoreParametersHelper $coreParametersHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi
     ) {
-        $this->leadModel         = $leadModel;
-        $this->notificationModel = $notificationModel;
-        $this->notificationApi   = $notificationApi;
-
-        parent::__construct($factory);
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadModel            = $leadModel;
+        $this->notificationModel    = $notificationModel;
+        $this->notificationApi      = $notificationApi;
     }
 
     /**
@@ -70,7 +74,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD              => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+            NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -79,7 +83,7 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->factory->getParameter('notification_enabled')) {
+        if ($this->coreParametersHelper->getParameter('notification_enabled')) {
             $event->addAction(
                 'notification.send_notification',
                 [
@@ -89,7 +93,7 @@ class CampaignSubscriber extends CommonSubscriber
                     'formType'         => 'notificationsend_list',
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php'
+                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
                 ]
             );
         }
@@ -103,7 +107,6 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
-
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
@@ -118,7 +121,6 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($playerID)) {
-
             return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
@@ -128,7 +130,6 @@ class CampaignSubscriber extends CommonSubscriber
         $notification = $this->notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
-
             return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
@@ -137,7 +138,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $url,
                 [
                     'notification' => $notification->getId(),
-                    'lead'         => $lead->getId()
+                    'lead'         => $lead->getId(),
                 ]
             );
         }
@@ -167,7 +168,6 @@ class CampaignSubscriber extends CommonSubscriber
 
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
-
             return $event->setResult(false);
         }
 

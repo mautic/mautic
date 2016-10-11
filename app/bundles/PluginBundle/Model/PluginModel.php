@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 
 /**
- * Class PluginModel
+ * Class PluginModel.
  */
 class PluginModel extends FormModel
 {
@@ -51,7 +51,7 @@ class PluginModel extends FormModel
     }
 
     /**
-     * Get lead fields used in selects/matching
+     * Get lead fields used in selects/matching.
      */
     public function getLeadFields()
     {

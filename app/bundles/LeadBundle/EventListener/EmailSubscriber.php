@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -17,9 +17,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
 /**
- * Class EmailSubscriber
- *
- * @package Mautic\LeadBundle\EventListener
+ * Class EmailSubscriber.
  */
 class EmailSubscriber extends CommonSubscriber
 {
@@ -38,13 +36,13 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailDisplay', 0)
-        );
+        return [
+            EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
+            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailDisplay', 0],
+        ];
     }
 
     /**
@@ -53,7 +51,7 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
-        $tokenHelper->setPermissionSet(array('lead:fields:full'));
+        $tokenHelper->setPermissionSet(['lead:fields:full']);
 
         if ($event->tokenSectionsRequested()) {
             //add email tokens
@@ -61,20 +59,20 @@ class EmailSubscriber extends CommonSubscriber
                 'lead.emailtokens',
                 'mautic.lead.email.header.index',
                 $tokenHelper->getTokenContent(
-                    array(
-                        'filter' => array(
-                            'force' => array(
-                                array(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
                                     'column' => 'f.isPublished',
                                     'expr'   => 'eq',
-                                    'value'  => true
-                                )
-                            )
-                        ),
+                                    'value'  => true,
+                                ],
+                            ],
+                        ],
                         'orderBy'        => 'f.label',
                         'orderByDir'     => 'ASC',
-                        'hydration_mode' => 'HYDRATE_ARRAY'
-                    )
+                        'hydration_mode' => 'HYDRATE_ARRAY',
+                    ]
                 ),
                 255
             );
@@ -103,10 +101,10 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailGenerate(EmailSendEvent $event)
     {
         // Combine all possible content to find tokens across them
-        $content  = $event->getSubject();
+        $content = $event->getSubject();
         $content .= $event->getContent();
         $content .= $event->getPlainText();
-        $lead     = $event->getLead();
+        $lead = $event->getLead();
 
         $tokenList = TokenHelper::findLeadTokens($content, $lead);
         if (count($tokenList)) {

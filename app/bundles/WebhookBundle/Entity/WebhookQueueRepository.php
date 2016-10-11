@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   Mautic, Inc
  * @author      Mautic, Inc
- * @link        http://allyde.com
+ *
+ * @link        http://mautic.com
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -25,7 +25,7 @@ class WebhookQueueRepository extends CommonRepository
             return;
         }
         $qb = $this->_em->getConnection()->createQueryBuilder();
-        $qb->delete(MAUTIC_TABLE_PREFIX . 'webhook_queue')
+        $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
                 $qb->expr()->in('id', $idList)
             )
@@ -42,13 +42,13 @@ class WebhookQueueRepository extends CommonRepository
     public function getQueueCountByWebhookId($id)
     {
         // if no idea was sent (the hook was deleted) then return a count of 0
-        if (! $id) {
+        if (!$id) {
             return 0;
         }
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb    = $this->_em->getConnection()->createQueryBuilder();
         $count = $qb->select('count(id) as webhook_count')
-                 ->from(MAUTIC_TABLE_PREFIX . 'webhook_queue', $this->getTableAlias())
-                 ->where('webhook_id = ' . $id)
+                 ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
+                 ->where('webhook_id = '.$id)
                  ->execute()->fetch();
 
         return $count['webhook_count'];

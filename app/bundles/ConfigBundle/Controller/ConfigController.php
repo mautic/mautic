@@ -1,36 +1,35 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ConfigBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
-use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\ConfigEvents;
+use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\FormError;
 
 /**
- * Class ConfigController
+ * Class ConfigController.
  */
 class ConfigController extends FormController
 {
-
     /**
-     * Controller action for editing the application configuration
+     * Controller action for editing the application configuration.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ()
+    public function editAction()
     {
         //admin only allowed
-        if (!$this->factory->getUser()->isAdmin()) {
+        if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
 
@@ -39,8 +38,8 @@ class ConfigController extends FormController
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $formConfigs            = $event->getForms();
         $formThemes             = $event->getFormThemes();
-        $doNotChange            = $this->factory->getParameter('security.restrictedConfigFields');
-        $doNotChangeDisplayMode = $this->factory->getParameter('security.restrictedConfigFields.displayMode', 'remove');
+        $doNotChange            = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
+        $doNotChangeDisplayMode = $this->coreParametersHelper->getParameter('security.restrictedConfigFields.displayMode', 'remove');
 
         $this->mergeParamsWithLocal($formConfigs, $doNotChange);
 
@@ -48,12 +47,12 @@ class ConfigController extends FormController
         $model = $this->getModel('config');
 
         // Create the form
-        $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
-        $form   = $model->createForm($formConfigs, $this->get('form.factory'), array(
+        $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
+        $form   = $model->createForm($formConfigs, $this->get('form.factory'), [
             'action'                 => $action,
             'doNotChange'            => $doNotChange,
-            'doNotChangeDisplayMode' => $doNotChangeDisplayMode
-        ));
+            'doNotChangeDisplayMode' => $doNotChangeDisplayMode,
+        ]);
 
         /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
@@ -97,7 +96,7 @@ class ConfigController extends FormController
                         // Ensure the config has a secret key
                         $params = $configurator->getParameters();
                         if (empty($params['secret_key'])) {
-                            $configurator->mergeParameters(array('secret_key' => EncryptionHelper::generateKey()));
+                            $configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
                         }
 
                         $configurator->write();
@@ -108,13 +107,12 @@ class ConfigController extends FormController
                         /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
                         $cacheHelper = $this->factory->getHelper('cache');
                         $cacheHelper->clearContainerFile();
-
                     } catch (\RuntimeException $exception) {
-                        $this->addFlash('mautic.config.config.error.not.updated', array('%exception%' => $exception->getMessage()), 'error');
+                        $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(new FormError(
-                        $this->factory->getTranslator()->trans('mautic.config.notwritable')
+                        $this->translator->trans('mautic.config.notwritable')
                     ));
                 }
             }
@@ -122,7 +120,7 @@ class ConfigController extends FormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', ['objectAction' => 'edit']));
                 } else {
                     return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }
@@ -131,32 +129,32 @@ class ConfigController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
+        return $this->delegateView([
+            'viewParameters' => [
                 'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity(),
+                'security'    => $this->get('mautic.security'),
                 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
                 'formConfigs' => $formConfigs,
-                'isWritable'  => $isWritabale
-            ),
+                'isWritable'  => $isWritabale,
+            ],
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'activeLink'    => '#mautic_config_index',
                 'mauticContent' => 'config',
-                'route'         => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'))
-            )
-        ));
+                'route'         => $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']),
+            ],
+        ]);
     }
 
     /**
-     * Merges default parameters from each subscribed bundle with the local (real) params
+     * Merges default parameters from each subscribed bundle with the local (real) params.
      *
      * @param array $forms
      * @param array $doNotChange
      *
      * @return array
      */
-    private function mergeParamsWithLocal (&$forms, $doNotChange)
+    private function mergeParamsWithLocal(&$forms, $doNotChange)
     {
         // Import the current local configuration, $parameters is defined in this file
         $localConfigFile = $this->factory->getLocalConfigFile();

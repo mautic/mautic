@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -17,13 +17,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadAssetData
- *
- * @package Mautic\AssetBundle\DataFixtures\ORM
+ * Class LoadAssetData.
  */
 class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -32,7 +29,6 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -43,8 +39,7 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('asset.asset')->getRepository();
+        $repo = $this->container->get('mautic.asset.model.asset')->getRepository();
 
         $asset = new Asset();
         $asset

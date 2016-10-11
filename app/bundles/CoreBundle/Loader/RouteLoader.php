@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Loader;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -16,11 +16,10 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class RouteLoader
+ * Class RouteLoader.
  */
 class RouteLoader extends Loader
 {
-
     /**
      * @var bool
      */
@@ -36,16 +35,17 @@ class RouteLoader extends Loader
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory  = $factory;
+        $this->factory = $factory;
     }
 
     /**
-     * Load each bundles routing.php file
+     * Load each bundles routing.php file.
      *
      * @param mixed $resource
      * @param null  $type
      *
      * @return RouteCollection
+     *
      * @throws \RuntimeException
      */
     public function load($resource, $type = null)

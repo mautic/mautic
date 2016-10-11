@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CalendarBundle\Model;
 
 use Mautic\CalendarBundle\CalendarEvents;
@@ -15,13 +15,12 @@ use Mautic\CalendarBundle\Event\EventGeneratorEvent;
 use Mautic\CoreBundle\Model\FormModel;
 
 /**
- * Class CalendarModel
+ * Class CalendarModel.
  */
 class CalendarModel extends FormModel
 {
-
     /**
-     * Collects data for the calendar display
+     * Collects data for the calendar display.
      *
      * @param array $dates Associative array containing a 'start_date' and 'end_date' key
      *
@@ -36,10 +35,10 @@ class CalendarModel extends FormModel
     }
 
     /**
-     * Collects data for the calendar display
+     * Collects data for the calendar display.
      *
-     * @param string    $bundle
-     * @param integer   $id
+     * @param string $bundle
+     * @param int    $id
      *
      * @return array
      */

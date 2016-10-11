@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -18,11 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadReportData
+ * Class LoadReportData.
  */
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -46,8 +45,8 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
             $report = new Report();
             $key    = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set".ucfirst($col);
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
                         $val = unserialize(stripslashes($val));
                     }

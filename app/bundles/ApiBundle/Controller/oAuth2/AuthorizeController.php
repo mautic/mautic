@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use FOS\OAuthServerBundle\Event\OAuthEvent;
@@ -16,17 +16,17 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class AuthorizeController
+ * Class AuthorizeController.
  */
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
-
     /**
-     * Authorize
+     * Authorize.
      *
      * @param Request $request
      *
      * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     *
      * @throws \OAuth2\OAuth2RedirectException
      * @throws AccessDeniedException
      *
@@ -45,7 +45,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             $this->container->get('session')->set('_fos_oauth_server.ensure_logout', true);
         }
 
-        $form = $this->container->get('fos_oauth_server.authorize.form');
+        $form        = $this->container->get('fos_oauth_server.authorize.form');
         $formHandler = $this->container->get('fos_oauth_server.authorize.form.handler');
 
         $event = $this->container->get('event_dispatcher')->dispatch(
@@ -67,10 +67,10 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
 
         return $this->container->get('templating')->renderResponse(
             'MauticApiBundle:Authorize:oAuth2/authorize.html.php',
-            array(
-                'form'      => $form->createView(),
-                'client'    => $this->getClient(),
-            )
+            [
+                'form'   => $form->createView(),
+                'client' => $this->getClient(),
+            ]
         );
     }
 }

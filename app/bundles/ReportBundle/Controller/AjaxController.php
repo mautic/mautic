@@ -1,26 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
- * Class AjaxController
+ * Class AjaxController.
  */
 class AjaxController extends CommonAjaxController
 {
-
     /**
-     * Get updated data for context
+     * Get updated data for context.
      *
      * @param Request $request
      *

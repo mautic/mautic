@@ -1,22 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Helper;
-use Mautic\CoreBundle\Factory\MauticFactory;
+
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 
 /**
- * Class CampaignEventHelper
- *
- * @package Mautic\LeadBundle\Helper
+ * Class CampaignEventHelper.
  */
 class CampaignEventHelper
 {
@@ -26,7 +23,7 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validatePointChange ($event, Lead $lead)
+    public static function validatePointChange($event, Lead $lead)
     {
         $properties  = $event['properties'];
         $checkPoints = $properties['points'];
@@ -47,7 +44,7 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateListChange (ListChangeEvent $eventDetails, $event)
+    public static function validateListChange(ListChangeEvent $eventDetails, $event)
     {
         $limitAddTo      = $event['properties']['addedTo'];
         $limitRemoveFrom = $event['properties']['removedFrom'];

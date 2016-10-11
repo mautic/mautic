@@ -1,30 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class LeadNote
- *
- * @package Mautic\LeadBundle\Entity
+ * Class LeadNote.
  */
 class LeadNote extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -53,7 +49,7 @@ class LeadNote extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -78,7 +74,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -86,34 +82,34 @@ class LeadNote extends FormEntity
     {
         $metadata->setGroupPrefix('leadNote')
             ->addProperties(
-                array(
+                [
                     'id',
                     'text',
                     'type',
-                    'dateTime'
-                )
+                    'dateTime',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string $text
      *
      * @return LeadNote
      */
-    public function setText ($text)
+    public function setText($text)
     {
         $this->isChanged('text', $text);
         $this->text = $text;
@@ -122,23 +118,23 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string
      */
-    public function getText ()
+    public function getText()
     {
         return $this->text;
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return LeadNote
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -147,32 +143,31 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
 
-
     /**
-     * Form validation rules
+     * Form validation rules.
      *
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
-            array('message' => 'mautic.lead.note.text.notblank')
+            ['message' => 'mautic.lead.note.text.notblank']
         ));
     }
 
     /**
      * @return Lead
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -180,7 +175,7 @@ class LeadNote extends FormEntity
     /**
      * @param Lead $lead
      */
-    public function setLead (Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -188,7 +183,7 @@ class LeadNote extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
@@ -196,7 +191,7 @@ class LeadNote extends FormEntity
     /**
      * @return mixed
      */
-    public function getDateTime ()
+    public function getDateTime()
     {
         return $this->dateTime;
     }
@@ -204,7 +199,7 @@ class LeadNote extends FormEntity
     /**
      * @param mixed $dateTime
      */
-    public function setDateTime ($dateTime)
+    public function setDateTime($dateTime)
     {
         $this->dateTime = $dateTime;
     }

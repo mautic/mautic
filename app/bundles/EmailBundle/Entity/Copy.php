@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,15 +14,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
- * Class Copy
- *
- * @package Mautic\EmailBundle\Entity
+ * Class Copy.
  */
 class Copy
 {
-
     /**
-     * MD5 hash of the content
+     * MD5 hash of the content.
      *
      * @var string
      */
@@ -46,7 +43,7 @@ class Copy
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 

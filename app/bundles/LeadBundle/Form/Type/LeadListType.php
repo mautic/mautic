@@ -1,34 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class LeadListType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class LeadListType.
  */
 class LeadListType extends AbstractType
 {
     private $model;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->model = $factory->getModel('lead.list');
     }
 
@@ -39,11 +36,11 @@ class LeadListType extends AbstractType
     {
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model = $this->model;
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
                 $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
 
-                $choices = array();
+                $choices = [];
                 foreach ($lists as $l) {
                     $choices[$l['id']] = $l['name'];
                 }
@@ -51,8 +48,8 @@ class LeadListType extends AbstractType
                 return $choices;
             },
             'global_only' => false,
-            'required'    => false
-        ));
+            'required'    => false,
+        ]);
     }
 
     /**
@@ -66,7 +63,8 @@ class LeadListType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
-        return "leadlist_choices";
+    public function getName()
+    {
+        return 'leadlist_choices';
     }
 }

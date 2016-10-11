@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Exception\DatabaseConnectionException;
@@ -63,7 +63,7 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
             define('MAUTIC_OFFLINE', 1);
 
             ob_start();
-            include MAUTIC_ROOT_DIR . '/offline.php';
+            include MAUTIC_ROOT_DIR.'/offline.php';
             $content = ob_get_clean();
 
             return new Response($content, 500);

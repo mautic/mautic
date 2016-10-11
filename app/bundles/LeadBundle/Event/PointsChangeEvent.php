@@ -1,25 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class PointsChangeEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class PointsChangeEvent.
  */
 class PointsChangeEvent extends CommonEvent
 {
-
     protected $old;
     protected $new;
 
@@ -29,13 +26,13 @@ class PointsChangeEvent extends CommonEvent
      */
     public function __construct(Lead &$lead, $old, $new)
     {
-        $this->entity =& $lead;
-        $this->old = (int) $old;
-        $this->new = (int) $new;
+        $this->entity = &$lead;
+        $this->old    = (int) $old;
+        $this->new    = (int) $new;
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -45,7 +42,7 @@ class PointsChangeEvent extends CommonEvent
     }
 
     /**
-     * Returns the new points
+     * Returns the new points.
      *
      * @return int
      */
@@ -55,7 +52,7 @@ class PointsChangeEvent extends CommonEvent
     }
 
     /**
-     * Returns the old points
+     * Returns the old points.
      *
      * @return int
      */

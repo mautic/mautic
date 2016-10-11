@@ -15,9 +15,3 @@ Mautic.categoryOnLoad = function (container, response) {
         mQuery('.category-select').trigger("chosen:updated");
     }
 };
-
-Mautic.onCategoryChange = function (catEl, route, header) {
-    if (mQuery(catEl).val() == 'new') {
-        Mautic.loadAjaxModal('#MauticSharedModal', route, 'get', header);
-    }
-};

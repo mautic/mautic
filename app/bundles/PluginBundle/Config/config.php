@@ -1,60 +1,61 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 return [
-    'routes'   => [
+    'routes' => [
         'main' => [
-            'mautic_integration_auth_callback_secure'    => [
+            'mautic_integration_auth_callback_secure' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback'
+                'controller' => 'MauticPluginBundle:Auth:authCallback',
             ],
-            'mautic_integration_auth_postauth_secure'    => [
+            'mautic_integration_auth_postauth_secure' => [
                 'path'       => '/plugins/integrations/authstatus/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authStatus'
+                'controller' => 'MauticPluginBundle:Auth:authStatus',
             ],
-            'mautic_plugin_index'                 => [
+            'mautic_plugin_index' => [
                 'path'       => '/plugins',
-                'controller' => 'MauticPluginBundle:Plugin:index'
+                'controller' => 'MauticPluginBundle:Plugin:index',
             ],
-            'mautic_plugin_config'                => [
+            'mautic_plugin_config' => [
                 'path'       => '/plugins/config/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:config'
+                'controller' => 'MauticPluginBundle:Plugin:config',
             ],
-            'mautic_plugin_info'                  => [
+            'mautic_plugin_info' => [
                 'path'       => '/plugins/info/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:info'
+                'controller' => 'MauticPluginBundle:Plugin:info',
             ],
-            'mautic_plugin_reload'                => [
+            'mautic_plugin_reload' => [
                 'path'       => '/plugins/reload',
-                'controller' => 'MauticPluginBundle:Plugin:reload'
-            ]
+                'controller' => 'MauticPluginBundle:Plugin:reload',
+            ],
         ],
         'public' => [
-            'mautic_integration_auth_user'        => [
+            'mautic_integration_auth_user' => [
                 'path'       => '/plugins/integrations/authuser/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authUser'
+                'controller' => 'MauticPluginBundle:Auth:authUser',
             ],
             'mautic_integration_auth_callback_bc' => [
                 'path'       => '/addon/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback'
+                'controller' => 'MauticPluginBundle:Auth:authCallback',
             ],
-            'mautic_integration_auth_callback'    => [
+            'mautic_integration_auth_callback' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback'
+                'controller' => 'MauticPluginBundle:Auth:authCallback',
             ],
-            'mautic_integration_auth_postauth'    => [
+            'mautic_integration_auth_postauth' => [
                 'path'       => '/plugins/integrations/authstatus/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authStatus'
+                'controller' => 'MauticPluginBundle:Auth:authStatus',
             ],
-        ]
+        ],
     ],
-    'menu'     => [
+    'menu' => [
         'admin' => [
             'priority' => 50,
             'items'    => [
@@ -62,69 +63,68 @@ return [
                     'id'        => 'mautic_plugin_root',
                     'iconClass' => 'fa-plus-circle',
                     'access'    => 'plugin:plugins:manage',
-                    'route'     => 'mautic_plugin_index'
-                ]
-            ]
-        ]
+                    'route'     => 'mautic_plugin_index',
+                ],
+            ],
+        ],
     ],
 
     'services' => [
         'events' => [
             'mautic.plugin.pointbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\PointSubscriber'
+                'class' => 'Mautic\PluginBundle\EventListener\PointSubscriber',
             ],
             'mautic.plugin.formbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\FormSubscriber'
+                'class' => 'Mautic\PluginBundle\EventListener\FormSubscriber',
             ],
             'mautic.plugin.campaignbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
+                'class'     => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
-                    'mautic.helper.integration'
-                ]
-            ]
+                    'mautic.helper.integration',
+                ],
+            ],
         ],
-        'forms'  => [
-            'mautic.form.type.integration.details'  => [
+        'forms' => [
+            'mautic.form.type.integration.details' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\DetailsType',
-                'alias' => 'integration_details'
+                'alias' => 'integration_details',
             ],
             'mautic.form.type.integration.settings' => [
                 'class'     => 'Mautic\PluginBundle\Form\Type\FeatureSettingsType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'integration_featuresettings'
+                'alias'     => 'integration_featuresettings',
             ],
-            'mautic.form.type.integration.fields'   => [
+            'mautic.form.type.integration.fields' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\FieldsType',
-                'alias' => 'integration_fields'
+                'alias' => 'integration_fields',
             ],
-            'mautic.form.type.integration.keys'     => [
+            'mautic.form.type.integration.keys' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\KeysType',
-                'alias' => 'integration_keys'
+                'alias' => 'integration_keys',
             ],
-            'mautic.form.type.integration.list'     => [
+            'mautic.form.type.integration.list' => [
                 'class'     => 'Mautic\PluginBundle\Form\Type\IntegrationsListType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'integration_list'
+                'alias'     => 'integration_list',
             ],
             'mautic.form.type.integration.config' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
-                'alias'     => 'integration_config'
-            ]
+                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
+                'alias' => 'integration_config',
+            ],
         ],
-        'other'  => [
+        'other' => [
             'mautic.helper.integration' => [
                 'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
-                'arguments' => 'mautic.factory'
-            ]
+                'arguments' => 'mautic.factory',
+            ],
         ],
-        'models' =>  [
+        'models' => [
             'mautic.plugin.model.plugin' => [
-                'class' => 'Mautic\PluginBundle\Model\PluginModel',
+                'class'     => 'Mautic\PluginBundle\Model\PluginModel',
                 'arguments' => [
-                    'mautic.lead.model.field'
-                ]
-            ]
-        ]
-    ]
+                    'mautic.lead.model.field',
+                ],
+            ],
+        ],
+    ],
 ];

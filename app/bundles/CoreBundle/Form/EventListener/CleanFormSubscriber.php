@@ -1,27 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class CleanFormSubscriber
+ * Class CleanFormSubscriber.
  *
  * Clean data before persisting to DB
  */
 class CleanFormSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var string
      */
@@ -40,15 +39,13 @@ class CleanFormSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::PRE_SUBMIT  => 'preSubmitData'
-        );
+        return [
+            FormEvents::PRE_SUBMIT => 'preSubmitData',
+        ];
     }
 
     /**
      * @param FormEvent $event
-     *
-     * @return void
      */
     public function preSubmitData(FormEvent $event)
     {

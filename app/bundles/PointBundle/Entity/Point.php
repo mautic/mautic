@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,13 +18,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Point
- *
- * @package Mautic\PointBundle\Entity
+ * Class Point.
  */
 class Point extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -63,7 +60,7 @@ class Point extends FormEntity
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var ArrayCollection
@@ -83,7 +80,7 @@ class Point extends FormEntity
     }
 
     /**
-     * Construct
+     * Construct.
      */
     public function __construct()
     {
@@ -93,13 +90,13 @@ class Point extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
-            ->addIndex(array('type'), 'point_type_search');
+            ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
 
@@ -126,19 +123,19 @@ class Point extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.core.name.required'
-        )));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+        ]));
 
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
-            'message' => 'mautic.point.type.notblank'
-        )));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
+            'message' => 'mautic.point.type.notblank',
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -146,43 +143,43 @@ class Point extends FormEntity
     {
         $metadata->setGroupPrefix('point')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'category',
                     'type',
-                    'description'
-                )
+                    'description',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'publishUp',
                     'publishDown',
                     'delta',
-                    'properties'
-                )
+                    'properties',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param array $properties
      *
      * @return Action
      */
-    public function setProperties ($properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -192,23 +189,23 @@ class Point extends FormEntity
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return array
      */
-    public function getProperties ()
+    public function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return Action
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -217,11 +214,11 @@ class Point extends FormEntity
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
@@ -229,19 +226,19 @@ class Point extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return Action
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -250,23 +247,23 @@ class Point extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Action
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -275,23 +272,23 @@ class Point extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Add log
+     * Add log.
      *
      * @param LeadPointLog $log
      *
      * @return Log
      */
-    public function addLog (LeadPointLog $log)
+    public function addLog(LeadPointLog $log)
     {
         $this->log[] = $log;
 
@@ -299,33 +296,33 @@ class Point extends FormEntity
     }
 
     /**
-     * Remove log
+     * Remove log.
      *
      * @param LeadPointLog $log
      */
-    public function removeLog (LeadPointLog $log)
+    public function removeLog(LeadPointLog $log)
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log
+     * Get log.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog ()
+    public function getLog()
     {
         return $this->log;
     }
 
     /**
-     * Set publishUp
+     * Set publishUp.
      *
      * @param \DateTime $publishUp
      *
      * @return Point
      */
-    public function setPublishUp ($publishUp)
+    public function setPublishUp($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -334,23 +331,23 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishUp
+     * Get publishUp.
      *
      * @return \DateTime
      */
-    public function getPublishUp ()
+    public function getPublishUp()
     {
         return $this->publishUp;
     }
 
     /**
-     * Set publishDown
+     * Set publishDown.
      *
      * @param \DateTime $publishDown
      *
      * @return Point
      */
-    public function setPublishDown ($publishDown)
+    public function setPublishDown($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -359,11 +356,11 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishDown
+     * Get publishDown.
      *
      * @return \DateTime
      */
-    public function getPublishDown ()
+    public function getPublishDown()
     {
         return $this->publishDown;
     }
@@ -371,7 +368,7 @@ class Point extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -379,7 +376,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }
@@ -387,7 +384,7 @@ class Point extends FormEntity
     /**
      * @return mixed
      */
-    public function getDelta ()
+    public function getDelta()
     {
         return $this->delta;
     }
@@ -395,8 +392,8 @@ class Point extends FormEntity
     /**
      * @param mixed $delta
      */
-    public function setDelta ($delta)
+    public function setDelta($delta)
     {
-        $this->delta = (int)$delta;
+        $this->delta = (int) $delta;
     }
 }

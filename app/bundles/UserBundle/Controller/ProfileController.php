@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 
 /**
- * Class ProfileController
+ * Class ProfileController.
  */
 class ProfileController extends FormController
 {
-
     /**
-     * Generate's account profile
+     * Generate's account profile.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -30,13 +29,13 @@ class ProfileController extends FormController
 
         //set some permissions
         $permissions = [
-            'apiAccess'    => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
+            'apiAccess' => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
                 $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
             'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
             'editUsername' => $this->get('mautic.security')->isGranted('user:profile:editusername'),
             'editPosition' => $this->get('mautic.security')->isGranted('user:profile:editposition'),
-            'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail')
+            'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail'),
         ];
 
         $action = $this->generateUrl('mautic_user_account');
@@ -67,7 +66,7 @@ class ProfileController extends FormController
                                 'mapped'     => false,
                                 'disabled'   => true,
                                 'data'       => $me->getFirstName(),
-                                'required'   => false
+                                'required'   => false,
                             ]
                         );
 
@@ -82,7 +81,7 @@ class ProfileController extends FormController
                                 'mapped'     => false,
                                 'disabled'   => true,
                                 'data'       => $me->getLastName(),
-                                'required'   => false
+                                'required'   => false,
                             ]
                         );
                         break;
@@ -100,7 +99,7 @@ class ProfileController extends FormController
                                 'mapped'     => false,
                                 'disabled'   => true,
                                 'data'       => $me->getUsername(),
-                                'required'   => false
+                                'required'   => false,
                             ]
                         );
                         break;
@@ -117,7 +116,7 @@ class ProfileController extends FormController
                                 'mapped'     => false,
                                 'disabled'   => true,
                                 'data'       => $me->getPosition(),
-                                'required'   => false
+                                'required'   => false,
                             ]
                         );
                         break;
@@ -134,7 +133,7 @@ class ProfileController extends FormController
                                 'mapped'     => false,
                                 'disabled'   => true,
                                 'data'       => $me->getEmail(),
-                                'required'   => false
+                                'required'   => false,
                             ]
                         );
                         break;
@@ -210,14 +209,14 @@ class ProfileController extends FormController
                             'returnUrl'       => $returnUrl,
                             'contentTemplate' => 'MauticUserBundle:Profile:index',
                             'passthroughVars' => [
-                                'mauticContent' => 'user'
+                                'mauticContent' => 'user',
                             ],
-                            'flashes'         => [ //success
+                            'flashes' => [ //success
                                 [
                                     'type' => 'notice',
-                                    'msg'  => 'mautic.user.account.notice.updated'
-                                ]
-                            ]
+                                    'msg'  => 'mautic.user.account.notice.updated',
+                                ],
+                            ],
                         ]
                     );
                 }
@@ -231,7 +230,7 @@ class ProfileController extends FormController
             'permissions'       => $permissions,
             'me'                => $me,
             'userForm'          => $form->createView(),
-            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent()
+            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent(),
         ];
 
         return $this->delegateView(
@@ -240,8 +239,8 @@ class ProfileController extends FormController
                 'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_user_account'),
-                    'mauticContent' => 'user'
-                ]
+                    'mauticContent' => 'user',
+                ],
             ]
         );
     }

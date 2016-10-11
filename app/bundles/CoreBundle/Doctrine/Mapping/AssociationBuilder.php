@@ -1,29 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 /**
- * Class AssociationBuilder
+ * Class AssociationBuilder.
  *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @link https://github.com/doctrine/doctrine2/pull/1326/
  *
  * Also gives support for allowing a many-to-one to be the primary key
- *
- * @package Mautic\CoreBundle\Doctrine\Metadata
  */
 class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilder
 {
-
     /**
-     * Set orphanRemoval
+     * Set orphanRemoval.
      *
      * @param bool $orphanRemoval
      *
@@ -37,7 +34,7 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
     }
 
     /**
-     * Allow a many-to-one to be the ID
+     * Allow a many-to-one to be the ID.
      *
      * @return $this
      */

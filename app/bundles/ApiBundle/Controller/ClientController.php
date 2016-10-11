@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 
 /**
- * Class ClientController
+ * Class ClientController.
  */
 class ClientController extends FormController
 {
-
     /**
-     * Generate's default client list
+     * Generate's default client list.
      *
      * @param int $page
      *
@@ -51,7 +50,7 @@ class ClientController extends FormController
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'orderByDir' => $orderByDir,
             ]
         );
 
@@ -69,8 +68,8 @@ class ClientController extends FormController
                     'contentTemplate' => 'MauticApiBundle:Client:index',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_client_index',
-                        'mauticContent' => 'client'
-                    ]
+                        'mauticContent' => 'client',
+                    ],
                 ]
             );
         }
@@ -94,7 +93,7 @@ class ClientController extends FormController
         $apiOptions['oauth2'] = 'OAuth 2';
         $filters['api_mode']  = [
             'values'  => [$apiMode],
-            'options' => $apiOptions
+            'options' => $apiOptions,
         ];
 
         $parameters = [
@@ -104,7 +103,7 @@ class ClientController extends FormController
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
             'searchValue' => $filter,
-            'filters'     => $filters
+            'filters'     => $filters,
         ];
 
         return $this->delegateView(
@@ -113,8 +112,8 @@ class ClientController extends FormController
                 'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_client_index', ['page' => $page]),
-                    'mauticContent' => 'client'
-                ]
+                    'mauticContent' => 'client',
+                ],
             ]
         );
     }
@@ -150,7 +149,7 @@ class ClientController extends FormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
-                    'msgVars' => ['%id%' => $clientId]
+                    'msgVars' => ['%id%' => $clientId],
                 ];
             } else {
                 $name = $client->getName();
@@ -161,8 +160,8 @@ class ClientController extends FormController
                     'type'    => 'notice',
                     'msg'     => 'mautic.api.client.notice.revoked',
                     'msgVars' => [
-                        '%name%' => $name
-                    ]
+                        '%name%' => $name,
+                    ],
                 ];
             }
         }
@@ -172,9 +171,9 @@ class ClientController extends FormController
                 'returnUrl'       => $this->generateUrl('mautic_user_account'),
                 'contentTemplate' => 'MauticUserBundle:Profile:index',
                 'passthroughVars' => [
-                    'success' => $success
+                    'success' => $success,
                 ],
-                'flashes'         => $flashes
+                'flashes' => $flashes,
             ]
         );
     }
@@ -231,9 +230,9 @@ class ClientController extends FormController
                                 'mautic_client_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $client->getId()
+                                    'objectId'     => $client->getId(),
                                 ]
-                            )
+                            ),
                         ]
                     );
                 }
@@ -246,8 +245,8 @@ class ClientController extends FormController
                         'contentTemplate' => 'MauticApiBundle:Client:index',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_client_index',
-                            'mauticContent' => 'client'
-                        ]
+                            'mauticContent' => 'client',
+                        ],
                     ]
                 );
             } elseif ($valid && !$cancelled) {
@@ -257,22 +256,22 @@ class ClientController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form' => $form->createView(),
-                    'tmpl' => $this->request->get('tmpl', 'form')
+                    'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
                 'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_new',
                     'route'         => $action,
-                    'mauticContent' => 'client'
-                ]
+                    'mauticContent' => 'client',
+                ],
             ]
         );
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
      * @param int  $objectId
      * @param bool $ignorePost
@@ -282,7 +281,6 @@ class ClientController extends FormController
     public function editAction($objectId, $ignorePost = false)
     {
         if (!$this->get('mautic.security')->isGranted('api:clients:editother')) {
-
             return $this->accessDenied();
         }
 
@@ -296,8 +294,8 @@ class ClientController extends FormController
             'contentTemplate' => 'MauticApiBundle:Client:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
-                'mauticContent' => 'client'
-            ]
+                'mauticContent' => 'client',
+            ],
         ];
 
         //client not found
@@ -310,9 +308,9 @@ class ClientController extends FormController
                             [
                                 'type'    => 'error',
                                 'msg'     => 'mautic.api.client.error.notfound',
-                                'msgVars' => ['%id%' => $objectId]
-                            ]
-                        ]
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
                     ]
                 )
             );
@@ -342,9 +340,9 @@ class ClientController extends FormController
                                 'mautic_client_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $client->getId()
+                                    'objectId'     => $client->getId(),
                                 ]
-                            )
+                            ),
                         ]
                     );
 
@@ -365,22 +363,22 @@ class ClientController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form' => $form->createView(),
-                    'tmpl' => $this->request->get('tmpl', 'form')
+                    'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
                 'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_index',
                     'route'         => $action,
-                    'mauticContent' => 'client'
-                ]
+                    'mauticContent' => 'client',
+                ],
             ]
         );
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
      * @param int $objectId
      *
@@ -402,8 +400,8 @@ class ClientController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'success'       => $success,
-                'mauticContent' => 'client'
-            ]
+                'mauticContent' => 'client',
+            ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
@@ -414,7 +412,7 @@ class ClientController extends FormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
-                    'msgVars' => ['%id%' => $objectId]
+                    'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif ($model->isLocked($entity)) {
                 //deny access if the entity is locked
@@ -427,8 +425,8 @@ class ClientController extends FormController
                     'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => [
                         '%name%' => $name,
-                        '%id%'   => $objectId
-                    ]
+                        '%id%'   => $objectId,
+                    ],
                 ];
             }
         }
@@ -437,7 +435,7 @@ class ClientController extends FormController
             array_merge(
                 $postActionVars,
                 [
-                    'flashes' => $flashes
+                    'flashes' => $flashes,
                 ]
             )
         );

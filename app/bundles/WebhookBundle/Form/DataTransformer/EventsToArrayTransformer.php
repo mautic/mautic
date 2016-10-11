@@ -1,21 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\WebhookBundle\Form\DataTransformer;
 
 use Doctrine\ORM\PersistentCollection;
-use Symfony\Component\Form\DataTransformerInterface;
-use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\Webhook;
+use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class EventsToArrayTransformer
+ * Class EventsToArrayTransformer.
  */
 class EventsToArrayTransformer implements DataTransformerInterface
 {
@@ -27,21 +27,22 @@ class EventsToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Convert from the PersistentCollection of Event entities to a simple array
+     * Convert from the PersistentCollection of Event entities to a simple array.
      *
      * @return array
      */
     public function transform($events)
     {
-        $eventArray = array();
+        $eventArray = [];
         foreach ($events as $event) {
             $eventArray[] = $event->getEventType();
         }
+
         return $eventArray;
     }
 
     /**
-     * Convert a simple array into a PersistentCollection of Event entities
+     * Convert a simple array into a PersistentCollection of Event entities.
      *
      * @return PersistentCollection
      */

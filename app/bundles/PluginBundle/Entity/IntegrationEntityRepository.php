@@ -1,22 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * IntegrationRepository
+ * IntegrationRepository.
  */
 class IntegrationEntityRepository extends CommonRepository
 {
-
     /**
      * @param      $integration
      * @param      $integrationEntity
@@ -30,11 +29,11 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate =  null, $endDate =  null, $push = false, $start = 0, $limit = 0)
+    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('i.integration_entity_id, i.id, i.internal_entity_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'integration_entity', 'i');
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         $q->where('i.integration = :integration')
             ->andWhere('i.integration_entity = :integrationEntity')
@@ -44,7 +43,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntity', $internalEntity);
         if ($push) {
-            $q->join('i', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = i.internal_entity_id and l.last_active >= :startDate')
+            $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.last_active >= :startDate')
                 ->setParameter('startDate', $startDate);
         }
 

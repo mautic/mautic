@@ -1,31 +1,27 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class StatRepository
- *
- * @package Mautic\DynamicContentBundle\Entity
+ * Class StatRepository.
  */
 class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * @param      $dynamicContentId
+     * @param   $dynamicContentId
      *
      * @return array
      */
@@ -65,7 +61,7 @@ class StatRepository extends CommonRepository
 
         if ($dynamicContentIds) {
             if (!is_array($dynamicContentIds)) {
-                $dynamicContentIds = array((int) $dynamicContentIds);
+                $dynamicContentIds = [(int) $dynamicContentIds];
             }
             $q->where(
                 $q->expr()->in('s.dynamic_content_id', $dynamicContentIds)
@@ -78,7 +74,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get sent counts based grouped by dynamic content Id
+     * Get sent counts based grouped by dynamic content Id.
      *
      * @param array     $dynamicContentIds
      * @param \DateTime $fromDate
@@ -106,7 +102,7 @@ class StatRepository extends CommonRepository
         //get a total number of sent emails first
         $results = $q->execute()->fetchAll();
 
-        $counts = array();
+        $counts = [];
 
         foreach ($results as $r) {
             $counts[$r['dynamic_content_id']] = $r['sent_count'];
@@ -116,12 +112,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's dynamic content stat
+     * Get a lead's dynamic content stat.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -136,15 +133,15 @@ class StatRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dc.name', $query->expr()->literal('%' . $options['search'] . '%'))
+                $query->expr()->like('dc.name', $query->expr()->literal('%'.$options['search'].'%'))
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent'] );
+        return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent']);
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -152,14 +149,14 @@ class StatRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats')
+        $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 
     /**
-     * Delete a stat
+     * Delete a stat.
      *
      * @param $id
      */

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -21,11 +21,10 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class DynamicListType
+ * Class DynamicListType.
  */
 class DynamicListType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -52,69 +51,63 @@ class DynamicListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'remove_onclick'  => 'Mautic.removeFormListOption(this);',
             'option_required' => true,
             'option_notblank' => true,
             'remove_icon'     => 'fa fa-times',
             'sortable'        => 'fa fa-ellipsis-v handle',
-            'label'        => false,
-            'options'      => array(
+            'label'           => false,
+            'options'         => [
                 'label'    => false,
                 'required' => false,
-                'attr'     => array(
-                    'class'         => 'form-control',
-                    'preaddon'      => function (Options $options) {
-
+                'attr'     => [
+                    'class'    => 'form-control',
+                    'preaddon' => function (Options $options) {
                         return $options['remove_icon'];
                     },
-                    'preaddon_attr' =>
-                        function (Options $options) {
-
-                            return array(
-                                'onclick' => $options['remove_onclick']
-                            );
-                        },
-                    'postaddon'  => function (Options $options) {
-
+                    'preaddon_attr' => function (Options $options) {
+                        return [
+                                'onclick' => $options['remove_onclick'],
+                            ];
+                    },
+                    'postaddon' => function (Options $options) {
                         return $options['sortable'];
                     },
-                ),
+                ],
 
                 'constraints' => function (Options $options) {
-
-                    return ($options['option_notblank']) ? array(
+                    return ($options['option_notblank']) ? [
                         new NotBlank(
-                            array('message' => 'mautic.form.lists.notblank')
-                        )
-                    ) : array();
+                            ['message' => 'mautic.form.lists.notblank']
+                        ),
+                    ] : [];
                 },
-                'error_bubbling' => true
-            ),
+                'error_bubbling' => true,
+            ],
             'allow_add'    => true,
             'allow_delete' => true,
             'prototype'    => true,
-            'constraints'  =>  function (Options $options) {
-
-                return ($options['option_required']) ? array(
+            'constraints'  => function (Options $options) {
+                return ($options['option_required']) ? [
                     new Count(
-                        array(
+                        [
                             'minMessage' => 'mautic.form.lists.count',
-                            'min'        => 1
-                        )
-                    )
-                ) : array();
+                            'min'        => 1,
+                        ]
+                    ),
+                ] : [];
             },
-            'error_bubbling' => false
-        ));
+            'error_bubbling' => false,
+        ]);
 
-        $resolver->setOptional(array(
+        $resolver->setOptional([
             'sortable',
             'remove_onclick',
             'option_required',
             'option_notblank',
-            'remove_icon'
-        ));
+            'remove_icon',
+        ]);
     }
 
     /**

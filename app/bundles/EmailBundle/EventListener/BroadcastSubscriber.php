@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -18,9 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class BroadcastSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class BroadcastSubscriber.
  */
 class BroadcastSubscriber implements EventSubscriberInterface
 {
@@ -54,10 +52,10 @@ class BroadcastSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::CHANNEL_BROADCAST => ['onBroadcast', 0]
+            CoreEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],
         ];
     }
 

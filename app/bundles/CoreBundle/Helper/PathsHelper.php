@@ -1,18 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Helper;
+
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
- * Class PathsHelper
+ * Class PathsHelper.
  */
 class PathsHelper
 {
@@ -64,30 +64,31 @@ class PathsHelper
      */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {
-        $this->user = $userHelper->getUser();
-        $this->paths = $coreParametersHelper->getParameter('paths');
-        $this->theme = $coreParametersHelper->getParameter('theme');
-        $this->imagePath = $coreParametersHelper->getParameter('image_path');
-        $this->dashboardImportDir = $coreParametersHelper->getParameter('dashboard_import_dir');
+        $this->user                   = $userHelper->getUser();
+        $this->paths                  = $coreParametersHelper->getParameter('paths');
+        $this->theme                  = $coreParametersHelper->getParameter('theme');
+        $this->imagePath              = $coreParametersHelper->getParameter('image_path');
+        $this->dashboardImportDir     = $coreParametersHelper->getParameter('dashboard_import_dir');
         $this->dashboardImportUserDir = $coreParametersHelper->getParameter('dashboard_import_user_dir');
-        $this->kernelCacheDir = $coreParametersHelper->getParameter('kernel.cache_dir');
-        $this->kernelLogsDir = $coreParametersHelper->getParameter('kernel.logs_dir');
+        $this->kernelCacheDir         = $coreParametersHelper->getParameter('kernel.cache_dir');
+        $this->kernelLogsDir          = $coreParametersHelper->getParameter('kernel.logs_dir');
     }
 
     /**
      * Get the path to specified area.  Returns relative by default with the exception of cache and log
-     * which will be absolute regardless of $fullPath setting
+     * which will be absolute regardless of $fullPath setting.
      *
      * @param string $name
      * @param bool   $fullPath
      *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function getSystemPath($name, $fullPath = false)
     {
         if ($name == 'currentTheme' || $name == 'current_theme') {
-            $path = $this->paths['themes']."/".$this->theme;
+            $path = $this->paths['themes'].'/'.$this->theme;
         } elseif ($name == 'cache' || $name == 'logs') {
             //these are absolute regardless as they are configurable
             return ($name === 'cache') ? $this->kernelCacheDir : $this->kernelLogsDir;
@@ -109,7 +110,7 @@ class PathsHelper
                 return $globalPath;
             }
 
-            if (! $userPath = $this->dashboardUserImportDir) {
+            if (!$userPath = $this->dashboardUserImportDir) {
                 $userPath = $globalPath;
             } elseif (substr($userPath, -1) === '/') {
                 $userPath = substr($userPath, 0, -1);
@@ -133,9 +134,9 @@ class PathsHelper
         }
 
         if ($fullPath) {
-            $rootPath = (!empty($this->paths[$name . '_root'])) ? $this->paths[$name . '_root'] : $this->paths['root'];
+            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
 
-            return $rootPath . '/' . $path;
+            return $rootPath.'/'.$path;
         }
 
         return $path;

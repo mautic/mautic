@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -15,29 +15,27 @@ use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Event\StagesChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0),
-            LeadEvents::LEAD_POST_SAVE       => array('onLeadSave', -1),
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadEvents::LEAD_POST_SAVE       => ['onLeadSave', -1],
+        ];
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -49,7 +47,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -74,7 +71,7 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon'       => 'fa-tachometer',
+                        'icon' => 'fa-tachometer',
                     ]
                 );
             }
@@ -82,7 +79,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
@@ -94,12 +91,11 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Handle for new leads
+     * Handle for new leads.
      *
      * @param LeadEvent $event
      */
     public function onLeadSave(LeadEvent $event)
     {
-
     }
 }

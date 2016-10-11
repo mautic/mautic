@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Controller\SubscribedEvents;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Class BuilderTokenController
+ * Class BuilderTokenController.
  */
 abstract class BuilderTokenController extends FormController
 {
@@ -39,10 +39,10 @@ abstract class BuilderTokenController extends FormController
 
         $arguments = $this->getEntityArguments();
 
-        $dataArray = array(
+        $dataArray = [
             'newContent'    => $tokenHelper->getTokenContent($page, $arguments),
-            'mauticContent' => 'builder'
-        );
+            'mauticContent' => 'builder',
+        ];
 
         $response = new JsonResponse($dataArray);
 
@@ -62,25 +62,16 @@ abstract class BuilderTokenController extends FormController
         return null;
     }
 
-    /**
-     * @return null
-     */
     protected function getBundleName()
     {
         return null;
     }
 
-    /**
-     * @return null
-     */
     protected function getLangVar()
     {
         return null;
     }
 
-    /**
-     * @return null
-     */
     protected function getPermissionSet()
     {
         return null;
@@ -91,6 +82,6 @@ abstract class BuilderTokenController extends FormController
      */
     protected function getEntityArguments()
     {
-        return array();
+        return [];
     }
 }

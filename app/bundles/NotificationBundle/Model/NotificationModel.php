@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -35,7 +35,7 @@ class NotificationModel extends FormModel
 
     /**
      * NotificationModel constructor.
-     * 
+     *
      * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
@@ -219,7 +219,7 @@ class NotificationModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'push_notifications', 'p', 'p.id = t.notification_id')
             ->andWhere('p.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -283,7 +283,7 @@ class NotificationModel extends FormModel
         return $this->getStatRepository()->findBy(
             [
                 'notification' => (int) $notificationId,
-                'lead' => (int) $leadId,
+                'lead'         => (int) $leadId,
             ],
             ['dateSent' => 'DESC']
         );

@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle;
 
 /**
- * Class SocialEvents
+ * Class SocialEvents.
  *
  * Events available for MauticSocialBundle
  */
@@ -75,5 +75,4 @@ final class SocialEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.social.on_campaign_trigger_action';
-
 }

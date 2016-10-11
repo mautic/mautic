@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\UserModel;
@@ -14,13 +14,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class UserListType
- *
- * @package Mautic\UserBundle\Form\Type
+ * Class UserListType.
  */
 class UserListType extends AbstractType
 {
-
     private $choices = [];
 
     /**
@@ -37,10 +34,10 @@ class UserListType extends AbstractType
                         [
                             'column' => 'u.isPublished',
                             'expr'   => 'eq',
-                            'value'  => true
-                        ]
-                    ]
-                ]
+                            'value'  => true,
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -63,7 +60,7 @@ class UserListType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => true,
                 'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone'
+                'empty_value' => 'mautic.core.form.chooseone',
             ]
         );
     }
@@ -73,7 +70,7 @@ class UserListType extends AbstractType
      */
     public function getName()
     {
-        return "user_list";
+        return 'user_list';
     }
 
     /**

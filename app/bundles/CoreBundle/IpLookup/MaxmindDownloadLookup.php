@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
@@ -38,7 +38,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
     }
 
     /**
-     * Extract the IP from the local database
+     * Extract the IP from the local database.
      */
     protected function lookup()
     {
@@ -63,10 +63,9 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->longitude = $record->location->longitude;
             $this->timezone  = $record->location->timeZone;
             $this->zipcode   = $record->location->postalCode;
-
         } catch (\Exception $exception) {
             if ($this->logger) {
-                $this->logger->warn("IP LOOKUP: " . $exception->getMessage());
+                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
             }
         }
     }

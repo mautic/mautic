@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -31,7 +31,7 @@ class OneSignalApi extends AbstractNotificationApi
      */
     public function send($endpoint, $data)
     {
-        $appId = $this->factory->getParameter('notification_app_id');
+        $appId      = $this->factory->getParameter('notification_app_id');
         $restApiKey = $this->factory->getParameter('notification_rest_api_key');
 
         if (!$restApiKey) {
@@ -50,7 +50,7 @@ class OneSignalApi extends AbstractNotificationApi
             $this->apiUrlBase.$endpoint,
             json_encode($data),
             [
-                'Content-Type' => 'application/json',
+                'Content-Type'  => 'application/json',
                 'Authorization' => 'Basic '.$restApiKey,
             ]
         );

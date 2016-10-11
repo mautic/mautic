@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Swiftmailer\Message;
 
 class MauticMessage extends \Swift_Message
 {
+    /**
+     * @var array
+     */
+    protected $metadata = [];
 
     /**
      * @var array
      */
-    protected $metadata   = array();
-
-    /**
-     * @var array
-     */
-    protected $attachments = array();
+    protected $attachments = [];
 
     /**
      * Create a new Message.
@@ -47,7 +46,7 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
-     * Get the metadata
+     * Get the metadata.
      *
      * @return array
      */
@@ -57,10 +56,11 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
-     * Clears the metadata
+     * Clears the metadata.
      */
-    public function clearMetadata() {
-        $this->metadata = array();
+    public function clearMetadata()
+    {
+        $this->metadata = [];
     }
 
     /**
@@ -71,18 +71,18 @@ class MauticMessage extends \Swift_Message
      */
     public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false)
     {
-        $attachment = array(
+        $attachment = [
             'filePath'    => $filePath,
             'fileName'    => $fileName,
             'contentType' => $contentType,
-            'inline'      => $inline
-        );
+            'inline'      => $inline,
+        ];
 
         $this->attachments[] = $attachment;
     }
 
     /**
-     * Get attachments
+     * Get attachments.
      *
      * @return array
      */
@@ -92,10 +92,10 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
-     * Clear attachments
+     * Clear attachments.
      */
     public function clearAttachments()
     {
-        $this->attachments = array();
+        $this->attachments = [];
     }
 }

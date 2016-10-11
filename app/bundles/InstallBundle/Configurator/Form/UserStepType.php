@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class UserStepType extends AbstractType
 {
-
     /**
      * @var
      */
@@ -52,10 +51,10 @@ class UserStepType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -71,10 +70,10 @@ class UserStepType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -82,26 +81,26 @@ class UserStepType extends AbstractType
             'email',
             'email',
             [
-                'label'       => 'mautic.install.form.user.email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.install.form.user.email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope'
+                    'preaddon' => 'fa fa-envelope',
                 ],
                 'required'    => true,
                 'data'        => (!empty($storedData->email)) ? $storedData->email : '',
                 'constraints' => [
                     new Assert\NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                     new Assert\Email(
                         [
-                            'message' => 'mautic.core.email.required'
+                            'message' => 'mautic.core.email.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -109,20 +108,20 @@ class UserStepType extends AbstractType
             'username',
             'text',
             [
-                'label'       => 'mautic.install.form.user.username',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class' => 'form-control'
+                'label'      => 'mautic.install.form.user.username',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'data'        => (!empty($storedData->username)) ? $storedData->username : '',
                 'constraints' => [
                     new Assert\NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -130,27 +129,27 @@ class UserStepType extends AbstractType
             'password',
             'password',
             [
-                'label'       => 'mautic.install.form.user.password',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.install.form.user.password',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon' => 'fa fa-lock'
+                    'preaddon' => 'fa fa-lock',
                 ],
                 'required'    => true,
                 'constraints' => [
                     new Assert\NotBlank(
                         [
-                            'message' => 'mautic.core.value.required'
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                     new Assert\Length(
                         [
                             'min'        => 6,
-                            'minMessage' => 'mautic.install.password.minlength'
+                            'minMessage' => 'mautic.install.password.minlength',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
@@ -166,13 +165,13 @@ class UserStepType extends AbstractType
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
                             'icon'    => 'fa fa-arrow-circle-right',
-                            'onclick' => 'MauticInstaller.showWaitMessage(event);'
-                        ]
-                    ]
+                            'onclick' => 'MauticInstaller.showWaitMessage(event);',
+                        ],
+                    ],
                 ],
-                'apply_text'        => '',
-                'save_text'         => '',
-                'cancel_text'       => ''
+                'apply_text'  => '',
+                'save_text'   => '',
+                'cancel_text' => '',
             ]
         );
 

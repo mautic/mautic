@@ -1,27 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Mautic\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Mautic\UserBundle\Entity\Role;
 
 /**
- * Class LoadRoleData
+ * Class LoadRoleData.
  */
 class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -54,10 +53,10 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $role->setDescription('Has access to sales');
         $role->setIsAdmin(0);
 
-        $permissions = array(
-            'user:profile' => array('editname'),
-            'lead:leads'   => array('full')
-        );
+        $permissions = [
+            'user:profile' => ['editname'],
+            'lead:leads'   => ['full'],
+        ];
         $this->container->get('mautic.factory')->getModel('user.role')->setRolePermissions($role, $permissions);
 
         $manager->persist($role);

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -117,7 +117,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         }
 
         if ($authenticated) {
-
             return new PluginToken(
                 $providerKey,
                 $authenticatingService,
@@ -127,7 +126,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $response
             );
         } elseif ($response) {
-
             return new PluginToken(
                 $providerKey,
                 $authenticatingService,
@@ -153,7 +151,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function supportsToken(TokenInterface $token, $providerKey)
     {
-
         return ($token instanceof PluginToken || $token instanceof UsernamePasswordToken) && $token->getProviderKey() === $providerKey;
     }
 
@@ -167,7 +164,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function createToken(Request $request, $username, $password, $providerKey)
     {
-
         return new PluginToken(
             $providerKey,
             null,

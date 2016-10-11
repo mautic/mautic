@@ -1,13 +1,12 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -16,26 +15,23 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\DynamicContent\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0]
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
         ];
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -47,7 +43,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
 
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -67,22 +62,22 @@ class LeadSubscriber extends CommonSubscriber
                 if ($stat['dateSent']) {
                     $event->addEvent(
                         [
-                            'event'           => $eventTypeKey,
-                            'eventLabel'      => [
+                            'event'      => $eventTypeKey,
+                            'eventLabel' => [
                                 'label' => $stat['name'],
                                 'href'  => $this->router->generate(
                                     'mautic_dynamicContent_action',
                                     ['objectId' => $stat['dynamic_content_id'], 'objectAction' => 'view']
-                                )
+                                ),
                             ],
-                            'eventType'       => $eventTypeNameSent,
-                            'timestamp'       => $stat['dateSent'],
-                            'extra'           => [
+                            'eventType' => $eventTypeNameSent,
+                            'timestamp' => $stat['dateSent'],
+                            'extra'     => [
                                 'stat' => $stat,
-                                'type' => 'sent'
+                                'type' => 'sent',
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope'
+                            'icon'            => 'fa-envelope',
                         ]
                     );
                 }

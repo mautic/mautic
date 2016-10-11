@@ -1,25 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadStageLogRepository
+ * Class LeadStageLogRepository.
  */
 class LeadStageLogRepository extends CommonRepository
 {
-
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -33,7 +31,7 @@ class LeadStageLogRepository extends CommonRepository
             ->where('pl.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $actions = array();
+        $actions = [];
         foreach ($results as $r) {
             $actions[] = $r['stage_id'];
         }

@@ -1,24 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\FormBundle\MauticFormBundle;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FacebookLoginType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class FacebookLoginType.
  */
 class SocialLoginType extends AbstractType
 {
@@ -35,7 +32,7 @@ class SocialLoginType extends AbstractType
      */
     public function __construct(IntegrationHelper $helper, FormModel $form)
     {
-        $this->helper = $helper;
+        $this->helper    = $helper;
         $this->formModel = $form;
     }
 
@@ -51,7 +48,7 @@ class SocialLoginType extends AbstractType
         foreach ($integrationObjects as $integrationObject) {
             if ($integrationObject->getIntegrationSettings()->isPublished()) {
                 $model = $this->formModel;
-                $integrations .= $integrationObject->getName().",";
+                $integrations .= $integrationObject->getName().',';
                 $integration = [
                     'integration' => $integrationObject->getName(),
                 ];
@@ -63,7 +60,6 @@ class SocialLoginType extends AbstractType
                         'data' => $model->buildUrl('mautic_integration_auth_postauth', $integration, true, []),
                     ]
                 );
-
             }
         }
 
@@ -81,6 +77,6 @@ class SocialLoginType extends AbstractType
      */
     public function getName()
     {
-        return "sociallogin";
+        return 'sociallogin';
     }
 }

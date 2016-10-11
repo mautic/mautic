@@ -1,18 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignScheduledEvent
+ * Class CampaignScheduledEvent.
  */
 class CampaignScheduledEvent extends Event
 {
@@ -52,7 +52,7 @@ class CampaignScheduledEvent extends Event
     protected $eventSettings;
 
     /**
-     * Construct
+     * Construct.
      *
      * @param $args
      */

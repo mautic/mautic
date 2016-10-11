@@ -1,28 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
+use FOS\OAuthServerBundle\Model\ClientInterface;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
-use FOS\OAuthServerBundle\Model\ClientInterface;
 
 /**
- * Class AccessToken
- *
- * @package Mautic\ApiBundle\Entity\oAuth2
+ * Class AccessToken.
  */
 class AccessToken extends BaseAccessToken
 {
-
     /**
      * @var int
      */
@@ -56,12 +53,12 @@ class AccessToken extends BaseAccessToken
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_accesstokens')
-            ->addIndex(array('token'), 'oauth2_access_token_search');
+            ->addIndex(['token'], 'oauth2_access_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -91,23 +88,23 @@ class AccessToken extends BaseAccessToken
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set client
+     * Set client.
      *
      * @param ClientInterface $client
      *
      * @return AccessToken
      */
-    public function setClient (ClientInterface $client)
+    public function setClient(ClientInterface $client)
     {
         $this->client = $client;
 
@@ -115,23 +112,23 @@ class AccessToken extends BaseAccessToken
     }
 
     /**
-     * Get client
+     * Get client.
      *
      * @return ClientInterface
      */
-    public function getClient ()
+    public function getClient()
     {
         return $this->client;
     }
 
     /**
-     * Set user
+     * Set user.
      *
      * @param UserInterface $user
      *
      * @return AccessToken
      */
-    public function setUser (UserInterface $user = null)
+    public function setUser(UserInterface $user = null)
     {
         $this->user = $user;
 
@@ -139,11 +136,11 @@ class AccessToken extends BaseAccessToken
     }
 
     /**
-     * Get user
+     * Get user.
      *
      * @return UserInterface
      */
-    public function getUser ()
+    public function getUser()
     {
         return $this->user;
     }

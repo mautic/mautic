@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -17,11 +17,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * CLI Command to send a scheduled broadcast
+ * CLI Command to send a scheduled broadcast.
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -30,7 +29,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
         $this->setName('mautic:broadcasts:send')
             ->setDescription('Process contacts pending to receive a channel broadcast.')
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
 
 <info>php %command.full_name% --channel=email --id=3</info>
@@ -60,9 +59,10 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $channel   = $input->getOption('channel');
         $channelId = $input->getOption('id');
-        if (!$this->checkRunStatus($input, $output, ($channelId) ? $channelId : 'all')) {
-
+        $key       = $channel.$channelId;
+        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
             return 0;
         }
 
@@ -72,7 +72,7 @@ EOT
         $dispatcher = $this->getContainer()->get('event_dispatcher');
         $event      = $dispatcher->dispatch(
             CoreEvents::CHANNEL_BROADCAST,
-            new ChannelBroadcastEvent($input->getOption('channel'), $channelId, $output)
+            new ChannelBroadcastEvent($channel, $channelId, $output)
         );
 
         $results = $event->getResults();

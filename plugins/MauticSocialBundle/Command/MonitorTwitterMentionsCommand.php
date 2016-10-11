@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
@@ -39,16 +39,16 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
         $mentionsUrl = $this->twitter->getApiUrl('search/tweets');
 
         $query = $this->buildTwitterSearchQuery(
-            array(
-                '@'.$params['handle']
-            )
+            [
+                '@'.$params['handle'],
+            ]
         );
 
         // @todo set up count to be configurable
-        $requestQuery = array(
+        $requestQuery = [
             'q'     => $query,
-            'count' => $this->queryCount
-        );
+            'count' => $this->queryCount,
+        ];
 
         // if we have a max id string use it here
         if (is_array($stats) && array_key_exists('max_id_str', $stats) && $stats['max_id_str']) {

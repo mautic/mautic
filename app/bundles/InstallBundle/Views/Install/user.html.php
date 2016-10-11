@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -49,7 +50,7 @@ if ($tmpl == 'index') {
 
     <div class="row mt-20">
         <div class="col-sm-9">
-            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', array('step' => $index, 'count' => $count, 'completedSteps' => $completedSteps)); ?>
+            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', ['step' => $index, 'count' => $count, 'completedSteps' => $completedSteps]); ?>
         </div>
         <div class="col-sm-3">
             <?php echo $view['form']->row($form['buttons']); ?>

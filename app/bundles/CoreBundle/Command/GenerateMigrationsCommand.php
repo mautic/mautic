@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -28,23 +29,22 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command for generating new blank migration classes
+ * Command for generating new blank migration classes.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ *
  * @link    www.doctrine-project.org
  * @since   2.0
+ *
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class GenerateMigrationsCommand extends AbstractCommand
 {
-
     private static $_template =
             '<?php
 /**
@@ -98,7 +98,7 @@ class Version<version> extends AbstractMauticMigration
                 ->setName('mautic:migrations:generate')
                 ->setDescription('Generate a blank migration class.')
                 ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
-                ->setHelp(<<<EOT
+                ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command generates a blank migration class:
 
     <info>%command.full_name%</info>
@@ -115,7 +115,7 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $version = date('YmdHis');
-        $path = $this->generateMigration($input, $version);
+        $path    = $this->generateMigration($input, $version);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
@@ -124,13 +124,13 @@ EOT
     {
         $code = str_replace(['<version>', '<year>'], [$version, date('Y')], self::$_template);
         $code = preg_replace('/^ +$/m', '', $code);
-        $dir = MAUTIC_ROOT_DIR.'/app/migrations';
-        $path = $dir . '/Version' . $version . '.php';
+        $dir  = MAUTIC_ROOT_DIR.'/app/migrations';
+        $path = $dir.'/Version'.$version.'.php';
 
         file_put_contents($path, $code);
 
         if ($editorCmd = $input->getOption('editor-cmd')) {
-            proc_open($editorCmd . ' ' . escapeshellarg($path), [], $pipes);
+            proc_open($editorCmd.' '.escapeshellarg($path), [], $pipes);
         }
 
         return $path;

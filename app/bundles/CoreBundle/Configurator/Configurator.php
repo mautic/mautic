@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
@@ -21,30 +21,29 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class Configurator
 {
-
     /**
-     * Configuration filename
+     * Configuration filename.
      *
      * @var string
      */
     protected $filename;
 
     /**
-     * Array containing the steps
+     * Array containing the steps.
      *
      * @var StepInterface[]
      */
-    protected $steps = array();
+    protected $steps = [];
 
     /**
-     * Array containing the sorted steps
+     * Array containing the sorted steps.
      *
      * @var StepInterface[]
      */
-    protected $sortedSteps = array();
+    protected $sortedSteps = [];
 
     /**
-     * Configuration parameters
+     * Configuration parameters.
      *
      * @var array
      */
@@ -86,19 +85,20 @@ class Configurator
     public function addStep(StepInterface $step, $priority = 0)
     {
         if (!isset($this->steps[$priority])) {
-            $this->steps[$priority] = array();
+            $this->steps[$priority] = [];
         }
 
         $this->steps[$priority][] = $step;
-        $this->sortedSteps        = array();
+        $this->sortedSteps        = [];
     }
 
     /**
      * Retrieves the specified step.
      *
-     * @param integer $index
+     * @param int $index
      *
      * @return StepInterface
+     *
      * @throws \InvalidArgumentException
      */
     public function getStep($index)
@@ -117,7 +117,7 @@ class Configurator
      */
     public function getSteps()
     {
-        if ($this->sortedSteps === array()) {
+        if ($this->sortedSteps === []) {
             $this->sortedSteps = $this->getSortedSteps();
         }
 
@@ -132,7 +132,7 @@ class Configurator
      */
     private function getSortedSteps()
     {
-        $sortedSteps = array();
+        $sortedSteps = [];
         krsort($this->steps);
 
         foreach ($this->steps as $steps) {
@@ -155,7 +155,7 @@ class Configurator
     /**
      * Return the number of steps in the configurator.
      *
-     * @return integer
+     * @return int
      */
     public function getStepCount()
     {
@@ -179,7 +179,7 @@ class Configurator
      */
     public function getRequirements()
     {
-        $majors = array();
+        $majors = [];
 
         foreach ($this->getSteps() as $step) {
             foreach ($step->checkRequirements() as $major) {
@@ -197,7 +197,7 @@ class Configurator
      */
     public function getOptionalSettings()
     {
-        $minors = array();
+        $minors = [];
 
         foreach ($this->getSteps() as $step) {
             foreach ($step->checkOptionalSettings() as $minor) {
@@ -221,7 +221,7 @@ class Configurator
         foreach ($this->parameters as $key => $value) {
             if ($value !== '') {
                 if (is_string($value)) {
-                    $value = "'" . addcslashes($value, '\\\'') . "'";
+                    $value = "'".addcslashes($value, '\\\'')."'";
                 } elseif (is_bool($value)) {
                     $value = ($value) ? 'true' : 'false';
                 } elseif (is_null($value)) {
@@ -264,12 +264,12 @@ class Configurator
                 $string .= '"'.addcslashes($value, '\\"').'"';
             }
 
-            $counter--;
+            --$counter;
             if ($counter > 0) {
-                $string .= ", \n" . str_repeat("\t", $level + 1);
+                $string .= ", \n".str_repeat("\t", $level + 1);
             }
         }
-        $string .= "\n" . str_repeat("\t", $level) . ")";
+        $string .= "\n".str_repeat("\t", $level).')';
 
         return $string;
     }
@@ -277,7 +277,8 @@ class Configurator
     /**
      * Writes parameters to file.
      *
-     * @return integer
+     * @return int
+     *
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function write()
@@ -303,12 +304,12 @@ class Configurator
     protected function read()
     {
         if (!file_exists($this->filename)) {
-            return array();
+            return [];
         }
 
         include $this->filename;
 
         // Return the $parameters array defined in the file
-        return isset($parameters) ? $parameters : array();
+        return isset($parameters) ? $parameters : [];
     }
 }

@@ -1,29 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ *
  * @see         https://github.com/SlowProg/SparkPostSwiftMailer/blob/master/SwiftMailer/SparkPostTransport.php for additional source reference
  */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Entity\DoNotContact;
-use SparkPost\APIResponseException;
-use SparkPost\SparkPost;
 use GuzzleHttp\Client;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use SparkPost\SparkPost;
 use SparkPost\SparkPostException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SparkpostTransport
- * The referrence class for this was provided by
- *
+ * The referrence class for this was provided by.
  */
 class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
 {
@@ -95,6 +94,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @return SparkPost
+     *
      * @throws \Swift_TransportException
      */
     protected function createSparkPost()
@@ -111,7 +111,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @param \Swift_Mime_Message $message
-     * @param null               $failedRecipients
+     * @param null                $failedRecipients
      *
      * @return int Number of messages sent
      */
@@ -121,7 +121,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         if ($event = $this->getDispatcher()->createSendEvent($this, $message)) {
             $this->getDispatcher()->dispatchEvent($event, 'beforeSendPerformed');
             if ($event->bubbleCancelled()) {
-
                 return 0;
             }
         }
@@ -153,11 +152,12 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * https://jsapi.apiary.io/apis/sparkpostapi/introduction/subaccounts-coming-to-an-api-near-you-in-april!.html
+     * https://jsapi.apiary.io/apis/sparkpostapi/introduction/subaccounts-coming-to-an-api-near-you-in-april!.html.
      *
      * @param \Swift_Mime_Message $message
      *
      * @return array SparkPost Send Message
+     *
      * @throws \Swift_SwiftException
      */
     public function getSparkPostMessage(\Swift_Mime_Message $message)
@@ -167,7 +167,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         $this->message = $message;
         $metadata      = $this->getMetadata();
-        $mauticTokens  = $mergeVars = $mergeVarPlaceholders = [];
+        $mauticTokens  = $mergeVars  = $mergeVarPlaceholders  = [];
 
         // Sparkpost uses {{ name }} for tokens so Mautic's need to be converted; although using their {{{ }}} syntax to prevent HTML escaping
         if (!empty($metadata)) {
@@ -177,7 +177,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
             $mergeVars = $mergeVarPlaceholders = [];
             foreach ($mauticTokens as $token) {
-                $mergeVars[$token]            = strtoupper(preg_replace("/[^a-z0-9]+/i", "", $token));
+                $mergeVars[$token]            = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mergeVarPlaceholders[$token] = '{{{ '.$mergeVars[$token].' }}}';
             }
         }
@@ -186,7 +186,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         // Sparkpost requires a subject
         if (empty($message['subject'])) {
-
             throw new \Exception($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));
         }
 
@@ -202,7 +201,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             $recipient = [
                 'address'           => $to,
                 'substitution_data' => [],
-                'metadata'          => []
+                'metadata'          => [],
             ];
 
             if (isset($metadata[$to['email']])) {
@@ -234,9 +233,9 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $content = [
-            'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
+            'from' => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
                 : $message['from']['email'],
-            'subject'        => $message['subject'],
+            'subject' => $message['subject'],
         ];
 
         // Sparkpost will set parts regardless if they are empty or not
@@ -249,11 +248,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $sparkPostMessage = [
-            'content'        => $content,
-            'recipients'     => $recipients,
-            'headers'        => $message['headers'],
-            'inline_css'     => $inlineCss,
-            'tags'           => $tags
+            'content'    => $content,
+            'recipients' => $recipients,
+            'headers'    => $message['headers'],
+            'inline_css' => $inlineCss,
+            'tags'       => $tags,
         ];
 
         if (!empty($message['recipients']['cc'])) {
@@ -265,7 +264,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         if (!empty($message['attachments'])) {
-
             $sparkPostMessage['attachments'] = $message['attachments'];
         }
 
@@ -289,11 +287,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        return (count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded);
+        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
     }
 
     /**
-     * Returns a "transport" string to match the URL path /mailer/{transport}/callback
+     * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
      * @return mixed
      */
@@ -303,9 +301,9 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Handle response
+     * Handle response.
      *
-     * @param Request $request
+     * @param Request       $request
      * @param MauticFactory $factory
      *
      * @return array array('bounces' => array('hashID' => 'reason', ...));
@@ -317,12 +315,12 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $rows = [
             DoNotContact::BOUNCED => [
                 'hashIds' => [],
-                'emails'  => []
+                'emails'  => [],
             ],
             DoNotContact::UNSUBSCRIBED => [
                 'hashIds' => [],
-                'emails'  => []
-            ]
+                'emails'  => [],
+            ],
         ];
 
         foreach ($payload as $msys) {
@@ -332,13 +330,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             } elseif (isset($msys['unsubscribe_event'])) {
                 $event = $msys['unsubscribe_event'];
             } else {
-
                 continue;
             }
 
             // Process events sent from Mautic
             if (!isset($event['rcpt_meta']['hashId'])) {
-
                 continue;
             }
 

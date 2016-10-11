@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -16,14 +16,14 @@ class DynamicContentEvent extends CommonEvent
 {
     /**
      * DynamicContentEvent constructor.
-     * 
+     *
      * @param DynamicContent $entity
      * @param bool           $isNew
      */
     public function __construct(DynamicContent $entity, $isNew = false)
     {
         $this->entity = $entity;
-        $this->isNew = $isNew;
+        $this->isNew  = $isNew;
     }
 
     /**

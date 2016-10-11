@@ -1,29 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CommandListEvent
+ * Class CommandListEvent.
  */
 class CommandListEvent extends Event
 {
-
     /**
      * @var array
      */
-    protected $commands = array();
+    protected $commands = [];
 
     /**
-     * Returns the list of currently stored commands
+     * Returns the list of currently stored commands.
      *
      * @return mixed
      */
@@ -33,7 +32,7 @@ class CommandListEvent extends Event
     }
 
     /**
-     * Add an array of search commands
+     * Add an array of search commands.
      *
      * @param string $header   String name for section header
      * @param array  $commands Array of commands supported by the repository

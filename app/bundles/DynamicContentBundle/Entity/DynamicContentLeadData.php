@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -56,7 +56,7 @@ class DynamicContentLeadData extends CommonEntity
         $builder->setTable('dynamic_content_lead_data');
 
         $builder->addIdColumns(false, false);
-        
+
         $builder->addDateAdded(true);
 
         $builder->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead')

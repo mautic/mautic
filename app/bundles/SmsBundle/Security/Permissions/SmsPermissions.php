@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,8 +9,8 @@
  */
 namespace Mautic\SmsBundle\Security\Permissions;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class SmsPermissions.

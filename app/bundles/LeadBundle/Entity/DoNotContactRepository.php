@@ -1,36 +1,35 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * DoNotContactRepository
+ * DoNotContactRepository.
  */
 class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * Get a list of DNC entries based on channel and lead_id
+     * Get a list of DNC entries based on channel and lead_id.
      *
-     * @param Lead $lead
+     * @param Lead   $lead
      * @param string $channel
      *
      * @return \Mautic\LeadBundle\Entity\DoNotContact[]
      */
     public function getEntriesByLeadAndChannel(Lead $lead, $channel)
     {
-        return $this->findBy(array('channel' => $channel, 'lead' => $lead));
+        return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }
 
     /**
@@ -51,7 +50,7 @@ class DoNotContactRepository extends CommonRepository
 
         if ($ids) {
             if (!is_array($ids)) {
-                $ids = array((int) $ids);
+                $ids = [(int) $ids];
             }
             $q->where(
                 $q->expr()->in('dnc.channel_id', $ids)
@@ -113,7 +112,7 @@ class DoNotContactRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dnc.channel', $query->expr()->literal('%' . $options['search'] . '%'))
+                $query->expr()->like('dnc.channel', $query->expr()->literal('%'.$options['search'].'%'))
             );
         }
 
@@ -130,8 +129,8 @@ class DoNotContactRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
-            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = :channel')
             ->setParameter('channel', $channel);
 
@@ -143,7 +142,7 @@ class DoNotContactRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $dnc = array();
+        $dnc = [];
 
         foreach ($results as $r) {
             $dnc[] = $r['id'];

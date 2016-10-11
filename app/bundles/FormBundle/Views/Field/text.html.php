@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $containerType     = (isset($type)) ? $type : 'text';
@@ -11,18 +12,10 @@ $defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
 
 include __DIR__.'/field_helper.php';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'      => $id,
-        'formId'  => $formId
-    ]) : '';
-
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
-                <label $labelAttr>{$view->escape($field['label'])}</label>
+                <label $labelAttr>{$field['label']}</label>
 HTML;
-
 
 $help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
@@ -35,7 +28,6 @@ $textInput = <<<HTML
                 <textarea $inputAttr>{$field['defaultValue']}</textarea>
 HTML;
 
-
 else:
 $textInput = <<<HTML
 
@@ -43,10 +35,9 @@ $textInput = <<<HTML
 HTML;
 endif;
 
-
 $html = <<<HTML
 
-            <div $containerAttr>{$formButtons}{$label}{$help}{$textInput}
+            <div $containerAttr>{$label}{$help}{$textInput}
                 <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
             </div>
 

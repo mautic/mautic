@@ -1,28 +1,27 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Page;
 
 /**
- * Class AbTestHelper
+ * Class AbTestHelper.
  */
 class AbTestHelper
 {
-
     /**
-     * Determines the winner of A/B test based on bounce rates
+     * Determines the winner of A/B test based on bounce rates.
      *
      * @param $factory
-     * @param Page $parent
+     * @param Page   $parent
      * @param Page[] $children
      *
      * @return array
@@ -40,7 +39,7 @@ class AbTestHelper
             if ($counts) {
                 // Group by translation
                 $combined = [
-                    $parent->getId() => $counts[$parent->getId()]
+                    $parent->getId() => $counts[$parent->getId()],
                 ];
 
                 if ($parent->hasTranslations()) {
@@ -59,7 +58,7 @@ class AbTestHelper
                 foreach ($children as $child) {
                     if ($child->hasTranslations()) {
                         $combined[$child->getId()] = $counts[$child->getId()];
-                        $translations = $child->getTranslationChildren()->getKeys();
+                        $translations              = $child->getTranslationChildren()->getKeys();
                         foreach ($translations as $translation) {
                             $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
                             $combined[$child->getId()]['totalHits'] += $counts[$translation]['totalHits'];
@@ -94,7 +93,7 @@ class AbTestHelper
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.bouncerate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
                 ];
             }
         }
@@ -102,12 +101,12 @@ class AbTestHelper
         return [
             'winners' => [],
             'support' => [],
-            'basedOn' => 'page.bouncerate'
+            'basedOn' => 'page.bouncerate',
         ];
     }
 
     /**
-     * Determines the winner of A/B test based on dwell time rates
+     * Determines the winner of A/B test based on dwell time rates.
      *
      * @param MauticFactory $factory
      * @param Page          $parent
@@ -151,7 +150,7 @@ class AbTestHelper
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
                 ];
             }
         }
@@ -159,7 +158,7 @@ class AbTestHelper
         return [
             'winners' => [],
             'support' => [],
-            'basedOn' => 'page.dwelltime'
+            'basedOn' => 'page.dwelltime',
         ];
     }
 }

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -15,39 +15,38 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class TriggerEventType
+ * Class TriggerEventType.
  */
 class TriggerEventType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $masks = array('description' => 'html');
+        $masks = ['description' => 'html'];
 
-        $builder->add('name', 'text', array(
+        $builder->add('name', 'text', [
             'label'      => 'mautic.core.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+        ]);
 
-        $builder->add('description', 'textarea', array(
+        $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control editor'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+        ]);
 
         if (!empty($options['settings']['formType'])) {
             $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
 
-            $formTypeOptions =  array(
+            $formTypeOptions = [
                 'label' => false,
-                'data'  => $properties
-            );
+                'data'  => $properties,
+            ];
             if (!empty($options['settings']['formTypeOptions'])) {
                 $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
             }
@@ -70,21 +69,21 @@ class TriggerEventType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', 'form_buttons', array(
-            'save_text' => $btnValue,
-            'save_icon' => $btnIcon,
-            'apply_text' => false,
-            'container_class' => 'bottom-form-buttons'
-        ));
+        $builder->add('buttons', 'form_buttons', [
+            'save_text'       => $btnValue,
+            'save_icon'       => $btnIcon,
+            'apply_text'      => false,
+            'container_class' => 'bottom-form-buttons',
+        ]);
 
-        $builder->add('triggerId', 'hidden', array(
-            'mapped' => false
-        ));
+        $builder->add('triggerId', 'hidden', [
+            'mapped' => false,
+        ]);
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -93,11 +92,11 @@ class TriggerEventType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'settings' => false
-        ));
+        $resolver->setDefaults([
+            'settings' => false,
+        ]);
 
-        $resolver->setRequired(array('settings'));
+        $resolver->setRequired(['settings']);
     }
 
     /**
@@ -105,6 +104,6 @@ class TriggerEventType extends AbstractType
      */
     public function getName()
     {
-        return "pointtriggerevent";
+        return 'pointtriggerevent';
     }
 }

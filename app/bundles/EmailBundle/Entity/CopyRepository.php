@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\NoResultException;
@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
- * Class CopyRepository
+ * Class CopyRepository.
  */
 class CopyRepository extends CommonRepository
 {
@@ -36,7 +36,7 @@ class CopyRepository extends CommonRepository
                     'id'           => $hash,
                     'body'         => $body,
                     'subject'      => $subject,
-                    'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s')
+                    'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
                 ]
             );
 
@@ -49,8 +49,8 @@ class CopyRepository extends CommonRepository
     }
 
     /**
-     * @param      $string   md5 hash or content
-     * @param null $subject  If $string is the content, pass the subject to include it in the hash
+     * @param      $string  md5 hash or content
+     * @param null $subject If $string is the content, pass the subject to include it in the hash
      *
      * @return array
      */
@@ -58,7 +58,7 @@ class CopyRepository extends CommonRepository
     {
         if (null !== $subject) {
             // Combine subject with $string and hash together
-            $string = $subject . $string;
+            $string = $subject.$string;
         }
 
         // Assume that $string is already a md5 hash if 32 characters
@@ -78,7 +78,6 @@ class CopyRepository extends CommonRepository
 
         return $result;
     }
-
 
     /**
      * @return string

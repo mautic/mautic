@@ -1,14 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\IpLookup;
-
 
 class TelizeLookup extends AbstractRemoteDataLookup
 {
@@ -33,18 +32,16 @@ class TelizeLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
-        return array(
-            "X-Mashape-Key" => $this->auth,
-            "Accept"        => "application/json"
-        );
+        return [
+            'X-Mashape-Key' => $this->auth,
+            'Accept'        => 'application/json',
+        ];
     }
 
     /**
-     * Populates properties with obtained data from the service
+     * Populates properties with obtained data from the service.
      *
      * @param mixed $response Response from the service
-     *
-     * @return void
      */
     protected function parseResponse($response)
     {

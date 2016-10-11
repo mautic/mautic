@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -34,13 +34,13 @@ class CheckStepType extends AbstractType
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
                             'icon'    => 'fa fa-arrow-circle-right',
-                            'onclick' => 'MauticInstaller.showWaitMessage(event);'
-                        ]
-                    ]
+                            'onclick' => 'MauticInstaller.showWaitMessage(event);',
+                        ],
+                    ],
                 ],
-                'apply_text'        => '',
-                'save_text'         => '',
-                'cancel_text'       => ''
+                'apply_text'  => '',
+                'save_text'   => '',
+                'cancel_text' => '',
             ]
         );
 

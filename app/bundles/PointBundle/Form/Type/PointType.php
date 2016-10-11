@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -18,11 +18,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PointType
+ * Class PointType.
  */
 class PointType extends AbstractType
 {
-
     /**
      * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
      */
@@ -45,55 +44,54 @@ class PointType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
-        $builder->add('name', 'text', array(
+        $builder->add('name', 'text', [
             'label'      => 'mautic.core.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+        ]);
 
-        $builder->add('description', 'textarea', array(
+        $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control editor'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+        ]);
 
-        $builder->add('type', 'choice', array(
-            'choices' => $options['pointActions']['choices'],
+        $builder->add('type', 'choice', [
+            'choices'     => $options['pointActions']['choices'],
             'empty_value' => '',
             'label'       => 'mautic.point.form.type',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
-                'class' => 'form-control',
-                'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);'
-            ),
-        ));
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
+            ],
+        ]);
 
-        $builder->add('delta', 'number', array(
+        $builder->add('delta', 'number', [
             'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0
-        ));
+                    'tooltip' => 'mautic.point.action.delta.help',
+                ],
+            'precision' => 0,
+        ]);
 
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
         if ($type) {
-            $formType   =  (!empty($options['pointActions']['actions'][$type]['formType'])) ?
+            $formType = (!empty($options['pointActions']['actions'][$type]['formType'])) ?
                 $options['pointActions']['actions'][$type]['formType'] : 'genericpoint_settings';
-            $properties = ($options['data']) ? $options['data']->getProperties() : array();
-            $builder->add('properties', $formType, array(
+            $properties = ($options['data']) ? $options['data']->getProperties() : [];
+            $builder->add('properties', $formType, [
                 'label' => false,
-                'data'  => $properties
-            ));
+                'data'  => $properties,
+            ]);
         }
 
         if (!empty($options['data']) && $options['data'] instanceof Point) {
@@ -112,44 +110,44 @@ class PointType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', array(
-            'read_only'     => $readonly,
-            'data'          => $data
-        ));
+        $builder->add('isPublished', 'yesno_button_group', [
+            'read_only' => $readonly,
+            'data'      => $data,
+        ]);
 
-        $builder->add('publishUp', 'datetime', array(
+        $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'  => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
-        $builder->add('publishDown', 'datetime', array(
+        $builder->add('publishDown', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'  => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
         //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'point'
-        ));
+        $builder->add('category', 'category', [
+            'bundle' => 'point',
+        ]);
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -158,13 +156,13 @@ class PointType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => 'Mautic\PointBundle\Entity\Point',
-        ));
+        ]);
 
-        $resolver->setRequired(array('pointActions'));
+        $resolver->setRequired(['pointActions']);
 
-        $resolver->setOptional(array('actionType'));
+        $resolver->setOptional(['actionType']);
     }
 
     /**
@@ -172,6 +170,6 @@ class PointType extends AbstractType
      */
     public function getName()
     {
-        return "point";
+        return 'point';
     }
 }

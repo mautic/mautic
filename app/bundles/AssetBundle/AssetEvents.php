@@ -1,19 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle;
 
 /**
  * Class AssetEvents
- * Events available for AssetBundle
- *
- * @package Mautic\AssetBundle
+ * Events available for AssetBundle.
  */
 final class AssetEvents
 {
@@ -40,7 +38,7 @@ final class AssetEvents
     const ASSET_ON_LOAD = 'mautic.asset_on_load';
 
     /**
-     * The mautic.asset_on_remote_browse event is dispatched when browsing a remote provider
+     * The mautic.asset_on_remote_browse event is dispatched when browsing a remote provider.
      *
      * The event listener receives a
      * Mautic\AssetBundle\Event\RemoteAssetBrowseEvent instance.
@@ -50,7 +48,7 @@ final class AssetEvents
     const ASSET_ON_REMOTE_BROWSE = 'mautic.asset_on_remote_browse';
 
     /**
-     * The mautic.asset_on_upload event is dispatched before uploading a file
+     * The mautic.asset_on_upload event is dispatched before uploading a file.
      *
      * The event listener receives a
      * Mautic\AssetBundle\Event\AssetEvent instance.

@@ -1,33 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class PointRepository
+ * Class PointRepository.
  */
 class PointRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select($this->getTableAlias() . ', cat')
+            ->select($this->getTableAlias().', cat')
             ->from('MauticPointBundle:Point', $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
@@ -45,7 +41,7 @@ class PointRepository extends CommonRepository
     }
 
     /**
-     * Get array of published actions based on type
+     * Get array of published actions based on type.
      *
      * @param string $type
      *
@@ -76,8 +72,8 @@ class PointRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
-            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_action_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'points', 'p', 'x.point_id = p.id');
+            ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
 
         //make sure the published up and down dates are good
         $q->where(
@@ -90,7 +86,7 @@ class PointRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
 
         foreach ($results as $r) {
             $return[$r['id']] = $r;
@@ -99,7 +95,7 @@ class PointRepository extends CommonRepository
         return $return;
     }
     /**
-     * @param int    $leadId
+     * @param int $leadId
      *
      * @return array
      */
@@ -107,8 +103,8 @@ class PointRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
-            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_action_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'points', 'p', 'x.point_id = p.id');
+            ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
 
         //make sure the published up and down dates are good
         $q->where(
@@ -119,7 +115,7 @@ class PointRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
 
         foreach ($results as $r) {
             $return[$r['id']] = $r;
@@ -132,10 +128,10 @@ class PointRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, array(
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
             'p.name',
-            'p.description'
-        ));
+            'p.description',
+        ]);
     }
 
     /**

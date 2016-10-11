@@ -1,30 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class VideoHitRepository
+ * Class VideoHitRepository.
  */
 class VideoHitRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * Get video hit info for lead timeline
+     * Get video hit info for lead timeline.
      *
      * @param       $leadId
      * @param array $options
@@ -41,7 +39,7 @@ class VideoHitRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('h.url', $query->expr()->literal('%' . $options['search'] . '%'))
+                $query->expr()->like('h.url', $query->expr()->literal('%'.$options['search'].'%'))
             );
         }
 
@@ -58,16 +56,17 @@ class VideoHitRepository extends CommonRepository
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
-        return $result ?: new VideoHit;
+        return $result ?: new VideoHit();
     }
 
     /**
-     * Get a lead's page hits
+     * Get a lead's page hits.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -75,7 +74,7 @@ class VideoHitRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
-            ->where('h.lead = ' . (int) $leadId);
+            ->where('h.lead = '.(int) $leadId);
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
@@ -85,7 +84,7 @@ class VideoHitRepository extends CommonRepository
     }
 
     /**
-     * Count stats from hit times
+     * Count stats from hit times.
      *
      * @param array $times
      *
@@ -93,23 +92,24 @@ class VideoHitRepository extends CommonRepository
      */
     public function countStats($times)
     {
-        return array(
+        return [
             'sum'     => array_sum($times),
             'min'     => count($times) ? min($times) : 0,
             'max'     => count($times) ? max($times) : 0,
             'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
-            'count'   => count($times)
-        );
+            'count'   => count($times),
+        ];
     }
 
     /**
-     * Get list of referers ordered by it's count
+     * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int                               $limit
      * @param int                               $offset
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -125,7 +125,7 @@ class VideoHitRepository extends CommonRepository
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -133,9 +133,9 @@ class VideoHitRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'video_hits')
+        $q->update(MAUTIC_TABLE_PREFIX.'video_hits')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 }

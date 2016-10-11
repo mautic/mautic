@@ -109,7 +109,8 @@
         "sensio/generator-bundle": "~3.0",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
-        "phpunit/phpunit": "4.5"
+        "phpunit/phpunit": "4.5",
+        "friendsofphp/php-cs-fixer": "^1.12"
     },
     "repositories": [
         {
@@ -120,11 +121,13 @@
     "scripts": {
         "post-install-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "cp ./build/hooks/pre-commit ./.git/hooks/pre-commit"
         ],
         "post-update-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "cp ./build/hooks/pre-commit ./.git/hooks/pre-commit"
         ]
     },
     "config": {

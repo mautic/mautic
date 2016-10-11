@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -35,7 +35,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     public function transform($filters)
     {
         if (!is_array($filters)) {
-            return array();
+            return [];
         }
 
         foreach ($filters as &$f) {
@@ -44,8 +44,8 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, array('datetime', 'date', 'time'))) {
-                $dt = new DateTimeHelper($f['value'], '', 'utc');
+            if (in_array($type, ['datetime', 'date', 'time'])) {
+                $dt         = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }
         }
@@ -61,7 +61,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     public function reverseTransform($filters)
     {
         if (!is_array($filters)) {
-            return array();
+            return [];
         }
 
         foreach ($filters as &$f) {
@@ -70,8 +70,8 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, array('datetime', 'date', 'time'))) {
-                $dt = new DateTimeHelper($f['value'], '', 'local');
+            if (in_array($type, ['datetime', 'date', 'time'])) {
+                $dt         = new DateTimeHelper($f['value'], '', 'local');
                 $f['value'] = $dt->toUtcString();
             }
         }

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,13 +16,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * Class FormEntity
- *
- * @package Mautic\CoreBundle\Entity
+ * Class FormEntity.
  */
 class FormEntity extends CommonEntity
 {
-
     /**
      * @var bool
      */
@@ -49,7 +46,7 @@ class FormEntity extends CommonEntity
     private $dateModified;
 
     /**
-     * var null|int
+     * var null|int.
      */
     private $modifiedBy;
 
@@ -76,7 +73,7 @@ class FormEntity extends CommonEntity
     /**
      * @var array
      */
-    protected $changes = array();
+    protected $changes = [];
 
     /**
      * @var
@@ -140,7 +137,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -148,21 +145,21 @@ class FormEntity extends CommonEntity
     {
         $metadata->setGroupPrefix('publish')
             ->addProperties(
-                array(
+                [
                     'isPublished',
                     'dateAdded',
                     'createdBy',
                     'createdByUser',
                     'dateModified',
                     'modifiedBy',
-                    'modifiedByUser'
-                )
+                    'modifiedByUser',
+                ]
             )
             ->build();
     }
 
     /**
-     * Clear dates on clone
+     * Clear dates on clone.
      */
     public function __clone()
     {
@@ -170,11 +167,11 @@ class FormEntity extends CommonEntity
         $this->dateModified = null;
         $this->checkedOut   = null;
         $this->isPublished  = false;
-        $this->changes      = array();
+        $this->changes      = [];
     }
 
     /**
-     * Check publish status with option to check against category, publish up and down dates
+     * Check publish status with option to check against category, publish up and down dates.
      *
      * @param bool $checkPublishStatus
      * @param bool $checkCategoryStatus
@@ -202,7 +199,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set dateAdded
+     * Set dateAdded.
      *
      * @param \DateTime $dateAdded
      *
@@ -216,7 +213,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get dateAdded
+     * Get dateAdded.
      *
      * @return \DateTime
      */
@@ -226,7 +223,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set dateModified
+     * Set dateModified.
      *
      * @param \DateTime $dateModified
      *
@@ -240,7 +237,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get dateModified
+     * Get dateModified.
      *
      * @return \DateTime
      */
@@ -250,7 +247,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set checkedOut
+     * Set checkedOut.
      *
      * @param \DateTime $checkedOut
      *
@@ -264,7 +261,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get checkedOut
+     * Get checkedOut.
      *
      * @return \DateTime
      */
@@ -274,7 +271,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set createdBy
+     * Set createdBy.
      *
      * @param User $createdBy
      *
@@ -282,7 +279,7 @@ class FormEntity extends CommonEntity
      */
     public function setCreatedBy($createdBy = null)
     {
-        if ($createdBy != null && !$createdBy instanceof User ) {
+        if ($createdBy != null && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;
         } else {
             $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
@@ -295,7 +292,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get createdBy
+     * Get createdBy.
      *
      * @return User
      */
@@ -305,7 +302,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set modifiedBy
+     * Set modifiedBy.
      *
      * @param User $modifiedBy
      *
@@ -313,7 +310,7 @@ class FormEntity extends CommonEntity
      */
     public function setModifiedBy($modifiedBy = null)
     {
-        if ($modifiedBy != null && !$modifiedBy instanceof User ) {
+        if ($modifiedBy != null && !$modifiedBy instanceof User) {
             $this->modifiedBy = $modifiedBy;
         } else {
             $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
@@ -327,7 +324,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get modifiedBy
+     * Get modifiedBy.
      *
      * @return User
      */
@@ -337,7 +334,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set checkedOutBy
+     * Set checkedOutBy.
      *
      * @param User $checkedOutBy
      *
@@ -345,7 +342,7 @@ class FormEntity extends CommonEntity
      */
     public function setCheckedOutBy($checkedOutBy = null)
     {
-        if ($checkedOutBy != null && !$checkedOutBy instanceof User ) {
+        if ($checkedOutBy != null && !$checkedOutBy instanceof User) {
             $this->checkedOutBy = $checkedOutBy;
         } else {
             $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
@@ -359,7 +356,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get checkedOutBy
+     * Get checkedOutBy.
      *
      * @return User
      */
@@ -369,9 +366,9 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set isPublished
+     * Set isPublished.
      *
-     * @param boolean $isPublished
+     * @param bool $isPublished
      *
      * @return $this
      */
@@ -385,9 +382,9 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get isPublished
+     * Get isPublished.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsPublished()
     {
@@ -395,9 +392,10 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Check the publish status of an entity based on publish up and down datetimes
+     * Check the publish status of an entity based on publish up and down datetimes.
      *
      * @return string early|expired|published|unpublished
+     *
      * @throws \BadMethodCallException
      */
     public function getPublishStatus()

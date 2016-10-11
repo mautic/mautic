@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Helper;
 
 /**
- * Class TokenHelper
+ * Class TokenHelper.
  */
 class TokenHelper
 {
@@ -22,15 +22,15 @@ class TokenHelper
      *
      * @return array|string
      */
-    static function findLeadTokens($content, $lead, $replace = false)
+    public static function findLeadTokens($content, $lead, $replace = false)
     {
         // Search for bracket or bracket encoded
         // @deprecated BC support for leadfield
         $tokenRegex = [
             '/({|%7B)leadfield=(.*?)(}|%7D)/',
-            '/({|%7B)contactfield=(.*?)(}|%7D)/'
+            '/({|%7B)contactfield=(.*?)(}|%7D)/',
         ];
-        $tokenList = array();
+        $tokenList = [];
 
         foreach ($tokenRegex as $regex) {
             $foundMatches = preg_match_all($regex, $content, $matches);

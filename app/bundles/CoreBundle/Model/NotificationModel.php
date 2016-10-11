@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Model;
 
 use Debril\RssAtomBundle\Protocol\FeedReader;
@@ -22,12 +22,12 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Class NotificationModel
+ * Class NotificationModel.
  */
 class NotificationModel extends FormModel
 {
     /**
-     * @var boolean
+     * @var bool
      */
     protected $disableUpdates;
 
@@ -103,7 +103,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Write a notification
+     * Write a notification.
      *
      * @param string    $message   Message of the notification
      * @param string    $type      Optional $type to ID the source of the notification
@@ -123,7 +123,7 @@ class NotificationModel extends FormModel
         User $user = null
     ) {
         if ($user === null) {
-            $user = $this->user;
+            $user = $this->userHelper->getUser();
         }
 
         if ($user === null || !$user->getId()) {
@@ -146,25 +146,25 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Mark notifications read for a user
+     * Mark notifications read for a user.
      */
     public function markAllRead()
     {
-        $this->getRepository()->markAllReadForUser($this->user->getId());
+        $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
     }
 
     /**
-     * Clears a notification for a user
+     * Clears a notification for a user.
      *
      * @param $id Notification to clear; will clear all if empty
      */
     public function clearNotification($id)
     {
-        $this->getRepository()->clearNotificationsForUser($this->user->getId(), $id);
+        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id);
     }
 
     /**
-     * Get content for notifications
+     * Get content for notifications.
      *
      * @param null $afterId
      *
@@ -172,13 +172,13 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null, $includeRead = false)
     {
-        if ($this->user->isGuest) {
+        if ($this->userHelper->getUser()->isGuest) {
             return [[], false, ''];
         }
 
         $this->updateUpstreamNotifications();
 
-        $userId        = ($this->user) ? $this->user->getId() : 0;
+        $userId        = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
         $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead);
 
         $showNewIndicator = false;
@@ -195,7 +195,7 @@ class NotificationModel extends FormModel
         $updateMessage = '';
         $newUpdate     = false;
 
-        if (!$this->disableUpdates && $this->user->isAdmin()) {
+        if (!$this->disableUpdates && $this->userHelper->getUser()->isAdmin()) {
             $updateData = [];
             $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
@@ -235,14 +235,13 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Fetch upstream notifications via RSS
+     * Fetch upstream notifications via RSS.
      */
     public function updateUpstreamNotifications()
     {
         $url = $this->coreParametersHelper->getParameter('rss_notification_url');
 
         if (empty($url)) {
-
             return;
         }
 
@@ -262,15 +261,14 @@ class NotificationModel extends FormModel
                     $description = $item->getDescription();
                     if (mb_strlen(strip_tags($description)) > 300) {
                         $description = mb_substr(strip_tags($description), 0, 300);
-                        $description .= "... <a href=\"".$item->getLink()."\" target=\"_blank\">".$this->translator->trans(
+                        $description .= '... <a href="'.$item->getLink().'" target="_blank">'.$this->translator->trans(
                                 'mautic.core.notification.read_more'
-                            )."</a>";
+                            ).'</a>';
                     }
                     $header = $item->getTitle();
 
                     $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
                 }
-
             } catch (\Exception $exception) {
                 $this->logger->addWarning($exception->getMessage());
             }

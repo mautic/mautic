@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -20,14 +20,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class UserType
+ * Class UserType.
  */
 class UserType extends AbstractType
 {
-
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
@@ -101,8 +99,8 @@ class UserType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'preaddon'     => 'fa fa-user',
-                    'autocomplete' => 'off'
-                ]
+                    'autocomplete' => 'off',
+                ],
             ]
         );
 
@@ -112,7 +110,7 @@ class UserType extends AbstractType
             [
                 'label'      => 'mautic.core.firstname',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control']
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -122,7 +120,7 @@ class UserType extends AbstractType
             [
                 'label'      => 'mautic.core.lastname',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control']
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -135,9 +133,9 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-options' => json_encode($positions)
+                    'data-options' => json_encode($positions),
                 ],
-                'required'   => false
+                'required' => false,
             ]
         );
 
@@ -149,51 +147,51 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope'
-                ]
+                    'preaddon' => 'fa fa-envelope',
+                ],
             ]
         );
 
         $existing    = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
-        $required    = ($existing) ? false : true;
+        $required = ($existing) ? false : true;
         $builder->add(
             'plainPassword',
             'repeated',
             [
-                'first_name'      => 'password',
-                'first_options'   => [
-                    'label'          => 'mautic.core.password',
-                    'label_attr'     => ['class' => 'control-label'],
-                    'attr'           => [
+                'first_name'    => 'password',
+                'first_options' => [
+                    'label'      => 'mautic.core.password',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
                         'preaddon'     => 'fa fa-lock',
-                        'autocomplete' => 'off'
+                        'autocomplete' => 'off',
                     ],
                     'required'       => $required,
-                    'error_bubbling' => false
+                    'error_bubbling' => false,
                 ],
-                'second_name'     => 'confirm',
-                'second_options'  => [
-                    'label'          => 'mautic.user.user.form.passwordconfirm',
-                    'label_attr'     => ['class' => 'control-label'],
-                    'attr'           => [
+                'second_name'    => 'confirm',
+                'second_options' => [
+                    'label'      => 'mautic.user.user.form.passwordconfirm',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
                         'preaddon'     => 'fa fa-lock',
-                        'autocomplete' => 'off'
+                        'autocomplete' => 'off',
                     ],
                     'required'       => $required,
-                    'error_bubbling' => false
+                    'error_bubbling' => false,
                 ],
                 'type'            => 'password',
                 'invalid_message' => 'mautic.user.user.password.mismatch',
                 'required'        => $required,
-                'error_bubbling'  => false
+                'error_bubbling'  => false,
             ]
         );
 
@@ -201,13 +199,13 @@ class UserType extends AbstractType
             'timezone',
             'timezone',
             [
-                'label'       => 'mautic.core.timezone',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class' => 'form-control'
+                'label'      => 'mautic.core.timezone',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone'
+                'empty_value' => 'mautic.user.user.form.defaulttimezone',
             ]
         );
 
@@ -215,14 +213,14 @@ class UserType extends AbstractType
             'locale',
             'choice',
             [
-                'choices'     => $this->supportedLanguages,
-                'label'       => 'mautic.core.language',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class' => 'form-control'
+                'choices'    => $this->supportedLanguages,
+                'label'      => 'mautic.core.language',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaultlocale'
+                'empty_value' => 'mautic.user.user.form.defaultlocale',
             ]
         );
 
@@ -241,9 +239,9 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
                 'attr'       => [
-                    'class' => 'form-control'
+                    'class' => 'form-control',
                 ],
-                'data'       => $defaultSignature
+                'data' => $defaultSignature,
             ]
         );
 
@@ -253,10 +251,10 @@ class UserType extends AbstractType
                     'role',
                     'entity',
                     [
-                        'label'         => 'mautic.user.role',
-                        'label_attr'    => ['class' => 'control-label'],
-                        'attr'          => [
-                            'class' => 'form-control'
+                        'label'      => 'mautic.user.role',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
                         ],
                         'class'         => 'MauticUserBundle:Role',
                         'property'      => 'name',
@@ -264,7 +262,7 @@ class UserType extends AbstractType
                             return $er->createQueryBuilder('r')
                                 ->where('r.isPublished = true')
                                 ->orderBy('r.name', 'ASC');
-                        }
+                        },
                     ]
                 )
             );
@@ -272,21 +270,19 @@ class UserType extends AbstractType
             $builder->add('isPublished', 'yesno_button_group');
 
             $builder->add('buttons', 'form_buttons');
-
         } else {
-
             $builder->add(
                 'buttons',
                 'form_buttons',
                 [
                     'save_text'  => 'mautic.core.form.apply',
-                    'apply_text' => false
+                    'apply_text' => false,
                 ]
             );
         }
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -302,8 +298,8 @@ class UserType extends AbstractType
                     'Mautic\UserBundle\Entity\User',
                     'determineValidationGroups',
                 ],
-                'ignore_formexit'   => false,
-                'in_profile'        => false
+                'ignore_formexit' => false,
+                'in_profile'      => false,
             ]
         );
     }
@@ -313,6 +309,6 @@ class UserType extends AbstractType
      */
     public function getName()
     {
-        return "user";
+        return 'user';
     }
 }

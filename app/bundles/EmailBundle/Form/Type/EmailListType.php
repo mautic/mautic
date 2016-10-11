@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -16,9 +16,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class EmailListType
- *
- * @package Mautic\EmailBundle\Form\Type
+ * Class EmailListType.
  */
 class EmailListType extends AbstractType
 {
@@ -50,7 +48,7 @@ class EmailListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'          => function (Options $options) {
+                'choices' => function (Options $options) {
                     $choices = [];
 
                     $emails = $this->repo->getEmailList(
@@ -72,19 +70,19 @@ class EmailListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded'         => false,
-                'multiple'         => true,
-                'required'         => false,
-                'empty_value'      => function (Options $options) {
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.email.no.emails.note' : 'mautic.core.form.chooseone';
                 },
-                'email_type'       => 'template',
-                'disabled'         => function (Options $options) {
-                    return (empty($options['choices']));
+                'email_type' => 'template',
+                'disabled'   => function (Options $options) {
+                    return empty($options['choices']);
                 },
-                'top_level'        => 'variant',
-                'variant_parent'   => null,
-                'ignore_ids'       => []
+                'top_level'      => 'variant',
+                'variant_parent' => null,
+                'ignore_ids'     => [],
             ]
         );
 
@@ -96,7 +94,7 @@ class EmailListType extends AbstractType
      */
     public function getName()
     {
-        return "email_list";
+        return 'email_list';
     }
 
     /**

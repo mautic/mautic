@@ -1,25 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class LeadChangeEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class LeadChangeEvent.
  */
 class LeadChangeEvent extends Event
 {
-
     /**
      * @var Lead
      */
@@ -57,7 +54,7 @@ class LeadChangeEvent extends Event
     /**
      * @return Lead
      */
-    public function getOldLead ()
+    public function getOldLead()
     {
         return $this->oldLead;
     }
@@ -65,7 +62,7 @@ class LeadChangeEvent extends Event
     /**
      * @return mixed
      */
-    public function getOldTrackingId ()
+    public function getOldTrackingId()
     {
         return $this->oldTrackingId;
     }
@@ -73,7 +70,7 @@ class LeadChangeEvent extends Event
     /**
      * @return Lead
      */
-    public function getNewLead ()
+    public function getNewLead()
     {
         return $this->newLead;
     }
@@ -81,7 +78,7 @@ class LeadChangeEvent extends Event
     /**
      * @return mixed
      */
-    public function getNewTrackingId ()
+    public function getNewTrackingId()
     {
         return $this->newTrackingId;
     }

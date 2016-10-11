@@ -1,26 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 
 /**
- * Class ConfigMonitoredEmailType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class ConfigMonitoredEmailType.
  */
 class ConfigMonitoredEmailType extends AbstractType
 {
@@ -56,18 +52,18 @@ class ConfigMonitoredEmailType extends AbstractType
 
             $folderSettings = $event->getFolders();
             foreach ($folderSettings as $key => $settings) {
-                $folderData = (array_key_exists($key, $data)) ? $data[$key] : array();
+                $folderData = (array_key_exists($key, $data)) ? $data[$key] : [];
                 $builder->add(
                     $key,
                     'monitored_mailboxes',
-                    array(
+                    [
                         'label'            => $settings['label'],
                         'mailbox'          => $key,
                         'default_folder'   => $settings['default'],
                         'data'             => $folderData,
                         'required'         => false,
-                        'general_settings' => (array_key_exists('general', $data)) ? $data['general'] : array(),
-                    )
+                        'general_settings' => (array_key_exists('general', $data)) ? $data['general'] : [],
+                    ]
                 );
             }
         }

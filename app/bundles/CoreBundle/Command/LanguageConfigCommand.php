@@ -1,29 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
- * CLI Command to create language configuration files
+ * CLI Command to create language configuration files.
  */
 class LanguageConfigCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -31,7 +26,7 @@ class LanguageConfigCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:translation:createconfig')
             ->setDescription('Create config.php files for translations')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to create config.php files for translations
 
 <info>php %command.full_name%</info>
@@ -56,7 +51,7 @@ EOT
             return 0;
         }
 
-        $translationDir = dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/translations/';
+        $translationDir = dirname($this->getContainer()->getParameter('kernel.root_dir')).'/translations/';
 
         $installedLocales = new Finder();
         $installedLocales->directories()->in($translationDir)->ignoreDotFiles(true)->depth('== 0');
@@ -67,7 +62,7 @@ EOT
         /** @var \Symfony\Component\Finder\SplFileInfo $dir */
         foreach ($installedLocales as $dir) {
             // If a config.php file exists, we don't need to do anything
-            $configFile = $dir->getRealPath() . '/config.php';
+            $configFile = $dir->getRealPath().'/config.php';
 
             if (file_exists($configFile)) {
                 continue;
@@ -79,12 +74,12 @@ EOT
             $langInfo = $transifex->languageinfo->getLanguage($lang);
 
             // TODO - Don't hardcode the author data
-            $configData = $this->render(array('name' => $langInfo->name, 'locale' => $langInfo->code, 'author' => 'Mautic Translators'));
+            $configData = $this->render(['name' => $langInfo->name, 'locale' => $langInfo->code, 'author' => 'Mautic Translators']);
 
             if (!@file_put_contents($configFile, $configData)) {
-                $output->writeln($translator->trans('mautic.core.command.language_config.could_not_create', array('%file%' => $configFile)));
+                $output->writeln($translator->trans('mautic.core.command.language_config.could_not_create', ['%file%' => $configFile]));
             } else {
-                $output->writeln($translator->trans('mautic.core.command.language_config.config_written', array('%lang%' => $lang)));
+                $output->writeln($translator->trans('mautic.core.command.language_config.config_written', ['%lang%' => $lang]));
             }
         }
 
@@ -149,12 +144,12 @@ EOT
                 $string .= '"'.addcslashes($value, '\\"').'"';
             }
 
-            $counter--;
+            --$counter;
             if ($counter > 0) {
-                $string .= ", \n" . str_repeat("\t", $level + 1);
+                $string .= ", \n".str_repeat("\t", $level + 1);
             }
         }
-        $string .= "\n" . str_repeat("\t", $level) . ")";
+        $string .= "\n".str_repeat("\t", $level).')';
 
         return $string;
     }

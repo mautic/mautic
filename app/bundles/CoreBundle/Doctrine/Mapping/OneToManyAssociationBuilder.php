@@ -1,27 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 /**
- * OneToMany Association Builder
+ * OneToMany Association Builder.
  *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @link https://github.com/doctrine/doctrine2/pull/1326/
- *
- * @package Mautic\CoreBundle\Doctrine\Metadata
  */
 class OneToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\OneToManyAssociationBuilder
 {
-
     /**
-     * Set orphanRemoval
+     * Set orphanRemoval.
      *
      * @param bool $orphanRemoval
      *

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * SMS Channel Migration
+ * SMS Channel Migration.
  */
 class Version20160420000000 extends AbstractMauticMigration
 {
@@ -29,44 +29,43 @@ class Version20160420000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix.'sms_messages')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->keys = array(
-            'sms_messages'          => array(
-                'idx' => array(
-                    'category' => $this->generatePropertyName('sms_messages', 'idx', array('category_id'))
-                ),
-                'fk'  => array(
-                    'category' => $this->generatePropertyName('sms_messages', 'fk', array('category_id'))
-                )
-            ),
-            'sms_message_stats'     => array(
-                'idx' => array(
-                    'sms'  => $this->generatePropertyName('sms_message_stats', 'idx', array('sms_id')),
-                    'lead' => $this->generatePropertyName('sms_message_stats', 'idx', array('lead_id')),
-                    'list' => $this->generatePropertyName('sms_message_stats', 'idx', array('list_id')),
-                    'ip'   => $this->generatePropertyName('sms_message_stats', 'idx', array('ip_id'))
-                ),
-                'fk'  => array(
-                    'sms'  => $this->generatePropertyName('sms_message_stats', 'fk', array('sms_id')),
-                    'lead' => $this->generatePropertyName('sms_message_stats', 'fk', array('lead_id')),
-                    'list' => $this->generatePropertyName('sms_message_stats', 'fk', array('list_id')),
-                    'ip'   => $this->generatePropertyName('sms_message_stats', 'fk', array('ip_id'))
-                )
-            ),
-            'sms_message_list_xref' => array(
-                'idx' => array(
-                    'sms'      => $this->generatePropertyName('sms_message_list_xref', 'idx', array('sms_id')),
-                    'leadlist' => $this->generatePropertyName('sms_message_list_xref', 'idx', array('leadlist_id'))
-                ),
-                'fk'  => array(
-                    'sms'      => $this->generatePropertyName('sms_message_list_xref', 'fk', array('sms_id')),
-                    'leadlist' => $this->generatePropertyName('sms_message_list_xref', 'fk', array('leadlist_id'))
-                )
-            )
-        );
+        $this->keys = [
+            'sms_messages' => [
+                'idx' => [
+                    'category' => $this->generatePropertyName('sms_messages', 'idx', ['category_id']),
+                ],
+                'fk' => [
+                    'category' => $this->generatePropertyName('sms_messages', 'fk', ['category_id']),
+                ],
+            ],
+            'sms_message_stats' => [
+                'idx' => [
+                    'sms'  => $this->generatePropertyName('sms_message_stats', 'idx', ['sms_id']),
+                    'lead' => $this->generatePropertyName('sms_message_stats', 'idx', ['lead_id']),
+                    'list' => $this->generatePropertyName('sms_message_stats', 'idx', ['list_id']),
+                    'ip'   => $this->generatePropertyName('sms_message_stats', 'idx', ['ip_id']),
+                ],
+                'fk' => [
+                    'sms'  => $this->generatePropertyName('sms_message_stats', 'fk', ['sms_id']),
+                    'lead' => $this->generatePropertyName('sms_message_stats', 'fk', ['lead_id']),
+                    'list' => $this->generatePropertyName('sms_message_stats', 'fk', ['list_id']),
+                    'ip'   => $this->generatePropertyName('sms_message_stats', 'fk', ['ip_id']),
+                ],
+            ],
+            'sms_message_list_xref' => [
+                'idx' => [
+                    'sms'      => $this->generatePropertyName('sms_message_list_xref', 'idx', ['sms_id']),
+                    'leadlist' => $this->generatePropertyName('sms_message_list_xref', 'idx', ['leadlist_id']),
+                ],
+                'fk' => [
+                    'sms'      => $this->generatePropertyName('sms_message_list_xref', 'fk', ['sms_id']),
+                    'leadlist' => $this->generatePropertyName('sms_message_list_xref', 'fk', ['leadlist_id']),
+                ],
+            ],
+        ];
     }
 
     /**

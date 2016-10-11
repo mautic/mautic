@@ -1,33 +1,31 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PointsActionType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class PointsActionType.
  */
 class StageActionType extends AbstractType
 {
     private $model;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->model = $factory->getModel('stage');
     }
 
@@ -38,19 +36,19 @@ class StageActionType extends AbstractType
     {
         /** @var \Mautic\StageBundle\Model\StageModel $model */
         $model = $this->model;
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choices' => function (Options $options) use ($model) {
                 $stages = $model->getUserStages();
 
-                $choices = array();
+                $choices = [];
                 foreach ($stages as $s) {
                     $choices[$s['id']] = $s['name'];
                 }
 
                 return $choices;
             },
-            'required'    => false
-        ));
+            'required' => false,
+        ]);
     }
 
     /**
@@ -63,7 +61,8 @@ class StageActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
-        return "leadstage_action";
+    public function getName()
+    {
+        return 'leadstage_action';
     }
 }

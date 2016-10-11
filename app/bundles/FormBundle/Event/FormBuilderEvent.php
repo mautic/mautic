@@ -1,32 +1,39 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * Class FormBuilderEvent
+ * Class FormBuilderEvent.
  */
 class FormBuilderEvent extends Event
 {
+    use ComponentValidationTrait;
 
     /**
      * @var array
      */
-    private $actions = array();
+    private $actions = [];
 
     /**
      * @var array
      */
-    private $fields  = array();
+    private $fields = [];
+
+    /**
+     * @var array
+     */
+    private $validators = [];
 
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
@@ -44,45 +51,23 @@ class FormBuilderEvent extends Event
     /**
      * Adds a submit action to the list of available actions.
      *
-     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array $action - can contain the following keys:
-     *  'label'           => (required) what to display in the list
-     *  'description'     => (optional) short description of event
-     *  'template'        => (optional) template to use for the action's HTML in the form builder
-     *      i.e AcmeMyBundle:FormAction:theaction.html.php
-     *  'formType'        => (required) name of the form type SERVICE for the action
-     *  'formTypeOptions' => (optional) array of options to pass to formType
-     *  'formTheme'       => (optional  theme for custom form views
-     *  'validator'       => (optional) callback function to validate form results (or do whatever is necessary prior to
-     *                      calling the callback function and also before the results are saved to the DB). The function
-     *                      return an array of array(bool $valid, string $errorMessage)
+     * @param string $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $action can contain the following keys:
+     *                       $action = [
+     *                       'group'              => (required) Label of the group to add this action to
+     *                       'label'              => (required) what to display in the list
+     *                       'eventName'          => (required) Event dispatched to execute action; it will receive a SubmissionEvent object
+     *                       'formType'           => (required) name of the form type SERVICE for the action
+     *                       'allowCampaignForm'  => (optional) true to allow this action for campaign forms; defaults to false
+     *                       'description'        => (optional) short description of event
+     *                       'template'           => (optional) template to use for the action's HTML in the form builder;
+     *                       eg AcmeMyBundle:FormAction:theaction.html.php
+     *                       'formTypeOptions'    => (optional) array of options to pass to formType
+     *                       'formTheme'          => (optional  theme for custom form views
+     *                       'validator'          => (deprecated) callback function to validate form results - use addValidator() instead
+     *                       'callback'           => (deprecated) callback function that will be passed the results upon a form submit; use eventName instead
+     *                       ]
      *
-     *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          array $properties - values saved from the formType as defined here
-     *          array $post - values from submitted form
-     *          array $server - values from Request $request->server->all()
-     *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          array $feedback whatever is returned from other function subscribed to this event will be stored stored
-     *                in this variable with the $key as its index; can be used to store new entities, etc that can
-     *                be used by other subscribers
-     *          Mautic\FormBundle\Entity\Action $action
-     *          Mautic\FormBundle\Entity\Form $form
-     *          Mautic\FormBundle\Entity\Submission $submission
-     *  'callback'        => (required) callback function that will be passed the results upon a form submit.
-     *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          array $fields - form fields with keys id, type and alias
-     *          array $properties - values saved from the formType as defined here
-     *          array $post - values from submitted form
-     *          array $server - values from Request $request->server->all()
-     *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          array $feedback whatever is returned from other function subscribed to this event will be stored stored
-     *                in this variable with the $key as its index; can be used to store new entities, etc that can
-     *                be used by other subscribers
-     *          Mautic\FormBundle\Entity\Action $action
-     *          Mautic\FormBundle\Entity\Form $form
-     *          Mautic\FormBundle\Entity\Submission $submission
-     *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function addSubmitAction($key, array $action)
@@ -93,8 +78,7 @@ class FormBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label', 'formType', 'callback'),
-            array('callback', 'validator'),
+            ['group', 'label', 'formType', ['eventName', 'callback', 'validator']],
             $action
         );
 
@@ -108,71 +92,93 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get submit actions
+     * Get submit actions.
      *
      * @return array
      */
     public function getSubmitActions()
     {
-        uasort($this->actions, function ($a, $b) {
-            return strnatcasecmp(
-                $a['label'], $b['label']);
-        });
+        uasort(
+            $this->actions,
+            function ($a, $b) {
+                return strnatcasecmp(
+                    $a['label'],
+                    $b['label']
+                );
+            }
+        );
+
         return $this->actions;
     }
 
     /**
-     * Get submit actions by groups
+     * Get submit actions by groups.
      *
      * @return array
      */
     public function getSubmitActionGroups()
     {
         $actions = $this->getSubmitActions();
-        $groups = array();
+        $groups  = [];
         foreach ($actions as $key => $action) {
             $groups[$action['group']][$key] = $action;
         }
+
         return $groups;
     }
 
     /**
      * Adds a form field to the list of available fields in the form builder.
      *
-     * @param string $key   - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
-     * @param array  $field - must contain the following keys
-     *  'label'           => (required) what to display in the list
-     *  'formType'        => (required) name of the form type SERVICE for the field's property column
-     *  'formTypeOptions' => (optional) array of options to pass to formType
-     *  'formTheme'       => (optional) theme for custom form view
-     *  'template'        => (required) template to use for the field's HTML i.e AcmeMyBundle:FormField:thefield.html.php
-     *  'valueFilter' = (optional)the filter to use to clean the input as supported by InputHelper or a callback function that accepts
-     *      the variables FormField $field and $value
-     *  'valueConstraints' = (optional) callback function to use to validate the value; FormField $field and $filteredValue are passed in
-     *  'builderOptions'  => (optional) array of options:
-     *      addHelpMessage = true|false
-     *      addShowLabel = true|false
-     *      addDefaultValue = true|false
-     *      addLabelAttributes = true|false
-     *      addInputAttributes = true|false
-     *      addIsRequired = true|false
+     * @param string $key   unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
+     * @param array  $field can contain the following key/values
+     *                      $field = [
+     *                      'label'            => (required) what to display in the list
+     *                      'formType'         => (required) name of the form type SERVICE for the field's property column
+     *                      'template'         => (required) template to use for the field's HTML eg AcmeMyBundle:FormField:thefield.html.php
+     *                      'formTypeOptions'  => (optional) array of options to pass to formType
+     *                      'formTheme'        => (optional) theme for custom form view
+     *                      'valueFilter'      => (optional) the filter to use to clean the input as supported by InputHelper or a callback;
+     *                      should accept arguments FormField $field and $filteredValue
+     *                      'valueConstraints' => (deprecated) callback to use to validate the value; use addValidator() instead
+     *                      'builderOptions'   => (optional) array of options
+     *                      [
+     *                      'addHelpMessage'     => (bool) show help message inputs
+     *                      'addShowLabel'       => (bool) show label input
+     *                      'addDefaultValue'    => (bool) show default value input
+     *                      'addLabelAttributes' => (bool) show label attribute input
+     *                      'addInputAttributes' => (bool) show input attribute input
+     *                      'addIsRequired'      => (bool) show is required toggle
+     *                      ]
+     *                      ]
      *
-     * @return void
      * @throws InvalidArgumentException
      */
-
     public function addFormField($key, array $field)
     {
         if (array_key_exists($key, $this->fields)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
         }
-        $this->verifyComponent(array('label', 'formType', 'template'), array(), $field);
+
+        $callbacks = ['valueConstraints'];
+
+        // Only validate valueFilter if it's not a InputHelper method
+        if (isset($field['valueFilter'])
+            && (!is_string($field['valueFilter'])
+                || !is_callable(
+                    ['\Mautic\CoreBundle\Helper\InputHelper', $field['valueFilter']]
+                ))
+        ) {
+            $callbacks = ['valueFilter'];
+        }
+
+        $this->verifyComponent(['label', 'formType', 'template'], $field, $callbacks);
 
         $this->fields[$key] = $field;
     }
 
     /**
-     * Get form fields
+     * Get form fields.
      *
      * @return mixed
      */
@@ -182,25 +188,52 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
+     * Add a field validator.
      *
-     * @return void
-     * @throws InvalidArgumentException
+     * @param       $key
+     * @param array $validator
+     *                         $validator = [
+     *                         'eventName' => (required) Event name to dispatch to validate the form; it will recieve a ValidationEvent object
+     *                         'fieldType' => (optional) Optional filter to validate only a specific type of field; otherwise every field
+     *                         will be sent through the validation event
+     *                         ]
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    public function addValidator($key, array $validator)
     {
-        foreach ($keys as $k) {
-            if (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+        if (array_key_exists($key, $this->fields)) {
+            throw new InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
+        }
+
+        //check for required keys and that given functions are callable
+        $this->verifyComponent(['eventName'], $validator);
+
+        $this->validators[$key] = $validator;
+    }
+
+    /**
+     * Returns validators organized by ['form' => [], 'fieldType' => [], ...
+     *
+     * @return array
+     */
+    public function getValidators()
+    {
+        // Organize by field
+        $fieldValidators = [
+            'form' => [],
+        ];
+
+        foreach ($this->validators as $validator) {
+            if (isset($validator['fieldType'])) {
+                if (!isset($fieldValidators[$validator['fieldType']])) {
+                    $fieldValidators[$validator['fieldType']] = [];
+                }
+
+                $fieldValidators[$validator['fieldType']] = $validator['eventName'];
+            } else {
+                $fieldValidators['form'] = $validator['eventName'];
             }
         }
 
-        foreach ($methods as $m) {
-            if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException($component[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
-            }
-        }
+        return $fieldValidators;
     }
 }

@@ -1,25 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
- * Universal DNC Migration
+ * Universal DNC Migration.
  */
 class Version20160523000000 extends AbstractMauticMigration
 {
-
     /**
      * @param Schema $schema
      *
@@ -38,7 +36,6 @@ class Version20160523000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-
         $sql = <<<SQL
 CREATE TABLE `{$this->prefix}stages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -72,12 +69,12 @@ CREATE TABLE `{$this->prefix}lead_stages_change_log` (
   `action_name` varchar(255) NOT NULL,
   `date_added` datetime NOT NULL  COMMENT '(DC2Type:datetime)',
   PRIMARY KEY (`id`),
-  INDEX {$this->generatePropertyName('lead_stages_change_log', 'idx', array('lead_id'))} (lead_id)
+  INDEX {$this->generatePropertyName('lead_stages_change_log', 'idx', ['lead_id'])} (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
         $this->addSql($sql);
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_stages_change_log ADD CONSTRAINT ' . $this->generatePropertyName('lead_stages_change_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'lead_stages_change_log ADD CONSTRAINT '.$this->generatePropertyName('lead_stages_change_log', 'fk', ['lead_id']).' FOREIGN KEY (lead_id) REFERENCES '.$this->prefix.'leads (id) ON DELETE CASCADE');
 
         $sql = <<<SQL
 CREATE TABLE `{$this->prefix}stage_lead_action_log` (
@@ -86,16 +83,16 @@ CREATE TABLE `{$this->prefix}stage_lead_action_log` (
   `ip_id` int(11) DEFAULT NULL,
   `date_fired` datetime NOT NULL,
   PRIMARY KEY (`stage_id`, `lead_id`),
-  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('lead_id'))} (lead_id),
-  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('stage_id'))} (stage_id),
-  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('ip_id'))} (ip_id)
+  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', ['lead_id'])} (lead_id),
+  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', ['stage_id'])} (stage_id),
+  INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', ['ip_id'])} (ip_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($sql);
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('stage_id')) . ' FOREIGN KEY (stage_id) REFERENCES ' . $this->prefix . 'stages (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'leads ADD COLUMN stage_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'stage_lead_action_log ADD CONSTRAINT '.$this->generatePropertyName('stage_lead_action_log', 'fk', ['lead_id']).' FOREIGN KEY (lead_id) REFERENCES '.$this->prefix.'leads (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'stage_lead_action_log ADD CONSTRAINT '.$this->generatePropertyName('stage_lead_action_log', 'fk', ['stage_id']).' FOREIGN KEY (stage_id) REFERENCES '.$this->prefix.'stages (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'stage_lead_action_log ADD CONSTRAINT '.$this->generatePropertyName('stage_lead_action_log', 'fk', ['ip_id']).' FOREIGN KEY (ip_id) REFERENCES '.$this->prefix.'ip_addresses (id)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'leads ADD COLUMN stage_id INT DEFAULT NULL');
     }
 }

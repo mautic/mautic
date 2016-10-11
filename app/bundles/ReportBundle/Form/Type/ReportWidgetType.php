@@ -1,22 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ReportBundle\Form\Type;
 
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Mautic\ReportBundle\Entity\Report;
 
 /**
- * Class ReportWidgetType
+ * Class ReportWidgetType.
  */
 class ReportWidgetType extends AbstractType
 {
@@ -49,7 +48,7 @@ class ReportWidgetType extends AbstractType
                 $graphs = unserialize($report['graphs']);
 
                 foreach ($graphs as $graph) {
-                    $graphValue                            = $report['id'].":".$graph;
+                    $graphValue                            = $report['id'].':'.$graph;
                     $choices[$report['name']][$graphValue] = $graph;
                 }
             }
@@ -68,13 +67,13 @@ class ReportWidgetType extends AbstractType
                 'empty_value' => false,
                 'required'    => false,
                 'attr'        => [
-                    'class' => 'form-control'
-                ]
+                    'class' => 'form-control',
+                ],
             ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -83,6 +82,6 @@ class ReportWidgetType extends AbstractType
      */
     public function getName()
     {
-        return "report_widget";
+        return 'report_widget';
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -15,7 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class BuildJsSubscriber
+ * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
@@ -25,23 +25,20 @@ class BuildJsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 200)
+            CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 200],
         ];
     }
 
     /**
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
-     * must retain top priority of 1000
+     * must retain top priority of 1000.
      *
      * @param BuildJsEvent $event
-     *
-     * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $dwcUrl = $router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
 MauticJS.replaceDynamicContent = function () {

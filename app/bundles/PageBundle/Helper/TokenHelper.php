@@ -1,18 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;
 
 /**
- * Class TokenHelper
+ * Class TokenHelper.
  */
 class TokenHelper
 {
@@ -37,23 +37,21 @@ class TokenHelper
      *
      * @return array
      */
-    public function findPageTokens($content, $clickthrough = array())
+    public function findPageTokens($content, $clickthrough = [])
     {
         preg_match_all('/{pagelink=(.*?)}/', $content, $matches);
 
-        $tokens = array();
+        $tokens = [];
         if (!empty($matches[1])) {
             foreach ($matches[1] as $key => $pageId) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
-
                     continue;
                 }
 
                 $page = $this->model->getEntity($pageId);
 
                 if (!$page) {
-
                     continue;
                 }
 

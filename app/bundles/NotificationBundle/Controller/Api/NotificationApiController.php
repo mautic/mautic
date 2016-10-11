@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -20,7 +20,7 @@ class NotificationApiController extends CommonApiController
     /**
      * Receive Web Push subscription request.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function subscribeAction()
     {

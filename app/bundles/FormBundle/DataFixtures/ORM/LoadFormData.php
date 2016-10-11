@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -20,11 +20,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadFormData
+ * Class LoadFormData.
  */
 class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -43,21 +42,21 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $model   = $factory->getModel('form.form');
-        $repo    = $model->getRepository();
-        $forms = CsvHelper::csv_to_array(__DIR__ . '/fakeformdata.csv');
-        $formEntities = array();
+        $factory      = $this->container->get('mautic.factory');
+        $model        = $factory->getModel('form.form');
+        $repo         = $model->getRepository();
+        $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
+        $formEntities = [];
         foreach ($forms as $count => $rows) {
             $form = new Form();
-            $key = $count+1;
+            $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
 
-                    if (in_array($col, array('dateAdded'))) {
+                    if (in_array($col, ['dateAdded'])) {
                         $form->$setter(new \DateTime($val));
-                    } elseif (in_array($col, array('cachedHtml'))) {
+                    } elseif (in_array($col, ['cachedHtml'])) {
                         $val = stripslashes($val);
                         $form->$setter($val);
                     } else {
@@ -71,19 +70,19 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
         }
 
         //import fields
-        $fields = CsvHelper::csv_to_array(__DIR__ . '/fakefielddata.csv');
+        $fields = CsvHelper::csv_to_array(__DIR__.'/fakefielddata.csv');
         $repo   = $factory->getModel('form.field')->getRepository();
         foreach ($fields as $count => $rows) {
             $field = new Field();
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
 
-                    if (in_array($col, array('form'))) {
+                    if (in_array($col, ['form'])) {
                         $form = $this->getReference('form-'.$val);
                         $field->$setter($form);
                         $form->addField($count, $field);
-                    } elseif (in_array($col, array('customParameters','properties'))) {
+                    } elseif (in_array($col, ['customParameters', 'properties'])) {
                         $val = unserialize(stripslashes($val));
                         $field->$setter($val);
                     } else {
@@ -95,17 +94,17 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
         }
 
         //import actions
-        $actions = CsvHelper::csv_to_array(__DIR__ . '/fakeactiondata.csv');
+        $actions = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
         $repo    = $factory->getModel('form.action')->getRepository();
         foreach ($actions as $count => $rows) {
             $action = new Action();
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
 
-                    if (in_array($col, array('form'))) {
+                    if (in_array($col, ['form'])) {
                         $action->$setter($this->getReference('form-'.$val));
-                    }  elseif (in_array($col, array('properties'))) {
+                    } elseif (in_array($col, ['properties'])) {
                         $val = unserialize(stripslashes($val));
                         if ($col == 'settings') {
                             $val['callback'] = stripslashes($val['callback']);

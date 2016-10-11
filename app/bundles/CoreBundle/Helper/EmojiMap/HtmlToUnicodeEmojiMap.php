@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
  * This class will kill some IDEs so best to not parse these as PHP
  */
-
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
 class HtmlToUnicodeEmojiMap
 {
-    static public $map = [
+    public static $map = [
         "<span class=\x22emoji-outer emoji-sizer\x22><span class=\x22emoji-inner emojia9\x22></span></span>"                                  => "\xc2\xa9",
         "<span class=\x22emoji-outer emoji-sizer\x22><span class=\x22emoji-inner emojiae\x22></span></span>"                                  => "\xc2\xae",
         "<span class=\x22emoji-outer emoji-sizer\x22><span class=\x22emoji-inner emoji203c\x22></span></span>"                                => "\xe2\x80\xbc",

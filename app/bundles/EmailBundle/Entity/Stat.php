@@ -1,29 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+
 /**
- * Class Stat
- *
- * @package Mautic\EmailBundle\Entity
+ * Class Stat.
  */
 class Stat
 {
-
     /**
      * @var int
      */
@@ -102,7 +98,7 @@ class Stat
     /**
      * @var array
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * @var Copy
@@ -122,12 +118,12 @@ class Stat
     /**
      * @var array
      */
-    private $openDetails = array();
+    private $openDetails = [];
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -140,7 +136,6 @@ class Stat
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
             ->addIndex(['date_read'], 'email_date_read');
-
 
         $builder->addId();
 
@@ -217,7 +212,7 @@ class Stat
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -225,7 +220,7 @@ class Stat
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
-                array(
+                [
                     'id',
                     'emailAddress',
                     'ipAddress',
@@ -241,8 +236,8 @@ class Stat
                     'trackingHash',
                     'viewedInBrowser',
                     'lead',
-                    'email'
-                )
+                    'email',
+                ]
             )
             ->build();
     }
@@ -250,7 +245,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getDateRead ()
+    public function getDateRead()
     {
         return $this->dateRead;
     }
@@ -258,7 +253,7 @@ class Stat
     /**
      * @param mixed $dateRead
      */
-    public function setDateRead ($dateRead)
+    public function setDateRead($dateRead)
     {
         $this->dateRead = $dateRead;
     }
@@ -266,7 +261,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getDateSent ()
+    public function getDateSent()
     {
         return $this->dateSent;
     }
@@ -274,7 +269,7 @@ class Stat
     /**
      * @param mixed $dateSent
      */
-    public function setDateSent ($dateSent)
+    public function setDateSent($dateSent)
     {
         $this->dateSent = $dateSent;
     }
@@ -282,7 +277,7 @@ class Stat
     /**
      * @return Email
      */
-    public function getEmail ()
+    public function getEmail()
     {
         return $this->email;
     }
@@ -290,7 +285,7 @@ class Stat
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email = null)
+    public function setEmail(Email $email = null)
     {
         $this->email = $email;
     }
@@ -298,7 +293,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -306,7 +301,7 @@ class Stat
     /**
      * @return IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -314,7 +309,7 @@ class Stat
     /**
      * @param mixed $ip
      */
-    public function setIpAddress (IpAddress $ip)
+    public function setIpAddress(IpAddress $ip)
     {
         $this->ipAddress = $ip;
     }
@@ -322,7 +317,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getIsRead ()
+    public function getIsRead()
     {
         return $this->isRead;
     }
@@ -330,7 +325,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function isRead ()
+    public function isRead()
     {
         return $this->getIsRead();
     }
@@ -338,7 +333,7 @@ class Stat
     /**
      * @param mixed $isRead
      */
-    public function setIsRead ($isRead)
+    public function setIsRead($isRead)
     {
         $this->isRead = $isRead;
     }
@@ -346,7 +341,7 @@ class Stat
     /**
      * @return Lead
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -354,7 +349,7 @@ class Stat
     /**
      * @param mixed $lead
      */
-    public function setLead (Lead $lead = null)
+    public function setLead(Lead $lead = null)
     {
         $this->lead = $lead;
     }
@@ -362,7 +357,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getTrackingHash ()
+    public function getTrackingHash()
     {
         return $this->trackingHash;
     }
@@ -370,7 +365,7 @@ class Stat
     /**
      * @param mixed $trackingHash
      */
-    public function setTrackingHash ($trackingHash)
+    public function setTrackingHash($trackingHash)
     {
         $this->trackingHash = $trackingHash;
     }
@@ -378,7 +373,7 @@ class Stat
     /**
      * @return \Mautic\LeadBundle\Entity\LeadList
      */
-    public function getList ()
+    public function getList()
     {
         return $this->list;
     }
@@ -386,7 +381,7 @@ class Stat
     /**
      * @param mixed $list
      */
-    public function setList ($list)
+    public function setList($list)
     {
         $this->list = $list;
     }
@@ -394,7 +389,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getRetryCount ()
+    public function getRetryCount()
     {
         return $this->retryCount;
     }
@@ -402,23 +397,20 @@ class Stat
     /**
      * @param mixed $retryCount
      */
-    public function setRetryCount ($retryCount)
+    public function setRetryCount($retryCount)
     {
         $this->retryCount = $retryCount;
     }
 
-    /**
-     *
-     */
-    public function upRetryCount ()
+    public function upRetryCount()
     {
-        $this->retryCount++;
+        ++$this->retryCount;
     }
 
     /**
      * @return mixed
      */
-    public function getIsFailed ()
+    public function getIsFailed()
     {
         return $this->isFailed;
     }
@@ -426,7 +418,7 @@ class Stat
     /**
      * @param mixed $isFailed
      */
-    public function setIsFailed ($isFailed)
+    public function setIsFailed($isFailed)
     {
         $this->isFailed = $isFailed;
     }
@@ -434,7 +426,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function isFailed ()
+    public function isFailed()
     {
         return $this->getIsFailed();
     }
@@ -442,7 +434,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getEmailAddress ()
+    public function getEmailAddress()
     {
         return $this->emailAddress;
     }
@@ -450,7 +442,7 @@ class Stat
     /**
      * @param mixed $emailAddress
      */
-    public function setEmailAddress ($emailAddress)
+    public function setEmailAddress($emailAddress)
     {
         $this->emailAddress = $emailAddress;
     }
@@ -458,7 +450,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getViewedInBrowser ()
+    public function getViewedInBrowser()
     {
         return $this->viewedInBrowser;
     }
@@ -466,7 +458,7 @@ class Stat
     /**
      * @param mixed $viewedInBrowser
      */
-    public function setViewedInBrowser ($viewedInBrowser)
+    public function setViewedInBrowser($viewedInBrowser)
     {
         $this->viewedInBrowser = $viewedInBrowser;
     }
@@ -474,7 +466,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
@@ -482,7 +474,7 @@ class Stat
     /**
      * @param mixed $source
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->source = $source;
     }
@@ -490,7 +482,7 @@ class Stat
     /**
      * @return mixed
      */
-    public function getSourceId ()
+    public function getSourceId()
     {
         return $this->sourceId;
     }
@@ -498,15 +490,15 @@ class Stat
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId ($sourceId)
+    public function setSourceId($sourceId)
     {
-        $this->sourceId = (int)$sourceId;
+        $this->sourceId = (int) $sourceId;
     }
 
     /**
      * @return mixed
      */
-    public function getTokens ()
+    public function getTokens()
     {
         return $this->tokens;
     }
@@ -514,7 +506,7 @@ class Stat
     /**
      * @param mixed $tokens
      */
-    public function setTokens ($tokens)
+    public function setTokens($tokens)
     {
         $this->tokens = $tokens;
     }
@@ -546,17 +538,17 @@ class Stat
     {
         $this->openDetails[] = $details;
 
-        $this->openCount++;
+        ++$this->openCount;
     }
 
     /**
-     * Up the sent count
+     * Up the sent count.
      *
      * @return Stat
      */
     public function upOpenCount()
     {
-        $count = (int) $this->openCount + 1;
+        $count           = (int) $this->openCount + 1;
         $this->openCount = $count;
 
         return $this;

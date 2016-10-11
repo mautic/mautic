@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,14 +9,8 @@
  */
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
-use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -45,7 +39,7 @@ class DynamicContentApiController extends CommonController
     {
         $lead    = $this->getModel('lead')->getCurrentLead();
         $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentForLead($objectAlias, $lead);
-        
+
         return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
     }
 }

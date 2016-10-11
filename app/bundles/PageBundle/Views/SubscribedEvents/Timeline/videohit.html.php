@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $viewTime = $duration = $percentage = $unknown = $view['translator']->trans('mautic.core.unknown');
 
 if ($event['extra']['hit']['time_watched']) {
@@ -16,7 +16,7 @@ if ($event['extra']['hit']['time_watched']) {
     if ($viewTime > 60) {
         $sec      = $viewTime % 60;
         $min      = floor($viewTime / 60);
-        $viewTime = $min . 'm ' . $sec . 's';
+        $viewTime = $min.'m '.$sec.'s';
     } else {
         $viewTime .= 's';
     }
@@ -29,7 +29,7 @@ if ($event['extra']['hit']['duration']) {
     if ($duration > 60) {
         $sec      = $duration % 60;
         $min      = floor($duration / 60);
-        $duration = $min . 'm ' . $sec . 's';
+        $duration = $min.'m '.$sec.'s';
     } else {
         $duration .= 's';
     }

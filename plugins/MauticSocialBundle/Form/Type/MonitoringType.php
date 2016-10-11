@@ -1,15 +1,14 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -19,86 +18,86 @@ class MonitoringType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('title', 'text', array(
+        $builder->add('title', 'text', [
             'label'      => 'mautic.core.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+        ]);
 
-        $builder->add('description', 'textarea', array(
+        $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control editor'),
-            'required'   => false
-        ));
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+        ]);
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $builder->add('publishUp', 'datetime', array(
+        $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
-        $builder->add('publishDown', 'datetime', array(
+        $builder->add('publishDown', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
-        $builder->add('networkType', 'choice', array(
+        $builder->add('networkType', 'choice', [
             'label'      => 'mautic.social.monitoring.type.list',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class' => 'form-control',
-                'onchange' => 'Mautic.getNetworkFormAction(this)'
-            ),
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.getNetworkFormAction(this)',
+            ],
             'choices'     => $options['networkTypes'], // passed from the controller
-            'empty_value' => 'mautic.core.form.chooseone'
-        ));
+            'empty_value' => 'mautic.core.form.chooseone',
+        ]);
 
         // if we have a network type value add in the form
-        if (! empty($options['networkType']) && array_key_exists($options['networkType'], $options['networkTypes'])) {
+        if (!empty($options['networkType']) && array_key_exists($options['networkType'], $options['networkTypes'])) {
 
             // get the values from the entity function
             $properties = $options['data']->getProperties();
 
             $builder->add('properties', $options['networkType'],
-                array (
+                [
                     'label' => false,
-                    'data'  => $properties
-                )
+                    'data'  => $properties,
+                ]
             );
         }
 
-        $builder->add('lists', 'leadlist_choices', array(
+        $builder->add('lists', 'leadlist_choices', [
             'label'      => 'mautic.lead.lead.events.addtolists',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'       => 'form-control'
-            ),
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class' => 'form-control',
+            ],
             'multiple' => true,
-            'expanded' => false
-        ));
+            'expanded' => false,
+        ]);
 
         //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'plugin:mauticSocial'
-        ));
+        $builder->add('category', 'category', [
+            'bundle' => 'plugin:mauticSocial',
+        ]);
 
         $builder->add('buttons', 'form_buttons');
     }
@@ -108,19 +107,19 @@ class MonitoringType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
                 'data_class' => 'MauticPlugin\MauticSocialBundle\Entity\Monitoring',
-            ));
+            ]);
 
         // allow network types to be sent through - list
-        $resolver->setRequired(array('networkTypes'));
+        $resolver->setRequired(['networkTypes']);
 
         // allow the specific network type - single
-        $resolver->setOptional(array('networkType'));
+        $resolver->setOptional(['networkType']);
     }
 
     public function getName()
     {
-        return "monitoring";
+        return 'monitoring';
     }
 }

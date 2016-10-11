@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle\Event;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
- * Class AssetLoadEvent
- *
- * @package Mautic\AssetBundle\Event
+ * Class AssetLoadEvent.
  */
 class AssetLoadEvent extends CommonEvent
 {
@@ -34,7 +32,7 @@ class AssetLoadEvent extends CommonEvent
     }
 
     /**
-     * Returns the Download entity
+     * Returns the Download entity.
      *
      * @return Download
      */
@@ -52,7 +50,7 @@ class AssetLoadEvent extends CommonEvent
     }
 
     /**
-     * Returns if this is the first download for the session
+     * Returns if this is the first download for the session.
      *
      * @return bool
      */
