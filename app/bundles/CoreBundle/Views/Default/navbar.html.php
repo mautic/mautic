@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -32,7 +33,7 @@
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
-        <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
+        <?php echo $view->render('MauticCoreBundle:Menu:profile.html.php'); ?>
         <li>
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
                 <i class="fa fa-cog fs-16"></i>

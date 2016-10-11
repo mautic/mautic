@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -15,7 +15,9 @@
     </div>
     <div class="panel-body">
         <?php foreach ($form->children as $key => $f): ?>
-        <?php if (in_array($key, ['sms_frequency_number', 'sms_frequency_time'])) continue; ?>
+        <?php if (in_array($key, ['sms_frequency_number', 'sms_frequency_time'])) {
+    continue;
+} ?>
         <div class="row">
             <div class="col-md-6">
                 <?php echo $view['form']->row($f); ?>

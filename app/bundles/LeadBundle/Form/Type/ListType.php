@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -22,23 +22,20 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class ListType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class ListType.
  */
 class ListType extends AbstractType
 {
-
     private $translator;
-    private $fieldChoices = [];
+    private $fieldChoices    = [];
     private $timezoneChoices = [];
-    private $countryChoices = [];
-    private $regionChoices = [];
-    private $listChoices = [];
-    private $emailChoices = [];
-    private $tagChoices = [];
-    private $stageChoices = [];
-    private $localeChoices = [];
+    private $countryChoices  = [];
+    private $regionChoices   = [];
+    private $listChoices     = [];
+    private $emailChoices    = [];
+    private $tagChoices      = [];
+    private $stageChoices    = [];
+    private $localeChoices   = [];
 
     /**
      * @param MauticFactory $factory
@@ -101,7 +98,7 @@ class ListType extends AbstractType
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control']
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -114,9 +111,9 @@ class ListType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'length'  => 25,
-                    'tooltip' => 'mautic.lead.list.help.alias'
+                    'tooltip' => 'mautic.lead.list.help.alias',
                 ],
-                'required'   => false
+                'required' => false,
             ]
         );
 
@@ -127,7 +124,7 @@ class ListType extends AbstractType
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],
-                'required'   => false
+                'required'   => false,
             ]
         );
 
@@ -135,7 +132,7 @@ class ListType extends AbstractType
             'isGlobal',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.list.form.isglobal'
+                'label' => 'mautic.lead.list.form.isglobal',
             ]
         );
 
@@ -147,8 +144,8 @@ class ListType extends AbstractType
                 'filters',
                 'collection',
                 [
-                    'type'           => 'leadlist_filter',
-                    'options'        => [
+                    'type'    => 'leadlist_filter',
+                    'options' => [
                         'label'     => false,
                         'timezones' => $this->timezoneChoices,
                         'countries' => $this->countryChoices,
@@ -157,21 +154,21 @@ class ListType extends AbstractType
                         'lists'     => $this->listChoices,
                         'emails'    => $this->emailChoices,
                         'tags'      => $this->tagChoices,
-                        'stage'     => $this->stageChoices
+                        'stage'     => $this->stageChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
                     'allow_add'      => true,
                     'allow_delete'   => true,
-                    'label'          => false
+                    'label'          => false,
                 ]
             )->addModelTransformer($filterModalTransformer)
         );
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -182,7 +179,7 @@ class ListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadList'
+                'data_class' => 'Mautic\LeadBundle\Entity\LeadList',
             ]
         );
     }
@@ -208,6 +205,6 @@ class ListType extends AbstractType
      */
     public function getName()
     {
-        return "leadlist";
+        return 'leadlist';
     }
 }

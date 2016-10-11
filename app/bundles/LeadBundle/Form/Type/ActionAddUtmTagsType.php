@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,14 +13,9 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Doctrine\ORM\EntityRepository;
 
 /**
- * Class FormSubmitActionAddUtmTagType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class FormSubmitActionAddUtmTagType.
  */
 class ActionAddUtmTagsType extends AbstractType
 {
@@ -39,8 +35,6 @@ class ActionAddUtmTagsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-
     }
 
     /**
@@ -48,6 +42,6 @@ class ActionAddUtmTagsType extends AbstractType
      */
     public function getName()
     {
-        return "lead_action_addutmtags";
+        return 'lead_action_addutmtags';
     }
 }

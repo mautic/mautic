@@ -1,6 +1,6 @@
 <?php
 /**
- * Modified from \Symfony\Component\Validator\Constraints\UrlValidator
+ * Modified from \Symfony\Component\Validator\Constraints\UrlValidator.
  *
  * This file is part of the Symfony package.
  *
@@ -10,10 +10,11 @@
  * file that was distributed with this source code.
  *
  *
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 

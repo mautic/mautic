@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +15,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * Class FormatHelper
+ * Class FormatHelper.
  */
 class FormatterHelper extends Helper
 {
@@ -34,7 +35,7 @@ class FormatterHelper extends Helper
     }
 
     /**
-     * Format a string
+     * Format a string.
      *
      * @param $val
      * @param $type
@@ -55,7 +56,7 @@ class FormatterHelper extends Helper
                     }
                 }
 
-                $stringParts = array();
+                $stringParts = [];
                 foreach ($val as $k => $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
@@ -79,13 +80,13 @@ class FormatterHelper extends Helper
                 $string = $this->dateHelper->toDate($val, 'utc');
                 break;
             case 'url':
-                $string = ($textOnly) ? $val : '<a href="' . $val . '" target="_new">' . $val . '</a>';
+                $string = ($textOnly) ? $val : '<a href="'.$val.'" target="_new">'.$val.'</a>';
                 break;
             case 'email':
-                $string = ($textOnly) ? $val : '<a href="mailto:' . $val . '">' . $val . '</a>';
+                $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
                 break;
             case 'int':
-                $string = (int)$val;
+                $string = (int) $val;
                 break;
             default:
                 $string = InputHelper::clean($val);

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']))) {
@@ -12,16 +13,19 @@ if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['
     }
 }
 
-$hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
+if (!$hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
+    // Unset if set to prevent features tab from showing when there's no feature to show
+    unset($form['featureSettings']['leadFields']);
+}
 if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count($form['featureSettings']) > 1) || (!$hasFields && count($form['featureSettings']))))) {
     if (isset($form['featureSettings'])) {
         $form['featureSettings']->setRendered();
     }
 }
 
-$fieldHtml      = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$fieldLabel     = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass  = ($hasFields) ? '' : ' hide';
+$fieldHtml     = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldTabClass = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 ?>
 
@@ -61,9 +65,9 @@ unset($form['featureSettings']['leadFields']);
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <?php
-                    $attr = $form['authButton']->vars['attr'];
+                    $attr          = $form['authButton']->vars['attr'];
                     $attr['class'] = 'btn btn-success btn-lg';
-                    echo $view['form']->widget($form['authButton'], array('attr' => $attr));
+                    echo $view['form']->widget($form['authButton'], ['attr' => $attr]);
                     ?>
                 </div>
             </div>

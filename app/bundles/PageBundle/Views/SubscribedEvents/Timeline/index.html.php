@@ -1,21 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $timeOnPage = $view['translator']->trans('mautic.core.unknown');
 if ($event['extra']['hit']['dateLeft']) {
     $timeOnPage = ($event['extra']['hit']['dateLeft']->getTimestamp() - $event['extra']['hit']['dateHit']->getTimestamp());
 
     // format the time
     if ($timeOnPage > 60) {
-        $sec = $timeOnPage % 60;
-        $min = floor($timeOnPage / 60);
-        $timeOnPage = $min . 'm ' . $sec . 's';
+        $sec        = $timeOnPage % 60;
+        $min        = floor($timeOnPage / 60);
+        $timeOnPage = $min.'m '.$sec.'s';
     } else {
         $timeOnPage .= 's';
     }

@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class TrackableRepository
+ * Class TrackableRepository.
  */
 class TrackableRepository extends CommonRepository
 {
     /**
-     * Find redirects that are trackable
+     * Find redirects that are trackable.
      *
      * @param $channel
      * @param $channelId
@@ -33,7 +32,7 @@ class TrackableRepository extends CommonRepository
 
         return $q->select('r.redirect_id, r.url, r.hits, r.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
-            ->innerJoin('r',MAUTIC_TABLE_PREFIX.'channel_url_trackables', $this->getTableAlias(),
+            ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $this->getTableAlias(),
                 $q->expr()->andX(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
@@ -47,7 +46,7 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Get a Trackable by Redirect URL
+     * Get a Trackable by Redirect URL.
      *
      * @param $url
      * @param $channel
@@ -58,7 +57,7 @@ class TrackableRepository extends CommonRepository
     public function findByUrl($url, $channel, $channelId)
     {
         $alias = $this->getTableAlias();
-        $q = $this->createQueryBuilder($alias)
+        $q     = $this->createQueryBuilder($alias)
             ->innerJoin("$alias.redirect", 'r');
 
         $q->where(
@@ -77,7 +76,7 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Get an array of Trackable entities by Redirect URLs
+     * Get an array of Trackable entities by Redirect URLs.
      *
      * @param array $urls
      * @param       $channel
@@ -88,7 +87,7 @@ class TrackableRepository extends CommonRepository
     public function findByUrls(array $urls, $channel, $channelId)
     {
         $alias = $this->getTableAlias();
-        $q = $this->createQueryBuilder($alias)
+        $q     = $this->createQueryBuilder($alias)
             ->innerJoin("$alias.redirect", 'r');
 
         $q->where(
@@ -105,7 +104,7 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count
+     * Up the hit count.
      *
      * @param      $redirectId
      * @param      $channel
@@ -118,10 +117,10 @@ class TrackableRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'channel_url_trackables')
-            ->set('hits', 'hits + ' . (int) $increaseBy)
+            ->set('hits', 'hits + '.(int) $increaseBy)
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->eq('redirect_id' , (int) $redirectId),
+                    $q->expr()->eq('redirect_id', (int) $redirectId),
                     $q->expr()->eq('channel', ':channel'),
                     $q->expr()->eq('channel_id', (int) $channelId)
                 )
@@ -129,14 +128,14 @@ class TrackableRepository extends CommonRepository
             ->setParameter('channel', $channel);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + ' . (int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
         $q->execute();
     }
 
     /**
-     * Get hit count
+     * Get hit count.
      *
      * @param                 $channel
      * @param                 $channelIds
@@ -158,7 +157,7 @@ class TrackableRepository extends CommonRepository
 
         if ($channelIds) {
             if (!is_array($channelIds)) {
-                $channelIds = array((int) $channelIds);
+                $channelIds = [(int) $channelIds];
             }
             $q->where(
                 $q->expr()->in('cut.channel_id', $channelIds)
@@ -187,7 +186,7 @@ class TrackableRepository extends CommonRepository
             // Return array of results
             $byList = [];
             foreach ($results as $result) {
-                $byList[$result['leadlist_id']]= $result['click_count'];
+                $byList[$result['leadlist_id']] = $result['click_count'];
             }
 
             return $byList;

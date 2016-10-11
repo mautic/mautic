@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -24,7 +25,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $output;
 
     /**
-     * Set moderation options
+     * Set moderation options.
      */
     protected function configure()
     {
@@ -39,8 +40,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output)
     {
-        $force        = $input->getOption('force');
-        $checkFile    = $this->checkfile = $this->getContainer()->getParameter('kernel.cache_dir').'/../script_executions.json';
+        $force = $input->getOption('force');
+
+        $checkFile    = $this->checkfile    = $this->getContainer()->getParameter('kernel.cache_dir').'/../script_executions.json';
         $command      = $this->getName();
         $this->output = $output;
 
@@ -70,12 +72,10 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 fclose($fp);
 
                 return false;
-            }
-            else {
+            } else {
                 // looks like the process died
                 $this->pidTable['in_progress'][$command]['pid'] = $currentPid;
             }
-
         }
 
         ftruncate($fp, 0);
@@ -91,7 +91,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * Complete this run
+     * Complete this run.
      */
     protected function completeRun()
     {
@@ -104,9 +104,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             if ($this->output) {
                 $this->output->writeln('<error>completeRun() - We should have read an array of times</error>');
             }
-        }
-        else
-        {
+        } else {
             // Our task has ended so remove the pid
             unset($this->pidTable['in_progress'][$this->getName()]['pid']);
 

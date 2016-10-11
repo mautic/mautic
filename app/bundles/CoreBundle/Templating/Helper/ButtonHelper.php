@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +14,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * Class ButtonHelper
+ * Class ButtonHelper.
  */
 class ButtonHelper extends Helper
 {
@@ -107,19 +108,19 @@ class ButtonHelper extends Helper
                 } elseif (!isset($c['confirm']['btnClass'])) {
                     $c['confirm']['btnClass'] = 'btn btn-default';
                 }
-            } elseif (in_array($this->groupType, array('button-dropdown', 'dropdown'))) {
+            } elseif (in_array($this->groupType, ['button-dropdown', 'dropdown'])) {
                 if (!isset($c['confirm']['btnClass'])) {
                     $c['confirm']['btnClass'] = '';
                 } elseif ($this->groupType == 'button-dropdown') {
-                    $search                   = array(
+                    $search = [
                         'btn-default',
                         'btn-primary',
                         'btn-success',
                         'btn-info',
                         'btn-warning',
                         'btn-danger',
-                        'btn'
-                    );
+                        'btn',
+                    ];
                     $c['confirm']['btnClass'] = str_replace($search, '', $c['attr']['class']);
                 }
             }
@@ -131,7 +132,7 @@ class ButtonHelper extends Helper
             $attr = $this->menuLink;
 
             if (!isset($c['attr'])) {
-                $c['attr'] = array();
+                $c['attr'] = [];
             }
 
             if (isset($c['btnClass'])) {
@@ -148,15 +149,15 @@ class ButtonHelper extends Helper
                 && isset($c['attr']['class'])
             ) {
                 // Remove btn classes
-                $search             = array(
+                $search = [
                     'btn-default',
                     'btn-primary',
                     'btn-success',
                     'btn-info',
                     'btn-warning',
                     'btn-danger',
-                    'btn'
-                );
+                    'btn',
+                ];
                 $c['attr']['class'] = str_replace($search, '', $c['attr']['class']);
             }
 
@@ -197,13 +198,11 @@ class ButtonHelper extends Helper
     {
         $preCustomButtonContent = '';
         foreach ($this->preCustomButtons as $c) {
-
             if ($this->groupType == 'button-dropdown' && $buttonCount === 1) {
                 $preCustomButtonContent .= $dropdownHtml;
-
             }
             $preCustomButtonContent .= $this->buildCustom($c, $buttonCount);
-            $buttonCount++;
+            ++$buttonCount;
         }
 
         return $preCustomButtonContent;
@@ -219,7 +218,7 @@ class ButtonHelper extends Helper
                     $postCustomButtonContent .= $dropdownHtml;
                 }
                 $postCustomButtonContent .= $this->buildCustom($c, $buttonCount);
-                $buttonCount++;
+                ++$buttonCount;
             }
         }
 

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +13,10 @@ namespace Mautic\CoreBundle\Monolog\Handler;
 use Monolog\Handler\StreamHandler;
 
 /**
- * Class PhpHandler
+ * Class PhpHandler.
  */
 class PhpHandler extends StreamHandler
 {
-
     /**
      * @var string
      */
@@ -35,12 +35,12 @@ class PhpHandler extends StreamHandler
                 throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
             $this->errorMessage = null;
-            set_error_handler(array($this, 'customErrorHandler'));
+            set_error_handler([$this, 'customErrorHandler']);
             if (!file_exists($this->url)) {
                 $this->stream = fopen($this->url, 'a');
 
                 //write php line to it
-                fwrite($this->stream, (string) '<?php die("access denied!"); ?>' . "\n\n");
+                fwrite($this->stream, (string) '<?php die("access denied!"); ?>'."\n\n");
             } else {
                 $this->stream = fopen($this->url, 'a');
             }
@@ -56,7 +56,6 @@ class PhpHandler extends StreamHandler
         }
 
         parent::write($record);
-
     }
 
     /**

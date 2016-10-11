@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,9 +17,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class CacheHelper
- *
- * @package Mautic\CoreBundle\Helper
+ * Class CacheHelper.
  */
 class CacheHelper
 {
@@ -45,9 +44,7 @@ class CacheHelper
     }
 
     /**
-     * Clear the application cache and run the warmup routine for the current environment
-     *
-     * @return void
+     * Clear the application cache and run the warmup routine for the current environment.
      */
     public function clearCache()
     {
@@ -62,7 +59,7 @@ class CacheHelper
         //attempt to squash command output
         ob_start();
 
-        $args = array('console', 'cache:clear', '--env=' . $this->env);
+        $args = ['console', 'cache:clear', '--env='.$this->env];
 
         if ($this->env == 'prod') {
             $args[] = '--no-debug';
@@ -71,7 +68,7 @@ class CacheHelper
         $input       = new ArgvInput($args);
         $application = new Application($this->factory->getKernel());
         $application->setAutoExit(false);
-        $output      = new NullOutput();
+        $output = new NullOutput();
         $application->run($input, $output);
 
         if (ob_get_length() > 0) {
@@ -80,7 +77,7 @@ class CacheHelper
     }
 
     /**
-     * Deletes the cache folder
+     * Deletes the cache folder.
      */
     public function nukeCache()
     {
@@ -93,7 +90,7 @@ class CacheHelper
     }
 
     /**
-     * Delete's the file Symfony caches settings in
+     * Delete's the file Symfony caches settings in.
      *
      * @param bool $configSave
      */
@@ -110,32 +107,32 @@ class CacheHelper
     }
 
     /**
-     * Clears the cache for translations
+     * Clears the cache for translations.
      *
      * @param null $locale
      */
     public function clearTranslationCache($locale = null)
     {
         if ($locale) {
-            $localeCache = $this->cacheDir . '/translations/catalogue.' . $locale . '.php';
+            $localeCache = $this->cacheDir.'/translations/catalogue.'.$locale.'.php';
             if (file_exists($localeCache)) {
                 unlink($localeCache);
             }
         } else {
             $fs = new Filesystem();
-            $fs->remove($this->cacheDir . '/translations');
+            $fs->remove($this->cacheDir.'/translations');
         }
     }
 
     /**
-     * Clears the cache for routing
+     * Clears the cache for routing.
      */
     public function clearRoutingCache()
     {
-        $unlink = array(
+        $unlink = [
             $this->factory->getKernel()->getContainer()->getParameter('router.options.generator.cache_class'),
-            $this->factory->getKernel()->getContainer()->getParameter('router.options.matcher.cache_class')
-        );
+            $this->factory->getKernel()->getContainer()->getParameter('router.options.matcher.cache_class'),
+        ];
 
         foreach ($unlink as $file) {
             if (file_exists($this->cacheDir.'/'.$file.'.php')) {
@@ -145,7 +142,7 @@ class CacheHelper
     }
 
     /**
-     * Clear cache related session items
+     * Clear cache related session items.
      */
     protected function clearSessionItems()
     {
@@ -156,7 +153,7 @@ class CacheHelper
     }
 
     /**
-     * Clear opcaches
+     * Clear opcaches.
      *
      * @param bool|false $configSave
      */

@@ -1,23 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 /**
- * Class VtigerIntegration
+ * Class VtigerIntegration.
  */
 class VtigerIntegration extends CrmAbstractIntegration
 {
     private $authorzationError = '';
 
     /**
-     * Returns the name of the social integration that must match the name of the file
+     * Returns the name of the social integration that must match the name of the file.
      *
      * @return string
      */
@@ -41,17 +42,17 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             'url'       => 'mautic.vtiger.form.url',
             'username'  => 'mautic.vtiger.form.username',
-            'accessKey' => 'mautic.vtiger.form.password'
-        );
+            'accessKey' => 'mautic.vtiger.form.password',
+        ];
     }
 
     /**
      * @return string
      */
-    public function getClientIdKey ()
+    public function getClientIdKey()
     {
         return 'username';
     }
@@ -59,7 +60,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return string
      */
-    public function getClientSecretKey ()
+    public function getClientSecretKey()
     {
         return 'accessKey';
     }
@@ -67,7 +68,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return string
      */
-    public function getAuthTokenKey ()
+    public function getAuthTokenKey()
     {
         return 'sessionName';
     }
@@ -91,11 +92,11 @@ class VtigerIntegration extends CrmAbstractIntegration
             return false;
         }
 
-        $url         = $this->getApiUrl();
-        $parameters  = array(
+        $url        = $this->getApiUrl();
+        $parameters = [
             'operation' => 'getchallenge',
-            'username'  => $this->keys['username']
-        );
+            'username'  => $this->keys['username'],
+        ];
 
         $response = $this->makeRequest($url, $parameters);
 
@@ -103,11 +104,11 @@ class VtigerIntegration extends CrmAbstractIntegration
             return $this->getErrorsFromResponse($response);
         }
 
-        $loginParameters = array(
+        $loginParameters = [
             'operation' => 'login',
             'username'  => $this->keys['username'],
-            'accessKey' => md5($response['result']['token'] . $this->keys['accessKey'])
-        );
+            'accessKey' => md5($response['result']['token'].$this->keys['accessKey']),
+        ];
 
         $response = $this->makeRequest($url, $loginParameters, 'POST');
 
@@ -124,6 +125,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                 return true;
             } else {
                 $this->authorzationError = $error;
+
                 return false;
             }
         }
@@ -134,20 +136,20 @@ class VtigerIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getAuthLoginUrl ()
+    public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**
-     * Retrieves and stores tokens returned from oAuthLogin
+     * Retrieves and stores tokens returned from oAuthLogin.
      *
      * @param array $settings
      * @param array $parameters
      *
      * @return array
      */
-    public function authCallback ($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         $success = $this->isAuthorized();
         if (!$success) {
@@ -160,28 +162,28 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return mixed|void
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        $vtigerFields      = array();
+        $vtigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
                 $leadObject = $this->getApiHelper()->getLeadFields();
 
                 if ($leadObject == null || !isset($leadObject['fields'])) {
-                    return array();
+                    return [];
                 }
 
                 foreach ($leadObject['fields'] as $fieldInfo) {
-                    if (!isset($fieldInfo['name']) || !$fieldInfo['editable'] || in_array($fieldInfo['type']['name'], array('owner', 'reference', 'boolean', 'autogenerated'))) {
+                    if (!isset($fieldInfo['name']) || !$fieldInfo['editable'] || in_array($fieldInfo['type']['name'], ['owner', 'reference', 'boolean', 'autogenerated'])) {
                         continue;
                     }
 
-                    $vtigerFields[$fieldInfo['name']] = array(
-                        'type'      => 'string',
-                        'label'     => $fieldInfo['label'],
-                        'required'  => $fieldInfo['mandatory']
-                    );
+                    $vtigerFields[$fieldInfo['name']] = [
+                        'type'     => 'string',
+                        'label'    => $fieldInfo['label'],
+                        'required' => $fieldInfo['mandatory'],
+                    ];
                 }
             }
         } catch (ErrorException $exception) {
@@ -190,6 +192,7 @@ class VtigerIntegration extends CrmAbstractIntegration
             if (!$silenceExceptions) {
                 throw $exception;
             }
+
             return false;
         }
 
@@ -203,15 +206,14 @@ class VtigerIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getFormNotes ($section)
+    public function getFormNotes($section)
     {
         if ($section == 'leadfield_match') {
-            return array('mautic.vtiger.form.field_match_notes', 'info');
+            return ['mautic.vtiger.form.field_match_notes', 'info'];
         }
 
         return parent::getFormNotes($section);
     }
-
 
     /**
      * {@inheritdoc}
@@ -231,9 +233,9 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
-        return array(
+        return [
             'requires_callback'      => false,
-            'requires_authorization' => true
-        );
+            'requires_authorization' => true,
+        ];
     }
 }

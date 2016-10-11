@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,15 +13,12 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class ListLeadRepository
- *
- * @package Mautic\LeadBundle\Entity
+ * Class ListLeadRepository.
  */
 class ListLeadRepository extends CommonRepository
 {
-
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -30,19 +28,19 @@ class ListLeadRepository extends CommonRepository
         // First check to ensure the $toLead doesn't already exist
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'l')
-            ->where('l.lead_id = ' . $toLeadId)
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->where('l.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $lists = array();
+        $lists = [];
         foreach ($results as $r) {
             $lists[] = $r['leadlist_id'];
         }
 
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'lead_lists_leads')
-            ->set('lead_id', (int)$toLeadId)
-            ->where('lead_id = ' . (int)$fromLeadId);
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId);
 
         if (!empty($lists)) {
             $q->andWhere(
@@ -51,8 +49,8 @@ class ListLeadRepository extends CommonRepository
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
-                ->delete(MAUTIC_TABLE_PREFIX . 'lead_lists_leads')
-                ->where('lead_id = ' . (int)$fromLeadId)
+                ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
+                ->where('lead_id = '.(int) $fromLeadId)
                 ->execute();
         } else {
             $q->execute();

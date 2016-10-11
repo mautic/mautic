@@ -1,20 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Helper;
 
 /**
- * Class DateTimeHelper
+ * Class DateTimeHelper.
  */
 class DateTimeHelper
 {
-
     /**
      * @var string
      */
@@ -56,7 +56,7 @@ class DateTimeHelper
     }
 
     /**
-     * Sets date/time
+     * Sets date/time.
      *
      * @param \DateTime|string $datetime
      * @param string           $fromFormat
@@ -78,10 +78,10 @@ class DateTimeHelper
 
         if ($datetime instanceof \DateTime) {
             $this->datetime = $datetime;
-            $this->string = $this->datetime->format($fromFormat);
+            $this->string   = $this->datetime->format($fromFormat);
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
-            $this->string = $this->datetime->format($fromFormat);
+            $this->string   = $this->datetime->format($fromFormat);
         } elseif ($fromFormat == null) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
@@ -96,7 +96,7 @@ class DateTimeHelper
 
             if ($this->datetime === false) {
                 //the format does not match the string so let's attempt to fix that
-                $this->string = date($this->format, strtotime($datetime));
+                $this->string   = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
                     $this->format,
                     $this->string
@@ -117,6 +117,7 @@ class DateTimeHelper
             if (empty($format)) {
                 $format = $this->format;
             }
+
             return $utc->format($format);
         }
 
@@ -187,6 +188,7 @@ class DateTimeHelper
     {
         if ($this->datetime) {
             $local = $this->datetime->setTimezone($this->local);
+
             return $local->getTimestamp();
         }
 
@@ -200,6 +202,7 @@ class DateTimeHelper
     {
         if ($this->datetime) {
             $utc = $this->datetime->setTimezone($this->utc);
+
             return $utc->getTimestamp();
         }
 
@@ -207,7 +210,7 @@ class DateTimeHelper
     }
 
     /**
-     * Gets a difference
+     * Gets a difference.
      *
      * @param string     $compare
      * @param null       $format
@@ -224,8 +227,8 @@ class DateTimeHelper
         $with = clone $this->datetime;
 
         if ($resetTime) {
-            $compare->setTime( 0, 0, 0 );
-            $with->setTime( 0, 0, 0 );
+            $compare->setTime(0, 0, 0);
+            $with->setTime(0, 0, 0);
         }
 
         $interval = $compare->diff($with);
@@ -234,10 +237,10 @@ class DateTimeHelper
     }
 
     /**
-     * Add to datetime
+     * Add to datetime.
      *
      * @param            $intervalString
-     * @param bool|false $clone             If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
      * @return \DateTime
      */
@@ -256,10 +259,10 @@ class DateTimeHelper
     }
 
     /**
-     * Subtract from datetime
+     * Subtract from datetime.
      *
      * @param            $intervalString
-     * @param bool|false $clone             If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
      * @return \DateTime
      */
@@ -278,10 +281,10 @@ class DateTimeHelper
     }
 
     /**
-     * Modify datetime
+     * Modify datetime.
      *
      * @param            $string
-     * @param bool|false $clone    If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone  If true, return a new \DateTime rather than update current one
      *
      * @return \DateTime
      */
@@ -298,7 +301,7 @@ class DateTimeHelper
     }
 
     /**
-     * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow
+     * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
      *
      * @param $interval
      *
@@ -310,9 +313,9 @@ class DateTimeHelper
             $interval = $this->getDiff('now', null, true);
         }
 
-        $diffDays = (integer) $interval->format( "%R%a" );
+        $diffDays = (int) $interval->format('%R%a');
 
-        switch( $diffDays ) {
+        switch ($diffDays) {
             case 0:
                 return 'today';
             case -1:

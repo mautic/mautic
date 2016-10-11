@@ -1,26 +1,24 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Report generator
+ * Report generator.
  */
 class ReportGenerator
 {
@@ -47,7 +45,7 @@ class ReportGenerator
     /**
      * @var string
      */
-    private $validInterface = "Mautic\\ReportBundle\\Builder\\ReportBuilderInterface";
+    private $validInterface = 'Mautic\\ReportBundle\\Builder\\ReportBuilderInterface';
 
     /**
      * @var string
@@ -72,7 +70,7 @@ class ReportGenerator
     }
 
     /**
-     * Gets query
+     * Gets query.
      *
      * @param array $options Optional options array for the query
      *
@@ -90,7 +88,7 @@ class ReportGenerator
     }
 
     /**
-     * Gets form
+     * Gets form.
      *
      * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
      * @param array                              $options Parameters set by the caller
@@ -103,7 +101,7 @@ class ReportGenerator
     }
 
     /**
-     * Gets the getContentTemplate path
+     * Gets the getContentTemplate path.
      *
      * @return string
      */
@@ -113,9 +111,10 @@ class ReportGenerator
     }
 
     /**
-     * Gets report builder
+     * Gets report builder.
      *
      * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     protected function getBuilder()
@@ -123,7 +122,7 @@ class ReportGenerator
         $className = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
 
         if (!class_exists($className)) {
-            throw new RuntimeException("The MauticReportBuilder does not exist.");
+            throw new RuntimeException('The MauticReportBuilder does not exist.');
         }
 
         $reflection = new \ReflectionClass($className);

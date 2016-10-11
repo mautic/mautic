@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +14,10 @@ use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Helper class for fetching update data
+ * Helper class for fetching update data.
  */
 class UpdateHelper
 {
-
     /**
      * @var \Joomla\Http\Http
      */
@@ -39,7 +39,7 @@ class UpdateHelper
     }
 
     /**
-     * Fetches a download package from the remote server
+     * Fetches a download package from the remote server.
      *
      * @param string $package
      *
@@ -52,42 +52,42 @@ class UpdateHelper
             $data = $this->connector->get($package);
         } catch (\Exception $exception) {
             $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
+            $logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
-            return array(
+            return [
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.package'
-            );
+                'message' => 'mautic.core.updater.error.fetching.package',
+            ];
         }
 
         if ($data->code != 200) {
-            return array(
+            return [
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.package'
-            );
+                'message' => 'mautic.core.updater.error.fetching.package',
+            ];
         }
 
         // Set the filesystem target
-        $target = $this->factory->getSystemPath('cache') . '/' . basename($package);
+        $target = $this->factory->getSystemPath('cache').'/'.basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
 
         // Return an array for the sake of consistency
-        return array(
-            'error' => false
-        );
+        return [
+            'error' => false,
+        ];
     }
 
     /**
-     * Tries to get server OS
+     * Tries to get server OS.
      *
      * @return string
      */
     public function getServerOs()
     {
         if (function_exists('php_uname')) {
-            return php_uname('s') . ' ' . php_uname('r');
+            return php_uname('s').' '.php_uname('r');
         } elseif (defined('PHP_OS')) {
             return PHP_OS;
         }
@@ -96,7 +96,7 @@ class UpdateHelper
     }
 
     /**
-     * Retrieves the update data from our home server
+     * Retrieves the update data from our home server.
      *
      * @param bool $overrideCache
      *
@@ -133,7 +133,7 @@ class UpdateHelper
                     'dbDriver'      => $this->factory->getParameter('db_driver'),
                     'serverOs'      => $this->getServerOs(),
                     'instanceId'    => $instanceId,
-                    'installSource' => $this->factory->getParameter('install_source', 'Mautic')
+                    'installSource' => $this->factory->getParameter('install_source', 'Mautic'),
                 ]
             );
 
@@ -149,7 +149,7 @@ class UpdateHelper
                 [
                     'appVersion' => $this->factory->getVersion(),
                     'phpVersion' => PHP_VERSION,
-                    'stability'  => $this->factory->getParameter('update_stability')
+                    'stability'  => $this->factory->getParameter('update_stability'),
                 ]
             );
 
@@ -162,7 +162,7 @@ class UpdateHelper
 
             return [
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates'
+                'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         }
 
@@ -179,7 +179,7 @@ class UpdateHelper
 
             return [
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates'
+                'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         }
 
@@ -187,7 +187,7 @@ class UpdateHelper
         if ($update->latest_version) {
             return [
                 'error'   => false,
-                'message' => 'mautic.core.updater.running.latest.version'
+                'message' => 'mautic.core.updater.running.latest.version',
             ];
         }
 
@@ -195,7 +195,7 @@ class UpdateHelper
         if (version_compare($this->factory->getVersion(), $update->version, 'ge')) {
             return [
                 'error'   => false,
-                'message' => 'mautic.core.updater.running.latest.version'
+                'message' => 'mautic.core.updater.running.latest.version',
             ];
         }
 
@@ -207,7 +207,7 @@ class UpdateHelper
             'announcement' => $update->announcement,
             'package'      => $update->package,
             'checkedTime'  => time(),
-            'stability'    => $this->factory->getParameter('update_stability')
+            'stability'    => $this->factory->getParameter('update_stability'),
         ];
 
         file_put_contents($cacheFile, json_encode($data));

@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,30 +13,29 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class ReportType
+ * Class ReportType.
  */
 class ReportType extends AbstractType
 {
     /**
-     * Factory object
+     * Factory object.
      *
      * @var \Mautic\CoreBundle\Factory\MauticFactory
      */
     private $factory;
 
     /**
-     * Translator object
+     * Translator object.
      *
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
@@ -60,7 +60,6 @@ class ReportType extends AbstractType
 
         // Only add these fields if we're in edit mode
         if (!$options['read_only']) {
-
             $builder->add(
                 'name',
                 'text',
@@ -68,7 +67,7 @@ class ReportType extends AbstractType
                     'label'      => 'mautic.core.name',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
-                    'required'   => true
+                    'required'   => true,
                 ]
             );
 
@@ -79,7 +78,7 @@ class ReportType extends AbstractType
                     'label'      => 'mautic.core.description',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control editor'],
-                    'required'   => false
+                    'required'   => false,
                 ]
             );
 
@@ -93,8 +92,8 @@ class ReportType extends AbstractType
                     'label' => 'mautic.report.report.form.issystem',
                     'data'  => $data,
                     'attr'  => [
-                        'tooltip' => 'mautic.report.report.form.issystem.tooltip'
-                    ]
+                        'tooltip' => 'mautic.report.report.form.issystem.tooltip',
+                    ],
                 ]
             );
 
@@ -116,8 +115,8 @@ class ReportType extends AbstractType
                     'attr'        => [
                         'class'    => 'form-control',
                         'tooltip'  => 'mautic.report.report.form.source.help',
-                        'onchange' => 'Mautic.updateReportSourceData(this.value)'
-                    ]
+                        'onchange' => 'Mautic.updateReportSourceData(this.value)',
+                    ],
                 ]
             );
 
@@ -132,10 +131,10 @@ class ReportType extends AbstractType
                     $source = key($tables[$firstGroup]);
                 }
 
-                $columns               = $model->getColumnList($source);
-                $filters               = $model->getFilterList($source);
-                $filterDefinitions     = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
-                $operatorHtml          = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
+                $columns           = $model->getColumnList($source);
+                $filters           = $model->getFilterList($source);
+                $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
+                $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
 
                 if (is_array($currentColumns)) {
                     $orderColumns = array_values($currentColumns);
@@ -158,8 +157,8 @@ class ReportType extends AbstractType
                         'attr'       => [
                             'class'         => 'form-control multiselect',
                             'data-order'    => $order,
-                            'data-sortable' => 'true'
-                        ]
+                            'data-sortable' => 'true',
+                        ],
                     ]
                 );
 
@@ -168,12 +167,12 @@ class ReportType extends AbstractType
                     'filters',
                     'report_filters',
                     [
-                        'type'         => 'filter_selector',
-                        'label'        => false,
-                        'options'      => [
+                        'type'    => 'filter_selector',
+                        'label'   => false,
+                        'options' => [
                             'filterList'   => $filters->choices,
                             'operatorList' => $filters->operatorChoices,
-                            'required'     => false
+                            'required'     => false,
                         ],
                         'allow_add'    => true,
                         'allow_delete' => true,
@@ -183,8 +182,8 @@ class ReportType extends AbstractType
                             'data-filter-definitions' => $filterDefinitions,
                             'data-filter-operators'   => $operatorHtml,
                         ],
-                        'filters'      => $filters->definitions,
-                        'report'       => $formData
+                        'filters' => $filters->definitions,
+                        'report'  => $formData,
                     ]
                 );
 
@@ -192,16 +191,16 @@ class ReportType extends AbstractType
                     'tableOrder',
                     'collection',
                     [
-                        'type'         => 'table_order',
-                        'label'        => false,
-                        'options'      => [
+                        'type'    => 'table_order',
+                        'label'   => false,
+                        'options' => [
                             'columnList' => $columns->choices,
-                            'required'   => false
+                            'required'   => false,
                         ],
                         'allow_add'    => true,
                         'allow_delete' => true,
                         'prototype'    => true,
-                        'required'     => false
+                        'required'     => false,
                     ]
                 );
 
@@ -210,10 +209,10 @@ class ReportType extends AbstractType
                     'value_template_yesno',
                     'yesno_button_group',
                     [
-                        'label'       => false,
-                        'mapped'      => false,
-                        'attr'        => [
-                            'class' => 'filter-value'
+                        'label'  => false,
+                        'mapped' => false,
+                        'attr'   => [
+                            'class' => 'filter-value',
                         ],
                         'data'        => 1,
                         'choice_list' => new ChoiceList(
@@ -244,8 +243,8 @@ class ReportType extends AbstractType
                         'attr'       => [
                             'class'         => 'form-control multiselect',
                             'data-order'    => $order,
-                            'data-sortable' => 'true'
-                        ]
+                            'data-sortable' => 'true',
+                        ],
                     ]
                 );
             };
@@ -261,8 +260,8 @@ class ReportType extends AbstractType
             $builder->addEventListener(
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier) {
-                    $data    = $event->getData();
-                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
+                    $data = $event->getData();
+                    $graphs = (isset($data['graphs'])) ? $data['graphs'] : [];
                     $columns = (isset($data['columns'])) ? $data['columns'] : [];
                     $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }
@@ -271,8 +270,8 @@ class ReportType extends AbstractType
             $builder->add('buttons', 'form_buttons');
         }
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -284,7 +283,7 @@ class ReportType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Mautic\ReportBundle\Entity\Report',
-                'table_list' => []
+                'table_list' => [],
             ]
         );
     }
@@ -294,11 +293,11 @@ class ReportType extends AbstractType
      */
     public function getName()
     {
-        return "report";
+        return 'report';
     }
 
     /**
-     * Extracts the keys from the table_list option and builds an array of tables for the select list
+     * Extracts the keys from the table_list option and builds an array of tables for the select list.
      *
      * @param array $tables Array with the table list and columns
      *

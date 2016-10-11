@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +12,7 @@
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $activePage->getTitle());
+$view['slots']->set('headerTitle', $activePage->getTitle());
 
 $variantContent = $view->render(
     'MauticCoreBundle:Variant:index.html.php',
@@ -24,7 +25,7 @@ $variantContent = $view->render(
         'nameGetter'    => 'getTitle',
     ]
 );
-$showVariants    = !empty(trim($variantContent));
+$showVariants = !empty(trim($variantContent));
 
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',
@@ -36,7 +37,7 @@ $translationContent = $view->render(
         'nameGetter'   => 'getTitle',
     ]
 );
-$showTranslations   = !empty(trim($translationContent));
+$showTranslations = !empty(trim($translationContent));
 
 // Only show A/B test button if not already a translation of an a/b test
 $allowAbTest = $activePage->isTranslation(true) && $translations['parent']->isVariant() ? false : true;
@@ -49,7 +50,7 @@ $view['slots']->set(
             'item'            => $activePage,
             'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
+                'edit' => $view['security']->hasEntityAccess(
                     $permissions['page:pages:editown'],
                     $permissions['page:pages:editother'],
                     $activePage->getCreatedBy()
@@ -61,13 +62,13 @@ $view['slots']->set(
                     $permissions['page:pages:deleteown'],
                     $activePage->getCreatedBy()
                 ),
-                'close'  => $view['security']->hasEntityAccess(
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['page:pages:viewown'],
                     $permissions['page:pages:viewother'],
                     $activePage->getCreatedBy()
                 ),
             ],
-            'routeBase'       => 'page',
+            'routeBase' => 'page',
         ]
     )
 );

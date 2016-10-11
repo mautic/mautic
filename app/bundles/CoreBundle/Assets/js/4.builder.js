@@ -182,6 +182,18 @@ Mautic.clearThemeHtmlBeforeSave = function(form, callback) {
         textarea.val(editorHtml.find('html').get(0).outerHTML);
         callback();
     });
+
+    var dynamicContent = mQuery('#dynamic-content-container');
+
+    if (dynamicContent.length) {
+        var dynamicContentTextareas = dynamicContent.find('textarea.editor');
+
+        dynamicContentTextareas.each(function() {
+            var $this = mQuery(this);
+
+            $this.val(Mautic.clearFroalaStyles(mQuery($this.val())));
+        });
+    }
 }
 
 Mautic.clearFroalaStyles = function(content) {
@@ -381,7 +393,7 @@ Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
     Mautic.selectedSlot = null;
-    
+
     Mautic.builderContents.on('slot:selected', function(event, slot) {
         slot = mQuery(slot);
         Mautic.builderContents.find('[data-slot-focus]').remove();
@@ -520,20 +532,18 @@ Mautic.initSlotListeners = function() {
                 toolbarButtonsSM: buttons,
                 toolbarButtonsXS: buttons,
                 linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                useClasses: false,
                 imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
             };
 
-            slot.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, inlineFroalaOptions));
+            slot.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, inlineFroalaOptions));
             slot.froalaEditor('toolbar.hide');
         } else if (type === 'image') {
             var image = slot.find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
             // Init Froala editor
-            image.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+            image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    useClasses: false,
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }
             ));
@@ -552,11 +562,11 @@ Mautic.initSlotListeners = function() {
         Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
             if (tokens.length) {
                 mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') || 
-                        token.startsWith('{assetlink=') || 
-                        token.startsWith('{webview_url') || 
+                    if (token.startsWith('{pagelink=') ||
+                        token.startsWith('{assetlink=') ||
+                        token.startsWith('{webview_url') ||
                         token.startsWith('{unsubscribe_url')) {
-                        
+
                         linkList.push({
                             text: label,
                             href: token
@@ -621,7 +631,7 @@ Mautic.initSlotListeners = function() {
 
 // Init inside the builder's iframe
 mQuery(function() {
-    if (parent.mQuery('#builder-template-content').length) {
+    if (parent && parent.mQuery && parent.mQuery('#builder-template-content').length) {
         Mautic.builderContents = mQuery('body');
         Mautic.builderContents = Mautic.clearFroalaStyles(Mautic.builderContents);
         Mautic.initSlotListeners();

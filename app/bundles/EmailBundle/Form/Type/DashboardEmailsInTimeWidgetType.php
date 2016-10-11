@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class DashboardEmailsInTimeWidgetType
- *
- * @package Mautic\EmailBundle\Form\Type
+ * Class DashboardEmailsInTimeWidgetType.
  */
 class DashboardEmailsInTimeWidgetType extends AbstractType
 {
@@ -25,20 +24,20 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('flag', 'choice', array(
+        $builder->add('flag', 'choice', [
                 'label'   => 'mautic.email.flag.filter',
-                'choices' => array(
+                'choices' => [
                     ''                           => 'mautic.email.flag.sent',
                     'opened'                     => 'mautic.email.flag.opened',
                     'failed'                     => 'mautic.email.flag.failed',
                     'sent_and_opened'            => 'mautic.email.flag.sent.and.opened',
                     'sent_and_opened_and_failed' => 'mautic.email.flag.sent.and.opened.and.failed',
-                ),
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                ],
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
-                'required'   => false
-            )
+                'required'   => false,
+            ]
         );
     }
 
@@ -47,6 +46,6 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
      */
     public function getName()
     {
-        return "email_dashboard_emails_in_time_widget";
+        return 'email_dashboard_emails_in_time_widget';
     }
 }

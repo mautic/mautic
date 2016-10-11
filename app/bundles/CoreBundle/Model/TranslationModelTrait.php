@@ -1,27 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
-use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Provides helper methods for determine the requested language from contact's profile and/or request
+ * Provides helper methods for determine the requested language from contact's profile and/or request.
  *
  * Class TranslationModelTrait
  */
 trait TranslationModelTrait
 {
     /**
-     * Get the entity based on requested translation
+     * Get the entity based on requested translation.
      *
      *
      * @param TranslationEntityInterface $entity
@@ -130,7 +131,7 @@ trait TranslationModelTrait
     }
 
     /**
-     * Run post saving a translation aware entity
+     * Run post saving a translation aware entity.
      *
      * @param TranslationEntityInterface $entity
      */

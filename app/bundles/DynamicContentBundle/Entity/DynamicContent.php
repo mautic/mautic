@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -76,7 +77,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __construct()
     {
-        $this->stats = new ArrayCollection();
+        $this->stats           = new ArrayCollection();
         $this->variantChildren = new ArrayCollection();
     }
 
@@ -85,16 +86,16 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __clone()
     {
-        $this->id = null;
-        $this->sentCount = 0;
-        $this->stats = new ArrayCollection();
+        $this->id              = null;
+        $this->sentCount       = 0;
+        $this->stats           = new ArrayCollection();
         $this->variantChildren = new ArrayCollection();
 
         parent::__clone();
     }
 
     /**
-     * Clear stats
+     * Clear stats.
      */
     public function clearStats()
     {
@@ -174,12 +175,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     protected function isChanged($prop, $val)
     {
-        $getter = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'variantParent' || $prop == 'translationParent' || $prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId = ($val) ? $val->getId() : null;
+            $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
