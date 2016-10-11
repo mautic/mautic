@@ -458,7 +458,7 @@ class ListModel extends FormModel
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region'])) {
+            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
