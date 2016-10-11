@@ -467,7 +467,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -505,7 +505,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     var fieldOptions = fieldCallback = '';
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect') {
             // Generate the options
             fieldOptions = selectedOption.data("field-list");
 
@@ -617,6 +617,7 @@ Mautic.convertDynamicContentFilterInput = function(el) {
     }
 
     var newName = '';
+    var lastPos;
 
     if (filterEl.is('select')) {
         var isMultiple  = filterEl.attr('multiple');
@@ -635,7 +636,10 @@ Mautic.convertDynamicContentFilterInput = function(el) {
             filterEl.removeAttr('multiple');
 
             // Update the name
-            newName =  filterEl.attr('name').replace(/[\[\]']+/g, '');
+            newName = filterEl.attr('name');
+            lastPos = newName.lastIndexOf('[]');
+            newName = newName.substring(0, lastPos);
+
             filterEl.attr('name', newName);
 
             placeholder = mauticLang['chosenChooseOne'];

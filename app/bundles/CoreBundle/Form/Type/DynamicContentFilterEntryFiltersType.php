@@ -274,7 +274,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     'choices' => $choices,
                     'attr'    => [
                         'class'    => 'form-control not-chosen',
-                        'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                        'onchange' => 'Mautic.convertDynamicContentFilterInput(this)',
                     ],
                 ]
             );
