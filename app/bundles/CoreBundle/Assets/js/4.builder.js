@@ -505,6 +505,9 @@ Mautic.initSlotListeners = function() {
             slot.on('froalaEditor.initialized', function (e, editor) {
                 Mautic.initAtWho(editor.$el, Mautic.getBuilderTokensMethod(), editor);
             });
+            slot.on('froalaEditor.focus', function (e, editor) {
+                Mautic.initAtWho(editor.$el, Mautic.getBuilderTokensMethod(), editor);
+            });
 
             slot.on('froalaEditor.focus', function (e, editor) {
                 slot.froalaEditor('toolbar.show');
