@@ -154,6 +154,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
                     $type = 'choice';
                     $attr = array_merge(
