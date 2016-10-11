@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\Model;
 
 use DeviceDetector\DeviceDetector;
@@ -537,10 +538,6 @@ class PageModel extends FormModel
         if ($isUnique) {
             // Add UTM tags entry if a UTM tag exist
             $queryHasUtmTags = false;
-            if (!is_array($query)) {
-                parse_str($query, $query);
-            }
-
             foreach ($query as $key => $value) {
                 if (strpos($key, 'utm_') !== false) {
                     $queryHasUtmTags = true;
@@ -580,6 +577,7 @@ class PageModel extends FormModel
                 $this->leadModel->setUtmTags($lead, $utmTags);
             }
         }
+
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
