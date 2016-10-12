@@ -154,6 +154,7 @@ class ListType extends AbstractType
                         'emails'    => $this->emailChoices,
                         'tags'      => $this->tagChoices,
                         'stage'     => $this->stageChoices,
+                        'locales'   => $this->localeChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

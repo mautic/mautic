@@ -150,6 +150,7 @@ class FilterType extends AbstractType
                 case 'timezone':
                 case 'country':
                 case 'region':
+                case 'locale':
                     switch ($fieldType) {
                         case 'timezone':
                             $choiceKey = 'timezones';
@@ -159,6 +160,9 @@ class FilterType extends AbstractType
                             break;
                         case 'region':
                             $choiceKey = 'regions';
+                            break;
+                        case 'locale':
+                            $choiceKey = 'locales';
                             break;
                     }
 
@@ -203,6 +207,7 @@ class FilterType extends AbstractType
 
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
                     $type = 'choice';
                     $attr = array_merge(
@@ -368,6 +373,7 @@ class FilterType extends AbstractType
                 'emails',
                 'tags',
                 'stage',
+                'locales',
             ]
         );
 

@@ -172,6 +172,12 @@ class TokenSubscriber extends CommonSubscriber
                 case '!like':
                     $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
                     break;
+                case 'in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
+                    break;
+                case '!in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
+                    break;
             }
         }
 

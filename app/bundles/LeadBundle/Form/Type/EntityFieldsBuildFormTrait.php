@@ -156,7 +156,8 @@ trait EntityFieldsBuildFormTrait
                             $value = (int) $value;
                         }
                     }
-                    $typeProperties['data']        = $value;
+
+                    $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
