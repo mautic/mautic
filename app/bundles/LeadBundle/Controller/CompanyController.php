@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -641,6 +642,145 @@ class CompanyController extends FormController
                     'flashes' => $flashes,
                 ]
             )
+        );
+    }
+
+    /**
+     * Company Merge function.
+     *
+     * @param   $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function mergeAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model       = $this->getModel('lead.company');
+        $mainCompany = $model->getEntity($objectId);
+        $page        = $this->get('session')->get('mautic.lead.page', 1);
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        if ($mainCompany === null) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.lead.company.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $mainCompany->getId()]);
+
+        $form = $this->get('form.factory')->create(
+            'company_merge',
+            [],
+            [
+                'action' => $action,
+            ]
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $valid = true;
+            if (!$this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data             = $form->getData();
+                    $companyToMergeId = $data['company_to_merge'];
+                    $companyToMerge   = $model->getEntity($companyToMergeId);
+
+                    if ($companyToMerge === null) {
+                        return $this->postActionRedirect(
+                            array_merge(
+                                $postActionVars,
+                                [
+                                    'flashes' => [
+                                        [
+                                            'type'    => 'error',
+                                            'msg'     => 'mautic.lead.company.error.notfound',
+                                            'msgVars' => ['%id%' => $companyToMerge->getId()],
+                                        ],
+                                    ],
+                                ]
+                            )
+                        );
+                    } elseif (
+                        !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainCompany->getPermissionUser())
+                        || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $companyToMerge->getPermissionUser())
+                    ) {
+                        return $this->accessDenied();
+                    } elseif ($model->isLocked($mainCompany)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $companyToMerge, 'lead.company');
+                    } elseif ($model->isLocked($companyToMerge)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $companyToMerge, 'lead.company');
+                    }
+
+                    //Both leads are good so now we merge them
+                    $mainLead = $model->mergeLeads($mainCompany, $companyToMerge, false);
+                }
+            }
+
+            if ($valid) {
+                $viewParameters = [
+                    'objectId'     => $mainCompany->getId(),
+                    'objectAction' => 'view',
+                ];
+
+                return $this->postActionRedirect(
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_comapny_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'MauticLeadBundle:Company:edit',
+                        'passthroughVars' => [
+                            'closeModal' => 1,
+                        ],
+                    ]
+                );
+            }
+        }
+
+        $tmpl = $this->request->get('tmpl', 'index');
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'tmpl'         => $tmpl,
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_company_action',
+                        [
+                            'objectAction' => 'merge',
+                            'objectId'     => $mainCompany->getId(),
+                        ]
+                    ),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.php',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.company-merge-options' : null,
+                ],
+            ]
         );
     }
 }

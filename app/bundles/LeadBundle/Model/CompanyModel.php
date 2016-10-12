@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -598,5 +599,58 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         } else {
             return null;
         }
+    }
+
+    /**
+     * Company Merge function, will merge $mainCompany with $secCompany -  empty records from main company will be
+     * filled with secondary then secondary will be deleted.
+     *
+     * @param $mainCompany
+     * @param $secCompany
+     *
+     * @return mixed
+     */
+    public function companyMerge($mainCompany, $secCompany)
+    {
+        $this->logger->debug('COMPANY: Merging companies');
+
+        $mainCompanyId = $mainCompany->getId();
+        $secCompanyId  = $secCompany->getId();
+
+        //if they are the same lead, then just return one
+        if ($mainCompanyId === $secCompanyId) {
+            return $mainCompany;
+        }
+        //merge fields
+        $mergeFromFields = $mergeFrom->getFields();
+        foreach ($mergeFromFields as $group => $groupFields) {
+            foreach ($groupFields as $alias => $details) {
+                //overwrite old lead's data with new lead's if new lead's is not empty
+                if (!empty($details['value'])) {
+                    $mergeWith->addUpdatedField($alias, $details['value']);
+
+                    $this->logger->debug('LEAD: Updated '.$alias.' = '.$details['value']);
+                }
+            }
+        }
+
+        //merge owner
+        $oldOwner = $mergeWith->getOwner();
+        $newOwner = $mergeFrom->getOwner();
+
+        if ($oldOwner === null && $newOwner !== null) {
+            $mergeWith->setOwner($newOwner);
+
+            $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
+        }
+
+        //save the updated lead
+        $this->saveEntity($mergeWith, false);
+
+        //delete the old
+        $this->deleteEntity($mergeFrom);
+
+        //return the merged lead
+        return $mergeWith;
     }
 }

@@ -19,7 +19,34 @@ $header = ($entity->getId())
     :
     $view['translator']->trans('mautic.company.menu.new');
 $view['slots']->set('headerTitle', $header);
-
+$buttons[] = [
+    'attr' => [
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
+        'data-header' => $view['translator']->trans(
+            'mautic.lead.company.header.merge',
+            ['%name%' => $entity->getName()]
+        ),
+        'href' => $view['router']->path(
+            'mautic_company_action',
+            ['objectId' => $entity->getId(), 'objectAction' => 'merge']
+        ),
+    ],
+    'btnText'   => $view['translator']->trans('mautic.company.merge'),
+    'iconClass' => 'fa fa-user',
+];
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'item'          => $entity,
+            'routeBase'     => 'company',
+            'langVar'       => 'lead.company',
+            'customButtons' => $buttons,
+        ]
+    )
+);
 echo $view['form']->start($form);
 ?>
     <div class="box-layout">

@@ -420,6 +420,10 @@ return [
                 ],
                 'alias' => 'company_list',
             ],
+            'mautic.company.merge.type.form' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyMergeType',
+                'alias' => 'company_merge',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
