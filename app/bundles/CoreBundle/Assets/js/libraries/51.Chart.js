@@ -1785,6 +1785,7 @@ module.exports = function(Chart) {
 				// Specific to Bar Controller
 				categoryPercentage: 0.8,
 				barPercentage: 0.9,
+                useBarPercentage: false,
 
 				// grid line settings
 				gridLines: {
@@ -1957,18 +1958,25 @@ module.exports = function(Chart) {
 			var categoryWidth = tickWidth * xScale.options.categoryPercentage;
 			var categorySpacing = (tickWidth - (tickWidth * xScale.options.categoryPercentage)) / 2;
             var fullBarWidth = categoryWidth / datasetCount;
-			//var fullBarWidth = xScale.options.categoryPercentage;
+
+            if (xScale.options.useBarPercentage) {
+                fullBarWidth = xScale.options.categoryPercentage;
+            }
 
 			if (xScale.ticks.length !== this.chart.data.labels.length) {
 			    var perc = xScale.ticks.length / this.chart.data.labels.length;
 			    fullBarWidth = fullBarWidth * perc;
 			}
 
+			var barWidth = categoryWidth * xScale.options.barPercentage;
             var barSpacing = fullBarWidth - (fullBarWidth * xScale.options.barPercentage);
-			var barWidth = fullBarWidth * xScale.options.barPercentage;
-			//var barSpacing = categoryWidth - (fullBarWidth * xScale.options.barPercentage);
 
-			return {
+			if (xScale.options.useBarPercentage) {
+                barWidth = fullBarWidth * xScale.options.barPercentage;
+			    barSpacing = categoryWidth - (fullBarWidth * xScale.options.barPercentage);
+            }
+
+            return {
 				datasetCount: datasetCount,
 				tickWidth: tickWidth,
 				categoryWidth: categoryWidth,
@@ -2106,6 +2114,7 @@ module.exports = function(Chart) {
 				// Specific to Horizontal Bar Controller
 				categoryPercentage: 0.8,
 				barPercentage: 0.9,
+                useBarPercentage: false,
 
 				// grid line settings
 				gridLines: {
@@ -2293,7 +2302,10 @@ module.exports = function(Chart) {
 			var categoryHeight = tickHeight * yScale.options.categoryPercentage;
 			var categorySpacing = (tickHeight - (tickHeight * yScale.options.categoryPercentage)) / 2;
             var fullBarHeight = categoryHeight / datasetCount;
-			//var fullBarHeight = yScale.options.categoryPercentage;
+
+            if (xScale.options.useBarPercentage) {
+                fullBarHeight = yScale.options.categoryPercentage;
+            }
 
 			if (yScale.ticks.length !== this.chart.data.labels.length) {
 				var perc = yScale.ticks.length / this.chart.data.labels.length;
@@ -2301,7 +2313,11 @@ module.exports = function(Chart) {
 			}
 
 			var barHeight = fullBarHeight * yScale.options.barPercentage;
-			var barSpacing = (categoryHeight / datasetCount) - (fullBarHeight * yScale.options.barPercentage);
+			var barSpacing = fullBarHeight - (fullBarHeight * yScale.options.barPercentage);
+
+            if (xScale.options.useBarPercentage) {
+                barSpacing = (categoryHeight / datasetCount) - (fullBarHeight * yScale.options.barPercentage);
+            }
 
 			return {
 				datasetCount: datasetCount,

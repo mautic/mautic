@@ -3519,6 +3519,8 @@ var Mautic = {
                         Mautic.renderPieChart(canvas)
                     } else if (canvas.hasClass('bar-chart')) {
                         Mautic.renderBarChart(canvas)
+                    } else if (canvas.hasClass('liefechart-bar-chart')) {
+                        Mautic.renderLifechartBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
                     } else if (canvas.hasClass('horizontal-bar-chart')) {
@@ -3591,13 +3593,36 @@ var Mautic = {
             data: data,
             options: {
                 scales: {
-
+                    xAxes: [{
+                        barPercentage: 0.2,
+                        categorySpacing: 0.5
+                    }]
                 }
             }
         });
         Mautic.chartObjects.push(chart);
     },
-
+    /**
+     * Render the chart.js bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderLifechartBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 35,
+                        useBarPercentage: true
+                    }]
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
     /**
      * Render the chart.js simple bar chart
      *
@@ -3614,7 +3639,6 @@ var Mautic = {
                         stacked: false,
                         ticks: {fontSize: 9},
                         gridLines: {display:false},
-                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
@@ -3654,7 +3678,7 @@ var Mautic = {
                         stacked: false,
                         ticks: {beginAtZero: true, display: true, fontSize: 9},
                         gridLines: {display:false},
-                        barPercentage: 8,
+                        barPercentage: 0.5,
                         categorySpacing: 1
                     }],
                     display: false
