@@ -267,10 +267,10 @@ class CampaignSubscriber extends CommonSubscriber
             $interval = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
             if (strpos($event->getConfig()['value'], '+P') !== FALSE) { //add date
-                $triggerDate->sub(new \DateInterval($interval)); //sub the today date with interval
+                $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
                 $result = $this->compareDateValue($lead, $event, $triggerDate);
             } else if (strpos($event->getConfig()['value'], '-P') !== FALSE) { //subtract date
-                $triggerDate->add(new \DateInterval($interval));
+                $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
                 $result = $this->compareDateValue($lead, $event, $triggerDate);
             } else if ($event->getConfig()['value'] === 'anniversary') {
                 /**
