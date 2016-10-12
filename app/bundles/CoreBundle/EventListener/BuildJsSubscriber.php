@@ -50,7 +50,7 @@ MauticJS.serialize = function(obj) {
     }
 
     return Object.keys(obj).map(function(key) {
-        return key + '=' + encodeURIComponent(obj[key]);
+        return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
     }).join('&');
 };
 
