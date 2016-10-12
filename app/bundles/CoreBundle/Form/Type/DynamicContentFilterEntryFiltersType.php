@@ -77,8 +77,9 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             $form    = $event->getForm();
             $options = $form->getConfig()->getOptions();
 
-            $fieldType = $data['type'];
-            $fieldName = $data['field'];
+            $fieldType   = $data['type'];
+            $fieldName   = $data['field'];
+            $fieldObject = $data['object'];
 
             $type = 'text';
             $attr = [
@@ -148,7 +149,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                    if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
                         $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
@@ -173,7 +174,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         }
                     }
 
-                    $list    = $options['fields'][$fieldName]['properties']['list'];
+                    $list    = $options['fields'][$fieldObject][$fieldName]['properties']['list'];
                     $choices = FormFieldHelper::parseListStringIntoArray($list);
 
                     if ($fieldType == 'select') {
@@ -197,7 +198,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                    if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
                         $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
@@ -258,12 +259,12 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             );
 
             $choices = $operatorChoices;
-            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+            if (isset($options['fields'][$fieldObject][$fieldName]['operators']['include'])) {
                 // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
-            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['include']));
+            } elseif (isset($options['fields'][$fieldObject][$fieldName]['operators']['exclude'])) {
                 // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['exclude']));
             }
 
             $form->add(
@@ -315,6 +316,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 'timezones',
                 'stages',
                 'locales',
+                'fields',
             ]
         );
 
