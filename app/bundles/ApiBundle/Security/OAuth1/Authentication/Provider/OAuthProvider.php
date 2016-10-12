@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\ApiBundle\Security\OAuth1\Authentication\Provider;
 
 use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;

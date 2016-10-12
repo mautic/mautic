@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
