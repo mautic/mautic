@@ -3609,7 +3609,6 @@ var Mautic = {
     renderLifechartBarChart: function(canvas) {
         var canvasWidth = mQuery(canvas).parent().width();
         var barWidth    = (canvasWidth < 300) ? 5 : 25;
-        console.log(canvasWidth);
         var data = mQuery.parseJSON(canvas.text());
         var chart = new Chart(canvas, {
             type: 'bar',
