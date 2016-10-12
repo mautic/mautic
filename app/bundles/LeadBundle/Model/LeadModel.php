@@ -1537,6 +1537,23 @@ class LeadModel extends FormModel
             );
         }
 
+        foreach ($leadFields as $leadField) {
+            if (isset($fieldData[$leadField['alias']])) {
+
+                // Adjust the boolean values from text to boolean
+                if ($leadField['type'] == 'boolean') {
+                    $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                }
+
+                // Skip if the value is in the CSV row
+                continue;
+            } elseif ($leadField['defaultValue']) {
+
+                // Fill in the default value if any
+                $fieldData[$leadField['alias']] = $leadField['defaultValue'];
+            }
+        }
+
         $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
 
         // Unset stage and owner from the form because it's already been handled
