@@ -217,6 +217,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $lists = $this->leadListModel->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
             $items = [];
 
+            if (empty($lists)) {
+                $lists[] = [
+                    'leads' => 0,
+                    'id'    => 0,
+                    'name'  => $event->getTranslator()->trans('mautic.lead.all.leads'),
+                    'alias' => '',
+                ];
+            }
+
             // Build table rows with links
             if ($lists) {
                 $stages            = [];
@@ -409,14 +418,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, [], ['canViewOthers' => $canViewOthers]);
                 $items = [];
 
+                if (empty($leads)) {
+                    $leads[] = [
+                        'name' => $this->translator->trans('mautic.report.report.noresults'),
+                    ];
+                }
+
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]);
+                        $leadUrl = isset($lead['id']) ? $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]) : '';
+                        $type    = isset($lead['id']) ? 'link' : 'text';
                         $row     = [
                             [
                                 'value' => $lead['name'],
-                                'type'  => 'link',
+                                'type'  => $type,
                                 'link'  => $leadUrl,
                             ],
                         ];
