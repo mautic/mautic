@@ -1956,15 +1956,17 @@ module.exports = function(Chart) {
 			}).call(this);
 			var categoryWidth = tickWidth * xScale.options.categoryPercentage;
 			var categorySpacing = (tickWidth - (tickWidth * xScale.options.categoryPercentage)) / 2;
-			var fullBarWidth = xScale.options.categoryPercentage;
+            var fullBarWidth = categoryWidth / datasetCount;
+			//var fullBarWidth = xScale.options.categoryPercentage;
 
 			if (xScale.ticks.length !== this.chart.data.labels.length) {
 			    var perc = xScale.ticks.length / this.chart.data.labels.length;
 			    fullBarWidth = fullBarWidth * perc;
 			}
 
+            var barSpacing = fullBarWidth - (fullBarWidth * xScale.options.barPercentage);
 			var barWidth = fullBarWidth * xScale.options.barPercentage;
-			var barSpacing = categoryWidth - (fullBarWidth * xScale.options.barPercentage);
+			//var barSpacing = categoryWidth - (fullBarWidth * xScale.options.barPercentage);
 
 			return {
 				datasetCount: datasetCount,
@@ -2290,7 +2292,8 @@ module.exports = function(Chart) {
 			}).call(this);
 			var categoryHeight = tickHeight * yScale.options.categoryPercentage;
 			var categorySpacing = (tickHeight - (tickHeight * yScale.options.categoryPercentage)) / 2;
-			var fullBarHeight = yScale.options.categoryPercentage;
+            var fullBarHeight = categoryHeight / datasetCount;
+			//var fullBarHeight = yScale.options.categoryPercentage;
 
 			if (yScale.ticks.length !== this.chart.data.labels.length) {
 				var perc = yScale.ticks.length / this.chart.data.labels.length;

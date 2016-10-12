@@ -3591,9 +3591,7 @@ var Mautic = {
             data: data,
             options: {
                 scales: {
-                    xAxes: [{
-                        barPercentage: 35
-                    }]
+
                 }
             }
         });
