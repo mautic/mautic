@@ -213,6 +213,12 @@ class SubmissionModel extends CommonFormModel
             }
 
             if ($f->isRequired() && empty($value)) {
+
+                //field is required, but hidden from form because of 'ShowWhenValueExists'
+                if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
+                    continue;
+                }
+
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
@@ -440,7 +446,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                 $s['ipAddress']['ipAddress'],
                                 $s['referer'],
                             ];
@@ -517,7 +523,7 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                     $s['ipAddress']['ipAddress'],
                                     $s['referer'],
                                 ];

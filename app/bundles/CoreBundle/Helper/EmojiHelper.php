@@ -105,6 +105,10 @@ class EmojiHelper
         foreach ($maps as $useMap) {
             $mapClass = "Mautic\\CoreBundle\\Helper\\EmojiMap\\{$useMap}EmojiMap";
             $text     = str_replace(array_keys($mapClass::$map), $mapClass::$map, $text);
+
+            if (isset($mapClass::$exceptions)) {
+                $text = str_replace(array_keys($mapClass::$exceptions), $mapClass::$exceptions, $text);
+            }
         }
 
         if ($to !== 'emoji') {

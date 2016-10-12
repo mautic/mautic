@@ -453,7 +453,7 @@ class CompanyController extends FormController
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $model->getEntity($objectId);
-                $form    = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields]);
+                $form    = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
             }
         } else {
             //lock the entity

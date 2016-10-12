@@ -684,9 +684,16 @@ class FieldModel extends FormModel
      */
     public function getFieldListWithProperties($object = 'lead')
     {
+        $forceFilters[] = [
+            'column' => 'f.object',
+            'expr'   => 'eq',
+            'value'  => $object,
+        ];
         $contactFields = $this->getEntities(
             [
-                'object'           => $object,
+                'filter' => [
+                    'force' => $forceFilters,
+                ],
                 'ignore_paginator' => true,
                 'hydration_mode'   => 'hydrate_array',
             ]

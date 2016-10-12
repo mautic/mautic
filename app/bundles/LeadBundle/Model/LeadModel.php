@@ -193,7 +193,7 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      *
-     * @return \Mautic\LeadBundle\Entity\StatDeviceRepository
+     * @return \Mautic\LeadBundle\Entity\LeadDeviceRepository
      */
     public function getDeviceRepository()
     {
@@ -208,6 +208,16 @@ class LeadModel extends FormModel
     public function getFrequencyRuleRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+    }
+
+    /**
+     * Get the Stages change log repository.
+     *
+     * @return \Mautic\LeadBundle\Entity\StagesChangeLogRepository
+     */
+    public function getStagesChangeLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:StagesChangeLog');
     }
 
     /**
@@ -416,6 +426,18 @@ class LeadModel extends FormModel
             if (!empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
             }
+        }
+
+        $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
+        $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+
+        if (isset($data['stage']) && $data['stage'] != $currentLeadStage) {
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
+            $lead->stageChangeLogEntry(
+                $stage,
+                $stage->getId().':'.$stage->getName(),
+                $this->translator->trans('mautic.stage.event.changed')
+          );
         }
 
         //save the field values
@@ -1007,9 +1029,9 @@ class LeadModel extends FormModel
         }
         $lead->setStage($stage);
         $lead->stageChangeLogEntry(
-            'batch',
+            $stage,
             $stage->getId().': '.$stage->getName(),
-            'Manually Added'
+            $this->translator->trans('mautic.stage.event.added.batch')
         );
     }
 
@@ -1024,9 +1046,9 @@ class LeadModel extends FormModel
     {
         $lead->setStage(null);
         $lead->stageChangeLogEntry(
-            'batch',
-            null,
-            'Manually Removed'
+            $stage,
+            $stage->getId().': '.$stage->getName(),
+            $this->translator->trans('mautic.stage.event.removed.batch')
         );
     }
 
@@ -1446,11 +1468,12 @@ class LeadModel extends FormModel
 
             //add a contact stage change log
             $log = new StagesChangeLog();
+            $log->setStage($stage);
             $log->setEventName($stage->getId().':'.$stage->getName());
             $log->setLead($lead);
             $log->setActionName(
                 $this->translator->trans(
-                    'mautic.lead.import.action.name',
+                    'mautic.stage.import.action.name',
                     [
                         '%name%' => $this->userHelper->getUser()->getUsername(),
                     ]
@@ -1512,6 +1535,23 @@ class LeadModel extends FormModel
                     'hydration_mode' => 'HYDRATE_ARRAY',
                 ]
             );
+        }
+
+        foreach ($leadFields as $leadField) {
+            if (isset($fieldData[$leadField['alias']])) {
+
+                // Adjust the boolean values from text to boolean
+                if ($leadField['type'] == 'boolean') {
+                    $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                }
+
+                // Skip if the value is in the CSV row
+                continue;
+            } elseif ($leadField['defaultValue']) {
+
+                // Fill in the default value if any
+                $fieldData[$leadField['alias']] = $leadField['defaultValue'];
+            }
         }
 
         $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
