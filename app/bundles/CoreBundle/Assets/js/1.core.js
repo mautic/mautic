@@ -3595,7 +3595,6 @@ var Mautic = {
                 scales: {
                     xAxes: [{
                         barPercentage: 0.9,
-                        categorySpacing: 0.5
                     }]
                 }
             }
@@ -3608,21 +3607,26 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderLifechartBarChart: function(canvas) {
+        var canvasWidth = mQuery(canvas).parent().width();
+        var barWidth    = (canvasWidth < 300) ? 5 : 25;
+        console.log(canvasWidth);
         var data = mQuery.parseJSON(canvas.text());
         var chart = new Chart(canvas, {
             type: 'bar',
             data: data,
             options: {
                 scales: {
-                    xAxes: [{
-                        barPercentage: 35,
-                        useBarPercentage: true
-                    }]
+                    xAxes: [
+                        {
+                            barThickness: barWidth,
+                        }
+                    ]
                 }
             }
         });
         Mautic.chartObjects.push(chart);
     },
+
     /**
      * Render the chart.js simple bar chart
      *
@@ -3729,6 +3733,11 @@ var Mautic = {
         }
     },
 
+    /**
+     *
+     * @param wrapper
+     * @returns {*}
+     */
     renderMap: function(wrapper) {
         // Map render causes a JS error on FF when the element is hidden
         if (wrapper.is(':visible')) {
