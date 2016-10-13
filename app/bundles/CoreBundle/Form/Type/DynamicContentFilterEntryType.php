@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -87,6 +88,7 @@ class DynamicContentFilterEntryType extends AbstractType
                         'timezones' => $this->timezoneChoices,
                         'stages'    => $this->stageChoices,
                         'locales'   => $this->localeChoices,
+                        'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -171,6 +172,12 @@ class TokenSubscriber extends CommonSubscriber
                     break;
                 case '!like':
                     $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
+                    break;
+                case 'in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
+                    break;
+                case '!in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
                     break;
             }
         }

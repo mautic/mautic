@@ -14,6 +14,7 @@
  * @author      Barbushin Sergey http://linkedin.com/in/barbushin
  * @copyright   BSD (three-clause)
  */
+
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -238,6 +239,9 @@ class Mailbox
             $this->settings           = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
             $this->imapFolder         = $this->mailboxes[$key]['folder'];
             $this->settings['folder'] = $this->mailboxes[$key]['folder'];
+            // Disconnect so that new mailbox settings are used
+            $this->disconnect();
+            // Setup new connection
             $this->setImapPath();
         } else {
             throw new MailboxException($key.' not found');

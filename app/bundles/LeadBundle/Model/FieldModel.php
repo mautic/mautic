@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
@@ -684,9 +685,16 @@ class FieldModel extends FormModel
      */
     public function getFieldListWithProperties($object = 'lead')
     {
+        $forceFilters[] = [
+            'column' => 'f.object',
+            'expr'   => 'eq',
+            'value'  => $object,
+        ];
         $contactFields = $this->getEntities(
             [
-                'object'           => $object,
+                'filter' => [
+                    'force' => $forceFilters,
+                ],
                 'ignore_paginator' => true,
                 'hydration_mode'   => 'hydrate_array',
             ]

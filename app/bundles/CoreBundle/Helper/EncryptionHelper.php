@@ -9,6 +9,7 @@
  *
  * http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc/
  */
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;

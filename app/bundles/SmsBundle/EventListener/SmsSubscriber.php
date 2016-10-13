@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
@@ -109,7 +110,7 @@ class SmsSubscriber extends CommonSubscriber
         $log    = [
             'bundle'   => 'sms',
             'object'   => 'sms',
-            'objectId' => $entity->getId(),
+            'objectId' => $entity->deletedId,
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];
@@ -145,7 +146,7 @@ class SmsSubscriber extends CommonSubscriber
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {
-                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
             }
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);

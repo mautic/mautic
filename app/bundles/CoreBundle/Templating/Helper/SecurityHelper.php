@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;

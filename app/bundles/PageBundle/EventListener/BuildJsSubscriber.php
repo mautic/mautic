@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -64,8 +65,56 @@ class BuildJsSubscriber extends CommonSubscriber
         $js = <<<JS
 (function(m, l, n, d) {
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
+    m.fingerprint = null;
+    m.fingerprintComponents = null;
+
+    m.addFingerprint = function(params) {
+        for (var componentId in m.fingerprintComponents) {
+            var component = m.fingerprintComponents[componentId];
+            if (typeof component.key !== 'undefined') {
+                if (component.key === 'resolution') {
+                    params.resolution = component.value[0] + 'x' + component.value[1];
+                } else if (component.key === 'timezone_offset') {
+                    params.timezone_offset = component.value;
+                } else if (component.key === 'navigator_platform') {
+                    params.platform = component.value;
+                } else if (component.key === 'adblock') {
+                    params.adblock = component.value;
+                } else if (component.key === 'do_not_track') {
+                    params.do_not_track = component.value;
+                }
+            }
+        }
+        params.fingerprint = m.fingerprint;
+    }
+
+    m.buildTrackingImage = function(pageview, params) {
+        m.addFingerprint(params);
+        delete m.trackingPixel;
+        m.trackingPixel = new Image();
+
+        if (typeof pageview[3] === 'object') {
+            var events = ['onabort', 'onerror', 'onload'];
+            for (var i = 0; i < events.length; i++) {
+                var e = events[i];
+                if (typeof pageview[3][e] === 'function') {
+                    m.trackingPixel[e] = pageview[3][e];
+                }
+            }
+        }
+
+        m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
+    }
 
     m.sendPageview = function(pageview) {
+
+        if (!pageview) {
+            if (typeof m.getInput === 'function') {
+                var pageview = m.getInput('send', 'pageview');
+            } else {
+                return false;
+            }
+        }
 
         var params = {
             page_title: d.title,
@@ -81,50 +130,24 @@ class BuildJsSubscriber extends CommonSubscriber
             }
         }
 
-        new Fingerprint2().get(function(result, components) {
-            params.fingerprint = result;
-            for (var componentId in components) {
-                var component = components[componentId];
-                if (typeof component.key !== 'undefined') {
-                    if (component.key === 'resolution') {
-                        params.resolution = component.value[0] + 'x' + component.value[1];
-                    } else if (component.key === 'timezone_offset') {
-                        params.timezone_offset = component.value;
-                    } else if (component.key === 'navigator_platform') {
-                        params.platform = component.value;
-                    } else if (component.key === 'adblock') {
-                        params.adblock = component.value;
-                    } else if (component.key === 'do_not_track') {
-                        params.do_not_track = component.value;
-                    }
-                }
-            }
-
-            m.trackingPixel = new Image();
-
-            if (typeof pageview[3] === 'object') {
-                var events = ['onabort', 'onerror', 'onload'];
-                for (var i = 0; i < events.length; i++) {
-                    var e = events[i];
-                    if (typeof pageview[3][e] === 'function') {
-                        m.trackingPixel[e] = pageview[3][e];
-                    }
-                }
-            }
-
-            m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
-        });
-
-        
-    }
-
-    if (typeof m.getInput === 'function') {
-        var pageview = m.getInput('send', 'pageview');
-
-        if (pageview) {
-            m.sendPageview(pageview)
+        if (!m.fingerprint) {
+            new Fingerprint2().get(function(result, components) {
+                m.fingerprint = result;
+                m.fingerprintComponents = components;
+                m.buildTrackingImage(pageview, params);
+            });
+        } else {
+            m.buildTrackingImage(pageview, params);
         }
     }
+
+    // Process pageviews after mtc.js loaded
+    m.sendPageview();
+
+    // Process pageviews after new are added
+    document.addEventListener('eventAddedToMauticQueue', function(e) {
+        m.sendPageview(e.detail);
+    });
 
 })(MauticJS, location, navigator, document);
 

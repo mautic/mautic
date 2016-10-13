@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -156,7 +157,8 @@ trait EntityFieldsBuildFormTrait
                             $value = (int) $value;
                         }
                     }
-                    $typeProperties['data']        = $value;
+
+                    $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
