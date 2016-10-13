@@ -1,10 +1,12 @@
 <?php
-/**
+
+/*
  * Created by PhpStorm.
  * User: alan
  * Date: 9/14/16
  * Time: 5:42 PM.
  */
+
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;

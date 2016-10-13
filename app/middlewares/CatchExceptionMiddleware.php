@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Exception\DatabaseConnectionException;
