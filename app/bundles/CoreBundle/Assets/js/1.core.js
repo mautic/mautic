@@ -3519,6 +3519,8 @@ var Mautic = {
                         Mautic.renderPieChart(canvas)
                     } else if (canvas.hasClass('bar-chart')) {
                         Mautic.renderBarChart(canvas)
+                    } else if (canvas.hasClass('liefechart-bar-chart')) {
+                        Mautic.renderLifechartBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
                     } else if (canvas.hasClass('horizontal-bar-chart')) {
@@ -3592,8 +3594,32 @@ var Mautic = {
             options: {
                 scales: {
                     xAxes: [{
-                        barPercentage: 35
+                        barPercentage: 0.9,
                     }]
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
+    /**
+     * Render the chart.js bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderLifechartBarChart: function(canvas) {
+        var canvasWidth = mQuery(canvas).parent().width();
+        var barWidth    = (canvasWidth < 300) ? 5 : 25;
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [
+                        {
+                            barThickness: barWidth,
+                        }
+                    ]
                 }
             }
         });
@@ -3616,7 +3642,6 @@ var Mautic = {
                         stacked: false,
                         ticks: {fontSize: 9},
                         gridLines: {display:false},
-                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
@@ -3656,7 +3681,7 @@ var Mautic = {
                         stacked: false,
                         ticks: {beginAtZero: true, display: true, fontSize: 9},
                         gridLines: {display:false},
-                        barPercentage: 8,
+                        barPercentage: 0.5,
                         categorySpacing: 1
                     }],
                     display: false
@@ -3707,6 +3732,11 @@ var Mautic = {
         }
     },
 
+    /**
+     *
+     * @param wrapper
+     * @returns {*}
+     */
     renderMap: function(wrapper) {
         // Map render causes a JS error on FF when the element is hidden
         if (wrapper.is(':visible')) {
