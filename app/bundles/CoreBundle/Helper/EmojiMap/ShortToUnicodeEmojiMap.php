@@ -1358,4 +1358,9 @@ class ShortToUnicodeEmojiMap
             ':woman-heart-woman:'                                      => "\xf0\x9f\x91\xa9\xe2\x80\x8d\xe2\x9d\xa4\xef\xb8\x8f\xe2\x80\x8d\xf0\x9f\x91\xa9",
             ':woman-kiss-woman:'                                       => "\xf0\x9f\x91\xa9\xe2\x80\x8d\xe2\x9d\xa4\xef\xb8\x8f\xe2\x80\x8d\xf0\x9f\x92\x8b\xe2\x80\x8d\xf0\x9f\x91\xa9",
       ];
+
+    public static $exceptions = [
+            // Outlook email rendering
+            "microsoft-com\xf0\x9f\x8f\xa2office" => 'microsoft-com:office:office',
+      ];
 }

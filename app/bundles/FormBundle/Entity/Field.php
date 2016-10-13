@@ -852,7 +852,7 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if ($lead !== null && $this->leadField && $lead->getFieldValue($this->leadField) !== null) {
+            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField))) {
                 return false;
             }
         }

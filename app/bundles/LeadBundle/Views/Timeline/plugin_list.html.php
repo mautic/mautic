@@ -93,10 +93,10 @@ $baseUrl = isset($lead) ? $view['router']->path(
     <?php foreach ($events['events'] as $counter => $event): ?>
         <?php
         $counter += 1; // prevent 0
-        $icon = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
+        $icon       = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
         $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
         if (is_array($eventLabel)):
-            $linkType = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
+            $linkType   = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
             $eventLabel = "<a href=\"{$eventLabel['href']}\" $linkType>{$eventLabel['label']}</a>";
         endif;
         $eventLabel = preg_replace('/a\s+href/', 'a target="_new" href', $eventLabel);
@@ -127,8 +127,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
                        onclick="mQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
                        data-activate-details="<?php echo $counter; ?>"
                        class="btn btn-xs btn-nospin btn-default<?php if (empty($details)) {
-                           echo ' disabled';
-                       } ?>" data-toggle="tooltip"
+            echo ' disabled';
+        } ?>" data-toggle="tooltip"
                        title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
                         <span class="fa fa-fw <?php echo $icon ?>"></span>
                     </a>
@@ -152,8 +152,8 @@ $baseUrl = isset($lead) ? $view['router']->path(
             <br/>
 
             <span class="timeline-type"><?php if (isset($event['eventType'])) {
-                    echo $event['eventType'];
-                } ?>: </span>
+            echo $event['eventType'];
+        } ?>: </span>
 
             <br/>
 
@@ -181,7 +181,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 //        'target'     => '#timeline-table',
 //        'totalItems' => $events['total'],
 //    ]
-//); ?>
+//);?>
 
 <!--/ timeline -->
 

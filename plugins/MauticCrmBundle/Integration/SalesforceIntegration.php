@@ -179,6 +179,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceobjects = $settings['feature_settings']['objects'];
         }
 
+        $isRequired = function (array $field) {
+            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status']);
+        };
+
         try {
             if ($this->isAuthorized()) {
                 if (!empty($salesForceobjects) and is_array($salesForceobjects)) {
@@ -192,16 +196,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
-                                        ['reference', 'boolean']
+                                        ['reference']
                                     )
                                 ) {
                                     continue;
                                 }
-
+                                if ($fieldInfo['type'] == 'boolean') {
+                                    $type = 'boolean';
+                                } else {
+                                    $type = 'string';
+                                }
                                 $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
-                                    'type'     => 'string',
+                                    'type'     => $type,
                                     'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                    'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], ['Status'])),
+                                    'required' => $isRequired($fieldInfo),
                                 ];
                             }
                         }
@@ -210,14 +218,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $leadObject = $this->getApiHelper()->getLeadFields('Lead');
                     if (!empty($leadObject) && isset($leadObject['fields'])) {
                         foreach ($leadObject['fields'] as $fieldInfo) {
-                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference', 'boolean'])) {
+                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference'])) {
                                 continue;
                             }
 
                             $salesFields[$fieldInfo['name']] = [
                                 'type'     => 'string',
                                 'label'    => $fieldInfo['label'],
-                                'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], ['Status'])),
+                                'required' => $isRequired($fieldInfo),
                             ];
                         }
                     }
@@ -266,8 +274,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-
-        $params['fields'] = implode(',', $fields);
+        $params['fields']                          = implode(',', $fields);
 
         $count = 0;
 
@@ -483,6 +490,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $executed;
+    }
+
+    /**
+     * @param $query
+     * @param $object
+     */
+    public function ammendToSfFields($fields)
+    {
+        $newFields = [];
+        foreach ($fields as $key => $field) {
+            $key                      = explode('-', $key);
+            $newFields[trim($key[0])] = $field;
+        }
+
+        return $newFields;
     }
 
     /**

@@ -20,11 +20,12 @@ trait LeadAccessTrait
      *
      * @param $leadId
      * @param $action
-     * @param bool $isPlugin
+     * @param bool   $isPlugin
      * @param string $intgegration
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkLeadAccess ($leadId, $action, $isPlugin = false, $integration = '')
+    protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
         //make sure the user has view access to this lead
         $leadModel = $this->getModel('lead');
@@ -32,17 +33,17 @@ trait LeadAccessTrait
 
         if ($lead === null) {
             //set the return URL
-            $page      = $this->get('session')->get($isPlugin?'mautic.'.$integration.'.page':'mautic.lead.page', 1);
-            $returnUrl = $this->generateUrl($isPlugin?'mautic_plugin_timeline_index':'mautic_contact_index', ['page' => $page]);
+            $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
+            $returnUrl = $this->generateUrl($isPlugin ? 'mautic_plugin_timeline_index' : 'mautic_contact_index', ['page' => $page]);
 
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => $isPlugin?'MauticLeadBundle:Lead:pluginIndex':'MauticLeadBundle:Lead:index',
+                    'contentTemplate' => $isPlugin ? 'MauticLeadBundle:Lead:pluginIndex' : 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
-                        'activeLink'    => $isPlugin?'#mautic_plugin_timeline_index':'#mautic_contact_index',
-                        'mauticContent' => 'leadTimeline'
+                        'activeLink'    => $isPlugin ? '#mautic_plugin_timeline_index' : '#mautic_contact_index',
+                        'mauticContent' => 'leadTimeline',
                     ],
                     'flashes' => [
                         [
@@ -66,13 +67,13 @@ trait LeadAccessTrait
     }
 
     /**
-     * Returns leads the user has access to
+     * Returns leads the user has access to.
      *
      * @param $action
      *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkAllAccess ($action, $limit)
+    protected function checkAllAccess($action, $limit)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -88,21 +89,20 @@ trait LeadAccessTrait
                         [
                             'column' => 'l.date_identified',
                             'expr'   => 'isNotNull',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-                'oderBy' => 'r.last_active',
-                'orderByDir' => 'DESC',
-                'limit' => $limit,
-                'hydration_mode' => 'HYDRATE_ARRAY'
+                'oderBy'         => 'r.last_active',
+                'orderByDir'     => 'DESC',
+                'limit'          => $limit,
+                'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
 
         if ($leads === null) {
-
             return $this->accessDenied();
         }
 
-        foreach($leads as $lead){
+        foreach ($leads as $lead) {
             if (!$this->get('mautic.security')->hasEntityAccess(
                 'lead:leads:'.$action.'own',
                 'lead:leads:'.$action.'other',

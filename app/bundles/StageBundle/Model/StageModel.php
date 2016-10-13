@@ -13,10 +13,8 @@ namespace Mautic\StageBundle\Model;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Action;
-use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
@@ -209,85 +207,5 @@ class StageModel extends CommonFormModel
         $stages = $this->em->getRepository('MauticStageBundle:Stage')->getStages($user);
 
         return $stages;
-    }
-
-    /**
-     * Triggers a specific stage change (this function is not being used any more but leaving it in case we do want to move stages through different actions).
-     *
-     * @param $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
-     */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
-    {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return;
-        }
-
-        if ($typeId !== null && MAUTIC_ENV === 'prod') {
-            $triggeredEvents = $this->session->get('mautic.triggered.stage.actions', []);
-            if (in_array($typeId, $triggeredEvents)) {
-                return;
-            }
-            $triggeredEvents[] = $typeId;
-            $this->session->set('mautic.triggered.stage.actions', $triggeredEvents);
-        }
-
-        //find all the actions for published stages
-        /** @var \Mautic\StageBundle\Entity\StageRepository $repo */
-        $repo            = $this->getRepository();
-        $availableStages = $repo->getPublishedByType($type);
-
-        if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
-
-            if (null === $lead || !$lead->getId()) {
-                return;
-            }
-        }
-
-        //get available actions
-        $availableActions = $this->getStageActions();
-
-        //get a list of actions that has already been performed on this lead
-        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-
-        $persist = [];
-        foreach ($availableStages as $action) {
-
-            //if it's already been done, then skip it
-            if (isset($completedActions[$action->getId()])) {
-                continue;
-            }
-
-            //make sure the action still exists
-            if (!isset($availableActions['actions'][$action->getName()])) {
-                continue;
-            }
-
-            $parsed = explode('.', $action->getName());
-            $lead->stageChangeLogEntry(
-                $parsed[0],
-                $action->getId().': '.$action->getName(),
-                'Moved by an action'
-            );
-            $lead->setStage($action);
-            $log = new LeadStageLog();
-            $log->setStage($action);
-            $log->setLead($lead);
-            $log->setDateFired(new \DateTime());
-
-            $persist[] = $log;
-        }
-
-        if (!empty($persist)) {
-            $this->leadModel->saveEntity($lead);
-            $this->getRepository()->saveEntities($persist);
-
-            // Detach logs to reserve memory
-            $this->em->clear('Mautic\StageBundle\Entity\LeadStageLog');
-        }
     }
 }

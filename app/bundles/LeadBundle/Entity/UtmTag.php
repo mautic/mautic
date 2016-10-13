@@ -99,7 +99,7 @@ class UtmTag
 
         $builder->addNullableField('query', 'array');
 
-        $builder->addNullableField('referer', 'string');
+        $builder->addNullableField('referer', 'text');
 
         $builder->addNullableField('remoteHost', 'string', 'remote_host');
 

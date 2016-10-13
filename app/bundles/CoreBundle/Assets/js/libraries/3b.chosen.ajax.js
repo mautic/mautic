@@ -28,7 +28,11 @@
         }
 
         return this.each(function () {
-            return $(this).next('.chosen-container').find(".search-field > input, .chosen-search > input").bind('keyup', function () {
+            return $(this).next('.chosen-container').find(".search-field > input, .chosen-search > input").bind('keyup', function (event) {
+                if (event.which === 8 || event.which === 93 || event.which === 17 || event.which === 18) {
+                    return false;
+                }
+
                 var field, msg, success, untrimmed_val, val, search_field;
                 untrimmed_val = $(this).val();
                 val = $.trim($(this).val());
@@ -113,6 +117,13 @@
                             hasNew.prependTo(select);
                         }
                         select.trigger("chosen:updated");
+
+                        setTimeout( function() {
+                            // Hack to force chosen to hide already selected values from the list
+                            var e = $.Event("keyup.chosen");
+                            e.which = 93; // Windows/Command
+                            field.trigger(e);
+                        }, 5);
                     } else {
                         select.data().chosen.no_results_clear();
                         select.data().chosen.no_results(field.val());

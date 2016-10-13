@@ -131,6 +131,7 @@ class Stat
         $builder->setTable('email_stats')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
+            ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
             ->addIndex(['is_read'], 'stat_email_read_search')
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')

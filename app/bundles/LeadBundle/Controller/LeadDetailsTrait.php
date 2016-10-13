@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 trait LeadDetailsTrait
 {
-
     /**
      * @param array      $leads
      * @param array|null $filters
@@ -36,7 +35,7 @@ trait LeadDetailsTrait
                 [
                     'search'        => '',
                     'includeEvents' => [],
-                    'excludeEvents' => []
+                    'excludeEvents' => [],
                 ]
             );
         }
@@ -49,7 +48,7 @@ trait LeadDetailsTrait
 
             $orderBy = [
                 $session->get('mautic.gmail.timeline.orderby'),
-                $session->get('mautic.gmail.timeline.orderbydir')
+                $session->get('mautic.gmail.timeline.orderbydir'),
             ];
         }
 
@@ -62,34 +61,34 @@ trait LeadDetailsTrait
             'total'    => 0,
             'page'     => $page,
             'limit'    => $limit,
-            'maxPages' => 0
+            'maxPages' => 0,
         ];
 
         // get events for each contact
-        foreach ($leads as /** @var LeadModel $lead */ $lead) {
+        foreach ($leads as /* @var LeadModel $lead */ $lead) {
             //  if (!$lead->getEmail()) continue; // discard contacts without email
 
             /** @var LeadModel $model */
-            $model = $this->getModel('lead');
+            $model       = $this->getModel('lead');
             $engagements = $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
-            $events = $engagements['events'];
-            $types = $engagements['types'];
+            $events      = $engagements['events'];
+            $types       = $engagements['types'];
 
             // inject lead into events
-            foreach($events as &$event){
-                $event['leadId'] = $lead->getId();
+            foreach ($events as &$event) {
+                $event['leadId']    = $lead->getId();
                 $event['leadEmail'] = $lead->getEmail();
-                $event['leadName'] = $lead->getName() ? $lead->getName() : $lead->getEmail();
+                $event['leadName']  = $lead->getName() ? $lead->getName() : $lead->getEmail();
             }
 
             $result['events'] = array_merge($result['events'], $events);
-            $result['types'] = array_merge($result['types'], $types);
+            $result['types']  = array_merge($result['types'], $types);
             $result['total'] += $engagements['total'];
         }
 
-        $result['maxPages'] = ($limit<=0)? 1 : round(ceil($result['total'] / $limit));
+        $result['maxPages'] = ($limit <= 0) ? 1 : round(ceil($result['total'] / $limit));
 
-        usort($result['events'], array($this, 'cmp')); // sort events by
+        usort($result['events'], [$this, 'cmp']); // sort events by
 
         // now all events are merged, let's limit to   $limit
         array_splice($result['events'], $limit);
@@ -102,6 +101,7 @@ trait LeadDetailsTrait
     /**
      * @param $a
      * @param $b
+     *
      * @return int
      */
     private function cmp($a, $b)
@@ -109,6 +109,7 @@ trait LeadDetailsTrait
         if ($a['timestamp'] === $b['timestamp']) {
             return 0;
         }
+
         return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
     }
 

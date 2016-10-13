@@ -106,7 +106,7 @@ class Download
 
         $builder->addField('code', 'integer');
 
-        $builder->createField('referer', 'string')
+        $builder->createField('referer', 'text')
             ->nullable()
             ->build();
 

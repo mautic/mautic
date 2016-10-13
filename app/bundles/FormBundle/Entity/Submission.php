@@ -97,7 +97,7 @@ class Submission
             ->columnName('date_submitted')
             ->build();
 
-        $builder->addField('referer', 'string');
+        $builder->addField('referer', 'text');
 
         $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
