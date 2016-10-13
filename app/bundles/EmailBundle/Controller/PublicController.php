@@ -28,6 +28,11 @@ class PublicController extends CommonFormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
+        
+        if (!$stat->getEmail() && $this->get('mautic.security')->isAnonymous()) {
+            // Anonymous users don't have access to view custom emails
+            return $this->accessDenied();
+        }
 
         if (!empty($stat)) {
             if ($this->get('mautic.security')->isAnonymous()) {
