@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -32,9 +32,9 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             $this->getApiKey() => 'mautic.hubspot.form.apikey',
-        );
+        ];
     }
 
     /**
@@ -60,10 +60,10 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
-        return array(
-            'requires_callback' => false,
+        return [
+            'requires_callback'      => false,
             'requires_authorization' => false,
-        );
+        ];
     }
     /**
      * {@inheritdoc}
@@ -86,9 +86,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return array|mixed
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        $hubsFields = array();
+        $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
@@ -96,10 +96,10 @@ class HubspotIntegration extends CrmAbstractIntegration
 
                 if (isset($leadFields)) {
                     foreach ($leadFields as $fieldInfo) {
-                        $hubsFields[$fieldInfo['name']] = array(
-                            'type' => 'string',
+                        $hubsFields[$fieldInfo['name']] = [
+                            'type'  => 'string',
                             'label' => $fieldInfo['label'],
-                        );
+                        ];
                     }
                 }
                 // Email is Required for this kind of integration
@@ -123,15 +123,15 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function formatLeadDataForCreateOrUpdate($leadData = array())
+    public function formatLeadDataForCreateOrUpdate($leadData = [])
     {
-        $formattedLeadData = array();
+        $formattedLeadData = [];
 
         foreach ($leadData as $field => $value) {
-            $formattedLeadData['properties'][] = array(
+            $formattedLeadData['properties'][] = [
                 'property' => $field,
-                'value' => $value,
-            );
+                'value'    => $value,
+            ];
         }
 
         return $formattedLeadData;

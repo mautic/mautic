@@ -1,38 +1,38 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PublicController
+ * Class PublicController.
  */
 class PublicController extends CommonFormController
 {
-
     /**
      * @param         $slug
      * @param Request $request
      *
      * @return Response
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
@@ -42,7 +42,7 @@ class PublicController extends CommonFormController
         $model    = $this->getModel('page');
         $security = $this->get('mautic.security');
         /** @var Page $entity */
-        $entity   = $model->getEntityBySlugs($slug);
+        $entity = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
             $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
@@ -107,7 +107,6 @@ class PublicController extends CommonFormController
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariants)) {
-
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
@@ -168,19 +167,22 @@ class PublicController extends CommonFormController
                             }
 
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
-                            uasort($variants, function($a, $b) {
-                                if ($a['weight_deficit'] === $b['weight_deficit']) {
-                                    if ($a['hits'] === $b['hits']) {
-                                        return 0;
+                            uasort(
+                                $variants,
+                                function ($a, $b) {
+                                    if ($a['weight_deficit'] === $b['weight_deficit']) {
+                                        if ($a['hits'] === $b['hits']) {
+                                            return 0;
+                                        }
+
+                                        // if weight is the same - sort by least number displayed
+                                        return ($a['hits'] < $b['hits']) ? -1 : 1;
                                     }
 
-                                    // if weight is the same - sort by least number displayed
-                                    return ($a['hits'] < $b['hits']) ? -1 : 1;
+                                    // sort by the one with the greatest deficit first
+                                    return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
                                 }
-
-                                // sort by the one with the greatest deficit first
-                                return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
-                            });
+                            );
 
                             //find the one with the most difference from weight
 
@@ -222,7 +224,6 @@ class PublicController extends CommonFormController
                 /**
                  * @deprecated  BC support to be removed in 3.0
                  */
-
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
@@ -255,7 +256,12 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
+            $this->get('templating.helper.assets')->addScript(
+                $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                'onPageDisplay_headClose',
+                true,
+                'mautic_js'
+            );
 
             $event = new PageDisplayEvent($content, $entity);
             $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
@@ -275,6 +281,7 @@ class PublicController extends CommonFormController
      * @param $id
      *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
@@ -313,7 +320,7 @@ class PublicController extends CommonFormController
                     'content'  => $content,
                     'page'     => $entity,
                     'template' => $template,
-                    'public'   => true // @deprecated Remove in 2.0
+                    'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
 
@@ -351,6 +358,7 @@ class PublicController extends CommonFormController
      * @param $redirectId
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function redirectAction($redirectId)
@@ -360,7 +368,7 @@ class PublicController extends CommonFormController
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
         if (empty($redirect) || !$redirect->isPublished(false)) {
-            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 
         $this->getModel('page')->hitPage($redirect, $this->request);
@@ -463,11 +471,11 @@ class PublicController extends CommonFormController
                 $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
+                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
             } else {
                 // Fallback for other types like html, text, textarea and all unknown
-                $value = isset($content[$slot]) ? $content[$slot] : "";
+                $value = isset($content[$slot]) ? $content[$slot] : '';
                 $slotsHelper->set($slot, $value);
             }
         }
@@ -478,7 +486,7 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * Track video views
+     * Track video views.
      */
     public function hitVideoAction()
     {
@@ -497,5 +505,20 @@ class PublicController extends CommonFormController
         }
 
         return new Response();
+    }
+
+    /**
+     * Get the ID of the currently tracked Contact.
+     *
+     * @return JsonResponse
+     */
+    public function getContactIdAction()
+    {
+        $data = [];
+        if ($this->get('mautic.security')->isAnonymous()) {
+            $data = ['id' => $this->getModel('lead')->getCurrentLead()->getId()];
+        }
+
+        return new JsonResponse($data);
     }
 }

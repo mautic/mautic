@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class GlobalSearchEvent
+ * Class GlobalSearchEvent.
  */
 class GlobalSearchEvent extends Event
 {
-
     /**
      * @var array
      */
-    protected $results = array();
+    protected $results = [];
 
     /**
      * @var string
@@ -43,7 +42,7 @@ class GlobalSearchEvent extends Event
     }
 
     /**
-     * Returns the string to be searched
+     * Returns the string to be searched.
      *
      * @return string
      */
@@ -54,25 +53,26 @@ class GlobalSearchEvent extends Event
 
     /**
      * Add an array of results from a search query to be listed in right side panel
-     * Each result should be the ENTIRE html to be rendered
+     * Each result should be the ENTIRE html to be rendered.
      *
      * @param string $header  String name for section header
      * @param array  $results Array of HTML output that will be wrapped in <li /> elements
      */
     public function addResults($header, array $results)
     {
-        $header = $this->translator->trans($header);
+        $header                 = $this->translator->trans($header);
         $this->results[$header] = $results;
     }
 
     /**
-     * Returns the results
+     * Returns the results.
      *
      * @return array
      */
     public function getResults()
     {
-        uksort($this->results, "strnatcmp");
+        uksort($this->results, 'strnatcmp');
+
         return $this->results;
     }
 }

@@ -34,7 +34,7 @@ class NotificationApiController extends CommonApiController
     /**
      * Receive Web Push subscription request.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function subscribeAction()
     {

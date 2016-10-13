@@ -1,28 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class CookieHelper
- *
- * @package Mautic\CoreBundle\Helper
+ * Class CookieHelper.
  */
 class CookieHelper
 {
-    private $path = null;
-    private $domain = null;
-    private $secure = false;
+    private $path     = null;
+    private $domain   = null;
+    private $secure   = false;
     private $httponly = false;
 
     /**
@@ -58,7 +55,6 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-
         if ($this->request == null) {
             return true;
         }
@@ -75,7 +71,7 @@ class CookieHelper
     }
 
     /**
-     * Deletes a cookie by expiring it
+     * Deletes a cookie by expiring it.
      *
      * @param           $name
      * @param null      $path

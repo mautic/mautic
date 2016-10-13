@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,9 +9,9 @@
  */
 namespace Mautic\SmsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
  * Class ConfigSubscriber.
@@ -31,9 +31,9 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm([
-            'bundle' => 'SmsBundle',
-            'formAlias' => 'smsconfig',
-            'formTheme' => 'MauticSmsBundle:FormTheme\Config',
+            'bundle'     => 'SmsBundle',
+            'formAlias'  => 'smsconfig',
+            'formTheme'  => 'MauticSmsBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticSmsBundle'),
         ]);
     }

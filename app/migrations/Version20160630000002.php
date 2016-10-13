@@ -1,19 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+
 /**
- * Class Version20160630000002
+ * Class Version20160630000002.
  */
 class Version20160630000002 extends AbstractMauticMigration
 {
@@ -27,7 +28,6 @@ class Version20160630000002 extends AbstractMauticMigration
     {
         $table = $schema->getTable($this->prefix.'stages');
         if ($table->hasIndex($this->generatePropertyName('stages', 'idx', ['category_id']))) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -36,8 +36,8 @@ class Version20160630000002 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $fk  = $this->generatePropertyName('stages', 'fk', array('category_id'));
-        $idx = $this->generatePropertyName('stages', 'idx', array('category_id'));
+        $fk  = $this->generatePropertyName('stages', 'fk', ['category_id']);
+        $idx = $this->generatePropertyName('stages', 'idx', ['category_id']);
 
         $this->addSql("ALTER TABLE {$this->prefix}stages ADD CONSTRAINT {$fk} FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL");
         $this->addSql("CREATE INDEX {$idx} ON {$this->prefix}stages (category_id)");

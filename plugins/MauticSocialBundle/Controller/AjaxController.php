@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -14,9 +14,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class AjaxController
- *
- * @package Mautic\EmailBundle\Controller
+ * Class AjaxController.
  */
 class AjaxController extends CommonAjaxController
 {
@@ -33,7 +31,7 @@ class AjaxController extends CommonAjaxController
         // default to empty
         $dataArray = [
             'html'    => '',
-            'success' => 0
+            'success' => 0,
         ];
 
         if (!empty($type)) {
@@ -51,16 +49,15 @@ class AjaxController extends CommonAjaxController
                 [
                     $type.'[', // this is going to generate twitter_hashtag[ or twitter_mention[
                     $type.'_', // this is going to generate twitter_hashtag_ or twitter_mention_
-                    $type
+                    $type,
                 ],
                 [
                     'monitoring[properties][',
                     'monitoring_properties_',
-                    'monitoring'
+                    'monitoring',
                 ],
                 $html
             );
-
 
             $dataArray['html']    = $html;
             $dataArray['success'] = 1;

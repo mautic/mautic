@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * Class SecurityHelper
+ * Class SecurityHelper.
  */
 class SecurityHelper extends Helper
 {
@@ -40,9 +40,9 @@ class SecurityHelper extends Helper
     /**
      * SecurityHelper constructor.
      *
-     * @param CorePermissions $security
-     * @param RequestStack    $requestStack
-     * @param EventDispatcherInterface      $dispatcher
+     * @param CorePermissions          $security
+     * @param RequestStack             $requestStack
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(CorePermissions $security, RequestStack $requestStack, EventDispatcherInterface $dispatcher)
     {
@@ -60,7 +60,7 @@ class SecurityHelper extends Helper
     }
 
     /**
-     * Helper function to check if the logged in user has access to an entity
+     * Helper function to check if the logged in user has access to an entity.
      *
      * @param $ownPermission
      * @param $otherPermission
@@ -84,7 +84,7 @@ class SecurityHelper extends Helper
     }
 
     /**
-     * Get content from listeners
+     * Get content from listeners.
      */
     public function getAuthenticationContent()
     {

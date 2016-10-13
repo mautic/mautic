@@ -1,23 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 /**
- * Extended Translator service
+ * Extended Translator service.
  */
 class Translator extends BaseTranslator
 {
     /**
-     * Check if the specified message ID exists
+     * Check if the specified message ID exists.
      *
      * @param string      $id     The message id (may also be an object that can be cast to string)
      * @param string|null $domain The domain for the message or null to use the default
@@ -61,7 +61,7 @@ class Translator extends BaseTranslator
 
     /**
      * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
-     * $alternative
+     * $alternative.
      *
      * @param      $preferred
      * @param      $alternative
@@ -71,13 +71,11 @@ class Translator extends BaseTranslator
      *
      * @return string
      */
-    public function transConditional($preferred, $alternative, $parameters = array(), $domain = null, $locale = null)
+    public function transConditional($preferred, $alternative, $parameters = [], $domain = null, $locale = null)
     {
         if ($this->hasId($preferred, $domain, $locale)) {
-
             return $this->trans($preferred, $parameters, $domain, $locale);
         } else {
-
             return $this->trans($alternative, $parameters, $domain, $locale);
         }
     }

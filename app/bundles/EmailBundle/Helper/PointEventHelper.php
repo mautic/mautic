@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Helper;
+
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PointBundle\Entity\TriggerEvent;
 
 /**
- * Class PointEventHelper
+ * Class PointEventHelper.
  */
 class PointEventHelper
 {
-
     /**
      * @param $eventDetails
      * @param $action
@@ -60,7 +59,7 @@ class PointEventHelper
                 $leadCredentials       = $leadModel->flattenFields($leadFields);
                 $leadCredentials['id'] = $lead->getId();
 
-                $options = array('source' => array('trigger', $event['id']));
+                $options = ['source' => ['trigger', $event['id']]];
                 $model->sendEmail($email, $leadCredentials, $options);
             }
         }

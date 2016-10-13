@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\Http;
@@ -14,16 +14,16 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
 {
-    public $city = '';
-    public $region = '';
-    public $zipcode = '';
-    public $country = '';
-    public $latitude = '';
-    public $longitude = '';
-    public $isp = '';
+    public $city         = '';
+    public $region       = '';
+    public $zipcode      = '';
+    public $country      = '';
+    public $latitude     = '';
+    public $longitude    = '';
+    public $isp          = '';
     public $organization = '';
-    public $timezone = '';
-    public $extra = '';
+    public $timezone     = '';
+    public $extra        = '';
 
     /**
      * @var string IP Address
@@ -31,7 +31,7 @@ abstract class AbstractLookup
     protected $ip;
 
     /**
-     * Authorization for lookup service
+     * Authorization for lookup service.
      *
      * @var
      */
@@ -53,14 +53,14 @@ abstract class AbstractLookup
     protected $config;
 
     /**
-     * Return attribution HTML displayed in the configuration UI
+     * Return attribution HTML displayed in the configuration UI.
      *
      * @return string
      */
     abstract public function getAttribution();
 
     /**
-     * Executes the lookup of the IP address
+     * Executes the lookup of the IP address.
      */
     abstract protected function lookup();
 
@@ -98,7 +98,7 @@ abstract class AbstractLookup
     }
 
     /**
-     * Return details of the IP address lookup
+     * Return details of the IP address lookup.
      *
      * @return array
      */
@@ -107,10 +107,11 @@ abstract class AbstractLookup
         $reflect = new \ReflectionClass($this);
         $props   = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
 
-        $details = array();
+        $details = [];
         foreach ($props as $prop) {
             $details[$prop->getName()] = $prop->getValue($this);
         }
+
         return $details;
     }
 }

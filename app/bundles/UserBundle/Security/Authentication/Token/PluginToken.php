@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
- * Class PluginToken
+ * Class PluginToken.
  */
 class PluginToken extends AbstractToken
 {
@@ -84,9 +84,6 @@ class PluginToken extends AbstractToken
         return $this->providerKey;
     }
 
-    /**
-     * @return null
-     */
     public function getAuthenticatingService()
     {
         return $this->authenticatingService;

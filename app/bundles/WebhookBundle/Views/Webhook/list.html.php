@@ -1,13 +1,15 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticWebhookBundle:Webhook:index.html.php');
+}
 ?>
 
 <?php if (count($items)): ?>
@@ -16,32 +18,32 @@ if ($tmpl == 'index')
             <thead>
                 <tr>
                     <?php
-                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                             'checkall' => 'true',
-                            'target'   => '#webhookTable'
-                        ));
+                            'target'   => '#webhookTable',
+                        ]);
 
-                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                             'sessionVar' => 'mautic_webhook',
                             'orderBy'    => 'e.name',
                             'text'       => 'mautic.core.name',
                             'class'      => 'col-webhook-name',
-                            'default'    => true
-                        ));
+                            'default'    => true,
+                        ]);
 
-                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                             'sessionVar' => 'mautic_webhook',
                             'orderBy'    => 'e.webhookUrl',
                             'text'       => 'mautic.webhook.webhook_url',
-                            'class'      => 'col-webhook-id visible-md visible-lg'
-                        ));
+                            'class'      => 'col-webhook-id visible-md visible-lg',
+                        ]);
 
-                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                             'sessionVar' => 'mautic_webhook',
                             'orderBy'    => 'e.id',
                             'text'       => 'mautic.core.id',
-                            'class'      => 'col-webhook-id visible-md visible-lg'
-                        ));
+                            'class'      => 'col-webhook-id visible-md visible-lg',
+                        ]);
                     ?>
                 </tr>
             </thead>
@@ -51,21 +53,21 @@ if ($tmpl == 'index')
                     <tr>
                         <td>
                             <?php
-                                echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                                    'item'      => $item,
-                                    'templateButtons' => array(
-                                        'edit'      => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
-                                        'clone'     => $permissions['webhook:webhooks:create'],
-                                        'delete'    => $view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteother'], $item->getCreatedBy()),
-                                    ),
-                                    'routeBase'  => 'webhook',
-                                ));
+                                echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                                    'item'            => $item,
+                                    'templateButtons' => [
+                                        'edit'   => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
+                                        'clone'  => $permissions['webhook:webhooks:create'],
+                                        'delete' => $view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteother'], $item->getCreatedBy()),
+                                    ],
+                                    'routeBase' => 'webhook',
+                                ]);
                             ?>
                         </td>
                         <td>
                             <div>
-                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'webhook')); ?>
-                                <a data-toggle="ajax" href="<?php echo $view['router']->path('mautic_webhook_action', array('objectId' => $item->getId(), 'objectAction' => 'view')); ?>">
+                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'webhook']); ?>
+                                <a data-toggle="ajax" href="<?php echo $view['router']->path('mautic_webhook_action', ['objectId' => $item->getId(), 'objectAction' => 'view']); ?>">
                                     <?php echo $item->getName(); ?>
                                 </a>
                                 <?php if ($description = $item->getDescription()): ?>
@@ -82,14 +84,14 @@ if ($tmpl == 'index')
     </div>
 
     <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => count($items),
-            "page"            => $page,
-            "limit"           => $limit,
-            "menuLinkId"      => 'mautic_webhook_index',
-            "baseUrl"         => $view['router']->path('mautic_webhook_index'),
-            'sessionVar'      => 'mautic_webhook'
-        )); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+            'totalItems' => count($items),
+            'page'       => $page,
+            'limit'      => $limit,
+            'menuLinkId' => 'mautic_webhook_index',
+            'baseUrl'    => $view['router']->path('mautic_webhook_index'),
+            'sessionVar' => 'mautic_webhook',
+        ]); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>

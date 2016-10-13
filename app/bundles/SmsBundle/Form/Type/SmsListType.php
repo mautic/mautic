@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -28,7 +28,7 @@ class SmsListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->viewOther = $factory->getSecurity()->isGranted('sms:smses:viewother');
-        $this->repo = $factory->getModel('sms')->getRepository();
+        $this->repo      = $factory->getModel('sms')->getRepository();
 
         $this->repo->setCurrentUser($factory->getUser());
     }
@@ -39,7 +39,7 @@ class SmsListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $viewOther = $this->viewOther;
-        $repo = $this->repo;
+        $repo      = $this->repo;
 
         $resolver->setDefaults(
             [
@@ -62,9 +62,9 @@ class SmsListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded' => false,
-                'multiple' => true,
-                'required' => false,
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.sms.no.smses.note' : 'mautic.core.form.chooseone';
                 },

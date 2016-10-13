@@ -1,17 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
-use Mautic\EmailBundle\Helper\ImapHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,11 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * CLI command to check for messages
+ * CLI command to check for messages.
  */
 class ProcessFetchEmailCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -33,13 +31,13 @@ class ProcessFetchEmailCommand extends ContainerAwareCommand
             ->setName('mautic:email:fetch')
             ->setAliases(
                 [
-                    'mautic:emails:fetch'
+                    'mautic:emails:fetch',
                 ]
             )
             ->setDescription('Fetch and process monitored email.')
             ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')
             ->setHelp(
-                <<<EOT
+                <<<'EOT'
                 The <info>%command.name%</info> command is used to fetch and process messages such as bounces and unsubscribe requests. Configure the Monitored Email settings in Mautic's Configuration.
 
 <info>php %command.full_name%</info>
@@ -107,8 +105,8 @@ EOT
                     if (count($mailIds)) {
                         foreach ($mailIds as $id) {
                             $messages[] = $imapHelper->getMail($id);
-                            $counter++;
-                            $processed++;
+                            ++$counter;
+                            ++$processed;
 
                             if ($limit && $counter >= $limit) {
                                 break;
@@ -148,7 +146,6 @@ EOT
         }
 
         if (empty($searchMailboxes)) {
-
             $output->writeln('No mailboxes are configured.');
         }
 

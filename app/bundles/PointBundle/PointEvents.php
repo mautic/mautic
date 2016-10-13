@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle;
 
 /**
- * Class PointEvents
+ * Class PointEvents.
  *
  * Events available for PointBundle
  */
@@ -53,7 +53,7 @@ final class PointEvents
     const POINT_POST_DELETE = 'mautic.point_post_delete';
 
     /**
-     * The mautic.point_on_build event is thrown before displaying the point builder form to allow adding of custom actions
+     * The mautic.point_on_build event is thrown before displaying the point builder form to allow adding of custom actions.
      *
      * The event listener receives a Mautic\PointBundle\Event\PointBuilderEvent instance.
      *
@@ -62,7 +62,7 @@ final class PointEvents
     const POINT_ON_BUILD = 'mautic.point_on_build';
 
     /**
-     * The mautic.point_on_action event is thrown to execute a point action
+     * The mautic.point_on_action event is thrown to execute a point action.
      *
      * The event listener receives a Mautic\PointBundle\Event\PointActionEvent instance.
      *
@@ -107,7 +107,7 @@ final class PointEvents
     const TRIGGER_POST_DELETE = 'mautic.trigger_post_delete';
 
     /**
-     * The mautic.trigger_on_build event is thrown before displaying the trigger builder form to allow adding of custom actions
+     * The mautic.trigger_on_build event is thrown before displaying the trigger builder form to allow adding of custom actions.
      *
      * The event listener receives a Mautic\PointBundle\Event\TriggerBuilderEvent instance.
      *
@@ -116,7 +116,7 @@ final class PointEvents
     const TRIGGER_ON_BUILD = 'mautic.trigger_on_build';
 
     /**
-     * The mautic.trigger_on_event_execute event is thrown to execute a trigger event
+     * The mautic.trigger_on_event_execute event is thrown to execute a trigger event.
      *
      * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
      *

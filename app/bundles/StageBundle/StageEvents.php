@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle;
 
 /**
- * Class StageEvents
+ * Class StageEvents.
  *
  * Events available for StageBundle
  */
@@ -53,7 +53,7 @@ final class StageEvents
     const STAGE_POST_DELETE = 'mautic.stage_post_delete';
 
     /**
-     * The mautic.stage_on_build event is thrown before displaying the stage builder form to allow adding of custom actions
+     * The mautic.stage_on_build event is thrown before displaying the stage builder form to allow adding of custom actions.
      *
      * The event listener receives a Mautic\StageBundle\Event\StageBuilderEvent instance.
      *
@@ -62,7 +62,7 @@ final class StageEvents
     const STAGE_ON_BUILD = 'mautic.stage_on_build';
 
     /**
-     * The mautic.stage_on_action event is thrown to execute a stage action
+     * The mautic.stage_on_action event is thrown to execute a stage action.
      *
      * The event listener receives a Mautic\StageBundle\Event\StageActionEvent instance.
      *

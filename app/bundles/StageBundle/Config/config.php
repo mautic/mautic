@@ -60,22 +60,31 @@ return [
             'mautic.stage.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\StageBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                 ],
             ],
             'mautic.stage.subscriber' => [
-                'class' => 'Mautic\StageBundle\EventListener\StageSubscriber',
+                'class'     => 'Mautic\StageBundle\EventListener\StageSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
             ],
             'mautic.stage.leadbundle.subscriber' => [
                 'class' => 'Mautic\StageBundle\EventListener\LeadSubscriber',
             ],
             'mautic.stage.search.subscriber' => [
-                'class' => 'Mautic\StageBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\StageBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.stage.dashboard.subscriber' => [
-                'class' => 'Mautic\StageBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\StageBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
         ],
         'forms' => [

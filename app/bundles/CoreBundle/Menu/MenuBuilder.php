@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -18,11 +18,10 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class MenuBuilder
+ * Class MenuBuilder.
  */
 class MenuBuilder
 {
-
     /**
      * @var FactoryInterface
      */
@@ -70,7 +69,7 @@ class MenuBuilder
     }
 
     /**
-     * Used by breadcrumbs to determine active link
+     * Used by breadcrumbs to determine active link.
      *
      * @param \Knp\Menu\ItemInterface $menu
      * @param string                  $forRouteUri
@@ -83,13 +82,13 @@ class MenuBuilder
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
+                if ($forRouteUri == 'current' && $this->matcher->isCurrent($item)) {
                     //current match
                     return $item;
-                } else if ($forRouteUri != "current" && $item->getUri() == $forRouteUri) {
+                } elseif ($forRouteUri != 'current' && $item->getUri() == $forRouteUri) {
                     //route uri match
                     return $item;
-                } else if (!empty($forRouteName) && $forRouteName == $item->getExtra("routeName")) {
+                } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
                     //route name match
                     return $item;
                 }
@@ -112,7 +111,7 @@ class MenuBuilder
      */
     private function buildMenu($name)
     {
-        static $menus = array();
+        static $menus = [];
 
         if (!isset($menus[$name])) {
             $loader = new ArrayLoader($this->factory);

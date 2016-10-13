@@ -267,6 +267,7 @@ class PageType extends AbstractType
                     'maxlength'    => 200,
                     'tooltip'      => 'mautic.page.form.redirecturl.help',
                     'data-toggle'  => 'field-lookup',
+                    'data-action'  => 'page:fieldList',
                     'data-target'  => 'redirectUrl',
                     'data-options' => $redirectUrlDataOptions,
                 ],

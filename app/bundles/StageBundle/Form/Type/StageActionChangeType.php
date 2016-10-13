@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -16,9 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class EmailSendType
- *
- * @package Mautic\EmailBundle\Form\Type
+ * Class EmailSendType.
  */
 class StageActionChangeType extends AbstractType
 {
@@ -27,7 +25,8 @@ class StageActionChangeType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->factory = $factory;
     }
 
@@ -35,34 +34,35 @@ class StageActionChangeType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('stage', 'stageaction_list', array(
-            'label'       => 'mautic.stage.selectstage',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
+        $builder->add('stage', 'stageaction_list', [
+            'label'      => 'mautic.stage.selectstage',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.choose.stage_descr',
-            ),
+            ],
             'multiple'    => false,
             'required'    => true,
-            'constraints' => array(
+            'constraints' => [
                 new NotBlank(
-                    array('message' => 'mautic.core.value.required')
-                )
-            )
-        ));
+                    ['message' => 'mautic.core.value.required']
+                ),
+            ],
+        ]);
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('update_select'));
+        $resolver->setOptional(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "stageaction_change";
+    public function getName()
+    {
+        return 'stageaction_change';
     }
 }

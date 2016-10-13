@@ -70,12 +70,15 @@ return [
     'services' => [
         'events' => [
             'mautic.campaign.subscriber' => [
-                'class' => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+                'class'     => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
             ],
             'mautic.campaign.leadbundle.subscriber' => [
                 'class'     => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead',
                 ],
@@ -87,10 +90,17 @@ return [
                 'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber',
             ],
             'mautic.campaign.search.subscriber' => [
-                'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\CampaignBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                ],
             ],
             'mautic.campaign.dashboard.subscriber' => [
-                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.model.event',
+                ],
             ],
             'mautic.campaignconfigbundle.subscriber' => [
                 'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',

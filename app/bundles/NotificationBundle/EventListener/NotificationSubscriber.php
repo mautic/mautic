@@ -12,7 +12,7 @@ namespace Mautic\NotificationBundle\EventListener;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\NotificationBundle\Event\NotificationEvent;
@@ -42,20 +42,24 @@ class NotificationSubscriber extends CommonSubscriber
     protected $assetTokenHelper;
 
     /**
-     * DynamicContentSubscriber constructor.
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * NotificationSubscriber constructor.
      *
-     * @param MauticFactory    $factory
+     * @param AuditLogModel    $auditLogModel
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
-    public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
     {
+        $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -86,7 +90,7 @@ class NotificationSubscriber extends CommonSubscriber
                 'action'   => ($event->isNew()) ? 'create' : 'update',
                 'details'  => $details,
             ];
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -105,7 +109,7 @@ class NotificationSubscriber extends CommonSubscriber
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**

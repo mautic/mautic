@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
- * Class ExceptionController
+ * Class ExceptionController.
  */
 class ExceptionController extends CommonController
 {
@@ -40,12 +40,12 @@ class ExceptionController extends CommonController
 
             // Special handling for oauth and api urls
             if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) || strpos($request->getUri(), '/api') !== false) {
-                $dataArray = array(
-                    'error' => array(
+                $dataArray = [
+                    'error' => [
                         'message' => $exception->getMessage(),
-                        'code'    => $code
-                    )
-                );
+                        'code'    => $code,
+                    ],
+                ];
                 if ($env == 'dev') {
                     $dataArray['trace'] = $exception->getTrace();
                 }
@@ -57,7 +57,7 @@ class ExceptionController extends CommonController
                 $layout = 'Error';
             }
 
-            $anonymous    = $this->factory->getSecurity()->isAnonymous();
+            $anonymous    = $this->get('mautic.security')->isAnonymous();
             $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
             if ($anonymous) {
                 if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
@@ -77,33 +77,33 @@ class ExceptionController extends CommonController
             $urlParts = parse_url($url);
 
             return $this->delegateView(
-                array(
-                    'viewParameters'  => array(
+                [
+                    'viewParameters' => [
                         'baseTemplate'   => $baseTemplate,
                         'status_code'    => $code,
                         'status_text'    => $statusText,
                         'exception'      => $exception,
                         'logger'         => $logger,
                         'currentContent' => $currentContent,
-                        'isPublicPage'   => $anonymous
-                    ),
+                        'isPublicPage'   => $anonymous,
+                    ],
                     'contentTemplate' => $template,
-                    'passthroughVars' => array(
-                        'error' => array(
+                    'passthroughVars' => [
+                        'error' => [
                             'code'      => $code,
                             'text'      => $statusText,
                             'exception' => ($env == 'dev') ? $exception->getMessage() : '',
-                            'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
-                        ),
-                        'route' => $urlParts['path']
-                    )
-                )
+                            'trace'     => ($env == 'dev') ? $exception->getTrace() : '',
+                        ],
+                        'route' => $urlParts['path'],
+                    ],
+                ]
             );
         }
     }
 
     /**
-     * @param int     $startObLevel
+     * @param int $startObLevel
      *
      * @return string
      */

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,11 +9,11 @@
  */
 namespace Mautic\SmsBundle\Form\Type;
 
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SmsSendType.
@@ -43,9 +43,9 @@ class SmsSendType extends AbstractType
             'sms',
             'sms_list',
             [
-                'label'       => 'mautic.sms.send.selectsmss',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.sms.send.selectsmss',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.sms.choose.smss',
                     'onchange' => 'Mautic.disabledSmsAction()',
@@ -55,7 +55,7 @@ class SmsSendType extends AbstractType
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.sms.choosesms.notblank']
-                    )
+                    ),
                 ],
             ]
         );
@@ -74,12 +74,12 @@ class SmsSendType extends AbstractType
                 'newSmsButton',
                 'button',
                 [
-                    'attr'  => [
+                    'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewSmsWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
-                        'icon'    => 'fa fa-plus',
+                        'icon' => 'fa fa-plus',
                     ],
                     'label' => 'mautic.sms.send.new.sms',
                 ]
@@ -102,9 +102,9 @@ class SmsSendType extends AbstractType
                 'editSmsButton',
                 'button',
                 [
-                    'attr'  => [
+                    'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewSmsWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($sms),
                         'icon'     => 'fa fa-edit',
                     ],

@@ -1,24 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class VideoHit
- *
- * @package Mautic\PageBundle\Entity
+ * Class VideoHit.
  */
 class VideoHit
 {
@@ -93,7 +90,7 @@ class VideoHit
     private $organization;
 
     /**
-     * @var integer
+     * @var int
      */
     private $code;
 
@@ -125,7 +122,7 @@ class VideoHit
     /**
      * @var string
      */
-    private $browserLanguages = array();
+    private $browserLanguages = [];
 
     /**
      * @var string
@@ -133,19 +130,19 @@ class VideoHit
     private $channel;
 
     /**
-     * @var integer
+     * @var int
      */
     private $channelId;
 
     /**
      * @var array
      */
-    private $query = array();
+    private $query = [];
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -247,7 +244,7 @@ class VideoHit
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -255,7 +252,7 @@ class VideoHit
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
-                array(
+                [
                     'dateHit',
                     'dateLeft',
                     'lead',
@@ -276,16 +273,16 @@ class VideoHit
                     'sourceId',
                     'query',
                     'timeWatched',
-                    'guid'
-                )
+                    'guid',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -293,7 +290,7 @@ class VideoHit
     }
 
     /**
-     * Set dateHit
+     * Set dateHit.
      *
      * @param \DateTime $dateHit
      *
@@ -307,7 +304,7 @@ class VideoHit
     }
 
     /**
-     * Get dateHit
+     * Get dateHit.
      *
      * @return \DateTime
      */
@@ -337,7 +334,7 @@ class VideoHit
     }
 
     /**
-     * Set country
+     * Set country.
      *
      * @param string $country
      *
@@ -351,7 +348,7 @@ class VideoHit
     }
 
     /**
-     * Get country
+     * Get country.
      *
      * @return string
      */
@@ -361,7 +358,7 @@ class VideoHit
     }
 
     /**
-     * Set region
+     * Set region.
      *
      * @param string $region
      *
@@ -375,7 +372,7 @@ class VideoHit
     }
 
     /**
-     * Get region
+     * Get region.
      *
      * @return string
      */
@@ -385,7 +382,7 @@ class VideoHit
     }
 
     /**
-     * Set city
+     * Set city.
      *
      * @param string $city
      *
@@ -399,7 +396,7 @@ class VideoHit
     }
 
     /**
-     * Get city
+     * Get city.
      *
      * @return string
      */
@@ -409,7 +406,7 @@ class VideoHit
     }
 
     /**
-     * Set isp
+     * Set isp.
      *
      * @param string $isp
      *
@@ -423,7 +420,7 @@ class VideoHit
     }
 
     /**
-     * Get isp
+     * Get isp.
      *
      * @return string
      */
@@ -433,7 +430,7 @@ class VideoHit
     }
 
     /**
-     * Set organization
+     * Set organization.
      *
      * @param string $organization
      *
@@ -447,7 +444,7 @@ class VideoHit
     }
 
     /**
-     * Get organization
+     * Get organization.
      *
      * @return string
      */
@@ -457,9 +454,9 @@ class VideoHit
     }
 
     /**
-     * Set code
+     * Set code.
      *
-     * @param integer $code
+     * @param int $code
      *
      * @return VideoHit
      */
@@ -471,9 +468,9 @@ class VideoHit
     }
 
     /**
-     * Get code
+     * Get code.
      *
-     * @return integer
+     * @return int
      */
     public function getCode()
     {
@@ -481,7 +478,7 @@ class VideoHit
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
@@ -495,7 +492,7 @@ class VideoHit
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
@@ -505,7 +502,7 @@ class VideoHit
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
      *
@@ -519,7 +516,7 @@ class VideoHit
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */
@@ -529,7 +526,7 @@ class VideoHit
     }
 
     /**
-     * Set userAgent
+     * Set userAgent.
      *
      * @param string $userAgent
      *
@@ -543,7 +540,7 @@ class VideoHit
     }
 
     /**
-     * Get userAgent
+     * Get userAgent.
      *
      * @return string
      */
@@ -553,7 +550,7 @@ class VideoHit
     }
 
     /**
-     * Set remoteHost
+     * Set remoteHost.
      *
      * @param string $remoteHost
      *
@@ -567,7 +564,7 @@ class VideoHit
     }
 
     /**
-     * Get remoteHost
+     * Get remoteHost.
      *
      * @return string
      */
@@ -577,7 +574,7 @@ class VideoHit
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
@@ -591,7 +588,7 @@ class VideoHit
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
@@ -601,7 +598,7 @@ class VideoHit
     }
 
     /**
-     * Set pageLanguage
+     * Set pageLanguage.
      *
      * @param string $pageLanguage
      *
@@ -615,7 +612,7 @@ class VideoHit
     }
 
     /**
-     * Get pageLanguage
+     * Get pageLanguage.
      *
      * @return string
      */
@@ -625,7 +622,7 @@ class VideoHit
     }
 
     /**
-     * Set browserLanguages
+     * Set browserLanguages.
      *
      * @param string $browserLanguages
      *
@@ -639,7 +636,7 @@ class VideoHit
     }
 
     /**
-     * Get browserLanguages
+     * Get browserLanguages.
      *
      * @return string
      */
@@ -689,7 +686,7 @@ class VideoHit
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getChannelId()
     {
@@ -697,7 +694,7 @@ class VideoHit
     }
 
     /**
-     * @param integer $channelId
+     * @param int $channelId
      *
      * @return VideoHit
      */

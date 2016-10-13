@@ -1,101 +1,99 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\EmailStepType;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Validator\Constraints as Assert;
-use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * Email Step.
  */
 class EmailStep implements StepInterface
 {
-
-    /**
+    /*
      * From name for email sent from Mautic
      *
      * @var string
      */
-    var $mailer_from_name;
+    public $mailer_from_name;
 
-    /**
+    /*
      * From email sent from Mautic
      *
      * @var string
      */
-    var $mailer_from_email;
+    public $mailer_from_email;
 
-    /**
+    /*
      * Mail transport
      *
      * @var string
      */
-    var $mailer_transport = 'mail';
+    public $mailer_transport = 'mail';
 
-    /**
+    /*
      * SMTP host
      *
      * @var string
      */
-    var $mailer_host;
+    public $mailer_host;
 
-    /**
+    /*
      * SMTP port
      *
      * @var string
      */
-    var $mailer_port;
+    public $mailer_port;
 
-    /**
+    /*
      * SMTP username
      *
      * @var string
      */
-    var $mailer_user;
+    public $mailer_user;
 
-    /**
+    /*
      * SMTP password
      *
      * @var string
      */
-    var $mailer_password;
+    public $mailer_password;
 
-    /**
+    /*
      * SMTP encryption
      *
      * @var string
      */
-    var $mailer_encryption; // null|tls|ssl
+    public $mailer_encryption; // null|tls|ssl
 
-    /**
+    /*
      * SMTP auth mode
      *
      * @var string
      */
-    var $mailer_auth_mode; //  null|plain|login|cram-md5
+    public $mailer_auth_mode; //  null|plain|login|cram-md5
 
-    /**
+    /*
      * Spool mode
      *
      * @var string
      */
-    var $mailer_spool_type = 'memory'; // file|memory
+    public $mailer_spool_type = 'memory'; // file|memory
 
-    /**
+    /*
      * Spool path
      *
      * @var string
      */
-    var $mailer_spool_path = "%kernel.root_dir%/spool";
+    public $mailer_spool_path = '%kernel.root_dir%/spool';
 
     /**
      * @param Session $session
@@ -122,7 +120,7 @@ class EmailStep implements StepInterface
      */
     public function checkRequirements()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -130,7 +128,7 @@ class EmailStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -146,7 +144,7 @@ class EmailStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        $parameters = array();
+        $parameters = [];
 
         foreach ($data as $key => $value) {
             $parameters[$key] = $value;

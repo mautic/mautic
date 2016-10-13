@@ -1,20 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
@@ -24,32 +24,43 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class FormSubscriber
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
     /**
      * @var MailHelper
      */
-    private $mailer;
+    protected $mailer;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
 
     /**
      * FormSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param MailHelper    $mailer
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     * @param MailHelper     $mailer
      */
-    public function __construct(MauticFactory $factory, MailHelper $mailer)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
     {
-        parent::__construct($factory);
-
-        $this->mailer = $mailer->getMailer();
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel  = $auditLogModel;
+        $this->mailer         = $mailer->getMailer();
     }
 
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -63,7 +74,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -72,19 +83,19 @@ class FormSubscriber extends CommonSubscriber
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "form",
-                "object"    => "form",
-                "objectId"  => $form->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest(),
+                'bundle'    => 'form',
+                'object'    => 'form',
+                'objectId'  => $form->getId(),
+                'action'    => ($event->isNew()) ? 'create' : 'update',
+                'details'   => $details,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param Events\FormEvent $event
      */
@@ -92,20 +103,20 @@ class FormSubscriber extends CommonSubscriber
     {
         $form = $event->getForm();
         $log  = [
-            "bundle"    => "form",
-            "object"    => "form",
-            "objectId"  => $form->deletedId,
-            "action"    => "delete",
-            "details"   => ['name' => $form->getName()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest(),
+            'bundle'    => 'form',
+            'object'    => 'form',
+            'objectId'  => $form->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $form->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
-     * Add a simple email form
+     * Add a simple email form.
      *
-     * @param FormBuilderEvent $event
+     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
@@ -118,8 +129,8 @@ class FormSubscriber extends CommonSubscriber
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
+            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ];
 
         $event->addSubmitAction('form.email', $action);
@@ -135,8 +146,8 @@ class FormSubscriber extends CommonSubscriber
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
+            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ];
 
         $event->addSubmitAction('form.repost', $action);
@@ -213,17 +224,23 @@ class FormSubscriber extends CommonSubscriber
             return;
         }
 
-        $post    = $event->getPost();
-        $results = $event->getResults();
-        $config  = $event->getActionConfig();
-        $fields  = $event->getFields();
-        $lead    = $event->getSubmission()->getLead();
-
-        $payload = [
+        $post          = $event->getPost();
+        $results       = $event->getResults();
+        $config        = $event->getActionConfig();
+        $fields        = $event->getFields();
+        $lead          = $event->getSubmission()->getLead();
+        $matchedFields = [];
+        $payload       = [
             'mautic_contact' => $lead->getProfileFields(),
+            'mautic_form'    => [
+                'id'   => $post['formId'],
+                'name' => $post['formName'],
+                'url'  => $post['return'],
+            ],
         ];
-
+        $fieldTypes = [];
         foreach ($fields as $field) {
+            $fieldTypes[$field['alias']] = $field['type'];
             if (!isset($post[$field['alias']]) || 'button' == $field['type']) {
                 continue;
             }
@@ -231,9 +248,9 @@ class FormSubscriber extends CommonSubscriber
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
-
-            $payload[$key] = $value;
+            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $matchedFields[$key] = $field['alias'];
+            $payload[$key]       = $value;
         }
 
         $headers = [
@@ -251,8 +268,8 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            $client    = new Client(['timeout' => 15]);
-            $response  = $client->post(
+            $client   = new Client(['timeout' => 15]);
+            $response = $client->post(
                 $config['post_url'],
                 [
                     'form_params' => $payload,
@@ -260,11 +277,11 @@ class FormSubscriber extends CommonSubscriber
                 ]
             );
 
-            if ($redirect = $this->parseResponse($response)) {
+            if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
         } catch (ServerException $exception) {
-            $this->parseResponse($exception->getResponse());
+            $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
@@ -275,10 +292,21 @@ class FormSubscriber extends CommonSubscriber
             $email = $config['failure_email'];
             // Failed so send email if applicable
             if (!empty($email)) {
-                $post['array'] = $post;
+                // Remove Mautic values and password fields
+                foreach ($post as $key => $value) {
+                    if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
+                        unset($post[$key]);
+                    }
+                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                        $post[$key] = '*********';
+                    }
+                }
+                $post['mautic_contact'] = array_filter($payload['mautic_contact']);
+                $post['mautic_form']    = $payload['mautic_form'];
+
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $emails     = $emails = $this->getEmailsFromString($email);
+                $emails     = $emails     = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -287,7 +315,7 @@ class FormSubscriber extends CommonSubscriber
                     $this->translator->trans(
                         'mautic.form.action.repost.failed_message',
                         [
-                            '%link%'    => $this->router->generate(
+                            '%link%' => $this->router->generate(
                                 'mautic_form_results',
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -304,11 +332,17 @@ class FormSubscriber extends CommonSubscriber
         }
     }
 
-    private function parseResponse(Response $response)
+    /**
+     * @param Response $response
+     * @param array    $matchedFields
+     *
+     * @return bool|mixed
+     */
+    private function parseResponse(Response $response, array $matchedFields = [])
     {
-        $body  = (string) $response->getBody();
-        $error = false;
-        $redirect = false;
+        $body       = (string) $response->getBody();
+        $error      = false;
+        $redirect   = false;
         $violations = [];
 
         if ($json = json_decode($body, true)) {
@@ -323,8 +357,18 @@ class FormSubscriber extends CommonSubscriber
             } elseif (isset($body['errors'])) {
                 $error = implode(', ', $body['errors']);
             } elseif (isset($body['violations'])) {
-                $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
-                $violations = $body['violations'];
+                $error          = $this->translator->trans('mautic.form.action.repost.validation_failed');
+                $formViolations = $body['violations'];
+
+                // Ensure the violations match up to Mautic's
+                $violations = [];
+                foreach ($formViolations as $field => $violation) {
+                    if (isset($matchedFields[$field])) {
+                        $violations[$matchedFields[$field]] = $violation;
+                    } else {
+                        $error .= ' '.$violation;
+                    }
+                }
             } elseif (isset($body['redirect'])) {
                 $redirect = $body['redirect'];
             }
@@ -359,7 +403,7 @@ class FormSubscriber extends CommonSubscriber
             } else {
                 $output .= $row;
             }
-            $output .= "</td></tr>";
+            $output .= '</td></tr>';
         }
         $output .= '</table>';
 

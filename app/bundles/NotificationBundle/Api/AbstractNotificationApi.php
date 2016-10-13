@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -37,7 +37,7 @@ abstract class AbstractNotificationApi
     public function __construct(MauticFactory $factory, Http $http)
     {
         $this->factory = $factory;
-        $this->http = $http;
+        $this->http    = $http;
     }
 
     /**

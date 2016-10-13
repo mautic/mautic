@@ -1,25 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class Redirect
- *
- * @package Mautic\PageBundle\Entity
+ * Class Redirect.
  */
 class Redirect extends FormEntity
 {
@@ -64,7 +61,7 @@ class Redirect extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -93,7 +90,7 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -101,23 +98,23 @@ class Redirect extends FormEntity
     {
         $metadata->setGroupPrefix('redirect')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'redirectId',
-                    'url'
-                )
+                    'url',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'hits',
-                    'uniqueHits'
-                )
+                    'uniqueHits',
+                ]
             )
             ->build();
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -160,9 +157,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set hits
+     * Set hits.
      *
-     * @param integer $hits
+     * @param int $hits
      *
      * @return Page
      */
@@ -174,9 +171,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get hits
+     * Get hits.
      *
-     * @return integer
+     * @return int
      */
     public function getHits()
     {
@@ -184,9 +181,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set uniqueHits
+     * Set uniqueHits.
      *
-     * @param integer $uniqueHits
+     * @param int $uniqueHits
      *
      * @return Page
      */
@@ -198,9 +195,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get uniqueHits
+     * Get uniqueHits.
      *
-     * @return integer
+     * @return int
      */
     public function getUniqueHits()
     {

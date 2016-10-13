@@ -121,15 +121,22 @@ return [
             'mautic.form.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\FormSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
                 ],
             ],
             'mautic.form.pagebundle.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\PageSubscriber',
+                'class'     => 'Mautic\FormBundle\EventListener\PageSubscriber',
+                'arguments' => [
+                    'mautic.form.model.form',
+                ],
             ],
             'mautic.form.pointbundle.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\PointSubscriber',
+                'class'     => 'Mautic\FormBundle\EventListener\PointSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point',
+                ],
             ],
             'mautic.form.reportbundle.subscriber' => [
                 'class' => 'Mautic\FormBundle\EventListener\ReportSubscriber',
@@ -137,9 +144,9 @@ return [
             'mautic.form.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.form.calendarbundle.subscriber' => [
@@ -148,7 +155,6 @@ return [
             'mautic.form.leadbundle.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.form.model.form',
                     'mautic.page.model.page',
                 ],
@@ -157,13 +163,21 @@ return [
                 'class' => 'Mautic\FormBundle\EventListener\EmailSubscriber',
             ],
             'mautic.form.search.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\FormBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.form.model.form',
+                ],
             ],
             'mautic.form.webhook.subscriber' => [
                 'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
             ],
             'mautic.form.dashboard.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\FormBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.form.model.submission',
+                    'mautic.form.model.form',
+                ],
             ],
         ],
         'forms' => [
@@ -260,6 +274,7 @@ return [
                 'arguments' => [
                     'request_stack',
                     'mautic.helper.templating',
+                    'mautic.helper.theme',
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
@@ -278,6 +293,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.field',
+                    'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
                 ],
             ],

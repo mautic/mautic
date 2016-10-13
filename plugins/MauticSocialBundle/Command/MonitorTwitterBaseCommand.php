@@ -1,27 +1,27 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mautic\LeadBundle\Entity\Lead;
 
 abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 {
-    /** @var  \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration */
+    /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration */
     protected $twitter;
 
     protected $output;
@@ -38,7 +38,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     protected $queryCount = 100;
 
-    protected $manipulatedLeads = array();
+    protected $manipulatedLeads = [];
 
     /**
      * @var MonitoringModel
@@ -51,7 +51,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setHelp(
-            <<<EOT
+            <<<'EOT'
             I'm not sure what to put here yet
 EOT
         )
@@ -67,10 +67,10 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input      = $input;
-        $this->output     = $output;
-        $this->maxRuns    = $this->input->getOption('max-runs');
-        $this->queryCount = $this->input->getOption('query-count');
+        $this->input           = $input;
+        $this->output          = $output;
+        $this->maxRuns         = $this->input->getOption('max-runs');
+        $this->queryCount      = $this->input->getOption('query-count');
         $this->monitoringModel = $this->getContainer()->get('mautic.social.model.monitoring');
 
         $translator = $this->getContainer()->get('translator');
@@ -116,7 +116,7 @@ EOT
 
             if (array_key_exists('errors', $results)) {
                 foreach ($results['errors'] as $error) {
-                    $this->output->writeln($error['code'].": ".$error['message']);
+                    $this->output->writeln($error['code'].': '.$error['message']);
                 }
             }
 
@@ -137,7 +137,7 @@ EOT
         // get stats after being updated
         $stats = $monitor->getStats();
 
-        $this->runCount++;
+        ++$this->runCount;
 
         // if we have stats and a next results request, process it here
         // @todo add a check for max iterations
@@ -188,9 +188,9 @@ EOT
         $handleField = $this->getContainer()->getParameter('mautic.twitter_handle_field', $this->getNetworkName());
 
         $leadField = $leadFieldModel->getRepository()->findOneBy(
-            array(
-                'alias' => $handleField
-            )
+            [
+                'alias' => $handleField,
+            ]
         );
 
         if (!$leadField) {
@@ -207,7 +207,7 @@ EOT
         defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
-        $twitterLeads = array();
+        $twitterLeads = [];
         $qb           = $leadModel->getRepository()->createQueryBuilder('f');
         $expr         = $qb->expr();
         foreach ($statusList as $status) {
@@ -219,21 +219,21 @@ EOT
 
         if (!empty($twitterLeads)) {
             $leads = $leadModel->getRepository()->getEntities(
-                array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
                                 'column' => 'l.'.$handleField,
                                 'expr'   => 'in',
-                                'value'  => $twitterLeads
-                            )
-                        )
-                    )
-                )
+                                'value'  => $twitterLeads,
+                            ],
+                        ],
+                    ],
+                ]
             );
 
             // Key by twitter handle
-            $twitterLeads = array();
+            $twitterLeads = [];
             foreach ($leads as $leadId => $lead) {
                 $fields                       = $lead->getFields();
                 $twitterHandle                = $fields[$handleFieldGroup][$handleField]['value'];
@@ -243,7 +243,7 @@ EOT
             unset($leads);
         }
 
-        $processedLeads = array();
+        $processedLeads = [];
         foreach ($statusList as $status) {
             if (empty($status['user']['screen_name'])) {
                 continue;
@@ -254,20 +254,19 @@ EOT
             $lastActive     = new \DateTime($tweetTimestamp);
             $handle         = $status['user']['screen_name'];
 
-            /** @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
+            /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
 
                 if (isset($twitterLeads[$handle])) {
-                    $this->updatedLeads++;
+                    ++$this->updatedLeads;
 
                     $isNew      = false;
                     $leadEntity = $twitterLeads[$handle];
 
                     $this->output->writeln('Updating existing lead ID #'.$leadEntity->getId().' ('.$handle.')');
-
                 } else {
-                    $this->newLeads++;
+                    ++$this->newLeads;
 
                     $this->output->writeln('Creating new lead');
 
@@ -275,15 +274,15 @@ EOT
                     $leadEntity = new Lead();
                     $leadEntity->setNewlyCreated(true);
 
-                    list ($firstName, $lastName) = $this->splitName($status['user']['name']);
+                    list($firstName, $lastName) = $this->splitName($status['user']['name']);
 
                     // build new lead fields
-                    $fields = array(
+                    $fields = [
                         $handleField => $handle,
                         'firstname'  => $firstName,
                         'lastname'   => $lastName,
-                        'country'    => $status['user']['location']
-                    );
+                        'country'    => $status['user']['location'],
+                    ];
 
                     // set field values
                     $leadModel->setFieldValues($leadEntity, $fields, false);
@@ -333,20 +332,20 @@ EOT
     /*
      * handles splitting a string handle into first / last name based on a space
      *
-     * return array($first, $last)
+     * @return array($first, $last)
      */
     private function splitName($name)
     {
         // array the entire name
-        $nameParts = explode(" ", $name);
+        $nameParts = explode(' ', $name);
 
         // last part of the array is our last
         $lastName = array_pop($nameParts);
 
         // push the rest of the name into first name
-        $firstName = implode(" ", $nameParts);
+        $firstName = implode(' ', $nameParts);
 
-        return array($lastName, $firstName);
+        return [$firstName, $lastName];
     }
 
     /*
@@ -412,7 +411,7 @@ EOT
      *
      * URL Encoding done in makeRequest()
      */
-    protected function buildTwitterSearchQuery(Array $query)
+    protected function buildTwitterSearchQuery(array $query)
     {
         $queryString = implode(' ', $query);
 

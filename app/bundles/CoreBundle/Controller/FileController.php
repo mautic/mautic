@@ -1,38 +1,38 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class FileController
+ * Class FileController.
  */
 class FileController extends AjaxController
 {
-    protected $imageMimes = array(
+    protected $imageMimes = [
         'image/gif',
         'image/jpeg',
         'image/pjpeg',
         'image/jpeg',
         'image/pjpeg',
         'image/png',
-        'image/x-png'
-    );
+        'image/x-png',
+    ];
 
-    protected $response = array();
+    protected $response = [];
 
     protected $statusCode = Response::HTTP_OK;
 
     /**
-     * Uploads a file
+     * Uploads a file.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -55,7 +55,7 @@ class FileController extends AjaxController
     }
 
     /**
-     * List the files in /media directory
+     * List the files in /media directory.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -68,11 +68,11 @@ class FileController extends AjaxController
                 $imagePath = $this->getMediaAbsolutePath().'/'.$name;
                 $imageUrl  = $this->getMediaUrl().'/'.$name;
                 if (!is_dir($name) && in_array(mime_content_type($imagePath), $this->imageMimes)) {
-                    $this->response[] = array(
+                    $this->response[] = [
                         'url'   => $imageUrl,
                         'thumb' => $imageUrl,
-                        'name'  => $name
-                    );
+                        'name'  => $name,
+                    ];
                 }
             }
         } else {
@@ -83,22 +83,22 @@ class FileController extends AjaxController
     }
 
     /**
-     * Delete a file from /media directory
+     * Delete a file from /media directory.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function deleteAction()
     {
         $src       = InputHelper::clean($this->request->request->get('src'));
-        $response  = array('deleted' => false);
+        $response  = ['deleted' => false];
         $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         } elseif (!is_writable($imagePath)) {
             $this->response['error'] = 'File is not writable';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         } else {
             unlink($imagePath);
             $this->response['deleted'] = true;
@@ -107,9 +107,8 @@ class FileController extends AjaxController
         return $this->sendJsonResponse($this->response, $this->statusCode);
     }
 
-
     /**
-     * Get the Media directory full file system path
+     * Get the Media directory full file system path.
      *
      * @return string
      */
@@ -119,19 +118,19 @@ class FileController extends AjaxController
 
         if ($mediaDir === false) {
             $this->response['error'] = 'Media dir does not exist';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
         if (is_writable($mediaDir) === false) {
             $this->response['error'] = 'Media dir is not writable';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
         return $mediaDir;
     }
 
     /**
-     * Get the Media directory full file system path
+     * Get the Media directory full file system path.
      *
      * @return string
      */
@@ -140,6 +139,6 @@ class FileController extends AjaxController
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()
             .$this->request->getBasePath().'/'
-            .$this->factory->getParameter('image_path');
+            .$this->coreParametersHelper->getParameter('image_path');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -28,9 +28,9 @@ class NotificationClickEvent extends CommonEvent
      */
     public function __construct(Stat $stat, $request)
     {
-        $this->entity = $stat;
+        $this->entity       = $stat;
         $this->notification = $stat->getNotification();
-        $this->request = $request;
+        $this->request      = $request;
     }
 
     /**

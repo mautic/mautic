@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -14,13 +14,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * UserRepository
+ * UserRepository.
  */
 class UserRepository extends CommonRepository
 {
-
     /**
-     * Find user by username or email
+     * Find user by username or email.
      *
      * @param $identifier
      *
@@ -45,10 +44,10 @@ class UserRepository extends CommonRepository
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
         $conn     = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array(
+        $conn->update(MAUTIC_TABLE_PREFIX.'users', [
             'last_login'  => $datetime,
-            'last_active' => $datetime
-        ), array('id' => (int) $user->getId()));
+            'last_active' => $datetime,
+        ], ['id' => (int) $user->getId()]);
     }
 
     /**
@@ -56,9 +55,9 @@ class UserRepository extends CommonRepository
      */
     public function setLastActive($user)
     {
-        $now = new DateTimeHelper();
+        $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array('last_active' => $now->toUtcString()), array('id' => (int) $user->getId()));
+        $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
     }
 
     /**
@@ -68,17 +67,16 @@ class UserRepository extends CommonRepository
     public function setOnlineStatus($userId, $status)
     {
         $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX . 'users', array('online_status' => $status), array('id' => (int) $userId));
+        $conn->update(MAUTIC_TABLE_PREFIX.'users', ['online_status' => $status], ['id' => (int) $userId]);
     }
 
     /**
      * Last active updates every 2 minutes. If it didn't get updated, it means the user closed their browser and are thus
-     * now offline
-     *
+     * now offline.
      */
     public function updateOnlineStatuses()
     {
-        $dt    = new DateTimeHelper();
+        $dt           = new DateTimeHelper();
         $offlineDelay = $dt->getUtcDateTime();
         $offlineDelay->setTimestamp(strtotime('15 minutes ago'));
 
@@ -92,36 +90,37 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Checks to ensure that a username and/or email is unique
+     * Checks to ensure that a username and/or email is unique.
      *
      * @param $params
      *
      * @return array
      */
-    public function checkUniqueUsernameEmail($params) {
+    public function checkUniqueUsernameEmail($params)
+    {
         $q = $this->createQueryBuilder('u');
 
         if (isset($params['email'])) {
             $q->where('u.username = :email OR u.email = :email')
-                ->setParameter("email", $params['email']);
+                ->setParameter('email', $params['email']);
         }
 
         if (isset($params['username'])) {
             $q->orWhere('u.username = :username OR u.email = :username')
-                ->setParameter("username", $params['username']);
+                ->setParameter('username', $params['username']);
         }
 
         return $q->getQuery()->getResult();
     }
 
     /**
-     * Get a list of users
+     * Get a list of users.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('u')
@@ -134,7 +133,7 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Get a list of users for an autocomplete input
+     * Get a list of users for an autocomplete input.
      *
      * @param string $search
      * @param int    $limit
@@ -143,7 +142,7 @@ class UserRepository extends CommonRepository
      *
      * @return array
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = array())
+    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
     {
         $q = $this->_em->createQueryBuilder();
 
@@ -215,7 +214,7 @@ class UserRepository extends CommonRepository
             ->distinct()
             ->from('MauticUserBundle:User', 'u')
             ->where("u.position != ''")
-            ->andWhere("u.position IS NOT NULL");
+            ->andWhere('u.position IS NOT NULL');
         if (!empty($search)) {
             $q->andWhere('u.position LIKE :search')
                 ->setParameter('search', "{$search}%");
@@ -236,24 +235,17 @@ class UserRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('u.username',  ':'.$unique),
-            $q->expr()->like('u.email',     ':'.$unique),
-            $q->expr()->like('u.firstName', ':'.$unique),
-            $q->expr()->like('u.lastName',  ':'.$unique),
-            $q->expr()->like('u.position',  ':'.$unique),
-            $q->expr()->like('r.name',  ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-        return array(
-            $expr,
-            array("$unique" => $string)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'u.username',
+                'u.email',
+                'u.firstName',
+                'u.lastName',
+                'u.position',
+                'r.name',
+            ]
         );
     }
 
@@ -268,35 +260,35 @@ class UserRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq("u.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq("u.isPublished", ":$unique");
-                $forceParameters = array($unique => false);
+                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
 
                 break;
-            case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                $expr            = $q->expr()->eq("r.isAdmin", ":$unique");
-                $forceParameters = array($unique => true);
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+                $expr            = $q->expr()->eq('r.isAdmin', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
-                $expr = $q->expr()->like("u.email", ':' . $unique);
+                $expr = $q->expr()->like('u.email', ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
-                $expr = $q->expr()->like("u.position", ':' . $unique);
+                $expr = $q->expr()->like('u.position', ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.username'):
-                $expr = $q->expr()->like("u.username", ':' . $unique);
+                $expr = $q->expr()->like('u.username', ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.role'):
-                $expr = $q->expr()->like("r.name", ':' . $unique);
+                $expr = $q->expr()->like('r.name', ':'.$unique);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':' . $unique),
-                    $q->expr()->like('u.lastName', ':' . $unique)
+                    $q->expr()->like('u.firstName', ':'.$unique),
+                    $q->expr()->like('u.lastName', ':'.$unique)
                 );
                 break;
         }
@@ -304,13 +296,13 @@ class UserRepository extends CommonRepository
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif (!$returnParameter) {
-            $parameters = array();
+            $parameters = [];
         } else {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array($expr, $parameters);
+        return [$expr, $parameters];
     }
 
     /**
@@ -318,7 +310,7 @@ class UserRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-         return array(
+        return [
             'mautic.core.searchcommand.email',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
@@ -326,8 +318,8 @@ class UserRepository extends CommonRepository
             'mautic.core.searchcommand.name',
             'mautic.user.user.searchcommand.position',
             'mautic.user.user.searchcommand.role',
-            'mautic.user.user.searchcommand.username'
-        );
+            'mautic.user.user.searchcommand.username',
+        ];
     }
 
     /**
@@ -335,11 +327,11 @@ class UserRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('u.lastName', 'ASC'),
-            array('u.firstName', 'ASC'),
-            array('u.username', 'ASC')
-        );
+        return [
+            ['u.lastName', 'ASC'],
+            ['u.firstName', 'ASC'],
+            ['u.username', 'ASC'],
+        ];
     }
 
     /**

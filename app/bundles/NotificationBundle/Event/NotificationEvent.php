@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -24,7 +24,7 @@ class NotificationEvent extends CommonEvent
     public function __construct(Notification $notification, $isNew = false)
     {
         $this->entity = $notification;
-        $this->isNew = $isNew;
+        $this->isNew  = $isNew;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -101,13 +101,10 @@ class Notification extends FormEntity
      */
     private $notificationType = 'template';
 
-    /**
-     *
-     */
     public function __clone()
     {
-        $this->id = null;
-        $this->stats = new ArrayCollection();
+        $this->id        = null;
+        $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
         $this->readCount = 0;
 
@@ -272,12 +269,12 @@ class Notification extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'category' || $prop == 'list') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId = ($val) ? $val->getId() : null;
+            $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }

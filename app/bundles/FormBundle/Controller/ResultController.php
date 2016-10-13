@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Model\FormModel;
 
 /**
- * Class ResultController
+ * Class ResultController.
  */
 class ResultController extends CommonFormController
 {
-
     /**
      * @param int $objectId
      * @param int $page
@@ -27,11 +26,12 @@ class ResultController extends CommonFormController
     public function indexAction($objectId, $page)
     {
         /** @var FormModel $formModel */
-        $formModel = $this->getModel('form.form');
-        $form      = $formModel->getEntity($objectId);
-        $session   = $this->get('session');
-        $formPage  = $session->get('mautic.form.page', 1);
-        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+        $formModel      = $this->getModel('form.form');
+        $form           = $formModel->getEntity($objectId);
+        $session        = $this->get('session');
+        $formPage       = $session->get('mautic.form.page', 1);
+        $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+        $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
         if ($form === null) {
             //redirect back to form list
@@ -42,15 +42,15 @@ class ResultController extends CommonFormController
                     'contentTemplate' => 'MauticFormBundle:Form:index',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
-                        'mauticContent' => 'form'
+                        'mauticContent' => 'form',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.form.error.notfound',
-                            'msgVars' => ['%id%' => $objectId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -67,10 +67,7 @@ class ResultController extends CommonFormController
         }
 
         //set limits
-        $limit = $session->get(
-            'mautic.formresult.'.$objectId.'.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
-        );
+        $limit = $session->get('mautic.formresult.'.$objectId.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
 
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -90,7 +87,7 @@ class ResultController extends CommonFormController
 
         if ($this->request->query->has('result')) {
             // Force ID
-            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $this->request->query->get('result'), 'strict' => false,];
+            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $this->request->query->get('result'), 'strict' => false];
             $session->set("mautic.formresult.$objectId.filters", $filters);
         }
 
@@ -103,7 +100,8 @@ class ResultController extends CommonFormController
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
                 'form'           => $form,
-                'withTotalCount' => true
+                'withTotalCount' => true,
+                'viewOnlyFields' => $viewOnlyFields,
             ]
         );
 
@@ -124,8 +122,8 @@ class ResultController extends CommonFormController
                     'contentTemplate' => 'MauticFormBundle:Result:index',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
-                        'mauticContent' => 'formresult'
-                    ]
+                        'mauticContent' => 'formresult',
+                    ],
                 ]
             );
         }
@@ -137,11 +135,11 @@ class ResultController extends CommonFormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'items'          => $results,
                     'filters'        => $filters,
                     'form'           => $form,
-                    'viewOnlyFields' => $formModel->getCustomComponents()['viewOnlyFields'],
+                    'viewOnlyFields' => $viewOnlyFields,
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
@@ -150,7 +148,7 @@ class ResultController extends CommonFormController
                         'form:forms:editown',
                         'form:forms:editother',
                         $form->getCreatedBy()
-                    )
+                    ),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
                 'passthroughVars' => [
@@ -160,10 +158,10 @@ class ResultController extends CommonFormController
                         'mautic_form_results',
                         [
                             'objectId' => $objectId,
-                            'page'     => $page
+                            'page'     => $page,
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
@@ -173,6 +171,7 @@ class ResultController extends CommonFormController
      * @param string $format
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
      * @throws \Exception
      */
     public function exportAction($objectId, $format = 'csv')
@@ -192,15 +191,15 @@ class ResultController extends CommonFormController
                     'contentTemplate' => 'MauticFormBundle:Form:index',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
-                        'mauticContent' => 'form'
+                        'mauticContent' => 'form',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.form.error.notfound',
-                            'msgVars' => ['%id%' => $objectId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -221,7 +220,7 @@ class ResultController extends CommonFormController
             'filter'     => ['force' => $filters],
             'orderBy'    => $orderBy,
             'orderByDir' => $orderByDir,
-            'form'       => $form
+            'form'       => $form,
         ];
 
         /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
@@ -231,7 +230,7 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * Delete a form result
+     * Delete a form result.
      *
      * @param     $formId
      * @param int $objectId
@@ -256,7 +255,7 @@ class ResultController extends CommonFormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $form->getCreatedBy())) {
                     return $this->accessDenied();
@@ -273,12 +272,11 @@ class ResultController extends CommonFormController
                             'msg'     => 'mautic.form.notice.batch_results_deleted',
                             'msgVars' => [
                                 '%count%'     => count($entities),
-                                'pluralCount' => count($entities)
-                            ]
+                                'pluralCount' => count($entities),
+                            ],
                         ];
                     }
                 }
-
             } else {
                 // Find the result
                 $entity = $model->getEntity($objectId);
@@ -287,7 +285,7 @@ class ResultController extends CommonFormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => ['%id%' => $objectId],
                     ];
                 } else {
                     // Check to see if the user has form edit access
@@ -305,14 +303,14 @@ class ResultController extends CommonFormController
                     'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => [
                         '%name%' => '#'.$entity->getId(),
-                    ]
+                    ],
                 ];
             }
         } //else don't do anything
 
         $viewParameters = [
             'objectId' => $form->getId(),
-            'page'     => $page
+            'page'     => $page,
         ];
 
         return $this->postActionRedirect(
@@ -321,9 +319,9 @@ class ResultController extends CommonFormController
                 'viewParameters'  => $viewParameters,
                 'contentTemplate' => 'MauticFormBundle:Result:index',
                 'passthroughVars' => [
-                    'mauticContent' => 'formresult'
+                    'mauticContent' => 'formresult',
                 ],
-                'flashes'         => $flashes
+                'flashes' => $flashes,
             ]
         );
     }

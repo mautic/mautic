@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 
 /**
- * Class SubmitActionEmailType
+ * Class SubmitActionEmailType.
  */
 class SubmitActionEmailType extends AbstractType
 {
@@ -56,12 +56,12 @@ class SubmitActionEmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
-                'data'       => $data
+                'data'       => $data,
             ]
         );
 
         if (!isset($options['data']['message'])) {
-            $fields   = $this->getFormFields($options['attr']['data-formid']);
+            $fields  = $this->getFormFields($options['attr']['data-formid']);
             $message = '';
 
             foreach ($fields as $token => $label) {
@@ -79,7 +79,7 @@ class SubmitActionEmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor editor-basic'],
                 'required'   => false,
-                'data'       => $message
+                'data'       => $message,
             ]
         );
 
@@ -89,7 +89,7 @@ class SubmitActionEmailType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.form.action.sendemail.copytolead',
-                'data'  => $default
+                'data'  => $default,
             ]
         );
 
@@ -97,19 +97,19 @@ class SubmitActionEmailType extends AbstractType
             'to',
             'text',
             [
-                'label'       => 'mautic.form.action.sendemail.to',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.form.action.sendemail.to',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails'
+                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
                 ],
                 'required'    => false,
                 'constraints' => new Email(
                     [
-                        'message' => 'mautic.core.email.required'
+                        'message' => 'mautic.core.email.required',
                     ]
-                )
+                ),
             ]
         );
 
@@ -117,19 +117,19 @@ class SubmitActionEmailType extends AbstractType
             'cc',
             'text',
             [
-                'label'       => 'mautic.form.action.sendemail.cc',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.form.action.sendemail.cc',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails'
+                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
                 ],
                 'required'    => false,
                 'constraints' => new Email(
                     [
-                        'message' => 'mautic.core.email.required'
+                        'message' => 'mautic.core.email.required',
                     ]
-                )
+                ),
             ]
         );
 
@@ -137,19 +137,19 @@ class SubmitActionEmailType extends AbstractType
             'bcc',
             'text',
             [
-                'label'       => 'mautic.form.action.sendemail.bcc',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.form.action.sendemail.bcc',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails'
+                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
                 ],
                 'required'    => false,
                 'constraints' => new Email(
                     [
-                        'message' => 'mautic.core.email.required'
+                        'message' => 'mautic.core.email.required',
                     ]
-                )
+                ),
             ]
         );
     }
@@ -159,7 +159,7 @@ class SubmitActionEmailType extends AbstractType
      */
     public function getName()
     {
-        return "form_submitaction_sendemail";
+        return 'form_submitaction_sendemail';
     }
 
     /**

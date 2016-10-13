@@ -1,26 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class LeadTriggerLog
- *
- * @package Mautic\PointBundle\Entity
+ * Class LeadTriggerLog.
  */
 class LeadTriggerLog
 {
-
     /**
      * @var TriggerEvent
      **/
@@ -44,7 +40,7 @@ class LeadTriggerLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -69,7 +65,7 @@ class LeadTriggerLog
     /**
      * @return mixed
      */
-    public function getDateFired ()
+    public function getDateFired()
     {
         return $this->dateFired;
     }
@@ -77,7 +73,7 @@ class LeadTriggerLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired ($dateFired)
+    public function setDateFired($dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -85,7 +81,7 @@ class LeadTriggerLog
     /**
      * @return mixed
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -93,7 +89,7 @@ class LeadTriggerLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress ($ipAddress)
+    public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -101,7 +97,7 @@ class LeadTriggerLog
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -109,7 +105,7 @@ class LeadTriggerLog
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -117,7 +113,7 @@ class LeadTriggerLog
     /**
      * @return mixed
      */
-    public function getEvent ()
+    public function getEvent()
     {
         return $this->event;
     }
@@ -125,7 +121,7 @@ class LeadTriggerLog
     /**
      * @param mixed $event
      */
-    public function setEvent ($event)
+    public function setEvent($event)
     {
         $this->event = $event;
     }

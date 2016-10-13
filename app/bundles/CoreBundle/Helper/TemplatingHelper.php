@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Templating\TemplateNameParser;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class TemplatingHelper
+ * Class TemplatingHelper.
  */
 class TemplatingHelper
 {
@@ -26,7 +26,7 @@ class TemplatingHelper
 
     /**
      * TemplatingHelper constructor.
-     * 
+     *
      * @param Kernel $kernel
      */
     public function __construct(Kernel $kernel)
@@ -35,8 +35,8 @@ class TemplatingHelper
     }
 
     /**
-     * Retrieve the templating service
-     * 
+     * Retrieve the templating service.
+     *
      * @return \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
     public function getTemplating()

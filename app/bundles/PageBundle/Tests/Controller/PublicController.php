@@ -1,14 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Tests\Controller;
-
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -26,7 +25,7 @@ use Symfony\Component\Routing\Router;
 class PublicController extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Test that the appropriate variant is displayed based on hit counts and variant weights
+     * Test that the appropriate variant is displayed based on hit counts and variant weights.
      */
     public function testVariantPageWeightsAreAppropriate()
     {
@@ -36,34 +35,34 @@ class PublicController extends \PHPUnit_Framework_TestCase
         // C = 25%
 
         // A = 0/50; B = 0/25; C = 0/25
-        $this->assertEquals('pageA', $this->getVariantContent(0,0,0));
+        $this->assertEquals('pageA', $this->getVariantContent(0, 0, 0));
 
         // A = 100/50; B = 0/25; C = 0/25
-        $this->assertEquals('pageB', $this->getVariantContent(1,0,0));
+        $this->assertEquals('pageB', $this->getVariantContent(1, 0, 0));
 
         // A = 50/50; B = 50/25; C = 0/25;
-        $this->assertEquals('pageC', $this->getVariantContent(1,1,0));
+        $this->assertEquals('pageC', $this->getVariantContent(1, 1, 0));
 
         // A = 33/50; B = 33/25; C = 33/25;
-        $this->assertEquals('pageA', $this->getVariantContent(1,1,1));
+        $this->assertEquals('pageA', $this->getVariantContent(1, 1, 1));
 
         // A = 66/50; B = 33/25; C = 0/25
-        $this->assertEquals('pageC', $this->getVariantContent(2,1,0));
+        $this->assertEquals('pageC', $this->getVariantContent(2, 1, 0));
 
         // A = 50/50; B = 25/25; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(2,1,1));
+        $this->assertEquals('pageA', $this->getVariantContent(2, 1, 1));
 
         // A = 33/50; B = 66/50; C = 0/25
-        $this->assertEquals('pageC', $this->getVariantContent(1,2,0));
+        $this->assertEquals('pageC', $this->getVariantContent(1, 2, 0));
 
         // A = 25/50; B = 50/50; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(1,2,1));
+        $this->assertEquals('pageA', $this->getVariantContent(1, 2, 1));
 
         // A = 55/50; B = 18/25; C = 27/25
-        $this->assertEquals('pageB', $this->getVariantContent(6,2,3));
+        $this->assertEquals('pageB', $this->getVariantContent(6, 2, 3));
 
         // A = 50/50; B = 25/25; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(6,3,3));
+        $this->assertEquals('pageA', $this->getVariantContent(6, 3, 3));
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle\Controller;
 
 use Oneup\UploaderBundle\Controller\DropzoneController;
@@ -18,12 +18,11 @@ class UploadController extends DropzoneController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-
     public function upload()
     {
-        $request = $this->container->get('request');
+        $request  = $this->container->get('request');
         $response = new EmptyResponse();
-        $files = $this->getFiles($request->files);
+        $files    = $this->getFiles($request->files);
 
         if (!empty($files)) {
             foreach ($files as $file) {

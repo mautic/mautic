@@ -1,20 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class BuildJsEvent
- *
- * @package Mautic\PageBundle\Event
+ * Class BuildJsEvent.
  */
 class BuildJsEvent extends Event
 {
@@ -33,7 +31,7 @@ class BuildJsEvent extends Event
      */
     public function __construct($js, $debugMode = false)
     {
-        $this->js = $js;
+        $this->js        = $js;
         $this->debugMode = $debugMode;
     }
 
@@ -46,10 +44,10 @@ class BuildJsEvent extends Event
     }
 
     /**
-     * Append JS
+     * Append JS.
      *
      * @param string $js
-     * @param string $section The section name. Shows when in debug mode.
+     * @param string $section The section name. Shows when in debug mode
      *
      * @return $this
      */

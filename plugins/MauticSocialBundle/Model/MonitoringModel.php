@@ -1,25 +1,24 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class MonitoringModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class MonitoringModel extends FormModel
 {
@@ -32,12 +31,13 @@ class MonitoringModel extends FormModel
      * @param array $options
      *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $params = [])
     {
         if (!$entity instanceof Monitoring) {
-            throw new MethodNotAllowedHttpException (['Monitoring']);
+            throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
         if (!empty($action)) {
@@ -48,7 +48,7 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
      *
@@ -57,7 +57,7 @@ class MonitoringModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            $entity = new Monitoring;
+            $entity = new Monitoring();
         } else {
             $entity = parent::getEntity($id);
         }
@@ -82,16 +82,16 @@ class MonitoringModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = SocialEvents::MONITOR_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = SocialEvents::MONITOR_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = SocialEvents::MONITOR_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = SocialEvents::MONITOR_POST_DELETE;
                 break;
             default:
@@ -114,7 +114,7 @@ class MonitoringModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitoringEntity
+     * @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring
      */
     public function saveEntity($monitoringEntity, $unlock = true)
     {
@@ -122,7 +122,7 @@ class MonitoringModel extends FormModel
         if (!$monitoringEntity->isNew()) {
             //increase the revision
             $revision = $monitoringEntity->getRevision();
-            $revision++;
+            ++$revision;
             $monitoringEntity->setRevision($revision);
         } // is new
         else {
@@ -156,7 +156,7 @@ class MonitoringModel extends FormModel
     {
         $types = [
             'twitter_handle'  => 'mautic.social.monitoring.type.list.twitter.handle',
-            'twitter_hashtag' => 'mautic.social.monitoring.type.list.twitter.hashtag'
+            'twitter_hashtag' => 'mautic.social.monitoring.type.list.twitter.hashtag',
         ];
 
         return $types;

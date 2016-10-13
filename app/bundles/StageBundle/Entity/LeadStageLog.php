@@ -1,26 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class LeadStageLog
- *
- * @package Mautic\StageBundle\Entity
+ * Class LeadStageLog.
  */
 class LeadStageLog
 {
-
     /**
      * @var Stage
      **/
@@ -44,7 +40,7 @@ class LeadStageLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -69,7 +65,7 @@ class LeadStageLog
     /**
      * @return mixed
      */
-    public function getDateFired ()
+    public function getDateFired()
     {
         return $this->dateFired;
     }
@@ -77,7 +73,7 @@ class LeadStageLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired ($dateFired)
+    public function setDateFired($dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -85,7 +81,7 @@ class LeadStageLog
     /**
      * @return mixed
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -93,7 +89,7 @@ class LeadStageLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress ($ipAddress)
+    public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -101,7 +97,7 @@ class LeadStageLog
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -109,7 +105,7 @@ class LeadStageLog
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -117,7 +113,7 @@ class LeadStageLog
     /**
      * @return mixed
      */
-    public function getStage ()
+    public function getStage()
     {
         return $this->stage;
     }
@@ -125,7 +121,7 @@ class LeadStageLog
     /**
      * @param mixed $stage
      */
-    public function setStage ($stage)
+    public function setStage($stage)
     {
         $this->stage = $stage;
     }

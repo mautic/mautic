@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class LeadEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class LeadEvent.
  */
 class LeadEvent extends CommonEvent
 {
@@ -25,12 +23,12 @@ class LeadEvent extends CommonEvent
      */
     public function __construct(Lead &$lead, $isNew = false)
     {
-        $this->entity  =& $lead;
-        $this->isNew = $isNew;
+        $this->entity = &$lead;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -40,7 +38,7 @@ class LeadEvent extends CommonEvent
     }
 
     /**
-     * Sets the Lead entity
+     * Sets the Lead entity.
      *
      * @param Lead $lead
      */

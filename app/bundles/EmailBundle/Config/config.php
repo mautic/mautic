@@ -39,6 +39,13 @@ return [
             ],
         ],
         'public' => [
+            'mautic_plugin_tracker' => [
+                'path'         => '/plugin/{integration}/tracking.gif',
+                'controller'   => 'MauticEmailBundle:Public:pluginTrackingGif',
+                'requirements' => [
+                    'integration' => '.+',
+                ],
+            ],
             'mautic_email_tracker' => [
                 'path'       => '/email/{idHash}.gif',
                 'controller' => 'MauticEmailBundle:Public:trackingImage',
@@ -69,9 +76,10 @@ return [
         'main' => [
             'items' => [
                 'mautic.email.emails' => [
-                    'route'  => 'mautic_email_index',
-                    'access' => ['email:emails:viewown', 'email:emails:viewother'],
-                    'parent' => 'mautic.core.channels',
+                    'route'    => 'mautic_email_index',
+                    'access'   => ['email:emails:viewown', 'email:emails:viewother'],
+                    'parent'   => 'mautic.core.channels',
+                    'priority' => 100,
                 ],
             ],
         ],
@@ -82,10 +90,21 @@ return [
     'services' => [
         'events' => [
             'mautic.email.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\EmailSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\EmailSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.emailbuilder.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\BuilderSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\BuilderSubscriber',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.email.model.email',
+                    'mautic.page.model.trackable',
+                    'mautic.page.model.redirect',
+                ],
             ],
             'mautic.emailtoken.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber',
@@ -93,9 +112,10 @@ return [
             'mautic.email.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.lead.model.lead',
                     'mautic.email.model.email',
+                    'mautic.campaign.model.event',
+                    'mautic.core.model.messagequeue',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -108,25 +128,57 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
             ],
             'mautic.email.pointbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\PointSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point',
+                ],
             ],
             'mautic.email.calendarbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber',
             ],
             'mautic.email.search.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.email.webhook.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
             ],
             'mautic.email.configbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.email.pagebundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\PageSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\PageSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.email.dashboard.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
+            ],
+            'mautic.email.broadcast.subscriber' => [
+                'class'     => 'Mautic\EmailBundle\EventListener\BroadcastSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.email.model.email',
+                ],
+            ],
+            'mautic.email.messagequeue.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\MessageQueueSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
         ],
         'forms' => [
@@ -217,6 +269,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
+                    'mautic.http.connector',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -269,9 +322,11 @@ return [
                     'mautic.helper.mailbox',
                     'mautic.helper.mailer',
                     'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.helper.core_parameters',
+                    'mautic.core.model.messagequeue',
                 ],
             ],
         ],

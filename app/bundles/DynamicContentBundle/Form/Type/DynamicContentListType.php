@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -47,7 +47,7 @@ class DynamicContentListType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'choices'     => function (Options $options) use ($repo, $viewOther) {
+                'choices' => function (Options $options) use ($repo, $viewOther) {
                     static $choices;
 
                     if (is_array($choices)) {
@@ -74,7 +74,7 @@ class DynamicContentListType extends AbstractType
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.dynamicContent.no.dynamicContent.note' : 'mautic.core.form.chooseone';
                 },
-                'disabled'    => function (Options $options) {
+                'disabled' => function (Options $options) {
                     return empty($options['choices']);
                 },
             ]

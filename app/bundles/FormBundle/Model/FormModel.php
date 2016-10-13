@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Model;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -40,6 +41,11 @@ class FormModel extends CommonFormModel
      * @var TemplatingHelper
      */
     protected $templatingHelper;
+
+    /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
 
     /**
      * @var SchemaHelperFactory
@@ -76,15 +82,18 @@ class FormModel extends CommonFormModel
      *
      * @param RequestStack        $requestStack
      * @param TemplatingHelper    $templatingHelper
+     * @param ThemeHelper         $themeHelper
      * @param SchemaHelperFactory $schemaHelperFactory
      * @param ActionModel         $formActionModel
      * @param FieldModel          $formFieldModel
      * @param LeadModel           $leadModel
      * @param FormFieldHelper     $fieldHelper
+     * @param LeadFieldModel      $leadFieldModel
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
+        ThemeHelper $themeHelper,
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
@@ -94,6 +103,7 @@ class FormModel extends CommonFormModel
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
+        $this->themeHelper         = $themeHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel     = $formActionModel;
         $this->formFieldModel      = $formFieldModel;
@@ -331,6 +341,32 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * @param Form  $entity
+     * @param array $actions
+     */
+    public function deleteActions(Form $entity, $actions)
+    {
+        if (empty($actions)) {
+            return;
+        }
+
+        $existingActions = $entity->getActions()->toArray();
+        $deleteActions   = [];
+        foreach ($actions as $actionId) {
+            if (isset($existingActions[$actionId])) {
+                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $entity->removeAction($actionEntity);
+                $deleteActions[] = $actionId;
+            }
+        }
+
+        // Delete actions from db
+        if (count($deleteActions)) {
+            $this->formActionModel->deleteEntities($deleteActions);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function saveEntity($entity, $unlock = true)
@@ -393,6 +429,7 @@ class FormModel extends CommonFormModel
         $theme       = $entity->getTemplate();
         $submissions = null;
         $lead        = $this->leadModel->getCurrentLead();
+        $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -408,9 +445,25 @@ class FormModel extends CommonFormModel
             );
         }
 
+        if ($entity->getRenderStyle()) {
+            $templating = $this->templatingHelper->getTemplating();
+            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+        }
+
         // Determine pages
         $fields = $entity->getFields()->toArray();
-        $pages  = ['open' => [], 'close' => []];
+
+        // Ensure the correct order in case this is generated right after a form save with new fields
+        uasort($fields, function ($a, $b) {
+            if ($a->getOrder() === $b->getOrder()) {
+                return 0;
+            }
+
+            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
+        });
+
+        $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
         $closeFieldId =
@@ -453,6 +506,7 @@ class FormModel extends CommonFormModel
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
                 'fieldSettings' => $this->getCustomComponents()['fields'],
+                'fields'        => $fields,
                 'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
                 'form'          => $entity,
                 'theme'         => $theme,
@@ -460,6 +514,7 @@ class FormModel extends CommonFormModel
                 'lead'          => $lead,
                 'formPages'     => $pages,
                 'lastFormPage'  => $lastPage,
+                'style'         => $style,
             ]
         );
 
@@ -772,7 +827,7 @@ class FormModel extends CommonFormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

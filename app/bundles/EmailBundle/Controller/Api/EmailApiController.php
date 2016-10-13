@@ -43,7 +43,7 @@ class EmailApiController extends CommonApiController
                 [
                     'column' => 'e.createdBy',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId(),
+                    'value'  => $this->user->getId(),
                 ];
         }
 

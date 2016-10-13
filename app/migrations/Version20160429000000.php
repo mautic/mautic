@@ -1,21 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
- * Trackables
+ * Trackables.
  */
 class Version20160429000000 extends AbstractMauticMigration
 {
@@ -31,12 +30,11 @@ class Version20160429000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix.'channel_url_trackables')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->redirectIdx = $this->generatePropertyName($this->prefix . 'channel_url_trackables', 'idx', array('redirect_id'));
-        $this->redirectFk  = $this->generatePropertyName($this->prefix . 'channel_url_trackables', 'fk', array('redirect_id'));
+        $this->redirectIdx = $this->generatePropertyName($this->prefix.'channel_url_trackables', 'idx', ['redirect_id']);
+        $this->redirectFk  = $this->generatePropertyName($this->prefix.'channel_url_trackables', 'fk', ['redirect_id']);
     }
 
     /**
@@ -44,7 +42,6 @@ class Version20160429000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}channel_url_trackables (
   redirect_id INT NOT NULL, 
@@ -63,14 +60,14 @@ SQL;
     }
 
     /**
-     * Migrate email redirects to the trackable table
+     * Migrate email redirects to the trackable table.
      *
      * @param Schema $schema
      */
     public function postUp(Schema $schema)
     {
         $logger = $this->factory->getLogger();
-        $qb = $this->connection->createQueryBuilder();
+        $qb     = $this->connection->createQueryBuilder();
 
         $qb->select('r.id, r.email_id, r.hits, r.unique_hits')
             ->from($this->prefix.'page_redirects', 'r')
@@ -85,13 +82,13 @@ SQL;
             $this->connection->beginTransaction();
 
             foreach ($results as $row) {
-                $insert = array(
+                $insert = [
                     'redirect_id' => $row['id'],
                     'channel'     => 'email',
                     'channel_id'  => $row['email_id'],
                     'hits'        => $row['hits'],
-                    'unique_hits' => $row['unique_hits']
-                );
+                    'unique_hits' => $row['unique_hits'],
+                ];
 
                 $this->connection->insert($this->prefix.'channel_url_trackables', $insert);
 
@@ -103,7 +100,7 @@ SQL;
             } catch (\Exception $e) {
                 $this->connection->rollBack();
 
-                $logger->addError($e->getMessage(), array('exception' => $e));
+                $logger->addError($e->getMessage(), ['exception' => $e]);
             }
 
             // Increase the start

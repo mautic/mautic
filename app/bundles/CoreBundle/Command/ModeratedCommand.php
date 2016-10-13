@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -18,10 +18,11 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 {
     protected $checkfile;
     protected $key;
-    protected $executionTimes = array();
+    protected $executionTimes = [];
+    protected $output;
 
     /**
-     * Set moderation options
+     * Set moderation options.
      */
     protected function configure()
     {
@@ -37,8 +38,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $key)
     {
-        $force     = $input->getOption('force');
-        $timeout   = $this->getContainer()->hasParameter('mautic.command_timeout') ?
+        $this->output = $output;
+        $force        = $input->getOption('force');
+        $timeout      = $this->getContainer()->hasParameter('mautic.command_timeout') ?
             $this->getContainer()->getParameter('mautic.command_timeout') : 1800;
         $checkFile = $this->checkfile = $this->getContainer()->getParameter('kernel.cache_dir').'/../script_executions.json';
         $command   = $this->getName();
@@ -52,7 +54,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         $this->executionTimes = json_decode(fgets($fp, 8192), true);
         if (!is_array($this->executionTimes)) {
-            $this->executionTimes = array();
+            $this->executionTimes = [];
         }
 
         if ($force || empty($this->executionTimes['in_progress'][$command][$key])) {
@@ -87,7 +89,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * Complete this run
+     * Complete this run.
      */
     protected function completeRun()
     {
@@ -97,12 +99,8 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         $this->executionTimes = json_decode(fgets($fp, 8192), true);
         if (!is_array($this->executionTimes)) {
-            if ($output) {
-                $output->writeln('<error>completeRun() - We should have read an array of times</error>');
-            }
-        }
-        else
-        {
+            $this->writeln('<error>completeRun() - We should have read an array of times</error>');
+        } else {
             // Our task has ended so remove the start time
             unset($this->executionTimes['in_progress'][$this->getName()][$this->key]);
 

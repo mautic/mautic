@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -21,29 +21,29 @@ if ($tmpl == 'index') {
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'checkall' => 'true',
-                        'target' => '#dwcTable',
+                        'target'   => '#dwcTable',
                     ]);
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy' => 'e.title',
-                        'text' => 'mautic.core.title',
-                        'class' => 'col-dwc-title',
-                        'default' => true,
+                        'orderBy'    => 'e.title',
+                        'text'       => 'mautic.core.title',
+                        'class'      => 'col-dwc-title',
+                        'default'    => true,
                     ]);
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy' => 'e.name',
-                        'text' => 'mautic.core.category',
-                        'class' => 'visible-md visible-lg col-dwc-category',
+                        'orderBy'    => 'e.name',
+                        'text'       => 'mautic.core.category',
+                        'class'      => 'visible-md visible-lg col-dwc-category',
                     ]);
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy' => 'e.id',
-                        'text' => 'mautic.core.id',
-                        'class' => 'col-dwc-id visible-md visible-lg',
+                        'orderBy'    => 'e.id',
+                        'text'       => 'mautic.core.id',
+                        'class'      => 'col-dwc-id visible-md visible-lg',
                     ]);
                     ?>
                 </tr>
@@ -54,10 +54,10 @@ if ($tmpl == 'index') {
                         <td>
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
-                                'item' => $item,
+                                'item'            => $item,
                                 'templateButtons' => [
-                                    'edit' => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
-                                    'clone' => $permissions['dynamicContent:dynamicContents:create'],
+                                    'edit'   => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
+                                    'clone'  => $permissions['dynamicContent:dynamicContents:create'],
                                     'delete' => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
                                 ],
                                 'routeBase'  => 'dynamicContent',
@@ -91,8 +91,8 @@ if ($tmpl == 'index') {
                         </td>
                         <td class="visible-md visible-lg">
                             <?php $category = $item->getCategory(); ?>
-                            <?php $catName = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
-                            <?php $color = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
+                            <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                            <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                             <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                         </td>
                         <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
@@ -103,10 +103,10 @@ if ($tmpl == 'index') {
         <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
             'totalItems' => count($items),
-            'page' => $page,
-            'limit' => $limit,
+            'page'       => $page,
+            'limit'      => $limit,
             'menuLinkId' => 'mautic_dynamicContent_index',
-            'baseUrl' => $view['router']->generate('mautic_dynamicContent_index'),
+            'baseUrl'    => $view['router']->generate('mautic_dynamicContent_index'),
             'sessionVar' => 'dynamicContent',
         ]); ?>
         </div>

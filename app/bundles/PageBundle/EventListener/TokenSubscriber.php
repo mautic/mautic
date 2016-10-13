@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -14,7 +14,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class TokenSubscriber
+ * Class TokenSubscriber.
  */
 class TokenSubscriber extends CommonSubscriber
 {
@@ -23,15 +23,13 @@ class TokenSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            PageEvents::PAGE_ON_DISPLAY => array('decodeTokens', 254)
-        );
+        return [
+            PageEvents::PAGE_ON_DISPLAY => ['decodeTokens', 254],
+        ];
     }
 
     /**
      * @param PageDisplayEvent $event
-     *
-     * @return void
      */
     public function decodeTokens(PageDisplayEvent $event)
     {

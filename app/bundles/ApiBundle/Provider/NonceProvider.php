@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Provider;
 
 use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
@@ -15,13 +15,12 @@ use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\Entity\oAuth1\Nonce;
 
 /**
- * Class NonceProvider
+ * Class NonceProvider.
  */
 class NonceProvider implements NonceProviderInterface
 {
-
     /**
-     * @var \Mautic\ApiBundle\Entity\oAuth1\NonceRepository $repo
+     * @var \Mautic\ApiBundle\Entity\oAuth1\NonceRepository
      */
     protected $repo;
 
@@ -40,13 +39,13 @@ class NonceProvider implements NonceProviderInterface
     }
 
     /**
-     * Ensure a unique nonce and appropriate timestamp
+     * Ensure a unique nonce and appropriate timestamp.
      *
-     * @param                                                     $nonce
-     * @param                                                     $timestamp
-     * @param  \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     * @param                                                    $nonce
+     * @param                                                    $timestamp
+     * @param \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
      *
-     * @return boolean
+     * @return bool
      */
     public function checkNonceAndTimestampUnicity($nonce, $timestamp, ConsumerInterface $consumer)
     {
@@ -62,7 +61,7 @@ class NonceProvider implements NonceProviderInterface
             $lastFifteen = strtotime('-15 minutes');
             if ($timestamp >= $lastFifteen) {
                 //make sure nonce has not been used before
-                $usedNonces = $this->repo->findBy(array('nonce' => $nonce));
+                $usedNonces = $this->repo->findBy(['nonce' => $nonce]);
 
                 if (count($usedNonces) === 0) {
                     $notUsed = true;
@@ -82,11 +81,11 @@ class NonceProvider implements NonceProviderInterface
     }
 
     /**
-     * @param                                                     $nonce
-     * @param                                                     $timestamp
-     * @param  \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     * @param                                                    $nonce
+     * @param                                                    $timestamp
+     * @param \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
      *
-     * @return boolean
+     * @return bool
      */
     public function registerNonceAndTimestamp($nonce, $timestamp, ConsumerInterface $consumer)
     {

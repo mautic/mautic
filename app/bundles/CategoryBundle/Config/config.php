@@ -50,7 +50,12 @@ return [
     'services' => [
         'events' => [
             'mautic.category.subscriber' => [
-                'class' => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'class'     => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'arguments' => [
+                    'mautic.helper.bundle',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
             ],
         ],
         'forms' => [

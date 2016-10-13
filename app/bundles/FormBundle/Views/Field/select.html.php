@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $defaultInputFormClass = ' not-chosen';
 $defaultInputClass     = 'selectbox';
 $containerType         = 'select';
@@ -17,44 +17,28 @@ if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
 }
 
-$parseList = [];
-if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
-    $parseList = $contactFields[$field['leadField']]['properties']['list'];
-} else {
-    if (isset($list)) {
-        $parseList = $list;
-    } else {
-        $parseList = $properties['list'];
-    }
-
-    if (isset($parseList['list'])) {
-        $parseList = $parseList['list'];
-    }
-}
-
-$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
-$firstListValue  = reset($list);
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
                 <label $labelAttr>{$field['label']}</label>
 HTML;
-
 
 $help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
                 <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
-$emptyOption = (empty($properties['empty_value'])) ? '' : <<<HTML
+$emptyOption = '';
+if ((!empty($properties['empty_value']) || empty($field['defaultValue']) && empty($properties['multiple']))):
+    $emptyOption = <<<HTML
 
                     <option value="">{$properties['empty_value']}</option>
 HTML;
+endif;
 
-$options = (!empty($emptyOption)) ? array($emptyOption) :  array();
+$options = (!empty($emptyOption)) ? [$emptyOption] : [];
 
 foreach ($list as $listValue => $listLabel):
-$selected = ($listValue === $field['defaultValue']) ? ' selected="selected"' : '';
+$selected  = ($listValue === $field['defaultValue']) ? ' selected="selected"' : '';
 $options[] = <<<HTML
 
                     <option value="{$view->escape($listValue)}"{$selected}>{$view->escape($listLabel)}</option>
@@ -62,7 +46,7 @@ HTML;
 endforeach;
 
 $optionsHtml = implode('', $options);
-$html = <<<HTML
+$html        = <<<HTML
 
             <div $containerAttr>{$label}{$help}
                 <select $inputAttr>$optionsHtml

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,10 +10,10 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
  * Class Stat.
@@ -352,9 +352,6 @@ class Stat
         $this->retryCount = $retryCount;
     }
 
-    /**
-     *
-     */
     public function upRetryCount()
     {
         ++$this->retryCount;
@@ -445,7 +442,7 @@ class Stat
      */
     public function upClickCount()
     {
-        $count = (int) $this->clickCount + 1;
+        $count            = (int) $this->clickCount + 1;
         $this->clickCount = $count;
 
         return $this;

@@ -1,27 +1,23 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticSocialBundle\Model\SocialEventLogModel;
 
 /**
- * Class CampaignEventHelper
- *
- * @package MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper
+ * Class CampaignEventHelper.
  */
 class CampaignEventHelper
 {
@@ -84,12 +80,11 @@ class CampaignEventHelper
 
         // Setup clickthrough for URLs in tweet
         $this->clickthrough = [
-            'source' => ['campaign', $event['campaign']['id']]
+            'source' => ['campaign', $event['campaign']['id']],
         ];
 
         $leadArray = $lead->getProfileFields();
         if (empty($leadArray['twitter'])) {
-
             return false;
         }
 
@@ -121,7 +116,7 @@ class CampaignEventHelper
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (strpos($tweetHandle, '@') !== false) ? $tweetHandle : "@$tweetHandle"
+            '{twitter_handle}' => (strpos($tweetHandle, '@') !== false) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(
@@ -139,7 +134,7 @@ class CampaignEventHelper
         );
 
         /**
-         * @var string $token
+         * @var string
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {

@@ -1,22 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CalendarBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CalendarGeneratorEvent
+ * Class CalendarGeneratorEvent.
  */
 class CalendarGeneratorEvent extends Event
 {
-
     /**
      * @var array
      */
@@ -25,7 +24,7 @@ class CalendarGeneratorEvent extends Event
     /**
      * @var array
      */
-    private $events = array();
+    private $events = [];
 
     /**
      * @param array $dates
@@ -36,11 +35,9 @@ class CalendarGeneratorEvent extends Event
     }
 
     /**
-     * Adds an array of events to the container
+     * Adds an array of events to the container.
      *
      * @param array $events
-     *
-     * @return void
      */
     public function addEvents(array $events)
     {
@@ -48,7 +45,7 @@ class CalendarGeneratorEvent extends Event
         foreach ($events as &$event) {
             if (isset($event['color']) && $event['color']) {
                 $event['textColor'] = $this->getContrastColor($event['color']);
-                $event['color'] = '#' . $event['color'];
+                $event['color']     = '#'.$event['color'];
             }
         }
 
@@ -56,7 +53,7 @@ class CalendarGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the event dates
+     * Fetches the event dates.
      *
      * @return array
      */
@@ -66,7 +63,7 @@ class CalendarGeneratorEvent extends Event
     }
 
     /**
-     * Fetches the events container
+     * Fetches the events container.
      *
      * @return array
      */
@@ -78,9 +75,9 @@ class CalendarGeneratorEvent extends Event
     /**
      * Returns contrast hexadecimal color from color in the param.
      * It is used for picking contrast font color on $hex background.
-     * 
+     *
      * @param string $hex
-     * 
+     *
      * @return string
      */
     public function getContrastColor($hex)

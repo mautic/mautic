@@ -1,13 +1,13 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$tableFields = array('gender', 'homeCity', 'bio');
+$tableFields = ['gender', 'homeCity', 'bio'];
 ?>
 <div class="media">
     <?php if (isset($profile['profileImage'])): ?>
@@ -17,7 +17,7 @@ $tableFields = array('gender', 'homeCity', 'bio');
     <?php endif; ?>
 
     <div class="media-body">
-        <h4 class="media-heading"><?php echo $profile['firstName'] . ' ' . $profile['lastName']; ?></h4>
+        <h4 class="media-heading"><?php echo $profile['firstName'].' '.$profile['lastName']; ?></h4>
         <p class="text-muted"><a href="https://foursquare.com/user/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
         <table class="table table-condensed table-bordered">
             <?php foreach ($tableFields as $t): ?>

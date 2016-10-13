@@ -1,20 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FormFieldGroupType
+ * Class FormFieldGroupType.
  */
 class FormFieldGroupType extends AbstractType
 {
@@ -34,9 +33,9 @@ class FormFieldGroupType extends AbstractType
                 'attr'       => [
                     'class'     => 'form-control',
                     'tooltip'   => 'mautic.form.field.help.group.labelattr',
-                    'maxlength' => '255'
+                    'maxlength' => '255',
                 ],
-                'required'   => false
+                'required' => false,
             ]
         );
 
@@ -57,6 +56,6 @@ class FormFieldGroupType extends AbstractType
      */
     public function getName()
     {
-        return "formfield_group";
+        return 'formfield_group';
     }
 }

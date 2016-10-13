@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class VariantModelTrait
+ * Class VariantModelTrait.
  */
 trait VariantModelTrait
 {
@@ -25,7 +23,7 @@ trait VariantModelTrait
     protected $inConversion = false;
 
     /**
-     * Converts a variant to the main item and the original main item a variant
+     * Converts a variant to the main item and the original main item a variant.
      *
      * @param VariantEntityInterface $entity
      */
@@ -86,7 +84,7 @@ trait VariantModelTrait
     }
 
     /**
-     * Prepare a variant for saving
+     * Prepare a variant for saving.
      *
      * @param VariantEntityInterface $entity
      * @param array                  $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
@@ -110,7 +108,6 @@ trait VariantModelTrait
 
             // If unpublished and wasn't changed from published - don't reset
             if (!$entity->isPublished(false) && (!isset($changes['isPublished']))) {
-
                 return false;
             }
 
@@ -135,13 +132,12 @@ trait VariantModelTrait
     }
 
     /**
-     * Run post saving a variant aware entity
+     * Run post saving a variant aware entity.
      *
      * @param VariantEntityInterface $entity
      * @param bool                   $resetVariants
      * @param array                  $relatedIds
      * @param \DateTime|null         $variantStartDate
-     *
      */
     protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], \DateTime $variantStartDate = null)
     {

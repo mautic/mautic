@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -15,9 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class StatRepository
- *
- * @package Mautic\EmailBundle\Entity
+ * Class StatRepository.
  */
 class StatRepository extends CommonRepository
 {
@@ -27,6 +25,7 @@ class StatRepository extends CommonRepository
      * @param $trackingHash
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -72,7 +71,7 @@ class StatRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         //index by lead
-        $stats = array();
+        $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
         }
@@ -98,7 +97,7 @@ class StatRepository extends CommonRepository
 
         if ($emailIds) {
             if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+                $emailIds = [(int) $emailIds];
             }
             $q->where(
                 $q->expr()->in('s.email_id', $emailIds)
@@ -109,7 +108,7 @@ class StatRepository extends CommonRepository
             $q->addSelect('s.list_id')
                 ->groupBy('s.list_id');
         } elseif ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $q->andWhere('s.is_failed = :false')
@@ -150,7 +149,7 @@ class StatRepository extends CommonRepository
 
         if ($emailIds) {
             if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+                $emailIds = [(int) $emailIds];
             }
             $q->where(
                 $q->expr()->in('s.email_id', $emailIds)
@@ -161,7 +160,7 @@ class StatRepository extends CommonRepository
             $q->addSelect('s.list_id')
                 ->groupBy('s.list_id');
         } elseif ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $q->andWhere('is_read = :true')
@@ -194,7 +193,7 @@ class StatRepository extends CommonRepository
      */
     public function getOpenedRates($emailIds, \DateTime $fromDate = null)
     {
-        $inIds = (!is_array($emailIds)) ? array($emailIds) : $emailIds;
+        $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('e.email_id, count(e.id) as the_count')
@@ -218,13 +217,13 @@ class StatRepository extends CommonRepository
         //get a total number of sent emails first
         $totalCounts = $sq->execute()->fetchAll();
 
-        $return  = array();
+        $return = [];
         foreach ($inIds as $id) {
-            $return[$id] = array(
+            $return[$id] = [
                 'totalCount' => 0,
                 'readCount'  => 0,
-                'readRate'   => 0
-            );
+                'readRate'   => 0,
+            ];
         }
 
         foreach ($totalCounts as $t) {
@@ -264,7 +263,7 @@ class StatRepository extends CommonRepository
 
         if ($emailIds) {
             if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+                $emailIds = [(int) $emailIds];
             }
             $q->where(
                 $q->expr()->in('s.email_id', $emailIds)
@@ -275,7 +274,7 @@ class StatRepository extends CommonRepository
             $q->addSelect('s.list_id')
                 ->groupBy('s.list_id');
         } elseif ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $q->andWhere('is_failed = :true')
@@ -314,7 +313,7 @@ class StatRepository extends CommonRepository
 
         if ($emailIds) {
             if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+                $emailIds = [(int) $emailIds];
             }
             $q->where(
                 $q->expr()->in('s.email_id', $emailIds)
@@ -324,7 +323,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('open_count > 0');
 
         if ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $results = $q->execute()->fetchAll();
@@ -333,16 +332,17 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's email stat
+     * Get a lead's email stat.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = array())
+    public function getLeadStats($leadId, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
@@ -407,7 +407,6 @@ class StatRepository extends CommonRepository
             );
         }
 
-
         $timeToReadParser = function (&$stat) {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
@@ -429,11 +428,12 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get counts for Sent, Read and Failed emails
+     * Get counts for Sent, Read and Failed emails.
      *
      * @param QueryBuilder $query
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -450,11 +450,12 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for Sent, Read and Failed email count
+     * Get pie graph data for Sent, Read and Failed email count.
      *
      * @param QueryBuilder $query
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -465,17 +466,18 @@ class StatRepository extends CommonRepository
             ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
+
         return $results;
     }
 
     /**
-     * Get sent counts based grouped by email Id
+     * Get sent counts based grouped by email Id.
      *
      * @param array $emailIds
      *
      * @return array
      */
-    public function getSentCounts($emailIds = array(), \DateTime $fromDate = null)
+    public function getSentCounts($emailIds = [], \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
@@ -499,7 +501,7 @@ class StatRepository extends CommonRepository
         //get a total number of sent emails first
         $results = $q->execute()->fetchAll();
 
-        $counts = array();
+        $counts = [];
 
         foreach ($results as $r) {
             $counts[$r['email_id']] = $r['sentcount'];
@@ -509,7 +511,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -517,21 +519,21 @@ class StatRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'email_stats')
+        $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 
     /**
-     * Delete a stat
+     * Delete a stat.
      *
      * @param $id
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', array('stat_id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', ['stat_id' => (int) $id]);
     }
 
     /**
@@ -551,8 +553,30 @@ class StatRepository extends CommonRepository
     public function findContactEmailStats($leadId, $emailId)
     {
         return $this->createQueryBuilder('s')
-            ->where("IDENTITY(s.lead) = ".(int)$leadId." AND IDENTITY(s.email) = ".(int)$emailId)
+            ->where('IDENTITY(s.lead) = '.(int) $leadId.' AND IDENTITY(s.email) = '.(int) $emailId)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param $contacts
+     * @param $emailId
+     *
+     * @return mixed
+     */
+    public function checkContactsSentEmail($contacts, $emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('id, lead_id')
+        ->where('s.email_id = :email')
+        ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('is_failed = 0')
+        ->setParameter(':email', $emailId)
+        ->setParameter(':contacts', $contacts);
+
+        $results = $query->execute()->fetch();
+
+        return $results;
     }
 }

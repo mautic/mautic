@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Security\Permissions;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class UserPermissions
+ * Class UserPermissions.
  */
 class UserPermissions extends AbstractPermissions
 {
-
     /**
      * {@inheritdoc}
      */
@@ -35,7 +34,6 @@ class UserPermissions extends AbstractPermissions
         ];
         $this->addStandardPermissions('users', false);
         $this->addStandardPermissions('roles', false);
-
     }
 
     /**
@@ -65,10 +63,10 @@ class UserPermissions extends AbstractPermissions
                     'editposition' => 'mautic.user.account.permissions.editposition',
                     'full'         => 'mautic.user.account.permissions.editall',
                 ],
-                'label'   => 'mautic.user.permissions.profile',
-                'data'    => (!empty($data['profile']) ? $data['profile'] : []),
-                'bundle'  => 'user',
-                'level'   => 'profile',
+                'label'  => 'mautic.user.permissions.profile',
+                'data'   => (!empty($data['profile']) ? $data['profile'] : []),
+                'bundle' => 'user',
+                'level'  => 'profile',
             ]
         );
     }

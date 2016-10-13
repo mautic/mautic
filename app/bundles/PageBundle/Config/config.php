@@ -29,6 +29,10 @@ return [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage',
             ],
+            'mautic_page_tracker_getcontact' => [
+                'path'       => '/mtc',
+                'controller' => 'MauticPageBundle:Public:getContactId',
+            ],
             'mautic_url_redirect' => [
                 'path'       => '/r/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect',
@@ -85,13 +89,18 @@ return [
     'services' => [
         'events' => [
             'mautic.page.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\PageSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\PageSubscriber',
+                'arguments' => [
+                    'templating.helper.assets',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
             ],
             'mautic.pagebuilder.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\BuilderSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.page.helper.token',
+                    'mautic.helper.integration',
                     'mautic.page.model.page',
                 ],
             ],
@@ -99,7 +108,10 @@ return [
                 'class' => 'Mautic\PageBundle\EventListener\TokenSubscriber',
             ],
             'mautic.page.pointbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\PointSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\PointSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point',
+                ],
 
             ],
             'mautic.page.reportbundle.subscriber' => [
@@ -108,36 +120,54 @@ return [
             'mautic.page.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\LeadSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.page.model.video',
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory'],
+                ],
             ],
             'mautic.page.calendarbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\CalendarSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\CalendarSubscriber',
+                'arguments' => [
+                    'mautic.page.model.page',
+                ],
             ],
             'mautic.page.configbundle.subscriber' => [
                 'class' => 'Mautic\PageBundle\EventListener\ConfigSubscriber',
             ],
             'mautic.page.search.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.page.model.page',
+                ],
             ],
             'mautic.page.webhook.subscriber' => [
                 'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber',
             ],
             'mautic.page.dashboard.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.page.model.page',
+                ],
             ],
             'mautic.page.js.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'templating.helper.assets',
+                ],
             ],
             'mautic.page.maintenance.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'doctrine.dbal.default_connection',
                 ],
             ],

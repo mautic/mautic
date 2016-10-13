@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class FormFieldHelper
+ * Class FormFieldHelper.
  */
 class FormFieldHelper extends AbstractFormFieldHelper
 {
@@ -35,16 +35,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * @var array
      */
     private $types = [
-        'captcha'     => [
+        'captcha' => [
             'constraints' => [
-                NotBlank::class =>
-                    ['message' => 'mautic.form.submission.captcha.invalid'],
+                NotBlank::class => ['message' => 'mautic.form.submission.captcha.invalid'],
 
-                EqualTo::class =>
-                    ['message' => 'mautic.form.submission.captcha.invalid'],
+                EqualTo::class => ['message' => 'mautic.form.submission.captcha.invalid'],
 
-                Blank::class =>
-                    ['message' => 'mautic.form.submission.captcha.invalid'],
+                Blank::class => ['message' => 'mautic.form.submission.captcha.invalid'],
             ],
         ],
         'checkboxgrp' => [],
@@ -53,27 +50,25 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'email'       => [
             'filter'      => 'email',
             'constraints' => [
-                Email::class =>
-                    ['message' => 'mautic.form.submission.email.invalid'],
+                Email::class => ['message' => 'mautic.form.submission.email.invalid'],
             ],
         ],
-        'freetext'    => [],
-        'hidden'      => [],
-        'number'      => [
+        'freetext' => [],
+        'hidden'   => [],
+        'number'   => [
             'filter' => 'float',
         ],
-        'pagebreak'   => [],
-        'password'    => [],
-        'radiogrp'    => [],
-        'select'      => [],
-        'tel'         => [],
-        'text'        => [],
-        'textarea'    => [],
-        'url'         => [
+        'pagebreak' => [],
+        'password'  => [],
+        'radiogrp'  => [],
+        'select'    => [],
+        'tel'       => [],
+        'text'      => [],
+        'textarea'  => [],
+        'url'       => [
             'filter'      => 'url',
             'constraints' => [
-                Url::class =>
-                    ['message' => 'mautic.form.submission.url.invalid'],
+                Url::class => ['message' => 'mautic.form.submission.url.invalid'],
             ],
         ],
     ];
@@ -97,7 +92,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Set the translation key prefix
+     * Set the translation key prefix.
      */
     public function setTranslationKeyPrefix()
     {
@@ -125,7 +120,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Get fields input filter
+     * Get fields input filter.
      *
      * @param $type
      *
@@ -157,7 +152,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         if (isset($this->types[$type]['constraints'])) {
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
                 //don't check empty values unless the constraint is NotBlank
-                if (strpos($constraint, 'NotBlank') === false && empty($value)) {
+                if (NotBlank::class === $constraint && empty($value)) {
                     continue;
                 }
 
@@ -165,7 +160,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
                         // Used as a honeypot
-                        continue;
+                        $captcha = '';
                     } elseif (Blank::class === $constraint) {
                         continue;
                     }
@@ -184,7 +179,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                         $transParameters = $v->getParameters();
 
                         if ($f !== null) {
-                            $transParameters['%label%'] = "&quot;".$f->getLabel()."&quot;";
+                            $transParameters['%label%'] = '&quot;'.$f->getLabel().'&quot;';
                         }
 
                         $errors[] = $this->translator->trans($v->getMessage(), $transParameters, 'validators');
@@ -211,7 +206,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'email':
             case 'hidden':
                 if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'
+                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'
                         .$match[4].'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
@@ -233,7 +228,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                         $formHtml,
                         $match
                     )) {
-                        $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                        $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
                             .$match[4].' checked />';
                         $formHtml = str_replace($match[0], $replace, $formHtml);
                     }
@@ -242,7 +237,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'radiogrp':
                 $value = urldecode($value);
                 if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
+                    $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
                         .' checked />';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }

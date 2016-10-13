@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -108,13 +109,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -274,21 +275,24 @@ class ListModel extends FormModel
         ];
 
         //field choices
-        $choices = [
+        $choices['lead'] = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'date'],
                 'operators'  => 'default',
+                'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
                 'properties' => ['type' => 'date'],
                 'operators'  => 'default',
+                'object'     => 'lead',
             ],
             'last_active' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
                 'properties' => ['type' => 'date'],
                 'operators'  => 'default',
+                'object'     => 'lead',
             ],
             'owner_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
@@ -297,11 +301,13 @@ class ListModel extends FormModel
                     'callback' => 'activateLeadFieldTypeahead',
                 ],
                 'operators' => 'text',
+                'object'    => 'lead',
             ],
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
                 'operators'  => 'default',
+                'object'     => 'lead',
             ],
             'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
@@ -309,6 +315,7 @@ class ListModel extends FormModel
                     'type' => 'leadlist',
                 ],
                 'operators' => 'multiselect',
+                'object'    => 'lead',
             ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
@@ -321,6 +328,7 @@ class ListModel extends FormModel
                         '!in',
                     ],
                 ],
+                'object' => 'lead',
             ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
@@ -328,6 +336,7 @@ class ListModel extends FormModel
                     'type' => 'tags',
                 ],
                 'operators' => 'multiselect',
+                'object'    => 'lead',
             ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
@@ -339,6 +348,7 @@ class ListModel extends FormModel
                     ],
                 ],
                 'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
@@ -350,6 +360,7 @@ class ListModel extends FormModel
                     ],
                 ],
                 'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
@@ -361,6 +372,7 @@ class ListModel extends FormModel
                     ],
                 ],
                 'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'dnc_unsubscribed_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
@@ -372,6 +384,7 @@ class ListModel extends FormModel
                     ],
                 ],
                 'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
@@ -384,6 +397,7 @@ class ListModel extends FormModel
                         'like',
                     ],
                 ],
+                'object' => 'lead',
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
@@ -396,6 +410,7 @@ class ListModel extends FormModel
                         '!=',
                     ],
                 ],
+                'object' => 'lead',
             ],
         ];
 
@@ -406,46 +421,56 @@ class ListModel extends FormModel
                     'isListable'  => true,
                     'isPublished' => true,
                 ],
+                'orderBy' => 'f.object',
             ]
         );
         foreach ($fields as $field) {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['lookup', 'boolean'])) {
+            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
                 if ($type == 'boolean') {
                     //create a lookup list with ID
-                    $properties['list'] = $properties['yes'].'|'.$properties['no'].'||1|0';
+                    $properties['list'] = [
+                        0 => $properties['no'],
+                        1 => $properties['yes'],
+                    ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
+                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
-            $choices[$field->getAlias()] = [
+            $choices[$field->getObject()][$field->getAlias()] = [
                 'label'      => $field->getLabel(),
                 'properties' => $properties,
+                'object'     => $field->getObject(),
             ];
 
             // Set operators allowed
             if ($type == 'boolean') {
-                $choices[$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, ['select', 'country', 'timezone', 'region'])) {
-                $choices[$field->getAlias()]['operators'] = 'select';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
+            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
-                $choices[$field->getAlias()]['operators'] = 'text';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
             } else {
-                $choices[$field->getAlias()]['operators'] = 'default';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'default';
             }
         }
 
-        $cmp = function ($a, $b) {
-            return strcmp($a['label'], $b['label']);
-        };
-
-        uasort($choices, $cmp);
-
         foreach ($choices as $key => $choice) {
-            if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
-                $choices[$key]['operators'] = $operators[$choice['operators']];
+            $cmp = function ($a, $b) {
+                return strcmp($a['label'], $b['label']);
+            };
+            uasort($choice, $cmp);
+            $choices[$key] = $choice;
+        }
+
+        foreach ($choices as $object => $choiceObject) {
+            foreach ($choiceObject as $key => $choice) {
+                if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
+                    $choices[$object][$key]['operators'] = $operators[$choice['operators']];
+                }
             }
         }
 
@@ -460,7 +485,7 @@ class ListModel extends FormModel
     public function getUserLists($alias = '')
     {
         $user = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->user : false;
+            $this->userHelper->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
@@ -604,6 +629,9 @@ class ListModel extends FormModel
             }
         }
 
+        // Unset max ID to prevent capping at newly added max ID
+        unset($batchLimiters['maxId']);
+
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
             $list,
@@ -614,6 +642,9 @@ class ListModel extends FormModel
                 'batchLimiters'  => $batchLimiters,
             ]
         );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
@@ -1020,7 +1051,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1070,7 +1101,7 @@ class ListModel extends FormModel
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1082,7 +1113,7 @@ class ListModel extends FormModel
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
-                    ->setParameter('userId', $this->user->getId());
+                    ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
             if (!empty($dateFrom)) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
@@ -1103,7 +1134,7 @@ class ListModel extends FormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         if (isset($filter['flag'])) {
@@ -1168,7 +1199,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1241,7 +1272,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('l.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();

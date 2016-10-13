@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $containerType     = 'pagebreak-wrapper';
 $defaultInputClass = 'pagebreak';
 
 include __DIR__.'/field_helper.php';
 
 $backButtonAttr = $nextButtonAttr = $inputAttr;
-$classPrefix = 'btn btn-default mautic-pagebreak-';
+$classPrefix    = 'btn btn-default mautic-pagebreak-';
 
 $appendAttribute($backButtonAttr, 'class', $classPrefix.'back');
 $appendAttribute($nextButtonAttr, 'class', $classPrefix.'next'.((!empty($inForm)) ? ' mr-lg ' : ''));

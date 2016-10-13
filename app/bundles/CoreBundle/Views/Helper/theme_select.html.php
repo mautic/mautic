@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -11,8 +12,12 @@
 <div class="row">
     <?php foreach ($themes as $themeKey => $themeInfo) : ?>
         <?php $isSelected = ($active === $themeKey); ?>
-        <?php if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) continue; ?>
-        <?php if (isset($themeInfo['config']['features']) && !in_array($type, $themeInfo['config']['features'])) continue; ?>
+        <?php if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) {
+    continue;
+} ?>
+        <?php if (isset($themeInfo['config']['features']) && !in_array($type, $themeInfo['config']['features'])) {
+    continue;
+} ?>
         <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png'); ?>
         <?php $hasThumbnail = file_exists($themeInfo['dir'].'/thumbnail.png'); ?>
         <div class="col-md-3 theme-list">

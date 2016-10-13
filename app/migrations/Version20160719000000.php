@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20160719000000
+ * Class Version20160719000000.
  */
 class Version20160719000000 extends AbstractMauticMigration
 {
@@ -69,7 +69,7 @@ SQL;
         );
 
         $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_id INT DEFAULT NULL");
-        $this->addSql("CREATE INDEX ".$this->generatePropertyName('page_hits', 'idx', ['device_id'])." ON {$this->prefix}page_hits (device_id)");
+        $this->addSql('CREATE INDEX '.$this->generatePropertyName('page_hits', 'idx', ['device_id'])." ON {$this->prefix}page_hits (device_id)");
 
         $this->addSql(
             'ALTER TABLE '.$this->prefix.'page_hits ADD CONSTRAINT '.$this->generatePropertyName('page_hits', 'fk', ['device_id'])

@@ -125,7 +125,7 @@ Mautic.formFieldOnLoad = function (container, response) {
             var newField = false;
         } else {
             //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').parent();
+            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
             panel.before(newHtml);
             var newField = true;
         }
@@ -258,7 +258,7 @@ Mautic.selectFormType = function(formType) {
         mQuery('.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
-    console.log(mQuery('li.action-standalone-only').length);
+
     mQuery('#mauticform_formType').val(formType);
 
     mQuery('body').removeClass('noscroll');

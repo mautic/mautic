@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -40,11 +40,11 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
-            SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignAction', 0]
+            SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignAction', 0],
         ];
     }
 
@@ -53,13 +53,13 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $action = array(
-            'label'           => 'mautic.social.twitter.tweet.event.open',
-            'description'     => 'mautic.social.twitter.tweet.event.open_desc',
-            'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'twitter_tweet',
-            'formTheme'       => 'MauticSocialBundle:FormTheme\Campaigns'
-        );
+        $action = [
+            'label'       => 'mautic.social.twitter.tweet.event.open',
+            'description' => 'mautic.social.twitter.tweet.event.open_desc',
+            'eventName'   => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'    => 'twitter_tweet',
+            'formTheme'   => 'MauticSocialBundle:FormTheme\Campaigns',
+        ];
 
         $event->addAction('twitter.tweet', $action);
     }

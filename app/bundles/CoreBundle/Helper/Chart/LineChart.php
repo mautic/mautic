@@ -1,26 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
-use Mautic\CoreBundle\Helper\Chart\AbstactChart;
-use Mautic\CoreBundle\Helper\Chart\ChartInterface;
-
 /**
- * Class LineChart
+ * Class LineChart.
  *
  * Line chart requires the same data as Bar chart
  */
 class LineChart extends AbstractChart implements ChartInterface
 {
     /**
-     * Configurable date format
+     * Configurable date format.
      *
      * @var string
      */
@@ -28,7 +25,7 @@ class LineChart extends AbstractChart implements ChartInterface
 
     /**
      * Match date/time unit to a humanly readable label
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
      *
      * @var array
      */
@@ -45,9 +42,9 @@ class LineChart extends AbstractChart implements ChartInterface
     ];
 
     /**
-     * Defines the basic chart values, generates the time axe labels from it
+     * Defines the basic chart values, generates the time axe labels from it.
      *
-     * @param string    $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -65,25 +62,25 @@ class LineChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Render chart data
+     * Render chart data.
      */
     public function render()
     {
         return [
             'labels'   => $this->labels,
-            'datasets' => $this->datasets
+            'datasets' => $this->datasets,
         ];
     }
 
     /**
      * Define a dataset by name and data. Method will add the rest.
      *
-     * @param  string $label
-     * @param  array  $data
+     * @param string $label
+     * @param array  $data
      *
      * @return $this
      */
-    public function setDataset($label = null, array $data)
+    public function setDataset($label, array $data)
     {
         $datasetId = count($this->datasets);
 
@@ -98,9 +95,9 @@ class LineChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Generate array of labels from the form data
+     * Generate array of labels from the form data.
      *
-     * @param  integer $amount
+     * @param int $amount
      */
     public function generateTimeLabels($amount)
     {
@@ -112,7 +109,7 @@ class LineChart extends AbstractChart implements ChartInterface
         $oneUnit = $this->getUnitInterval();
         $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
 
-        for ($i = 0; $i < $amount; $i++) {
+        for ($i = 0; $i < $amount; ++$i) {
             $this->labels[] = $date->format($format);
 
             // Special case for months because PHP behaves weird with February
@@ -127,9 +124,9 @@ class LineChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Generate unique color for the dataset
+     * Generate unique color for the dataset.
      *
-     * @param  integer $datasetId
+     * @param int $datasetId
      *
      * @return array
      */
@@ -141,7 +138,7 @@ class LineChart extends AbstractChart implements ChartInterface
             'backgroundColor'           => $color->toRgba(0.1),
             'borderColor'               => $color->toRgba(0.8),
             'pointHoverBackgroundColor' => $color->toRgba(0.75),
-            'pointHoverBorderColor'     => $color->toRgba(1)
+            'pointHoverBorderColor'     => $color->toRgba(1),
         ];
     }
 }

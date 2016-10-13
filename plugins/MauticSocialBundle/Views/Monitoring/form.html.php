@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'monitoring');
@@ -17,10 +17,10 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
 <?php
     $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.social.monitoring.menu.edit',
-        array('%name%' => $view['translator']->trans($entity->getTitle()))) :
+        ['%name%' => $view['translator']->trans($entity->getTitle())]) :
         $view['translator']->trans('mautic.social.monitoring.menu.new');
 
-        $view['slots']->set("headerTitle", $header);
+        $view['slots']->set('headerTitle', $header);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -70,9 +70,9 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
 <?php echo $view['form']->end($form); ?>
 
 <?php
-$view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
-            'id'           => 'formComponentModal',
-            'header'       => false,
-            'footerButtons'=> true
-        )));
+$view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', [
+            'id'            => 'formComponentModal',
+            'header'        => false,
+            'footerButtons' => true,
+        ]));
 ?>

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -14,17 +14,14 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 
 /**
- * Class FormSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
@@ -32,7 +29,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a send email actions to available form submit actions
+     * Add a send email actions to available form submit actions.
      *
      * @param FormBuilderEvent $event
      */
@@ -54,13 +51,13 @@ class FormSubscriber extends CommonSubscriber
 
         // Send email to lead
         $action = [
-            'group'             => 'mautic.email.actions',
-            'label'             => 'mautic.email.form.action.sendemail.lead',
-            'description'       => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'          => 'emailsend_list',
-            'formTypeOptions'   => ['update_select' => 'formaction_properties_email'],
-            'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
-            'callback'          => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
+            'group'           => 'mautic.email.actions',
+            'label'           => 'mautic.email.form.action.sendemail.lead',
+            'description'     => 'mautic.email.form.action.sendemail.lead.descr',
+            'formType'        => 'emailsend_list',
+            'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
+            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
         ];
 
         $event->addSubmitAction('email.send.lead', $action);

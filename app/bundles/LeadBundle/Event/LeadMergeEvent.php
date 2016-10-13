@@ -1,25 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class LeadEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class LeadEvent.
  */
 class LeadMergeEvent extends Event
 {
-
     private $victor;
 
     private $loser;
@@ -31,11 +28,11 @@ class LeadMergeEvent extends Event
     public function __construct(Lead $victor, Lead $loser)
     {
         $this->victor = $victor;
-        $this->loser = $loser;
+        $this->loser  = $loser;
     }
 
     /**
-     * Returns the victor (loser merges into the victor)
+     * Returns the victor (loser merges into the victor).
      *
      * @return Lead
      */
@@ -45,7 +42,7 @@ class LeadMergeEvent extends Event
     }
 
     /**
-     * Returns the loser (loser merges into the victor)
+     * Returns the loser (loser merges into the victor).
      *
      * @param Lead $lead
      */

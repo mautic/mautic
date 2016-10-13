@@ -1,32 +1,28 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\UserBundle\Entity\User;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\SecurityContext;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
-use Psr\Log\LoggerInterface;
 
 /**
- * Class AbstractCommonModel
- *
- * @package Mautic\CoreBundle\Model
+ * Class AbstractCommonModel.
  */
 abstract class AbstractCommonModel
 {
@@ -75,9 +71,9 @@ abstract class AbstractCommonModel
     protected $translator;
 
     /**
-     * @var User
+     * @var UserHelper
      */
-    protected $user;
+    protected $userHelper;
 
     /**
      * @var LoggerInterface
@@ -132,19 +128,18 @@ abstract class AbstractCommonModel
         $this->logger = $logger;
     }
 
-
     /**
-     * Initialize the user parameter for use in locking procedures
+     * Initialize the user parameter for use in locking procedures.
      *
      * @param UserHelper $userHelper
      */
-    public function setUser(UserHelper $userHelper)
+    public function setUserHelper(UserHelper $userHelper)
     {
-        $this->user = $userHelper->getUser();
+        $this->userHelper = $userHelper;
     }
 
     /**
-     * Retrieve the supported search commands for a repository
+     * Retrieve the supported search commands for a repository.
      *
      * @return array
      */
@@ -154,7 +149,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Retrieve the search command list for a repository
+     * Retrieve the search command list for a repository.
      *
      * @return array
      */
@@ -166,7 +161,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Retrieve the repository for an entity
+     * Retrieve the repository for an entity.
      *
      * @return \Mautic\CoreBundle\Entity\CommonRepository|bool
      */
@@ -182,7 +177,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Retrieve the permissions base
+     * Retrieve the permissions base.
      *
      * @return string
      */
@@ -192,7 +187,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Return a list of entities
+     * Return a list of entities.
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
@@ -205,7 +200,7 @@ abstract class AbstractCommonModel
 
         if ($repo instanceof CommonRepository) {
             $repo->setTranslator($this->translator);
-            $repo->setCurrentUser($this->user);
+            $repo->setCurrentUser($this->userHelper->getUser());
 
             return $repo->getEntities($args);
         }
@@ -214,7 +209,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Get a specific entity
+     * Get a specific entity.
      *
      * @param $id
      *
@@ -235,7 +230,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Encode an array to append to a URL
+     * Encode an array to append to a URL.
      *
      * @param $array
      *
@@ -247,7 +242,7 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * Decode a string appended to URL into an array
+     * Decode a string appended to URL into an array.
      *
      * @param      $string
      * @param bool $urlDecode
@@ -274,16 +269,16 @@ abstract class AbstractCommonModel
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
-        $url  = $this->router->generate($route, $routeParams, $absolute);
-        $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
+        $url = $this->router->generate($route, $routeParams, $absolute);
+        $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
 
         return $url;
     }
 
     /**
-     * Retrieve entity based on id/alias slugs
+     * Retrieve entity based on id/alias slugs.
      *
      * @param string $slug
      *
@@ -300,12 +295,12 @@ abstract class AbstractCommonModel
         $locales   = Intl::getLocaleBundle()->getLocaleNames();
 
         switch (true) {
-            case ($slugCount === 3):
+            case $slugCount === 3:
                 list($lang, $category, $idSlug) = $slugs;
 
                 break;
 
-            case ($slugCount === 2):
+            case $slugCount === 2:
                 list($category, $idSlug) = $slugs;
 
                 // Check if the first slug is actually a locale
@@ -316,7 +311,7 @@ abstract class AbstractCommonModel
 
                 break;
 
-            case ($slugCount === 1):
+            case $slugCount === 1:
                 $idSlug = $slugs[0];
 
                 break;
@@ -358,6 +353,5 @@ abstract class AbstractCommonModel
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
-
     }
 }

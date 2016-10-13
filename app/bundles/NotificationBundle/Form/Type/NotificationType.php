@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,7 +10,6 @@
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
@@ -32,8 +31,8 @@ class NotificationType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
-        $this->em = $factory->getEntityManager();
-        $this->request = $factory->getRequest();
+        $this->em         = $factory->getEntityManager();
+        $this->request    = $factory->getRequest();
     }
 
     /**
@@ -49,9 +48,9 @@ class NotificationType extends AbstractType
             'name',
             'text',
             [
-                'label' => 'mautic.notification.form.internal.name',
+                'label'      => 'mautic.notification.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -59,10 +58,10 @@ class NotificationType extends AbstractType
             'description',
             'textarea',
             [
-                'label' => 'mautic.notification.form.internal.description',
+                'label'      => 'mautic.notification.form.internal.description',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
-                'required' => false,
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -70,9 +69,9 @@ class NotificationType extends AbstractType
             'heading',
             'text',
             [
-                'label' => 'mautic.notification.form.heading',
+                'label'      => 'mautic.notification.form.heading',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -80,11 +79,11 @@ class NotificationType extends AbstractType
             'message',
             'textarea',
             [
-                'label' => 'mautic.notification.form.message',
+                'label'      => 'mautic.notification.form.message',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
+                'attr'       => [
                     'class' => 'form-control',
-                    'rows' => 6,
+                    'rows'  => 6,
                 ],
             ]
         );
@@ -93,10 +92,10 @@ class NotificationType extends AbstractType
             'url',
             'url',
             [
-                'label' => 'mautic.notification.form.url',
+                'label'      => 'mautic.notification.form.url',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.url.tooltip',
                 ],
                 'required' => false,
@@ -109,14 +108,14 @@ class NotificationType extends AbstractType
             'publishUp',
             'datetime',
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishup',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishup',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -125,14 +124,14 @@ class NotificationType extends AbstractType
             'publishDown',
             'datetime',
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishdown',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishdown',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -150,9 +149,9 @@ class NotificationType extends AbstractType
             'language',
             'locale',
             [
-                'label' => 'mautic.core.language',
+                'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
+                'attr'       => [
                     'class' => 'form-control',
                 ],
                 'required' => false,
@@ -173,7 +172,7 @@ class NotificationType extends AbstractType
                 'updateSelect',
                 'hidden',
                 [
-                    'data' => $options['update_select'],
+                    'data'   => $options['update_select'],
                     'mapped' => false,
                 ]
             );

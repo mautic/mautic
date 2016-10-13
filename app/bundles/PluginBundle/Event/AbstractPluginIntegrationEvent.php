@@ -1,19 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class AbstractPluginIntegrationEvent
+ * Class AbstractPluginIntegrationEvent.
  */
 class AbstractPluginIntegrationEvent extends Event
 {
@@ -23,7 +23,7 @@ class AbstractPluginIntegrationEvent extends Event
     protected $integration;
 
     /**
-     * Get the integration's name
+     * Get the integration's name.
      *
      * @return mixed
      */
@@ -33,7 +33,7 @@ class AbstractPluginIntegrationEvent extends Event
     }
 
     /**
-     * Get the integration object
+     * Get the integration object.
      *
      * @return AbstractIntegration
      */
@@ -42,4 +42,3 @@ class AbstractPluginIntegrationEvent extends Event
         return $this->integration;
     }
 }
-

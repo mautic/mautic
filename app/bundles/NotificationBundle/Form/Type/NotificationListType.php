@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -28,7 +28,7 @@ class NotificationListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->viewOther = $factory->getSecurity()->isGranted('notification:notifications:viewother');
-        $this->repo = $factory->getModel('notification')->getRepository();
+        $this->repo      = $factory->getModel('notification')->getRepository();
 
         $this->repo->setCurrentUser($factory->getUser());
     }
@@ -39,7 +39,7 @@ class NotificationListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $viewOther = $this->viewOther;
-        $repo = $this->repo;
+        $repo      = $this->repo;
 
         $resolver->setDefaults(
             [
@@ -62,14 +62,14 @@ class NotificationListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded' => false,
-                'multiple' => true,
-                'required' => false,
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.notification.no.notifications.note' : 'mautic.core.form.chooseone';
                 },
                 'notification_type' => 'template',
-                'disabled' => function (Options $options) {
+                'disabled'          => function (Options $options) {
                     return empty($options['choices']);
                 },
             ]

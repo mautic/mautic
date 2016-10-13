@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
- * Class SecurityController
+ * Class SecurityController.
  */
 class SecurityController extends CommonController
 {
-
     /**
      * @param Request $request
      *
@@ -39,11 +38,11 @@ class SecurityController extends CommonController
         }
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
-                $msg = "mautic.user.auth.error.invalidlogin";
+                $msg = 'mautic.user.auth.error.invalidlogin';
             } else {
                 $msg = $error->getMessage();
             }
-            $this->addFlash($msg, array(), 'error', null, false);
+            $this->addFlash($msg, [], 'error', null, false);
         }
 
         if ($session->has('_security.target_path')) {
@@ -54,10 +53,10 @@ class SecurityController extends CommonController
 
         return $this->render(
             'MauticApiBundle:Security:login.html.php',
-            array(
+            [
                 'last_username' => $session->get(SecurityContext::LAST_USERNAME),
-                'route'         => 'mautic_oauth2_server_auth_login_check'
-            )
+                'route'         => 'mautic_oauth2_server_auth_login_check',
+            ]
         );
     }
 

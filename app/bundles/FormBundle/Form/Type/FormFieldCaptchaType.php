@@ -1,24 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FormFieldCaptchaType
+ * Class FormFieldCaptchaType.
  */
 class FormFieldCaptchaType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -28,14 +26,14 @@ class FormFieldCaptchaType extends AbstractType
             'captcha',
             'text',
             [
-                'label'       => 'mautic.form.field.form.property_captcha',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.form.field.form.property_captcha',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'       => 'form-control',
                     'tooltip'     => 'mautic.form.field.help.captcha',
                     'placeholder' => 'mautic.form.field.help.captcha_placeholder',
                 ],
-                'required'    => false
+                'required' => false,
             ]
         );
 
@@ -46,7 +44,7 @@ class FormFieldCaptchaType extends AbstractType
                 'label'      => 'mautic.form.field.form.property_placeholder',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => false
+                'required'   => false,
             ]
         );
 
@@ -57,7 +55,7 @@ class FormFieldCaptchaType extends AbstractType
                 'label'      => 'mautic.form.field.form.property_captchaerror',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => false
+                'required'   => false,
             ]
         );
     }
@@ -67,6 +65,6 @@ class FormFieldCaptchaType extends AbstractType
      */
     public function getName()
     {
-        return "formfield_captcha";
+        return 'formfield_captcha';
     }
 }

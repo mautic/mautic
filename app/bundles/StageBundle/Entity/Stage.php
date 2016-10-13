@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,13 +18,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Stage
- *
- * @package Mautic\StageBundle\Entity
+ * Class Stage.
  */
 class Stage extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -73,7 +70,7 @@ class Stage extends FormEntity
     }
 
     /**
-     * Construct
+     * Construct.
      */
     public function __construct()
     {
@@ -83,12 +80,12 @@ class Stage extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('stages')
             ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository');
-        
+
         $builder->addIdColumns();
 
         $builder->createField('weight', 'integer')
@@ -109,15 +106,15 @@ class Stage extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.core.name.required'
-        )));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -125,53 +122,53 @@ class Stage extends FormEntity
     {
         $metadata->setGroupPrefix('stage')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'category',
                     'weight',
-                    'description'
-                )
+                    'description',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'publishUp',
-                    'publishDown'
-                )
+                    'publishDown',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set weight
+     * Set weight.
      *
-     * @param integer $weight
+     * @param int $weight
      *
-     * @return integer
+     * @return int
      */
-    public function setWeight ($type)
+    public function setWeight($type)
     {
-        $this->weight = (int)$type;
+        $this->weight = (int) $type;
 
         return $this;
     }
 
     /**
-     * Get weight
+     * Get weight.
      *
-     * @return integer
+     * @return int
      */
-    public function getWeight ()
+    public function getWeight()
     {
         return $this->weight;
     }
@@ -179,19 +176,19 @@ class Stage extends FormEntity
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return string
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -200,23 +197,23 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return string
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -225,23 +222,23 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Add log
+     * Add log.
      *
      * @param LeadStageLog $log
      *
      * @return Log
      */
-    public function addLog (LeadStageLog $log)
+    public function addLog(LeadStageLog $log)
     {
         $this->log[] = $log;
 
@@ -249,33 +246,33 @@ class Stage extends FormEntity
     }
 
     /**
-     * Remove log
+     * Remove log.
      *
      * @param LeadStageLog $log
      */
-    public function removeLog (LeadStageLog $log)
+    public function removeLog(LeadStageLog $log)
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log
+     * Get log.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog ()
+    public function getLog()
     {
         return $this->log;
     }
 
     /**
-     * Set publishUp
+     * Set publishUp.
      *
      * @param \DateTime $publishUp
      *
      * @return Stage
      */
-    public function setPublishUp ($publishUp)
+    public function setPublishUp($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -284,23 +281,23 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishUp
+     * Get publishUp.
      *
      * @return \DateTime
      */
-    public function getPublishUp ()
+    public function getPublishUp()
     {
         return $this->publishUp;
     }
 
     /**
-     * Set publishDown
+     * Set publishDown.
      *
      * @param \DateTime $publishDown
      *
      * @return Stage
      */
-    public function setPublishDown ($publishDown)
+    public function setPublishDown($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -309,11 +306,11 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishDown
+     * Get publishDown.
      *
      * @return \DateTime
      */
-    public function getPublishDown ()
+    public function getPublishDown()
     {
         return $this->publishDown;
     }
@@ -321,7 +318,7 @@ class Stage extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -329,7 +326,7 @@ class Stage extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }

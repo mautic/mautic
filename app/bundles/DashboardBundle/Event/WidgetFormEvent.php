@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 
 /**
- * Class WidgetFormEvent
- *
- * @package Mautic\DashboardBundle\Event
+ * Class WidgetFormEvent.
  */
 class WidgetFormEvent extends CommonEvent
 {
@@ -23,7 +21,7 @@ class WidgetFormEvent extends CommonEvent
     protected $type;
 
     /**
-     * Set the widget type
+     * Set the widget type.
      *
      * @param string $type
      */
@@ -33,7 +31,7 @@ class WidgetFormEvent extends CommonEvent
     }
 
     /**
-     * Get the widget type
+     * Get the widget type.
      *
      * @return string $type
      */
@@ -43,7 +41,7 @@ class WidgetFormEvent extends CommonEvent
     }
 
     /**
-     * Set the widget form
+     * Set the widget form.
      *
      * @param string $form
      */
@@ -53,7 +51,7 @@ class WidgetFormEvent extends CommonEvent
     }
 
     /**
-     * Returns the widget edit form
+     * Returns the widget edit form.
      *
      * @param string $form
      */

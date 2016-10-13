@@ -1,18 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ParseEmailEvent
+ * Class ParseEmailEvent.
  */
 class ParseEmailEvent extends Event
 {
@@ -42,7 +42,7 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * Get the array of messages
+     * Get the array of messages.
      *
      * @return \Mautic\EmailBundle\MonitoredEmail\Message[]
      */
@@ -84,7 +84,7 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * Check if the set of messages is applicable and should be processed by the listener
+     * Check if the set of messages is applicable and should be processed by the listener.
      *
      * @param $bundleKey
      * @param $folderKeys
@@ -101,7 +101,6 @@ class ParseEmailEvent extends Event
             $key = $bundleKey.'_'.$folderKey;
 
             if (in_array($key, $this->keys)) {
-
                 return true;
             }
         }
@@ -110,7 +109,7 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * Set a criteria request for filtering fetched mail
+     * Set a criteria request for filtering fetched mail.
      *
      * @param $bundleKey
      * @param $folderKeys

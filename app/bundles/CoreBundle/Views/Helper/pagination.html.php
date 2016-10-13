@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$target     = (!empty($target)) ? $target : '.page-list';
-$tmpl       = (!empty($tmpl)) ? $tmpl : 'list';
+$target = (!empty($target)) ? $target : '.page-list';
+$tmpl   = (!empty($tmpl)) ? $tmpl : 'list';
 
 if (empty($fixedPages)) {
     $limit = (!isset($limit)) ? 30 : (int) $limit;
@@ -31,9 +31,9 @@ if ($page <= 0) {
     $page = (int) $page;
 }
 
-$pageClass           = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";
-$menuLink            = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
-$paginationWrapper   = isset($paginationWrapper) ? $paginationWrapper : "pagination-wrapper ml-md mr-md";
+$pageClass           = (!isset($paginationClass)) ? '' : " pagination-$paginationClass";
+$menuLink            = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : '';
+$paginationWrapper   = isset($paginationWrapper) ? $paginationWrapper : 'pagination-wrapper ml-md mr-md';
 $queryString         = '?tmpl='.$tmpl.(isset($queryString) ? $queryString : '');
 $formExit            = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
 $responsiveViewports = ['desktop', 'mobile'];
@@ -54,7 +54,7 @@ foreach ($responsiveViewports as $viewport):
         $paginationClass   = 'sm';
         $pageClass         = 'pagination-sm';
         $responsiveClass   = 'visible-xs hidden-sm hidden-md hidden-lg';
-        $paginationWrapper = "pagination-wrapper pull-left nm";
+        $paginationWrapper = 'pagination-wrapper pull-left nm';
     else:
         $responsiveClass = 'hidden-xs visible-sm visible-md visible-lg';
     endif;
@@ -63,7 +63,7 @@ foreach ($responsiveViewports as $viewport):
     <div class="<?php echo $responsiveClass; ?>">
         <?php if (empty($fixedLimit)): ?>
             <div class="pull-right">
-                <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
+                <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ''; ?>
                 <select autocomplete="false" class="form-control not-chosen pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData('<?php echo $sessionVar; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
                     <?php foreach ($limitOptions as $value => $label): ?>
                         <?php $selected = ($limit === $value) ? ' selected="selected"' : ''; ?>
@@ -78,7 +78,7 @@ foreach ($responsiveViewports as $viewport):
         <div class="<?php echo $paginationWrapper; ?>">
             <ul class="pagination nm <?php echo $pageClass; ?>">
                 <?php
-                $urlPage = "/1";
+                $urlPage = '/1';
                 $url     = ($page > 1) ? $baseUrl.$urlPage.$queryString : 'javascript: void(0);';
                 $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="'.$target.'"'.$menuLink;
                 $class   = ($page <= 1) ? ' class="disabled"' : '';
@@ -91,7 +91,7 @@ foreach ($responsiveViewports as $viewport):
                 </li>
 
                 <?php
-                $urlPage = "/".($page - 1);
+                $urlPage = '/'.($page - 1);
                 $url     = (($page - 1) >= 1) ? $baseUrl.$urlPage.$queryString : 'javascript: void(0);';
                 $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="'.$target.'"'.$menuLink;
                 $class   = (($page - 1) <= 0) ? ' class="disabled"' : '';
@@ -113,10 +113,10 @@ foreach ($responsiveViewports as $viewport):
                     $lastPage = $totalPages;
                 }
                 ?>
-                <?php for ($i = $startPage; $i <= $lastPage; $i++): ?>
+                <?php for ($i = $startPage; $i <= $lastPage; ++$i): ?>
                     <?php
                     $class = ($page === (int) $i) ? ' class="active"' : '';
-                    $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl."/".$i.$queryString;
+                    $url   = ($page === (int) $i) ? 'javascript: void(0);' : $baseUrl.'/'.$i.$queryString;
                     $data  = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="'.$target.'"'.$menuLink;
                     ?>
                     <li<?php echo $class; ?>>
@@ -127,7 +127,7 @@ foreach ($responsiveViewports as $viewport):
                 <?php endfor; ?>
 
                 <?php
-                $urlPage = "/".($page + 1);
+                $urlPage = '/'.($page + 1);
                 $url     = (($page + 1) <= $totalPages) ? $baseUrl.$urlPage.$queryString : 'javascript: void(0);';
                 $data    = ($url == 'javascript: void(0);') ? '' : 'data-toggle="ajax" data-target="'.$target.'"'.$menuLink;
                 $class   = (($page + 1) > $totalPages) ? ' class="disabled"' : '';
@@ -140,7 +140,7 @@ foreach ($responsiveViewports as $viewport):
                 </li>
 
                 <?php
-                $urlPage = "/".$totalPages;
+                $urlPage = '/'.$totalPages;
                 $url     = ($page < $totalPages) ? $baseUrl.$urlPage.$queryString : 'javascript: void(0);';
                 $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="'.$target.'"'.$menuLink;
                 $class   = ($page === $totalPages) ? ' class="disabled"' : '';

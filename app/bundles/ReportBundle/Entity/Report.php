@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -17,9 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Report
- *
- * @package Mautic\ReportBundle\Entity
+ * Class Report.
  */
 class Report extends FormEntity
 {
@@ -51,22 +49,22 @@ class Report extends FormEntity
     /**
      * @var array
      */
-    private $columns = array();
+    private $columns = [];
 
     /**
      * @var array
      */
-    private $filters = array();
+    private $filters = [];
 
     /**
      * @var array
      */
-    private $tableOrder = array();
+    private $tableOrder = [];
 
     /**
      * @var array
      */
-    private $graphs = array();
+    private $graphs = [];
 
     public function __clone()
     {
@@ -78,7 +76,7 @@ class Report extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -107,22 +105,20 @@ class Report extends FormEntity
         $builder->createField('graphs', 'array')
             ->nullable()
             ->build();
-
-
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new NotBlank(array(
-            'message' => 'mautic.core.name.required'
-        )));
+        $metadata->addPropertyConstraint('name', new NotBlank([
+            'message' => 'mautic.core.name.required',
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -134,7 +130,7 @@ class Report extends FormEntity
                     'id',
                     'name',
                     'description',
-                    'system'
+                    'system',
                 ]
             )
             ->addProperties(
@@ -143,30 +139,30 @@ class Report extends FormEntity
                     'columns',
                     'filters',
                     'tableOrder',
-                    'graphs'
+                    'graphs',
                 ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Report
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -175,23 +171,23 @@ class Report extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Set system
+     * Set system.
      *
      * @param string $system
      *
      * @return Report
      */
-    public function setSystem ($system)
+    public function setSystem($system)
     {
         $this->isChanged('system', $system);
         $this->system = $system;
@@ -200,23 +196,23 @@ class Report extends FormEntity
     }
 
     /**
-     * Get system
+     * Get system.
      *
-     * @return integer
+     * @return int
      */
-    public function getSystem ()
+    public function getSystem()
     {
         return $this->system;
     }
 
     /**
-     * Set source
+     * Set source.
      *
      * @param string $source
      *
      * @return Report
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -225,23 +221,23 @@ class Report extends FormEntity
     }
 
     /**
-     * Get source
+     * Get source.
      *
      * @return string
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
 
     /**
-     * Set columns
+     * Set columns.
      *
      * @param string $columns
      *
      * @return Report
      */
-    public function setColumns ($columns)
+    public function setColumns($columns)
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -250,23 +246,23 @@ class Report extends FormEntity
     }
 
     /**
-     * Get columns
+     * Get columns.
      *
      * @return string
      */
-    public function getColumns ()
+    public function getColumns()
     {
         return $this->columns;
     }
 
     /**
-     * Set filters
+     * Set filters.
      *
      * @param string $filters
      *
      * @return Report
      */
-    public function setFilters ($filters)
+    public function setFilters($filters)
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -275,11 +271,11 @@ class Report extends FormEntity
     }
 
     /**
-     * Get filters
+     * Get filters.
      *
      * @return string
      */
-    public function getFilters ()
+    public function getFilters()
     {
         return $this->filters;
     }
@@ -287,7 +283,7 @@ class Report extends FormEntity
     /**
      * @return mixed
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
@@ -295,7 +291,7 @@ class Report extends FormEntity
     /**
      * @param mixed $description
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -303,7 +299,7 @@ class Report extends FormEntity
     /**
      * @return mixed
      */
-    public function getTableOrder ()
+    public function getTableOrder()
     {
         return $this->tableOrder;
     }
@@ -311,7 +307,7 @@ class Report extends FormEntity
     /**
      * @param array $tableOrder
      */
-    public function setTableOrder (array $tableOrder)
+    public function setTableOrder(array $tableOrder)
     {
         $this->tableOrder = $tableOrder;
     }
@@ -319,7 +315,7 @@ class Report extends FormEntity
     /**
      * @return mixed
      */
-    public function getGraphs ()
+    public function getGraphs()
     {
         return $this->graphs;
     }
@@ -327,7 +323,7 @@ class Report extends FormEntity
     /**
      * @param array $graphs
      */
-    public function setGraphs (array $graphs)
+    public function setGraphs(array $graphs)
     {
         $this->graphs = $graphs;
     }

@@ -1,16 +1,16 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <ul class="list-group">
     <?php
-    $i = 0;
+    $i     = 0;
     $total = count($activity); ?>
 
      <?php foreach ($activity as $item): ?>
@@ -31,6 +31,6 @@
             <p class="text-muted"><i class="fa fa-clock-o"></i> <?php echo $view['date']->toFull($item['createdAt'], 'UTC', 'U'); ?></p>
             <?php echo $i == 0 ? '' : '<hr />'; ?>
         </li>
-        <?php $i++; ?>
+        <?php ++$i; ?>
     <?php endforeach; ?>
 </ul>

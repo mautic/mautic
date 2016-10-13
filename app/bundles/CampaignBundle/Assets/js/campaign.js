@@ -117,7 +117,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
             if (destroy) {
                 mQuery(chosenOption).tooltip('destroy');
             } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body'});
+                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
             }
         }
     });
@@ -1263,6 +1263,9 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
         });
 
         var newWidth = (500 / 3) * groupsEnabled;
+        if (newWidth >= mQuery(window).width()) {
+            newWidth = mQuery(window).width() - 10;
+        }
 
         var leftPos = (forcePosition) ? forcePosition.left : Mautic.campaignBuilderAnchorClickedPosition.left - (newWidth / 2 - 10);
         var topPos  = (forcePosition) ? forcePosition.top : Mautic.campaignBuilderAnchorClickedPosition.top + 25;

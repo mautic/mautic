@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -19,17 +19,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FeatureSettingsType
- *
- * @package Mautic\PluginBundle\Form\Type
+ * Class FeatureSettingsType.
  */
 class FeatureSettingsType extends AbstractType
 {
-
     /**
      * @param MauticFactory $factory
      */
-    public function __construct (MauticFactory $factory)
+    public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
@@ -38,9 +35,8 @@ class FeatureSettingsType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $integration_object = $options['integration_object'];
 
         //add custom feature settings
@@ -48,51 +44,49 @@ class FeatureSettingsType extends AbstractType
         $leadFields = $options['lead_fields'];
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields) {
-
-            $settings = array(
+            $settings = [
                 'silence_exceptions' => false,
-                'feature_settings'   => $data
-            );
+                'feature_settings'   => $data,
+            ];
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
                 if (!is_array($fields)) {
-                    $fields = array();
+                    $fields = [];
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fields = array();
+                $fields = [];
                 $error  = $e->getMessage();
             }
 
-            list ($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
+            list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
 
             /**
              * Auto Match Integration Fields with Mautic Fields.
              */
-            $flattenLeadFields = array();
+            $flattenLeadFields = [];
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
             }
 
             $integrationFields  = array_keys($fields);
             $flattenLeadFields  = array_keys($flattenLeadFields);
-            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, "strcasecmp");
+            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
 
-
-            $autoMatchedFields = array();
+            $autoMatchedFields = [];
             foreach ($fieldsIntersection as $field) {
                 $autoMatchedFields[$field] = strtolower($field);
             }
 
-            $form->add('leadFields', 'integration_fields', array(
+            $form->add('leadFields', 'integration_fields', [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
                 'lead_fields'          => $leadFields,
                 'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
-                'alert_type'           => $alertType
-            ));
+                'alert_type'           => $alertType,
+            ]);
 
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
@@ -101,7 +95,6 @@ class FeatureSettingsType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
-
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
@@ -118,16 +111,16 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('integration', 'integration_object', 'lead_fields'));
+        $resolver->setRequired(['integration', 'integration_object', 'lead_fields']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName ()
+    public function getName()
     {
-        return "integration_featuresettings";
+        return 'integration_featuresettings';
     }
 }

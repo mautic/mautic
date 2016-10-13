@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\SkipMigrationException;
@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Web Notification Channel Migration
+ * Web Notification Channel Migration.
  */
 class Version20160414000000 extends AbstractMauticMigration
 {
@@ -32,48 +32,48 @@ class Version20160414000000 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->keys = array(
-            'push_notifications'      => array(
-                'idx' => array(
-                    'category' => $this->generatePropertyName('push_notifications', 'idx', array('category_id'))
-                ),
-                'fk'  => array(
-                    'category' => $this->generatePropertyName('push_notifications', 'fk', array('category_id'))
-                )
-            ),
-            'push_notification_stats' => array(
-                'idx' => array(
-                    'notification' => $this->generatePropertyName('push_notification_stats', 'idx', array('notification_id')),
-                    'lead'         => $this->generatePropertyName('push_notification_stats', 'idx', array('lead_id')),
-                    'list'         => $this->generatePropertyName('push_notification_stats', 'idx', array('list_id')),
-                    'ip'           => $this->generatePropertyName('push_notification_stats', 'idx', array('ip_id'))
-                ),
-                'fk'  => array(
-                    'notification' => $this->generatePropertyName('push_notification_stats', 'fk', array('notification_id')),
-                    'lead'         => $this->generatePropertyName('push_notification_stats', 'fk', array('lead_id')),
-                    'list'         => $this->generatePropertyName('push_notification_stats', 'fk', array('list_id')),
-                    'ip'           => $this->generatePropertyName('push_notification_stats', 'fk', array('ip_id'))
-                )
-            ),
-            'push_ids' => array(
-                'idx' =>  array(
-                    'lead' => $this->generatePropertyName('push_ids', 'idx', array('lead_id'))
-                ),
-                'fk' => array(
-                    'lead' => $this->generatePropertyName('push_ids', 'fk', array('lead_id'))
-                )
-            ),
-            'push_notification_list_xref'   => array(
-                'idx' => array(
-                    'notification' => $this->generatePropertyName('push_notification_list_xref', 'idx', array('notification_id')),
-                    'leadlist'     => $this->generatePropertyName('push_notification_list_xref', 'idx', array('leadlist_id'))
-                ),
-                'fk'  => array(
-                    'notification' => $this->generatePropertyName('push_notification_list_xref', 'fk', array('notification_id')),
-                    'leadlist'     => $this->generatePropertyName('push_notification_list_xref', 'fk', array('leadlist_id'))
-                )
-            )
-        );
+        $this->keys = [
+            'push_notifications' => [
+                'idx' => [
+                    'category' => $this->generatePropertyName('push_notifications', 'idx', ['category_id']),
+                ],
+                'fk' => [
+                    'category' => $this->generatePropertyName('push_notifications', 'fk', ['category_id']),
+                ],
+            ],
+            'push_notification_stats' => [
+                'idx' => [
+                    'notification' => $this->generatePropertyName('push_notification_stats', 'idx', ['notification_id']),
+                    'lead'         => $this->generatePropertyName('push_notification_stats', 'idx', ['lead_id']),
+                    'list'         => $this->generatePropertyName('push_notification_stats', 'idx', ['list_id']),
+                    'ip'           => $this->generatePropertyName('push_notification_stats', 'idx', ['ip_id']),
+                ],
+                'fk' => [
+                    'notification' => $this->generatePropertyName('push_notification_stats', 'fk', ['notification_id']),
+                    'lead'         => $this->generatePropertyName('push_notification_stats', 'fk', ['lead_id']),
+                    'list'         => $this->generatePropertyName('push_notification_stats', 'fk', ['list_id']),
+                    'ip'           => $this->generatePropertyName('push_notification_stats', 'fk', ['ip_id']),
+                ],
+            ],
+            'push_ids' => [
+                'idx' => [
+                    'lead' => $this->generatePropertyName('push_ids', 'idx', ['lead_id']),
+                ],
+                'fk' => [
+                    'lead' => $this->generatePropertyName('push_ids', 'fk', ['lead_id']),
+                ],
+            ],
+            'push_notification_list_xref' => [
+                'idx' => [
+                    'notification' => $this->generatePropertyName('push_notification_list_xref', 'idx', ['notification_id']),
+                    'leadlist'     => $this->generatePropertyName('push_notification_list_xref', 'idx', ['leadlist_id']),
+                ],
+                'fk' => [
+                    'notification' => $this->generatePropertyName('push_notification_list_xref', 'fk', ['notification_id']),
+                    'leadlist'     => $this->generatePropertyName('push_notification_list_xref', 'fk', ['leadlist_id']),
+                ],
+            ],
+        ];
     }
 
     /**

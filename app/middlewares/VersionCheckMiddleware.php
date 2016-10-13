@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     const PRIORITY = 10;
-    
+
     const MAUTIC_MINIMUM_PHP = '5.6.19';
     const MAUTIC_MAXIMUM_PHP = '7.0.999';
 
@@ -37,7 +37,7 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
     }
 
     /**
-     * Check Minimum / Maximum PHP versions
+     * Check Minimum / Maximum PHP versions.
      *
      * {@inheritdoc}
      */

@@ -1,25 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Symfony\Component\Form\FormView;
 
 /**
- * Class FormHelper
- *
- * @package Mautic\CoreBundle\Templating\Helper
+ * Class FormHelper.
  */
 class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper
 {
     /**
-     * Render widget if it exists
+     * Render widget if it exists.
      *
      * @param       $form
      * @param       $key
@@ -28,7 +26,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return mixed|string
      */
-    public function widgetIfExists ($form, $key, $template = null, $variables = array())
+    public function widgetIfExists($form, $key, $template = null, $variables = [])
     {
         $content = (isset($form[$key])) ? $this->widget($form[$key], $variables) : '';
 
@@ -40,7 +38,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     }
 
     /**
-     * Render row if it exists
+     * Render row if it exists.
      *
      * @param       $form
      * @param       $key
@@ -49,7 +47,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return mixed|string
      */
-    public function rowIfExists ($form, $key, $template = null, $variables = array())
+    public function rowIfExists($form, $key, $template = null, $variables = [])
     {
         $content = (isset($form[$key])) ? $this->row($form[$key], $variables) : '';
 
@@ -61,7 +59,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     }
 
     /**
-     * Render label if it exists
+     * Render label if it exists.
      *
      * @param       $form
      * @param       $key
@@ -70,7 +68,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
      *
      * @return mixed|string
      */
-    public function labelIfExists ($form, $key, $template = null, $variables = array())
+    public function labelIfExists($form, $key, $template = null, $variables = [])
     {
         $content = (isset($form[$key])) ? $this->label($form[$key], null, $variables) : '';
 
@@ -82,14 +80,15 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     }
 
     /**
-     * Checks to see if the form and its children has an error
+     * Checks to see if the form and its children has an error.
      *
      * @param FormView $form
      * @param array    $exluding
      *
      * @return bool
      */
-    public function containsErrors (FormView $form, array $exluding = array()) {
+    public function containsErrors(FormView $form, array $exluding = [])
+    {
         if (count($form->vars['errors'])) {
             return true;
         }
@@ -99,7 +98,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
             }
 
             if (isset($child->vars['errors']) && count($child->vars['errors'])) {
-               return true;
+                return true;
             }
 
             if (count($child->children)) {
@@ -109,6 +108,7 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
                 }
             }
         }
+
         return false;
     }
 }

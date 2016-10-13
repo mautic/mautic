@@ -1,18 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class PluginIntegrationKeyEvent
+ * Class PluginIntegrationKeyEvent.
  */
 class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
@@ -34,7 +34,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * Get the keys array
+     * Get the keys array.
      */
     public function getKeys()
     {
@@ -42,7 +42,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * Set new keys array
+     * Set new keys array.
      *
      * @param $keys
      */

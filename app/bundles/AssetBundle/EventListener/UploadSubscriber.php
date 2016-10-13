@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -19,9 +19,7 @@ use Oneup\UploaderBundle\UploadEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class UploadSubscriber
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class UploadSubscriber.
  */
 class UploadSubscriber extends CommonSubscriber
 {
@@ -42,26 +40,26 @@ class UploadSubscriber extends CommonSubscriber
 
     /**
      * UploadSubscriber constructor.
-     * 
-     * @param TranslatorInterface $translator
+     *
+     * @param TranslatorInterface  $translator
      * @param CoreParametersHelper $coreParametersHelper
-     * @param AssetModel $assetModel
+     * @param AssetModel           $assetModel
      */
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, AssetModel $assetModel)
     {
-        $this->translator = $translator;
+        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->assetModel = $assetModel;
+        $this->assetModel           = $assetModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
         return [
             UploadEvents::POST_UPLOAD => ['onPostUpload', 0],
-            UploadEvents::VALIDATION  => ['onUploadValidation', 0]
+            UploadEvents::VALIDATION  => ['onUploadValidation', 0],
         ];
     }
 
@@ -71,7 +69,7 @@ class UploadSubscriber extends CommonSubscriber
      *
      * @param PostUploadEvent $event
      */
-    public function onPostUpload (PostUploadEvent $event)
+    public function onPostUpload(PostUploadEvent $event)
     {
         $request   = $event->getRequest()->request;
         $response  = $event->getResponse();
@@ -79,7 +77,7 @@ class UploadSubscriber extends CommonSubscriber
         $file      = $event->getFile();
         $config    = $event->getConfig();
         $uploadDir = $config['storage']['directory'];
-        $tmpDir    = $uploadDir . '/tmp/' . $tempId;
+        $tmpDir    = $uploadDir.'/tmp/'.$tempId;
 
         // Move uploaded file to temporary folder
         $file->move($tmpDir);
@@ -90,11 +88,11 @@ class UploadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Validates file before upload
+     * Validates file before upload.
      *
      * @param ValidationEvent $event
      */
-    public function onUploadValidation (ValidationEvent $event)
+    public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
@@ -104,7 +102,7 @@ class UploadSubscriber extends CommonSubscriber
             if ($file->getSize() > $maxSize) {
                 $message = $this->translator->trans('mautic.asset.asset.error.file.size', [
                     '%fileSize%' => round($file->getSize() / 1048576, 2),
-                    '%maxSize%'  => round($maxSize / 1048576, 2)
+                    '%maxSize%'  => round($maxSize / 1048576, 2),
                 ], 'validators');
                 throw new ValidationException($message);
             }
@@ -112,7 +110,7 @@ class UploadSubscriber extends CommonSubscriber
             if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions))) {
                 $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
                     '%fileExtension%' => $file->getExtension(),
-                    '%extensions%'    => implode(', ', $extensions)
+                    '%extensions%'    => implode(', ', $extensions),
                 ], 'validators');
                 throw new ValidationException($message);
             }

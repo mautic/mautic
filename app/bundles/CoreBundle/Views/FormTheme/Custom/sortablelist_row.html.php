@@ -1,10 +1,10 @@
 <?php
-$list      = $form->children['list'];
-$hasErrors = count($list->vars['errors']);
-$feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
+$list          = $form->children['list'];
+$hasErrors     = count($list->vars['errors']);
+$feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 $datePrototype = (isset($list->vars['prototype'])) ?
     $view->escape('<div class="sortable">'.$view['form']->widget($list->vars['prototype']).'</div>') : '';
-$feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
+$feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 ?>
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="<?php echo $form->vars['id']; ?>" class="form-group col-xs-12 <?php echo $feedbackClass; ?>" id="<?php echo $form->vars['id']; ?>_list" style="overflow:auto">
@@ -14,9 +14,11 @@ $feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
             <?php echo $view['translator']->trans('mautic.core.form.list.additem'); ?>
         </a>
         <?php if ($isSortable): ?>
-        <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
+        <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) {
+    printf('%s="%s" ', $view->escape($k), $view->escape($v));
+}?>>
         <?php endif; ?>
-            <?php foreach ($list->children as $item): ?>
+            <?php foreach ($list->children as $key => $item): ?>
             <?php echo $view['form']->block($item, 'sortablelist_entry_row'); ?>
             <?php endforeach; ?>
         </div>

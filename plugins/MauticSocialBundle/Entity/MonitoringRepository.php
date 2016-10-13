@@ -1,35 +1,35 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MonitoringRepository
+ * Class MonitoringRepository.
  */
 class MonitoringRepository extends CommonRepository
 {
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         return parent::getEntities($args);
     }
 
-    public function getPublishedEntities($args = array())
+    public function getPublishedEntities($args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
@@ -50,7 +50,7 @@ class MonitoringRepository extends CommonRepository
         $q->where($expr);
         $args['qb'] = $q;
 
-        return (parent::getEntities($args)->count());
+        return parent::getEntities($args)->count();
     }
 
     /**
@@ -64,10 +64,10 @@ class MonitoringRepository extends CommonRepository
         return $this->addStandardCatchAllWhereClause(
             $q,
             $filter,
-            array(
+            [
                 $this->getTableAlias().'.title',
-                $this->getTableAlias().'.description'
-            )
+                $this->getTableAlias().'.description',
+            ]
         );
     }
 

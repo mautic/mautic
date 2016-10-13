@@ -1,28 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
-use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
 use Bazinga\OAuthServerBundle\Model\AccessTokenInterface;
+use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class AccessToken
- *
- * @package Mautic\ApiBundle\Entity\oAuth1
+ * Class AccessToken.
  */
 class AccessToken implements AccessTokenInterface
 {
-
     /**
      * @var int
      */
@@ -56,12 +53,12 @@ class AccessToken implements AccessTokenInterface
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth1_access_tokens')
-            ->addIndex(array('token'), 'oauth1_access_token_search');
+            ->addIndex(['token'], 'oauth1_access_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -88,25 +85,25 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getToken ()
+    public function getToken()
     {
         return $this->token;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setToken ($token)
+    public function setToken($token)
     {
         $this->token = $token;
 
@@ -114,17 +111,17 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getSecret ()
+    public function getSecret()
     {
         return $this->secret;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setSecret ($secret)
+    public function setSecret($secret)
     {
         $this->secret = $secret;
 
@@ -132,17 +129,17 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getExpiresAt ()
+    public function getExpiresAt()
     {
         return $this->expiresAt;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setExpiresAt ($expiresAt)
+    public function setExpiresAt($expiresAt)
     {
         $this->expiresAt = $expiresAt;
 
@@ -150,9 +147,9 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getExpiresIn ()
+    public function getExpiresIn()
     {
         if ($this->expiresAt) {
             return $this->expiresAt - time();
@@ -162,9 +159,9 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function hasExpired ()
+    public function hasExpired()
     {
         if ($this->expiresAt) {
             return time() > $this->expiresAt;
@@ -174,17 +171,17 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getUser ()
+    public function getUser()
     {
         return $this->user;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setUser (UserInterface $user)
+    public function setUser(UserInterface $user)
     {
         $this->user = $user;
 
@@ -192,9 +189,9 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setConsumer (ConsumerInterface $consumer)
+    public function setConsumer(ConsumerInterface $consumer)
     {
         $this->consumer = $consumer;
 
@@ -202,9 +199,9 @@ class AccessToken implements AccessTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getConsumer ()
+    public function getConsumer()
     {
         return $this->consumer;
     }

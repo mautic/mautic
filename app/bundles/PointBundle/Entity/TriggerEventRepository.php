@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * TriggerEventRepository
+ * TriggerEventRepository.
  */
 class TriggerEventRepository extends CommonRepository
 {
-
     /**
-     * Get array of published triggers based on point total
+     * Get array of published triggers based on point total.
      *
-     * @param int      $points
+     * @param int $points
      *
      * @return array
      */
@@ -44,7 +43,7 @@ class TriggerEventRepository extends CommonRepository
     }
 
     /**
-     * Get array of published actions based on type
+     * Get array of published actions based on type.
      *
      * @param string $type
      *
@@ -66,6 +65,7 @@ class TriggerEventRepository extends CommonRepository
             ->setParameter('type', $type);
 
         $results = $q->getQuery()->getResult();
+
         return $results;
     }
 
@@ -78,16 +78,16 @@ class TriggerEventRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.*')
-            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_event_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'point_trigger_events', 'e', 'x.event_id = e.id')
-            ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'point_triggers', 't', 'e.trigger_id = t.id');
+            ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'x')
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX.'point_trigger_events', 'e', 'x.event_id = e.id')
+            ->innerJoin('e', MAUTIC_TABLE_PREFIX.'point_triggers', 't', 'e.trigger_id = t.id');
 
         //make sure the published up and down dates are good
         $q->where($q->expr()->eq('x.lead_id', (int) $leadId));
 
         $results = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
 
         foreach ($results as $r) {
             $return[$r['id']] = $r;
@@ -95,7 +95,6 @@ class TriggerEventRepository extends CommonRepository
 
         return $return;
     }
-
 
     /**
      * @param int $eventId
@@ -107,11 +106,11 @@ class TriggerEventRepository extends CommonRepository
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
-            ->where('e.event_id = ' . (int) $eventId)
+            ->where('e.event_id = '.(int) $eventId)
             ->execute()
             ->fetchAll();
 
-        $return = array();
+        $return = [];
 
         foreach ($results as $r) {
             $return[] = $r['lead_id'];

@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
 
 /**
- * Class VariantMigrationTrait
+ * Class VariantMigrationTrait.
  */
 trait VariantMigrationTrait
 {
-
     /**
-     * Add variant parent/child relationship schema
+     * Add variant parent/child relationship schema.
      *
      * @param Schema $schema
      * @param        $tableName

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -14,13 +14,13 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Mautic\LeadBundle\Entity\LeadField;
 
 /**
- * Class LeadFieldData
+ * Class LeadFieldData.
  */
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -42,58 +42,78 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $fields       = FieldModel::$coreFields;
+        $fieldGroups['lead']    = FieldModel::$coreFields;
+        $fieldGroups['company'] = FieldModel::$coreCompanyFields;
+
         $translator   = $this->container->get('translator');
         $indexesToAdd = [];
-
-        /** @var ColumnSchemaHelper $leadsSchema */
-        $leadsSchema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
-
-        $order = 1;
-        foreach ($fields as $alias => $field) {
-            $type = isset($field['type']) ? $field['type'] : 'text';
-
-            $entity = new LeadField();
-            $entity->setLabel($translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
-            $entity->setGroup(isset($field['group']) ? $field['group'] : 'core');
-            $entity->setOrder($order);
-            $entity->setAlias($alias);
-            $entity->setType($type);
-            $entity->setIsUniqueIdentifer(!empty($field['unique']));
-            $entity->setProperties(isset($field['properties']) ? $field['properties'] : []);
-            $entity->setIsFixed(!empty($field['fixed']));
-            $entity->setIsListable(!empty($field['listable']));
-            $entity->setIsShortVisible(!empty($field['short']));
-
-            $manager->persist($entity);
-            $manager->flush();
-
-            //add the column to the leads table
-            $leadsSchema->addColumn(
-                FieldModel::getSchemaDefinition($alias, $type, $entity->getIsUniqueIdentifier())
-            );
-
-            $indexesToAdd[] = $alias;
-
-            $this->addReference('leadfield-'.$alias, $entity);
-            $order++;
-        }
-
-        $leadsSchema->executeChanges();
-
-        /** @var IndexSchemaHelper $indexHelper */
-        $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
-
-        foreach ($indexesToAdd as $name) {
-            $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
-            if ('textarea' != $type) {
-                $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search');
+        foreach ($fieldGroups as $object => $fields) {
+            if ($object == 'company') {
+                /** @var ColumnSchemaHelper $companiesSchema */
+                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
+            } else {
+                /** @var ColumnSchemaHelper $companiesSchema */
+                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
             }
+
+            $order = 1;
+            foreach ($fields as $alias => $field) {
+                $type = isset($field['type']) ? $field['type'] : 'text';
+
+                $entity = new LeadField();
+                $entity->setLabel($translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
+                $entity->setGroup(isset($field['group']) ? $field['group'] : 'core');
+                $entity->setOrder($order);
+                $entity->setAlias($alias);
+                $entity->setIsRequired(isset($field['required']) ? $field['required'] : false);
+                $entity->setType($type);
+                $entity->setObject($field['object']);
+                $entity->setIsUniqueIdentifer(!empty($field['unique']));
+                $entity->setProperties(isset($field['properties']) ? $field['properties'] : []);
+                $entity->setIsFixed(!empty($field['fixed']));
+                $entity->setIsListable(!empty($field['listable']));
+                $entity->setIsShortVisible(!empty($field['short']));
+
+                $manager->persist($entity);
+                $manager->flush();
+
+                $schema->addColumn(
+                    FieldModel::getSchemaDefinition($alias, $type, $entity->getIsUniqueIdentifier())
+                );
+                $indexesToAdd[$object][] = $alias;
+
+                $this->addReference('leadfield-'.$alias, $entity);
+                ++$order;
+            }
+
+            $schema->executeChanges();
         }
 
-        // Add an attribution index
-        $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'_contact_attribution');
-        $indexHelper->executeChanges();
+        foreach ($indexesToAdd as $object => $indexes) {
+            if ($object == 'company') {
+                /** @var IndexSchemaHelper $indexHelper */
+                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'companies');
+            } else {
+                /** @var IndexSchemaHelper $indexHelper */
+                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
+            }
+
+            foreach ($indexes as $name) {
+                $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
+                if ('textarea' != $type) {
+                    $indexHelper->addIndex([$name], $name.'_search');
+                }
+            }
+            if ($object == 'lead') {
+                // Add an attribution index
+                $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
+            } else {
+                $indexHelper->addIndex(['companyname', 'companyemail'], 'company_filter');
+                $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
+            }
+
+            $indexHelper->executeChanges();
+        }
     }
 
     /**

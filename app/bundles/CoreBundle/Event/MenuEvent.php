@@ -1,23 +1,22 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class MenuEvent
+ * Class MenuEvent.
  */
 class MenuEvent extends Event
 {
-
     /**
      * @var array
      */
@@ -29,7 +28,7 @@ class MenuEvent extends Event
     protected $type;
 
     /**
-     * Menu helper
+     * Menu helper.
      *
      * @var MenuHelper
      */
@@ -56,11 +55,9 @@ class MenuEvent extends Event
     }
 
     /**
-     * Add items to the menu
+     * Add items to the menu.
      *
      * @param array $menuItems
-     *
-     * @return void
      */
     public function addMenuItems(array $menuItems)
     {
@@ -87,7 +84,7 @@ class MenuEvent extends Event
     }
 
     /**
-     * Return the menu items
+     * Return the menu items.
      *
      * @return array
      */
@@ -107,5 +104,4 @@ class MenuEvent extends Event
     {
         return $this->type;
     }
-
 }

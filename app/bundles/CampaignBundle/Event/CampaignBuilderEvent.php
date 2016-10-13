@@ -1,22 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * Class CampaignBuilderEvent
- *
- * @package Mautic\CampaignBundle\Event
+ * Class CampaignBuilderEvent.
  */
 class CampaignBuilderEvent extends Event
 {
@@ -55,16 +53,16 @@ class CampaignBuilderEvent extends Event
      *
      * @param string $key      a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $decision can contain the following keys:
-     *               $decision = [
-     *                  'label'              => (required) what to display in the list
-     *                  'eventName'          => (required) The event name to fire when this event is triggered.
-     *                  'description'        => (optional) short description of event
-     *                  'formType'           => (optional) name of the form type SERVICE for the action
-     *                  'formTypeOptions'    => (optional) array of options to pass to the formType service
-     *                  'formTheme'          => (optional) form theme
-     *                  'associatedActions'  => (optional) Array of action types to limit what this decision can be associated with
-     *                  'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
-     *               ]
+     *                         $decision = [
+     *                         'label'              => (required) what to display in the list
+     *                         'eventName'          => (required) The event name to fire when this event is triggered.
+     *                         'description'        => (optional) short description of event
+     *                         'formType'           => (optional) name of the form type SERVICE for the action
+     *                         'formTypeOptions'    => (optional) array of options to pass to the formType service
+     *                         'formTheme'          => (optional) form theme
+     *                         'associatedActions'  => (optional) Array of action types to limit what this decision can be associated with
+     *                         'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     *                         ]
      */
     public function addDecision($key, array $decision)
     {
@@ -79,14 +77,14 @@ class CampaignBuilderEvent extends Event
             ['callback']
         );
 
-        $action['label']       = $this->translator->trans($decision['label']);
-        $action['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
+        $decision['label']       = $this->translator->trans($decision['label']);
+        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
 
         $this->decisions[$key] = $decision;
     }
 
     /**
-     * Get decisions
+     * Get decisions.
      *
      * @return mixed
      */
@@ -136,14 +134,14 @@ class CampaignBuilderEvent extends Event
      *
      * @param string $key       a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $condition can contain the following keys:
-     *               $condition = [
-     *                   'label'           => (required) what to display in the list
-     *                   'eventName'       => (required) The event name to fire when this event is triggered.
-     *                   'description'     => (optional) short description of event
-     *                   'formType'        => (optional) name of the form type SERVICE for the action
-     *                   'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                   'formTheme'       => (optional) form theme
-     *               ]
+     *                          $condition = [
+     *                          'label'           => (required) what to display in the list
+     *                          'eventName'       => (required) The event name to fire when this event is triggered.
+     *                          'description'     => (optional) short description of event
+     *                          'formType'        => (optional) name of the form type SERVICE for the action
+     *                          'formTypeOptions' => (optional) array of options to pass to the formType service
+     *                          'formTheme'       => (optional) form theme
+     *                          ]
      */
     public function addCondition($key, array $event)
     {
@@ -165,7 +163,7 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get lead conditions
+     * Get lead conditions.
      *
      * @return array
      */
@@ -213,19 +211,19 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an action to the list of available .
      *
-     * @param string $key       a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $action    can contain the following keys:
-     *               $action = [
-     *                   'label'               => (required) what to display in the list
-     *                   'eventName'           => (required) The event to fire when this event is triggered.
-     *                   'description'         => (optional) short description of event
-     *                   'formType'            => (optional) name of the form type SERVICE for the action
-     *                   'formTypeOptions'     => (optional) array of options to pass to the formType service
-     *                   'formTheme'           => (optional) form theme
-     *                   'timelineTemplate'    => (optional) custom template for the lead timeline
-     *                   'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
-     *                   'anchorRestrictions'  => (optional) Array of event anchors this event should not be allowed to connect to
-     *               ]
+     * @param string $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $action can contain the following keys:
+     *                       $action = [
+     *                       'label'               => (required) what to display in the list
+     *                       'eventName'           => (required) The event to fire when this event is triggered.
+     *                       'description'         => (optional) short description of event
+     *                       'formType'            => (optional) name of the form type SERVICE for the action
+     *                       'formTypeOptions'     => (optional) array of options to pass to the formType service
+     *                       'formTheme'           => (optional) form theme
+     *                       'timelineTemplate'    => (optional) custom template for the lead timeline
+     *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
+     *                       'anchorRestrictions'  => (optional) Array of event anchors this event should not be allowed to connect to
+     *                       ]
      */
     public function addAction($key, array $action)
     {
@@ -248,7 +246,7 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get actions
+     * Get actions.
      *
      * @return array
      */

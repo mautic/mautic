@@ -1,13 +1,12 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Model\EventModel;
@@ -39,9 +38,9 @@ class DynamicContentHelper
     /**
      * DynamicContentHelper constructor.
      *
-     * @param DynamicContentModel           $dynamicContentModel
-     * @param EventModel                    $campaignEventModel
-     * @param EventDispatcherInterface      $dispatcher
+     * @param DynamicContentModel      $dynamicContentModel
+     * @param EventModel               $campaignEventModel
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, EventDispatcherInterface $dispatcher)
     {
@@ -58,7 +57,7 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
-        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.' . $slot);
+        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.'.$slot);
         $content  = '';
 
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
@@ -92,8 +91,8 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string $content
-     * @param Lead|array   $lead
+     * @param string     $content
+     * @param Lead|array $lead
      *
      * @return string Content with the {content} tokens replaced with dynamic content
      */
@@ -103,7 +102,7 @@ class DynamicContentHelper
         preg_match_all('/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
-            $slot = $match[2];
+            $slot           = $match[2];
             $defaultContent = $match[3];
 
             $dwcContent = $this->getDynamicContentForLead($slot, $lead);

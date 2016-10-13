@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -16,13 +16,10 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Class SocialMediaKeysType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class SocialMediaKeysType.
  */
 class KeysType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -50,7 +47,7 @@ class KeysType extends AbstractType
                                 $context->buildViolation('mautic.core.value.required')->addViolation();
                             }
                         }
-                    )
+                    ),
                 ] : [];
 
             $type = ($isSecret) ? 'password' : 'text';
@@ -59,15 +56,15 @@ class KeysType extends AbstractType
                 $key,
                 $type,
                 [
-                    'label'          => $label,
-                    'label_attr'     => ['class' => 'control-label'],
-                    'attr'           => [
+                    'label'      => $label,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'       => 'form-control',
-                        'placeholder' => ($type == 'password') ? '**************' : ''
+                        'placeholder' => ($type == 'password') ? '**************' : '',
                     ],
                     'required'       => $required,
                     'constraints'    => $constraints,
-                    'error_bubbling' => false
+                    'error_bubbling' => false,
                 ]
             );
         }
@@ -89,6 +86,6 @@ class KeysType extends AbstractType
      */
     public function getName()
     {
-        return "integration_keys";
+        return 'integration_keys';
     }
 }

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -14,13 +14,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ListChangeEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class ListChangeEvent.
  */
 class ListChangeEvent extends Event
 {
-
     private $lead;
     private $leads;
     private $list;
@@ -37,12 +34,12 @@ class ListChangeEvent extends Event
         } else {
             $this->lead = $leads;
         }
-        $this->list   = $list;
-        $this->added  = $added;
+        $this->list  = $list;
+        $this->added = $added;
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -52,7 +49,7 @@ class ListChangeEvent extends Event
     }
 
     /**
-     * Returns batch array of leads
+     * Returns batch array of leads.
      *
      * @return array
      */
@@ -66,7 +63,7 @@ class ListChangeEvent extends Event
      */
     public function getList()
     {
-       return $this->list;
+        return $this->list;
     }
 
     /**

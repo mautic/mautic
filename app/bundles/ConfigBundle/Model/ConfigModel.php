@@ -1,22 +1,21 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\ConfigBundle\Model;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
- * Class ConfigModel
+ * Class ConfigModel.
  */
 class ConfigModel extends AbstractCommonModel
 {
-
     /**
      * {@inheritdoc}
      */
@@ -26,16 +25,17 @@ class ConfigModel extends AbstractCommonModel
     }
 
     /**
-     * Creates the appropriate form per the model
+     * Creates the appropriate form per the model.
      *
      * @param array                                        $data
      * @param \Symfony\Component\Form\FormFactoryInterface $formFactory
      * @param array                                        $options
      *
      * @return \Symfony\Component\Form\Form
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($data, $formFactory, $options = array())
+    public function createForm($data, $formFactory, $options = [])
     {
         return $formFactory->create('config', $data, $options);
     }

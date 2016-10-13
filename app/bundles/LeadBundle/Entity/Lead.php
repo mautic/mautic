@@ -22,8 +22,10 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class Lead.
  */
-class Lead extends FormEntity
+class Lead extends FormEntity implements CustomFieldEntityInterface
 {
+    use CustomFieldEntityTrait;
+
     /**
      * Used to determine social identity.
      *
@@ -50,6 +52,11 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $pointsChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $companyChangeLog;
 
     /**
      * @var ArrayCollection
@@ -82,13 +89,6 @@ class Lead extends FormEntity
     private $socialCache = [];
 
     /**
-     * Just a place to store updated field values so we don't have to loop through them again comparing.
-     *
-     * @var array
-     */
-    private $updatedFields = [];
-
-    /**
      * Used to populate trigger color.
      *
      * @var string
@@ -111,13 +111,6 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $notes;
-
-    /**
-     * Used by Mautic to populate the fields pulled from the DB.
-     *
-     * @var array
-     */
-    protected $fields = [];
 
     /**
      * @var string
@@ -165,23 +158,14 @@ class Lead extends FormEntity
      */
     public function __construct()
     {
-        $this->ipAddresses     = new ArrayCollection();
-        $this->pushIds         = new ArrayCollection();
-        $this->doNotContact    = new ArrayCollection();
-        $this->pointsChangeLog = new ArrayCollection();
-        $this->tags            = new ArrayCollection();
-        $this->stageChangeLog  = new ArrayCollection();
-        $this->frequencyRules  = new ArrayCollection();
-    }
-
-    /**
-     * @param $name
-     *
-     * @return bool
-     */
-    public function __get($name)
-    {
-        return $this->getFieldValue(strtolower($name));
+        $this->ipAddresses      = new ArrayCollection();
+        $this->pushIds          = new ArrayCollection();
+        $this->doNotContact     = new ArrayCollection();
+        $this->pointsChangeLog  = new ArrayCollection();
+        $this->tags             = new ArrayCollection();
+        $this->stageChangeLog   = new ArrayCollection();
+        $this->frequencyRules   = new ArrayCollection();
+        $this->companyChangeLog = new ArrayCollection();
     }
 
     /**
@@ -212,6 +196,14 @@ class Lead extends FormEntity
             ->build();
 
         $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(['dateAdded' => 'DESC'])
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('companyChangeLog', 'CompanyChangeLog')
             ->orphanRemoval()
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
@@ -468,6 +460,16 @@ class Lead extends FormEntity
     }
 
     /**
+     * Returns the user to be used for permissions.
+     *
+     * @return User|int
+     */
+    public function getPermissionUser()
+    {
+        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+    }
+
+    /**
      * Add ipAddress.
      *
      * @param IpAddress $ipAddress
@@ -596,35 +598,6 @@ class Lead extends FormEntity
         }
 
         return '';
-    }
-
-    /**
-     * Get lead field value.
-     *
-     * @param      $field
-     * @param null $group
-     *
-     * @return bool
-     */
-    public function getFieldValue($field, $group = null)
-    {
-        if (isset($this->updatedFields[$field])) {
-            return $this->updatedFields[$field];
-        }
-
-        if (!empty($group) && isset($this->fields[$group][$field])) {
-            return $this->fields[$group][$field]['value'];
-        }
-
-        foreach ($this->fields as $group => $groupFields) {
-            foreach ($groupFields as $name => $details) {
-                if ($name == $field) {
-                    return $details['value'];
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -787,16 +760,15 @@ class Lead extends FormEntity
     /**
      * Creates a points change entry.
      *
-     * @param           $type
-     * @param           $name
-     * @param           $action
-     * @param           $pointsDelta
-     * @param IpAddress $ip
+     * @param $stage
+     * @param $name
+     * @param $action
      */
-    public function stageChangeLogEntry($type, $name, $action)
+    public function stageChangeLogEntry($stage, $name, $action)
     {
         //create a new points change event
         $event = new StagesChangeLog();
+        $event->setStage($stage);
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());
@@ -805,9 +777,9 @@ class Lead extends FormEntity
     }
 
     /**
-     * Add pointsChangeLog.
+     * Add StagesChangeLog.
      *
-     * @param PointsChangeLog $pointsChangeLog
+     * @param StagesChangeLog $stageChangeLog
      *
      * @return Lead
      */
@@ -836,6 +808,44 @@ class Lead extends FormEntity
     public function getPointsChangeLog()
     {
         return $this->pointsChangeLog;
+    }
+
+    /**
+     * @param      $type
+     * @param      $name
+     * @param      $action
+     * @param null $company
+     */
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    {
+        if (!$company) {
+            // No need to record a null delta
+            return;
+        }
+
+        // Create a new company change event
+        $event = new CompanyChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setCompany($company);
+        $event->setLead($this);
+        $this->addCompanyChangeLog($event);
+    }
+
+    /**
+     * Add Company ChangeLog.
+     *
+     * @param CompanyChangeLog $companyChangeLog
+     *
+     * @return Lead
+     */
+    public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
+    {
+        $this->companyChangeLog[] = $companyChangeLog;
+
+        return $this;
     }
 
     /**
@@ -984,87 +994,6 @@ class Lead extends FormEntity
     public function getSocialCache()
     {
         return $this->socialCache;
-    }
-
-    /**
-     * @param $fields
-     */
-    public function setFields($fields)
-    {
-        $this->fields = $fields;
-    }
-
-    /**
-     * @param bool $ungroup
-     *
-     * @return array
-     */
-    public function getFields($ungroup = false)
-    {
-        if ($ungroup && isset($this->fields['core'])) {
-            $return = [];
-            foreach ($this->fields as $group => $fields) {
-                $return += $fields;
-            }
-
-            return $return;
-        }
-
-        return $this->fields;
-    }
-
-    /**
-     * Get profile values.
-     *
-     * @return array
-     */
-    public function getProfileFields()
-    {
-        $fieldValues = [
-            'id' => $this->id,
-        ];
-        if (isset($this->fields['core'])) {
-            foreach ($this->fields as $group => $fields) {
-                foreach ($fields as $alias => $field) {
-                    $fieldValues[$alias] = $field['value'];
-                }
-            }
-        }
-
-        return array_merge($fieldValues, $this->updatedFields);
-    }
-
-    /**
-     * Add an updated field to persist to the DB and to note changes.
-     *
-     * @param        $alias
-     * @param        $value
-     * @param string $oldValue
-     */
-    public function addUpdatedField($alias, $value, $oldValue = '')
-    {
-        if ($this->wasAnonymous == null) {
-            $this->wasAnonymous = $this->isAnonymous();
-        }
-
-        $value = trim($value);
-        if ($value == '') {
-            // Ensure value is null for consistency
-            $value = null;
-        }
-
-        $this->changes['fields'][$alias] = [$oldValue, $value];
-        $this->updatedFields[$alias]     = $value;
-    }
-
-    /**
-     * Get the array of updated fields.
-     *
-     * @return array
-     */
-    public function getUpdatedFields()
-    {
-        return $this->updatedFields;
     }
 
     /**
@@ -1258,7 +1187,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * Get tags.
+     * Get utm tags.
      *
      * @return mixed
      */
@@ -1268,9 +1197,9 @@ class Lead extends FormEntity
     }
 
     /**
-     * Set tags.
+     * Set utm tags.
      *
-     * @param $tags
+     * @param $utmTags
      *
      * @return $this
      */
@@ -1334,7 +1263,7 @@ class Lead extends FormEntity
     /**
      * Remove frequencyRule.
      *
-     * @param Tag $tag
+     * @param FrequencyRule $frequencyRule
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {

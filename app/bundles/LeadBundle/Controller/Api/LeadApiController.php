@@ -29,7 +29,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = ['leadDetails', 'userList', 'publishDetails', 'ipAddress'];
+        $this->serializerGroups = ['leadDetails', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
     }
 
     /**
@@ -51,7 +51,7 @@ class LeadApiController extends CommonApiController
 
         if (count($uniqueLeadFieldData)) {
             if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
+                $existingLeads = $this->get('doctrine.orm.entity_manager')->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
 
                 if (!empty($existingLeads)) {
                     // Lead found so edit rather than create a new one
@@ -92,7 +92,7 @@ class LeadApiController extends CommonApiController
      */
     public function getOwnersAction()
     {
-        if (!$this->factory->getSecurity()->isGranted(
+        if (!$this->get('mautic.security')->isGranted(
             ['lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'],
             'MATCH_ONE'
         )
@@ -118,7 +118,7 @@ class LeadApiController extends CommonApiController
      */
     public function getFieldsAction()
     {
-        if (!$this->factory->getSecurity()->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
+        if (!$this->get('mautic.security')->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -154,14 +154,14 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
             $results = $this->getModel('lead.note')->getEntities(
                 [
                     'start'  => $this->request->query->get('start', 0),
-                    'limit'  => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+                    'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
                     'filter' => [
                         'string' => $this->request->query->get('search', ''),
                         'force'  => [
@@ -207,7 +207,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -247,7 +247,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -309,6 +309,11 @@ class LeadApiController extends CommonApiController
         if (isset($parameters['tags'])) {
             $this->model->modifyTags($entity, $parameters['tags']);
             unset($parameters['tags']);
+        }
+
+        if (isset($parameters['companies'])) {
+            $this->model->modifyCompanies($entity, $parameters['companies']);
+            unset($parameters['companies']);
         }
 
         // Check for lastActive date

@@ -1,32 +1,30 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Core\Exception as Exception;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class DefaultController
+ * Class DefaultController.
  */
 class SecurityController extends CommonController
 {
-
     /**
      * {@inheritdoc}
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
         $authChecker = $this->get('security.authorization_checker');
@@ -35,7 +33,6 @@ class SecurityController extends CommonController
         if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
             $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
-
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
             $event->setController(function () use ($redirectUrl) {
                 return new RedirectResponse($redirectUrl);
@@ -44,11 +41,11 @@ class SecurityController extends CommonController
     }
 
     /**
-     * Generates login form and processes login
+     * Generates login form and processes login.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction ()
+    public function loginAction()
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -57,17 +54,18 @@ class SecurityController extends CommonController
             if ($step == 'clearCache') {
                 // Run migrations
                 $this->request->query->set('finalize', 1);
+
                 return $this->forward('MauticCoreBundle:Ajax:updateDatabaseMigration',
-                    array(
-                        'request'  => $this->request
-                    )
+                    [
+                        'request' => $this->request,
+                    ]
                 );
             } elseif ($step == 'schemaMigration') {
                 // Done so finalize
                 return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
-                    array(
-                        'request'  => $this->request
-                    )
+                    [
+                        'request' => $this->request,
+                    ]
                 );
             }
 
@@ -95,39 +93,38 @@ class SecurityController extends CommonController
                 $msg = $error->getMessage();
             }
 
-            $this->addFlash($msg, array(), 'error', null, false);
+            $this->addFlash($msg, [], 'error', null, false);
         }
         $this->request->query->set('tmpl', 'login');
 
         // Get a list of SSO integrations
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
-        $integrations = $integrationHelper->getIntegrationObjects(null, array('sso_service'), true, null, true);
+        $integrations      = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
+        return $this->delegateView([
+            'viewParameters' => [
                 'last_username' => $session->get(Security::LAST_USERNAME),
-                'integrations'  => $integrations
-            ),
+                'integrations'  => $integrations,
+            ],
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
-            'passthroughVars' => array(
+            'passthroughVars' => [
                 'route'          => $this->generateUrl('login'),
                 'mauticContent'  => 'user',
-                'sessionExpired' => true
-            )
-        ));
+                'sessionExpired' => true,
+            ],
+        ]);
     }
 
     /**
-     * Do nothing
+     * Do nothing.
      */
     public function loginCheckAction()
     {
-
     }
 
     /**
-     * The plugin should be handling this in it's listener
+     * The plugin should be handling this in it's listener.
      *
      * @param $integration
      *
@@ -135,12 +132,11 @@ class SecurityController extends CommonController
      */
     public function ssoLoginAction($integration)
     {
-
         return new RedirectResponse($this->generateUrl('login'));
     }
 
     /**
-     * The plugin should be handling this in it's listener
+     * The plugin should be handling this in it's listener.
      *
      * @param $integration
      *

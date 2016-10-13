@@ -1,22 +1,20 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\WidgetFormEvent;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class AjaxController
+ * Class AjaxController.
  */
 class AjaxController extends CommonAjaxController
 {
@@ -29,10 +27,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function viewingVisitorsAction(Request $request)
     {
-        $dataArray  = array('success' => 0);
+        $dataArray = ['success' => 0];
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
-        $pageRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $pageRepository               = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPageBundle:Hit');
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
@@ -44,22 +42,23 @@ class AjaxController extends CommonAjaxController
      * Returns HTML of a new widget based on its values.
      *
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateWidgetFormAction(Request $request)
     {
-        $data = $request->request->get('widget');
-        $dataArray = array('success' => 0);
+        $data      = $request->request->get('widget');
+        $dataArray = ['success' => 0];
 
         // Clear params if type is not selected
         if (empty($data['type'])) {
             unset($data['params']);
         }
 
-        $widget = new Widget();
-        $form = $this->get('form.factory')->create('widget', $widget);
-        $formHtml = $this->render("MauticDashboardBundle::Widget\\form.html.php",
-            array('form' => $form->bind($data)->createView())
+        $widget   = new Widget();
+        $form     = $this->get('form.factory')->create('widget', $widget);
+        $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.php',
+            ['form' => $form->bind($data)->createView()]
         )->getContent();
 
         $dataArray['formHtml'] = $formHtml;
@@ -72,20 +71,21 @@ class AjaxController extends CommonAjaxController
      * Saves the new ordering of dashboard widgets.
      *
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateWidgetOrderingAction(Request $request)
     {
         $data = $request->request->get('ordering');
         $repo = $this->getModel('dashboard')->getRepository();
-        $repo->updateOrdering(array_flip($data), $this->factory->getUser()->getId());
-        $dataArray = array('success' => 1);
+        $repo->updateOrdering(array_flip($data), $this->user->getId());
+        $dataArray = ['success' => 1];
 
         return $this->sendJsonResponse($dataArray);
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
      * @param Request $request
      *
@@ -93,11 +93,11 @@ class AjaxController extends CommonAjaxController
      */
     public function deleteAction(Request $request)
     {
-        $objectId = $request->request->get('widget');
-        $dataArray = array('success' => 0);
+        $objectId  = $request->request->get('widget');
+        $dataArray = ['success' => 0];
 
         // @todo: build permissions
-        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
+        // if (!$this->get('mautic.security')->isGranted('dashobard:widgets:delete')) {
         //     return $this->accessDenied();
         // }
 
@@ -106,7 +106,7 @@ class AjaxController extends CommonAjaxController
         $entity = $model->getEntity($objectId);
         if ($entity) {
             $model->deleteEntity($entity);
-            $name = $entity->getName();
+            $name                 = $entity->getName();
             $dataArray['success'] = 1;
         }
 

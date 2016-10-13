@@ -417,7 +417,7 @@ class AssetModel extends FormModel
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->user);
+                $repo->setCurrentUser($this->userHelper->getUser());
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
@@ -529,7 +529,7 @@ class AssetModel extends FormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
@@ -560,10 +560,10 @@ class AssetModel extends FormModel
         if (!$canViewOthers) {
             $allQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
             $uniqueQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $all    = $query->fetchCount($allQ);
@@ -599,7 +599,7 @@ class AssetModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -631,7 +631,7 @@ class AssetModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

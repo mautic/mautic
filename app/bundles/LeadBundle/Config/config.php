@@ -11,6 +11,21 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_plugin_timeline_index' => [
+                'path'         => '/plugin/{integration}/timeline/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginIndex',
+                'requirements' => [
+                    'integration' => '.+',
+                ],
+            ],
+            'mautic_plugin_timeline_view' => [
+                'path'         => '/plugin/{integration}/timeline/view/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginView',
+                'requirements' => [
+                    'integration' => '.+',
+                    'leadId'      => '\d+',
+                ],
+            ],
             'mautic_contact_emailtoken_index' => [
                 'path'       => '/contacts/emailtokens/{page}',
                 'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index',
@@ -62,6 +77,14 @@ return [
             'mautic_contact_action' => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute',
+            ],
+            'mautic_company_index' => [
+                'path'       => '/companies/{page}',
+                'controller' => 'MauticLeadBundle:Company:index',
+            ],
+            'mautic_company_action' => [
+                'path'       => '/companies/{objectAction}/{objectId}',
+                'controller' => 'MauticLeadBundle:Company:execute',
             ],
         ],
         'api' => [
@@ -144,6 +167,12 @@ return [
                     'route'     => 'mautic_contact_index',
                     'priority'  => 80,
                 ],
+                'mautic.companies.menu.index' => [
+                    'route'     => 'mautic_company_index',
+                    'iconClass' => 'fa-building-o',
+                    'access'    => ['lead:leads:viewother'],
+                    'priority'  => 75,
+                ],
                 'mautic.lead.list.menu.index' => [
                     'iconClass' => 'fa-pie-chart',
                     'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
@@ -169,7 +198,17 @@ return [
             'mautic.lead.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory'],
+                ],
+            ],
+            'mautic.lead.subscriber.company' => [
+                'class'     => 'Mautic\LeadBundle\EventListener\CompanySubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
@@ -182,7 +221,6 @@ return [
             'mautic.lead.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
@@ -191,7 +229,6 @@ return [
             'mautic.lead.reportbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\ReportSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.lead.model.list',
                     'mautic.lead.model.field',
                     'mautic.lead.model.lead',
@@ -207,18 +244,24 @@ return [
                 'class' => 'Mautic\LeadBundle\EventListener\PointSubscriber',
             ],
             'mautic.lead.search.subscriber' => [
-                'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\LeadBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.webhook.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber',
             ],
             'mautic.lead.dashboard.subscriber' => [
-                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',
+                'class'     => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                ],
             ],
             'mautic.lead.maintenance.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'doctrine.dbal.default_connection',
                 ],
             ],
@@ -226,7 +269,7 @@ return [
         'forms' => [
             'mautic.form.type.lead' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'mautic.lead.model.company'],
                 'alias'     => 'lead',
             ],
             'mautic.form.type.leadlist' => [
@@ -358,6 +401,27 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_dashboard_leads_lifetime_widget',
             ],
+            'mautic.company.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
+                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security'],
+                'alias'     => 'company',
+            ],
+            'mautic.company.campaign.action.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
+                'arguments' => 'router',
+                'alias'     => 'addtocompany_action',
+            ],
+            'mautic.company.list.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
+                'arguments' => [
+                    'mautic.lead.model.company',
+                    'mautic.helper.user',
+                    'translator',
+                    'router',
+                    'database_connection',
+                ],
+                'alias' => 'company_list',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
@@ -397,6 +461,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
                     'form.factory',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -413,6 +478,13 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
+            ],
+            'mautic.lead.model.company' => [
+                'class'     => 'Mautic\LeadBundle\Model\CompanyModel',
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'session',
+                ],
             ],
         ],
     ],

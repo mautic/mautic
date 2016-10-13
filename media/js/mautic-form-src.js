@@ -277,7 +277,44 @@
             if (showPageBreak) {
                 showPageBreak.style.display = 'block';
             }
-        },
+        };
+
+        Form.getPageForField = function (formId, fieldId, switchPage) {
+            if (typeof switchPage === 'undefined') {
+                switchPage = true;
+            }
+            var containerId = Form.getFieldContainerId(formId, fieldId);
+
+            // If within a page break - go back to the page that includes this field
+            var pageBreak = pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
+            if (pageBreak) {
+                var page = pageBreak.getAttribute('data-mautic-form-page');
+                if (switchPage) {
+                    Form.switchPage(document.getElementById('mauticform_' + formId), page);
+                }
+
+                return page;
+            }
+        };
+
+        Form.findAncestor = function (el, cls) {
+            var ancestor = false;
+            while (true) {
+                var parent = el.parentElement
+                if (!parent || Form.hasClass(parent, 'mauticform-innerform')) {
+                    break;
+                } else if (Form.hasClass(parent, cls)) {
+                    ancestor = parent;
+                    break;
+                }
+            }
+
+            return ancestor;
+        };
+
+        Form.hasClass = function (el, cls) {
+            return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
+        };
 
         Form.validator = function(formId) {
             var validator = {
@@ -287,6 +324,7 @@
                     }
 
                     var formValid = Form.customCallbackHandler(formId, 'onValidate');
+                    var firstInvalidField = false;
 
                     // If true, then a callback handled it
                     if (formValid === null) {
@@ -311,6 +349,7 @@
                         for (var fieldKey in MauticFormValidations[formId]) {
                             if (!validator.validateField(theForm, fieldKey)) {
                                 formValid = false;
+                                firstInvalidField = fieldKey;
                             }
                         }
 
@@ -324,6 +363,8 @@
                     if (formValid && submitForm) {
                         theForm.submit();
                     } else {
+                        Form.getPageForField(formId, firstInvalidField);
+
                         // Otherwise enable submit button after response is received
                         validator.enableSubmitButton();
                     }
@@ -366,10 +407,7 @@
                             }
                         }
 
-                        var containerId = 'mauticform_' + formId + '_' + fieldKey;
-                        if (!document.getElementById(containerId)) {
-                            containerId = 'mauticform_' + fieldKey;
-                        }
+                        var containerId = Form.getFieldContainerId(formId, fieldKey);
 
                         if (!valid) {
                             validator.markError(containerId, valid);
@@ -486,8 +524,22 @@
                         } else if (response.redirect) {
                             window.location = response.redirect;
                         } else if (response.validationErrors) {
+                            var firstPage = false;
                             for (var field in response.validationErrors) {
+                                var elPage = Form.getPageForField(formId, field, false);
+                                if (elPage) {
+                                    elPage = parseInt(elPage);
+                                    if (firstPage) {
+                                        firstPage = (firstPage < elPage) ? firstPage : elPage;
+                                    } else {
+                                        firstPage = elPage;
+                                    }
+                                }
                                 this.markError('mauticform_' + formId + '_' + field, false, response.validationErrors[field]);
+                            }
+
+                            if (firstPage) {
+                                Form.switchPage(document.getElementById('mauticform_' + formId), firstPage);
                             }
                         } else if (response.errorMessage) {
                             this.setMessage(response.errorMessage, 'error');
@@ -579,6 +631,15 @@
             }, false);
 
             if (Core.debug()) console.log('Messenger listener started.');
+        };
+
+        Form.getFieldContainerId = function(formId, fieldKey) {
+            var containerId = 'mauticform_' + formId + '_' + fieldKey;
+            if (!document.getElementById(containerId)) {
+                containerId = 'mauticform_' + fieldKey;
+            }
+
+            return containerId;
         };
 
         Core.getValidator = function(formId) {

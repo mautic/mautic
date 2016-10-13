@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
@@ -20,13 +20,10 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class SortableListType
- *
- * @deprecated Use DynamicListType instead
+ * Class SortableListType.
  */
 class SortableListType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -36,9 +33,9 @@ class SortableListType extends AbstractType
             new Count(
                 [
                     'minMessage' => 'mautic.form.lists.count',
-                    'min'        => 1
+                    'min'        => 1,
                 ]
-            )
+            ),
         ] : [];
 
         if ($options['constraint_callback'] instanceof Callback) {
@@ -50,31 +47,31 @@ class SortableListType extends AbstractType
                 'list',
                 'collection',
                 [
-                    'label'          => false,
-                    'entry_type'     => ($options['with_labels']) ? SortableValueLabelListType::class : 'text',
-                    'options'        => [
-                        'label'          => false,
-                        'required'       => false,
-                        'attr'           => [
+                    'label'      => false,
+                    'entry_type' => ($options['with_labels']) ? SortableValueLabelListType::class : 'text',
+                    'options'    => [
+                        'label'    => false,
+                        'required' => false,
+                        'attr'     => [
                             'class'         => 'form-control',
                             'preaddon'      => $options['remove_icon'],
                             'preaddon_attr' => [
-                                'onclick' => $options['remove_onclick']
+                                'onclick' => $options['remove_onclick'],
                             ],
-                            'postaddon'     => $options['sortable']
+                            'postaddon' => $options['sortable'],
                         ],
-                        'constraints'    => ($options['option_notblank']) ? [
+                        'constraints' => ($options['option_notblank']) ? [
                             new NotBlank(
                                 ['message' => 'mautic.form.lists.notblank']
-                            )
+                            ),
                         ] : [],
-                        'error_bubbling' => true
+                        'error_bubbling' => true,
                     ],
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'prototype'      => true,
                     'constraints'    => $constraints,
-                    'error_bubbling' => false
+                    'error_bubbling' => false,
                 ]
             )
         )->addModelTransformer(new SortableListTransformer($options['option_notblank']));
@@ -111,7 +108,7 @@ class SortableListType extends AbstractType
                 'remove_onclick',
                 'option_required',
                 'option_notblank',
-                'remove_icon'
+                'remove_icon',
             ]
         );
     }
