@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -47,5 +48,19 @@ class CompanyLeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         return $result;
+    }
+
+    public function getCompanyLeads($companyId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('cl.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
+
+        $q->where($q->expr()->eq('cl.company_id', ':company'))
+            ->setParameter(':company', $companyId);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

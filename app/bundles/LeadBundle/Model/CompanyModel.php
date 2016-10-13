@@ -622,35 +622,41 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             return $mainCompany;
         }
         //merge fields
-        $mergeFromFields = $mergeFrom->getFields();
-        foreach ($mergeFromFields as $group => $groupFields) {
+        $mergeSecFields    = $secCompany->getFields();
+        $mainCompanyFields = $mainCompany->getFields();
+        foreach ($mergeSecFields as $group => $groupFields) {
             foreach ($groupFields as $alias => $details) {
-                //overwrite old lead's data with new lead's if new lead's is not empty
-                if (!empty($details['value'])) {
-                    $mergeWith->addUpdatedField($alias, $details['value']);
-
-                    $this->logger->debug('LEAD: Updated '.$alias.' = '.$details['value']);
+                //fill in empty main company fields with secondary company fields
+                if (empty($mainCompanyFields[$group][$alias]['value']) && !empty($details['value'])) {
+                    $mainCompany->addUpdatedField($alias, $details['value']);
+                    $this->logger->debug('Company: Updated '.$alias.' = '.$details['value']);
                 }
             }
         }
 
         //merge owner
-        $oldOwner = $mergeWith->getOwner();
-        $newOwner = $mergeFrom->getOwner();
+        $mainCompanyOwner = $mainCompany->getOwner();
+        $secCompanyOwner  = $secCompany->getOwner();
 
-        if ($oldOwner === null && $newOwner !== null) {
-            $mergeWith->setOwner($newOwner);
-
-            $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
+        if ($mainCompanyOwner === null && $secCompanyOwner !== null) {
+            $mainCompany->setOwner($secCompanyOwner);
         }
 
-        //save the updated lead
-        $this->saveEntity($mergeWith, false);
+        //move all leads from secondary company to main company
+        $companyLeadRepo = $this->getCompanyLeadRepository();
+        $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
+        $this->logger->debug(print_r($secCompanyLeads, true));
 
-        //delete the old
-        $this->deleteEntity($mergeFrom);
+        foreach ($secCompanyLeads as $lead) {
+            $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);
+        }
+        //save the updated company
+        $this->saveEntity($mainCompany, false);
 
-        //return the merged lead
-        return $mergeWith;
+        //delete the old company
+        $this->deleteEntity($secCompany);
+
+        //return the merged company
+        return $mainCompany;
     }
 }

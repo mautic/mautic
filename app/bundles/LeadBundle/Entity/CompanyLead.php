@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -54,7 +55,6 @@ class CompanyLead
 
         $builder->createManyToOne('company', 'Company')
             ->isPrimaryKey()
-            ->inversedBy('leads')
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->build();
 

@@ -654,6 +654,16 @@ class CompanyController extends FormController
      */
     public function mergeAction($objectId)
     {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editother',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model       = $this->getModel('lead.company');
         $mainCompany = $model->getEntity($objectId);
@@ -722,10 +732,7 @@ class CompanyController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
-                        !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainCompany->getPermissionUser())
-                        || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $companyToMerge->getPermissionUser())
-                    ) {
+                    } elseif (!$permissions['lead:leads:editother']) {
                         return $this->accessDenied();
                     } elseif ($model->isLocked($mainCompany)) {
                         //deny access if the entity is locked
@@ -736,7 +743,7 @@ class CompanyController extends FormController
                     }
 
                     //Both leads are good so now we merge them
-                    $mainLead = $model->mergeLeads($mainCompany, $companyToMerge, false);
+                    $mainCompany = $model->companyMerge($mainCompany, $companyToMerge, false);
                 }
             }
 
@@ -748,7 +755,7 @@ class CompanyController extends FormController
 
                 return $this->postActionRedirect(
                     [
-                        'returnUrl'       => $this->generateUrl('mautic_comapny_action', $viewParameters),
+                        'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => 'MauticLeadBundle:Company:edit',
                         'passthroughVars' => [

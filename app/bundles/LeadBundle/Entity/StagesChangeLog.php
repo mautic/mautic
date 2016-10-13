@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -71,7 +72,7 @@ class StagesChangeLog
             ->build();
 
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
-            ->inversedBy('stageChangeLog')
+            ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
 
