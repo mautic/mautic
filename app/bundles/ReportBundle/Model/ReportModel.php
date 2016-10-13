@@ -372,9 +372,9 @@ class ReportModel extends FormModel
                             if ($count === 0) {
                                 //write the row
                                 fputcsv($handle, $header);
-                            } else {
-                                fputcsv($handle, $row);
                             }
+
+                            fputcsv($handle, $row);
 
                             //free memory
                             unset($row, $reportData['data'][$count]);

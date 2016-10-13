@@ -77,9 +77,9 @@ class SalesforceApi extends CrmApi
     /**
      * @return mixed
      */
-    public function getLeadFields()
+    public function getLeadFields($object = null)
     {
-        return $this->request('describe');
+        return $this->request('describe', [], 'GET', false, $object);
     }
 
     /**
@@ -206,9 +206,10 @@ class SalesforceApi extends CrmApi
                 $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
-        $settings['feature_settings']['objects'] = $object;
+        $settings['feature_settings']['objects'][] = $object;
 
         $fields       = $this->integration->getAvailableLeadFields($settings);
+        $fields       = $this->integration->ammendToSfFields($fields);
         $fields['id'] = ['id' => []];
         $result       = [];
 

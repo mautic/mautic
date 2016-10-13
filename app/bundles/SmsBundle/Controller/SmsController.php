@@ -399,7 +399,7 @@ class SmsController extends FormController
                 $returnUrl      = $this->generateUrl('mautic_sms_index', $viewParameters);
                 $template       = 'MauticSmsBundle:Sms:index';
                 //clear any modified content
-                $session->remove('mautic.sms.'.$entity->getSessionId().'.content');
+                $session->remove('mautic.sms.'.$entity->getId().'.content');
             }
 
             $passthrough = [
@@ -643,11 +643,7 @@ class SmsController extends FormController
                 return $this->accessDenied();
             }
 
-            $entity      = clone $entity;
-            $session     = $this->get('session');
-            $contentName = 'mautic.sms.'.$entity->getSessionId().'.content';
-
-            $session->set($contentName, $entity->getContent());
+            $entity = clone $entity;
         }
 
         return $this->newAction($entity);
@@ -703,7 +699,7 @@ class SmsController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => [
-                    '%name%' => $entity->getTitle(),
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId,
                 ],
             ];

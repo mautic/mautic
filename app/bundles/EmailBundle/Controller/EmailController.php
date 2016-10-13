@@ -1429,14 +1429,20 @@ class EmailController extends FormController
         /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
         $routerHelper = $this->factory->getHelper('template.router');
 
+        $existingAssets = $assetsHelper->getAssets();
+
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';");
         $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';");
         $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
         $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
+
+        // Use the assetsHelper to auto-build the asset html
         $builderAssets = $assetsHelper->getHeadDeclarations();
-        $assetsHelper->clear();
+
+        // Reset the assets helper to what it was before.
+        $assetsHelper->setAssets($existingAssets);
 
         return $builderAssets;
     }

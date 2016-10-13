@@ -332,6 +332,10 @@ class PublicController extends CommonFormController
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
+        if ($emailEntity === null) {
+            return $this->notFound();
+        }
+
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
             || (!$this->get('mautic.security')->isAnonymous()

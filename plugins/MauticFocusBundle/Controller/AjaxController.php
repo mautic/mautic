@@ -41,7 +41,7 @@ class AjaxController extends CommonAjaxController
                 $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
 
                 $http     = $this->get('mautic.http.connector');
-                $response = $http->get($snapshotUrl.'?key='.$snapshotKey.'&url='.urlencode($website));
+                $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
 
                 if ($response->code === 200) {
                     $package = json_decode($response->body, true);

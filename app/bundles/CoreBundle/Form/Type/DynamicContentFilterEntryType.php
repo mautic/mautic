@@ -88,6 +88,7 @@ class DynamicContentFilterEntryType extends AbstractType
                         'timezones' => $this->timezoneChoices,
                         'stages'    => $this->stageChoices,
                         'locales'   => $this->localeChoices,
+                        'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

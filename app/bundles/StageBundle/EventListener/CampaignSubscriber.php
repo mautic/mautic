@@ -97,9 +97,8 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($stageChange) {
-            $parsed = explode('.', $stageToChangeTo->getName());
             $lead->stageChangeLogEntry(
-                $parsed[0],
+                $stageToChangeTo,
                 $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
                 $event->getName()
             );

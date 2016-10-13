@@ -458,10 +458,8 @@ class ListModel extends FormModel
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, ['select', 'country', 'timezone', 'region'])) {
+            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
-            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region'])) {
-                $choices[$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
             } else {
@@ -640,6 +638,9 @@ class ListModel extends FormModel
             }
         }
 
+        // Unset max ID to prevent capping at newly added max ID
+        unset($batchLimiters['maxId']);
+
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
             $list,
@@ -650,6 +651,9 @@ class ListModel extends FormModel
                 'batchLimiters'  => $batchLimiters,
             ]
         );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;

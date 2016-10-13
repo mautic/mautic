@@ -45,11 +45,11 @@ return [
             'mautic_email_tracker'             => [
 =======
             'mautic_plugin_tracker' => [
-                'path'       => '/plugin/{integration}/tracking.gif',
-                'controller' => 'MauticEmailBundle:Public:pluginTrackingGif',
+                'path'         => '/plugin/{integration}/tracking.gif',
+                'controller'   => 'MauticEmailBundle:Public:pluginTrackingGif',
                 'requirements' => [
                     'integration' => '.+',
-                ]
+                ],
             ],
             'mautic_email_tracker' => [
 >>>>>>> refs/remotes/mautic/staging
