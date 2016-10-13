@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;

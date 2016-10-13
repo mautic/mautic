@@ -15,6 +15,7 @@
  * @author      Barbushin Sergey http://linkedin.com/in/barbushin
  * @copyright   BSD (three-clause)
  */
+
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

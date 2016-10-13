@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
 use Doctrine\ORM\Mapping as ORM;
