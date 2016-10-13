@@ -13,7 +13,13 @@ namespace MauticPlugin\MauticOutlookBundle;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
 /**
- * Class MauticOutlookBundle.
+<<<<<<< HEAD:plugins/MauticOutlookBundle/MauticOutlookBundle.php
+ * Class MauticOutlookBundle
+ *
+ * @package Mautic\LeadBundle
+=======
+ * Class MauticGmailBundle.
+>>>>>>> refs/remotes/mautic/staging:plugins/MauticGmailBundle/MauticGmailBundle.php
  */
 class MauticOutlookBundle extends PluginBundleBase
 {

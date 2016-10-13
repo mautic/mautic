@@ -19,6 +19,9 @@ trait LeadDetailsTrait
 {
 
     /**
+<<<<<<< HEAD
+     * Get a list of places for the lead based on IP location
+=======
      * @param array      $leads
      * @param array|null $filters
      * @param array|null $orderBy
@@ -114,6 +117,7 @@ trait LeadDetailsTrait
 
     /**
      * Get a list of places for the lead based on IP location.
+>>>>>>> refs/remotes/mautic/staging
      *
      * @param Lead $lead
      *

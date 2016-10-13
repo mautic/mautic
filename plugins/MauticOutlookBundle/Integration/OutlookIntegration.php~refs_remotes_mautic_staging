@@ -8,15 +8,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticGmailBundle\Integration;
+namespace MauticPlugin\MauticOutlookBundle\Integration;
 
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class GmailIntegration extends AbstractIntegration
+class OutlookIntegration extends AbstractIntegration
 {
     public function getName()
     {
-        return 'Gmail';
+        return 'Outlook';
     }
 
     /**
@@ -39,7 +40,7 @@ class GmailIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'secret' => 'mautic.integration.gmail.secret',
+            'secret' => 'mautic.integration.outlook.secret',
         ];
     }
 }

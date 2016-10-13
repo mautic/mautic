@@ -8,13 +8,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticGmailBundle;
+namespace MauticPlugin\MauticOutlookBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
 /**
- * Class MauticGmailBundle.
+ * Class MauticOutlookBundle.
  */
-class MauticGmailBundle extends PluginBundleBase
+class MauticOutlookBundle extends PluginBundleBase
 {
 }

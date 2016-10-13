@@ -68,6 +68,9 @@ class TimelineController extends CommonController
             ]
         );
     }
+<<<<<<< HEAD
+}
+=======
 
     public function pluginIndexAction(Request $request, $integration, $page = 1)
     {
@@ -174,3 +177,4 @@ class TimelineController extends CommonController
         );
     }
 }
+>>>>>>> refs/remotes/mautic/staging

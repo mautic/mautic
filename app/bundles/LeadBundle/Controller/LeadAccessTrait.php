@@ -20,11 +20,15 @@ trait LeadAccessTrait
      *
      * @param $leadId
      * @param $action
+<<<<<<< HEAD
+     *
+=======
      * @param bool $isPlugin
      * @param string $intgegration
+>>>>>>> refs/remotes/mautic/staging
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkLeadAccess ($leadId, $action, $isPlugin = false, $integration = '')
+    protected function checkLeadAccess ($leadId, $action)
     {
         //make sure the user has view access to this lead
         $leadModel = $this->getModel('lead');
@@ -32,17 +36,22 @@ trait LeadAccessTrait
 
         if ($lead === null) {
             //set the return URL
-            $page      = $this->get('session')->get($isPlugin?'mautic.'.$integration.'.page':'mautic.lead.page', 1);
-            $returnUrl = $this->generateUrl($isPlugin?'mautic_plugin_timeline_index':'mautic_contact_index', ['page' => $page]);
+            $page      = $this->get('session')->get('mautic.lead.page', 1);
+            $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
 
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => $isPlugin?'MauticLeadBundle:Lead:pluginIndex':'MauticLeadBundle:Lead:index',
+                    'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
+<<<<<<< HEAD
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadNote'
+=======
                         'activeLink'    => $isPlugin?'#mautic_plugin_timeline_index':'#mautic_contact_index',
                         'mauticContent' => 'leadTimeline'
+>>>>>>> refs/remotes/mautic/staging
                     ],
                     'flashes' => [
                         [
@@ -64,6 +73,9 @@ trait LeadAccessTrait
             return $lead;
         }
     }
+<<<<<<< HEAD
+}
+=======
 
     /**
      * Returns leads the user has access to
@@ -116,3 +128,4 @@ trait LeadAccessTrait
         return $leads;
     }
 }
+>>>>>>> refs/remotes/mautic/staging
