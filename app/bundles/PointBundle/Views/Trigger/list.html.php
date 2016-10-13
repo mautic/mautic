@@ -26,7 +26,7 @@ if ($tmpl == 'index') {
             echo "<th class='col-pointtrigger-color'></th>";
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'point.trigger',
+                'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.name',
                 'text'       => 'mautic.core.name',
                 'class'      => 'col-pointtrigger-name',
@@ -35,20 +35,20 @@ if ($tmpl == 'index') {
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'pointtrigger',
-                'orderBy'    => 'cat.title',
+                'orderBy'    => 'c.title',
                 'text'       => 'mautic.core.category',
                 'class'      => 'col-pointtrigger-category visible-md visible-lg',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'point.trigger',
+                'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.points',
                 'text'       => 'mautic.point.trigger.thead.points',
                 'class'      => 'col-pointtrigger-points',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'point.trigger',
+                'sessionVar' => 'pointtrigger',
                 'orderBy'    => 't.id',
                 'text'       => 'mautic.core.id',
                 'class'      => 'col-pointtrigger-id visible-md visible-lg',
