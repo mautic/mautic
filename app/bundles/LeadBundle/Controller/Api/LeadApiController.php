@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
@@ -17,13 +17,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class LeadApiController
- *
- * @package Mautic\LeadBundle\Controller\Api
+ * Class LeadApiController.
  */
 class LeadApiController extends CommonApiController
 {
-
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
@@ -32,7 +29,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
+        $this->serializerGroups = ['leadDetails', 'userList', 'publishDetails', 'ipAddress'];
     }
 
     /**
@@ -44,7 +41,7 @@ class LeadApiController extends CommonApiController
         $parameters = $this->request->request->all();
 
         $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = array();
+        $uniqueLeadFieldData = [];
 
         foreach ($parameters as $k => $v) {
             if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
@@ -74,14 +71,14 @@ class LeadApiController extends CommonApiController
     {
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'force'          => [
+                'force' => [
                     [
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
-                        'value'  => true
-                    ]
+                        'value'  => true,
+                    ],
                 ],
-                'hydration_mode' => 'HYDRATE_ARRAY'
+                'hydration_mode' => 'HYDRATE_ARRAY',
             ]
         );
 
@@ -89,14 +86,14 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of users for lead owner edits
+     * Obtains a list of users for lead owner edits.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getOwnersAction()
     {
         if (!$this->factory->getSecurity()->isGranted(
-            array('lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'),
+            ['lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'],
             'MATCH_ONE'
         )
         ) {
@@ -108,47 +105,46 @@ class LeadApiController extends CommonApiController
         $start   = $this->request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('userList'));
+        $context = SerializationContext::create()->setGroups(['userList']);
         $view->setSerializationContext($context);
 
         return $this->handleView($view);
     }
 
     /**
-     * Obtains a list of custom fields
+     * Obtains a list of custom fields.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getFieldsAction()
     {
-        if (!$this->factory->getSecurity()->isGranted(array('lead:leads:editown', 'lead:leads:editother'), 'MATCH_ONE')) {
+        if (!$this->factory->getSecurity()->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
         $fields = $this->getModel('lead.field')->getEntities(
-            array(
-                'filter' => array(
-                    'force' => array(
-                        array(
+            [
+                'filter' => [
+                    'force' => [
+                        [
                             'column' => 'f.isPublished',
                             'expr'   => 'eq',
-                            'value'  => true
-                        )
-                    )
-                )
-            )
+                            'value'  => true,
+                        ],
+                    ],
+                ],
+            ]
         );
 
         $view    = $this->view($fields, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('leadFieldList'));
+        $context = SerializationContext::create()->setGroups(['leadFieldList']);
         $view->setSerializationContext($context);
 
         return $this->handleView($view);
     }
 
-
     /**
-     * Obtains a list of notes on a specific lead
+     * Obtains a list of notes on a specific lead.
      *
      * @param $id
      *
@@ -163,35 +159,35 @@ class LeadApiController extends CommonApiController
             }
 
             $results = $this->getModel('lead.note')->getEntities(
-                array(
-                    'start'      => $this->request->query->get('start', 0),
-                    'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
-                    'filter'     => array(
+                [
+                    'start'  => $this->request->query->get('start', 0),
+                    'limit'  => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+                    'filter' => [
                         'string' => $this->request->query->get('search', ''),
-                        'force'  => array(
-                            array(
+                        'force'  => [
+                            [
                                 'column' => 'n.lead',
                                 'expr'   => 'eq',
-                                'value'  => $entity
-                            )
-                        )
-                    ),
+                                'value'  => $entity,
+                            ],
+                        ],
+                    ],
                     'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
-                    'orderByDir' => $this->request->query->get('orderByDir', 'DESC')
-                )
+                    'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+                ]
             );
 
             list($notes, $count) = $this->prepareEntitiesForView($results);
 
             $view = $this->view(
-                array(
+                [
                     'total' => $count,
-                    'notes' => $notes
-                ),
+                    'notes' => $notes,
+                ],
                 Codes::HTTP_OK
             );
 
-            $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
+            $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
             $view->setSerializationContext($context);
 
             return $this->handleView($view);
@@ -201,7 +197,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of lead lists the lead is in
+     * Obtains a list of lead lists the lead is in.
      *
      * @param $id
      *
@@ -227,10 +223,10 @@ class LeadApiController extends CommonApiController
             }
 
             $view = $this->view(
-                array(
+                [
                     'total' => count($lists),
-                    'lists' => $lists
-                ),
+                    'lists' => $lists,
+                ],
                 Codes::HTTP_OK
             );
 
@@ -241,7 +237,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of campaigns the lead is part of
+     * Obtains a list of campaigns the lead is part of.
      *
      * @param $id
      *
@@ -257,7 +253,7 @@ class LeadApiController extends CommonApiController
 
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
             $campaignModel = $this->getModel('campaign');
-            $campaigns = $campaignModel->getLeadCampaigns($entity, true);
+            $campaigns     = $campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
                 if (!empty($c['lists'])) {
@@ -274,10 +270,10 @@ class LeadApiController extends CommonApiController
             }
 
             $view = $this->view(
-                array(
+                [
                     'total'     => count($campaigns),
-                    'campaigns' => $campaigns
-                ),
+                    'campaigns' => $campaigns,
+                ],
                 Codes::HTTP_OK
             );
 
@@ -290,10 +286,10 @@ class LeadApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead  &$entity
-     * @param                                 $parameters
-     * @param                                 $form
-     * @param string                          $action
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -332,7 +328,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Remove IpAddress and lastActive as it'll be handled outside the form
+     * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
      * @param $parameters
      * @param $entity
@@ -348,12 +344,10 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Flatten fields into an 'all' key for dev convenience
+     * Flatten fields into an 'all' key for dev convenience.
      *
      * @param        $entity
      * @param string $action
-     *
-     * @return void
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {

@@ -1,27 +1,26 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class CoreSubscriber
+ * Class CoreSubscriber.
  */
 class CommonSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var \Symfony\Component\HttpFoundation\Request
      */
@@ -75,74 +74,71 @@ class CommonSubscriber implements EventSubscriberInterface
     /**
      * @param MauticFactory $factory
      */
-    public function __construct (MauticFactory $factory)
+    public function __construct(MauticFactory $factory)
     {
-        $this->factory     = $factory;
-        $this->templating  = $factory->getTemplating();
-        $this->request     = $factory->getRequest();
-        $this->security    = $factory->getSecurity();
-        $this->serializer  = $factory->getSerializer();
-        $this->params      = $factory->getSystemParameters();
-        $this->dispatcher  = $factory->getDispatcher();
-        $this->translator  = $factory->getTranslator();
-        $this->em          = $factory->getEntityManager();
-        $this->router      = $factory->getRouter();
+        $this->factory    = $factory;
+        $this->templating = $factory->getTemplating();
+        $this->request    = $factory->getRequest();
+        $this->security   = $factory->getSecurity();
+        $this->serializer = $factory->getSerializer();
+        $this->params     = $factory->getSystemParameters();
+        $this->dispatcher = $factory->getDispatcher();
+        $this->translator = $factory->getTranslator();
+        $this->em         = $factory->getEntityManager();
+        $this->router     = $factory->getRouter();
 
         $this->init();
     }
 
     /**
-     * Post __construct setup so that inheriting classes don't have to pass all the arguments
+     * Post __construct setup so that inheriting classes don't have to pass all the arguments.
      */
     protected function init()
     {
-
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array();
+        return [];
     }
 
     /**
-     * Find and add menu items
+     * Find and add menu items.
      *
      * @param MauticEvents\MenuEvent $event
      */
-    protected function buildMenu (MauticEvents\MenuEvent $event)
+    protected function buildMenu(MauticEvents\MenuEvent $event)
     {
-        $name = $event->getType();
+        $name    = $event->getType();
         $bundles = $this->factory->getMauticBundles(true);
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['menu'][$name])) {
                 $menu = $bundle['config']['menu'][$name];
                 $event->addMenuItems(
-                    array(
+                    [
                         'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                        'items'    => !isset($menu['items']) ? $menu : $menu['items']
-                    )
+                        'items'    => !isset($menu['items']) ? $menu : $menu['items'],
+                    ]
                 );
             }
         }
     }
 
     /**
-     * Find and add menu items
+     * Find and add menu items.
      *
      * @param MauticEvents\IconEvent $event
-     *
-     * @return void
      */
-    protected function buildIcons (MauticEvents\IconEvent $event)
+    protected function buildIcons(MauticEvents\IconEvent $event)
     {
         $session = $this->factory->getSession();
-        $icons   = $session->get('mautic.menu.icons', array());
+        $icons   = $session->get('mautic.menu.icons', []);
 
         if (empty($icons)) {
-            $bundles    = $this->factory->getMauticBundles(true);
+            $bundles = $this->factory->getMauticBundles(true);
             /** @var MenuHelper $menuHelper */
             $menuHelper = $this->factory->getHelper('menu');
             foreach ($bundles as $bundle) {
@@ -175,15 +171,12 @@ class CommonSubscriber implements EventSubscriberInterface
         }
     }
 
-
     /**
-     * Get routing from bundles and add to Routing event
+     * Get routing from bundles and add to Routing event.
      *
      * @param MauticEvents\RouteEvent $event
-     *
-     * @return void
      */
-    protected function buildRoute (MauticEvents\RouteEvent $event)
+    protected function buildRoute(MauticEvents\RouteEvent $event)
     {
         $type       = $event->getType();
         $bundles    = $this->factory->getMauticBundles(true);
@@ -223,7 +216,7 @@ class CommonSubscriber implements EventSubscriberInterface
                                 'action' => 'deleteEntity',
                                 'method' => 'DELETE',
                                 'path'   => '/{id}/delete',
-                            ]
+                            ],
                         ];
 
                         foreach (['name', 'path', 'controller'] as $required) {
@@ -257,7 +250,7 @@ class CommonSubscriber implements EventSubscriberInterface
     private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
     {
         // Set defaults and controller
-        $defaults = (!empty($details['defaults'])) ? $details['defaults'] : array();
+        $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];
         if (isset($details['controller'])) {
             $defaults['_controller'] = $details['controller'];
         }
@@ -277,7 +270,7 @@ class CommonSubscriber implements EventSubscriberInterface
         }
 
         // Set requirements
-        $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+        $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
         if (strpos($details['path'], '{page}') !== false) {
@@ -295,7 +288,7 @@ class CommonSubscriber implements EventSubscriberInterface
             }
             if (!isset($requirements['objectId'])) {
                 // Only allow alphanumeric for objectId
-                $requirements['objectId'] = "[a-zA-Z0-9_]+";
+                $requirements['objectId'] = '[a-zA-Z0-9_]+';
             }
         }
         if ($type == 'api' && strpos($details['path'], '{id}') !== false) {

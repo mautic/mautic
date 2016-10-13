@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,17 +10,16 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\PageBundle\Entity\Trackable;
-use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\NotificationBundle\Event\NotificationEvent;
-use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\PageBundle\Model\TrackableModel;
 
 /**
  * Class NotificationSubscriber.
@@ -52,8 +51,8 @@ class NotificationSubscriber extends CommonSubscriber
      */
     public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
     {
-        $this->trackableModel = $trackableModel;
-        $this->pageTokenHelper = $pageTokenHelper;
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
 
         parent::__construct($factory);
@@ -65,9 +64,9 @@ class NotificationSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            NotificationEvents::NOTIFICATION_POST_SAVE => ['onPostSave', 0],
+            NotificationEvents::NOTIFICATION_POST_SAVE   => ['onPostSave', 0],
             NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
-            NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            NotificationEvents::TOKEN_REPLACEMENT        => ['onTokenReplacement', 0],
         ];
     }
 
@@ -81,11 +80,11 @@ class NotificationSubscriber extends CommonSubscriber
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle' => 'notification',
-                'object' => 'notification',
+                'bundle'   => 'notification',
+                'object'   => 'notification',
                 'objectId' => $entity->getId(),
-                'action' => ($event->isNew()) ? 'create' : 'update',
-                'details' => $details,
+                'action'   => ($event->isNew()) ? 'create' : 'update',
+                'details'  => $details,
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -99,12 +98,12 @@ class NotificationSubscriber extends CommonSubscriber
     public function onDelete(NotificationEvent $event)
     {
         $entity = $event->getNotification();
-        $log = [
-            'bundle' => 'notification',
-            'object' => 'notification',
+        $log    = [
+            'bundle'   => 'notification',
+            'object'   => 'notification',
             'objectId' => $entity->deletedId,
-            'action' => 'delete',
-            'details' => ['name' => $entity->getName()],
+            'action'   => 'delete',
+            'details'  => ['name' => $entity->getName()],
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

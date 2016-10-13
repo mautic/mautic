@@ -1,161 +1,162 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes'   => array(
-        'main' => array(
-            'mautic_campaignevent_action' => array(
+return [
+    'routes' => [
+        'main' => [
+            'mautic_campaignevent_action' => [
                 'path'       => '/campaigns/events/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Event:execute'
-            ),
-            'mautic_campaignsource_action'      => array(
+                'controller' => 'MauticCampaignBundle:Event:execute',
+            ],
+            'mautic_campaignsource_action' => [
                 'path'       => '/campaigns/sources/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Source:execute'
-            ),
-            'mautic_campaign_index'       => array(
+                'controller' => 'MauticCampaignBundle:Source:execute',
+            ],
+            'mautic_campaign_index' => [
                 'path'       => '/campaigns/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:index'
-            ),
-            'mautic_campaign_action'      => array(
+                'controller' => 'MauticCampaignBundle:Campaign:index',
+            ],
+            'mautic_campaign_action' => [
                 'path'       => '/campaigns/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Campaign:execute'
-            ),
-            'mautic_campaign_contacts'       => array(
+                'controller' => 'MauticCampaignBundle:Campaign:execute',
+            ],
+            'mautic_campaign_contacts' => [
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:contacts',
-            )
-        ),
-        'api'  => array(
+            ],
+        ],
+        'api' => [
             'mautic_api_campaignsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'campaigns',
                 'path'            => '/campaigns',
-                'controller'      => 'MauticCampaignBundle:Api\CampaignApi'
+                'controller'      => 'MauticCampaignBundle:Api\CampaignApi',
             ],
-            'mautic_api_campaignaddcontact' => array(
+            'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
-                'method'     => 'POST'
-            ),
-            'mautic_api_campaignremovecontact' => array(
+                'method'     => 'POST',
+            ],
+            'mautic_api_campaignremovecontact' => [
                 'path'       => '/campaigns/{id}/contact/remove/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
-                'method'     => 'POST'
-            )
-        )
-    ),
+                'method'     => 'POST',
+            ],
+        ],
+    ],
 
-    'menu'     => array(
-        'main' => array(
-            'mautic.campaign.menu.index' => array(
+    'menu' => [
+        'main' => [
+            'mautic.campaign.menu.index' => [
                 'iconClass' => 'fa-clock-o',
                 'route'     => 'mautic_campaign_index',
                 'access'    => 'campaign:campaigns:view',
-                'priority'  => 50
-            )
-        )
-    ),
+                'priority'  => 50,
+            ],
+        ],
+    ],
 
-    'categories' => array(
-        'campaign' => null
-    ),
+    'categories' => [
+        'campaign' => null,
+    ],
 
-    'services' => array(
-        'events' => array(
-            'mautic.campaign.subscriber'                => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber'
-            ),
-            'mautic.campaign.leadbundle.subscriber'     => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
+    'services' => [
+        'events' => [
+            'mautic.campaign.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber',
+            ],
+            'mautic.campaign.leadbundle.subscriber' => [
+                'class'     => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
                 'arguments' => [
                     'mautic.factory',
                     'mautic.campaign.model.campaign',
-                    'mautic.lead.model.lead'
-                ]
-            ),
-            'mautic.campaign.calendarbundle.subscriber' => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\CalendarSubscriber'
-            ),
-            'mautic.campaign.pointbundle.subscriber'    => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber'
-            ),
-            'mautic.campaign.search.subscriber'         => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
-            ),
-            'mautic.campaign.dashboard.subscriber'           => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber'
-            ),
-            'mautic.campaignconfigbundle.subscriber'   => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber'
-            ),
-        ),
-        'forms'  => array(
-            'mautic.campaign.type.form'                 => array(
+                    'mautic.lead.model.lead',
+                ],
+            ],
+            'mautic.campaign.calendarbundle.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\CalendarSubscriber',
+            ],
+            'mautic.campaign.pointbundle.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber',
+            ],
+            'mautic.campaign.search.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber',
+            ],
+            'mautic.campaign.dashboard.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber',
+            ],
+            'mautic.campaignconfigbundle.subscriber' => [
+                'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',
+            ],
+        ],
+        'forms' => [
+            'mautic.campaign.type.form' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign'
-            ),
-            'mautic.campaignrange.type.action'          => array(
+                'alias'     => 'campaign',
+            ],
+            'mautic.campaignrange.type.action' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-                'alias' => 'campaignevent'
-            ),
-            'mautic.campaign.type.campaignlist'         => array(
+                'alias' => 'campaignevent',
+            ],
+            'mautic.campaign.type.campaignlist' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign_list'
-            ),
-            'mautic.campaign.type.trigger.leadchange'   => array(
+                'alias'     => 'campaign_list',
+            ],
+            'mautic.campaign.type.trigger.leadchange' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType',
-                'alias' => 'campaignevent_leadchange'
-            ),
-            'mautic.campaign.type.action.addremovelead' => array(
+                'alias' => 'campaignevent_leadchange',
+            ],
+            'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
-                'alias' => 'campaignevent_addremovelead'
-            ),
-            'mautic.campaign.type.canvassettings'       => array(
+                'alias' => 'campaignevent_addremovelead',
+            ],
+            'mautic.campaign.type.canvassettings' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
-                'alias' => 'campaignevent_canvassettings'
-            ),
-            'mautic.campaign.type.leadsource'           => array(
+                'alias' => 'campaignevent_canvassettings',
+            ],
+            'mautic.campaign.type.leadsource' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign_leadsource'
-            ),
-            'mautic.form.type.campaignconfig'                    => array(
+                'alias'     => 'campaign_leadsource',
+            ],
+            'mautic.form.type.campaignconfig' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaignconfig'
-            ),
-        ),
-        'models' =>  array(
-            'mautic.campaign.model.campaign' => array(
-                'class' => 'Mautic\CampaignBundle\Model\CampaignModel',
-                'arguments' => array(
+                'alias'     => 'campaignconfig',
+            ],
+        ],
+        'models' => [
+            'mautic.campaign.model.campaign' => [
+                'class'     => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
-                    'mautic.form.model.form'
-                )
-            ),
-            'mautic.campaign.model.event' => array(
-                'class' => 'Mautic\CampaignBundle\Model\EventModel',
-                'arguments' => array(
+                    'mautic.form.model.form',
+                ],
+            ],
+            'mautic.campaign.model.event' => [
+                'class'     => 'Mautic\CampaignBundle\Model\EventModel',
+                'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
-                    'mautic.factory'
-                )
-            )
-        )
-    ),
-    'parameters' => array(
-        'campaign_time_wait_on_event_false' => 'PT1H'
-    )
-);
+                    'mautic.factory',
+                ],
+            ],
+        ],
+    ],
+    'parameters' => [
+        'campaign_time_wait_on_event_false' => 'PT1H',
+    ],
+];

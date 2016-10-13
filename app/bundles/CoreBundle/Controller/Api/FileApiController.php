@@ -1,52 +1,49 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class FileApiController
- *
- * @package Mautic\CoreBundle\Controller\Api
+ * Class FileApiController.
  */
 class FileApiController extends CommonApiController
 {
-
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         // $this->model            = $this->getModel('campaign');
         // $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
-        $this->entityNameOne    = 'file';
-        $this->entityNameMulti  = 'files';
+        $this->entityNameOne   = 'file';
+        $this->entityNameMulti = 'files';
         // $this->permissionBase   = 'campaign:campaigns';
         // $this->serializerGroups = array("campaignDetails", "categoryList", "publishDetails");
     }
 
-    protected $imageMimes = array(
+    protected $imageMimes = [
         'image/gif',
         'image/jpeg',
         'image/pjpeg',
         'image/jpeg',
         'image/pjpeg',
         'image/png',
-        'image/x-png'
-    );
+        'image/x-png',
+    ];
 
     protected $statusCode = Response::HTTP_OK;
 
     /**
-     * Uploads a file
+     * Uploads a file.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -69,7 +66,7 @@ class FileApiController extends CommonApiController
     }
 
     /**
-     * List the files in /media directory
+     * List the files in /media directory.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -94,22 +91,22 @@ class FileApiController extends CommonApiController
     }
 
     /**
-     * Delete a file from /media directory
+     * Delete a file from /media directory.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function deleteAction()
     {
         $src       = InputHelper::clean($this->request->request->get('src'));
-        $response  = array('deleted' => false);
+        $response  = ['deleted' => false];
         $imagePath = $this->getAbsolutePath().'/'.basename($src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         } elseif (!is_writable($imagePath)) {
             $this->response['error'] = 'File is not writable';
-            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         } else {
             unlink($imagePath);
             $this->response['deleted'] = true;
@@ -118,16 +115,15 @@ class FileApiController extends CommonApiController
         return $this->sendJsonResponse($this->response, $this->statusCode);
     }
 
-
     /**
-     * Get the Media directory full file system path
+     * Get the Media directory full file system path.
      *
      * @return string
      */
     protected function getAbsolutePath($dir)
     {
         $possibleDirs = ['assets', 'images'];
-        $dir = InputHelper::alphanum($dir);
+        $dir          = InputHelper::alphanum($dir);
 
         if (!in_array($dir, $possibleDirs)) {
             return $this->notFound($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
@@ -154,7 +150,7 @@ class FileApiController extends CommonApiController
     }
 
     /**
-     * Get the Media directory full file system path
+     * Get the Media directory full file system path.
      *
      * @return string
      */

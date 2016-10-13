@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CategoryBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -20,9 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CategoryType
- *
- * @package Mautic\CategoryBundle\Form\Type
+ * Class CategoryType.
  */
 class CategoryType extends AbstractType
 {
@@ -67,7 +65,7 @@ class CategoryType extends AbstractType
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => ['class' => 'form-control'],
                         'required'   => true,
-                        'data'       => $selected
+                        'data'       => $selected,
                     ]
                 );
             } else {
@@ -76,7 +74,7 @@ class CategoryType extends AbstractType
                     'bundle',
                     'hidden',
                     [
-                        'data' => $options['bundle']
+                        'data' => $options['bundle'],
                     ]
                 );
             }
@@ -88,7 +86,7 @@ class CategoryType extends AbstractType
             [
                 'label'      => 'mautic.core.title',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control']
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -99,7 +97,7 @@ class CategoryType extends AbstractType
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => false
+                'required'   => false,
             ]
         );
 
@@ -113,7 +111,7 @@ class CategoryType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.category.form.alias.help',
                 ],
-                'required'   => false
+                'required' => false,
             ]
         );
 
@@ -125,9 +123,9 @@ class CategoryType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'       => 'form-control',
-                    'data-toggle' => 'color'
+                    'data-toggle' => 'color',
                 ],
-                'required'   => false
+                'required' => false,
             ]
         );
 
@@ -137,14 +135,14 @@ class CategoryType extends AbstractType
             'inForm',
             'hidden',
             [
-                'mapped' => false
+                'mapped' => false,
             ]
         );
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -163,7 +161,7 @@ class CategoryType extends AbstractType
                     }
 
                     return $bundle;
-                }
+                },
             ]
         );
     }
@@ -173,6 +171,6 @@ class CategoryType extends AbstractType
      */
     public function getName()
     {
-        return "category_form";
+        return 'category_form';
     }
 }

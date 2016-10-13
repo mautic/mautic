@@ -1,16 +1,17 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 return [
     'routes' => [
         'main' => [
-            'mautic_category_index'  => [
+            'mautic_category_index' => [
                 'path'       => '/categories/{bundle}/{page}',
                 'controller' => 'MauticCategoryBundle:Category:index',
                 'defaults'   => [
@@ -25,12 +26,12 @@ return [
                 ],
             ],
         ],
-        'api'    => [
+        'api' => [
             'mautic_api_categoriesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'MauticCategoryBundle:Api\CategoryApi'
+                'controller'      => 'MauticCategoryBundle:Api\CategoryApi',
             ],
         ],
     ],
@@ -52,19 +53,19 @@ return [
                 'class' => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
             ],
         ],
-        'forms'  => [
-            'mautic.form.type.category'              => [
+        'forms' => [
+            'mautic.form.type.category' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'category',
             ],
-            'mautic.form.type.category_form'         => [
+            'mautic.form.type.category_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
                 'alias'     => 'category_form',
                 'arguments' => [
                     'translator',
-                    'session'
-                ]
+                    'session',
+                ],
             ],
             'mautic.form.type.category_bundles_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',

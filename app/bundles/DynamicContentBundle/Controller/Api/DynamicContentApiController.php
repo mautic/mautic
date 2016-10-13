@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,8 +11,6 @@ namespace Mautic\DynamicContentBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class DynamicContentApiController.
@@ -22,13 +20,13 @@ class DynamicContentApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->getModel('dynamicContent');
-        $this->entityClass      = 'Mautic\DynamicContentBundle\Entity\DynamicContent';
-        $this->entityNameOne    = 'dynamicContent';
-        $this->entityNameMulti  = 'dynamicContents';
-        $this->permissionBase   = 'dynamicContent:dynamicContents';
+        $this->model           = $this->getModel('dynamicContent');
+        $this->entityClass     = 'Mautic\DynamicContentBundle\Entity\DynamicContent';
+        $this->entityNameOne   = 'dynamicContent';
+        $this->entityNameMulti = 'dynamicContents';
+        $this->permissionBase  = 'dynamicContent:dynamicContents';
     }
 }

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\EmailBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
@@ -16,13 +16,10 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class EmailApiController
- *
- * @package Mautic\EmailBundle\Controller\Api
+ * Class EmailApiController.
  */
 class EmailApiController extends CommonApiController
 {
-
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
@@ -35,7 +32,7 @@ class EmailApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of emails
+     * Obtains a list of emails.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -46,25 +43,26 @@ class EmailApiController extends CommonApiController
                 [
                     'column' => 'e.createdBy',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
+                    'value'  => $this->factory->getUser()->getId(),
                 ];
         }
 
         //get parent level only
         $this->listFilters[] = [
             'column' => 'e.variantParent',
-            'expr'   => 'isNull'
+            'expr'   => 'isNull',
         ];
 
         return parent::getEntitiesAction();
     }
 
     /**
-     * Sends the email to it's assigned lists
+     * Sends the email to it's assigned lists.
      *
      * @param int $id Email ID
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function sendAction($id)
@@ -84,25 +82,25 @@ class EmailApiController extends CommonApiController
                 [
                     'success'          => 1,
                     'sentCount'        => $count,
-                    'failedRecipients' => $failed
+                    'failedRecipients' => $failed,
                 ],
                 Codes::HTTP_OK
             );
 
             return $this->handleView($view);
-
         }
 
         return $this->notFound();
     }
 
     /**
-     * Sends the email to a specific lead
+     * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
      * @param int $leadId Lead ID
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function sendLeadAction($id, $leadId)
@@ -140,7 +138,7 @@ class EmailApiController extends CommonApiController
                     $leadFields,
                     [
                         'source' => ['api', 0],
-                        'tokens' => $cleantokens
+                        'tokens' => $cleantokens,
                     ]
                 );
             }

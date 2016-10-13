@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,8 +10,8 @@
 namespace Mautic\DynamicContentBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
@@ -30,7 +30,7 @@ class DynamicContentModel extends FormModel
     use TranslationModelTrait;
 
     /**
-     * Retrieve the permissions base
+     * Retrieve the permissions base.
      *
      * @return string
      */
@@ -87,7 +87,7 @@ class DynamicContentModel extends FormModel
         if ($id === null) {
             return new DynamicContent();
         }
-        
+
         return parent::getEntity($id);
     }
 
@@ -127,17 +127,17 @@ class DynamicContentModel extends FormModel
 
         $qb->insert(MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data')
             ->values([
-                'lead_id' => $lead->getId(),
+                'lead_id'            => $lead->getId(),
                 'dynamic_content_id' => $dwc->getId(),
-                'slot' => ':slot',
-                'date_added' => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s'))
+                'slot'               => ':slot',
+                'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
             ])->setParameter('slot', $slot);
 
         $qb->execute();
     }
 
     /**
-     * @param      $slot
+     * @param            $slot
      * @param Lead|array $lead
      *
      * @return DynamicContent
@@ -198,16 +198,16 @@ class DynamicContentModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = DynamicContentEvents::PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = DynamicContentEvents::POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = DynamicContentEvents::PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = DynamicContentEvents::POST_DELETE;
                 break;
             default:
@@ -229,7 +229,7 @@ class DynamicContentModel extends FormModel
     }
 
     /**
-     * Joins the page table and limits created_by to currently logged in user
+     * Joins the page table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
      */
@@ -241,18 +241,18 @@ class DynamicContentModel extends FormModel
     }
 
     /**
-     * Get line chart data of hits
+     * Get line chart data of hits.
      *
-     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
      * @param array     $filter
-     * @param boolean   $canViewOthers
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $flag = null;
 

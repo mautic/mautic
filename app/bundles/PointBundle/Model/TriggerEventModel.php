@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -14,11 +14,10 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class TriggerEventModel
+ * Class TriggerEventModel.
  */
 class TriggerEventModel extends CommonFormModel
 {
-
     /**
      * {@inheritdoc}
      *
@@ -56,10 +55,10 @@ class TriggerEventModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof TriggerEvent) {
-            throw new MethodNotAllowedHttpException(array('Trigger'));
+            throw new MethodNotAllowedHttpException(['Trigger']);
         }
 
         if (!empty($action)) {

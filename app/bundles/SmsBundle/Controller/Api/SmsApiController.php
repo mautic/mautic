@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,8 +10,8 @@
 namespace Mautic\SmsBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class SmsApiController.
@@ -21,14 +21,14 @@ class SmsApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->getModel('sms');
-        $this->entityClass      = 'Mautic\SmsBundle\Entity\Sms';
-        $this->entityNameOne    = 'sms';
-        $this->entityNameMulti  = 'smses';
-        $this->permissionBase   = 'sms:smses';
+        $this->model           = $this->getModel('sms');
+        $this->entityClass     = 'Mautic\SmsBundle\Entity\Sms';
+        $this->entityNameOne   = 'sms';
+        $this->entityNameMulti = 'smses';
+        $this->permissionBase  = 'sms:smses';
     }
 
     /**

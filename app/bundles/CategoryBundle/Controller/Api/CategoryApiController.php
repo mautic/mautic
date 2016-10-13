@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CategoryBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -14,12 +14,11 @@ use Mautic\CategoryBundle\Entity\Category;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class CategoryApiController
+ * Class CategoryApiController.
  */
 class CategoryApiController extends CommonApiController
 {
-
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
 
@@ -28,11 +27,11 @@ class CategoryApiController extends CommonApiController
         $this->entityNameOne    = 'category';
         $this->entityNameMulti  = 'categories';
         $this->permissionBase   = 'categories:category';
-        $this->serializerGroups = ["categoryDetails"];
+        $this->serializerGroups = ['categoryDetails'];
     }
 
     /**
-     * Checks if user has permission to access retrieved entity
+     * Checks if user has permission to access retrieved entity.
      *
      * @param Category $entity
      * @param string   $action view|create|edit|publish|delete
