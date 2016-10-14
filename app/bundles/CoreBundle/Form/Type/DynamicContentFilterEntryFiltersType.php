@@ -206,7 +206,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     break;
             }
 
-            if (in_array($data['operator'], ['empty', '!empty'])) {
+            if ($data['operator'] === null || in_array($data['operator'], ['empty', '!empty'])) {
                 $attr['disabled'] = 'disabled';
             } else {
                 $customOptions['constraints'] = [
