@@ -401,6 +401,10 @@ class CommonApiController extends FOSRestController implements MauticController
             $formErrors = $this->getFormErrorMessages($form);
             $msg        = $this->getFormErrorMessage($formErrors);
 
+            if (!$msg) {
+                $msg = 'Request data are not valid';
+            }
+
             return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
         }
 
@@ -483,18 +487,11 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $errors = [];
 
-        foreach ($form->getErrors() as $key => $error) {
-            if ($form->isRoot()) {
-                $errors['#'][] = $error->getMessage();
+        foreach ($form->getErrors(true) as $error) {
+            if (isset($errors[$error->getOrigin()->getName()])) {
+                $errors[$error->getOrigin()->getName()] = [$error->getMessage()];
             } else {
-                $errors[] = $error->getMessage();
-            }
-        }
-
-        foreach ($form->all() as $child) {
-            $childErrors = $child->getErrors();
-            if (count($childErrors)) {
-                $errors[$child->getName()] = $this->getFormErrorMessages($child);
+                $errors[$error->getOrigin()->getName()][] = $error->getMessage();
             }
         }
 
