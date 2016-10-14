@@ -108,6 +108,7 @@ class EntityLookupType extends AbstractType
                             'class'              => "form-control {$options['model']}-select",
                             'data-chosen-lookup' => $options['ajax_lookup_action'],
                             'data-model'         => $options['model'],
+                            'main-entity'        => $options['main_entity'],
                         ];
 
                     if (!empty($options['modal_route'])) {

@@ -705,7 +705,8 @@ class CompanyController extends FormController
             'company_merge',
             [],
             [
-                'action' => $action,
+                'action'      => $action,
+                'main_entity' => $mainCompany->getId(),
             ]
         );
 

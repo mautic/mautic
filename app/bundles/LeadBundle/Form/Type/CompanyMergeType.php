@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,6 +33,7 @@ class CompanyMergeType extends AbstractType
                 'multiple'    => false,
                 'required'    => true,
                 'modal_route' => false,
+                'main_entity' => $options['main_entity'],
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.company.choosecompany.notblank']
@@ -53,6 +55,13 @@ class CompanyMergeType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(
+            ['main_entity']
+        );
     }
 
     /**

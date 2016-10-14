@@ -27,12 +27,13 @@ class CompanyListType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'               => 'mautic.lead.lead.companies',
-                'entity_label_column' => 'companyname',
+                'entity_label_column' => 'companyname, companycity, companycountry',
                 'modal_route'         => 'mautic_company_action',
                 'modal_header'        => 'mautic.company.new.company',
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
                 'multiple'            => true,
+                'main_entity'         => null,
             ]
         );
     }
