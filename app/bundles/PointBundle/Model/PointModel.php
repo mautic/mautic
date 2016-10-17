@@ -190,11 +190,10 @@ class PointModel extends CommonFormModel
     /**
      * Triggers a specific point change.
      *
-     * @param $type
+     * @param       $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
      * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
-     *25
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {

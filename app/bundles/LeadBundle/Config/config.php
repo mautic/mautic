@@ -137,6 +137,21 @@ return [
                 'path'       => '/contacts/list/fields',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getFields',
             ],
+            'mautic_api_editcontactpoints' => [
+                'path'       => '/contacts/{id}/setpoints/{points}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:setPoints',
+                'method'     => 'PATCH',
+            ],
+            'mautic_api_addcontactpoints' => [
+                'path'       => '/contacts/{id}/addpoints/{points}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addPoints',
+                'method'     => 'PATCH',
+            ],
+            'mautic_api_subtractleadpoints' => [
+                'path'       => '/contacts/{id}/subtractpoints/{points}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:subtractPoints',
+                'method'     => 'PATCH',
+            ],
             'mautic_api_getcontactsegments' => [
                 'path'       => '/contacts/list/segments',
                 'controller' => 'MauticLeadBundle:Api\ListApi:getLists',

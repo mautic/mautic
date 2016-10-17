@@ -51,4 +51,9 @@ final class ApiEvents
      * @var string
      */
     const BUILD_ROUTE = 'mautic.build_api_route';
+
+    /**
+     * @var string
+     */
+    const API_CALL_APPLYRULE = 'mautic.api_call';
 }

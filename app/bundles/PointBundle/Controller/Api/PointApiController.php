@@ -11,7 +11,10 @@
 
 namespace Mautic\PointBundle\Controller\Api;
 
+use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Event\ApiEvent;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -46,5 +49,31 @@ class PointApiController extends CommonApiController
         $view        = $this->view(['pointActionTypes' => $actionTypes['list']]);
 
         return $this->handleView($view);
+    }
+
+    /**
+     * @param unknown $id
+     * @param unknown $leadId
+     *
+     * @return
+     */
+    public function applyRuleAction($id, $leadId)
+    {
+        if (empty($id) || empty($leadId)) {
+            return new JsonResponse([
+                'message' => 'A points rule ID and contact ID are required',
+                'success' => false,
+            ]);
+        }
+
+        $lead = $this->factory->getModel('lead')->getEntity($leadId);
+
+        $event = new ApiEvent($lead, $id);
+
+        $this->factory->getDispatcher()->dispatch(ApiEvents::API_CALL_APPLYRULE, $event);
+
+        return new JsonResponse([
+            'success' => true,
+        ]);
     }
 }
