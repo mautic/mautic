@@ -180,6 +180,9 @@ class TwitterIntegration extends SocialIntegration
 
             $socialCache['profile'] = $info;
         }
+        $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
+
+        return $data;
     }
 
     /**
