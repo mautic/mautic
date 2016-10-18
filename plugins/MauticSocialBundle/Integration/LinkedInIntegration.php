@@ -106,8 +106,9 @@ class LinkedInIntegration extends SocialIntegration
 
         if (!isset($accessToken['access_token'])) {
             return;
-        } elseif (isset($accessToken['access_token'])) {
-            $persistLead = $this->persistNewLead;
+        } elseif (isset($accessToken['persist_lead'])) {
+            $persistLead = $accessToken['persist_lead'];
+            unset($accessToken['persist_lead']);
         }
 
         $fields        = $this->getFieldNames($this->getAvailableLeadFields());

@@ -215,7 +215,8 @@ abstract class SocialIntegration extends AbstractIntegration
         } else {
             $this->factory->getSession()->remove($this->getName().'_tokenResponse');
             $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
-            $this->persistNewLead       = true;
+
+            $this->persistNewLead = true;
         }
 
         return $accessToken;
