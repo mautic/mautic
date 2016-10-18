@@ -59,6 +59,11 @@ return [
                 'controller' => 'MauticPointBundle:Api\TriggerApi:deletePointTriggerEvents',
                 'method'     => 'DELETE',
             ],
+            'mautic_api_adjustcontactpoints' => [
+                'path'       => '/contacts/{leadId}/points/{operator}/{delta}',
+                'controller' => 'MauticPointBundle:Api\PointApi:adjustPoints',
+                'method'     => 'POST',
+            ],
         ],
     ],
 

@@ -11,10 +11,9 @@
 
 namespace Mautic\PointBundle\Controller\Api;
 
-use Mautic\ApiBundle\ApiEvents;
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\ApiBundle\Event\ApiEvent;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -29,6 +28,7 @@ class PointApiController extends CommonApiController
     {
         parent::initialize($event);
         $this->model            = $this->getModel('point');
+        $this->leadModel        = $this->getModel('lead');
         $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
@@ -52,28 +52,50 @@ class PointApiController extends CommonApiController
     }
 
     /**
-     * @param unknown $id
-     * @param unknown $leadId
+     * Subtract points from a lead.
      *
-     * @return
+     * @param int    $leadId
+     * @param string $operator
+     * @param int    $delta
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function applyRuleAction($id, $leadId)
+    public function adjustPointsAction($leadId, $operator, $delta)
     {
-        if (empty($id) || empty($leadId)) {
-            return new JsonResponse([
-                'message' => 'A points rule ID and contact ID are required',
-                'success' => false,
-            ]);
+        $lead = $this->leadModel->getEntity($leadId);
+
+        if ($lead === null) {
+            return $this->notFound();
         }
 
-        $lead = $this->factory->getModel('lead')->getEntity($leadId);
+        if (!$this->checkEntityAccess($lead, 'edit')) {
+            return $this->accessDenied();
+        }
 
-        $event = new ApiEvent($lead, $id);
+        try {
+            $this->logApiPointChange($lead, $delta, $operator);
+        } catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+        }
 
-        $this->factory->getDispatcher()->dispatch(ApiEvents::API_CALL_APPLYRULE, $event);
+        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+    }
 
-        return new JsonResponse([
-            'success' => true,
-        ]);
+    /**
+     * Log the lead points change.
+     *
+     * @param int $leadId
+     * @param int $delta
+     */
+    protected function logApiPointChange($lead, $delta, $operator)
+    {
+        $trans      = $this->get('translator');
+        $ip         = $this->get('mautic.helper.ip_lookup')->getIpAddress();
+        $eventName  = InputHelper::clean($this->request->request->get('eventName', $trans->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
+        $actionName = InputHelper::clean($this->request->request->get('actionName', $trans->trans('mautic.lead.event.api')));
+
+        $lead->adjustPoints($delta, $operator);
+        $lead->addPointsChangeLogEntry('API', $eventName, $actionName, $delta, $ip);
+        $this->leadModel->saveEntity($lead, false);
     }
 }

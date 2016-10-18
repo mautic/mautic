@@ -14,11 +14,8 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\PointsChangeLog;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -286,142 +283,6 @@ class LeadApiController extends CommonApiController
         }
 
         return $this->notFound();
-    }
-
-    /**
-     * Change the number of points a lead.
-     *
-     * @param int $leadId
-     * @param int $points
-     *
-     * @return
-     */
-    public function setPointsAction($id, $points)
-    {
-        $parameters = $this->request->request->all();
-
-        // recover lead
-        $lead = $this->model->getEntity($id);
-        if (!$lead instanceof $this->entityClass) {
-            return $this->notFound();
-        }
-        if (!$this->checkEntityAccess($lead, 'edit')) {
-            return $this->accessDenied();
-        }
-
-        // change the numbre of points
-        $lead->setPoints($points);
-
-        $this->historyEventsPointsApi($lead, $points, $parameters);
-
-        // sauv bdd
-        $this->model->saveEntity($lead, false);
-
-        return new JsonResponse([
-            'success' => true,
-        ]);
-    }
-
-    /**
-     * Add number of points a lead.
-     *
-     * @param int $leadId
-     * @param int $points
-     *
-     * @return
-     */
-    public function addPointsAction($id, $points)
-    {
-        $parameters = $this->request->request->all();
-
-        // recover lead
-        $lead = $this->model->getEntity($id);
-        if (!$lead instanceof $this->entityClass) {
-            return $this->notFound();
-        }
-        if (!$this->checkEntityAccess($lead, 'edit')) {
-            return $this->accessDenied();
-        }
-
-        // collect the points
-        $pointslead  = $lead->getPoints();
-        $totalPoints = $pointslead + $points;
-
-        $this->historyEventsPointsApi($lead, +$points, $parameters);
-
-        // change the numbre of points
-        $lead->setPoints($totalPoints);
-
-        // sauv bdd
-        $this->model->saveEntity($lead, false);
-
-        return new JsonResponse([
-            'success' => true,
-        ]);
-    }
-
-    /**
-     * Remove number of points a lead.
-     *
-     * @param int $leadId
-     * @param int $points
-     *
-     * @return
-     */
-    public function subtractPointsAction($id, $points)
-    {
-        $parameters = $this->request->request->all();
-
-        // recover lead
-        $lead = $this->model->getEntity($id);
-        if (!$lead instanceof $this->entityClass) {
-            return $this->notFound();
-        }
-        if (!$this->checkEntityAccess($lead, 'edit')) {
-            return $this->accessDenied();
-        }
-
-        // collect the points
-        $pointslead  = $lead->getPoints();
-        $totalPoints = $pointslead - $points;
-
-        $this->historyEventsPointsApi($lead, -$points, $parameters);
-
-        // change the numbre of points
-        $lead->setPoints($totalPoints);
-
-        // sauv bdd
-        $this->model->saveEntity($lead, false);
-
-        return new JsonResponse([
-            'success' => true,
-        ]);
-    }
-
-    protected function historyEventsPointsApi($lead, $points, $parameters)
-    {
-        $eventName  = (array_key_exists('eventname', $parameters)) ? $parameters['eventname'] : null;
-        $actionName = (array_key_exists('actionname', $parameters)) ? $parameters['actionname'] : null;
-
-        $en = $this->factory->getTranslator()->trans('mautic.lead.report.points.action_name');
-        $an = $this->factory->getTranslator()->trans('mautic.lead.event.api');
-
-        $eventName  = ($eventName === null) ? $en : $eventName;
-        $actionName = ($actionName === null) ? $an : $actionName;
-
-        $ip = new IpAddress();
-        $ip->setIpAddress($this->request->server->get('SERVER_ADDR'));
-
-        $event = new PointsChangeLog();
-        $event->setType('API');
-        $event->setEventName($eventName);
-        $event->setActionName($actionName);
-        $event->setIpAddress($ip);
-        $event->setDateAdded(new \DateTime());
-        $event->setDelta($points);
-        $event->setLead($lead);
-
-        $lead->addPointsChangeLog($event);
     }
 
     /**
