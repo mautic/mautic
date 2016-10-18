@@ -656,6 +656,13 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
+Mautic.togglePreferredChannel = function(leadId, channel) {
+    var action = mQuery('#' + channel).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query = "action=lead:togglePreferredLeadChannel&leadId=" + leadId + "&channel=" + channel + "&channelAction=" + action;
+
+    Mautic.toggleLeadSwitch(channel, query, action);
+};
+
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;

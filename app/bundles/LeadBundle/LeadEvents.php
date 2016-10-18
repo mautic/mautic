@@ -343,4 +343,13 @@ final class LeadEvents
      * @var string
      */
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.add_channel event registers communication channels.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance.
+     *
+     * @var string
+     */
+    const ADD_CHANNEL = 'mautic.add_channel';
 }

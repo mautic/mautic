@@ -958,26 +958,35 @@ class LeadController extends FormController
             $frequencyRules = $model->getFrequencyRule($lead);
 
             foreach ($frequencyRules as $frequencyRule) {
-                $data['channels'][]       = $frequencyRule['channel'];
                 $data['frequency_number'] = $frequencyRule['frequency_number'];
                 $data['frequency_time']   = $frequencyRule['frequency_time'];
             }
 
-            $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+            $action      = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+            $channels    = $model->getContactPreferredChannels($lead);
+            $allChannels = $model->getAllChannels();
+
+            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            $listModel = $this->getModel('lead.list');
+            $lists     = $listModel->getUserLists();
+
+            // Get a list of lists for the lead
+            $leadsLists = $model->getLists($lead, true, true);
 
             $form = $this->get('form.factory')->create(
                 'lead_contact_frequency_rules',
                 [],
                 [
-                    'action' => $action,
-                    'data'   => $data,
+                    'action'   => $action,
+                    'data'     => $data,
+                    'channels' => $channels,
                 ]
             );
             if ($this->request->getMethod() == 'POST') {
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $formdata = $form->getData();
-                        $model->setFrequencyRules($lead, $formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
+                        $model->setFrequencyRules($lead, $formdata['frequency_time'], $formdata['frequency_number']);
                     }
                 }
 
@@ -985,6 +994,9 @@ class LeadController extends FormController
                     $viewParameters = [
                         'objectId'     => $lead->getId(),
                         'objectAction' => 'view',
+                        'lists'        => $lists,
+                        'leadsLists'   => $leadsLists,
+                        'lead'         => $lead,
                     ];
 
                     return $this->postActionRedirect(
@@ -1014,6 +1026,11 @@ class LeadController extends FormController
                                 'objectId'     => $lead->getId(),
                             ]
                         ),
+                        'channels'     => $allChannels,
+                        'leadChannels' => $channels,
+                        'lead'         => $lead,
+                        'lists'        => $lists,
+                        'leadLists'    => $leadsLists,
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
                     'passthroughVars' => [

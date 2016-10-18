@@ -32,6 +32,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\ChannelEvent;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -1197,8 +1198,11 @@ class LeadModel extends FormModel
      */
     public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
+        $this->logger->error(print_r($channel, true));
+        $this->logger->error(print_r($lead->getId(), true));
         /** @var DoNotContact $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
+            $this->logger->error(print_r($dnc->getChannel(), true));
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
@@ -1321,12 +1325,13 @@ class LeadModel extends FormModel
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $channel, $frequencyTime = null, $frequencyNumber = null)
+    public function setFrequencyRules(Lead $lead, $frequencyTime = null, $frequencyNumber = null)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
         $entities       = [];
-        foreach ($channel as $ch) {
+        $channels       = $this->getContactPreferredChannels($lead);
+        foreach ($channels as $ch) {
             $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
             $frequencyRule->setChannel($ch);
             $frequencyRule->setLead($lead);
@@ -2149,7 +2154,6 @@ class LeadModel extends FormModel
 
         return $event->getEventCounter();
     }
-
     /**
      * @param Lead $lead
      * @param      $company
@@ -2172,5 +2176,38 @@ class LeadModel extends FormModel
         }
 
         return false;
+    }
+
+    /**
+     * Get contact channels.
+     *
+     * @return array
+     */
+    public function getContactPreferredChannels(Lead $lead)
+    {
+        $channels = $this->getAllChannels();
+
+        foreach ($channels as $channel) {
+            if ($this->isContactable($lead, $channel)) {
+                unset($channels[$channel]);
+            }
+        }
+
+        return $channels;
+    }
+
+    /**
+     * Get contact channels.
+     *
+     * @return array
+     */
+    public function getAllChannels()
+    {
+        $event = new ChannelEvent();
+
+        $this->dispatcher->dispatch(LeadEvents::ADD_CHANNEL, $event);
+        $channels = $event->getChannels();
+
+        return $channels;
     }
 }

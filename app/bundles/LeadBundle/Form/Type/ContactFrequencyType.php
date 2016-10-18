@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,26 +29,6 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'channels',
-            'choice',
-            [
-                'choices' => [
-                    'sms'   => 'mautic.sms.sms',
-                    'email' => 'mautic.email.email',
-                ],
-                'label'       => 'mautic.lead.contact.channels',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'empty_value' => '',
-                'attr'        => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
-                ],
-                'required' => false,
-            ]
-        );
-
         $formModifier = function (FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
@@ -128,6 +109,14 @@ class ContactFrequencyType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['channels']);
     }
 
     /**

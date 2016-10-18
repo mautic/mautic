@@ -183,6 +183,9 @@ return [
                     'mautic.email.model.email',
                 ],
             ],
+            'mautic.email.channel.subscriber' => [
+                'class' => \Mautic\EmailBundle\EventListener\ChannelSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.email' => [

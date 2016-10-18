@@ -332,6 +332,36 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function togglePreferredLeadChannelAction(Request $request)
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $channel   = InputHelper::clean($request->request->get('channel'));
+        $action    = InputHelper::clean($request->request->get('channelAction'));
+
+        if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
+            $leadModel = $this->getModel('lead');
+
+            $lead = $leadModel->getEntity($leadId);
+
+            if ($lead !== null && $channel !== null) {
+                if ($action === 'remove') {
+                    $leadModel->addDncForLead($lead, $channel, 'user', 3);
+                } elseif ($action === 'add') {
+                    $leadModel->removeDncForLead($lead, $channel);
+                }
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function toggleLeadCampaignAction(Request $request)
     {
         $dataArray  = ['success' => 0];

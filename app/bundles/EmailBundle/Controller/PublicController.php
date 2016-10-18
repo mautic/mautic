@@ -119,14 +119,60 @@ class PublicController extends CommonFormController
         if (!empty($stat)) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
-
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel = $this->getModel('lead');
             if ($lead) {
                 // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
                 $leadModel->setCurrentLead($lead);
-            }
 
+                $frequencyRules = $leadModel->getFrequencyRule($lead);
+                $data           = [];
+                foreach ($frequencyRules as $frequencyRule) {
+                    $data['frequency_number'] = $frequencyRule['frequency_number'];
+                    $data['frequency_time']   = $frequencyRule['frequency_time'];
+                }
+
+                $action      = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+                $channels    = $leadModel->getContactPreferredChannels($lead);
+                $allChannels = $leadModel->getAllChannels();
+
+            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            $listModel = $this->getModel('lead.list');
+                $lists = $listModel->getUserLists();
+
+            // Get a list of lists for the lead
+            $leadsLists = $leadModel->getLists($lead, true, true);
+
+                $form = $this->get('form.factory')->create(
+                'lead_contact_frequency_rules',
+                [],
+                [
+                    'action'   => $action,
+                    'channels' => $channels,
+                    'data'     => $data,
+                ]
+            );
+                $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+                'MauticLeadBundle:Lead:frequency.html.php',
+                [
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_contact_action',
+                        [
+                            'objectAction' => 'contactFrequency',
+                            'objectId'     => $lead->getId(),
+                        ]
+                    ),
+                    'channels'     => $allChannels,
+                    'leadChannels' => $channels,
+                    'lead'         => $lead,
+                    'lists'        => $lists,
+                    'leadLists'    => $leadsLists,
+                ]
+            );
+                $formContent = $html;
+            }
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
             $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
@@ -156,11 +202,10 @@ class PublicController extends CommonFormController
 
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
                 $unsubscribeForm = $email->getUnsubscribeForm();
-
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
-                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    $formContent .= '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
         } else {
@@ -184,8 +229,7 @@ class PublicController extends CommonFormController
             'lead'     => $lead,
             'template' => $template,
             'message'  => $message,
-            'type'     => 'notice',
-            'name'     => $translator->trans('mautic.email.unsubscribe'),
+
         ];
 
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
