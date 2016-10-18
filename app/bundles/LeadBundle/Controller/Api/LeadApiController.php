@@ -318,6 +318,16 @@ class LeadApiController extends CommonApiController
             unset($parameters['companies']);
         }
 
+        // Contact parameters which can be updated apart form contact fields
+        $contactParams = ['points', 'color', 'owner'];
+
+        foreach ($contactParams as $contactParam) {
+            if (isset($parameters[$contactParam])) {
+                $entity->setPoints($parameters[$contactParam]);
+                unset($parameters[$contactParam]);
+            }
+        }
+
         // Check for lastActive date
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
