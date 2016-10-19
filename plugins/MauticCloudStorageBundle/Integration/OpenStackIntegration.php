@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +16,10 @@ use Gaufrette\Adapter\OpenStackCloudFiles\ObjectStoreFactory;
 use OpenCloud\OpenStack;
 
 /**
- * Class OpenStackIntegration
+ * Class OpenStackIntegration.
  */
 class OpenStackIntegration extends CloudStorageIntegration
 {
-
     /**
      * @var OpenStack
      */
@@ -38,7 +39,7 @@ class OpenStackIntegration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
@@ -48,7 +49,7 @@ class OpenStackIntegration extends CloudStorageIntegration
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
@@ -62,12 +63,12 @@ class OpenStackIntegration extends CloudStorageIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
-            'username' => 'mautic.integration.keyfield.OpenStack.username',
-            'password' => 'mautic.integration.keyfield.OpenStack.password',
-            'tenantName' => 'mautic.integration.keyfield.OpenStack.tenantName',
-            'containerName' => 'mautic.integration.keyfield.OpenCloud.containerName'
-        );
+        return [
+            'username'      => 'mautic.integration.keyfield.OpenStack.username',
+            'password'      => 'mautic.integration.keyfield.OpenStack.password',
+            'tenantName'    => 'mautic.integration.keyfield.OpenStack.tenantName',
+            'containerName' => 'mautic.integration.keyfield.OpenCloud.containerName',
+        ];
     }
 
     /**
@@ -83,11 +84,11 @@ class OpenStackIntegration extends CloudStorageIntegration
 
             $this->connection = new OpenStack(
                 $settings['provider']['serviceUrl'],
-                array(
-                    'username' => $keys['username'],
-                    'password' => $keys['password'],
-                    'tenantName' => $keys['tenantName']
-                )
+                [
+                    'username'   => $keys['username'],
+                    'password'   => $keys['password'],
+                    'tenantName' => $keys['tenantName'],
+                ]
             );
 
             $this->storeFactory = new ObjectStoreFactory($this->connection, null, 'publicURL');

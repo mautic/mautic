@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -23,14 +25,12 @@ namespace Mautic\CoreBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
@@ -41,18 +41,18 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class TranslationDebugCommand extends ContainerAwareCommand
 {
-    const MESSAGE_MISSING = 0;
-    const MESSAGE_UNUSED = 1;
+    const MESSAGE_MISSING         = 0;
+    const MESSAGE_UNUSED          = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
 
     /**
      * {@inheritdoc}
      */
-    protected function configure ()
+    protected function configure()
     {
         $this
             ->setName('mautic:translation:debug')
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption('locale', 'l', InputOption::VALUE_OPTIONAL, 'The locale'),
                 new InputOption('bundle', 'b', InputOption::VALUE_OPTIONAL, 'The bundle name'),
                 new InputOption('logfile', 'log', InputOption::VALUE_OPTIONAL, 'Optional log file'),
@@ -61,9 +61,9 @@ class TranslationDebugCommand extends ContainerAwareCommand
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
-            ))
+            ])
             ->setDescription('Displays translation messages informations')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
 templates and translation files of a given bundle.
@@ -91,9 +91,9 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute (InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $locale    = $input->getOption('locale');
+        $locale = $input->getOption('locale');
         if (empty($locale)) {
             $locale = 'en_US';
         }
@@ -118,7 +118,7 @@ EOF
                 return;
             }
 
-            $bundles = array($bundles[$bundle]);
+            $bundles = [$bundles[$bundle]];
         }
 
         // Load defined messages
@@ -131,29 +131,29 @@ EOF
 
         foreach ($bundles as $bundle) {
             if (!$dupsOnly) {
-                if (file_exists($bundle['directory'] . '/Views')) {
-                    $phpFormExtractor->extract($bundle['directory'] . '/Views', $extractedCatalogue);
-                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . '/Views', $extractedCatalogue);
+                if (file_exists($bundle['directory'].'/Views')) {
+                    $phpFormExtractor->extract($bundle['directory'].'/Views', $extractedCatalogue);
+                    $this->getContainer()->get('translation.extractor')->extract($bundle['directory'].'/Views', $extractedCatalogue);
                 }
 
                 if (!$viewsOnly) {
-                    $directories = array(
+                    $directories = [
                         '/Form/Type',
                         '/EventListener',
                         '/Model',
                         '/EventListener',
-                        '/Controller'
-                    );
+                        '/Controller',
+                    ];
                     foreach ($directories as $d) {
-                        if (file_exists($bundle['directory'] . $d)) {
-                            $phpFormExtractor->extract($bundle['directory'] . $d, $extractedCatalogue);
-                            $this->getContainer()->get('translation.extractor')->extract($bundle['directory'] . $d, $extractedCatalogue);
+                        if (file_exists($bundle['directory'].$d)) {
+                            $phpFormExtractor->extract($bundle['directory'].$d, $extractedCatalogue);
+                            $this->getContainer()->get('translation.extractor')->extract($bundle['directory'].$d, $extractedCatalogue);
                         }
                     }
                 }
             }
 
-            if (is_dir($bundle['directory'] . '/Translations')) {
+            if (is_dir($bundle['directory'].'/Translations')) {
                 $currentCatalogue = $loader->load(null, $locale, $domain);
             }
         }
@@ -162,7 +162,7 @@ EOF
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
         $allMessages    = $mergeOperation->getResult()->all($domain);
         if (null !== $domain) {
-            $allMessages = array($domain => $allMessages);
+            $allMessages = [$domain => $allMessages];
         }
 
         // No defined or extracted messages
@@ -182,10 +182,10 @@ EOF
         $table = new Table($output);
 
         // Display header line
-        $headers = array('State(s)', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = ['State(s)', 'Id', sprintf('Message Preview (%s)', $locale)];
         $table->setHeaders($headers);
 
-        $duplicateCheck = array();
+        $duplicateCheck = [];
 
         // Iterate all message ids and determine their state
         foreach ($allMessages as $domain => $messages) {
@@ -194,14 +194,14 @@ EOF
 
                 $duplicateKey = strtolower($value);
                 if (!isset($duplicateCheck[$duplicateKey])) {
-                    $duplicateCheck[$duplicateKey] = array();
+                    $duplicateCheck[$duplicateKey] = [];
                 }
-                $duplicateCheck[$duplicateKey][] = array(
+                $duplicateCheck[$duplicateKey][] = [
                     'id'     => $messageId,
-                    'domain' => $domain
-                );
+                    'domain' => $domain,
+                ];
 
-                $states = array();
+                $states = [];
 
                 if ($extractedCatalogue->defines($messageId, $domain)) {
                     if (!$currentCatalogue->defines($messageId, $domain)) {
@@ -217,7 +217,7 @@ EOF
                     continue;
                 }
 
-                $row = array($this->formatStates($states), $this->formatId($messageId), $this->sanitizeString($value));
+                $row = [$this->formatStates($states), $this->formatId($messageId), $this->sanitizeString($value)];
 
                 $table->addRow($row);
             }
@@ -240,7 +240,7 @@ EOF
         $table = new Table($output);
 
         // Display header line
-        $headers = array('Value', 'Domain', 'Message ID');
+        $headers = ['Value', 'Domain', 'Message ID'];
         $table->setHeaders($headers);
 
         //Check for duplicates
@@ -248,11 +248,11 @@ EOF
         foreach ($duplicateCheck as $value => $dups) {
             $count = count($dups);
             if ($count > 1) {
-                $totalDuplicateCount++;
-                $table->addRow(array('', '', ''));
-                $table->addRow(array($this->sanitizeString($value), $count, ''));
+                ++$totalDuplicateCount;
+                $table->addRow(['', '', '']);
+                $table->addRow([$this->sanitizeString($value), $count, '']);
                 foreach ($dups as $dup) {
-                    $table->addRow(array('', $dup['domain'], $dup['id']));
+                    $table->addRow(['', $dup['domain'], $dup['id']]);
                 }
             }
         }
@@ -260,11 +260,10 @@ EOF
         $table->render();
 
         $output->writeln('');
-        $output->writeln('<info>Total number of duplicates: ' . $totalDuplicateCount . '</info>');
-
+        $output->writeln('<info>Total number of duplicates: '.$totalDuplicateCount.'</info>');
     }
 
-    private function formatState ($state)
+    private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
             return '<fg=red>x</>';
@@ -281,9 +280,9 @@ EOF
         return $state;
     }
 
-    private function formatStates (array $states)
+    private function formatStates(array $states)
     {
-        $result = array();
+        $result = [];
         foreach ($states as $state) {
             $result[] = $this->formatState($state);
         }
@@ -291,21 +290,21 @@ EOF
         return implode(' ', $result);
     }
 
-    private function formatId ($id)
+    private function formatId($id)
     {
         return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
     }
 
-    private function sanitizeString ($string, $length = 40)
+    private function sanitizeString($string, $length = 40)
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
         if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
             if (mb_strlen($string, $encoding) > $length) {
-                return mb_substr($string, 0, $length - 3, $encoding) . '...';
+                return mb_substr($string, 0, $length - 3, $encoding).'...';
             }
         } elseif (strlen($string) > $length) {
-            return substr($string, 0, $length - 3) . '...';
+            return substr($string, 0, $length - 3).'...';
         }
 
         return $string;
@@ -319,22 +318,22 @@ class PhpFormTranslationExtractor extends PhpExtractor
      *
      * @var array
      */
-    protected $sequences = array(
-        array(
+    protected $sequences = [
+        [
             "'label'",
             '=>',
             self::MESSAGE_TOKEN,
-        ),
-        array(
+        ],
+        [
             "placeholder'",
             '=>',
             self::MESSAGE_TOKEN,
-        ),
-        array(
+        ],
+        [
             "'tooltip'",
             '=>',
             self::MESSAGE_TOKEN,
-        )
+        ],
 
-    );
+    ];
 }

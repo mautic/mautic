@@ -1,16 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 return [
     'routes' => [
         'main' => [
-            'mautic_report_index'  => [
+            'mautic_report_index' => [
                 'path'       => '/reports/{page}',
                 'controller' => 'MauticReportBundle:Report:index',
             ],
@@ -21,10 +23,10 @@ return [
                     'format' => 'csv',
                 ],
             ],
-            'mautic_report_view'   => [
-                'path'         => '/reports/view/{objectId}/{reportPage}',
-                'controller'   => 'MauticReportBundle:Report:view',
-                'defaults'     => [
+            'mautic_report_view' => [
+                'path'       => '/reports/view/{objectId}/{reportPage}',
+                'controller' => 'MauticReportBundle:Report:view',
+                'defaults'   => [
                     'reportPage' => 1,
                 ],
                 'requirements' => [
@@ -36,12 +38,12 @@ return [
                 'controller' => 'MauticReportBundle:Report:execute',
             ],
         ],
-        'api'  => [
+        'api' => [
             'mautic_api_getreports' => [
                 'path'       => '/reports',
                 'controller' => 'MauticReportBundle:Api\ReportApi:getEntities',
             ],
-            'mautic_api_getreport'  => [
+            'mautic_api_getreport' => [
                 'path'       => '/reports/{id}',
                 'controller' => 'MauticReportBundle:Api\ReportApi:getReport',
             ],
@@ -57,7 +59,7 @@ return [
                     'report:reports:viewown',
                     'report:reports:viewother',
                 ],
-                'priority'  => 20,
+                'priority' => 20,
             ],
         ],
     ],
@@ -65,23 +67,30 @@ return [
     'services' => [
         'events' => [
             'mautic.report.search.subscriber' => [
-                'class' => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
+                'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.report.model.report',
+                ],
             ],
             'mautic.report.report.subscriber' => [
-                'class' => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
+                'class'     => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
             ],
             'mautic.report.dashboard.subscriber' => [
                 'class'     => 'Mautic\ReportBundle\EventListener\DashboardSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.report.model.report',
-                    'mautic.security'
-                ]
+                    'mautic.security',
+                ],
 
             ],
         ],
-        'forms'  => [
-            'mautic.form.type.report'          => [
+        'forms' => [
+            'mautic.form.type.report' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'report',
@@ -90,21 +99,21 @@ return [
                 'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',
                 'alias' => 'filter_selector',
             ],
-            'mautic.form.type.table_order'     => [
+            'mautic.form.type.table_order' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'table_order',
             ],
-            'mautic.form.type.report_filters'  => [
+            'mautic.form.type.report_filters' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'report_filters',
             ],
-            'mautic.form.type.report_dynamic_filters'  => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-                'alias'     => 'report_dynamicfilters',
+            'mautic.form.type.report_dynamic_filters' => [
+                'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
+                'alias' => 'report_dynamicfilters',
             ],
-            'mautic.form.type.report_widget'  => [
+            'mautic.form.type.report_widget' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
                 'alias'     => 'report_widget',
                 'arguments' => 'mautic.report.model.report',

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -18,14 +20,14 @@
                     </div>
                     <div class="col-md-4 va-m">
                         <h5 class="fw-sb text-primary">
-                            <a href="<?php echo $view['router']->path('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $email['campaign_id'])); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $email['campaign_id']]); ?>" data-toggle="ajax">
                                 <?php echo $email['campaign_name']; ?>
                             </a>
                         </h5>
                         <span class="text-white dark-sm"><?php echo $email['event_name']; ?></span>
                     </div>
                     <div class="col-md-4 va-m text-right">
-                        <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->path('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
+                        <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $email['lead_id']]); ?>" data-toggle="ajax">
                             <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
                             <?php echo $email['lead_name']; ?>
                         </a>

@@ -1,29 +1,30 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PluginBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PluginRepository
+ * Class PluginRepository.
  */
 class PluginRepository extends CommonRepository
 {
-
     /**
-     * Find an addon record by bundle name
+     * Find an addon record by bundle name.
      *
      * @param string $bundle
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findByBundle($bundle)
@@ -38,13 +39,13 @@ class PluginRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
-            ->from('MauticPluginBundle:Plugin', $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias() . '.' . $args['index'] : $this->getTableAlias() . '.id');
+            ->from('MauticPluginBundle:Plugin', $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 
-        $args['qb'] = $q;
+        $args['qb']               = $q;
         $args['ignore_paginator'] = true;
 
         return parent::getEntities($args);
@@ -55,9 +56,9 @@ class PluginRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('p.name', 'ASC')
-        );
+        return [
+            ['p.name', 'ASC'],
+        ];
     }
 
     /**

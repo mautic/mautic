@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 
 <div class="col-md-4">
@@ -21,6 +22,6 @@
                 <h3 class="text-white dark-sm"><span class="fa <?php echo isset($graph['iconClass']) ? $graph['iconClass'] : ''; ?>"></span></h3>
             </div>
         </div>
-        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $graph['data'], 'chartType' => 'pie', 'chartHeight' => 210)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $graph['data'], 'chartType' => 'pie', 'chartHeight' => 210]); ?>
     </div>
 </div>

@@ -1,20 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * MauticSocialBundle schema
+ * MauticSocialBundle schema.
  *
  * Class Version20160520000000
  */
@@ -32,39 +34,37 @@ class Version20160520000000 extends AbstractMauticMigration
     {
         // Test to see if this migration has already been applied
         if ($schema->hasTable($this->prefix.'monitoring_leads')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-
-        $this->keys = array(
-            'monitoring_leads'   => array(
-                'idx' => array(
-                    'monitor' => $this->generatePropertyName('monitoring_leads', 'idx', array('monitor_id')),
-                    'lead'    => $this->generatePropertyName('monitoring_leads', 'idx', array('lead_id')),
-                ),
-                'fk'  => array(
-                    'monitor' => $this->generatePropertyName('monitoring_leads', 'fk', array('monitor_id')),
-                    'lead'    => $this->generatePropertyName('monitoring_leads', 'fk', array('lead_id')),
-                )
-            ),
-            'monitoring'         => array(
-                'idx' => array(
-                    'category' => $this->generatePropertyName('monitoring', 'idx', array('category_id'))
-                ),
-                'fk'  => array(
-                    'category' => $this->generatePropertyName('monitoring', 'fk', array('category_id')),
-                )
-            ),
-            'monitor_post_count' => array(
-                'idx' => array(
-                    'monitor' => $this->generatePropertyName('monitor_post_count', 'idx', array('monitor_id'))
-                ),
-                'fk'  => array(
-                    'monitor' => $this->generatePropertyName('monitor_post_count', 'fk', array('monitor_id'))
-                )
-            )
-        );
+        $this->keys = [
+            'monitoring_leads' => [
+                'idx' => [
+                    'monitor' => $this->generatePropertyName('monitoring_leads', 'idx', ['monitor_id']),
+                    'lead'    => $this->generatePropertyName('monitoring_leads', 'idx', ['lead_id']),
+                ],
+                'fk' => [
+                    'monitor' => $this->generatePropertyName('monitoring_leads', 'fk', ['monitor_id']),
+                    'lead'    => $this->generatePropertyName('monitoring_leads', 'fk', ['lead_id']),
+                ],
+            ],
+            'monitoring' => [
+                'idx' => [
+                    'category' => $this->generatePropertyName('monitoring', 'idx', ['category_id']),
+                ],
+                'fk' => [
+                    'category' => $this->generatePropertyName('monitoring', 'fk', ['category_id']),
+                ],
+            ],
+            'monitor_post_count' => [
+                'idx' => [
+                    'monitor' => $this->generatePropertyName('monitor_post_count', 'idx', ['monitor_id']),
+                ],
+                'fk' => [
+                    'monitor' => $this->generatePropertyName('monitor_post_count', 'fk', ['monitor_id']),
+                ],
+            ],
+        ];
     }
 
     /**
@@ -83,7 +83,6 @@ CREATE TABLE {$this->prefix}monitoring_leads (
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;
         $this->addSql($sql);
-
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}monitoring (

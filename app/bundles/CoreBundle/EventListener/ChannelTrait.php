@@ -1,18 +1,35 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Factory\ModelFactory;
 
 trait ChannelTrait
 {
     /**
-     * Get the model for a channel
+     * @var ModelFactory
+     */
+    protected $modelFactory;
+
+    /**
+     * @param ModelFactory $modelFactory
+     */
+    public function setModelFactory(ModelFactory $modelFactory)
+    {
+        $this->modelFactory = $modelFactory;
+    }
+
+    /**
+     * Get the model for a channel.
      *
      * @param $channel
      *
@@ -20,27 +37,29 @@ trait ChannelTrait
      */
     protected function getChannelModel($channel)
     {
-        static $models = [];
-
-        if (!isset($models[$channel])) {
-            $channelModel = false;
+        if (null !== $this->modelFactory) {
+            if ($this->modelFactory->hasModel($channel)) {
+                return $this->modelFactory->getModel($channel);
+            }
+        } else {
+            // BC - @deprecated - to be removed in 3.0
             try {
-                $channelModel = $this->factory->getModel($channel);
+                return $this->factory->getModel($channel);
             } catch (\Exception $exception) {
                 // No model found
             }
-
-            $models[$channel] = $channelModel;
         }
 
-        return $models[$channel];
+        return false;
     }
 
     /**
-     * Get the entity for a channel item
+     * Get the entity for a channel item.
      *
      * @param $channel
      * @param $channelId
+     *
+     * @return mixed
      */
     protected function getChannelEntity($channel, $channelId)
     {
@@ -57,7 +76,7 @@ trait ChannelTrait
     }
 
     /**
-     * Get the name and/or view URL for a channel entity
+     * Get the name and/or view URL for a channel entity.
      *
      * @param      $channel
      * @param      $channelId
@@ -87,14 +106,14 @@ trait ChannelTrait
                         $routeSourceName,
                         [
                             'objectAction' => 'view',
-                            'objectId'     => $channelId
+                            'objectId'     => $channelId,
                         ]
                     );
                 }
 
                 return [
                     'name' => $name,
-                    'url'  => $url
+                    'url'  => $url,
                 ];
             }
 

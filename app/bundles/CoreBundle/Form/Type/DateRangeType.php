@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +16,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FilterType
- *
- * @package Mautic\CoreBundle\Form\Type
+ * Class FilterType.
  */
 class DateRangeType extends AbstractType
 {
-
     private $factory;
 
     /**
@@ -48,13 +47,13 @@ class DateRangeType extends AbstractType
         $builder->add(
             'date_from',
             'text',
-            array(
+            [
                 'label'      => 'mautic.core.date.from',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'data'       => $dateFrom->format($humanFormat),
-            )
+            ]
         );
 
         $dateTo = (empty($options['data']['date_to']))
@@ -66,26 +65,26 @@ class DateRangeType extends AbstractType
         $builder->add(
             'date_to',
             'text',
-            array(
+            [
                 'label'      => 'mautic.core.date.to',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
                 'required'   => false,
-                'data'       => $dateTo->format($humanFormat)
-            )
+                'data'       => $dateTo->format($humanFormat),
+            ]
         );
 
         $builder->add(
             'apply',
             'submit',
-            array(
+            [
                 'label' => 'mautic.core.form.apply',
-                'attr'  => array('class' => 'btn btn-default')
-            )
+                'attr'  => ['class' => 'btn btn-default'],
+            ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -94,6 +93,6 @@ class DateRangeType extends AbstractType
      */
     public function getName()
     {
-        return "daterange";
+        return 'daterange';
     }
 }

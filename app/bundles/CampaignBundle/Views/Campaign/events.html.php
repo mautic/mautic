@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <?php if (!empty($events) && is_array($events)) : ?>
 <!-- start: trigger type event -->
@@ -34,7 +35,7 @@
                     <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
                 </div>
                 <div class="col-md-4 va-m text-right">
-                    <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.' . $event['type']); ?></em>
+                    <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?></em>
                 </div>
             </div>
         </li>

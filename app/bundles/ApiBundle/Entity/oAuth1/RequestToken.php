@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,13 +18,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class RequestToken
- *
- * @package Mautic\ApiBundle\Entity\oAuth1
+ * Class RequestToken.
  */
 class RequestToken implements RequestTokenInterface
 {
-
     /**
      * @var int
      */
@@ -49,7 +48,7 @@ class RequestToken implements RequestTokenInterface
     protected $secret;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $expiresAt;
 
@@ -61,12 +60,12 @@ class RequestToken implements RequestTokenInterface
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth1_request_tokens')
-            ->addIndex(array('token'), 'oauth1_request_token_search');
+            ->addIndex(['token'], 'oauth1_request_token_search');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -93,25 +92,25 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getToken ()
+    public function getToken()
     {
         return $this->token;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setToken ($token)
+    public function setToken($token)
     {
         $this->token = $token;
 
@@ -119,17 +118,17 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getSecret ()
+    public function getSecret()
     {
         return $this->secret;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setSecret ($secret)
+    public function setSecret($secret)
     {
         $this->secret = $secret;
 
@@ -137,17 +136,17 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getExpiresAt ()
+    public function getExpiresAt()
     {
         return $this->expiresAt;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setExpiresAt ($expiresAt)
+    public function setExpiresAt($expiresAt)
     {
         $this->expiresAt = $expiresAt;
 
@@ -155,9 +154,9 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getExpiresIn ()
+    public function getExpiresIn()
     {
         if ($this->expiresAt) {
             return $this->expiresAt - time();
@@ -167,9 +166,9 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function hasExpired ()
+    public function hasExpired()
     {
         if ($this->expiresAt) {
             return time() > $this->expiresAt;
@@ -179,17 +178,17 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getUser ()
+    public function getUser()
     {
         return $this->user;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setUser (UserInterface $user)
+    public function setUser(UserInterface $user)
     {
         $this->user = $user;
 
@@ -197,9 +196,9 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setConsumer (ConsumerInterface $consumer)
+    public function setConsumer(ConsumerInterface $consumer)
     {
         $this->consumer = $consumer;
 
@@ -207,25 +206,25 @@ class RequestToken implements RequestTokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getConsumer ()
+    public function getConsumer()
     {
         return $this->consumer;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getVerifier ()
+    public function getVerifier()
     {
         return $this->verifier;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setVerifier ($verifier)
+    public function setVerifier($verifier)
     {
         $this->verifier = $verifier;
     }

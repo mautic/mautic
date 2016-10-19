@@ -1,42 +1,74 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\ApiEvents;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\ApiBundle\Event as Events;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Class ApiSubscriber
+ * Class ApiSubscriber.
  */
 class ApiSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * ApiSubscriber constructor.
+     *
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param AuditLogModel        $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->auditLogModel        = $auditLogModel;
+    }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST         => array('onKernelRequest', 255),
-            ApiEvents::CLIENT_POST_SAVE   => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_POST_DELETE => array('onClientDelete', 0)
-        );
+        return [
+            KernelEvents::REQUEST         => ['onKernelRequest', 255],
+            ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
+            ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
+        ];
     }
 
     /**
-     * Check for API requests and throw denied access if API is disabled
+     * Check for API requests and throw denied access if API is disabled.
      *
      * @param GetResponseEvent $event
      */
@@ -46,7 +78,7 @@ class ApiSubscriber extends CommonSubscriber
             return;
         }
 
-        $apiEnabled = $this->factory->getParameter('api_enabled');
+        $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
         $request    = $event->getRequest();
         $requestUrl = $request->getRequestUri();
 
@@ -55,20 +87,19 @@ class ApiSubscriber extends CommonSubscriber
         defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
 
         if ($isApiRequest && !$apiEnabled) {
-
             throw new AccessDeniedHttpException(
-                $this->factory->getTranslator()->trans(
+                $this->translator->trans(
                     'mautic.core.url.error.401',
-                    array(
-                        '%url%' => $request->getRequestUri()
-                    )
+                    [
+                        '%url%' => $request->getRequestUri(),
+                    ]
                 )
             );
         }
     }
 
     /**
-     * Add a client change entry to the audit log
+     * Add a client change entry to the audit log.
      *
      * @param Events\ClientEvent $event
      */
@@ -76,34 +107,34 @@ class ApiSubscriber extends CommonSubscriber
     {
         $client = $event->getClient();
         if ($details = $event->getChanges()) {
-            $log        = array(
+            $log = [
                 'bundle'    => 'api',
                 'object'    => 'client',
                 'objectId'  => $client->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
-                'ipAddress' => $this->factory->getIpAddressFromRequest()
-            );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
     /**
-     * Add a role delete entry to the audit log
+     * Add a role delete entry to the audit log.
      *
      * @param Events\ClientEvent $event
      */
     public function onClientDelete(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-        $log = array(
-            'bundle'     => 'api',
-            'object'     => 'client',
-            'objectId'   => $client->deletedId,
-            'action'     => 'delete',
-            'details'    => array('name' => $client->getName()),
-            'ipAddress'  => $this->factory->getIpAddressFromRequest()
-        );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $log    = [
+            'bundle'    => 'api',
+            'object'    => 'client',
+            'objectId'  => $client->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $client->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
     }
 }

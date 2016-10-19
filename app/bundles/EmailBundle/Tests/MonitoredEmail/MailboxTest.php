@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,32 +15,31 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
 /**
- * Class Mailbox
+ * Class Mailbox.
  */
-class Mailbox extends \PHPUnit_Framework_TestCase
+class MailboxTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testSettingsForMonitoredEmailWithoutOverride()
     {
         $config = [
-            "general"             => [
-                "address"    => "foo@bar.com",
-                "host"       => "imap.bar.com",
-                "port"       => "993",
-                "encryption" => "/ssl",
-                "user"       => "foo@bar.com",
-                "password"   => "topsecret"
+            'general' => [
+                'address'    => 'foo@bar.com',
+                'host'       => 'imap.bar.com',
+                'port'       => '993',
+                'encryption' => '/ssl',
+                'user'       => 'foo@bar.com',
+                'password'   => 'topsecret',
             ],
-            "EmailBundle_bounces" => [
-                "address"           => "",
-                "host"              => "",
-                "port"              => "993",
-                "encryption"        => "/ssl",
-                "user"              => "",
-                "password"          => "",
-                "override_settings" => "",
-                "folder"            => "Bounces",
-                "ssl"               => "1"
+            'EmailBundle_bounces' => [
+                'address'           => '',
+                'host'              => '',
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => '',
+                'password'          => '',
+                'override_settings' => '',
+                'folder'            => 'Bounces',
+                'ssl'               => '1',
             ],
         ];
 
@@ -68,24 +69,24 @@ class Mailbox extends \PHPUnit_Framework_TestCase
     public function testSettingsForMonitoredEmailWithOverride()
     {
         $config = [
-            "general"             => [
-                "address"    => "foo@bar.com",
-                "host"       => "imap.bar.com",
-                "port"       => "993",
-                "encryption" => "/ssl",
-                "user"       => "foo@bar.com",
-                "password"   => "topsecret"
+            'general' => [
+                'address'    => 'foo@bar.com',
+                'host'       => 'imap.bar.com',
+                'port'       => '993',
+                'encryption' => '/ssl',
+                'user'       => 'foo@bar.com',
+                'password'   => 'topsecret',
             ],
-            "EmailBundle_bounces" => [
-                "address"           => "bar@foo.com",
-                "host"              => "imap.foo.com",
-                "port"              => "993",
-                "encryption"        => "/ssl",
-                "user"              => "bar@foo.com",
-                "password"          => "topsecret",
-                "override_settings" => true,
-                "folder"            => "INBOX",
-                "ssl"               => "1"
+            'EmailBundle_bounces' => [
+                'address'           => 'bar@foo.com',
+                'host'              => 'imap.foo.com',
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => 'bar@foo.com',
+                'password'          => 'topsecret',
+                'override_settings' => true,
+                'folder'            => 'INBOX',
+                'ssl'               => '1',
             ],
         ];
 

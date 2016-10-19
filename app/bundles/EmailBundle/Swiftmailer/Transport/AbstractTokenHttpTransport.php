@@ -1,16 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 /**
- * Class AbstractTokenHttpTransport
+ * Class AbstractTokenHttpTransport.
  */
 abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport
 {
@@ -30,33 +32,34 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     private $apiKey;
 
     /**
-     * Return an array of headers for the POST
+     * Return an array of headers for the POST.
      *
      * @return array
      */
     abstract protected function getHeaders();
 
     /**
-     * Return the payload for the POST
+     * Return the payload for the POST.
      *
      * @return mixed
      */
     abstract protected function getPayload();
 
     /**
-     * Return the URL for the API endpoint
+     * Return the URL for the API endpoint.
      *
      * @return string
      */
     abstract protected function getApiEndpoint();
 
     /**
-     * Analyze the output of the API response and return any addresses that FAILED to send
+     * Analyze the output of the API response and return any addresses that FAILED to send.
      *
      * @param $response
      * @param $curlInfo
      *
      * @throws \Swift_TransportException
+     *
      * @return array
      */
     abstract protected function handlePostResponse($response, $curlInfo);
@@ -118,6 +121,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
      * @param null                $failedRecipients
      *
      * @return int
+     *
      * @throws \Swift_TransportException
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
@@ -152,7 +156,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
 
                     $message->generateId();
 
-                    return ($count - count($failed));
+                    return $count - count($failed);
                 } else {
                     $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                     $evt->setFailedRecipients($failedRecipients);
@@ -182,14 +186,15 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * POST payload to API endpoint
+     * POST payload to API endpoint.
      *
      * @param array $settings
      *
      * @return array of failed addresses
+     *
      * @throws \Swift_TransportException
      */
-    protected function post($settings = array())
+    protected function post($settings = [])
     {
         $payload  = empty($settings['payload']) ? $this->getPayload() : $settings['payload'];
         $headers  = empty($settings['headers']) ? $this->getHeaders() : $settings['headers'];
@@ -214,13 +219,12 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
         $response = curl_exec($ch);
         $info     = curl_getinfo($ch);
 
-        if(curl_error($ch)) {
-            $this->throwException("API call to $endpoint failed: " . curl_error($ch));
+        if (curl_error($ch)) {
+            $this->throwException("API call to $endpoint failed: ".curl_error($ch));
         }
 
         curl_close($ch);
 
         return $this->handlePostResponse($response, $info);
     }
-
 }

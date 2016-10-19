@@ -4,6 +4,10 @@
     font-weight: bold;
 }
 
+.form-field-wrapper {
+    position: relative;
+}
+
 #mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
     padding: 10px;
 }
@@ -29,8 +33,9 @@
 }
 
 #mauticforms_fields .form-buttons {
-    float: right;
-    margin-top: 8px;
+    position: absolute;
+    right: 8px;
+    top: 8px;
 }
 
 #mauticforms_fields input, #mauticforms_fields textarea, #mauticforms_fields select {
@@ -65,6 +70,10 @@ textarea.form-html {
 }
 
 .formresult-list th:not(.col-formresult-id):not(.col-actions) {
+    min-width: 125px;
+}
+
+.formresult-list th.col-formresult-id {
     min-width: 125px;
 }
 

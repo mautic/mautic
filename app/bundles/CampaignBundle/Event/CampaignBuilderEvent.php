@@ -1,34 +1,36 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * Class CampaignBuilderEvent
- *
- * @package Mautic\CampaignBundle\Event
+ * Class CampaignBuilderEvent.
  */
 class CampaignBuilderEvent extends Event
 {
+    use ComponentValidationTrait;
 
     /**
      * @var array
      */
-    private $leadDecisions = [];
+    private $decisions = [];
 
     /**
      * @var array
      */
-    private $leadConditions = [];
+    private $conditions = [];
 
     /**
      * @var array
@@ -51,111 +53,129 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an lead decision to the list of available .
      *
-     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $action  - can contain the following keys:
-     *                        'label'       => (required) what to display in the list
-     *                        'description' => (optional) short description of event
-     *                        'formType'    => (optional) name of the form type SERVICE for the action
-     *                        'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                        'formTheme'   => (optional) form theme
-     *                        'eventName'   => (optional) The event name to fire when this event is triggered.
-     *                        'associatedActions' => (optional) Array of action types to limit what this decision can be associated with
-     *                        'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     * @param string $key      a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $decision can contain the following keys:
+     *                         $decision = [
+     *                         'label'              => (required) what to display in the list
+     *                         'eventName'          => (required) The event name to fire when this event is triggered.
+     *                         'description'        => (optional) short description of event
+     *                         'formType'           => (optional) name of the form type SERVICE for the action
+     *                         'formTypeOptions'    => (optional) array of options to pass to the formType service
+     *                         'formTheme'          => (optional) form theme
+     *                         'associatedActions'  => (optional) Array of action types to limit what this decision can be associated with
+     *                         'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     *                         ]
      */
-    public function addLeadDecision($key, array $action)
+    public function addDecision($key, array $decision)
     {
-        if (array_key_exists($key, $this->leadDecisions)) {
+        if (array_key_exists($key, $this->decisions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['label'],
-            ['callback'],
-            $action
+            ['label', ['eventName', 'callback']],
+            $decision,
+            ['callback']
         );
 
-        $action['label']       = $this->translator->trans($action['label']);
-        $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
+        $decision['label']       = $this->translator->trans($decision['label']);
+        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
 
-        $this->leadDecisions[$key] = $action;
+        $this->decisions[$key] = $decision;
     }
 
     /**
-     * Get lead decisions
+     * Get decisions.
+     *
+     * @return mixed
+     */
+    public function getDecisions()
+    {
+        static $sorted = false;
+
+        if (empty($sorted)) {
+            uasort(
+                $this->decisions,
+                function ($a, $b) {
+                    return strnatcasecmp(
+                        $a['label'],
+                        $b['label']
+                    );
+                }
+            );
+            $sorted = true;
+        }
+
+        return $this->decisions;
+    }
+
+    /**
+     * @deprecated - use addDecision instead
+     *
+     * @param       $key
+     * @param array $decision
+     */
+    public function addLeadDecision($key, array $decision)
+    {
+        $this->addDecision($key, $decision);
+    }
+
+    /**
+     * @deprecated - use getDecisions instead
      *
      * @return array
      */
     public function getLeadDecisions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->leadDecisions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->leadDecisions;
+        return $this->getDecisions();
     }
 
     /**
      * Add an lead condition to the list of available conditions.
      *
-     * @param string $key           - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $condition     - can contain the following keys:
-     *                              'label'       => (required) what to display in the list
-     *                              'description' => (optional) short description of event
-     *                              'formType'    => (optional) name of the form type SERVICE for the action
-     *                              'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                              'formTheme'   => (optional) form theme
-     *                              'callback'    => (optional) callback function that will be passed when the event is triggered
-     *                              The callback function should return a bool to determine if the trigger's actions
-     *                              should be executed.  For example, only trigger actions for specific entities.
-     *                              it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                              mixed $eventDetails Whatever the bundle passes when triggering the event
-     *                              Mautic\CoreBundle\Factory\MauticFactory $factory
-     *                              Mautic\LeadBundle\Entity\Lead $lead
-     *                              array $event
+     * @param string $key       a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $condition can contain the following keys:
+     *                          $condition = [
+     *                          'label'           => (required) what to display in the list
+     *                          'eventName'       => (required) The event name to fire when this event is triggered.
+     *                          'description'     => (optional) short description of event
+     *                          'formType'        => (optional) name of the form type SERVICE for the action
+     *                          'formTypeOptions' => (optional) array of options to pass to the formType service
+     *                          'formTheme'       => (optional) form theme
+     *                          ]
      */
-    public function addLeadCondition($key, array $event)
+    public function addCondition($key, array $event)
     {
-        if (array_key_exists($key, $this->leadConditions)) {
+        if (array_key_exists($key, $this->conditions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['label'],
-            ['callback'],
-            $event
+            ['label', ['eventName', 'callback']],
+            $event,
+            ['callback']
         );
 
         $event['label']       = $this->translator->trans($event['label']);
         $event['description'] = (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
 
-        $this->leadConditions[$key] = $event;
+        $this->conditions[$key] = $event;
     }
 
     /**
-     * Get lead conditions
+     * Get lead conditions.
      *
      * @return array
      */
-    public function getLeadConditions()
+    public function getConditions()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
             uasort(
-                $this->leadConditions,
+                $this->conditions,
                 function ($a, $b) {
                     return strnatcasecmp(
                         $a['label'],
@@ -166,23 +186,46 @@ class CampaignBuilderEvent extends Event
             $sorted = true;
         }
 
-        return $this->leadConditions;
+        return $this->conditions;
+    }
+
+    /**
+     * @deprecated use addCondition instead
+     *
+     * @param       $key
+     * @param array $event
+     */
+    public function addLeadCondition($key, array $event)
+    {
+        $this->addCondition($key, $event);
+    }
+
+    /**
+     * @deprecated use getConditions() instead
+     *
+     * @return array
+     */
+    public function getLeadConditions()
+    {
+        return $this->getConditions();
     }
 
     /**
      * Add an action to the list of available .
      *
-     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $action - can contain the following keys:
-     *                       'label'            => (required) what to display in the list
-     *                       'description'      => (optional) short description of event
-     *                       'formType'         => (optional) name of the form type SERVICE for the action
-     *                       'formTypeOptions'  => (optional) array of options to pass to the formType service
-     *                       'formTheme'        => (optional) form theme
-     *                       'timelineTemplate' => (optional) custom template for the lead timeline
-     *                       'eventName'        => (required) The event to fire when this event is triggered.
+     * @param string $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $action can contain the following keys:
+     *                       $action = [
+     *                       'label'               => (required) what to display in the list
+     *                       'eventName'           => (required) The event to fire when this event is triggered.
+     *                       'description'         => (optional) short description of event
+     *                       'formType'            => (optional) name of the form type SERVICE for the action
+     *                       'formTypeOptions'     => (optional) array of options to pass to the formType service
+     *                       'formTheme'           => (optional) form theme
+     *                       'timelineTemplate'    => (optional) custom template for the lead timeline
      *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
-     *                       'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     *                       'anchorRestrictions'  => (optional) Array of event anchors this event should not be allowed to connect to
+     *                       ]
      */
     public function addAction($key, array $action)
     {
@@ -192,9 +235,9 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['label'],
-            [],
-            $action
+            ['label', ['eventName', 'callback']],
+            $action,
+            ['callback']
         );
 
         //translate the group
@@ -205,7 +248,7 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get actions
+     * Get actions.
      *
      * @return array
      */
@@ -227,25 +270,5 @@ class CampaignBuilderEvent extends Event
         }
 
         return $this->actions;
-    }
-
-    /**
-     * @param array $component
-     */
-    private function verifyComponent(array $keys, array $methods, array $component)
-    {
-        foreach ($keys as $k) {
-            if (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
-            }
-        }
-
-        foreach ($methods as $m) {
-            if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException(
-                    $component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.'
-                );
-            }
-        }
     }
 }

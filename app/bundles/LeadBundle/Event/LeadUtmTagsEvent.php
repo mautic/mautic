@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class PointsChangeEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class PointsChangeEvent.
  */
 class LeadUtmTagsEvent extends CommonEvent
 {
@@ -25,12 +25,12 @@ class LeadUtmTagsEvent extends CommonEvent
      */
     public function __construct(Lead &$lead, $utmTag)
     {
-        $this->entity =& $lead;
+        $this->entity  = &$lead;
         $this->utmtags = $utmTag;
     }
 
     /**
-     * Returns the Lead entity
+     * Returns the Lead entity.
      *
      * @return Lead
      */
@@ -40,7 +40,7 @@ class LeadUtmTagsEvent extends CommonEvent
     }
 
     /**
-     * Returns the new points
+     * Returns the new points.
      *
      * @return int
      */

@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
- * Class DoctrineEventsSubscriber
+ * Class DoctrineEventsSubscriber.
  */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
@@ -40,14 +41,11 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
     /**
      * @param LoadClassMetadataEventArgs $args
-     *
-     * @return void
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
-
             return;
         } elseif (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
@@ -58,7 +56,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
         // Do not re-apply the prefix in an inheritance hierarchy.
         if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
-
             return;
         }
 
@@ -85,7 +82,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
                 [
                     'name'              => $this->tablePrefix.$classMetadata->getTableName(),
                     'indexes'           => $indexes,
-                    'uniqueConstraints' => $uniqueConstraints
+                    'uniqueConstraints' => $uniqueConstraints,
                 ]
             );
 

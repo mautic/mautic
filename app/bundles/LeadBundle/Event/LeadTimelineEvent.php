@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,20 +17,19 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class LeadTimelineEvent
+ * Class LeadTimelineEvent.
  */
 class LeadTimelineEvent extends Event
 {
-
     /**
-     * Container with all filtered events
+     * Container with all filtered events.
      *
      * @var array
      */
     protected $events = [];
 
     /**
-     * Container with all registered events types
+     * Container with all registered events types.
      *
      * @var array
      */
@@ -38,7 +39,7 @@ class LeadTimelineEvent extends Event
      * Array of filters
      *  search => (string) search term
      *  includeEvents => (array) event types to include
-     *  excludeEvents => (array) event types to exclude
+     *  excludeEvents => (array) event types to exclude.
      *
      * @var array
      */
@@ -50,7 +51,7 @@ class LeadTimelineEvent extends Event
     protected $orderBy = null;
 
     /**
-     * Lead entity for the lead the timeline is being generated for
+     * Lead entity for the lead the timeline is being generated for.
      *
      * @var Lead
      */
@@ -92,7 +93,7 @@ class LeadTimelineEvent extends Event
     protected $dateTo;
 
     /**
-     * Time unit to group counts by (M = month, D = day, Y = year, null = no grouping)
+     * Time unit to group counts by (M = month, D = day, Y = year, null = no grouping).
      *
      * @var string
      */
@@ -110,16 +111,16 @@ class LeadTimelineEvent extends Event
      * @param array      $filters
      * @param array|null $orderBy
      * @param int        $page
-     * @param int        $limit     Limit per type
+     * @param int        $limit   Limit per type
      */
     public function __construct(Lead $lead, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
     {
         $this->lead    = $lead;
-        $this->filters = !empty($filters) ?  $filters :
+        $this->filters = !empty($filters) ? $filters :
             [
                 'search'        => '',
                 'includeEvents' => [],
-                'excludeEvents' => []
+                'excludeEvents' => [],
             ];
         $this->orderBy = $orderBy;
         $this->page    = $page;
@@ -135,8 +136,6 @@ class LeadTimelineEvent extends Event
      * 'extra'     => array     An optional array of extra data for the event
      *
      * @param array $data Data array for the table
-     *
-     * @return void
      */
     public function addEvent(array $data)
     {
@@ -146,8 +145,8 @@ class LeadTimelineEvent extends Event
                 $countData = [
                     [
                         'date'  => $data['timestamp'],
-                        'count' => 1
-                    ]
+                        'count' => 1,
+                    ],
                 ];
 
                 $count = $this->chartQuery->completeTimeData($countData);
@@ -156,7 +155,7 @@ class LeadTimelineEvent extends Event
                 if (!isset($this->totalEvents[$data['event']])) {
                     $this->totalEvents[$data['event']] = 0;
                 }
-                $this->totalEvents[$data['event']]++;
+                ++$this->totalEvents[$data['event']];
             }
         } else {
             if (!isset($this->events[$data['event']])) {
@@ -167,14 +166,13 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch the events
+     * Fetch the events.
      *
      * @return array Events sorted by timestamp with most recent event first
      */
     public function getEvents()
     {
         if (empty($this->events)) {
-
             return [];
         }
 
@@ -208,7 +206,6 @@ class LeadTimelineEvent extends Event
 
                         case 'timestamp':
                             if ($a['timestamp'] == $b['timestamp']) {
-
                                 $aPriority = isset($a['eventPriority']) ? (int) $a['eventPriority'] : 0;
                                 $bPriority = isset($b['eventPriority']) ? (int) $b['eventPriority'] : 0;
 
@@ -229,14 +226,13 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Get the max number of pages for pagination
+     * Get the max number of pages for pagination.
      *
      * @return float|int
      */
     public function getMaxPage()
     {
         if (!$this->totalEvents) {
-
             return 1;
         }
 
@@ -244,7 +240,7 @@ class LeadTimelineEvent extends Event
         $largest = max($this->totalEvents);
 
         // Max page is $largest / $limit
-        return ($largest) ? ceil($largest/$this->limit) : 1;
+        return ($largest) ? ceil($largest / $this->limit) : 1;
     }
 
     /**
@@ -252,8 +248,6 @@ class LeadTimelineEvent extends Event
      *
      * @param string $eventTypeKey  Identifier of the event type
      * @param string $eventTypeName Name of the event type for humans
-     *
-     * @return void
      */
     public function addEventType($eventTypeKey, $eventTypeName)
     {
@@ -261,7 +255,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch the event types
+     * Fetch the event types.
      *
      * @return array of available types
      */
@@ -273,9 +267,9 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch the filter array for queries
+     * Fetch the filter array for queries.
      *
-     * @return array of wanted filteres. Empty == all.
+     * @return array of wanted filteres. Empty == all
      */
     public function getEventFilters()
     {
@@ -283,7 +277,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch the order for queries
+     * Fetch the order for queries.
      *
      * @return array|null
      */
@@ -293,16 +287,16 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch start/limit for queries
+     * Fetch start/limit for queries.
      *
      * @return array
      */
     public function getEventLimit()
     {
         return [
-            'leadId'  => $this->lead->getId(),
-            'limit'   => $this->limit,
-            'start'   => (1 === $this->page) ? 0 : ($this->page - 1) * $this->limit
+            'leadId' => $this->lead->getId(),
+            'limit'  => $this->limit,
+            'start'  => (1 === $this->page) ? 0 : ($this->page - 1) * $this->limit,
         ];
     }
 
@@ -320,14 +314,14 @@ class LeadTimelineEvent extends Event
                 'unit'       => $this->groupUnit,
                 'fromDate'   => $this->dateFrom,
                 'toDate'     => $this->dateTo,
-                'chartQuery' => $this->chartQuery
+                'chartQuery' => $this->chartQuery,
             ],
             $this->getEventLimit()
         );
     }
 
     /**
-     * Fetches the lead being acted on
+     * Fetches the lead being acted on.
      *
      * @return Lead
      */
@@ -337,7 +331,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Determine if an event type should be included
+     * Determine if an event type should be included.
      *
      * @param      $eventType
      * @param bool $inclusive
@@ -362,7 +356,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Check if the event is getting an engagement count only
+     * Check if the event is getting an engagement count only.
      *
      * @return bool
      */
@@ -372,7 +366,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Get the date range to get counts by
+     * Get the date range to get counts by.
      *
      * @return array
      */
@@ -382,7 +376,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Get the unit counts are to be grouped by
+     * Get the unit counts are to be grouped by.
      *
      * @return string
      */
@@ -392,7 +386,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Get total number of events for pagination
+     * Get total number of events for pagination.
      */
     public function getEventCounter()
     {
@@ -404,7 +398,7 @@ class LeadTimelineEvent extends Event
         }
 
         $counter = [
-            'total' => array_sum($this->totalEvents)
+            'total' => array_sum($this->totalEvents),
         ];
 
         if ($this->countOnly && $this->groupUnit) {
@@ -415,7 +409,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Add to the event counters
+     * Add to the event counters.
      *
      * @param int|array $count
      */
@@ -446,7 +440,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Subtract from the total counter if there is an event that was skipped for whatever reason
+     * Subtract from the total counter if there is an event that was skipped for whatever reason.
      *
      * @param $eventType
      * @param $count
@@ -457,7 +451,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Calculate engagement counts only
+     * Calculate engagement counts only.
      *
      * @param \DateTime       $dateFrom
      * @param \DateTime       $dateTo
@@ -474,7 +468,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Get chart query helper to format dates
+     * Get chart query helper to format dates.
      *
      * @return ChartQuery
      */

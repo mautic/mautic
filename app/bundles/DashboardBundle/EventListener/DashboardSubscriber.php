@@ -1,69 +1,70 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DashboardBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
-use Mautic\DashboardBundle\Event\WidgetFormEvent;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Event\WidgetFormEvent;
+use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 
 /**
- * Class DashboardSubscriber
- *
- * @package Mautic\DashboardBundle\EventListener
+ * Class DashboardSubscriber.
  */
 class DashboardSubscriber extends CommonSubscriber
 {
     /**
-     * Define the name of the bundle/category of the widget(s)
+     * Define the name of the bundle/category of the widget(s).
      *
      * @var string
      */
     protected $bundle = 'others';
 
     /**
-     * Define the widget(s)
+     * Define the widget(s).
      *
      * @var array
      */
-    protected $types = array();
+    protected $types = [];
 
     /**
-     * Define permissions to see those widgets
+     * Define permissions to see those widgets.
      *
      * @var array
      */
-    protected $permissions = array();
+    protected $permissions = [];
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => array('onWidgetListGenerate', 0),
-            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE => array('onWidgetFormGenerate', 0),
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => array('onWidgetDetailGenerate', 0),
-        );
+        return [
+            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
+            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE   => ['onWidgetFormGenerate', 0],
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
+        ];
     }
 
     /**
-     * Adds widget new widget types to the list of available widget types 
+     * Adds widget new widget types to the list of available widget types.
      *
      * @param WidgetTypeListEvent $event
-     *
-     * @return void
      */
     public function onWidgetListGenerate(WidgetTypeListEvent $event)
     {
-        if ($this->permissions && !$event->hasPermissions($this->permissions)) return;
+        if ($this->permissions && !$event->hasPermissions($this->permissions)) {
+            return;
+        }
 
         $widgetTypes = array_keys($this->types);
 
@@ -73,11 +74,9 @@ class DashboardSubscriber extends CommonSubscriber
     }
 
     /**
-     * Set a widget edit form when needed 
+     * Set a widget edit form when needed.
      *
      * @param WidgetFormEvent $event
-     *
-     * @return void
      */
     public function onWidgetFormGenerate(WidgetFormEvent $event)
     {
@@ -88,30 +87,27 @@ class DashboardSubscriber extends CommonSubscriber
     }
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed.
      *
      * @param WidgetDetailEvent $event
-     *
-     * @return void
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
     }
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed.
      *
      * @param WidgetDetailEvent $event
-     *
-     * @return void
      */
     public function checkPermissions(WidgetDetailEvent $event)
     {
         $widgetTypes = array_keys($this->types);
         if ($this->permissions && !$event->hasPermissions($this->permissions) && in_array($event->getType(), $widgetTypes)) {
             $translator = $event->getTranslator();
-            $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+            $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', ['%section%' => $this->bundle]));
             $event->stopPropagation();
+
             return;
         }
     }

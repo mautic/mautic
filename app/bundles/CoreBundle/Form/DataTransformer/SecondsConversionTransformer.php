@@ -1,8 +1,11 @@
-<?php /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+<?php
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +14,7 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class SecondsConversionTransformer
+ * Class SecondsConversionTransformer.
  */
 class SecondsConversionTransformer implements DataTransformerInterface
 {
@@ -19,13 +22,13 @@ class SecondsConversionTransformer implements DataTransformerInterface
 
     public function __construct($viewFormat = 'H')
     {
-        $this->viewFormat  = $viewFormat;
+        $this->viewFormat = $viewFormat;
     }
 
     /**
-     * Converts to format
+     * Converts to format.
      *
-     * @param  string|null $value
+     * @param string|null $value
      *
      * @return string
      */
@@ -52,9 +55,9 @@ class SecondsConversionTransformer implements DataTransformerInterface
     }
 
     /**
-     * Converts to seconds
+     * Converts to seconds.
      *
-     * @param  string $value
+     * @param string $value
      *
      * @return string
      */

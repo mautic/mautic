@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -28,8 +30,8 @@ class SmsClickEvent extends CommonEvent
      */
     public function __construct(Stat $stat, $request)
     {
-        $this->entity = $stat;
-        $this->sms = $stat->getSms();
+        $this->entity  = $stat;
+        $this->sms     = $stat->getSms();
         $this->request = $request;
     }
 

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,13 +16,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class Download
- *
- * @package Mautic\AssetBundle\Entity
+ * Class Download.
  */
 class Download
 {
-
     /**
      * @var int
      */
@@ -108,7 +107,7 @@ class Download
 
         $builder->addField('code', 'integer');
 
-        $builder->createField('referer', 'string')
+        $builder->createField('referer', 'text')
             ->nullable()
             ->build();
 
@@ -131,9 +130,9 @@ class Download
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -141,7 +140,7 @@ class Download
     }
 
     /**
-     * Set dateDownload
+     * Set dateDownload.
      *
      * @param \DateTime $dateDownload
      *
@@ -155,7 +154,7 @@ class Download
     }
 
     /**
-     * Get dateDownload
+     * Get dateDownload.
      *
      * @return \DateTime
      */
@@ -165,9 +164,9 @@ class Download
     }
 
     /**
-     * Set code
+     * Set code.
      *
-     * @param integer $code
+     * @param int $code
      *
      * @return Download
      */
@@ -179,9 +178,9 @@ class Download
     }
 
     /**
-     * Get code
+     * Get code.
      *
-     * @return integer
+     * @return int
      */
     public function getCode()
     {
@@ -189,7 +188,7 @@ class Download
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
@@ -203,7 +202,7 @@ class Download
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
@@ -213,7 +212,7 @@ class Download
     }
 
     /**
-     * Set asset
+     * Set asset.
      *
      * @param Asset $asset
      *
@@ -227,7 +226,7 @@ class Download
     }
 
     /**
-     * Get asset
+     * Get asset.
      *
      * @return Asset
      */
@@ -237,7 +236,7 @@ class Download
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
@@ -251,7 +250,7 @@ class Download
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
@@ -261,9 +260,9 @@ class Download
     }
 
     /**
-     * Set trackingId
+     * Set trackingId.
      *
-     * @param integer $trackingId
+     * @param int $trackingId
      *
      * @return Download
      */
@@ -275,9 +274,9 @@ class Download
     }
 
     /**
-     * Get trackingId
+     * Get trackingId.
      *
-     * @return integer
+     * @return int
      */
     public function getTrackingId()
     {
@@ -317,7 +316,7 @@ class Download
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getSourceId()
     {

@@ -1,14 +1,15 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $template   = '<div class="col-md-6">{content}</div>';
-$properties = (isset($form['properties'])) ? $form['properties'] : array();
+$properties = (isset($form['properties'])) ? $form['properties'] : [];
 ?>
 
 <div class="bundle-form">

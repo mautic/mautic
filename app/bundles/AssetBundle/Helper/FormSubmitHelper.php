@@ -1,13 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\Helper;
+
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
@@ -16,13 +19,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class FormSubmitHelper
- *
- * @package Mautic\AssetBundle\Helper
+ * Class FormSubmitHelper.
  */
 class FormSubmitHelper
 {
-
     /**
      * @param Action        $action
      * @param MauticFactory $factory
@@ -33,22 +33,22 @@ class FormSubmitHelper
     {
         $properties = $action->getProperties();
 
-        $assetId  = $properties['asset'];
+        $assetId = $properties['asset'];
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model  = $factory->getModel('asset');
-        $asset  = $model->getEntity($assetId);
-        $form   = $action->getForm();
+        $model = $factory->getModel('asset');
+        $asset = $model->getEntity($assetId);
+        $form  = $action->getForm();
 
         //make sure the asset still exists and is published
         if ($asset != null && $asset->isPublished()) {
             //register a callback after the other actions have been fired
-            return array(
+            return [
                 'callback' => '\Mautic\AssetBundle\Helper\FormSubmitHelper::downloadFile',
                 'form'     => $form,
                 'asset'    => $asset,
-                'message'  => (isset($properties['message'])) ? $properties['message'] : ''
-            );
+                'message'  => (isset($properties['message'])) ? $properties['message'] : '',
+            ];
         }
     }
 
@@ -65,29 +65,29 @@ class FormSubmitHelper
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $factory->getModel('asset');
-        $url   = $model->generateUrl($asset, true, array('form', $form->getId()));
+        $url   = $model->generateUrl($asset, true, ['form', $form->getId()]);
 
         if ($messengerMode) {
-            return array('download' => $url);
+            return ['download' => $url];
         }
 
-        $msg = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
-            '%url%' => $url
-        ));
+        $msg = $message.$factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', [
+            '%url%' => $url,
+        ]);
 
         $analytics = $factory->getHelper('template.analytics')->getCode();
 
-        if (! empty($analytics)) {
+        if (!empty($analytics)) {
             $factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $factory->getHelper('theme')->checkForTwigTemplate(':' . $factory->getParameter('theme') . ':message.html.php');
+        $logicalName = $factory->getHelper('theme')->checkForTwigTemplate(':'.$factory->getParameter('theme').':message.html.php');
 
-        $content = $factory->getTemplating()->renderResponse($logicalName, array(
+        $content = $factory->getTemplating()->renderResponse($logicalName, [
             'message'  => $msg,
             'type'     => 'notice',
-            'template' => $factory->getParameter('theme')
-        ))->getContent();
+            'template' => $factory->getParameter('theme'),
+        ])->getContent();
 
         return new Response($content);
     }

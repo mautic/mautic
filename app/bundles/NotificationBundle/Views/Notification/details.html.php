@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -23,8 +24,8 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'item' => $notification,
-            'customButtons' => (isset($customButtons)) ? $customButtons : [],
+            'item'            => $notification,
+            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
                 'edit' => $view['security']->hasEntityAccess(
                     $permissions['notification:notifications:editown'],
@@ -32,7 +33,7 @@ $view['slots']->set(
                     $notification->getCreatedBy()
                 ),
                 'delete' => $permissions['notification:notifications:create'],
-                'close' => $view['security']->hasEntityAccess(
+                'close'  => $view['security']->hasEntityAccess(
                     $permissions['notification:notifications:viewown'],
                     $permissions['notification:notifications:viewother'],
                     $notification->getCreatedBy()

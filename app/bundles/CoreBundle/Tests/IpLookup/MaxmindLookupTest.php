@@ -1,21 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
-use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
 
 /**
- * Class MaxmindLookupTest
+ * Class MaxmindLookupTest.
  *
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated
@@ -35,7 +36,7 @@ class MaxmindLookupTest extends \PHPUnit_Framework_TestCase
         $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
             ->getMock();
         $mockResponse->code = 200;
-        $mockResponse->body = <<<RESPONSE
+        $mockResponse->body = <<<'RESPONSE'
 {
   "city":  {
       "confidence":  25,
@@ -159,7 +160,6 @@ RESPONSE;
         $this->mockHttp->expects($this->once())
             ->method('get')
             ->willReturn($mockResponse);
-
     }
 
     public function testCountryIpLookupSuccessful()

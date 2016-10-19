@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +16,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20160114000000
+ * Class Version20160114000000.
  */
-
 class Version20160114000000 extends AbstractMauticMigration
 {
     /**
@@ -28,9 +29,8 @@ class Version20160114000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         // Test to see if this migration has already been applied
-        $formTable = $schema->getTable($this->prefix . 'form_fields');
+        $formTable = $schema->getTable($this->prefix.'form_fields');
         if ($formTable->hasColumn('is_auto_fill')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -40,6 +40,6 @@ class Version20160114000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD COLUMN is_auto_fill TINYINT(1) DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'form_fields ADD COLUMN is_auto_fill TINYINT(1) DEFAULT NULL');
     }
 }

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +13,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -20,19 +21,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class MailchimpType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class MailchimpType.
  */
 class MailchimpType extends AbstractType
 {
-
     /**
      * @var MauticFactory
      */
     private $factory;
 
-    public function __construct (MauticFactory $factory)
+    public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
@@ -41,7 +39,7 @@ class MailchimpType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
@@ -54,7 +52,7 @@ class MailchimpType extends AbstractType
         try {
             $lists = $api->getLists();
 
-            $choices = array();
+            $choices = [];
             if (!empty($lists)) {
                 if ($lists['total']) {
                     foreach ($lists['data'] as $list) {
@@ -65,37 +63,29 @@ class MailchimpType extends AbstractType
                 asort($choices);
             }
         } catch (\Exception $e) {
-            $choices = array();
+            $choices = [];
             $error   = $e->getMessage();
         }
 
-        $builder->add('list', 'choice', array(
+        $builder->add('list', 'choice', [
             'choices'  => $choices,
             'label'    => 'mautic.emailmarketing.list',
             'required' => false,
-            'attr'     => array(
+            'attr'     => [
                 'tooltip'  => 'mautic.emailmarketing.list.tooltip',
-                'onchange' => 'Mautic.getIntegrationLeadFields(\'Mailchimp\', this, {"list": this.value});'
-            )
-        ));
+                'onchange' => 'Mautic.getIntegrationLeadFields(\'Mailchimp\', this, {"list": this.value});',
+            ],
+        ]);
 
-        $builder->add('doubleOptin', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'label'       => 'mautic.mailchimp.double_optin',
-            'data'        => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin']
-        ));
+        $builder->add('doubleOptin', 'yesno_button_group', [
+            'label' => 'mautic.mailchimp.double_optin',
+            'data'  => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin'],
+        ]);
 
-        $builder->add('sendWelcome', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'label'       => 'mautic.emailmarketing.send_welcome',
-            'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
-        ));
+        $builder->add('sendWelcome', 'yesno_button_group', [
+            'label' => 'mautic.emailmarketing.send_welcome',
+            'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
+        ]);
 
         if (!empty($error)) {
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
@@ -111,35 +101,35 @@ class MailchimpType extends AbstractType
             $leadFields = $this->factory->getModel('plugin')->getLeadFields();
 
             $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields) {
-                $settings = array(
+                $settings = [
                     'silence_exceptions' => false,
-                    'feature_settings'   => array(
-                        'list_settings' => $data
-                    )
-                );
+                    'feature_settings'   => [
+                        'list_settings' => $data,
+                    ],
+                ];
 
                 try {
                     $fields = $mailchimp->getFormLeadFields($settings);
 
                     if (!is_array($fields)) {
-                        $fields = array();
+                        $fields = [];
                     }
                     $error = '';
                 } catch (\Exception $e) {
-                    $fields = array();
+                    $fields = [];
                     $error  = $e->getMessage();
                 }
 
-                list ($specialInstructions, $alertType) = $mailchimp->getFormNotes('leadfield_match');
-                $form->add('leadFields', 'integration_fields', array(
+                list($specialInstructions, $alertType) = $mailchimp->getFormNotes('leadfield_match');
+                $form->add('leadFields', 'integration_fields', [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
                     'lead_fields'          => $leadFields,
-                    'data'                 => isset($data['leadFields']) ? $data['leadFields'] : array(),
+                    'data'                 => isset($data['leadFields']) ? $data['leadFields'] : [],
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
-                    'alert_type'           => $alertType
-                ));
+                    'alert_type'           => $alertType,
+                ]);
 
                 if ($error) {
                     $form->addError(new FormError($error));
@@ -165,16 +155,16 @@ class MailchimpType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions (OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('form_area'));
+        $resolver->setOptional(['form_area']);
     }
 
     /**
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
-        return "emailmarketing_mailchimp";
+        return 'emailmarketing_mailchimp';
     }
 }

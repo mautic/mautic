@@ -1,18 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-
-$timeFrames = array(
+$timeFrames = [
     'i' => $view['translator']->trans('mautic.core.time.minutes'),
     'H' => $view['translator']->trans('mautic.core.time.hours'),
     'd' => $view['translator']->trans('mautic.core.time.days'),
-);
+];
 
 ?>
 
@@ -27,7 +27,7 @@ $timeFrames = array(
         <?php echo $view['form']->row($form['page_hits']); ?>
     </div>
     <!-- <div class="col-xs-6">
-        <?php //echo $view['form']->row($form['first_time']); ?>
+        <?php //echo $view['form']->row($form['first_time']);?>
     </div> -->
 </div>
 

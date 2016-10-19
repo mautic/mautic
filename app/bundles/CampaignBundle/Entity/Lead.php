@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,13 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class Lead
- *
- * @package Mautic\CampaignBundle\Entity
+ * Class Lead.
  */
 class Lead
 {
-
     /**
      * @var Campaign
      */
@@ -48,7 +47,7 @@ class Lead
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -79,7 +78,7 @@ class Lead
     /**
      * @return \DateTime
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -87,7 +86,7 @@ class Lead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded ($date)
+    public function setDateAdded($date)
     {
         $this->dateAdded = $date;
     }
@@ -95,7 +94,7 @@ class Lead
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -103,7 +102,7 @@ class Lead
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -111,7 +110,7 @@ class Lead
     /**
      * @return Campaign
      */
-    public function getCampaign ()
+    public function getCampaign()
     {
         return $this->campaign;
     }
@@ -119,7 +118,7 @@ class Lead
     /**
      * @param Campaign $campaign
      */
-    public function setCampaign ($campaign)
+    public function setCampaign($campaign)
     {
         $this->campaign = $campaign;
     }
@@ -127,7 +126,7 @@ class Lead
     /**
      * @return bool
      */
-    public function getManuallyRemoved ()
+    public function getManuallyRemoved()
     {
         return $this->manuallyRemoved;
     }
@@ -135,7 +134,7 @@ class Lead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved ($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved)
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -143,7 +142,7 @@ class Lead
     /**
      * @return bool
      */
-    public function wasManuallyRemoved ()
+    public function wasManuallyRemoved()
     {
         return $this->manuallyRemoved;
     }
@@ -151,7 +150,7 @@ class Lead
     /**
      * @return bool
      */
-    public function getManuallyAdded ()
+    public function getManuallyAdded()
     {
         return $this->manuallyAdded;
     }
@@ -159,7 +158,7 @@ class Lead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded ($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded)
     {
         $this->manuallyAdded = $manuallyAdded;
     }
@@ -167,7 +166,7 @@ class Lead
     /**
      * @return bool
      */
-    public function wasManuallyAdded ()
+    public function wasManuallyAdded()
     {
         return $this->manuallyAdded;
     }
