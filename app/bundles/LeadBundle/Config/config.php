@@ -157,6 +157,12 @@ return [
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_companiesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'companies',
+                'path'            => '/companies',
+                'controller'      => 'MauticLeadBundle:Api\CompanyApi',
+            ],
         ],
     ],
     'menu' => [

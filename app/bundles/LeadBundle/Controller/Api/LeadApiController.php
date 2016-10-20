@@ -79,6 +79,11 @@ class LeadApiController extends CommonApiController
                         'expr'   => 'eq',
                         'value'  => true,
                     ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'eq',
+                        'value'  => 'lead',
+                    ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]

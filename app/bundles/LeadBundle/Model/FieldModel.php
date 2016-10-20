@@ -764,9 +764,10 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getUniqueIdentiferFields()
+    public function getUniqueIdentiferFields($filters = [])
     {
-        $filters = ['isPublished' => true, 'isUniqueIdentifer' => true];
+        $filters['isPublished']       = true;
+        $filters['isUniqueIdentifer'] = true;
 
         $fields = $this->getFieldList(false, true, $filters);
 
