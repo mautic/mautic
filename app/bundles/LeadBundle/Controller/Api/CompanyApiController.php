@@ -24,12 +24,11 @@ class CompanyApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->getModel('lead.company');
-        $this->entityClass      = Company::class;
-        $this->entityNameOne    = 'company';
-        $this->entityNameMulti  = 'companies';
-        $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = ['publishDetails'];
+        $this->model           = $this->getModel('lead.company');
+        $this->entityClass     = Company::class;
+        $this->entityNameOne   = 'company';
+        $this->entityNameMulti = 'companies';
+        $this->permissionBase  = 'lead:leads';
     }
 
     // @todo - company merging is not ready yet
@@ -125,82 +124,84 @@ class CompanyApiController extends CommonApiController
     }
 
     /*
-     * Adds a lead to a list.
+     * Adds a contact to a company.
      *
-     * @param int $id     List ID
-     * @param int $leadId Lead ID
+     * @param int $companyId     Company ID
+     * @param int $contactId Contact ID
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    // public function addLeadAction($id, $leadId)
-    // {
-    //     $entity = $this->model->getEntity($id);
-    //     if (null !== $entity) {
-    //         $leadModel = $this->getModel('lead');
-    //         $lead      = $leadModel->getEntity($leadId);
+    public function addContactAction($companyId, $contactId)
+    {
+        $company = $this->model->getEntity($companyId);
+        $view    = $this->view(['success' => 1], Codes::HTTP_OK);
 
-    //         // Does the lead exist and the user has permission to edit
-    //         if ($lead == null) {
-    //             return $this->notFound();
-    //         } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-    //             return $this->accessDenied();
-    //         }
+        if ($company === null) {
+            return $this->notFound();
+        }
 
-    //         // Does the user have access to the list
-    //         $lists = $this->model->getUserLists();
-    //         if (!isset($lists[$id])) {
-    //             return $this->accessDenied();
-    //         }
+        $contactModel = $this->getModel('lead');
+        $contact      = $contactModel->getEntity($contactId);
 
-    //         $leadModel->addToLists($leadId, $entity);
+        // Does the contact exist and the user has permission to edit
+        if ($contact === null) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            return $this->accessDenied();
+        }
 
-    //         $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        // Does the user have access to the company
+        $comanies = $this->model->getUserCompanies();
 
-    //         return $this->handleView($view);
-    //     }
+        if (!isset($comanies[$companyId])) {
+            return $this->accessDenied();
+        }
 
-    //     return $this->notFound();
-    // }
+        $this->model->addLeadToCompany($company, $contact);
+
+        return $this->handleView($view);
+    }
 
     /*
-     * Removes given lead from a list.
+     * Removes given contact from a company.
      *
-     * @param int $id     List ID
-     * @param int $leadId Lead ID
+     * @param int $companyId     List ID
+     * @param int $contactId Lead ID
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    // public function removeLeadAction($id, $leadId)
-    // {
-    //     $entity = $this->model->getEntity($id);
-    //     if (null !== $entity) {
-    //         $leadModel = $this->getModel('lead');
-    //         $lead      = $leadModel->getEntity($leadId);
+    public function removeContactAction($companyId, $contactId)
+    {
+        $company = $this->model->getEntity($companyId);
+        $view    = $this->view(['success' => 1], Codes::HTTP_OK);
 
-    //         // Does the lead exist and the user has permission to edit
-    //         if ($lead == null) {
-    //             return $this->notFound();
-    //         } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-    //             return $this->accessDenied();
-    //         }
+        if ($company === null) {
+            return $this->notFound();
+        }
 
-    //         // Does the user have access to the list
-    //         $lists = $this->model->getUserLists();
-    //         if (!isset($lists[$id])) {
-    //             return $this->accessDenied();
-    //         }
+        $contactModel = $this->getModel('lead');
+        $contact      = $contactModel->getEntity($contactId);
 
-    //         $leadModel->removeFromLists($leadId, $entity);
+        // Does the contact exist and the user has permission to edit
+        if ($contact === null) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            return $this->accessDenied();
+        }
 
-    //         $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        // Does the user have access to the company
+        $comanies = $this->model->getUserCompanies();
 
-    //         return $this->handleView($view);
-    //     }
+        if (!isset($comanies[$companyId])) {
+            return $this->accessDenied();
+        }
 
-    //     return $this->notFound();
-    // }
+        $this->model->removeLeadFromCompany($company, $contact);
+
+        return $this->handleView($view);
+    }
 }

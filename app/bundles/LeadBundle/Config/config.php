@@ -163,6 +163,16 @@ return [
                 'path'            => '/companies',
                 'controller'      => 'MauticLeadBundle:Api\CompanyApi',
             ],
+            'mautic_api_companyaddcontact' => [
+                'path'       => '/companies/{companyId}/contact/add/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:addContact',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companyremovecontact' => [
+                'path'       => '/companies/{companyId}/contact/remove/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
+                'method'     => 'POST',
+            ],
         ],
     ],
     'menu' => [
