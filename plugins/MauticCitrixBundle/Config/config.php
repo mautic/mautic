@@ -17,28 +17,29 @@ return [
         'public'=>[
             'mautic_citrix_proxy' => [
                 'path'         => '/citrix/proxy',
-                'controller'   => 'MauticCitrixBundle:Public:proxy'
+                'controller'   => 'MauticCitrixBundle:Public:proxy',
             ],
-        ]
+            'mautic_citrix_sessionchanged' => [
+                'path'         => '/citrix/sessionChanged',
+                'controller'   => 'MauticCitrixBundle:Public:sessionChanged',
+            ],
+        ],
     ],
-    'services'    => array(
-        'events' => array(
-            'mautic.citrix.formbundle.subscriber' => array(
+    'services'    => [
+        'events' => [
+            'mautic.citrix.formbundle.subscriber' => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\FormSubscriber',
-                'arguments' => [
-                    'service_container',
-                ],
-            )
-        ),
-        'forms'  => array(
-            'mautic.form.type.fieldslist.citrixlist'  => array(
+            ],
+        ],
+        'forms'  => [
+            'mautic.form.type.fieldslist.citrixlist'  => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType',
-                'alias' => 'citrix_list'
-            ),
-            'mautic.form.type.citrix.submitaction'  => array(
+                'alias' => 'citrix_list',
+            ],
+            'mautic.form.type.citrix.submitaction'  => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType',
-                'alias' => 'citrix_submit_action'
-            ),
-        )
-    ),
+                'alias' => 'citrix_submit_action',
+            ],
+        ],
+    ],
 ];

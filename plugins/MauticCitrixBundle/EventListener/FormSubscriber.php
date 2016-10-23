@@ -10,7 +10,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event as Events;
@@ -32,46 +32,103 @@ class FormSubscriber extends CommonSubscriber
             FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
             CitrixEvents::ON_FORM_SUBMIT_ACTION => ['onFormSubmit', 0],
             CitrixEvents::ON_FORM_VALIDATE_ACTION => ['onFormValidate', 0],
+//            \Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST => ['onRequest', 0],
         );
     }
 
     /**
+     * Helper function to debug REST requests
      *
+     * @param PluginIntegrationRequestEvent $event
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     */
+    public function onRequest(PluginIntegrationRequestEvent $event)
+    {
+        $logger = CitrixHelper::getContainer()->get('monolog.logger.mautic');
+        $logger->log('error', "URL:\n".$event->getUrl()."\n\n");
+        $logger->log('error', "HEADERS:\n".print_r($event->getHeaders(), true)."\n\n");
+        $logger->log('error', "PARAMS:\n".print_r($event->getParameters(), true)."\n\n");
+        $logger->log('error', "SETTINGS:\n".print_r($event->getSettings(), true)."\n\n");
+    }
+
+    /**
      *
      * @param Events\ValidationEvent $event
      */
     public function onFormValidate(Events\ValidationEvent $event)
     {
-        $translator = CitrixHelper::getContainer()->get('translator');
-        $logger = CitrixHelper::getContainer()->get('monolog.logger.mautic');
-        $field = $event->getField();
-        $eventType = preg_filter('/^plugin\.citrix\.select\.(.*)$/', '$1', $field->getType());
-        $eventId = $event->getValue();
-       // $event->failedValidation($translator->trans('plugin.citrix.'.$eventType.'.nolongeravailable'));
+//        $translator = CitrixHelper::getContainer()->get('translator');
+//        $logger = CitrixHelper::getContainer()->get('monolog.logger.mautic');
+//        $field = $event->getField();
+//        $eventType = preg_filter('/^plugin\.citrix\.select\.(.*)$/', '$1', $field->getType());
+//        $eventId = $event->getValue();
+//        $event->failedValidation($translator->trans('plugin.citrix.'.$eventType.'.nolongeravailable'));
     }
 
     /**
      *
-     *
      * @param Events\SubmissionEvent $event
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function onFormSubmit(Events\SubmissionEvent $event)
     {
         $logger = CitrixHelper::getContainer()->get('monolog.logger.mautic');
-        // Make sure the form is still applicable
         $form = $event->getSubmission()->getForm();
+        $actions = $form->getActions();
         $post = $event->getPost();
-       // $logger->log('error', print_r($event, true));
+
+        /** @var \Mautic\FormBundle\Entity\Action $action */
+        foreach ($actions as $action) {
+            if ('plugin.citrix.subscribe.webinar' === $action->getType()) {
+                /** @var \Mautic\FormBundle\Entity\Field $field */
+                foreach ($form->getFields() as $field) {
+                    if ('plugin.citrix.select.webinar' === $field->getType()) {
+                        $logger->log('debug', $field->getAlias().'='.$post[$field->getAlias()]);
+                    }
+                }
+            } else {
+                if ('plugin.citrix.subscribe.meeting' === $action->getType()) {
+                    /** @var \Mautic\FormBundle\Entity\Field $field */
+                    foreach ($form->getFields() as $field) {
+                        if ('plugin.citrix.select.meeting' === $field->getType()) {
+                            $logger->log('debug', $field->getAlias().'='.$post[$field->getAlias()]);
+                        }
+                    }
+                } else {
+                    if ('plugin.citrix.subscribe.training' === $action->getType()) {
+                        /** @var \Mautic\FormBundle\Entity\Field $field */
+                        foreach ($form->getFields() as $field) {
+                            if ('plugin.citrix.select.training' === $field->getType()) {
+                                $logger->log('debug', $field->getAlias().'='.$post[$field->getAlias()]);
+                            }
+                        }
+                    } else {
+                        if ('plugin.citrix.subscribe.assist' === $action->getType()) {
+                            /** @var \Mautic\FormBundle\Entity\Field $field */
+                            foreach ($form->getFields() as $field) {
+                                if ('plugin.citrix.select.assist' === $field->getType()) {
+                                    $logger->log('debug', $field->getAlias().'='.$post[$field->getAlias()]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 //        if ((int)$form->getId() === (int)$focus->getForm()) {
 //            $this->model->addStat($focus, Stat::TYPE_FORM, $event->getSubmission());
 //        }
+
+        $event->stopPropagation();
     }
 
     /**
-     * Add a simple email form
      *
-     * @param FormBuilderEvent $event
+     * @param Events\FormBuilderEvent $event
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
@@ -160,19 +217,19 @@ class FormSubscriber extends CommonSubscriber
 
         $validator = [
             'eventName' => CitrixEvents::ON_FORM_VALIDATE_ACTION,
-            'fieldType' => 'plugin.citrix.select.webinar'
+            'fieldType' => 'plugin.citrix.select.webinar',
         ];
         $event->addValidator('plugin.citrix.validate.webinar', $validator);
 
         $validator = [
             'eventName' => CitrixEvents::ON_FORM_VALIDATE_ACTION,
-            'fieldType' => 'plugin.citrix.select.training'
+            'fieldType' => 'plugin.citrix.select.training',
         ];
         $event->addValidator('plugin.citrix.validate.training', $validator);
 
         $validator = [
             'eventName' => CitrixEvents::ON_FORM_VALIDATE_ACTION,
-            'fieldType' => 'plugin.citrix.select.assist'
+            'fieldType' => 'plugin.citrix.select.assist',
         ];
         $event->addValidator('plugin.citrix.validate.assist', $validator);
 

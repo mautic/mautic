@@ -129,15 +129,25 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function isAuthorized()
     {
         $keys = $this->getKeys();
-
         return isset($keys[$this->getAuthTokenKey()]);
     }
 
+    /**
+     * @return string
+     */
     public function getApiKey()
     {
-        $tokenData = $this->getKeys();
+        $keys = $this->getKeys();
+        return $keys[$this->getAuthTokenKey()];
+    }
 
-        return $tokenData[$this->getAuthTokenKey()];
+    /**
+     * @return string
+     */
+    public function getOrganizerKey()
+    {
+        $keys = $this->getKeys();
+        return $keys['organizer_key'];
     }
 
 }

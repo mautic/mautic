@@ -11,25 +11,34 @@
 namespace MauticPlugin\MauticCitrixBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonController
 {
 
+    /**
+     * This proxy is used for the GoToTraining API requests in order to bypass the CORS restrictions in AJAX.
+     *
+     * @param Request $request
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function proxyAction(Request $request)
     {
         $url = $request->query->get('url', null);
-
         if (!$url) {
-
-            // Passed url not specified.
             return $this->accessDenied(false, 'ERROR: url not specified');
-
         } else {
+            /** @var IntegrationHelper $integrationHelper */
+            $integrationHelper = $this->get('mautic.helper.integration');
+            $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
+
+            if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()){
+                return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
+            }
 
             $ch = curl_init($url);
-
             if (strtolower($request->server->get('REQUEST_METHOD', '')) === 'post') {
                 $headers = array(
                     'Content-type: application/json',
@@ -39,18 +48,13 @@ class PublicController extends CommonController
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->request->all()));
             }
-
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERAGENT, $request->server->get('HTTP_USER_AGENT', ''));
-
             list($header, $contents) = preg_split('/([\r\n][\r\n])\\1/', curl_exec($ch), 2);
-
             $status = curl_getinfo($ch);
-
             curl_close($ch);
-
         }
 
         // Set the JSON data object contents, decoding it from JSON if possible.
@@ -59,17 +63,62 @@ class PublicController extends CommonController
 
         // Generate JSON/JSONP string
         $json = json_encode($data);
-
         $response = new Response($json, $status['http_code']);
 
         // Generate appropriate content-type header.
         $is_xhr = strtolower($request->server->get('HTTP_X_REQUESTED_WITH', null)) === 'xmlhttprequest';
         $response->headers->set('Content-type', 'application/'.($is_xhr ? 'json' : 'x-javascript'));
-        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        // Allow CORS requests only from dev machines
+        $allowedIps = $this->coreParametersHelper->getParameter('dev_hosts')?:[];
+        if (in_array($request->getClientIp(), $allowedIps, true))  {
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+        }
 
         return $response;
-
     } // indexAction
+
+    /**
+     * This action will receive a POST when the session status changes.
+     * A POST will also be made when a customer joins the session and when the session ends
+     * (whether or not a customer joined)
+     *
+     * @param Request $request
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function sessionChangedAction(Request $request)
+    {
+        /** @var IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->get('mautic.helper.integration');
+        $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
+
+        if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()){
+            return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
+        }
+
+        $logger = $this->get('monolog.logger.mautic');
+        
+        $logger->log('error', print_r($request->request->all(), true));
+
+        $model = [
+            'sessionStartToken' => '559698066',
+            'customerJoinUrl' => 'https://www.fastsupport.com/710603076',
+            'sessionId' => 'SS-710603076',
+            'sessionType' => 'screen_sharing',
+            'status' => 'complete', // waiting, abandoned, active, notStarted
+            'startedAt' => '2016-10-22T19:01:36Z',
+            'customerJoinedAt' => '2016-10-22T19:33:25Z',
+            'endedAt' => '2016-10-22T19:45:43Z',
+            'expertName' => 'Werner Garcia',
+            'expertEmail' => 'werner.garcia@mautic.com',
+            'expertUserKey' => '5274445617256400000',
+            'customerName' => 'Ivan Estrada',
+            'customerEmail' => 'werner@gua.net',
+            'accountKey' => '1510204887402500000',
+        ];
+        
+        return new Response('OK');
+    } // sessionChangedAction
 
 } // class
 

@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCitrixBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class GotomeetingApi extends CitrixApi
+class GotowebinarApi extends CitrixApi
 {
     /**
      * @param string $operation
@@ -16,10 +16,11 @@ class GotomeetingApi extends CitrixApi
     public function request($operation, array $parameters = [], $method = 'GET')
     {
         $settings = [
-            'module'     => 'G2M',
+            'module'     => 'G2W',
             'method'     => $method,
             'parameters' => $parameters
         ];
-        return parent::_request($operation, $settings);
+        return parent::_request($operation, $settings,
+            sprintf('rest/organizers/%s', $this->integration->getOrganizerKey()));
     }
 }
