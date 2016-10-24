@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,52 +11,83 @@
 $leadId   = $lead->getId();
 $leadName = $lead->getPrimaryIdentifier();
 ?>
+<div class="table-responsive">
+    <?php echo $view['form']->start($form); ?>
+    <table class="table table-hover table-bordered" id="contact-timeline">
+        <thead>
+        <tr>
+            <th>
+                <div>All</div>
+                <input type="checkbox" id="lead_contact_frequency_rules_doNotContactChannels_0" name="check_all"
+                       onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,this.value);" value="all">
+            </th>
+            <th>
+                <h4><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></h4>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
 
-<?php echo $view['form']->start($form); ?>
-<div class="row">
-    <div class="col-md-6"><label class="control-label"><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></label>
-<ul class="channel-group">
-    <?php foreach ($channels as $channel): ?>
-        <?php
-        $isPreferred = isset($leadChannels[$channel]);
-        $switch      = $isPreferred ? 'fa-toggle-on' : 'fa-toggle-off';
-        $bgClass     = $isPreferred ? 'text-success' : 'text-danger';
-        ?>
-        <li class="list-group-item">
-            <i class="fa fa-lg fa-fw <?php echo $switch.' '.$bgClass; ?>" id="<?php echo $channel; ?>" onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>, '<?php echo $channel; ?>');"></i>
-            <span><?php echo $channel; ?></span>
-        </li>
-    <?php endforeach; ?>
-</ul>
-    </div>
-    <div class="col-md-6"><?php echo $view['form']->row($form['frequency_number']); ?></div>
-    <div class="col-md-6"><?php echo $view['form']->row($form['frequency_time']); ?></div>
 
-   <div class="col-md-12">
-       <h4 class="modal-title" id="MauticSharedModal-label">Contact Segments</h4> </br>
-    <ul class="list-group">
-        <?php foreach ($lists as $l): ?>
+        <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
             <?php
-            $inList  = isset($leadLists[$l['id']]);
-            $switch  = $inList ? 'fa-toggle-on' : 'fa-toggle-off';
-            $bgClass = $inList ? 'text-success' : 'text-danger';
+            $contactMe     = isset($leadChannels[$channel->value]);
+            $bgClass       = $contactMe ? 'text-success' : 'text-danger';
+            $isContactable = $contactMe ? 'channel-enabled' : 'channel-disabled';
+            $hidden        = $contactMe ? '' : 'hide';
+            $checked       = $contactMe ? 'checked' : '';
             ?>
-            <?php if ($inList): ?>
-                <li class="list-group-item">
-                    <i class="fa fa-lg fa-fw <?php echo $switch.' '.$bgClass; ?>" id="leadListToggle<?php echo $l['id']; ?>" onclick="Mautic.toggleLeadList('leadListToggle<?php echo $l['id']; ?>', <?php echo $leadId; ?>, <?php echo $l['id']; ?>);"></i>
-                    <span><?php echo $l['name'].' ('.$l['alias'].')'; ?></span>
-                </li>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </ul>
-   </div>
-    <?php if (empty($leadLists)): ?>
-        <div class="col-md-12">
-            <?php echo $lead->getName(); ?> does not belong to any lists, <a data-target='#MauticSharedModal' target="_self" href="<?php echo $view['router']->path(
-                'mautic_contact_action',
-                ['objectId' => $lead->getId(), 'objectAction' => 'list']); ?>">click here</a> to add this contact to a segment.
-        </div>
-    <?php endif; ?>
-</div>
-<?php echo $view['form']->end($form); ?>
+            <tr>
+                <th style="vertical-align: top" class="col-md-1">
+                    <input type="checkbox" id="<?php echo $channel->value ?>"
+                           name="lead_contact_frequency_rules[doNotContactChannels][]" class="contact checkbox"
+                           onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,this.value);"
+                           value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
+                </th>
+                <td class="col-md-11">
+                    <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> col-md-12">
+                        <h5><?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?></h5>
+                    </div>
 
+                    <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> col-md-12">
+                        <hr class="mnr-md mnl-md">
+                        <div class="col-md-6">
+                <div class="pull-left">
+                    <?php echo $view['form']->label($form['frequency_number_'.$channel->value]); ?>
+                            <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
+                </div>
+                            <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
+                            <span class="clearfix">
+                    <?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?>
+                </span>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
+                            </div>
+                            <div class="pull-right">
+                                <?php echo $view['form']->label($form['contact_pause_start_date_'.$channel->value]); ?>
+                                <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>
+                            </div>
+                            <div class="pull-right">
+                                <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
+                                <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
+                            </div>
+
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <?php unset($form['doNotContactChannels']); ?>
+        <tr>
+            <td colspan="2"><?php echo $view['form']->row($form['preferred_channel']); ?></td>
+        </tr>
+        <tr>
+            <td colspan="2"><?php echo $view['form']->row($form['lead_lists']); ?></td>
+        </tr>
+        </tbody>
+    </table>
+    <?php echo $view['form']->end($form); ?>
+
+</div>

@@ -206,3 +206,12 @@ ul.tag-cloud li {
 .inline-spacer {
     text-transform: capitalize;
 }
+.contact{
+    display: inline !important;
+}
+.channel-disabled{
+    color:lightgrey;
+}
+.channel-enabled{
+    color:black;
+}

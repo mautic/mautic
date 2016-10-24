@@ -32,6 +32,8 @@ class ChannelSubscriber extends CommonSubscriber
 
     public function onAddChannel(ChannelEvent $event)
     {
-        $event->setChannel('sms');
+        if (!empty($this->params['sms_enabled'])) {
+            $event->setChannel('sms');
+        }
     }
 }

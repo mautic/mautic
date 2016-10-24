@@ -50,6 +50,21 @@ class FrequencyRule
     private $channel;
 
     /**
+     * @var bool
+     */
+    private $preferredChannel = 0;
+
+    /**
+     * @var date
+     */
+    private $pauseFromDate;
+
+    /**
+     * @var date
+     */
+    private $pauseToDate;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -74,6 +89,18 @@ class FrequencyRule
             ->build();
 
         $builder->createField('channel', 'string')
+            ->build();
+
+        $builder->createField('preferredChannel', 'boolean')
+            ->columnName('preferred_channel')
+            ->build();
+
+        $builder->createField('pauseFromDate', 'datetime')
+            ->columnName('pause_from_date')
+            ->build();
+
+        $builder->createField('pauseToDate', 'datetime')
+            ->columnName('pause_to_date')
             ->build();
     }
 
@@ -181,5 +208,53 @@ class FrequencyRule
     public function setFrequencyTime($frequencyTime)
     {
         $this->frequencyTime = $frequencyTime;
+    }
+
+    /**
+     * @param $preferredChannel
+     */
+    public function setPreferredChannel($preferredChannel)
+    {
+        $this->preferredChannel = $preferredChannel;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPreferredChannel()
+    {
+        return $this->preferredChannel;
+    }
+
+    /**
+     * @param $pauseFromDate
+     */
+    public function setPauseFromDate($pauseFromDate)
+    {
+        $this->pauseFromDate = $pauseFromDate;
+    }
+
+    /**
+     * @return datetime
+     */
+    public function getPauseFromDate()
+    {
+        return $this->pauseFromDate;
+    }
+
+    /**
+     * @param $pauseToDate
+     */
+    public function setPauseToDate($pauseToDate)
+    {
+        $this->pauseToDate = $pauseToDate;
+    }
+
+    /**
+     * @return datetime
+     */
+    public function getPauseToDate()
+    {
+        return $this->pauseToDate;
     }
 }

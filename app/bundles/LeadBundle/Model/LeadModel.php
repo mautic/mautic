@@ -1198,11 +1198,8 @@ class LeadModel extends FormModel
      */
     public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
-        $this->logger->error(print_r($channel, true));
-        $this->logger->error(print_r($lead->getId(), true));
         /** @var DoNotContact $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
-            $this->logger->error(print_r($dnc->getChannel(), true));
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
@@ -1325,26 +1322,52 @@ class LeadModel extends FormModel
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $frequencyTime = null, $frequencyNumber = null)
+    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
         $entities       = [];
-        $channels       = $this->getContactPreferredChannels($lead);
-        foreach ($channels as $ch) {
-            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
-            $frequencyRule->setChannel($ch);
-            $frequencyRule->setLead($lead);
-            $frequencyRule->setDateAdded(new \DateTime());
-            $frequencyRule->setFrequencyNumber($frequencyNumber);
-            $frequencyRule->setFrequencyTime($frequencyTime);
-            $frequencyRule->setLead($lead);
+        $channels       = $this->getContactChannels($lead);
 
-            $entities[$ch] = $frequencyRule;
+        foreach ($channels as $ch) {
+            if (!empty($data['preferred_channel']) or (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) or (!empty($data['contact_pause_start_date_'.$ch]) and !empty($data['contact_pause_end_date_'.$ch]))) {
+                $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
+                $frequencyRule->setChannel($ch);
+                $frequencyRule->setLead($lead);
+                $frequencyRule->setDateAdded(new \DateTime());
+                if (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) {
+                    $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
+                    $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+                }
+
+                if (!empty($data['contact_pause_start_date_'.$ch]) and !empty($data['contact_pause_end_date_'.$ch])) {
+                    $frequencyRule->setPauseFromDate($data['contact_pause_start_date_'.$ch]);
+                    $frequencyRule->setPauseToDate($data['contact_pause_end_date_'.$ch]);
+                }
+
+                $frequencyRule->setLead($lead);
+                if ($data['preferred_channel'] == $ch) {
+                    $frequencyRule->setPreferredChannel(true);
+                } else {
+                    $frequencyRule->setPreferredChannel(false);
+                }
+                $entities[$ch] = $frequencyRule;
+            }
         }
 
         if (!empty($entities)) {
             $this->em->getRepository('MauticLeadBundle:FrequencyRule')->saveEntities($entities);
+        }
+
+        foreach ($data['lead_lists'] as $leadList) {
+            if (!isset($leadLists[$leadList])) {
+                $this->addToLists($lead, [$leadList]);
+            }
+        }
+        // Delete lists that were removed
+        $deletedLists = array_diff(array_keys($leadLists), $data['lead_lists']);
+        if (!empty($deletedLists)) {
+            $this->removeFromLists($lead, $deletedLists);
         }
 
         // Delete channels that were removed
@@ -2183,7 +2206,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getContactPreferredChannels(Lead $lead)
+    public function getContactChannels(Lead $lead)
     {
         $channels = $this->getAllChannels();
 

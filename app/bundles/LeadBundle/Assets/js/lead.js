@@ -655,18 +655,45 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
-
 Mautic.togglePreferredChannel = function(leadId, channel) {
-    var action = mQuery('#' + channel).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    if (channel == 'all') {
+       var status = mQuery('#lead_contact_frequency_rules_doNotContactChannels_0')[0].checked;  //"select all" change
+       // "select all" checked status
+        mQuery('.checkbox').each(function(){ //iterate all listed checkbox items
+            if (this.checked != status) {
+                this.checked = status; //change ".checkbox" checked status
+                Mautic.setPreferredChannel(leadId, this.value);
+            }
+        });
+    } else {
+        Mautic.setPreferredChannel(leadId,channel);
+    }
+
+};
+Mautic.setPreferredChannel = function(leadId, channel) {
+    var action = mQuery('#' + channel)[0].checked ? 'add' : 'remove';
     var query = "action=lead:togglePreferredLeadChannel&leadId=" + leadId + "&channel=" + channel + "&channelAction=" + action;
 
-    Mautic.toggleLeadSwitch(channel, query, action);
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (mQuery('#' + channel)[0].checked) {
+                mQuery('#is-contactable-' + channel).removeClass('channel-disabled').addClass('channel-enabled');
+            } else {
+                mQuery('#is-contactable-' + channel).removeClass('channel-enabled').addClass('channel-disabled');
+            }
+        }
+        });
+    mQuery( '#frequency_' + channel ).slideToggle();
+    mQuery( '#frequency_' + channel ).removeClass('hide');
 };
 
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
-
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 

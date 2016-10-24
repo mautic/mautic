@@ -954,17 +954,24 @@ class LeadController extends FormController
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
         $data  = [];
+
         if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $frequencyRules = $model->getFrequencyRule($lead);
 
-            foreach ($frequencyRules as $frequencyRule) {
-                $data['frequency_number'] = $frequencyRule['frequency_number'];
-                $data['frequency_time']   = $frequencyRule['frequency_time'];
+            $action                = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+            $channels              = $model->getContactChannels($lead);
+            $allChannels           = $model->getAllChannels();
+            $data['channels']      = $allChannels;
+            $data['lead_channels'] = $channels;
+            $data['leadId']        = $lead->getId();
+            foreach ($allChannels as $channel) {
+                foreach ($frequencyRules as $frequencyRule) {
+                    if ($channel == $frequencyRule['channel']) {
+                        $data['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
+                        $data['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
+                    }
+                }
             }
-
-            $action      = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
-            $channels    = $model->getContactPreferredChannels($lead);
-            $allChannels = $model->getAllChannels();
 
             /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
             $listModel = $this->getModel('lead.list');
@@ -986,7 +993,7 @@ class LeadController extends FormController
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $formdata = $form->getData();
-                        $model->setFrequencyRules($lead, $formdata['frequency_time'], $formdata['frequency_number']);
+                        $model->setFrequencyRules($lead, $formdata, $leadsLists);
                     }
                 }
 
@@ -1024,6 +1031,7 @@ class LeadController extends FormController
                             [
                                 'objectAction' => 'contactFrequency',
                                 'objectId'     => $lead->getId(),
+                                'channels'     => $allChannels,
                             ]
                         ),
                         'channels'     => $allChannels,
