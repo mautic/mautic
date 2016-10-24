@@ -50,9 +50,15 @@ class CategoryModel extends FormModel
         return 'getTitle';
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase($bundle = null)
     {
-        $bundle = $this->request->get('bundle');
+        if (null === $bundle) {
+            $bundle = $this->request->get('bundle');
+        }
+
+        if ('global' === $bundle || empty($bundle)) {
+            $bundle = 'category';
+        }
 
         return $bundle.':categories';
     }
