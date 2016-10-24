@@ -235,7 +235,7 @@ class CampaignModel extends CommonFormModel
         $parentUpdated  = [];
 
         //set the events from session
-        foreach ($sessionEvents as $id => $properties) {
+        foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
@@ -256,7 +256,7 @@ class CampaignModel extends CommonFormModel
             }
 
             $event->setCampaign($entity);
-            $events[$id] = $event;
+            $events[$properties['id']] = $event;
         }
 
         foreach ($deletedEvents as $deleteMe) {

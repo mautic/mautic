@@ -28,7 +28,7 @@ class CampaignApiController extends CommonApiController
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
         $this->permissionBase   = 'campaign:campaigns';
-        $this->serializerGroups = ['campaignDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['campaignDetails', 'categoryList', 'publishDetails', 'leadListList'];
     }
 
     /**
@@ -95,5 +95,105 @@ class CampaignApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        $method = $this->request->getMethod();
+
+        if ($method === 'POST' || $method === 'PUT') {
+            if (empty($parameters['events'])) {
+                $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
+                throw new \Exception($msg);
+            } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
+                $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
+                throw new \Exception($msg);
+            }
+        }
+
+        $deletedSources = ['lists' => [], 'forms' => []];
+        $deletedEvents  = [];
+        $currentSources = [
+            'lists' => isset($parameters['lists']) ? $parameters['lists'] : [],
+            'forms' => isset($parameters['forms']) ? $parameters['forms'] : [],
+        ];
+
+        // delete events and sources which does not exist in the PUT request
+        if ($method === 'PUT') {
+            $requestEventIds   = [];
+            $requestSegmentIds = [];
+            $requestFormIds    = [];
+
+            foreach ($parameters['events'] as $key => $requestEvent) {
+                if (!isset($requestEvent['id'])) {
+                    throw new \Exception('$campaign[events]['.$key.']["id"] is missing');
+                }
+                $requestEventIds[] = $requestEvent['id'];
+            }
+
+            foreach ($entity->getEvents() as $currentEvent) {
+                if (!in_array($currentEvent->getId(), $requestEventIds)) {
+                    $deletedEvents[] = $currentEvent->getId();
+                }
+            }
+
+            if (isset($parameters['lists'])) {
+                foreach ($parameters['lists'] as $requestSegment) {
+                    if (!isset($requestSegment['id'])) {
+                        throw new \Exception('$campaign[lists]['.$key.']["id"] is missing');
+                    }
+                    $requestSegmentIds[] = $requestSegment['id'];
+                }
+            }
+
+            foreach ($entity->getLists() as $currentSegment) {
+                if (!in_array($currentSegment->getId(), $requestSegmentIds)) {
+                    $deletedSources['lists'][] = $currentSegment->getId();
+                }
+            }
+
+            if (isset($parameters['forms'])) {
+                foreach ($parameters['forms'] as $requestForm) {
+                    if (!isset($requestForm['id'])) {
+                        throw new \Exception('$campaign[forms]['.$key.']["id"] is missing');
+                    }
+                    $requestFormIds[] = $requestForm['id'];
+                }
+            }
+
+            foreach ($entity->getForms() as $currentForm) {
+                if (!in_array($currentForm->getId(), $requestFormIds)) {
+                    $deletedSources['forms'][] = $currentForm->getId();
+                }
+            }
+        }
+
+        // Set lead sources
+        $this->model->setLeadSources($entity, $currentSources, $deletedSources);
+
+        // Build and set Event entities
+        if (isset($parameters['events']) && isset($parameters['canvasSettings'])) {
+            $this->model->setEvents($entity, $parameters['events'], $parameters['canvasSettings'], $deletedEvents);
+        }
+
+        // Persist to the database before building connection so that IDs are available
+        $this->model->saveEntity($entity);
+
+        // Update canvas settings with new event IDs then save
+        if (isset($parameters['canvasSettings'])) {
+            $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
+        }
+
+        if ($method === 'PUT' && !empty($deletedEvents)) {
+            $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
+        }
     }
 }
