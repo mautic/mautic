@@ -57,7 +57,7 @@ class CategoryRepository extends CommonRepository
             $q->expr()->eq('c.bundle', ':bundle')
         );
 
-        if ($includeGlobal) {
+        if ($includeGlobal && 'global' !== $bundle) {
             $expr->add(
                 $q->expr()->eq('c.bundle', $q->expr()->literal('global'))
             );
