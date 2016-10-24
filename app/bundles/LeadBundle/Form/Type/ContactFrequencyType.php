@@ -105,6 +105,7 @@ class ContactFrequencyType extends AbstractType
                             'required' => false,
                         ]
                     );
+
                     $form->add(
                             'contact_pause_start_date_'.$channel,
                             'datetime',
@@ -117,6 +118,7 @@ class ContactFrequencyType extends AbstractType
                                 ],
                                 'format'   => 'yyyy-MM-dd',
                                 'required' => false,
+                                'data'     => isset($data['contact_pause_start_date_'.$channel]) ? $data['contact_pause_start_date_'.$channel] : null,
                             ]
                     );
                     $form->add(
@@ -131,6 +133,7 @@ class ContactFrequencyType extends AbstractType
                             ],
                             'format'   => 'yyyy-MM-dd',
                             'required' => false,
+                            'data'     => isset($data['contact_pause_end_date_'.$channel]) ? $data['contact_pause_end_date_'.$channel] : null,
                         ]
                     );
                 }
