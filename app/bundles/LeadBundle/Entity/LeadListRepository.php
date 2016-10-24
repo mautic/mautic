@@ -21,6 +21,8 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * LeadListRepository.
@@ -573,6 +575,15 @@ class LeadListRepository extends CommonRepository
             $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'companies');
         }
         $options   = $this->getFilterExpressionFunctions();
+
+        // Add custom filters operators
+        $dispatcher = $this->factory->getDispatcher();
+        if ($dispatcher->hasListeners(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE)) {
+            $event = new LeadListFiltersOperatorsEvent($options, $this->translator);
+            $dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
+            $options = $event->getOperators();
+        }
+
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 

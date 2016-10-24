@@ -18,21 +18,57 @@ namespace MauticPlugin\MauticCitrixBundle;
 final class CitrixEvents
 {
     /**
-     * The mautic.citrix_on_form_submit event is dispatched right before a form is submitted.
+     * The mautic.on_form_submit_action event is dispatched right before a form is submitted.
      *
      * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
      *
      * @var string
      */
-    const ON_FORM_SUBMIT_ACTION = 'mautic.citrix_on_form_submit';
+    const ON_FORM_SUBMIT_ACTION = 'mautic.on_form_submit_action';
 
     /**
-     * The mautic.citrix_on_form_validate event is dispatched when a form is validated.
+     * The mautic.on_form_validate_action event is dispatched when a form is validated.
      *
      * The event listener receives a Mautic\FormBundle\Event\ValidationEvent instance.
      *
      * @var string
      */
-    const ON_FORM_VALIDATE_ACTION = 'mautic.citrix_on_form_validate';
+    const ON_FORM_VALIDATE_ACTION = 'mautic.on_form_validate_action';
+
+    /**
+     * The mautic.on_citrix_webinar_event event is dispatched when a campaign event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     *
+     * @var string
+     */
+    const ON_CITRIX_WEBINAR_EVENT = 'mautic.on_citrix_webinar_event';
+
+    /**
+     * The mautic.on_citrix_meeting_event event is dispatched when a campaign event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     *
+     * @var string
+     */
+    const ON_CITRIX_MEETING_EVENT = 'mautic.on_citrix_meeting_event';
+
+    /**
+     * The mautic.on_citrix_training_event event is dispatched when a campaign event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     *
+     * @var string
+     */
+    const ON_CITRIX_TRAINING_EVENT = 'mautic.on_citrix_training_event';
+
+    /**
+     * The mautic.on_citrix_assist_event event is dispatched when a campaign event is triggered.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
+     *
+     * @var string
+     */
+    const ON_CITRIX_ASSIST_EVENT = 'mautic.on_citrix_assist_event';
     
 }

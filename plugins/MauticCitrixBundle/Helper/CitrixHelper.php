@@ -19,6 +19,13 @@ use Monolog\Logger;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
+abstract class CitrixProducts extends BasicEnum{
+    const GOTOWEBINAR      = 'webinar';
+    const GOTOMEETING      = 'meeting';
+    const GOTOTRAINING     = 'training';
+    const GOTOASSIST       = 'assist';
+}
+
 class CitrixHelper
 {
     /** @var Container $container */
@@ -112,28 +119,24 @@ class CitrixHelper
     {
         /** @var Logger $logger */
         static $logger;
-
         try {
             if (null === $logger) {
                 $logger = self::$container->get('monolog.logger.mautic');
             }
             $logger->log($level, $msg);
         } catch (\Exception $ex) {
-
+            // do nothing
         }
     }
 
     /**
-     * @param array|string $results
+     * @param array $results
      * @param $key
      * @param $value
      * @return \Generator
      */
     public static function getKeyPairs($results, $key, $value)
     {
-        if (!(array)$results) {
-            $results = [$results];
-        }
         /** @var array $results */
         foreach ($results as $result) {
             if (array_key_exists($key, $result) && array_key_exists($value, $result)) {
@@ -143,24 +146,22 @@ class CitrixHelper
     }
 
     /**
-     * @param array|string $results
-     * @param bool $showAll
+     * @param array $sessions
+     * @param bool $showAll Wether or not to show only active sessions
      * @return \Generator
      */
-    public static function getAssistPairs($results, $showAll = true)
+    public static function getAssistPairs($sessions, $showAll = false)
     {
-        $sessions = $results['sessions'];
         /** @var array $sessions */
         foreach ($sessions as $session) {
             if ($showAll || !in_array($session['status'], ['complete', 'abandoned'], true)) {
                 yield $session['sessionId'] => sprintf('%s (%s)', $session['sessionId'], $session['status']);
             }
         }
-
     }
 
     /**
-     * @param $listType string Can be one of 'webinars', 'meetings', 'trainings' or 'assists'
+     * @param $listType string Can be one of 'webinar', 'meeting', 'training' or 'assist'
      * @return array
      */
     public static function getCitrixChoices($listType)
@@ -171,22 +172,24 @@ class CitrixHelper
                 throw new \AuthenticationException('You are not authorized to view '.$listType);
             }
 
-            if ('webinars' === $listType) {
+            if ('webinar' === $listType) {
                 $results = self::getG2wApi()->request('upcomingWebinars');
 
                 return iterator_to_array(self::getKeyPairs($results, 'webinarID', 'subject'));
             } else {
-                if ('meetings' === $listType) {
+                if ('meeting' === $listType) {
                     $results = self::getG2mApi()->request('upcomingMeetings');
 
                     return iterator_to_array(self::getKeyPairs($results, 'meetingId', 'subject'));
                 } else {
-                    if ('trainings' === $listType) {
+                    if ('training' === $listType) {
                         $results = self::getG2tApi()->request('trainings');
 
                         return iterator_to_array(self::getKeyPairs($results, 'trainingId', 'name'));
                     } else {
-                        if ('assists' === $listType) {
+                        if ('assist' === $listType) {
+                            // show sessions in the last month
+                            // times must be in ISO format: YYYY-MM-ddTHH:mm:ssZ
                             $params = [
                                 'fromTime' => preg_filter(
                                     '/^(.+)[\+\-].+$/',
@@ -197,7 +200,7 @@ class CitrixHelper
                             ];
                             $results = self::getG2aApi()->request('sessions', $params);
                             if ((array)$results && array_key_exists('sessions', $results)) {
-                                return iterator_to_array(self::getAssistPairs($results));
+                                return iterator_to_array(self::getAssistPairs($results['sessions']));
                             }
                         }
                     }
@@ -214,7 +217,7 @@ class CitrixHelper
      * @param $integration string
      * @return boolean
      */
-    private static function isAuthorized($integration)
+    public static function isAuthorized($integration)
     {
         $myIntegration = self::getIntegration($integration);
 
@@ -233,7 +236,7 @@ class CitrixHelper
 
             return $integrationHelper->getIntegrationObject($integration);
         } catch (\Exception $e) {
-
+            // do nothing
         }
 
         return null;
@@ -246,13 +249,78 @@ class CitrixHelper
     private static function listToIntegration($listType)
     {
         $integrations = [
-            'webinars' => 'Gotowebinar',
-            'meetings' => 'Gotomeeting',
-            'trainings' => 'Gototraining',
-            'assists' => 'Gotoassist',
+            'webinar' => 'Gotowebinar',
+            'meeting' => 'Gotomeeting',
+            'training' => 'Gototraining',
+            'assist' => 'Gotoassist',
         ];
 
         return $integrations[$listType];
+    }
+
+    /**
+     * @param string $str
+     * @param int $limit
+     * @return string
+     */
+    public static function getCleanString($str, $limit = 20)
+    {
+        $str = htmlentities(strtolower($str), ENT_NOQUOTES, 'utf-8');
+        $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
+        $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
+        $str = preg_replace('#&[^;]+;#', '', $str);
+
+        $availableChars = explode(' ', '0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z');
+        $safeStr = '';
+        $safeChar = '';
+        /** @var array $chars */
+        $chars = str_split($str);
+        foreach ($chars as $char) {
+            if (!in_array($char, $availableChars, true)) {
+                if ('-' !== $safeChar) {
+                    $safeChar = '-';
+                } else {
+                    continue;
+                }
+            } else {
+                $safeChar = $char;
+            }
+            $safeStr .= $safeChar;
+        }
+
+        return trim(substr($safeStr, 0, $limit), '-');
+    }
+
+    /**
+     * @param $webinarId
+     * @param $email
+     * @param $firstname
+     * @param $lastname
+     * @return bool
+     */
+    public static function registerToWebinar($webinarId, $email, $firstname, $lastname)
+    {
+        $params = [
+            'email' => $email,
+            'firstName' => $firstname,
+            'lastName' => $lastname,
+        ];
+
+        $success = false;
+
+        try {
+            $response = self::getG2wApi()->request(
+                'webinars/'.$webinarId.'/registrants?resendConfirmation=true',
+                $params,
+                'POST'
+            );
+
+            $success = (is_object($response) && property_exists($response, 'joinUrl'));
+        } catch (\Exception $ex) {
+            CitrixHelper::log('registerToWebinar: ' . $ex->getMessage());
+        }
+
+        return $success;
     }
 
 }

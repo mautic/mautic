@@ -29,6 +29,13 @@ return [
         'events' => [
             'mautic.citrix.formbundle.subscriber' => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\FormSubscriber',
+                'arguments' => ['doctrine.orm.entity_manager', 'kernel']
+            ],
+            'mautic.citrix.leadbundle.subscriber' => [
+                'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber',
+            ],
+            'mautic.citrix.campaignbundle.subscriber' => [
+                'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber',
             ],
         ],
         'forms'  => [
@@ -40,6 +47,15 @@ return [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType',
                 'alias' => 'citrix_submit_action',
             ],
+            'mautic.form.type.citrix.campaignevent' => array(
+                'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType',
+                'alias' => 'citrix_campaign_event',
+            )
+        ],
+        'models' =>  [
+            'mautic.citrix.model.citrix' => [
+                'class' => 'MauticPlugin\MauticCitrixBundle\Model\CitrixModel',
+            ]
         ],
     ],
 ];

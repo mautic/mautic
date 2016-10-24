@@ -12,8 +12,7 @@ namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FormFieldSelectType.
@@ -30,13 +29,41 @@ class CitrixListType extends AbstractType
             'empty_value',
             'text',
             [
-                'label'      => 'mautic.form.field.form.emptyvalue',
+                'label' => 'mautic.form.field.form.emptyvalue',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'attr' => ['class' => 'form-control'],
+                'required' => false,
             ]
         );
 
+        $default = false;
+
+        if (!empty($options['parentData'])) {
+            $default = empty($options['parentData']['properties']['multiple']) ? false : true;
+        }
+
+        $builder->add(
+            'multiple',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.form.field.form.multiple',
+                'data' => $default,
+            ]
+        );
+
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'parentData' => [],
+            ]
+        );
     }
 
     /**
