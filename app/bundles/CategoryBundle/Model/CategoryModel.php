@@ -193,8 +193,13 @@ class CategoryModel extends FormModel
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10)
     {
-        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        static $results = [];
 
-        return $results;
+        $key = $bundle.$filter.$limit;
+        if (!isset($results[$key])) {
+            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        }
+
+        return $results[$key];
     }
 }
