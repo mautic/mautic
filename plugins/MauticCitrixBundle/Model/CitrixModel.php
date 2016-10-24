@@ -30,6 +30,7 @@ class CitrixModel extends FormModel
     public function __construct()
     {
         $this->container = CitrixHelper::getContainer();
+        $this->setEntityManager($this->container->get('doctrine')->getManager());
         $this->_createTableIfNotExists();
     }
 
@@ -59,6 +60,7 @@ class CitrixModel extends FormModel
     public function addEvent($product, $email, $eventName, $eventType, \DateTime $eventDate = null)
     {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
+            CitrixHelper::log('addEvent: incorrect data');
             return;
         }
         $citrixEvent = new CitrixEvent();
@@ -166,7 +168,7 @@ class CitrixModel extends FormModel
             $eventType
         );
 
-        if (is_array($eventNames) && count($eventNames) > 0) {
+        if (0 !== count($eventNames)) {
             $dql .= sprintf(
                 'AND c.eventName IN (%s)',
                 implode(
@@ -183,7 +185,7 @@ class CitrixModel extends FormModel
 
         $query = $this->em->createQuery($dql);
 
-        return (int)$query->getResult()[0]['count'];
+        return (int)$query->getResult()[0]['cant'];
     }
 
     /**

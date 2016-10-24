@@ -14,13 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use MauticPlugin\MauticCitrixBundle\Helper\BasicEnum;
 
-abstract class CitrixEventTypes extends BasicEnum
-{
-    // Used for querying events
-    const REGISTERED = 'registered';
-    const ATTENDED = 'attended';
-}
-
 /**
  *
  * @ORM\Table(name="plugin_citrix_events")

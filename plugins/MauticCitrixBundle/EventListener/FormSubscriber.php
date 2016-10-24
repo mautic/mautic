@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
@@ -27,6 +28,8 @@ use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class FormSubscriber
@@ -288,6 +291,9 @@ class FormSubscriber extends CommonSubscriber
      * @param Events\SubmissionEvent $event
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @throws \Mautic\FormBundle\Exception\ValidationException
+     * @throws \InvalidArgumentException
      */
     public function onFormSubmit(Events\SubmissionEvent $event)
     {
@@ -326,25 +332,41 @@ class FormSubscriber extends CommonSubscriber
                         if ('' !== $email && '' !== $firstname && '' !== $lastname) {
                             foreach ($webinarsToRegister as $webinar) {
                                 $webinarId = $webinar['webinarId'];
-                                $isRegistered = CitrixHelper::registerToWebinar(
-                                    $webinarId,
-                                    $email,
-                                    $firstname,
-                                    $lastname
-                                );
-                                if ($isRegistered) {
-                                    $eventName = CitrixHelper::getCleanString(
-                                            $webinar['webinarTitle']
-                                        ).'_#'.$webinar['webinarId'];
-                                    /** @var CitrixModel $citrixModel */
-                                    $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel(
-                                        'mautic.citrix.model.citrix'
+                                try {
+                                    $isRegistered = CitrixHelper::registerToWebinar(
+                                        $webinarId,
+                                        $email,
+                                        $firstname,
+                                        $lastname
                                     );
-                                    try {
-                                        $citrixModel->addEvent(CitrixProducts::GOTOWEBINAR, $email, $eventName, CitrixEventTypes::REGISTERED);
-                                    } catch (\Exception $ex) {
+                                    if ($isRegistered) {
+                                        $eventName = CitrixHelper::getCleanString(
+                                                $webinar['webinarTitle']
+                                            ).'_#'.$webinar['webinarId'];
+                                        /** @var CitrixModel $citrixModel */
+                                        $citrixModel = CitrixHelper::getContainer()->get(
+                                            'mautic.model.factory'
+                                        )->getModel(
+                                            'citrix.citrix'
+                                        );
 
+                                        $citrixModel->addEvent(
+                                            CitrixProducts::GOTOWEBINAR,
+                                            $email,
+                                            $eventName,
+                                            CitrixEventTypes::REGISTERED
+                                        );
                                     }
+                                } catch (\Exception $ex) {
+                                    CitrixHelper::log('onFormSubmit: '.$ex->getMessage());
+                                    $validationException = new ValidationException($ex->getMessage());
+                                    $validationException->setViolations(
+                                        [
+                                            $fields->first()->getAlias() => $ex->getMessage(),
+                                        ]
+                                    );
+                                    $event->stopPropagation();
+                                    throw $validationException;
                                 }
                             }
                         }

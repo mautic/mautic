@@ -18,13 +18,7 @@ use MauticPlugin\MauticCitrixBundle\Api\GotowebinarApi;
 use Monolog\Logger;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-
-abstract class CitrixProducts extends BasicEnum{
-    const GOTOWEBINAR      = 'webinar';
-    const GOTOMEETING      = 'meeting';
-    const GOTOTRAINING     = 'training';
-    const GOTOASSIST       = 'assist';
-}
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CitrixHelper
 {
@@ -297,6 +291,7 @@ class CitrixHelper
      * @param $firstname
      * @param $lastname
      * @return bool
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
     public static function registerToWebinar($webinarId, $email, $firstname, $lastname)
     {
@@ -306,8 +301,6 @@ class CitrixHelper
             'lastName' => $lastname,
         ];
 
-        $success = false;
-
         try {
             $response = self::getG2wApi()->request(
                 'webinars/'.$webinarId.'/registrants?resendConfirmation=true',
@@ -315,12 +308,11 @@ class CitrixHelper
                 'POST'
             );
 
-            $success = (is_object($response) && property_exists($response, 'joinUrl'));
+            return (is_array($response) && array_key_exists('joinUrl', $response));
         } catch (\Exception $ex) {
             CitrixHelper::log('registerToWebinar: ' . $ex->getMessage());
+            throw new BadRequestHttpException($ex->getMessage());
         }
-
-        return $success;
     }
 
 }

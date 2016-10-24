@@ -90,10 +90,12 @@ class LeadSubscriber extends CommonSubscriber
 
         foreach ($activeProducts as $product) {
             $eventTypeRegistered = $product.'.registered';
+            $eventTypeRegisteredLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.registered');
             $eventTypeRegisteredName = $this->translator->trans('plugin.citrix.timeline.'.$product.'.registered');
             $event->addEventType($eventTypeRegistered, $eventTypeRegisteredName);
 
             $eventTypeAttended = $product.'.attended';
+            $eventTypeAttendedLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.attended');
             $eventTypeAttendedName = $this->translator->trans('plugin.citrix.timeline.'.$product.'.attended');
             $event->addEventType($eventTypeAttended, $eventTypeAttendedName);
 
@@ -109,10 +111,12 @@ class LeadSubscriber extends CommonSubscriber
                     $eventType = $citrixEvent->getEventType();
                     if ($eventType === CitrixEventTypes::REGISTERED) {
                         $timelineEventType = $eventTypeRegistered;
+                        $timelineEventTypeLabel = $eventTypeRegisteredLabel;
                         $timelineEventLabel = $eventTypeRegisteredName;
                     } else {
                         if ($eventType === CitrixEventTypes::ATTENDED) {
                             $timelineEventType = $eventTypeAttended;
+                            $timelineEventTypeLabel = $eventTypeAttendedLabel;
                             $timelineEventLabel = $eventTypeAttendedName;
                         } else {
                             continue;
@@ -127,6 +131,7 @@ class LeadSubscriber extends CommonSubscriber
                         array(
                             'event' => $timelineEventType,
                             'eventLabel' => $timelineEventLabel,
+                            'eventType' => $timelineEventTypeLabel,
                             'timestamp' => $citrixEvent->getEventDate(),
                             'extra' => [
                                 'eventName' => $citrixEvent->getEventName(),
@@ -192,7 +197,7 @@ class LeadSubscriber extends CommonSubscriber
                 $eventNames
             );
 
-            $event->addChoice(
+            $event->addChoice('lead',
                 $product.'-registration',
                 array(
                     'label' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.registration'),
@@ -206,7 +211,7 @@ class LeadSubscriber extends CommonSubscriber
                 )
             );
 
-            $event->addChoice(
+            $event->addChoice('lead',
                 $product.'-attendance',
                 array(
                     'label' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.attendance'),
@@ -220,7 +225,7 @@ class LeadSubscriber extends CommonSubscriber
                 )
             );
 
-            $event->addChoice(
+            $event->addChoice('lead',
                 $product.'-no-attendance',
                 array(
                     'label' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.no.attendance'),

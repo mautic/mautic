@@ -37,7 +37,7 @@ class LeadListFiltersChoicesEvent extends CommonEvent
      * @var Translator
      */
     protected $translator;
-	
+
     /**
      * @param array $choices
      * @param array $operators
@@ -78,13 +78,14 @@ class LeadListFiltersChoicesEvent extends CommonEvent
      * Add a new choice for list filters
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices
      *
+     * @param string $object
      * @param string $choiceKey
      * @param array $choiceConfig
      */
-    public function addChoice($choiceKey, $choiceConfig)
+    public function addChoice($object, $choiceKey, $choiceConfig)
     {
-        if (!array_key_exists($choiceKey, $this->choices)) {
-            $this->choices[$choiceKey] = $choiceConfig;
+        if (!array_key_exists($choiceKey, $this->choices[$object])) {
+            $this->choices[$object][$choiceKey] = $choiceConfig;
         }
     }
 }

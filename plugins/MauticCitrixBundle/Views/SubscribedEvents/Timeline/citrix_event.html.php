@@ -11,8 +11,7 @@
 /** @var array $event */
 ?>
 
-<li class="wrapper citrix-event">
-	<div class="figure"><span class="fa fa-video-camera"></span></div>
+<div class="wrapper citrix-event">
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
@@ -33,4 +32,4 @@
 			</p>
 		</div>
 	</div>
-</li>
+</div>

@@ -31,9 +31,9 @@ class CitrixCampaignEventType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!array_key_exists('product', $options) ||
-            !CitrixProducts::isValidValue($options['product']) ||
-            !CitrixHelper::isAuthorized('Goto'.$options['product'])
+        if (!(array_key_exists('attr', $options) && array_key_exists('data-product', $options['attr'])) ||
+            !CitrixProducts::isValidValue($options['attr']['data-product']) ||
+            !CitrixHelper::isAuthorized('Goto'.$options['attr']['data-product'])
         ) {
             return;
         }
@@ -41,10 +41,10 @@ class CitrixCampaignEventType extends AbstractType
         $translator = CitrixHelper::getContainer()->get('translator');
         /** @var CitrixModel $citrixModel */
         $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('citrix');
-        $eventNames = $citrixModel->getDistinctEventNames($options['product']);
+        $eventNames = $citrixModel->getDistinctEventNames($options['attr']['data-product']);
 
         if (CitrixHelper::isAuthorized('Gotowebinar')) {
-            $this->buildProduct($options['product'], $builder, $translator, $eventNames);
+            $this->buildProduct($options['attr']['data-product'], $builder, $translator, $eventNames);
         }
     }
 
@@ -66,7 +66,7 @@ class CitrixCampaignEventType extends AbstractType
                 'label' => $translator->trans('plugin.citrix.decision.criteria'),
                 'choices' => array(
                     'registeredToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.registered'),
-                    'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.participated'),
+                    'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
                 ),
             )
         );

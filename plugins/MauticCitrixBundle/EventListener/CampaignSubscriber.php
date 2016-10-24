@@ -67,8 +67,9 @@ class CampaignSubscriber extends CommonSubscriber
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public static function onCitrixEvent($product, CampaignExecutionEvent $event) {
-        if (!CitrixProducts::isValidValue($product)){
+    public static function onCitrixEvent($product, CampaignExecutionEvent $event)
+    {
+        if (!CitrixProducts::isValidValue($product)) {
             return false;
         }
         /** @var CitrixModel $citrixModel */
@@ -80,10 +81,20 @@ class CampaignSubscriber extends CommonSubscriber
         $email = $event->getLead()->getEmail();
 
         if ('registeredToAtLeast' === $criteria) {
-            $counter = $citrixModel->countEventsBy($product, $email, CitrixEventTypes::REGISTERED, $isAny ? false : $list);
+            $counter = $citrixModel->countEventsBy(
+                $product,
+                $email,
+                CitrixEventTypes::REGISTERED,
+                $isAny ? [] : $list
+            );
         } else {
             if ('attendedToAtLeast' === $criteria) {
-                $counter = $citrixModel->countEventsBy($product, $email, CitrixEventTypes::ATTENDED, $isAny ? false : $list);
+                $counter = $citrixModel->countEventsBy(
+                    $product,
+                    $email,
+                    CitrixEventTypes::ATTENDED,
+                    $isAny ? [] : $list
+                );
             } else {
                 return false;
             }
@@ -134,7 +145,9 @@ class CampaignSubscriber extends CommonSubscriber
                     'label' => 'plugin.citrix.campaign.event.'.$product.'.label',
                     'formType' => 'citrix_campaign_event',
                     'formTypeOptions' => [
-                        'product' => $product,
+                        'attr' => [
+                            'data-product' => $product,
+                        ],
                     ],
                     'eventName' => $eventNames[$product],
                 )
