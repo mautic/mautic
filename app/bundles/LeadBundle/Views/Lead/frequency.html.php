@@ -86,6 +86,9 @@ $leadName = $lead->getPrimaryIdentifier();
         <tr>
             <td colspan="2"><?php echo $view['form']->row($form['lead_lists']); ?></td>
         </tr>
+        <tr>
+            <td colspan="2"><?php echo $view['form']->row($form['global_categories']); ?></td>
+        </tr>
         </tbody>
     </table>
     <?php echo $view['form']->end($form); ?>

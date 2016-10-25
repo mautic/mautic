@@ -1238,11 +1238,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set stage.
+     * Set frequency rules.
      *
      * @param FrequencyRule $frequencyRules
      *
-     * @return frequencyRules
+     * @return Lead
      */
     public function setFrequencyRules(FrequencyRule $frequencyRules)
     {
@@ -1253,7 +1253,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get stage.
+     * Get frequency rules.
      *
      * @return array
      */

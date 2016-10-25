@@ -953,7 +953,10 @@ class LeadController extends FormController
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
-        $data  = [];
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category.category');
+        $categories    = $categoryModel->getLookupResults('global');
+        $data          = [];
 
         if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $frequencyRules = $model->getFrequencyRule($lead);
@@ -964,6 +967,8 @@ class LeadController extends FormController
             $data['channels']      = $allChannels;
             $data['lead_channels'] = $channels;
             $data['leadId']        = $lead->getId();
+            $data['categories']    = $categories;
+
             foreach ($allChannels as $channel) {
                 foreach ($frequencyRules as $frequencyRule) {
                     if ($channel == $frequencyRule['channel']) {
@@ -990,9 +995,8 @@ class LeadController extends FormController
                 'lead_contact_frequency_rules',
                 [],
                 [
-                    'action'   => $action,
-                    'data'     => $data,
-                    'channels' => $channels,
+                    'action' => $action,
+                    'data'   => $data,
                 ]
             );
             if ($this->request->getMethod() == 'POST') {

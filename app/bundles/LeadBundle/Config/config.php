@@ -424,6 +424,11 @@ return [
                 ],
                 'alias' => 'company_list',
             ],
+            'mautic.form.type.lead_categories' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\LeadCategoryType',
+                'arguments' => 'mautic.category.model.category',
+                'alias'     => 'leadcategory_choices',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
@@ -464,6 +469,7 @@ return [
                     'mautic.lead.model.list',
                     'form.factory',
                     'mautic.lead.model.company',
+                    'mautic.category.model.category',
                 ],
             ],
             'mautic.lead.model.field' => [

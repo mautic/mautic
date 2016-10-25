@@ -24,6 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ContactFrequencyType extends AbstractType
 {
     private $leadModel;
+
+    private $em;
     /**
      * @param LeadModel $leadModel
      */
@@ -154,6 +156,20 @@ class ContactFrequencyType extends AbstractType
                         'multiple'   => true,
                         'required'   => false,
                         'data'       => $lists,
+                    ]
+                );
+
+                $leadCategories = $this->leadModel->getLeadCategories($lead);
+
+                $form->add(
+                    'global_categories',
+                    'leadcategory_choices',
+                    [
+                        'label'      => 'mautic.lead.form.categories',
+                        'label_attr' => ['class' => 'control-label'],
+                        'multiple'   => true,
+                        'required'   => false,
+                        'data'       => $leadCategories,
                     ]
                 );
             }
