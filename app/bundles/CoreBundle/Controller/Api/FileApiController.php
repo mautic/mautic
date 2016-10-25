@@ -51,20 +51,23 @@ class FileApiController extends CommonApiController
      */
     public function createAction($dir)
     {
-        $path = $this->getAbsolutePath($dir);
-        if (!isset($this->response['error'])) {
+        $path     = $this->getAbsolutePath($dir);
+        $response = [];
+        if (!isset($response['error'])) {
             foreach ($this->request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($path, $fileName);
-                    $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $response['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $response['file'] = $fileName;
                 } else {
-                    $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+                    $response['error'] = 'The uploaded image does not have an allowed mime type';
                 }
             }
         }
+        $view = $this->view($response);
 
-        return $this->sendJsonResponse($this->response, $this->statusCode);
+        return $this->handleView($view);
     }
 
     /**
@@ -97,24 +100,25 @@ class FileApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function deleteAction()
+    public function deleteAction($dir, $file)
     {
-        $src       = InputHelper::clean($this->request->request->get('src'));
         $response  = ['deleted' => false];
-        $imagePath = $this->getAbsolutePath().'/'.basename($src);
+        $imagePath = $this->getAbsolutePath($dir).'/'.basename($file);
 
         if (!file_exists($imagePath)) {
-            $this->response['error'] = 'File does not exist';
-            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $response['error'] = 'File does not exist';
+            $this->statusCode  = Response::HTTP_INTERNAL_SERVER_ERROR;
         } elseif (!is_writable($imagePath)) {
-            $this->response['error'] = 'File is not writable';
-            $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $response['error'] = 'File is not writable';
+            $this->statusCode  = Response::HTTP_INTERNAL_SERVER_ERROR;
         } else {
             unlink($imagePath);
-            $this->response['deleted'] = true;
+            $response['deleted'] = true;
         }
 
-        return $this->sendJsonResponse($this->response, $this->statusCode);
+        $view = $this->view($response, $this->statusCode);
+
+        return $this->handleView($view);
     }
 
     /**

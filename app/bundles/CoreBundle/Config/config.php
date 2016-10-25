@@ -80,15 +80,20 @@ return [
                 'controller' => 'MauticCoreBundle:Api\FileApi:list',
             ],
             'mautic_core_api_file_create' => [
-                'path'       => '/files/{dir}/create',
+                'path'       => '/files/{dir}/new',
                 'controller' => 'MauticCoreBundle:Api\FileApi:create',
                 'method'     => 'POST',
             ],
-            'mautic_core_api_file_action' => [
-                'path'       => '/files/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Api\FileApi',
-                'method'     => 'POST',
+            'mautic_core_api_file_delete' => [
+                'path'       => '/files/{dir}/{file}/delete',
+                'controller' => 'MauticCoreBundle:Api\FileApi:delete',
+                'method'     => 'DELETE',
             ],
+//            'mautic_core_api_file_action' => [
+//                'path'       => '/files/{objectAction}/{objectId}',
+//                'controller' => 'MauticCoreBundle:Api\FileApi',
+//                'method'     => 'POST',
+//            ],
         ],
     ],
     'menu' => [
