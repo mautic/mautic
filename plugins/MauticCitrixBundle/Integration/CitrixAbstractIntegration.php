@@ -21,6 +21,14 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     protected $auth;
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return [];
+    }
+
+    /**
      * @param Integration $settings
      */
     public function setIntegrationSettings(Integration $settings)

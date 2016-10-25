@@ -47,10 +47,14 @@ return [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType',
                 'alias' => 'citrix_submit_action',
             ],
-            'mautic.form.type.citrix.campaignevent' => array(
+            'mautic.form.type.citrix.campaignevent' => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType',
                 'alias' => 'citrix_campaign_event',
-            )
+            ],
+            'mautic.form.type.citrix.campaignaction' => [
+                'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType',
+                'alias' => 'citrix_campaign_action',
+            ],
         ],
         'models' =>  [
             'mautic.citrix.model.citrix' => [

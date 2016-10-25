@@ -18,9 +18,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CitrixCampaignEventType
+ * Class CitrixCampaignActionType
  */
-class CitrixCampaignEventType extends AbstractType
+class CitrixCampaignActionType extends AbstractType
 {
 
     /**
@@ -42,42 +42,43 @@ class CitrixCampaignEventType extends AbstractType
 
         /** @var Translator $translator */
         $translator = CitrixHelper::getContainer()->get('translator');
-        /** @var CitrixModel $citrixModel */
-        $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('citrix');
-        $eventNames = $citrixModel->getDistinctEventNames($options['attr']['data-product']);
 
         $choices = [
-            'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
+            'webinar_subscribe' => $translator->trans('plugin.citrix.action.subscribe.webinar'),
+            'meeting_start' => $translator->trans('plugin.citrix.action.start.meeting'),
+            'training_subscribe' => $translator->trans('plugin.citrix.action.subscribe.training'),
+            'training_start' => $translator->trans('plugin.citrix.action.start.training'),
+            'assist_webchat' => $translator->trans('plugin.citrix.action.webchat.assist'),
+            'assist_screensharing' => $translator->trans('plugin.citrix.action.screensharing.assist'),
         ];
 
-        if (CitrixProducts::GOTOWEBINAR === $product) {
-            $choices['registeredToAtLeast'] =
-                 $translator->trans('plugin.citrix.criteria.'.$product.'.registered');
+        $newChoices = [];
+        foreach ($choices as $k => $c) {
+            if (strpos($k, $product) === 0) {
+                $newChoices[$k] = $c;
+            }
         }
 
         $builder->add(
             'event-criteria-'.$product,
             'choice',
-            array(
-                'label' => $translator->trans('plugin.citrix.decision.criteria'),
-                'choices' => $choices,
-            )
-        );
-
-        $choices = array_merge(
-            ['ANY' => $translator->trans('plugin.citrix.event.'.$product.'.any')],
-            array_combine($eventNames, $eventNames)
-        );
-
-        $builder->add(
-            $product.'-list',
-            'choice',
             [
-                'label' => $translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                'choices' => $choices,
-                'multiple' => true,
+                'label' => $translator->trans('plugin.citrix.action.criteria'),
+                'choices' => $newChoices,
             ]
         );
+
+        if (CitrixProducts::GOTOASSIST !== $product) {
+            $builder->add(
+                $product.'-list',
+                'choice',
+                [
+                    'label' => $translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                    'choices' => CitrixHelper::getCitrixChoices($product),
+                    'multiple' => true
+                ]
+            );
+        }
     }
 
     /**
@@ -85,6 +86,6 @@ class CitrixCampaignEventType extends AbstractType
      */
     public function getName()
     {
-        return 'citrix_campaign_event';
+        return 'citrix_campaign_action';
     }
 }

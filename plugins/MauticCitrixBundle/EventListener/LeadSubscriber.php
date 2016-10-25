@@ -59,23 +59,11 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $activeProducts = [];
-
-        if (CitrixHelper::isAuthorized('Gotowebinar')) {
-            $activeProducts[] = CitrixProducts::GOTOWEBINAR;
+        foreach (CitrixProducts::toArray() as $p){
+            if (CitrixHelper::isAuthorized('Goto'.$p)) {
+                $activeProducts[] = $p;
+            }
         }
-
-        if (CitrixHelper::isAuthorized('Gotomeeting')) {
-            $activeProducts[] = CitrixProducts::GOTOMEETING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gototraining')) {
-            $activeProducts[] = CitrixProducts::GOTOTRAINING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gotoassist')) {
-            $activeProducts[] = CitrixProducts::GOTOASSIST;
-        }
-
         if (0 === count($activeProducts)) {
             return;
         }
@@ -154,23 +142,11 @@ class LeadSubscriber extends CommonSubscriber
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
         $activeProducts = [];
-
-        if (CitrixHelper::isAuthorized('Gotowebinar')) {
-            $activeProducts[] = CitrixProducts::GOTOWEBINAR;
+        foreach (CitrixProducts::toArray() as $p){
+            if (CitrixHelper::isAuthorized('Goto'.$p)) {
+                $activeProducts[] = $p;
+            }
         }
-
-        if (CitrixHelper::isAuthorized('Gotomeeting')) {
-            $activeProducts[] = CitrixProducts::GOTOMEETING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gototraining')) {
-            $activeProducts[] = CitrixProducts::GOTOTRAINING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gotoassist')) {
-            $activeProducts[] = CitrixProducts::GOTOASSIST;
-        }
-
         if (0 === count($activeProducts)) {
             return;
         }
@@ -197,20 +173,24 @@ class LeadSubscriber extends CommonSubscriber
                 $eventNames
             );
 
-            $event->addChoice('lead',
-                $product.'-registration',
-                array(
-                    'label' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.registration'),
-                    'properties' => array(
-                        'type' => 'select',
-                        'list' => $eventNamesWithAny,
-                    ),
-                    'operators' => array(
-                        'include' => array('in', '!in'),
-                    ),
-                )
-            );
+            if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING == $product) {
 
+                $event->addChoice(
+                    'lead',
+                    $product.'-registration',
+                    array(
+                        'label' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.registration'),
+                        'properties' => array(
+                            'type' => 'select',
+                            'list' => $eventNamesWithAny,
+                        ),
+                        'operators' => array(
+                            'include' => array('in', '!in'),
+                        ),
+                    )
+                );
+            }
+            
             $event->addChoice('lead',
                 $product.'-attendance',
                 array(
@@ -248,23 +228,11 @@ class LeadSubscriber extends CommonSubscriber
     public function onListFiltering(LeadListFilteringEvent $event)
     {
         $activeProducts = [];
-
-        if (CitrixHelper::isAuthorized('Gotowebinar')) {
-            $activeProducts[] = CitrixProducts::GOTOWEBINAR;
+        foreach (CitrixProducts::toArray() as $p){
+            if (CitrixHelper::isAuthorized('Goto'.$p)) {
+                $activeProducts[] = $p;
+            }
         }
-
-        if (CitrixHelper::isAuthorized('Gotomeeting')) {
-            $activeProducts[] = CitrixProducts::GOTOMEETING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gototraining')) {
-            $activeProducts[] = CitrixProducts::GOTOTRAINING;
-        }
-
-        if (CitrixHelper::isAuthorized('Gotoassist')) {
-            $activeProducts[] = CitrixProducts::GOTOASSIST;
-        }
-
         if (0 === count($activeProducts)) {
             return;
         }
