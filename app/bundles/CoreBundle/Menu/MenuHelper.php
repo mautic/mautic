@@ -70,17 +70,6 @@ class MenuHelper
                 continue;
             }
 
-            if (isset($i['bundle'])) {
-                // Category shortcut
-                $bundleName = $i['bundle'];
-                $i          = [
-                    'access'          => $bundleName.':categories:view',
-                    'route'           => 'mautic_category_index',
-                    'id'              => 'mautic_'.$bundleName.'category_index',
-                    'routeParameters' => ['bundle' => $bundleName],
-                ];
-            }
-
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
