@@ -283,17 +283,11 @@ class LeadSubscriber extends CommonSubscriber
 
             if (in_array($currentFilter, $eventFilters, true)) {
                 $eventNames = $details['filter'];
-                $eventNamesForQuery = array_map(
-                    function ($name) {
-                        return "'".$name."'";
-                    },
-                    $eventNames
-                );
 
-                $isAnyEvent = in_array('any', $eventNames, true);
+                $isAnyEvent = in_array("'any'", $eventNames, true);
 
                 $leadEmail = '';
-                if ('' !== $leadId) {
+                if ('' !== $leadId && null !== $leadId) {
                     /** @var LeadRepository $leadRepository */
                     $leadRepository = $em->getRepository('MauticLeadBundle:Lead');
                     /** @var Lead $lead */
@@ -315,7 +309,7 @@ class LeadSubscriber extends CommonSubscriber
                                 $q->expr()->eq($alias.$k.'.product', "'".$product."'"),
                                 $q->expr()->eq($alias.$k.'.email', 'l.email'),
                                 $q->expr()->eq($alias.$k.'.event_type', "'".$eventType."'"),
-                                $q->expr()->in($alias.$k.'.event_name', $eventNamesForQuery)
+                                $q->expr()->in($alias.$k.'.event_name', $eventNames)
                             )
                         );
                     } else {
@@ -356,7 +350,7 @@ class LeadSubscriber extends CommonSubscriber
                                                 $alias.'sub1.event_type',
                                                 "'".CitrixEventTypes::REGISTERED."'"
                                             ),
-                                            $q->expr()->in($alias.'sub1.event_name', $eventNamesForQuery),
+                                            $q->expr()->in($alias.'sub1.event_name', $eventNames),
                                             $q->expr()->eq($alias.'sub1.email', $alias.'.email')
                                         )
                                     )->getSQL();
@@ -370,7 +364,7 @@ class LeadSubscriber extends CommonSubscriber
                                                 $alias.'sub2.event_type',
                                                 "'".CitrixEventTypes::ATTENDED."'"
                                             ),
-                                            $q->expr()->in($alias.'sub2.event_name', $eventNamesForQuery),
+                                            $q->expr()->in($alias.'sub2.event_name', $eventNames),
                                             $q->expr()->eq($alias.'sub2.email', $alias.'.email')
                                         )
                                     )->getSQL();

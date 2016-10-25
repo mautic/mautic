@@ -16,13 +16,17 @@ use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\TimeType;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * LeadListRepository.
@@ -577,7 +581,8 @@ class LeadListRepository extends CommonRepository
         $options   = $this->getFilterExpressionFunctions();
 
         // Add custom filters operators
-        $dispatcher = $this->factory->getDispatcher();
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = CitrixHelper::getContainer()->get('event_dispatcher');
         if ($dispatcher->hasListeners(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE)) {
             $event = new LeadListFiltersOperatorsEvent($options, $this->translator);
             $dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
@@ -588,6 +593,7 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($filters as $k => $details) {
+
             if (isset($details['object']) && $details['object'] != $object) {
                 continue;
             }
@@ -1110,6 +1116,16 @@ class LeadListRepository extends CommonRepository
                 }
 
                 $parameters[$parameter] = $details['filter'];
+            }
+
+            /** @var EventDispatcher $dispatcher */
+            $dispatcher = CitrixHelper::getContainer()->get('event_dispatcher');
+            if ($dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+                $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->_em);
+                $dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+                if ($event->isFilteringDone()) {
+                    $groupExpr = $q->expr()->andX($event->getSubQuery());
+                }
             }
         }
 
