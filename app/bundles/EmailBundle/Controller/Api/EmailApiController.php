@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -134,7 +133,7 @@ class EmailApiController extends CommonApiController
 
             $leadFields = array_merge(['id' => $leadId], $leadModel->flattenFields($lead->getFields()));
 
-            if (MailHelper::applyFrequencyRules($lead)) {
+            if ($this->get('mautic.helper.mailer')->applyFrequencyRules($lead)) {
                 $this->model->sendEmail(
                     $entity,
                     $leadFields,
