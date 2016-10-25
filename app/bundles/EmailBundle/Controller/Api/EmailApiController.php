@@ -30,7 +30,7 @@ class EmailApiController extends CommonApiController
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->permissionBase   = 'email:emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList'];
+        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
     }
 
     /**
@@ -151,5 +151,39 @@ class EmailApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        $method          = $this->request->getMethod();
+        $segmentModel    = $this->getModel('lead.list');
+        $requestSegments = isset($parameters['lists']) ? $parameters['lists'] : [];
+        $currentSegments = [];
+        $deletedSegments = [];
+
+        foreach ($entity->getLists() as $currentSegment) {
+            $currentSegments[] = $currentSegment->getId();
+
+            // delete events and sources which does not exist in the PUT request
+            if ($method === 'PUT' && !in_array($currentSegment->getId(), $requestSegments)) {
+                $event->removeList($currentSegment);
+            }
+        }
+
+        // Add new segments
+        foreach ($requestSegments as $requestSegment) {
+            if (!in_array($requestSegment, $currentSegments)) {
+                $segment = $segmentModel->getEntity($requestSegment);
+                $event->addList($segment);
+            }
+        }
     }
 }

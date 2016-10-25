@@ -453,6 +453,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'translationChildren',
                     'unsubscribeForm',
                     'dynamicContent',
+                    'lists',
                 ]
             )
             ->build();
