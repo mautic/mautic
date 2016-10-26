@@ -17,6 +17,7 @@ use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixRegistrationTrait;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 
@@ -25,6 +26,8 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+
+    use CitrixRegistrationTrait;
 
     /**
      * {@inheritdoc}
@@ -70,8 +73,6 @@ class CampaignSubscriber extends CommonSubscriber
      * @param string $product
      * @param CampaignExecutionEvent $event
      * @return bool
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function onCitrixAction($product, CampaignExecutionEvent $event)
     {
@@ -79,17 +80,33 @@ class CampaignSubscriber extends CommonSubscriber
             return false;
         }
 
-        // do stuff
-
         // get firstName, lastName and email from keys for sender email
         $config = $event->getConfig();
-        $email = $event->getLead()->getEmail();
         $criteria = $config['event-criteria-'.$product];
+        /** @var array $list */
         $list = $config[$product.'-list'];
 
-        CitrixHelper::log(PHP_EOL.
-            '***********************************************************************'.
-            PHP_EOL.'CAMPAIGN ACTION '.$product.'='.$email.' '.print_r($config, true));
+        if (in_array($criteria, ['webinar_register', 'training_register'], true)) {
+            try {
+                $productlist = CitrixHelper::getCitrixChoices($product);
+                $products = [];
+
+                foreach ($list as $productId) {
+                    if (array_key_exists(
+                        $productId,
+                        $productlist
+                    )) {
+                        $products[] = array(
+                            'productId' => $productId,
+                            'productTitle' => $productlist[$productId],
+                        );
+                    }
+                }
+                self::registerProduct($product, $event->getLead(), $products);
+            } catch (\Exception $ex) {
+                CitrixHelper::log('onCitrixAction - '.$product.': '.$ex->getMessage());
+            }
+        }
 
         /*
          * $config = Array (     
@@ -99,7 +116,14 @@ class CampaignSubscriber extends CommonSubscriber
          *       [0] => 3803653102383157249        
          *      )  
          *   ) 
+         * 
+         * 'webinar_register' 
+            'meeting_start' 
+            'training_register' 
+            'training_start' 
+            'assist_screensharing'
          */
+
 
         return true;
     }
@@ -145,10 +169,6 @@ class CampaignSubscriber extends CommonSubscriber
         $list = $config[$product.'-list'];
         $isAny = in_array('ANY', $list, true);
         $email = $event->getLead()->getEmail();
-
-        CitrixHelper::log(PHP_EOL.
-            '***********************************************************************'.PHP_EOL.
-            'CAMPAIGN EVENT '.$product.'='.$email.' '.print_r($config, true));
 
         if ('registeredToAtLeast' === $criteria) {
             $counter = $citrixModel->countEventsBy(
