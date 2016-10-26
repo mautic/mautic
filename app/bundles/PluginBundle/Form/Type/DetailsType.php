@@ -131,7 +131,7 @@ class DetailsType extends AbstractType
             'data_class' => 'Mautic\PluginBundle\Entity\Integration',
         ]);
 
-        $resolver->setRequired(['integration', 'integration_object', 'lead_fields']);
+        $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
     /**

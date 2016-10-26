@@ -174,10 +174,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $salesFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $salesForceobjects = [];
+        $salesForceObjects = [];
 
         if (isset($settings['feature_settings']['objects'])) {
-            $salesForceobjects = $settings['feature_settings']['objects'];
+            $salesForceObjects = $settings['feature_settings']['objects'];
         }
 
         $isRequired = function (array $field) {
@@ -186,8 +186,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($salesForceobjects) and is_array($salesForceobjects)) {
-                    foreach ($salesForceobjects as $sfObject) {
+                if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
+                    foreach ($salesForceObjects as $sfObject) {
                         if (isset($sfObject) and $sfObject == 'Activity') {
                             continue;
                         }
@@ -207,11 +207,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 } else {
                                     $type = 'string';
                                 }
-                                $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
-                                    'type'     => $type,
-                                    'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                    'required' => $isRequired($fieldInfo),
-                                ];
+                                if ($sfObject != 'Company') {
+                                    $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
+                                        'type'     => $type,
+                                        'label'    => $sfObject.' - '.$fieldInfo['label'],
+                                        'required' => $isRequired($fieldInfo),
+                                    ];
+                                } else {
+                                    $salesFields[$sfObject][$fieldInfo['name']] = [
+                                        'type'     => $type,
+                                        'label'    => $fieldInfo['label'],
+                                        'required' => $isRequired($fieldInfo),
+                                    ];
+                                }
                             }
                         }
                     }
@@ -353,6 +361,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'Lead'     => 'mautic.salesforce.object.lead',
                         'Contact'  => 'mautic.salesforce.object.contact',
+                        'Company'  => 'mautic.salesforce.object.company',
                         'Activity' => 'mautic.salesforce.object.activity',
                     ],
                     'expanded'    => true,

@@ -43,15 +43,17 @@ class FeatureSettingsType extends AbstractType
 
         //add custom feature settings
         $integration_object->appendToForm($builder, $options['data'], 'features');
-        $leadFields = $options['lead_fields'];
+        $leadFields    = $options['lead_fields'];
+        $companyFields = $options['company_fields'];
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields) {
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
             ];
             try {
-                $fields = $integration_object->getFormLeadFields($settings);
+                $fields                   = $integration_object->getFormLeadFields($settings);
+                $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
                 if (!is_array($fields)) {
                     $fields = [];
                 }
@@ -70,7 +72,8 @@ class FeatureSettingsType extends AbstractType
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
             }
-
+            $this->factory->getLogger()->error(print_r($fields, true));
+            $this->factory->getLogger()->error(print_r($integrationCompanyFields, true));
             $integrationFields  = array_keys($fields);
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
@@ -90,6 +93,16 @@ class FeatureSettingsType extends AbstractType
                 'alert_type'           => $alertType,
             ]);
 
+           /* $form->add('companyFields', 'integration_company_fields', [
+                'label'                => 'mautic.integration.comapnyfield_matches',
+                'required'             => true,
+                'company_fields'          => $companyFields,
+                'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
+                'integration_company_fields' => $integrationCompanyFields,
+                'special_instructions' => $specialInstructions,
+                'alert_type'           => $alertType,
+            ]);
+*/
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
             }

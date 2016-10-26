@@ -1651,6 +1651,18 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
      * returns template to render on popup window after trying to run OAuth.
      *
      *
