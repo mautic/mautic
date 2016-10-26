@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -445,6 +444,28 @@ class MessageHelper
             elseif (preg_match('/find the recipient domain/i', $body, $match)) {
                 $result['rule_cat'] = 'unknown';
                 $result['rule_no']  = '0237';
+            }
+			
+            /*
+             * rule: mailbox unknown;
+             * sample:
+             * The error that the other server returned was:
+             * 550 5.1.1 RESOLVER.ADR.RecipNotFound; not found
+             */
+            elseif (preg_match('/RecipNotFound/i', $body, $match)) {
+                $result['rule_cat'] = 'unknown';
+                $result['rule_no']  = '0237';
+            }
+			
+            /*
+             * rule: user reject;
+             * sample:
+             * The error that the other server returned was:
+             * 554 5.7.1 Your mail could not be delivered because the recipient is only accepting mail from specific email addresses.
+             */
+            elseif (preg_match('/accepting mail from specific email addresses/i', $body, $match)) {
+                $result['rule_cat'] = 'user_reject';
+                $result['rule_no']  = '0156';
             }
 
             /*
@@ -1151,6 +1172,16 @@ class MessageHelper
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0138';
                     }
+					
+                    /* rule: unknown
+                     * sample:
+                     * Diagnostic-Code: X-Postfix; host m2w-in1.domain.com[111.111.111.000] said: 551 <example@example.com> is a
+					 * deactivated mailbox
+                     */
+                    elseif (preg_match('/deactivated mailbox/is', $diag_code)) {
+                        $result['rule_cat'] = 'unknown';
+                        $result['rule_no']  = '0138';
+                    }
 
                     /* rule: unknown
                      * sample:
@@ -1499,6 +1530,17 @@ class MessageHelper
                         $result['rule_cat'] = 'command_reject';
                         $result['rule_no']  = '0225';
                     }
+					
+					/*
+					 * rule: mailbox restricted;
+					 * sample:
+					 * The error that the other server returned was:
+					 * Diagnostic-Code: SMTP; 550 5.7.1 RESOLVER.RST.NotAuthorized; not authorized
+					 */
+					elseif (preg_match('/NotAuthorized/is', $diag_code)) {
+						$result['rule_cat'] = 'command_reject';
+						$result['rule_no']  = '0225';
+					}
 
                     /* rule: content_reject
                      * sample:
@@ -1960,6 +2002,16 @@ class MessageHelper
                      * 554 5.3.5 Local configuration error^M
                      */
                     elseif (preg_match('/MX list.*point.*back/i', $dsn_msg)) {
+                        $result['rule_cat'] = 'dns_loop';
+                        $result['rule_no']  = '0199';
+                    }
+					
+                    /* rule: dns_loop
+                     * sample:
+                     * ----- Transcript of session follows -----^M
+                     * 554 5.4.6 Hop count exceeded - possible mail loop
+                     */
+                    elseif (preg_match('/Hop count exceeded/i', $dsn_msg)) {
                         $result['rule_cat'] = 'dns_loop';
                         $result['rule_no']  = '0199';
                     }
