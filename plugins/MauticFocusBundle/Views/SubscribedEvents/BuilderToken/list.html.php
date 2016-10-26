@@ -29,7 +29,7 @@ $icons = [
                 ?>
                 <a href="#" class="list-group-item" data-token="<?php echo $token; ?>">
                     <div>
-                        <span><i class="fa fa-fw <?php echo $icons[$item->getType()]; ?>"></i><?php echo $item->getName(); ?></span>
+                        <span><i class="fa fa-fw <?php echo (array_key_exists($item->getType(), $icons))? $icons[$item->getType()] : ''; ?>"></i><?php echo $item->getName(); ?></span>
                     </div>
                 </a>
             <?php endforeach; ?>

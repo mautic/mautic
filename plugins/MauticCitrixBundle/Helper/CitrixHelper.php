@@ -179,7 +179,7 @@ class CitrixHelper
                     if ('training' === $listType) {
                         $results = self::getG2tApi()->request('trainings');
 
-                        return iterator_to_array(self::getKeyPairs($results, 'trainingId', 'name'));
+                        return iterator_to_array(self::getKeyPairs($results, 'trainingKey', 'name'));
                     } else {
                         if ('assist' === $listType) {
                             // show sessions in the last month
@@ -242,14 +242,11 @@ class CitrixHelper
      */
     private static function listToIntegration($listType)
     {
-        $integrations = [
-            'webinar' => 'Gotowebinar',
-            'meeting' => 'Gotomeeting',
-            'training' => 'Gototraining',
-            'assist' => 'Gotoassist',
-        ];
+        if (CitrixProducts::isValidValue($listType)) {
+            return 'Goto'.$listType;
+        }
 
-        return $integrations[$listType];
+        return '';
     }
 
     /**
@@ -286,31 +283,50 @@ class CitrixHelper
     }
 
     /**
-     * @param $webinarId
+     * @param $product
+     * @param $productId
      * @param $email
      * @param $firstname
      * @param $lastname
      * @return bool
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
-    public static function registerToWebinar($webinarId, $email, $firstname, $lastname)
+    public static function registerToProduct($product, $productId, $email, $firstname, $lastname)
     {
-        $params = [
-            'email' => $email,
-            'firstName' => $firstname,
-            'lastName' => $lastname,
-        ];
-
         try {
-            $response = self::getG2wApi()->request(
-                'webinars/'.$webinarId.'/registrants?resendConfirmation=true',
-                $params,
-                'POST'
-            );
+            $response = [];
+            if ($product === CitrixProducts::GOTOWEBINAR) {
 
+                $params = [
+                    'email' => $email,
+                    'firstName' => $firstname,
+                    'lastName' => $lastname,
+                ];
+
+                $response = self::getG2wApi()->request(
+                    'webinars/'.$productId.'/registrants?resendConfirmation=true',
+                    $params,
+                    'POST'
+                );
+            } else {
+                if ($product === CitrixProducts::GOTOTRAINING) {
+
+                    $params = [
+                        'email' => $email,
+                        'givenName' => $firstname,
+                        'surname' => $lastname,
+                    ];
+
+                    $response = self::getG2tApi()->request(
+                        'trainings/'.$productId.'/registrants',
+                        $params,
+                        'POST'
+                    );
+                }
+            }
             return (is_array($response) && array_key_exists('joinUrl', $response));
         } catch (\Exception $ex) {
-            CitrixHelper::log('registerToWebinar: ' . $ex->getMessage());
+            CitrixHelper::log('registerToProduct: ' . $ex->getMessage());
             throw new BadRequestHttpException($ex->getMessage());
         }
     }

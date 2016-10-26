@@ -108,13 +108,13 @@ final class CitrixEvents
     const ON_CITRIX_ASSIST_ACTION = 'mautic.on_citrix_assist_action';
 
     /**
-     * The mautic.on_webinar_subscribe_action event is dispatched when form with that action is submitted.
+     * The mautic.on_webinar_register_action event is dispatched when form with that action is submitted.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\SubmissionEvent instance.
      *
      * @var string
      */
-    const ON_WEBINAR_SUBSCRIBE_ACTION = 'mautic.on_webinar_subscribe_action';
+    const ON_WEBINAR_REGISTER_ACTION = 'mautic.on_webinar_register_action';
 
     /**
      * The mautic.on_meeting_start_action event is dispatched when form with that action is submitted.
@@ -126,13 +126,13 @@ final class CitrixEvents
     const ON_MEETING_START_ACTION = 'mautic.on_meeting_start_action';
 
     /**
-     * The mautic.on_training_subscribe_action event is dispatched when form with that action is submitted.
+     * The mautic.on_training_register_action event is dispatched when form with that action is submitted.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\SubmissionEvent instance.
      *
      * @var string
      */
-    const ON_TRAINING_SUBSCRIBE_ACTION = 'mautic.on_training_subscribe_action';
+    const ON_TRAINING_REGISTER_ACTION = 'mautic.on_training_register_action';
 
     /**
      * The mautic.on_training_start_action event is dispatched when form with that action is submitted.

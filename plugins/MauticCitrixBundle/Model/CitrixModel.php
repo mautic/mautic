@@ -270,6 +270,9 @@ class CitrixModel extends FormModel
             $table->addIndex(['product', 'email', 'event_type'], 'citrix_product');
             $table->addIndex(['product', 'email', 'event_type', 'event_name'], 'citrix_product_name');
             $table->addIndex(['event_date'], 'citrix_event_date');
+            $table->addForeignKeyConstraint('leads', ['email'], ['email'],
+                ['onUpdate' => 'CASCADE','onDelete' => 'CASCADE'],
+                'FK_citrix_leads');
             $sm->createTable($table);
 
         }

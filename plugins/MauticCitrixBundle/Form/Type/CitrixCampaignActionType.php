@@ -44,11 +44,10 @@ class CitrixCampaignActionType extends AbstractType
         $translator = CitrixHelper::getContainer()->get('translator');
 
         $choices = [
-            'webinar_subscribe' => $translator->trans('plugin.citrix.action.subscribe.webinar'),
+            'webinar_register' => $translator->trans('plugin.citrix.action.register.webinar'),
             'meeting_start' => $translator->trans('plugin.citrix.action.start.meeting'),
-            'training_subscribe' => $translator->trans('plugin.citrix.action.subscribe.training'),
+            'training_register' => $translator->trans('plugin.citrix.action.register.training'),
             'training_start' => $translator->trans('plugin.citrix.action.start.training'),
-            'assist_webchat' => $translator->trans('plugin.citrix.action.webchat.assist'),
             'assist_screensharing' => $translator->trans('plugin.citrix.action.screensharing.assist'),
         ];
 

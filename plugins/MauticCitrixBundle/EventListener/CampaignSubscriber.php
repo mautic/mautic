@@ -32,38 +32,38 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            CitrixEvents::ON_CITRIX_WEBINAR_EVENT => array('onWebinarEvent', 0),
-            CitrixEvents::ON_CITRIX_MEETING_EVENT => array('onMeetingEvent', 0),
-            CitrixEvents::ON_CITRIX_TRAINING_EVENT => array('onTrainingEvent', 0),
-            CitrixEvents::ON_CITRIX_ASSIST_EVENT => array('onAssistEvent', 0),
-            CitrixEvents::ON_CITRIX_WEBINAR_ACTION => array('onWebinarAction', 0),
-            CitrixEvents::ON_CITRIX_MEETING_ACTION => array('onMeetingAction', 0),
-            CitrixEvents::ON_CITRIX_TRAINING_ACTION => array('onTrainingAction', 0),
-            CitrixEvents::ON_CITRIX_ASSIST_ACTION => array('onAssistAction', 0),
+            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            CitrixEvents::ON_CITRIX_WEBINAR_EVENT => ['onWebinarEvent', 0],
+            CitrixEvents::ON_CITRIX_MEETING_EVENT => ['onMeetingEvent', 0],
+            CitrixEvents::ON_CITRIX_TRAINING_EVENT => ['onTrainingEvent', 0],
+            CitrixEvents::ON_CITRIX_ASSIST_EVENT => ['onAssistEvent', 0],
+            CitrixEvents::ON_CITRIX_WEBINAR_ACTION => ['onWebinarAction', 0],
+            CitrixEvents::ON_CITRIX_MEETING_ACTION => ['onMeetingAction', 0],
+            CitrixEvents::ON_CITRIX_TRAINING_ACTION => ['onTrainingAction', 0],
+            CitrixEvents::ON_CITRIX_ASSIST_ACTION => ['onAssistAction', 0],
         );
     }
 
     /* Actions */
 
-    public static function onWebinarAction(CampaignExecutionEvent $event)
+    public function onWebinarAction(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixAction(CitrixProducts::GOTOWEBINAR, $event));
+        $event->setResult($this->onCitrixAction(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    public static function onMeetingAction(CampaignExecutionEvent $event)
+    public function onMeetingAction(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixAction(CitrixProducts::GOTOMEETING, $event));
+        $event->setResult($this->onCitrixAction(CitrixProducts::GOTOMEETING, $event));
     }
 
-    public static function onTrainingAction(CampaignExecutionEvent $event)
+    public function onTrainingAction(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixAction(CitrixProducts::GOTOTRAINING, $event));
+        $event->setResult($this->onCitrixAction(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    public static function onAssistAction(CampaignExecutionEvent $event)
+    public function onAssistAction(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixAction(CitrixProducts::GOTOASSIST, $event));
+        $event->setResult($this->onCitrixAction(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
@@ -73,7 +73,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public static function onCitrixAction($product, CampaignExecutionEvent $event)
+    public function onCitrixAction($product, CampaignExecutionEvent $event)
     {
         if (!CitrixProducts::isValidValue($product)) {
             return false;
@@ -82,30 +82,48 @@ class CampaignSubscriber extends CommonSubscriber
         // do stuff
 
         // get firstName, lastName and email from keys for sender email
+        $config = $event->getConfig();
+        $email = $event->getLead()->getEmail();
+        $criteria = $config['event-criteria-'.$product];
+        $list = $config[$product.'-list'];
+
+        CitrixHelper::log(PHP_EOL.
+            '***********************************************************************'.
+            PHP_EOL.'CAMPAIGN ACTION '.$product.'='.$email.' '.print_r($config, true));
+
+        /*
+         * $config = Array (     
+         *   [event-criteria-training] => training_start     
+         *   [training-list] => Array         
+         *     (             
+         *       [0] => 3803653102383157249        
+         *      )  
+         *   ) 
+         */
 
         return true;
     }
 
     /* Events */
 
-    public static function onWebinarEvent(CampaignExecutionEvent $event)
+    public function onWebinarEvent(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixEvent(CitrixProducts::GOTOWEBINAR, $event));
+        $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    public static function onMeetingEvent(CampaignExecutionEvent $event)
+    public function onMeetingEvent(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixEvent(CitrixProducts::GOTOMEETING, $event));
+        $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOMEETING, $event));
     }
 
-    public static function onTrainingEvent(CampaignExecutionEvent $event)
+    public function onTrainingEvent(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixEvent(CitrixProducts::GOTOTRAINING, $event));
+        $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    public static function onAssistEvent(CampaignExecutionEvent $event)
+    public function onAssistEvent(CampaignExecutionEvent $event)
     {
-        $event->setResult(self::onCitrixEvent(CitrixProducts::GOTOASSIST, $event));
+        $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
@@ -115,7 +133,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public static function onCitrixEvent($product, CampaignExecutionEvent $event)
+    public function onCitrixEvent($product, CampaignExecutionEvent $event)
     {
         if (!CitrixProducts::isValidValue($product)) {
             return false;
@@ -127,6 +145,10 @@ class CampaignSubscriber extends CommonSubscriber
         $list = $config[$product.'-list'];
         $isAny = in_array('ANY', $list, true);
         $email = $event->getLead()->getEmail();
+
+        CitrixHelper::log(PHP_EOL.
+            '***********************************************************************'.PHP_EOL.
+            'CAMPAIGN EVENT '.$product.'='.$email.' '.print_r($config, true));
 
         if ('registeredToAtLeast' === $criteria) {
             $counter = $citrixModel->countEventsBy(
@@ -182,7 +204,7 @@ class CampaignSubscriber extends CommonSubscriber
         ];
 
         foreach ($activeProducts as $product) {
-            $event->addDecision(
+            $event->addCondition(
                 'citrix.event.'.$product,
                 array(
                     'label' => 'plugin.citrix.campaign.event.'.$product.'.label',

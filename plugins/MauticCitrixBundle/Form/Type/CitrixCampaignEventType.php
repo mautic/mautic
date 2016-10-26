@@ -50,7 +50,7 @@ class CitrixCampaignEventType extends AbstractType
             'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
         ];
 
-        if (CitrixProducts::GOTOWEBINAR === $product) {
+        if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING === $product) {
             $choices['registeredToAtLeast'] =
                  $translator->trans('plugin.citrix.criteria.'.$product.'.registered');
         }
@@ -58,13 +58,13 @@ class CitrixCampaignEventType extends AbstractType
         $builder->add(
             'event-criteria-'.$product,
             'choice',
-            array(
+            [
                 'label' => $translator->trans('plugin.citrix.decision.criteria'),
                 'choices' => $choices,
-            )
+            ]
         );
 
-        $choices = array_merge(
+        $choices = array_replace(
             ['ANY' => $translator->trans('plugin.citrix.event.'.$product.'.any')],
             array_combine($eventNames, $eventNames)
         );
