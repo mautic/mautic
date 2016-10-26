@@ -421,6 +421,10 @@ return [
                 ],
                 'alias' => 'company_list',
             ],
+            'mautic.form.type.company_change_score' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                'alias' => 'scorecontactscompanies_action',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [

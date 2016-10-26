@@ -30,6 +30,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     private $id;
 
     /**
+     * @var int
+     */
+    private $score = 0;
+
+    /**
      * @var \Mautic\UserBundle\Entity\User
      */
     private $owner;
@@ -58,6 +63,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
+
+        $builder->createField('score', 'integer')
+            ->build();
     }
 
     /**
@@ -72,6 +80,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
                 [
                     'id',
                     'fields',
+                    'score',
                 ]
             )
             ->build();
@@ -165,5 +174,30 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * Set score.
+     *
+     * @param User $score
+     *
+     * @return Company
+     */
+    public function setScore($score)
+    {
+        $this->isChanged('score', $score);
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * Get score.
+     *
+     * @return int
+     */
+    public function getScore()
+    {
+        return $this->score;
     }
 }

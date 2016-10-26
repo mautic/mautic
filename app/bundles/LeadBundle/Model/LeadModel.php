@@ -2173,4 +2173,32 @@ class LeadModel extends FormModel
 
         return false;
     }
+
+    /**
+     * @param Lead $lead
+     * @param $score
+     *
+     * @return bool
+     */
+    public function scoreContactsCompany(Lead $lead, $score)
+    {
+        $success          = false;
+        $entities         = [];
+        $contactCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+
+        if (!empty($contactCompanies)) {
+            foreach ($contactCompanies as $contactCompany) {
+                $company = $this->companyModel->getEntity($contactCompany['company_id']);
+                $company->setScore($score);
+                $entities[] = $company;
+                $success    = true;
+            }
+        }
+
+        if (!empty($entities)) {
+            $this->companyModel->getCompanyLeadRepository()->saveEntities($entities);
+        }
+
+        return $success;
+    }
 }
