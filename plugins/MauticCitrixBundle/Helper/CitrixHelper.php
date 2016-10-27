@@ -345,7 +345,7 @@ class CitrixHelper
      * @return bool
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
-    public static function startProduct($product, $productId, $email, $firstname, $lastname)
+    public static function startToProduct($product, $productId, $email, $firstname, $lastname)
     {
         try {
             if ($product === CitrixProducts::GOTOMEETING) {
@@ -367,7 +367,8 @@ class CitrixHelper
                         $router = self::getContainer()->get('router');
                         $params = [
                             'sessionStatusCallbackUrl' => $router
-                                ->generate('mautic_citrix_sessionchanged', UrlGeneratorInterface::ABSOLUTE_URL),
+                                ->generate('mautic_citrix_sessionchanged', [],
+                                    UrlGeneratorInterface::ABSOLUTE_URL),
                             'sessionType' => 'screen_sharing',
                             'partnerObject' => '',
                             'partnerObjectUrl' => '',

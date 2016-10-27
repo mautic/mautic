@@ -8,12 +8,11 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
-
-use HttpException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait CitrixStartTrait
 {
@@ -24,7 +23,6 @@ trait CitrixStartTrait
      * @param array $productsToStart
      * @param  $emailId
      * @param  $actionId
-     * @throws \HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -46,7 +44,7 @@ trait CitrixStartTrait
             foreach ($productsToStart as $productToStart) {
                 $productId = $productToStart['productId'];
 
-                $hostUrl = CitrixHelper::startProduct(
+                $hostUrl = CitrixHelper::startToProduct(
                     $product,
                     $productId,
                     $email,
@@ -94,7 +92,7 @@ trait CitrixStartTrait
                         $options = ['source' => ['trigger', $actionId]];
                         $model->sendEmail($emailEntity, $leadFields, $options);
                     } else {
-                        throw new HttpException('Unable to load emal template!');
+                        throw new BadRequestHttpException('Unable to load emal template!');
                     }
 
                     // add event to DB
@@ -111,11 +109,11 @@ trait CitrixStartTrait
                         CitrixEventTypes::STARTED
                     );
                 } else {
-                    throw new HttpException('Unable to start!');
+                    throw new BadRequestHttpException('Unable to start!');
                 }
             }
         } else {
-            throw new HttpException('Mandatory lead fields not found!');
+            throw new BadRequestHttpException('Mandatory lead fields not found!');
         }
     }
 

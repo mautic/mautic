@@ -31,6 +31,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixRegistrationTrait;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixStartTrait;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class FormSubscriber
@@ -82,10 +83,10 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @param Events\SubmissionEvent $event
      * @param string $product
-     * @param bool $isStart indicates that this is a start product, not registration
+     * @param string $startType indicates that this is a start product, not registration
      * @throws ValidationException
      */
-    private function _doRegistration(Events\SubmissionEvent $event, $product, $isStart = false)
+    private function _doRegistration(Events\SubmissionEvent $event, $product, $startType = null)
     {
         $submission = $event->getSubmission();
         $form = $submission->getForm();
@@ -94,49 +95,61 @@ class FormSubscriber extends CommonSubscriber
         $actions = $form->getActions();
 
         try {
-
-            // check if there are products in the actions
-            /** @var Action $action */
-            foreach ($actions as $action) {
-                if (0 === strpos($action->getType(), 'plugin.citrix.action')) {
-                    $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
-                    $actionAction = str_replace('.', '_', $actionAction);
-                    if (!array_key_exists($actionAction, $submission->getResults())) {
-                        // add new hidden field to store the product id
-                        $field = new Field();
-                        $field->setType('hidden');
-                        $field->setLabel(ucfirst($product).' ID');
-                        $field->setAlias($actionAction);
-                        $field->setForm($form);
-                        $field->setOrder(99999);
-                        $field->setSaveResult(true);
-                        $form->addField($actionAction, $field);
-                        $this->em->persist($form);
-                        /** @var FormModel $formModel */
-                        $formModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('form');
-                        $formModel->createTableSchema($form);
+            // gotoassist screen sharing does not need a product
+            if ('assist' !== $product) {
+                // check if there are products in the actions
+                /** @var Action $action */
+                foreach ($actions as $action) {
+                    if (0 === strpos($action->getType(), 'plugin.citrix.action')) {
+                        $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
+                        $actionAction = str_replace('.', '_', $actionAction);
+                        if (!array_key_exists($actionAction, $submission->getResults())) {
+                            // add new hidden field to store the product id
+                            $field = new Field();
+                            $field->setType('hidden');
+                            $field->setLabel(ucfirst($product).' ID');
+                            $field->setAlias($actionAction);
+                            $field->setForm($form);
+                            $field->setOrder(99999);
+                            $field->setSaveResult(true);
+                            $form->addField($actionAction, $field);
+                            $this->em->persist($form);
+                            /** @var FormModel $formModel */
+                            $formModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('form');
+                            $formModel->createTableSchema($form);
+                        }
                     }
                 }
             }
 
             $productsToRegister = self::_getProductsFromPost($actions, $fields, $post, $product);
-            if (0 !== count($productsToRegister)) {
+            if ($product === 'assist' || (0 !== count($productsToRegister))) {
                 $results = $submission->getResults();
-
-                // replace the submitted value with something more legible
-                foreach ($productsToRegister as $productToRegister) {
-                    $results[$productToRegister['fieldName']] = $productToRegister['productTitle'].' ('.$productToRegister['productId'].')';
-                }
 
                 // persist the new values
                 $factory = CitrixHelper::getContainer()->get('mautic.model.factory');
-                /** @var SubmissionRepository $repo */
-                $repo = $factory->getModel('form.submission')->getRepository();
-                $resultsTableName = $repo->getResultsTableName($form->getId(), $form->getAlias());
-                $tableKeys = ['submission_id' => $submission->getId()];
-                $this->entityManager
-                    ->getConnection()
-                    ->update($resultsTableName, $results, $tableKeys);
+                if ($product !== 'assist') {
+                    // replace the submitted value with something more legible
+                    foreach ($productsToRegister as $productToRegister) {
+                        $results[$productToRegister['fieldName']] = $productToRegister['productTitle'].' ('.$productToRegister['productId'].')';
+                    }
+
+                    /** @var SubmissionRepository $repo */
+                    $repo = $factory->getModel('form.submission')->getRepository();
+                    $resultsTableName = $repo->getResultsTableName($form->getId(), $form->getAlias());
+                    $tableKeys = ['submission_id' => $submission->getId()];
+                    $this->entityManager
+                        ->getConnection()
+                        ->update($resultsTableName, $results, $tableKeys);
+                } else {
+                    // dummy field for assist
+                    $productsToRegister[] = // needed because there are no ids
+                        [
+                            'fieldName' => $startType,
+                            'productId' => $startType,
+                            'productTitle' => $startType,
+                        ];
+                }
 
                 /** @var LeadModel $leadModel */
                 $leadModel = $factory->getModel('lead');
@@ -145,21 +158,35 @@ class FormSubscriber extends CommonSubscriber
 
                 // execute action
                 if ($currentLead instanceof Lead) {
-                    if ($isStart) {
-                        if (array_key_exists('template', $action->getProperties())) {
-                            $emailId = $action->getProperties()['template'];
-                            self::startProduct($product, $currentLead, $productsToRegister, $emailId, $action->getId());
-                        } else {
-                            throw new \HttpException('Email template not found!');
+                    if (null !== $startType) {
+                        /** @var Action $action */
+                        foreach ($actions as $action) {
+                            $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
+                            if ($actionAction === $startType) {
+                                if (array_key_exists('template', $action->getProperties())) {
+                                    $emailId = $action->getProperties()['template'];
+                                    self::startProduct(
+                                        $product,
+                                        $currentLead,
+                                        $productsToRegister,
+                                        $emailId,
+                                        $action->getId()
+                                    );
+                                } else {
+                                    throw new BadRequestHttpException('Email template not found!');
+                                }
+                            }
                         }
                     } else {
                         self::registerProduct($product, $currentLead, $productsToRegister);
                     }
                 } else {
-                    throw new \HttpException('Lead not found!');
+                    throw new BadRequestHttpException('Lead not found!');
                 }
             } else {
-                throw new \HttpException('There are no products to ' . ($isStart? 'start' : 'register'));
+                throw new BadRequestHttpException(
+                    'There are no products to '.((null === $startType) ? 'register' : 'start')
+                );
             } // end-block
         } catch (\Exception $ex) {
             CitrixHelper::log('onProductRegistration - '.$product.': '.$ex->getMessage());
@@ -180,7 +207,7 @@ class FormSubscriber extends CommonSubscriber
 
     public function onMeetingStart(Events\SubmissionEvent $event)
     {
-        $this->_doRegistration($event, CitrixProducts::GOTOMEETING, true);
+        $this->_doRegistration($event, CitrixProducts::GOTOMEETING, 'start.meeting');
     }
 
     public function onTrainingRegister(Events\SubmissionEvent $event)
@@ -190,12 +217,12 @@ class FormSubscriber extends CommonSubscriber
 
     public function onTrainingStart(Events\SubmissionEvent $event)
     {
-        $this->_doRegistration($event, CitrixProducts::GOTOTRAINING, true);
+        $this->_doRegistration($event, CitrixProducts::GOTOTRAINING, 'start.training');
     }
 
     public function onAssistRemote(Events\SubmissionEvent $event)
     {
-        $this->_doRegistration($event, CitrixProducts::GOTOASSIST, true);
+        $this->_doRegistration($event, CitrixProducts::GOTOASSIST, 'screensharing.assist');
     }
 
     /**
@@ -224,7 +251,7 @@ class FormSubscriber extends CommonSubscriber
     {
         CitrixHelper::log(
             PHP_EOL.$event->getMethod().' '.$event->getUrl().' '.
-            var_export($event->getHeaders(), true) .
+            var_export($event->getHeaders(), true).
             var_export($event->getParameters(), true)
         );
     }
@@ -285,40 +312,43 @@ class FormSubscriber extends CommonSubscriber
                     $productIds = [$productIds];
                 }
                 foreach ($productIds as $productId) {
-                    $products[] = array(
+                    $products[] = [
                         'fieldName' => $alias,
                         'productId' => $productId,
                         'productTitle' => array_key_exists(
                             $productId,
                             $productlist
                         ) ? $productlist[$productId] : 'untitled',
-                    );
+                    ];
                 }
             }
         }
 
-        // check if there are products in the actions
-        /** @var Action $action */
-        foreach ($actions as $action) {
-            if (0 === strpos($action->getType(), 'plugin.citrix.action')) {
-                if (0 === count($productlist)) {
-                    $productlist = CitrixHelper::getCitrixChoices($product);
-                }
-                $actionProduct = preg_filter('/^.+\.([^\.]+)$/', '$1', $action->getType());
-                if (!CitrixHelper::isAuthorized('Goto'.$actionProduct)) {
-                    continue;
-                }
-                $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
-                $productId = $action->getProperties()['product'];
-                if (array_key_exists(
-                    $productId,
-                    $productlist
-                )) {
-                    $products[] = array(
-                        'fieldName' => str_replace('.', '_', $actionAction),
-                        'productId' => $productId,
-                        'productTitle' => $productlist[$productId],
-                    );
+        // gotoassist screen sharing does not need a product
+        if ('assist' !== $product) {
+            // check if there are products in the actions
+            /** @var Action $action */
+            foreach ($actions as $action) {
+                if (0 === strpos($action->getType(), 'plugin.citrix.action')) {
+                    if (0 === count($productlist)) {
+                        $productlist = CitrixHelper::getCitrixChoices($product);
+                    }
+                    $actionProduct = preg_filter('/^.+\.([^\.]+)$/', '$1', $action->getType());
+                    if (!CitrixHelper::isAuthorized('Goto'.$actionProduct)) {
+                        continue;
+                    }
+                    $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
+                    $productId = $action->getProperties()['product'];
+                    if (array_key_exists(
+                        $productId,
+                        $productlist
+                    )) {
+                        $products[] = array(
+                            'fieldName' => str_replace('.', '_', $actionAction),
+                            'productId' => $productId,
+                            'productTitle' => $productlist[$productId],
+                        );
+                    }
                 }
             }
         }

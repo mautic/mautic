@@ -18,6 +18,7 @@ use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixRegistrationTrait;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixStartTrait;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 
@@ -28,6 +29,7 @@ class CampaignSubscriber extends CommonSubscriber
 {
 
     use CitrixRegistrationTrait;
+    use CitrixStartTrait;
 
     /**
      * {@inheritdoc}
@@ -85,68 +87,64 @@ class CampaignSubscriber extends CommonSubscriber
         $criteria = $config['event-criteria-'.$product];
         /** @var array $list */
         $list = $config[$product.'-list'];
+        $emailId = $config['template'];
+        $actionId = 'citrix.action.'.$product;
+        try {
+            $productlist = CitrixHelper::getCitrixChoices($product);
+            $products = [];
 
-        if (in_array($criteria, ['webinar_register', 'training_register'], true)) {
-            try {
-                $productlist = CitrixHelper::getCitrixChoices($product);
-                $products = [];
-
-                foreach ($list as $productId) {
-                    if (array_key_exists(
-                        $productId,
-                        $productlist
-                    )) {
-                        $products[] = array(
-                            'productId' => $productId,
-                            'productTitle' => $productlist[$productId],
-                        );
-                    }
+            foreach ($list as $productId) {
+                if (array_key_exists(
+                    $productId,
+                    $productlist
+                )) {
+                    $products[] = array(
+                        'productId' => $productId,
+                        'productTitle' => $productlist[$productId],
+                    );
                 }
-                self::registerProduct($product, $event->getLead(), $products);
-            } catch (\Exception $ex) {
-                CitrixHelper::log('onCitrixAction - '.$product.': '.$ex->getMessage());
             }
+            if (in_array($criteria, ['webinar_register', 'training_register'], true)) {
+                self::registerProduct($product, $event->getLead(), $products);
+            } else {
+                if (in_array($criteria, ['assist_screensharing', 'training_start', 'meeting_start'], true)) {
+                    self::startProduct($product, $event->getLead(), $products, $emailId, $actionId);
+                }
+            }
+        } catch (\Exception $ex) {
+            CitrixHelper::log('onCitrixAction - '.$product.': '.$ex->getMessage());
         }
-
-        /*
-         * $config = Array (     
-         *   [event-criteria-training] => training_start     
-         *   [training-list] => Array         
-         *     (             
-         *       [0] => 3803653102383157249        
-         *      )  
-         *   ) 
-         * 
-         * 'webinar_register' 
-            'meeting_start' 
-            'training_register' 
-            'training_start' 
-            'assist_screensharing'
-         */
-
 
         return true;
     }
 
     /* Events */
 
-    public function onWebinarEvent(CampaignExecutionEvent $event)
-    {
+    public
+    function onWebinarEvent(
+        CampaignExecutionEvent $event
+    ) {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    public function onMeetingEvent(CampaignExecutionEvent $event)
-    {
+    public
+    function onMeetingEvent(
+        CampaignExecutionEvent $event
+    ) {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOMEETING, $event));
     }
 
-    public function onTrainingEvent(CampaignExecutionEvent $event)
-    {
+    public
+    function onTrainingEvent(
+        CampaignExecutionEvent $event
+    ) {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    public function onAssistEvent(CampaignExecutionEvent $event)
-    {
+    public
+    function onAssistEvent(
+        CampaignExecutionEvent $event
+    ) {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOASSIST, $event));
     }
 
@@ -157,8 +155,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function onCitrixEvent($product, CampaignExecutionEvent $event)
-    {
+    public function onCitrixEvent($product, CampaignExecutionEvent $event) {
         if (!CitrixProducts::isValidValue($product)) {
             return false;
         }
@@ -197,8 +194,10 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
-    {
+    public
+    function onCampaignBuild(
+        CampaignBuilderEvent $event
+    ) {
         $activeProducts = [];
         foreach (CitrixProducts::toArray() as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {

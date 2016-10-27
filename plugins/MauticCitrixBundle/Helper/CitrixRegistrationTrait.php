@@ -8,10 +8,10 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
-
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait CitrixRegistrationTrait
 {
@@ -20,7 +20,6 @@ trait CitrixRegistrationTrait
      * @param string $product
      * @param Lead $currentLead
      * @param array $productsToRegister
-     * @throws \HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -64,11 +63,11 @@ trait CitrixRegistrationTrait
                         CitrixEventTypes::REGISTERED
                     );
                 } else {
-                    throw new \HttpException('Unable to register!');
+                    throw new BadRequestHttpException('Unable to register!');
                 }
             }
         } else {
-            throw new \HttpException('Mandatory lead fields not found!');
+            throw new BadRequestHttpException('Mandatory lead fields not found!');
         }
     }
 
