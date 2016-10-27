@@ -175,7 +175,9 @@ class CitrixActionType extends AbstractType
         );
 
         if (array_key_exists('data-product-action', $options['attr']) &&
-            'start' === $options['attr']['data-product-action']
+            ( 'start' === $options['attr']['data-product-action'] ||
+             'screensharing' === $options['attr']['data-product-action'] )
+
         ) {
 
             $defaultOptions = [

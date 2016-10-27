@@ -10,8 +10,8 @@
 
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use FOS\OAuthServerBundle\Propel\Token;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -32,10 +32,10 @@ class EmailSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CitrixEvents::ON_TOKEN_GENERATE => ['onTokenGenerate', 254],
+//            CitrixEvents::ON_TOKEN_GENERATE => ['onTokenGenerate', 254],
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 254),
-            EmailEvents::EMAIL_ON_DISPLAY => array('decodeTokensDisplay', 254),
+//            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
+            EmailEvents::EMAIL_ON_DISPLAY => array('decodeTokensDisplay', 0),
         );
     }
 
@@ -125,7 +125,7 @@ class EmailSubscriber extends CommonSubscriber
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
                 }
-
+                
                 $button = $this->templating->render(
                     'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                     $params

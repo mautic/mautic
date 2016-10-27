@@ -48,6 +48,7 @@ class CitrixListType extends AbstractType
             [
                 'label' => 'mautic.form.field.form.multiple',
                 'data' => $default,
+                'required' => true,
             ]
         );
 

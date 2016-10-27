@@ -19,6 +19,8 @@ use Monolog\Logger;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 class CitrixHelper
 {
@@ -326,11 +328,77 @@ class CitrixHelper
                     );
                 }
             }
+
             return (is_array($response) && array_key_exists('joinUrl', $response));
         } catch (\Exception $ex) {
-            CitrixHelper::log('registerToProduct: ' . $ex->getMessage());
+            CitrixHelper::log('registerToProduct: '.$ex->getMessage());
             throw new BadRequestHttpException($ex->getMessage());
         }
+    }
+
+    /**
+     * @param $product
+     * @param $productId
+     * @param $email
+     * @param $firstname
+     * @param $lastname
+     * @return bool
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     */
+    public static function startProduct($product, $productId, $email, $firstname, $lastname)
+    {
+        try {
+            if ($product === CitrixProducts::GOTOMEETING) {
+                $response = self::getG2mApi()->request(
+                    'meetings/'.$productId.'/start'
+                );
+
+                return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
+            } else {
+                if ($product === CitrixProducts::GOTOTRAINING) {
+                    $response = self::getG2tApi()->request(
+                        'trainings/'.$productId.'/start'
+                    );
+
+                    return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
+                } else {
+                    if ($product === CitrixProducts::GOTOASSIST) {
+                        /** @var Router $router */
+                        $router = self::getContainer()->get('router');
+                        $params = [
+                            'sessionStatusCallbackUrl' => $router
+                                ->generate('mautic_citrix_sessionchanged', UrlGeneratorInterface::ABSOLUTE_URL),
+                            'sessionType' => 'screen_sharing',
+                            'partnerObject' => '',
+                            'partnerObjectUrl' => '',
+                            'customerName' => $firstname . ' ' . $lastname,
+                            'customerEmail' => $email,
+                            'machineUuid' => '',
+                        ];
+
+                        $response = self::getG2aApi()->request(
+                            'sessions',
+                            $params,
+                            'POST'
+                        );
+
+                        return (is_array($response) &&
+                            array_key_exists(
+                                'startScreenSharing',
+                                $response
+                            ) && array_key_exists(
+                                'launchUrl',
+                                $response['startScreenSharing']
+                            )) ? $response['startScreenSharing']['launchUrl'] : '';
+                    }
+                }
+            }
+        } catch (\Exception $ex) {
+            CitrixHelper::log('startProduct: '.$ex->getMessage());
+            throw new BadRequestHttpException($ex->getMessage());
+        }
+
+        return '';
     }
 
 }

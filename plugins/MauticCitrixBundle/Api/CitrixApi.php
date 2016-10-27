@@ -29,9 +29,11 @@ class CitrixApi
             'return_raw' => 'true', // needed to get the HTTP status code in the response
             'override_auth_token' => 'oauth_token='.$this->integration->getApiKey(),
         ];
+
         if (array_key_exists('requestSettings', $settings) && is_array($settings['requestSettings'])) {
             $requestSettings = array_merge($requestSettings, $settings['requestSettings']);
         }
+
         $url     = sprintf('%s/%s/%s/%s',
             $this->integration->getApiUrl(), $settings['module'], $route, $operation);
         /** @var Response $request */
