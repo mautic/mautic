@@ -34,14 +34,24 @@ class CitrixApi
             $requestSettings = array_merge($requestSettings, $settings['requestSettings']);
         }
 
-        $url     = sprintf('%s/%s/%s/%s',
-            $this->integration->getApiUrl(), $settings['module'], $route, $operation);
+        $url = sprintf(
+            '%s/%s/%s/%s',
+            $this->integration->getApiUrl(),
+            $settings['module'],
+            $route,
+            $operation
+        );
         /** @var Response $request */
-        $request = $this->integration->makeRequest($url, $settings['parameters'], $settings['method'], $requestSettings);
-        $status  = $request->code;
+        $request = $this->integration->makeRequest(
+            $url,
+            $settings['parameters'],
+            $settings['method'],
+            $requestSettings
+        );
+        $status = $request->code;
         $message = '';
 
-        switch($status){
+        switch ($status) {
             case 200:
                 // request ok
                 break;

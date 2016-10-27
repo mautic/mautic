@@ -74,7 +74,6 @@ class FormSubscriber extends CommonSubscriber
             CitrixEvents::ON_ASSIST_REMOTE_ACTION => ['onAssistRemote', 0],
             CitrixEvents::ON_FORM_VALIDATE_ACTION => ['onFormValidate', 0],
             FormEvents::FORM_PRE_SAVE => ['onFormPreSave', 0],
-            // TODO: Remove onRequest event
             \Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST => ['onRequest', 0],
             \Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
         );
@@ -233,12 +232,12 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onResponse(PluginIntegrationRequestEvent $event)
     {
-        /** @var Response $response */
-        $response = $event->getResponse();
-        CitrixHelper::log(
-            PHP_EOL. //$response->getStatusCode() . ' ' .
-            print_r($response, true)
-        );
+//        /** @var Response $response */
+//        $response = $event->getResponse();
+//        CitrixHelper::log(
+//            PHP_EOL. //$response->getStatusCode() . ' ' .
+//            print_r($response, true)
+//        );
     }
 
     /**
@@ -249,11 +248,18 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
-        CitrixHelper::log(
-            PHP_EOL.$event->getMethod().' '.$event->getUrl().' '.
-            var_export($event->getHeaders(), true).
-            var_export($event->getParameters(), true)
-        );
+//        CitrixHelper::log(
+//            PHP_EOL.$event->getMethod().' '.$event->getUrl().' '.
+//            var_export($event->getHeaders(), true).
+//            var_export($event->getParameters(), true)
+//        );
+
+        // clean parameter that was breaking the call
+        if (preg_match('/\/G2W\/rest\//', $event->getUrl())) {
+            $params = $event->getParameters();
+            unset($params['access_token']);
+            $event->setParameters($params);
+        }
     }
 
     /**

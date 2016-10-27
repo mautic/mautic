@@ -18,7 +18,12 @@ class GotowebinarApi extends CitrixApi
         $settings = [
             'module'     => 'G2W',
             'method'     => $method,
-            'parameters' => $parameters
+            'parameters' => $parameters,
+            'requestSettings'=>[
+              'headers'=>[
+                  'Accept'=>'application/json;charset=UTF-8',
+              ],
+            ],
         ];
         return parent::_request($operation, $settings,
             sprintf('rest/organizers/%s', $this->integration->getOrganizerKey()));

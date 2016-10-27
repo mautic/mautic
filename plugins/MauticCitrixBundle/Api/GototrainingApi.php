@@ -10,10 +10,11 @@ class GototrainingApi extends CitrixApi
      * @param string $operation
      * @param array $parameters
      * @param string $method
+     * @param string $route
      * @return mixed|string
      * @throws ApiErrorException
      */
-    public function request($operation, array $parameters = [], $method = 'GET')
+    public function request($operation, array $parameters = [], $method = 'GET', $route = 'rest')
     {
         $settings = [
             'module'     => 'G2T',
@@ -29,10 +30,10 @@ class GototrainingApi extends CitrixApi
                 ],
             ];
 
-            return parent::_request($operation, $settings);
+            return parent::_request($operation, $settings, $route);
         }
 
         return parent::_request($operation, $settings,
-            sprintf('rest/organizers/%s', $this->integration->getOrganizerKey()));
+            sprintf('%s/organizers/%s', $route, $this->integration->getOrganizerKey()));
     }
 }

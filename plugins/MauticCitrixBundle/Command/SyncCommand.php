@@ -10,8 +10,10 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Command;
 
+use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
+use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,6 +27,24 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SyncCommand extends ContainerAwareCommand
 {
+    /** @var  CitrixModel */
+    protected $citrixModel;
+
+    /**
+     * SyncCommand constructor.
+     * @param null $name
+     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     */
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+        $container = CitrixHelper::getContainer();
+        $factory = $container->get('mautic.model.factory');
+        $this->citrixModel = $factory->getModel('citrix.citrix');
+    }
+
     /**
      * {@inheritdoc}
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
@@ -55,7 +75,7 @@ class SyncCommand extends ContainerAwareCommand
         $activeProducts = [];
         if (null === $product) {
             // all products
-            foreach (CitrixProducts::toArray() as $p){
+            foreach (CitrixProducts::toArray() as $p) {
                 if (CitrixHelper::isAuthorized('Goto'.$p)) {
                     $activeProducts[] = $p;
                 }
@@ -67,16 +87,74 @@ class SyncCommand extends ContainerAwareCommand
         } else {
             if (!CitrixProducts::isValidValue($product)) {
                 $output->writeln('<error>Invalid product: '.$product.'. Aborted</error>');
+
                 return;
             }
             $activeProducts[] = $product;
         }
 
-        foreach ($activeProducts as $name) {
-            $output->writeln('<info>Synchronizing registrants for <comment>GoTo'.ucfirst($name).'</comment></info>');
-            $output->writeln('0 total contacts');
+        $count = 0;
+        foreach ($activeProducts as $product) {
+            $output->writeln('<info>Synchronizing registrants for <comment>GoTo'.ucfirst($product).'</comment></info>');
+
+            /** @var array $citrixChoices */
+            $citrixChoices = [];
+            $productIds = [];
+            if (null === $options['id']) {
+                // all products
+                $citrixChoices = CitrixHelper::getCitrixChoices($product, false);
+                $productIds = array_keys($citrixChoices);
+            } else {
+                $productIds[] = $options['id'];
+                $citrixChoices[$options['id']] = $options['id'];
+            }
+
+            foreach ($productIds as $productId) {
+                try {
+                    $eventName = $citrixChoices[$productId];//CitrixHelper::getEventName($product, $productId);
+                    $output->writeln('Synchronizing: ['.$productId.'] '.$eventName);
+
+                    $registrants = CitrixHelper::getRegistrants($product, $productId);
+                    $knownRegistrants = $this->citrixModel->getEmailsByEvent(
+                        $product,
+                        $eventName,
+                        CitrixEventTypes::REGISTERED
+                    );
+
+                    $count += $this->citrixModel->batchAddAndRemove(
+                        $product,
+                        $eventName,
+                        CitrixEventTypes::REGISTERED,
+                        array_diff($registrants, $knownRegistrants),
+                        array_diff($knownRegistrants, $registrants),
+                        $output
+                    );
+
+                    $attendees = CitrixHelper::getAttendees($product, $productId);
+                    $knownAttendees = $this->citrixModel->getEmailsByEvent(
+                        $product,
+                        $eventName,
+                        CitrixEventTypes::ATTENDED
+                    );
+
+                    $count += $this->citrixModel->batchAddAndRemove(
+                        $product,
+                        $eventName,
+                        CitrixEventTypes::ATTENDED,
+                        array_diff($attendees, $knownAttendees),
+                        array_diff($knownAttendees, $attendees),
+                        $output
+                    );
+
+                } catch (\Exception $ex) {
+                    $output->writeln('<error>Error syncing '.$product.': '.$productId.'.</error>');
+                    $output->writeln('<error>'.$ex->getMessage().'</error>');
+                }
+            }
+
         }
 
+        $output->writeln($count.' contacts synchronized.');
         $output->writeln('<info>Done.</info>');
     }
 }

@@ -32,7 +32,7 @@ class EmailSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-//            CitrixEvents::ON_TOKEN_GENERATE => ['onTokenGenerate', 254],
+//            CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
 //            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
             EmailEvents::EMAIL_ON_DISPLAY => array('decodeTokensDisplay', 0),
@@ -119,9 +119,9 @@ class EmailSubscriber extends CommonSubscriber
                 ];
 
                 // trigger event to replace the links in the tokens
-                if ($triggerEvent && $this->dispatcher->hasListeners(CitrixEvents::ON_TOKEN_GENERATE)) {
+                if ($triggerEvent && $this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_TOKEN_GENERATE)) {
                     $tokenEvent = new TokenGenerateEvent($params);
-                    $this->dispatcher->dispatch(CitrixEvents::ON_TOKEN_GENERATE, $tokenEvent);
+                    $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_TOKEN_GENERATE, $tokenEvent);
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
                 }

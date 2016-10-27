@@ -153,12 +153,20 @@ final class CitrixEvents
     const ON_ASSIST_REMOTE_ACTION = 'mautic.on_assist_remote_action';
 
     /**
-     * The mautic.on_token_generate event is dispatched before a token is decoded.
+     * The mautic.on_citrix_token_generate event is dispatched before a token is decoded.
      *
      * The event listener receives a MauticPlugin\MauticCitrixBundle\Event\TokenGenerateEvent instance.
      *
      * @var string
      */
-    const ON_TOKEN_GENERATE = 'mautic.on_token_generate';
-    
+    const ON_CITRIX_TOKEN_GENERATE = 'mautic.on_citrix_token_generate';
+
+    /**
+     * The mautic.on_citrix_event_update event is dispatched when an event has been updated externally.
+     *
+     * The event listener receives a MauticPlugin\MauticCitrixBundle\Event\CitrixEventUpdateEvent instance.
+     *
+     * @var string
+     */
+    const ON_CITRIX_EVENT_UPDATE = 'mautic.on_citrix_event_update';
 }
