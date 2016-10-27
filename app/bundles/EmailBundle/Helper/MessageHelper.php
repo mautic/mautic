@@ -387,7 +387,7 @@ class MessageHelper
         'oversize'       => ['remove' => 0, 'bounce_type' => 'soft'],
         'outofoffice'    => ['remove' => 0, 'bounce_type' => 'soft'],
         'unknown'        => ['remove' => 1, 'bounce_type' => 'hard'],
-        'unrecognized'   => ['remove' => 0, 'bounce_type' => false],
+        'unrecognized'   => ['remove' => 1, 'bounce_type' => false],
         'user_reject'    => ['remove' => 1, 'bounce_type' => 'hard'],
         'warning'        => ['remove' => 0, 'bounce_type' => 'soft'],
     ];
