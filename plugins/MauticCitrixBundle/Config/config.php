@@ -37,6 +37,9 @@ return [
             'mautic.citrix.campaignbundle.subscriber' => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber',
             ],
+            'mautic.citrix.emailbundle.subscriber' => [
+                'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+            ],
         ],
         'forms'  => [
             'mautic.form.type.fieldslist.citrixlist'  => [

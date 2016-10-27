@@ -16,7 +16,9 @@ use Doctrine\ORM\EntityManager;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
@@ -24,11 +26,9 @@ use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
-use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixRegistrationTrait;
-use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FormSubscriber extends CommonSubscriber
 {
-    
+
     use CitrixRegistrationTrait;
 
     /** @var EntityManager $entityManager */
@@ -69,7 +69,6 @@ class FormSubscriber extends CommonSubscriber
             CitrixEvents::ON_TRAINING_REGISTER_ACTION => ['onTrainingRegister', 0],
             CitrixEvents::ON_TRAINING_START_ACTION => ['onTrainingStart', 0],
             CitrixEvents::ON_ASSIST_REMOTE_ACTION => ['onAssistRemote', 0],
-            CitrixEvents::ON_ASSIST_WEBCHAT_ACTION => ['onAssistWebchat', 0],
             CitrixEvents::ON_FORM_VALIDATE_ACTION => ['onFormValidate', 0],
             FormEvents::FORM_PRE_SAVE => ['onFormPreSave', 0],
             // TODO: Remove onRequest event
@@ -78,7 +77,50 @@ class FormSubscriber extends CommonSubscriber
         );
     }
 
-    
+    /**
+     * @param Events\SubmissionEvent $event
+     * @param string $product
+     * @throws ValidationException
+     */
+    private function _doStart(Events\SubmissionEvent $event, $product)
+    {
+        $submission = $event->getSubmission();
+        $form = $submission->getForm();
+        $post = $event->getPost();
+        $fields = $form->getFields();
+        $actions = $form->getActions();
+
+        try {
+            $productsToStart = self::_getProductsFromPost($actions, $fields, $post, $product);
+            if (0 !== count($productsToStart)) {
+                $results = $submission->getResults();
+                foreach ($productsToStart as $productToStart) {
+                    $results[$productToStart['fieldName']] = $productToStart['productTitle'].' ('.$productToStart['productId'].')';
+                }
+                $submission->setResults($results); // make post results readable
+                /** @var LeadModel $leadModel */
+                $leadModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('lead');
+                /** @var Lead $currentLead */
+                $currentLead = $leadModel->getCurrentLead();
+                if ($currentLead instanceof Lead) {
+                    self::registerProduct($product, $currentLead, $productsToStart);
+                } else {
+                    throw new \HttpException('Lead not found!');
+                }
+            } else {
+                throw new \HttpException('There are no products to register!');
+            } // end-block
+        } catch (\Exception $ex) {
+            CitrixHelper::log('onProductRegistration - '.$product.': '.$ex->getMessage());
+            $validationException = new ValidationException($ex->getMessage());
+            $validationException->setViolations(
+                [
+                    'email' => $ex->getMessage(),
+                ]
+            );
+            throw $validationException;
+        }
+    }
 
     /**
      * @param Events\SubmissionEvent $event
@@ -95,15 +137,45 @@ class FormSubscriber extends CommonSubscriber
 
         try {
 
+            // check if there are products in the actions
+            /** @var Action $action */
+            foreach ($actions as $action) {
+                if (0 === strpos($action->getType(), 'plugin.citrix.action')) {
+                    $actionAction = preg_filter('/^.+\.([^\.]+\.[^\.]+)$/', '$1', $action->getType());
+                    $actionAction = str_replace('.', '_', $actionAction);
+                    if (!array_key_exists($actionAction, $submission->getResults())) {
+                        CitrixHelper::log('Adding new Field to form: ' . $actionAction);
+                        // add new hidden field to store the product
+                        $field = new Field();
+                        $field->setType('hidden');
+                        $field->setLabel(ucfirst($product).' ID');
+                        $field->setAlias($actionAction);
+                        $field->setForm($form);
+                        $field->setOrder(99999);
+                        $field->setSaveResult(true);
+                        $form->addField($actionAction, $field);
+                        $this->em->persist($form);
+                        /** @var FormModel $formModel */
+                        $formModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('form');
+                        $formModel->createTableSchema($form);
+                    }
+                }
+            }
+
             $productsToRegister = self::_getProductsFromPost($actions, $fields, $post, $product);
             if (0 !== count($productsToRegister)) {
                 $results = $submission->getResults();
                 foreach ($productsToRegister as $productToRegister) {
                     $results[$productToRegister['fieldName']] = $productToRegister['productTitle'].' ('.$productToRegister['productId'].')';
+                    CitrixHelper::log('Setting new value: ' . $productToRegister['fieldName'] . '='.
+                        $results[$productToRegister['fieldName']]);
                 }
-                $submission->setResults($results); // make post results readable
+                $factory = CitrixHelper::getContainer()->get('mautic.model.factory');
+                /** @var SubmissionRepository $repo */
+                $repo = $factory->getModel('form.submission')->getRepository();
+                $this->entityManager->getConnection()->update($repo->getResultsTableName($form->getId(), $form->getAlias()), $results, ['submission_id' => $submission->getId()]);
                 /** @var LeadModel $leadModel */
-                $leadModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('lead');
+                $leadModel = $factory->getModel('lead');
                 /** @var Lead $currentLead */
                 $currentLead = $leadModel->getCurrentLead();
                 if ($currentLead instanceof Lead) {
@@ -115,7 +187,7 @@ class FormSubscriber extends CommonSubscriber
                 throw new \HttpException('There are no products to register!');
             } // end-block
         } catch (\Exception $ex) {
-            CitrixHelper::log('onProductRegistration - '.$product . ': ' . $ex->getMessage());
+            CitrixHelper::log('onProductRegistration - '.$product.': '.$ex->getMessage());
             $validationException = new ValidationException($ex->getMessage());
             $validationException->setViolations(
                 [
@@ -133,14 +205,7 @@ class FormSubscriber extends CommonSubscriber
 
     public function onMeetingStart(Events\SubmissionEvent $event)
     {
-//        $form = $event->getForm();
-//        $post = $event->getPost();
-//        /** @var \Mautic\FormBundle\Entity\Field $field */
-//        foreach ($form->getFields() as $field) {
-//            if ('plugin.citrix.select.meeting' === $field->getType()) {
-//                $meetingId = $post[$field->getAlias()];
-//            }
-//        }
+        $this->_doStart($event, CitrixProducts::GOTOMEETING);
     }
 
     public function onTrainingRegister(Events\SubmissionEvent $event)
@@ -150,17 +215,12 @@ class FormSubscriber extends CommonSubscriber
 
     public function onTrainingStart(Events\SubmissionEvent $event)
     {
-
+        $this->_doStart($event, CitrixProducts::GOTOTRAINING);
     }
 
     public function onAssistRemote(Events\SubmissionEvent $event)
     {
-
-    }
-
-    public function onAssistWebchat(Events\SubmissionEvent $event)
-    {
-
+        $this->_doStart($event, CitrixProducts::GOTOASSIST);
     }
 
     /**
@@ -279,10 +339,11 @@ class FormSubscriber extends CommonSubscriber
                     $productlist
                 )) {
                     $products[] = array(
-                        'fieldName' => $actionAction,
+                        'fieldName' => str_replace('.', '_', $actionAction),
                         'productId' => $productId,
                         'productTitle' => $productlist[$productId],
                     );
+                    CitrixHelper::log('ADDING FIELD: ' . str_replace('.', '_', $actionAction));
                 }
             }
         }

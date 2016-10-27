@@ -74,9 +74,37 @@ class CitrixCampaignActionType extends AbstractType
                 [
                     'label' => $translator->trans('plugin.citrix.decision.'.$product.'.list'),
                     'choices' => CitrixHelper::getCitrixChoices($product),
-                    'multiple' => true
+                    'multiple' => true,
                 ]
             );
+        }
+
+        if (array_key_exists('meeting_start', $newChoices) ||
+            array_key_exists('training_start', $newChoices) ||
+            array_key_exists('assist_screensharing', $newChoices)
+        ) {
+
+            $defaultOptions = [
+                'label' => 'plugin.citrix.emailtemplate',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'tooltip' => 'plugin.citrix.emailtemplate_descr',
+                ],
+                'required' => true,
+                'multiple' => false,
+            ];
+
+            if (isset($options['list_options'])) {
+                if (isset($options['list_options']['attr'])) {
+                    $defaultOptions['attr'] = array_merge($defaultOptions['attr'], $options['list_options']['attr']);
+                    unset($options['list_options']['attr']);
+                }
+
+                $defaultOptions = array_merge($defaultOptions, $options['list_options']);
+            }
+
+            $builder->add('template', 'email_list', $defaultOptions);
         }
     }
 

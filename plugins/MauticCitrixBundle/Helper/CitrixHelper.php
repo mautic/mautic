@@ -117,7 +117,9 @@ class CitrixHelper
             if (null === $logger) {
                 $logger = self::$container->get('monolog.logger.mautic');
             }
+            $logger->log($level, '**********************************************************************');
             $logger->log($level, $msg);
+            $logger->log($level, '**********************************************************************');
         } catch (\Exception $ex) {
             // do nothing
         }

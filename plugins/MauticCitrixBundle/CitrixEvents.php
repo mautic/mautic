@@ -153,12 +153,12 @@ final class CitrixEvents
     const ON_ASSIST_REMOTE_ACTION = 'mautic.on_assist_remote_action';
 
     /**
-     * The mautic.on_assist_webchat_action event is dispatched when form with that action is submitted.
+     * The mautic.on_token_generate event is dispatched before a token is decoded.
      *
-     * The event listener receives a Mautic\CampaignBundle\Event\SubmissionEvent instance.
+     * The event listener receives a MauticPlugin\MauticCitrixBundle\Event\TokenGenerateEvent instance.
      *
      * @var string
      */
-    const ON_ASSIST_WEBCHAT_ACTION = 'mautic.on_assist_webchat_action';
+    const ON_TOKEN_GENERATE = 'mautic.on_token_generate';
     
 }

@@ -10,6 +10,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\PreSubmitSubscriber;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
@@ -39,6 +40,8 @@ class CitrixActionType extends AbstractType
             return;
         }
         $product = $options['attr']['data-product'];
+        
+       // $builder->addEventSubscriber(new PreSubmitSubscriber());
 
         $modelFactory = CitrixHelper::getContainer()->get('mautic.model.factory');
         /** @var \Mautic\FormBundle\Model\FieldModel $model */
@@ -170,6 +173,33 @@ class CitrixActionType extends AbstractType
                 ],
             )
         );
+
+        if (array_key_exists('data-product-action', $options['attr']) &&
+            'start' === $options['attr']['data-product-action']
+        ) {
+
+            $defaultOptions = [
+                'label' => 'plugin.citrix.emailtemplate',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'tooltip' => 'plugin.citrix.emailtemplate_descr',
+                ],
+                'required' => true,
+                'multiple' => false,
+            ];
+
+            if (isset($options['list_options'])) {
+                if (isset($options['list_options']['attr'])) {
+                    $defaultOptions['attr'] = array_merge($defaultOptions['attr'], $options['list_options']['attr']);
+                    unset($options['list_options']['attr']);
+                }
+
+                $defaultOptions = array_merge($defaultOptions, $options['list_options']);
+            }
+
+            $builder->add('template', 'email_list', $defaultOptions);
+        }
     }
 
     /**
