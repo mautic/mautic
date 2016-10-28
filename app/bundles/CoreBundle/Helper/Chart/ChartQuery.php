@@ -133,6 +133,8 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
+            // Can't rely on alias in "where" - so have to repeat.
+            $dateExpression = $this->getLocalDateExpression($dateColumn, $tablePrefix);
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
                 $dateFrom = clone $this->dateFrom;
@@ -143,7 +145,7 @@ class ChartQuery extends AbstractChart
                 if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
-                $query->andWhere($tablePrefix.'.'.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
+                $query->andWhere($dateExpression.' BETWEEN :dateFrom AND :dateTo');
                 $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             } else {
@@ -153,7 +155,7 @@ class ChartQuery extends AbstractChart
                     if ($this->isTimeUnit) {
                         $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                     }
-                    $query->andWhere($tablePrefix.'.'.$dateColumn.' >= :dateFrom');
+                    $query->andWhere($dateExpression.' >= :dateFrom');
                     $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 }
 
@@ -163,7 +165,7 @@ class ChartQuery extends AbstractChart
                     if ($this->isTimeUnit) {
                         $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                     }
-                    $query->andWhere($tablePrefix.'.'.$dateColumn.' <= :dateTo');
+                    $query->andWhere($dateExpression.' <= :dateTo');
                     $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
                 }
             }
@@ -217,8 +219,6 @@ class ChartQuery extends AbstractChart
      */
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't')
     {
-        // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
@@ -226,13 +226,20 @@ class ChartQuery extends AbstractChart
             $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
             unset($filters['groupBy']);
         }
-        $localDateConstruct = 'CONVERT_TZ('.$tablePrefix.'.'.$column.',\'UTC\',\''.date_default_timezone_get().'\')';
-        $dateConstruct      = 'DATE_FORMAT('.$localDateConstruct.', \''.$dbUnit.'\')';
 
-        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
+        $query->select($this->getLocalDateExpression($column, $tablePrefix).' AS date, COUNT(*) AS count')
             ->groupBy('date'.$groupBy);
 
         $query->orderBy('date', 'ASC')->setMaxResults($limit);
+    }
+
+    public function getLocalDateExpression($column, $tablePrefix = 't')
+    {
+        // Convert time units to the right form for current database platform.
+        $dbUnit = $this->translateTimeUnit($this->unit);
+        // Take timezone into acount.
+        $localDateConstruct = 'CONVERT_TZ('.$tablePrefix.'.'.$column.',\'UTC\',\''.date_default_timezone_get().'\')';
+        return 'DATE_FORMAT('.$localDateConstruct.', \''.$dbUnit.'\')';
     }
 
     /**
