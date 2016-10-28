@@ -43,6 +43,12 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+            'mautic.notification.stats.subscriber' => [
+                'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [

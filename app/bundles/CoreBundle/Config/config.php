@@ -92,6 +92,9 @@ return [
            'mautic_core_api_stats' => [
                'path'       => '/stats/{table}',
                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+               'defaults'   => [
+                    'table' => '',
+                ],
            ],
         ],
     ],
@@ -171,6 +174,12 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.core.stats.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

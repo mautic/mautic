@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AssetBundle\EventListener;
+namespace Mautic\DynamicContentBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\StatsSubscriber as CommonStatsSubscriber;
@@ -26,6 +26,7 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticAssetBundle:Download');
+        // ??? Attempted to call an undefined method named "loadMetadata" of class "Mautic\DynamicContentBundle\Entity\StatRepository". ???
+        // $this->repositories[] = $em->getRepository('MauticDynamicContentBundle:StatRepository');
     }
 }

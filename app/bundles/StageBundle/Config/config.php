@@ -87,6 +87,12 @@ return [
                     'mautic.stage.model.stage',
                 ],
             ],
+            'mautic.stage.stats.subscriber' => [
+                'class'     => \Mautic\StageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.stage.type.form' => [

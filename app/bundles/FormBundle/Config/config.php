@@ -180,6 +180,12 @@ return [
                     'mautic.form.model.form',
                 ],
             ],
+            'mautic.form.stats.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.form' => [

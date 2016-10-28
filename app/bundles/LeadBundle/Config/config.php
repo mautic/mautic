@@ -282,6 +282,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.lead.stats.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [

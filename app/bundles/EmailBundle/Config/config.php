@@ -181,6 +181,12 @@ return [
                     'mautic.email.model.email',
                 ],
             ],
+            'mautic.email.stats.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.email' => [

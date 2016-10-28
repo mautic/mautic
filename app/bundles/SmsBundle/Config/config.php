@@ -34,6 +34,12 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+            'mautic.sms.stats.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [

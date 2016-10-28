@@ -172,6 +172,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.page.stats.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.page' => [

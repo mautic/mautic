@@ -120,6 +120,12 @@ return [
                     'mautic.point.model.point',
                 ],
             ],
+            'mautic.point.stats.subscriber' => [
+                'class'     => \Mautic\PointBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.point.type.form' => [

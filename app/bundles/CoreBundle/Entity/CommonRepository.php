@@ -271,6 +271,16 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Returns entity table name.
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->getClassMetadata()->getTableName();
+    }
+
+    /**
      * @param string $alias
      * @param object $entity
      *

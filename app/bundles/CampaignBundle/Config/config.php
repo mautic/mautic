@@ -106,6 +106,12 @@ return [
             'mautic.campaignconfigbundle.subscriber' => [
                 'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',
             ],
+            'mautic.campaign.stats.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.campaign.type.form' => [

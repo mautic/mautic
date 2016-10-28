@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -66,7 +67,21 @@ class StatsEvent extends Event
      *
      * @var array
      */
-    protected $results;
+    protected $results = [];
+
+    /**
+     * Flag if some results were set.
+     *
+     * @var bool
+     */
+    protected $hasResults = false;
+
+    /**
+     * Source repository to fetch the results from.
+     *
+     * @var CommonRepository
+     */
+    protected $repository;
 
     /**
      * @param string $table
@@ -78,8 +93,8 @@ class StatsEvent extends Event
     public function __construct($table, $start = 0, $limit = 100, array $order = [], array $where = [])
     {
         $this->table = strtolower(trim(strip_tags($table)));
-        $this->start = $start;
-        $this->limit = $limit;
+        $this->start = (int) $start;
+        $this->limit = (int) $limit;
         $this->order = $order;
         $this->where = $where;
     }
@@ -94,6 +109,25 @@ class StatsEvent extends Event
         $this->tables[] = $table;
 
         return $this->table === $table;
+    }
+
+    /**
+     * Set the source repository to fetch the results from.
+     *
+     * @param CommonRepository $repository
+     *
+     * @return string
+     */
+    public function setRepository(CommonRepository $repository)
+    {
+        $this->repository = $repository;
+        $this->repository->getRows(
+            $this->getStart(),
+            $this->getLimit(),
+            $this->getOrder(),
+            $this->getWhere()
+        );
+        $this->setResults($this->results);
     }
 
     /**
@@ -143,7 +177,8 @@ class StatsEvent extends Event
      */
     public function setResults(array $results)
     {
-        $this->results = $results;
+        $this->results    = $results;
+        $this->hasResults = true;
         $this->stopPropagation();
     }
 
@@ -164,6 +199,18 @@ class StatsEvent extends Event
      */
     public function getTables()
     {
-        return $this->results;
+        sort($this->tables);
+
+        return $this->tables;
+    }
+
+    /**
+     * Returns boolean if the results were set or not.
+     *
+     * @return bool
+     */
+    public function hasResults()
+    {
+        return $this->hasResults;
     }
 }

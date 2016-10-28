@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AssetBundle\EventListener;
+namespace Mautic\StageBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\StatsSubscriber as CommonStatsSubscriber;
@@ -26,6 +26,6 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticAssetBundle:Download');
+        $this->repositories[] = $em->getRepository('MauticStageBundle:LeadStageLog');
     }
 }

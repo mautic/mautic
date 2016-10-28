@@ -121,9 +121,9 @@ return [
                 ],
             ],
             'mautic.asset.stats.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\StatsSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
-                    'mautic.asset.model.asset',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'oneup_uploader.pre_upload' => [

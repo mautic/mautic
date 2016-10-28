@@ -28,20 +28,20 @@ class StatsApiController extends CommonApiController
      */
     public function listAction($table = null)
     {
-        $response                   = [];
-        $where                      = InputHelper::clean($this->request->query->get('where', []));
-        $order                      = InputHelper::clean($this->request->query->get('order', []));
-        $start                      = (int) $this->request->query->get('start', 0);
-        $limit                      = (int) $this->request->query->get('limit', 100);
-        $filter['hydration_mode']   = 'HYDRATE_ARRAY';
-        $filter['ignore_paginator'] = true;
+        $response = [];
+        $where    = InputHelper::clean($this->request->query->get('where', []));
+        $order    = InputHelper::clean($this->request->query->get('order', []));
+        $start    = (int) $this->request->query->get('start', 0);
+        $limit    = (int) $this->request->query->get('limit', 100);
 
         $event = new StatsEvent($table, $start, $limit, $order, $where);
         $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
 
-        // if ($event->getResults() === null) {
-        //     return $this->notFound();
-        // }
+        // Return available tables if no result was set
+        if (!$event->hasResults()) {
+            $response['availableTables'] = $event->getTables();
+        }
+
         $response['stats'] = $event->getResults();
 
         $view = $this->view($response);

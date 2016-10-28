@@ -74,6 +74,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.dynamicContent.stats.subscriber' => [
+                'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.dwc' => [
