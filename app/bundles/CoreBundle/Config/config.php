@@ -89,11 +89,10 @@ return [
                 'controller' => 'MauticCoreBundle:Api\FileApi:delete',
                 'method'     => 'DELETE',
             ],
-//            'mautic_core_api_file_action' => [
-//                'path'       => '/files/{objectAction}/{objectId}',
-//                'controller' => 'MauticCoreBundle:Api\FileApi',
-//                'method'     => 'POST',
-//            ],
+           'mautic_core_api_stats' => [
+               'path'       => '/stats/{table}',
+               'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+           ],
         ],
     ],
     'menu' => [

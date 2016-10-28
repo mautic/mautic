@@ -120,6 +120,12 @@ return [
                     'mautic.asset.model.asset',
                 ],
             ],
+            'mautic.asset.stats.subscriber' => [
+                'class'     => 'Mautic\AssetBundle\EventListener\StatsSubscriber',
+                'arguments' => [
+                    'mautic.asset.model.asset',
+                ],
+            ],
             'oneup_uploader.pre_upload' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
                 'arguments' => [
