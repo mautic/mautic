@@ -152,7 +152,7 @@ class CitrixHelper
     {
         /** @var array $sessions */
         foreach ($sessions as $session) {
-            if ($showAll || !in_array($session['status'], ['complete', 'abandoned'], true)) {
+            if ($showAll || !in_array($session['status'], ['notStarted', 'abandoned'], true)) {
                 yield $session['sessionId'] => sprintf('%s (%s)', $session['sessionId'], $session['status']);
             }
         }
@@ -199,21 +199,8 @@ class CitrixHelper
                     return iterator_to_array(self::getKeyPairs($results, 'meetingId', 'subject'));
                 } else {
                     if ('training' === $listType) {
-
-                        if ($onlyFutures) {
                             $results = self::getG2tApi()->request('trainings');
-
                             return iterator_to_array(self::getKeyPairs($results, 'trainingKey', 'name'));
-                        } else {
-                            $params = [
-                                'startDate' => $fromTime,
-                                'endDate' => $toTime,
-                            ];
-                            $results = self::getG2tApi()->request('sessions', $params, 'POST', 'rest/reports');
-
-                            return iterator_to_array(self::getKeyPairs($results, 'sessionKey', 'trainingName'));
-                        }
-
                     } else {
                         if ('assist' === $listType) {
                             // show sessions in the last month
@@ -229,7 +216,7 @@ class CitrixHelper
                             ];
                             $results = self::getG2aApi()->request('sessions', $params);
                             if ((array)$results && array_key_exists('sessions', $results)) {
-                                return iterator_to_array(self::getAssistPairs($results['sessions'], !$onlyFutures));
+                                return iterator_to_array(self::getAssistPairs($results['sessions']));
                             }
                         }
                     }
