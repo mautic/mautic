@@ -106,6 +106,7 @@ trait CitrixStartTrait
                         $product,
                         $email,
                         $eventName,
+                        $productToStart['productTitle'],
                         CitrixEventTypes::STARTED
                     );
                 } else {

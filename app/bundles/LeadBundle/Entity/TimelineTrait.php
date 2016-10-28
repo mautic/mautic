@@ -101,7 +101,20 @@ trait TimelineTrait
             foreach ($results as &$result) {
                 foreach ($serializedColumns as $col) {
                     if (isset($result[$col])) {
-                        $result[$col] = (null == $result[$col]) ? [] : unserialize($result[$col]);
+                        if ((null === $result[$col])){
+                            $result[$col] = [];
+                        } else {
+                            $fixed_data = preg_replace_callback(
+                                '!s:(\d+):"(.*?)";!',
+                                function ($match) {
+                                    return ($match[1] == strlen($match[2])) ? $match[0] : 's:'.strlen(
+                                            $match[2]
+                                        ).':"'.$match[2].'";';
+                                },
+                                $result[$col]
+                            );
+                            $result[$col] = $fixed_data;
+                        }
                     }
                 }
 

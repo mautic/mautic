@@ -12,8 +12,12 @@ namespace MauticPlugin\MauticCitrixBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
+use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PublicController extends CommonController
 {
@@ -23,6 +27,8 @@ class PublicController extends CommonController
      *
      * @param Request $request
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \InvalidArgumentException
      */
     public function proxyAction(Request $request)
     {
@@ -85,6 +91,9 @@ class PublicController extends CommonController
      *
      * @param Request $request
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
     public function sessionChangedAction(Request $request)
     {
@@ -96,26 +105,52 @@ class PublicController extends CommonController
             return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
         }
 
-        $logger = $this->get('monolog.logger.mautic');
-        
-        $logger->log('error', print_r($request->request->all(), true));
+        $post = $request->request->all();
 
-        $model = [
-            'sessionStartToken' => '559698066',
-            'customerJoinUrl' => 'https://www.fastsupport.com/710603076',
-            'sessionId' => 'SS-710603076',
-            'sessionType' => 'screen_sharing',
-            'status' => 'complete', // waiting, abandoned, active, notStarted
-            'startedAt' => '2016-10-22T19:01:36Z',
-            'customerJoinedAt' => '2016-10-22T19:33:25Z',
-            'endedAt' => '2016-10-22T19:45:43Z',
-            'expertName' => 'Werner Garcia',
-            'expertEmail' => 'werner.garcia@mautic.com',
-            'expertUserKey' => '5274445617256400000',
-            'customerName' => 'Ivan Estrada',
-            'customerEmail' => 'werner@gua.net',
-            'accountKey' => '1510204887402500000',
-        ];
+        try {
+            /** @var CitrixModel $citrixModel */
+            $citrixModel = $this->get('mautic.model.factory')->getModel('citrix.citrix');
+            $productId = $post['sessionId'];
+            $eventDesc = sprintf('%s (%s)', $productId, $post['status']);
+            $eventName = CitrixHelper::getCleanString(
+                    $eventDesc
+                ).'_#'.$productId;
+            $product = 'assist';
+            $registrants = CitrixHelper::getRegistrants($product, $productId);
+            $knownRegistrants = $citrixModel->getEmailsByEvent(
+                $product,
+                $eventName,
+                CitrixEventTypes::REGISTERED
+            );
+
+            $citrixModel->batchAddAndRemove(
+                $product,
+                $eventName,
+                $eventDesc,
+                CitrixEventTypes::REGISTERED,
+                array_diff($registrants, $knownRegistrants),
+                array_diff($knownRegistrants, $registrants)
+            );
+
+            $attendees = CitrixHelper::getAttendees($product, $productId);
+            $knownAttendees = $citrixModel->getEmailsByEvent(
+                $product,
+                $eventName,
+                CitrixEventTypes::ATTENDED
+            );
+
+            $citrixModel->batchAddAndRemove(
+                $product,
+                $eventName,
+                $eventDesc,
+                CitrixEventTypes::ATTENDED,
+                array_diff($attendees, $knownAttendees),
+                array_diff($knownAttendees, $attendees)
+            );
+
+        } catch (\Exception $ex) {
+            throw new BadRequestHttpException($ex->getMessage());
+        }
         
         return new Response('OK');
     } // sessionChangedAction

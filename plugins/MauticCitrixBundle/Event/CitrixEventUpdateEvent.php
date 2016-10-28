@@ -33,6 +33,10 @@ class CitrixEventUpdateEvent extends CommonEvent
      * @var
      */
     private $email;
+    /**
+     * @var
+     */
+    private $eventDesc;
 
 
     /**
@@ -40,15 +44,17 @@ class CitrixEventUpdateEvent extends CommonEvent
      *
      * @param $product
      * @param $eventName
+     * @param $eventDesc
      * @param $eventType
      * @param $email
      */
-    public function __construct($product, $eventName, $eventType, $email)
+    public function __construct($product, $eventName, $eventDesc, $eventType, $email)
     {
         $this->product = $product;
         $this->eventName = $eventName;
         $this->eventType = $eventType;
         $this->email = $email;
+        $this->eventDesc = $eventDesc;
     }
 
     /**
@@ -81,6 +87,14 @@ class CitrixEventUpdateEvent extends CommonEvent
     public function getEventType()
     {
         return $this->eventType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventDesc()
+    {
+        return $this->eventDesc;
     }
 
 }

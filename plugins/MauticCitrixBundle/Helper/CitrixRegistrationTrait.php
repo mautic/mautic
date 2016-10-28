@@ -60,6 +60,7 @@ trait CitrixRegistrationTrait
                         $product,
                         $email,
                         $eventName,
+                        $productToRegister['productTitle'],
                         CitrixEventTypes::REGISTERED
                     );
                 } else {

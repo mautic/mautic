@@ -35,7 +35,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && substr($keys['url'], -1) === '/') {
+        if (array_key_exists('url', $keys) && substr($keys['url'], -1) === '/') {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -77,12 +77,12 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return object
+     * @return mixed
      */
     public function getApiHelper()
     {
         static $helper;
-        if (empty($helper)) {
+        if (null === $helper) {
             $class  = '\\MauticPlugin\\MauticCitrixBundle\\Api\\'.$this->getName().'Api';
             $helper = new $class($this);
         }

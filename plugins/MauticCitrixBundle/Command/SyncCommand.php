@@ -111,7 +111,10 @@ class SyncCommand extends ContainerAwareCommand
 
             foreach ($productIds as $productId) {
                 try {
-                    $eventName = $citrixChoices[$productId];//CitrixHelper::getEventName($product, $productId);
+                    $eventDesc = $citrixChoices[$productId];
+                    $eventName = CitrixHelper::getCleanString(
+                            $eventDesc
+                        ).'_#'.$productId;
                     $output->writeln('Synchronizing: ['.$productId.'] '.$eventName);
 
                     $registrants = CitrixHelper::getRegistrants($product, $productId);
@@ -124,6 +127,7 @@ class SyncCommand extends ContainerAwareCommand
                     $count += $this->citrixModel->batchAddAndRemove(
                         $product,
                         $eventName,
+                        $eventDesc,
                         CitrixEventTypes::REGISTERED,
                         array_diff($registrants, $knownRegistrants),
                         array_diff($knownRegistrants, $registrants),
@@ -140,6 +144,7 @@ class SyncCommand extends ContainerAwareCommand
                     $count += $this->citrixModel->batchAddAndRemove(
                         $product,
                         $eventName,
+                        $eventDesc,
                         CitrixEventTypes::ATTENDED,
                         array_diff($attendees, $knownAttendees),
                         array_diff($knownAttendees, $attendees),

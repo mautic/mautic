@@ -226,7 +226,6 @@ class FormSubscriber extends CommonSubscriber
 
     /**
      * Helper function to debug REST responses
-     * TODO: Remove onResponse function
      *
      * @param PluginIntegrationRequestEvent $event
      */

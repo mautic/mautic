@@ -52,6 +52,7 @@ class CitrixModel extends FormModel
      * @param string $product
      * @param string $email
      * @param string $eventName
+     * @param string $eventDesc
      * @param string $eventType
      * @param \DateTime $eventDate
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
@@ -60,7 +61,7 @@ class CitrixModel extends FormModel
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function addEvent($product, $email, $eventName, $eventType, \DateTime $eventDate = null)
+    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, \DateTime $eventDate = null)
     {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             CitrixHelper::log('addEvent: incorrect data');
@@ -71,6 +72,7 @@ class CitrixModel extends FormModel
         $citrixEvent->setProduct($product);
         $citrixEvent->setEmail($email);
         $citrixEvent->setEventName($eventName);
+        $citrixEvent->setEventDesc($eventDesc);
         $citrixEvent->setEventType($eventType);
 
         if (null !== $eventDate) {
@@ -155,6 +157,28 @@ class CitrixModel extends FormModel
 
     /**
      * @param string $product
+     * @return array
+     */
+    public function getDistinctEventNamesDesc($product)
+    {
+        if (!CitrixProducts::isValidValue($product)) {
+            return []; // is not a valid citrix product
+        }
+        $dql = sprintf(
+            "SELECT DISTINCT c.eventName, c.eventDesc FROM MauticCitrixBundle:CitrixEvent c WHERE c.product='%s'",
+            $product
+        );
+        $query = $this->em->createQuery($dql);
+        $items = $query->getResult();
+        $result = [];
+        foreach ($items as $item) {
+$result[$item['eventName']]=$item['eventDesc'];
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $product
      * @param string $email
      * @param string $eventType
      * @param array $eventNames
@@ -195,6 +219,7 @@ class CitrixModel extends FormModel
     /**
      * @param string $product
      * @param string $eventName
+     * @param string $eventDesc
      * @param string $eventType
      * @param array $emailsToAdd
      * @param array $emailsToRemove
@@ -209,6 +234,7 @@ class CitrixModel extends FormModel
     public function batchAddAndRemove(
         $product,
         $eventName,
+        $eventDesc,
         $eventType,
         array $emailsToAdd = [],
         array $emailsToRemove = [],
@@ -225,12 +251,13 @@ class CitrixModel extends FormModel
                 $citrixEvent->setProduct($product);
                 $citrixEvent->setEmail($email);
                 $citrixEvent->setEventName($eventName);
+                $citrixEvent->setEventDesc($eventDesc);
                 $citrixEvent->setEventType($eventType);
                 $this->em->persist($citrixEvent);
 
                 if (null !== $output) {
                     $output->writeln(
-                        'Adding '.
+                        ' + '.$email.' '.$eventType.' to '.
                         substr($citrixEvent->getEventName(), 0, 40).((strlen(
                                 $citrixEvent->getEventName()
                             ) > 40) ? '...' : '.')
@@ -256,7 +283,7 @@ class CitrixModel extends FormModel
 
                 if (null !== $output) {
                     $output->writeln(
-                        'Removing '.
+                        ' - '.$citrixEvent->getEmail().' '.$eventType.' from '.
                         substr($citrixEvent->getEventName(), 0, 40).((strlen(
                                 $citrixEvent->getEventName()
                             ) > 40) ? '...' : '.')
@@ -274,7 +301,7 @@ class CitrixModel extends FormModel
             foreach ($emailsToAdd as $email) {
 
                 if ($this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_EVENT_UPDATE)) {
-                    $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventType, $email);
+                    $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventDesc, $eventType, $email);
                     $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_EVENT_UPDATE, $citrixEvent);
                     unset($citrixEvent);
                 }
@@ -301,6 +328,7 @@ class CitrixModel extends FormModel
             $table->addColumn('product', 'string', ['length' => 20]);
             $table->addColumn('email', 'string', ['length' => 255]);
             $table->addColumn('event_name', 'string', ['length' => 255]);
+            $table->addColumn('event_desc', 'string', ['length' => 255]);
             $table->addColumn('event_type', 'string', ['length' => 50]);
             $table->addColumn('event_date', 'datetime');
             $table->setPrimaryKey(['id']);
@@ -310,13 +338,6 @@ class CitrixModel extends FormModel
             $table->addIndex(['product', 'email', 'event_type'], 'citrix_product');
             $table->addIndex(['product', 'email', 'event_type', 'event_name'], 'citrix_product_name');
             $table->addIndex(['event_date'], 'citrix_event_date');
-            $table->addForeignKeyConstraint(
-                'leads',
-                ['email'],
-                ['email'],
-                ['onUpdate' => 'CASCADE', 'onDelete' => 'CASCADE'],
-                'FK_citrix_leads'
-            );
             $sm->createTable($table);
 
         }

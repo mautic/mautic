@@ -11,7 +11,6 @@
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -97,6 +96,7 @@ class EmailSubscriber extends CommonSubscriber
      * Search and replace tokens with content
      *
      * @param EmailSendEvent $event
+     * @param bool $triggerEvent
      * @throws \RuntimeException
      */
     public function decodeTokens(EmailSendEvent $event, $triggerEvent = false)

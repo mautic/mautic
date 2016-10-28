@@ -100,12 +100,12 @@ class LeadSubscriber extends CommonSubscriber
                     if ($eventType === CitrixEventTypes::REGISTERED) {
                         $timelineEventType = $eventTypeRegistered;
                         $timelineEventTypeLabel = $eventTypeRegisteredLabel;
-                        $timelineEventLabel = $eventTypeRegisteredName;
+                        $timelineEventLabel = $eventTypeRegisteredName . ' - ' . $citrixEvent->getEventDesc();
                     } else {
                         if ($eventType === CitrixEventTypes::ATTENDED) {
                             $timelineEventType = $eventTypeAttended;
                             $timelineEventTypeLabel = $eventTypeAttendedLabel;
-                            $timelineEventLabel = $eventTypeAttendedName;
+                            $timelineEventLabel = $eventTypeAttendedName . ' - ' . $citrixEvent->getEventDesc();
                         } else {
                             continue;
                         }
@@ -123,6 +123,7 @@ class LeadSubscriber extends CommonSubscriber
                             'timestamp' => $citrixEvent->getEventDate(),
                             'extra' => [
                                 'eventName' => $citrixEvent->getEventName(),
+                                'eventDesc' => $citrixEvent->getEventDesc(),
                             ],
                             'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
                         )
@@ -155,8 +156,7 @@ class LeadSubscriber extends CommonSubscriber
         $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('citrix.citrix');
 
         foreach ($activeProducts as $product) {
-            $eventNames = $citrixModel->getDistinctEventNames($product);
-            $eventNames = array_combine($eventNames, $eventNames);
+            $eventNames = $citrixModel->getDistinctEventNamesDesc($product);
 
             $eventNamesWithoutAny = array_merge(
                 array(
@@ -173,7 +173,7 @@ class LeadSubscriber extends CommonSubscriber
                 $eventNames
             );
 
-            if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING == $product) {
+            if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING === $product) {
 
                 $event->addChoice(
                     'lead',

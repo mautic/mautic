@@ -12,7 +12,6 @@ namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
 use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
-use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -95,7 +94,7 @@ class CitrixCampaignActionType extends AbstractType
                 'multiple' => false,
             ];
 
-            if (isset($options['list_options'])) {
+            if (array_key_exists('list_options', $options)) {
                 if (isset($options['list_options']['attr'])) {
                     $defaultOptions['attr'] = array_merge($defaultOptions['attr'], $options['list_options']['attr']);
                     unset($options['list_options']['attr']);

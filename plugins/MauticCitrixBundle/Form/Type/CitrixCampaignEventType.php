@@ -44,7 +44,7 @@ class CitrixCampaignEventType extends AbstractType
         $translator = CitrixHelper::getContainer()->get('translator');
         /** @var CitrixModel $citrixModel */
         $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('citrix');
-        $eventNames = $citrixModel->getDistinctEventNames($options['attr']['data-product']);
+        $eventNamesDesc = $citrixModel->getDistinctEventNamesDesc($options['attr']['data-product']);
 
         $choices = [
             'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
@@ -66,7 +66,7 @@ class CitrixCampaignEventType extends AbstractType
 
         $choices = array_replace(
             ['ANY' => $translator->trans('plugin.citrix.event.'.$product.'.any')],
-            array_combine($eventNames, $eventNames)
+            $eventNamesDesc
         );
 
         $builder->add(

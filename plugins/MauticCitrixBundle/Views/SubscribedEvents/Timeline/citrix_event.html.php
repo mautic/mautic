@@ -28,7 +28,8 @@
 	    </div>
 		<div class="panel-footer">
 			<p>
-				<?php echo $view->escape($event['extra']['eventName']) ?>
+                <span class="event-name-slot"><?php echo $view->escape($event['extra']['eventName']) ?></span>
+				<span class="event-desc-slot"><?php echo $view->escape($event['extra']['eventDesc']) ?></span>
 			</p>
 		</div>
 	</div>

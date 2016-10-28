@@ -45,6 +45,11 @@ class CitrixEvent
     protected $eventName;
 
     /**
+     * @ORM\Column(name="event_desc", type="string", length=255)
+     */
+    protected $eventDesc;
+
+    /**
      * @ORM\Column(name="event_type", type="string", length=50)
      */
     protected $eventType;
@@ -59,6 +64,7 @@ class CitrixEvent
         $this->product = 'undefined';
         $this->email = 'undefined';
         $this->eventName = 'undefined';
+        $this->eventDesc = 'undefined';
         $this->eventDate = new \Datetime;
         $this->eventType = 'undefined';
     }
@@ -81,6 +87,7 @@ class CitrixEvent
         $builder->addNamedField('product', 'string', 'product');
         $builder->addNamedField('email', 'string', 'email');
         $builder->addNamedField('eventName', 'string', 'event_name');
+        $builder->addNamedField('eventDesc', 'string', 'event_desc');
         $builder->createField('eventType', 'string')
             ->columnName('event_type')
             ->length(50)
@@ -145,6 +152,14 @@ class CitrixEvent
     }
 
     /**
+     * @return string
+     */
+    public function getEventDesc()
+    {
+        return $this->eventDesc;
+    }
+
+    /**
      * @param string $eventName
      */
     public function setEventName($eventName)
@@ -182,5 +197,13 @@ class CitrixEvent
     public function setEventType($eventType)
     {
         $this->eventType = $eventType;
+    }
+
+    /**
+     * @param mixed $eventDesc
+     */
+    public function setEventDesc($eventDesc)
+    {
+        $this->eventDesc = $eventDesc;
     }
 }
