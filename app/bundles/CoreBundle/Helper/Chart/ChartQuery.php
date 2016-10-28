@@ -226,11 +226,13 @@ class ChartQuery extends AbstractChart
             $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
             unset($filters['groupBy']);
         }
-        $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
-            ->groupBy($dateConstruct.$groupBy);
+        $localDateConstruct = 'CONVERT_TZ('.$tablePrefix.'.'.$column.',\'UTC\',\''.date_default_timezone_get().'\')';
+        $dateConstruct      = 'DATE_FORMAT('.$localDateConstruct.', \''.$dbUnit.'\')';
 
-        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
+        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
+            ->groupBy('date'.$groupBy);
+
+        $query->orderBy('date', 'ASC')->setMaxResults($limit);
     }
 
     /**
