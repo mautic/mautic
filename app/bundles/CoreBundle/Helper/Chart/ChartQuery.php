@@ -136,31 +136,29 @@ class ChartQuery extends AbstractChart
             // Can't rely on alias in "where" - so have to repeat.
             $dateExpression = $this->getLocalDateExpression($dateColumn, $tablePrefix);
 
+            if ($this->dateFrom && $this->dateTo) {
+                // Between is faster so if we know both dates...
+                $query->andWhere($dateExpression.' BETWEEN :dateFrom AND :dateTo');
+            } elseif ($this->dateFrom) {
+                // Apply the start date/time if set
+                $query->andWhere($dateExpression.' >= :dateFrom');
+            } elseif ($this->dateTo) {
+                // Apply the end date/time if set
+                $query->andWhere($dateExpression.' <= :dateTo');
+            }
+
             if ($this->dateFrom) {
                 $dateFrom = clone $this->dateFrom;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 }
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
             }
             if ($this->dateTo) {
                 $dateTo = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
-            }
-
-            if ($this->dateFrom && $this->dateTo) {
-                // Between is faster so if we know both dates...
-                $query->andWhere($dateExpression.' BETWEEN :dateFrom AND :dateTo');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-                $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
-            } elseif ($this->dateFrom) {
-                // Apply the start date/time if set
-                $query->andWhere($dateExpression.' >= :dateFrom');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-            } elseif ($this->dateTo) {
-                // Apply the end date/time if set
-                $query->andWhere($dateExpression.' <= :dateTo');
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             }
         }
