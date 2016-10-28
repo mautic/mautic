@@ -135,39 +135,33 @@ class ChartQuery extends AbstractChart
         if ($dateColumn) {
             // Can't rely on alias in "where" - so have to repeat.
             $dateExpression = $this->getLocalDateExpression($dateColumn, $tablePrefix);
-            if ($this->dateFrom && $this->dateTo) {
-                // Between is faster so if we know both dates...
+
+            if ($this->dateFrom) {
                 $dateFrom = clone $this->dateFrom;
-                $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 }
+            }
+            if ($this->dateTo) {
+                $dateTo = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
+            }
+
+            if ($this->dateFrom && $this->dateTo) {
+                // Between is faster so if we know both dates...
                 $query->andWhere($dateExpression.' BETWEEN :dateFrom AND :dateTo');
                 $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
-            } else {
+            } elseif ($this->dateFrom) {
                 // Apply the start date/time if set
-                if ($this->dateFrom) {
-                    $dateFrom = clone $this->dateFrom;
-                    if ($this->isTimeUnit) {
-                        $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                    }
-                    $query->andWhere($dateExpression.' >= :dateFrom');
-                    $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-                }
-
+                $query->andWhere($dateExpression.' >= :dateFrom');
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+            } elseif ($this->dateTo) {
                 // Apply the end date/time if set
-                if ($this->dateTo) {
-                    $dateTo = clone $this->dateTo;
-                    if ($this->isTimeUnit) {
-                        $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                    }
-                    $query->andWhere($dateExpression.' <= :dateTo');
-                    $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
-                }
+                $query->andWhere($dateExpression.' <= :dateTo');
+                $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             }
         }
     }
