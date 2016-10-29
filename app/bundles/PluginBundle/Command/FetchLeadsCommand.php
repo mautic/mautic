@@ -90,8 +90,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $factory->getHelper('integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+            $config            = $this->mergeConfigToFeatureSettings();
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects']['Lead'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
 
                 $params['start'] = $startDate;
@@ -99,6 +100,23 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
                 if (strtotime($startDate) > strtotime('-30 days')) {
                     $processed = intval($integrationObject->getLeads($params));
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                } else {
+                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                }
+            }
+
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']['Account'])) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+
+                $params['start'] = $startDate;
+                $params['end']   = $endDate;
+
+                if (strtotime($startDate) > strtotime('-30 days')) {
+                    $processed = intval($integrationObject->getCompanies($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 

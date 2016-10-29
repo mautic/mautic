@@ -24,10 +24,12 @@ if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && c
     }
 }
 
-$fieldHtml     = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass = ($hasFields) ? '' : ' hide';
+$fieldHtml        = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$companyFieldHtml = ($hasFields) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
+$fieldLabel       = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldTabClass    = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
+unset($form['featureSettings']['companyFields']);
 ?>
 
 <?php if (!empty($description)): ?>
@@ -43,6 +45,7 @@ unset($form['featureSettings']['leadFields']);
     <?php if ($hasFields): ?>
         <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
     <?php endif; ?>
+    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#company-fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
 </ul>
 
 <?php echo $view['form']->start($form); ?>
@@ -91,6 +94,11 @@ unset($form['featureSettings']['leadFields']);
             <h4 class="mb-sm"><?php echo $view['translator']->trans($fieldLabel); ?></h4>
             <?php echo $fieldHtml; ?>
         </div>
+
     <?php endif; ?>
+    <div class="tab-pane fade bdr-w-0" id="company-fields-container">
+        <h4 class="mb-sm">Company Fields</h4>
+        <?php echo $companyFieldHtml; ?>
+    </div>
 </div>
 <?php echo $view['form']->end($form); ?>

@@ -106,6 +106,7 @@ class DetailsType extends AbstractType
             'integration'        => $options['integration'],
             'integration_object' => $options['integration_object'],
             'lead_fields'        => $options['lead_fields'],
+            'company_fields'     => $options['company_fields'],
         ]);
 
         $builder->add('name', 'hidden', ['data' => $options['integration']]);

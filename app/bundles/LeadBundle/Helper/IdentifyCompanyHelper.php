@@ -35,12 +35,12 @@ class IdentifyCompanyHelper
 
     /**
      * @param array        $parameters
-     * @param Lead         $lead
+     * @param mixed        $lead
      * @param CompanyModel $companyModel
      *
      * @return array
      */
-    public static function identifyLeadsCompany($parameters, Lead $lead, CompanyModel $companyModel)
+    public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
     {
         $companyName = $companyDomain = null;
         $leadAdded   = false;
@@ -49,6 +49,8 @@ class IdentifyCompanyHelper
             $companyName = filter_var($parameters['company'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         } elseif (isset($parameters['email'])) {
             $companyName = $companyDomain = self::domainExists($parameters['email']);
+        } elseif (isset($parameters['companyname'])) {
+            $companyName = filter_var($parameters['companyname'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
 
         if ($companyName) {
@@ -62,9 +64,12 @@ class IdentifyCompanyHelper
 
             if (!empty($company)) {
                 //check if lead is already assigned to company
-                $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company['id']))) {
-                    $leadAdded = true;
+                $companyEntity = $companyModel->getEntity($company['id']);
+                if ($lead) {
+                    $companyLeadRepo = $companyModel->getCompanyLeadRepository();
+                    if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company['id']))) {
+                        $leadAdded = true;
+                    }
                 }
             } else {
                 //create new company
@@ -79,10 +84,12 @@ class IdentifyCompanyHelper
                 $companyModel->setFieldValues($companyEntity, $company, true);
                 $companyModel->saveEntity($companyEntity);
                 $company['id'] = $companyEntity->getId();
-                $leadAdded     = true;
+                if ($lead) {
+                    $leadAdded = true;
+                }
             }
 
-            return [$company, $leadAdded];
+            return [$company, $leadAdded, $companyEntity];
         }
 
         return [null, false];
