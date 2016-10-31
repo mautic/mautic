@@ -84,6 +84,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 </style>
 <div class="tl-header">
     <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', ['%total%' => $events['total']]); ?>
+    <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events_for_contact', ['%contact%' => $lead->getName(), '%id%' => $lead->getId()]); ?>
     (<span class="tl-new"><?php echo $newCount; ?></span> <?php echo $view['translator']->trans(
         'mautic.lead.timeline.events_new'
     ); ?>)
@@ -120,50 +121,28 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo ' tr-new';
         }
         ?>">
-            <span class="timeline-row-id hide"><?php echo $event['timestamp']->format('U'); ?></span>
-            <span class="timeline-row-lead-id hide"><?php echo $event['leadId']; ?></span>
-            <div class="btn-group" role="group" style="float: right;">
-                <span class="timeline-icon">
-                    <a href="javascript:void(0);"
-                       onclick="mQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
-                       data-activate-details="<?php echo $counter; ?>"
-                       class="btn btn-xs btn-nospin btn-default<?php if (empty($details)) {
-            echo ' disabled';
-        } ?>" data-toggle="tooltip"
-                       title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
-                        <span class="fa fa-fw <?php echo $icon ?>"></span>
+            <span class="timeline-row-id timeline-timestamp">
+                <?php echo $view['date']->toText($event['timestamp']); ?>
+                on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?>
+            </span>
+           <br />
+            <span class="timeline-type">
+                <?php if (isset($event['eventType'])): ?>
+                    <?php echo $event['eventType']; ?>
+        <?php endif; ?>: </span>
+
+            <span class="timeline-name ellipsis">
+                <?php if ($eventLabel !== $event['eventType']): ?>
+                    <?php echo $eventLabel; ?>
+                <?php endif; ?>
+                <?php if (isset($event['leadEmail'])): ?>
+                    <a href="mailto:<?php echo $event['leadEmail']; ?>" title="<?php echo $event['leadEmail']; ?>" target="_new">
+                        <?php echo $event['leadName']; ?>
                     </a>
-                </span>
-
-                <span class="timeline-icon">
-                    <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-default" data-toggle="tooltip"
-                       onclick="mQuery(this).toggleClass('btn-warning')"
-                       title="Mute notifications">
-                        <span class="fa fa-fw fa-bell-slash-o"></span>
-                    </a>
-                </span>
-            </div>
-
-            <span class="timeline-lead ellipsis"><a href="mailto:<?php echo $event['leadEmail']; ?>"
-                                                    title="<?php echo $event['leadEmail']; ?>"
-                                                    target="_new"><?php echo $event['leadName']; ?></a></span>
-
-            <span class="timeline-timestamp"> on <?php echo $view['date']->toText($event['timestamp']); ?></span>
-
-            <br/>
-
-            <span class="timeline-type"><?php if (isset($event['eventType'])) {
-            echo $event['eventType'];
-        } ?>: </span>
-
-            <br/>
-
-            <?php if ($eventLabel !== $event['eventType']): ?>
-                <span class="timeline-name ellipsis"><?php echo $eventLabel; ?></span>
-            <?php endif; ?>
-
+                <?php endif?>
+            </span>
             <?php if (!empty($details)): ?>
-                <div class="timeline-details hide" id="timeline-details-<?php echo $counter; ?>">
+                <div class="timeline-details " id="timeline-details-<?php echo $counter; ?>">
                     <?php echo $details ?>
                 </div>
             <?php endif; ?>
@@ -171,18 +150,6 @@ $baseUrl = isset($lead) ? $view['router']->path(
     <?php endforeach; ?>
 
 </div>
-
-<?php //echo $view->render(
-//    'MauticCoreBundle:Helper:pagination.html.php',
-//    [
-//        'page'       => $events['page'],
-//        'fixedPages' => $events['maxPages'],
-//        'fixedLimit' => true,
-//        'baseUrl'    => $baseUrl,
-//        'target'     => '#timeline-table',
-//        'totalItems' => $events['total'],
-//    ]
-//);?>
 
 <!--/ timeline -->
 
