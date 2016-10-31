@@ -171,7 +171,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    public function buildDbalWhere(&$query, $args)
+    public function buildDbalWhere($query, $args)
     {
         $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn'];
         $justColumn  = ['isNull', 'isNotNull'];
@@ -202,7 +202,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    public function buildDbalOrderBy(&$query, $args)
+    public function buildDbalOrderBy($query, $args)
     {
         if ($args && is_array($args)) {
             foreach ($args as $argument) {
@@ -232,7 +232,7 @@ class CommonRepository extends EntityRepository
             throw new \InvalidArgumentException(sprintf($msg, 'col'));
         }
 
-        if (empty($args['val'])) {
+        if (!isset($args['val'])) {
             $args['val'] = '';
         }
 

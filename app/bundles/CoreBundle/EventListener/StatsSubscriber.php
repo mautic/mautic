@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\StatsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
  * Class StatsSubscriber.
@@ -53,7 +52,7 @@ class StatsSubscriber extends CommonSubscriber
     {
         foreach ($this->repositories as $repository) {
             if ($event->isLookingForTable($repository->getTableName())) {
-                $event->setRepository($this->repository);
+                $event->setRepository($repository);
             }
         }
     }
