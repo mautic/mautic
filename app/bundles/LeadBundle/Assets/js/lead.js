@@ -1113,3 +1113,12 @@ Mautic.updateFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+Mautic.setAsPrimaryCompany = function (companyId,leadId){
+    Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
+        if (response.success) {
+            mQuery('#company-' + response.oldPrimary).removeClass('primary');
+            mQuery('#company-' + response.newPrimary).addClass('primary');
+        }
+    });
+}

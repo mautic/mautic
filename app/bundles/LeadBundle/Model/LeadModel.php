@@ -2173,4 +2173,45 @@ class LeadModel extends FormModel
 
         return false;
     }
+
+    /**
+     * @param $companyId
+     * @param $leadId
+     */
+    public function setPrimaryCompany($companyId, $leadId)
+    {
+        $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($leadId);
+
+        $companyArray      = [];
+        $oldPrimaryCompany = false;
+
+        $lead = $this->getEntity($leadId);
+
+        foreach ($companies as $company) {
+            $company     = $this->companyModel->getEntity($company['company_id']);
+            $companyLead = $this->companyModel->getCompanyLeadRepository()->findOneBy(
+                [
+                    'lead'    => $lead,
+                    'company' => $company,
+                ]
+            );
+            if ($companyLead) {
+                if ($companyLead->getPrimary()) {
+                    $oldPrimaryCompany = $companyLead->getCompany()->getId();
+                }
+                if ($company->getId() == $companyId) {
+                    $companyLead->setPrimary(true);
+                } else {
+                    $companyLead->setPrimary(false);
+                }
+                $companyArray[] = $companyLead;
+            }
+        }
+
+        if (!empty($companyArray)) {
+            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray);
+        }
+
+        return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
+    }
 }
