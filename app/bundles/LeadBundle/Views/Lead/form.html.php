@@ -208,14 +208,10 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                     <div class="row">
                                         <?php foreach ($groupFields as $alias => $field): ?>
                                             <?php
-                                            if ($alias == 'company'):?><?php
-                                                unset($form[$alias]);
+                                            if ($alias == 'company' || !isset($form[$alias]) || $form[$alias]->isRendered()) {
                                                 continue;
-                                                ?>
-                                                <?php endif; ?>
-                                            <?php if ($form[$alias]->isRendered()) {
-                                                    continue;
-                                                } ?>
+                                            }
+                                            ?>
                                             <div class="col-sm-8">
                                                 <?php echo $view['form']->row($form[$alias]); ?>
                                             </div>
