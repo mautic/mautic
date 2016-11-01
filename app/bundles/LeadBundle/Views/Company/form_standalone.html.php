@@ -25,7 +25,7 @@ $buttons[] = [
         'data-target' => '#MauticSharedModal',
         'data-header' => $view['translator']->trans(
             'mautic.lead.company.header.merge',
-            ['%name%' => $entity->getName()]
+            ['%a%' => $entity->getName()]
         ),
         'href' => $view['router']->path(
             'mautic_company_action',
@@ -33,17 +33,17 @@ $buttons[] = [
         ),
     ],
     'btnText'   => $view['translator']->trans('mautic.company.merge'),
-    'iconClass' => 'fa fa-user',
+    'iconClass' => 'fa fa-building',
 ];
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'item'          => $entity,
-            'routeBase'     => 'company',
-            'langVar'       => 'lead.company',
-            'customButtons' => $buttons,
+            'item'              => $entity,
+            'routeBase'         => 'company',
+            'langVar'           => 'lead.company',
+            'postCustomButtons' => $buttons,
         ]
     )
 );

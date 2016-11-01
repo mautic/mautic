@@ -9,7 +9,11 @@
  */
 ?>
 
-<?php echo $view['form']->start($form); ?>
+<?php
+
+echo $view['form']->start($form);
+
+?>
 
     <div class="hide">
         <?php echo $view['form']->row($form['buttons']); ?>

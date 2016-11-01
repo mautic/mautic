@@ -665,9 +665,9 @@ class CompanyController extends FormController
             'RETURN_ARRAY'
         );
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $model       = $this->getModel('lead.company');
-        $mainCompany = $model->getEntity($objectId);
-        $page        = $this->get('session')->get('mautic.lead.page', 1);
+        $model            = $this->getModel('lead.company');
+        $secondaryCompany = $model->getEntity($objectId);
+        $page             = $this->get('session')->get('mautic.lead.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
@@ -682,7 +682,7 @@ class CompanyController extends FormController
             ],
         ];
 
-        if ($mainCompany === null) {
+        if ($secondaryCompany === null) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -699,14 +699,14 @@ class CompanyController extends FormController
             );
         }
 
-        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $mainCompany->getId()]);
+        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $secondaryCompany->getId()]);
 
         $form = $this->get('form.factory')->create(
             'company_merge',
             [],
             [
                 'action'      => $action,
-                'main_entity' => $mainCompany->getId(),
+                'main_entity' => $secondaryCompany->getId(),
             ]
         );
 
@@ -714,11 +714,11 @@ class CompanyController extends FormController
             $valid = true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data             = $form->getData();
-                    $companyToMergeId = $data['company_to_merge'];
-                    $companyToMerge   = $model->getEntity($companyToMergeId);
+                    $data           = $form->getData();
+                    $primaryMergeId = $data['company_to_merge'];
+                    $primaryCompany = $model->getEntity($primaryMergeId);
 
-                    if ($companyToMerge === null) {
+                    if ($primaryCompany === null) {
                         return $this->postActionRedirect(
                             array_merge(
                                 $postActionVars,
@@ -727,7 +727,7 @@ class CompanyController extends FormController
                                         [
                                             'type'    => 'error',
                                             'msg'     => 'mautic.lead.company.error.notfound',
-                                            'msgVars' => ['%id%' => $companyToMerge->getId()],
+                                            'msgVars' => ['%id%' => $primaryCompany->getId()],
                                         ],
                                     ],
                                 ]
@@ -735,23 +735,23 @@ class CompanyController extends FormController
                         );
                     } elseif (!$permissions['lead:leads:editother']) {
                         return $this->accessDenied();
-                    } elseif ($model->isLocked($mainCompany)) {
+                    } elseif ($model->isLocked($secondaryCompany)) {
                         //deny access if the entity is locked
-                        return $this->isLocked($postActionVars, $companyToMerge, 'lead.company');
-                    } elseif ($model->isLocked($companyToMerge)) {
+                        return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
+                    } elseif ($model->isLocked($primaryCompany)) {
                         //deny access if the entity is locked
-                        return $this->isLocked($postActionVars, $companyToMerge, 'lead.company');
+                        return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
                     }
 
                     //Both leads are good so now we merge them
-                    $mainCompany = $model->companyMerge($mainCompany, $companyToMerge, false);
+                    $mainCompany = $model->companyMerge($primaryCompany, $secondaryCompany, false);
                 }
             }
 
             if ($valid) {
                 $viewParameters = [
-                    'objectId'     => $mainCompany->getId(),
-                    'objectAction' => 'view',
+                    'objectId'     => $secondaryCompany->getId(),
+                    'objectAction' => 'edit',
                 ];
 
                 return $this->postActionRedirect(
@@ -779,7 +779,7 @@ class CompanyController extends FormController
                         'mautic_company_action',
                         [
                             'objectAction' => 'merge',
-                            'objectId'     => $mainCompany->getId(),
+                            'objectId'     => $secondaryCompany->getId(),
                         ]
                     ),
                 ],

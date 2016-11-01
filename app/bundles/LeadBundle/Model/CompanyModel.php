@@ -546,8 +546,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
-
+                $results = $this->em->getRepository('MauticLeadBundle:Company')->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+                $this->logger->error(print_r($results, true));
                 break;
         }
 
@@ -645,7 +645,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         //move all leads from secondary company to main company
         $companyLeadRepo = $this->getCompanyLeadRepository();
         $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
-        $this->logger->debug(print_r($secCompanyLeads, true));
 
         foreach ($secCompanyLeads as $lead) {
             $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);

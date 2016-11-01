@@ -27,7 +27,7 @@ class CompanyListType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'               => 'mautic.lead.lead.companies',
-                'entity_label_column' => 'companyname, companycity, companycountry',
+                'entity_label_column' => 'companyname',
                 'modal_route'         => 'mautic_company_action',
                 'modal_header'        => 'mautic.company.new.company',
                 'model'               => 'lead.company',

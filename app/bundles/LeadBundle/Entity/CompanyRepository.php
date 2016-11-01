@@ -10,6 +10,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -338,5 +339,58 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $contactCompanies;
+    }
+
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $alias = $prefix = $this->getTableAlias();
+        if (!empty($prefix)) {
+            $prefix .= '.';
+        }
+
+        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+
+        $class      = '\\'.$this->getClassName();
+        $reflection = new \ReflectionClass(new $class());
+
+        // Get the label column if necessary
+        if ($labelColumn == null) {
+            if ($reflection->hasMethod('getTitle')) {
+                $labelColumn = 'title';
+            } else {
+                $labelColumn = 'name';
+            }
+        }
+
+        $q->select($prefix.$valueColumn.' as value, 
+        case 
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
+        when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
+        when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")
+        else comp.companyname
+        end
+        as label')
+            ->from($tableName, $alias)
+            ->orderBy($prefix.$labelColumn);
+
+        if ($expr !== null && $expr->count()) {
+            $q->where($expr);
+        }
+
+        if (!empty($parameters)) {
+            $q->setParameters($parameters);
+        }
+
+        // Published only
+        if ($reflection->hasMethod('getIsPublished')) {
+            $q->andWhere(
+                $q->expr()->eq($prefix.'is_published', ':true')
+            )
+                ->setParameter('true', true, 'boolean');
+        }
+
+        return $q->execute()->fetchAll();
     }
 }
