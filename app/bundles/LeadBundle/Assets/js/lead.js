@@ -123,6 +123,8 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
+    mQuery('.fa-check').tooltip({html: true});
+    mQuery('.fa-check').tooltip({html: true});
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -1117,8 +1119,13 @@ Mautic.updateFilterPositioning = function (el) {
 Mautic.setAsPrimaryCompany = function (companyId,leadId){
     Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
         if (response.success) {
-            mQuery('#company-' + response.oldPrimary).removeClass('primary');
-            mQuery('#company-' + response.newPrimary).addClass('primary');
+            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+            } else {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+                mQuery('#company-' + response.newPrimary).addClass('primary');
+            }
+
         }
     });
 }

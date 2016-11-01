@@ -522,7 +522,7 @@ $view['slots']->set(
                     'mautic.lead.lead.companies'); ?></div>
             <?php foreach ($companies as $key => $company): ?>
                 <h5 class="pull-left mt-xs mr-xs"><span class="label label-success" >
-                       <i id="company-<?php echo $company['id']; ?>" class="fa fa-star <?php if ($company['is_primary'] == 1): ?>primary<?php endif?>" onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);"></i> <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
+                       <i id="company-<?php echo $company['id']; ?>" class="fa fa-check <?php if ($company['is_primary'] == 1): ?>primary<?php endif?>" onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);" title="<?php echo $view['translator']->trans('mautic.leac.company.set.primary'); ?>"></i> <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
                     </span>
                 </h5>
             <?php endforeach; ?>

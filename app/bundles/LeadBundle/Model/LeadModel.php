@@ -2183,7 +2183,7 @@ class LeadModel extends FormModel
         $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($leadId);
 
         $companyArray      = [];
-        $oldPrimaryCompany = false;
+        $oldPrimaryCompany = $newPrimaryCompany = false;
 
         $lead = $this->getEntity($leadId);
 
@@ -2199,8 +2199,11 @@ class LeadModel extends FormModel
                 if ($companyLead->getPrimary()) {
                     $oldPrimaryCompany = $companyLead->getCompany()->getId();
                 }
-                if ($company->getId() == $companyId) {
+
+                if ($company->getId() == $companyId and !$companyLead->getPrimary()) {
                     $companyLead->setPrimary(true);
+                    $newPrimaryCompany = $companyId;
+                    $lead->addUpdatedField('company', $company->getName());
                 } else {
                     $companyLead->setPrimary(false);
                 }
@@ -2208,7 +2211,12 @@ class LeadModel extends FormModel
             }
         }
 
+        if (!$newPrimaryCompany) {
+            $lead->addUpdatedField('company', '');
+        }
+
         if (!empty($companyArray)) {
+            $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray);
         }
 
