@@ -24,12 +24,8 @@ class FileApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        // $this->model            = $this->getModel('campaign');
-        // $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne   = 'file';
         $this->entityNameMulti = 'files';
-        // $this->permissionBase   = 'campaign:campaigns';
-        // $this->serializerGroups = array("campaignDetails", "categoryList", "publishDetails");
     }
 
     protected $imageMimes = [
@@ -42,8 +38,6 @@ class FileApiController extends CommonApiController
         'image/x-png',
     ];
 
-    protected $statusCode = Response::HTTP_OK;
-
     /**
      * Uploads a file.
      *
@@ -51,19 +45,26 @@ class FileApiController extends CommonApiController
      */
     public function createAction($dir)
     {
-        $path     = $this->getAbsolutePath($dir);
-        $response = [];
-        if (!isset($response['error'])) {
+        try {
+            $path = $this->getAbsolutePath($dir, true);
+        } catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        $response = [$this->entityNameOne => []];
+        if ($this->request->files) {
             foreach ($this->request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($path, $fileName);
-                    $response['link'] = $this->getMediaUrl().'/'.$fileName;
-                    $response['file'] = $fileName;
+                    $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $response[$this->entityNameOne]['name'] = $fileName;
                 } else {
-                    $response['error'] = 'The uploaded image does not have an allowed mime type';
+                    return $this->returnError('The uploaded file does not have an allowed mime type.', Response::HTTP_NOT_ACCEPTABLE);
                 }
             }
+        } else {
+            return $this->returnError('File was not found in the request.', Response::HTTP_NOT_ACCEPTABLE);
         }
         $view = $this->view($response);
 
@@ -77,7 +78,13 @@ class FileApiController extends CommonApiController
      */
     public function listAction($dir)
     {
-        $fnames = scandir($this->getAbsolutePath($dir));
+        try {
+            $filePath = $this->getAbsolutePath($dir);
+        } catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        $fnames = scandir($filePath);
 
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
@@ -102,21 +109,24 @@ class FileApiController extends CommonApiController
      */
     public function deleteAction($dir, $file)
     {
-        $response  = ['deleted' => false];
-        $imagePath = $this->getAbsolutePath($dir).'/'.basename($file);
+        $response = ['success' => false];
 
-        if (!file_exists($imagePath)) {
-            $response['error'] = 'File does not exist';
-            $this->statusCode  = Response::HTTP_INTERNAL_SERVER_ERROR;
-        } elseif (!is_writable($imagePath)) {
-            $response['error'] = 'File is not writable';
-            $this->statusCode  = Response::HTTP_INTERNAL_SERVER_ERROR;
-        } else {
-            unlink($imagePath);
-            $response['deleted'] = true;
+        try {
+            $filePath = $this->getAbsolutePath($dir).'/'.basename($file);
+        } catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        $view = $this->view($response, $this->statusCode);
+        if (!file_exists($filePath)) {
+            return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
+        } elseif (!is_writable($filePath)) {
+            return $this->returnError('File is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
+        } else {
+            unlink($filePath);
+            $response['success'] = true;
+        }
+
+        $view = $this->view($response);
 
         return $this->handleView($view);
     }
@@ -124,32 +134,49 @@ class FileApiController extends CommonApiController
     /**
      * Get the Media directory full file system path.
      *
+     * @param string $dir
+     * @param bool   $createDir
+     *
      * @return string
      */
-    protected function getAbsolutePath($dir)
+    protected function getAbsolutePath($dir, $createDir = false)
     {
         $possibleDirs = ['assets', 'images'];
-        $dir          = InputHelper::alphanum($dir);
+        $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
+        $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['\/']), '/');
+
+        // Dots in the dir name are slashes
+        if (strpos($dir, '.') !== false && !$subdir) {
+            $dirs = explode('.', $dir);
+            $dir  = $dirs[0];
+            unset($dirs[0]);
+            $subdir = implode('/', $dirs);
+        }
 
         if (!in_array($dir, $possibleDirs)) {
-            return $this->notFound($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
+            throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
         }
 
         $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
 
         if ($absoluteDir === false) {
-            return $this->returnError('Media dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if (is_writable($absoluteDir) === false) {
-            return $this->returnError('Media dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new \InvalidArgumentException($dir.' dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $subdir = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['\/']), '/');
-        $path   = $absoluteDir.'/'.$subdir;
+        $path = $absoluteDir.'/'.$subdir;
 
         if (!file_exists($path)) {
-            return $this->notFound($subdir.' doesn\'t exist in the '.$dir.' dir.');
+            if ($createDir) {
+                if (mkdir($path) === false) {
+                    throw new \InvalidArgumentException($dir.'/'.$subdir.' subdirectory could not be created.', Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');
+            }
         }
 
         return $path;
