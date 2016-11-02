@@ -52,7 +52,7 @@ class FileApiController extends CommonApiController
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $moved    = $file->move($path, $fileName);
 
-                    if ($dir === 'media') {
+                    if (substr($dir, 0, 6) === 'images') {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
                     }
 
@@ -64,6 +64,7 @@ class FileApiController extends CommonApiController
         } else {
             return $this->returnError('File was not found in the request.', Response::HTTP_NOT_ACCEPTABLE);
         }
+
         $view = $this->view($response);
 
         return $this->handleView($view);

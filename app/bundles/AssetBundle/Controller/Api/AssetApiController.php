@@ -60,7 +60,7 @@ class AssetApiController extends CommonApiController
         $assetDir = $this->get('mautic.helper.core_parameters')->getParameter('upload_dir');
         $entity->setUploadDir($assetDir);
 
-        if ($parameters['file']) {
+        if (isset($parameters['file'])) {
             if ($parameters['storageLocation'] === 'local') {
                 $entity->setPath($parameters['file']);
                 $entity->setFileInfoFromFile();
