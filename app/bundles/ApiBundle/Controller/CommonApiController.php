@@ -180,16 +180,23 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function getEntitiesAction()
     {
-        $repo       = $this->model->getRepository();
-        $tableAlias = $repo->getTableAlias();
-
+        $repo          = $this->model->getRepository();
+        $tableAlias    = $repo->getTableAlias();
         $publishedOnly = $this->request->get('published', 0);
+        $minimal       = $this->request->get('minimal', 0);
+
         if ($publishedOnly) {
             $this->listFilters[] = [
                 'column' => $tableAlias.'.isPublished',
                 'expr'   => 'eq',
                 'value'  => true,
             ];
+        }
+
+        if ($minimal) {
+            if (isset($this->serializerGroups[0])) {
+                $this->serializerGroups[0] = str_replace('Details', 'List', $this->serializerGroups[0]);
+            }
         }
 
         $args = [
