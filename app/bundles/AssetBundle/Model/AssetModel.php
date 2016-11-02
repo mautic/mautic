@@ -108,7 +108,6 @@ class AssetModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        //set the author for new asset
         if (!$entity->isNew()) {
             //increase the revision
             $revision = $entity->getRevision();

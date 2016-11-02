@@ -75,6 +75,7 @@ class PathsHelper
         $this->paths                  = $coreParametersHelper->getParameter('paths');
         $this->theme                  = $coreParametersHelper->getParameter('theme');
         $this->imagePath              = $coreParametersHelper->getParameter('image_path');
+        $this->assetPath              = $coreParametersHelper->getParameter('upload_dir');
         $this->dashboardImportDir     = $coreParametersHelper->getParameter('dashboard_import_dir');
         $this->dashboardImportUserDir = $coreParametersHelper->getParameter('dashboard_import_user_dir');
         $this->kernelCacheDir         = $coreParametersHelper->getParameter('kernel.cache_dir');

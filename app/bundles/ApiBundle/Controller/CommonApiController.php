@@ -357,8 +357,13 @@ class CommonApiController extends FOSRestController implements MauticController
             $parameters        = array_merge($defaultProperties, $parameters);
         }
 
-        $form         = $this->createEntityForm($entity);
-        $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+        $form = $this->createEntityForm($entity);
+
+        try {
+            $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+        } catch (\Exception $e) {
+            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+        }
 
         // Special handling of boolean fields because Symfony fails to recognize true values on PATCH but also adds
         // support for all boolean types (on, off, true, false, 1, 0)

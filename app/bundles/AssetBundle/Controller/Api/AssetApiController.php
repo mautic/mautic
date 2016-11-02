@@ -47,28 +47,38 @@ class AssetApiController extends CommonApiController
     }
 
     /**
-     * Creates a new entity.
+     * Convert posted parameters into what the form needs in order to successfully bind.
      *
-     * @return Response
+     * @param $parameters
+     * @param $entity
+     * @param $action
+     *
+     * @return mixed
      */
-    public function newEntityAction()
+    protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        $entity = $this->model->getEntity();
+        $assetDir = $this->get('mautic.helper.core_parameters')->getParameter('upload_dir');
+        $entity->setUploadDir($assetDir);
 
-        if (!$this->checkEntityAccess($entity, 'create')) {
-            return $this->accessDenied();
+        if ($parameters['file']) {
+            if ($parameters['storageLocation'] === 'local') {
+                $entity->setPath($parameters['file']);
+                $entity->setFileInfoFromFile();
+
+                if ($entity->loadFile() === null) {
+                    throw new \Exception('File '.$parameters['file'].' was not found in the asset directory.');
+                }
+            } elseif ($parameters['storageLocation'] === 'remote') {
+                $parameters['remotePath'] = $parameters['file'];
+                $entity->setFileInfoFromFile();
+                $entity->setFileNameFromRemote();
+            }
+
+            unset($parameters['file']);
+        } elseif ($action === 'new') {
+            throw new \Exception('File of the asset is required.');
         }
 
-        $parameters = $this->request->request->all();
-        $file       = $this->request->files->get('file');
-
-        $entity->setTempId(uniqid('tmp_'));
-        // $entity->setTempName();
-        $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size').'M')); // convert from MB to B
-        $entity->setUploadDir($this->factory->getParameter('upload_dir'));
-        $entity->preUpload();
-        $entity->upload();
-
-        return $this->processForm($entity, $parameters, 'POST');
+        return $parameters;
     }
 }

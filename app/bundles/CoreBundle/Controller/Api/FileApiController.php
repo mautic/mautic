@@ -28,14 +28,8 @@ class FileApiController extends CommonApiController
         $this->entityNameMulti = 'files';
     }
 
-    protected $imageMimes = [
-        'image/gif',
-        'image/jpeg',
-        'image/pjpeg',
-        'image/jpeg',
-        'image/pjpeg',
-        'image/png',
-        'image/x-png',
+    protected $forbiddenExtensions = [
+        'php',
     ];
 
     /**
@@ -54,13 +48,17 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($this->request->files) {
             foreach ($this->request->files as $file) {
-                if (in_array($file->getMimeType(), $this->imageMimes)) {
+                if (!in_array($file->guessExtension(), $this->forbiddenExtensions)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($path, $fileName);
-                    $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $moved    = $file->move($path, $fileName);
+
+                    if ($dir === 'media') {
+                        $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
+                    }
+
                     $response[$this->entityNameOne]['name'] = $fileName;
                 } else {
-                    return $this->returnError('The uploaded file does not have an allowed mime type.', Response::HTTP_NOT_ACCEPTABLE);
+                    return $this->returnError('The uploaded file cannot have these exetnsions: '.implode(',', $this->forbiddenExtensions).'.', Response::HTTP_NOT_ACCEPTABLE);
                 }
             }
         } else {
