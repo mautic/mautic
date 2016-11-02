@@ -102,7 +102,7 @@ class ConfigSubscriber extends CommonSubscriber
             if (strpos($data[$key], '%') !== false) {
                 $data[$key] = urldecode($data[$key]);
 
-                if (preg_match_all('/([^%]|^)(%{1}[^%]\S+[^%]%{1})([^%]|$)/i', $data[$key], $matches)) {
+                if (preg_match_all('/([^%]|^)(%{1}[^%]+[^%]%{1})([^%]|$)/i', $data[$key], $matches)) {
                     // Encode any left over to prevent Symfony from crashing
                     foreach ($matches[0] as $matchKey => $match) {
                         $replaceWith = $matches[1][$matchKey].'%'.$matches[2][$matchKey].'%'.$matches[3][$matchKey];
