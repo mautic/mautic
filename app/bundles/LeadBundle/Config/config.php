@@ -89,33 +89,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getcontacts' => [
-                'path'       => '/contacts',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntities',
-            ],
-            'mautic_api_newcontact' => [
-                'path'       => '/contacts/new',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:newEntity',
-                'method'     => 'POST',
-            ],
-            'mautic_api_getcontact' => [
-                'path'       => '/contacts/{id}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntity',
-            ],
-            'mautic_api_editputcontact' => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PUT',
-            ],
-            'mautic_api_editpatchcontact' => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PATCH',
-            ],
-            'mautic_api_deletecontact' => [
-                'path'       => '/contacts/{id}/delete',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:deleteEntity',
-                'method'     => 'DELETE',
+            'mautic_api_segmentsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'contacts',
+                'path'            => '/contacts',
+                'controller'      => 'MauticLeadBundle:Api\LeadApi',
             ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
