@@ -89,7 +89,7 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_segmentsstandard' => [
+            'mautic_api_contactsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'contacts',
                 'path'            => '/contacts',
@@ -150,6 +150,15 @@ return [
                 'path'       => '/companies/{companyId}/contact/remove/{contactId}',
                 'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
                 'method'     => 'POST',
+            ],
+            'mautic_api_fieldsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'fields',
+                'path'            => '/fields/{object}',
+                'controller'      => 'MauticLeadBundle:Api\FieldApi',
+                'defaults'        => [
+                    'object' => 'contact',
+                ],
             ],
         ],
     ],

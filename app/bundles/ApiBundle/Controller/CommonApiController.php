@@ -116,6 +116,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $serializerGroups = [];
 
     /**
+     * @var array
+     */
+    protected $routeParams = [];
+
+    /**
      * Initialize some variables.
      *
      * @param FilterControllerEvent $event
@@ -401,7 +406,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
                     $route,
-                    ['id' => $entity->getId()],
+                    array_merge(['id' => $entity->getId()], $this->routeParams),
                     true
                 );
             }
