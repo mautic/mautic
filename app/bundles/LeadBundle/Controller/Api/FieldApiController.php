@@ -49,4 +49,23 @@ class FieldApiController extends CommonApiController
 
         return $parameters;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        if ($parameters['properties']) {
+            $result = $this->model->setFieldProperties($entity, $parameters['properties']);
+
+            if ($result !== true) {
+                throw new \Exveption($this->get('translator')->trans($result, [], 'validators'));
+            }
+        }
+    }
 }
