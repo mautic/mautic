@@ -1541,10 +1541,25 @@ class LeadModel extends FormModel
 
         foreach ($leadFields as $leadField) {
             if (isset($fieldData[$leadField['alias']])) {
-
-                // Adjust the boolean values from text to boolean
-                if ($leadField['type'] == 'boolean') {
-                    $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                try {
+                    switch ($leadField['type']) {
+                        // Adjust the boolean values from text to boolean
+                        case 'boolean':
+                            $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                            break;
+                        // Ensure date/time entries match what symfony expects
+                        case 'datetime':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i:s');
+                            break;
+                        case 'date':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
+                            break;
+                        case 'time':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i:s');
+                            break;
+                    }
+                } catch (\Exception $exception) {
+                    // We tried; let the form handle the mal-formed data
                 }
 
                 // Skip if the value is in the CSV row
