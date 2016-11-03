@@ -60,11 +60,11 @@ class FieldApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        if ($parameters['properties']) {
+        if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
 
             if ($result !== true) {
-                throw new \Exveption($this->get('translator')->trans($result, [], 'validators'));
+                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Codes::HTTP_BAD_REQUEST);
             }
         }
     }

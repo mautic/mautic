@@ -66,7 +66,7 @@ class AssetApiController extends CommonApiController
                 $entity->setFileInfoFromFile();
 
                 if ($entity->loadFile() === null) {
-                    throw new \Exception('File '.$parameters['file'].' was not found in the asset directory.');
+                    return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Codes::HTTP_BAD_REQUEST);
                 }
             } elseif ($parameters['storageLocation'] === 'remote') {
                 $parameters['remotePath'] = $parameters['file'];
@@ -76,7 +76,7 @@ class AssetApiController extends CommonApiController
 
             unset($parameters['file']);
         } elseif ($action === 'new') {
-            throw new \Exception('File of the asset is required.');
+            return $this->returnError('File of the asset is required.', Codes::HTTP_BAD_REQUEST);
         }
 
         return $parameters;
