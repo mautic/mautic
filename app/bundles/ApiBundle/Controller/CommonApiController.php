@@ -391,10 +391,10 @@ class CommonApiController extends FOSRestController implements MauticController
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
-            try {
-                $this->preSaveEntity($entity, $form, $parameters, $action);
-            } catch (\Exception $e) {
-                return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            $preSaveError = $this->preSaveEntity($entity, $form, $parameters, $action);
+
+            if ($preSaveError instanceof Response) {
+                return $preSaveError;
             }
 
             $this->model->saveEntity($entity);

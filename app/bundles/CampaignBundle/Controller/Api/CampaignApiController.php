@@ -112,10 +112,12 @@ class CampaignApiController extends CommonApiController
         if ($method === 'POST' || $method === 'PUT') {
             if (empty($parameters['events'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
-                throw new \Exception($msg);
+
+                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
             } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
-                throw new \Exception($msg);
+
+                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
             }
         }
 
@@ -134,7 +136,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($parameters['events'] as $key => $requestEvent) {
                 if (!isset($requestEvent['id'])) {
-                    throw new \Exception('$campaign[events]['.$key.']["id"] is missing');
+                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
                 }
                 $requestEventIds[] = $requestEvent['id'];
             }
@@ -148,7 +150,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['lists'])) {
                 foreach ($parameters['lists'] as $requestSegment) {
                     if (!isset($requestSegment['id'])) {
-                        throw new \Exception('$campaign[lists]['.$key.']["id"] is missing');
+                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
                     }
                     $requestSegmentIds[] = $requestSegment['id'];
                 }
@@ -163,7 +165,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['forms'])) {
                 foreach ($parameters['forms'] as $requestForm) {
                     if (!isset($requestForm['id'])) {
-                        throw new \Exception('$campaign[forms]['.$key.']["id"] is missing');
+                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
                     }
                     $requestFormIds[] = $requestForm['id'];
                 }

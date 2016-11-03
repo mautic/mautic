@@ -182,7 +182,8 @@ class FormApiController extends CommonApiController
                 if (!$fieldForm->isValid()) {
                     $formErrors = $this->getFormErrorMessages($fieldForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
-                    throw new \Exception('Fields: '.$msg);
+
+                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
                 }
             }
 
@@ -223,7 +224,8 @@ class FormApiController extends CommonApiController
                 if (!$actionForm->isValid()) {
                     $formErrors = $this->getFormErrorMessages($actionForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
-                    throw new \Exception('Actions: '.$msg);
+
+                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
                 }
             }
 
