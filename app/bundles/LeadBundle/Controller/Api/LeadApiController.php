@@ -137,6 +137,7 @@ class LeadApiController extends CommonApiController
                             'column' => 'f.isPublished',
                             'expr'   => 'eq',
                             'value'  => true,
+                            'object' => 'lead',
                         ],
                     ],
                 ],

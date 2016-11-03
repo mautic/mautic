@@ -160,6 +160,12 @@ return [
                     'object' => 'contact',
                 ],
             ],
+            'mautic_api_notesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'notes',
+                'path'            => '/notes',
+                'controller'      => 'MauticLeadBundle:Api\NoteApi',
+            ],
         ],
     ],
     'menu' => [
