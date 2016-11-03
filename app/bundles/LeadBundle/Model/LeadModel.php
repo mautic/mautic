@@ -1549,13 +1549,13 @@ class LeadModel extends FormModel
                             break;
                         // Ensure date/time entries match what symfony expects
                         case 'datetime':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i:s');
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
                             break;
                         case 'date':
                             $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
                             break;
                         case 'time':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i:s');
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
                             break;
                     }
                 } catch (\Exception $exception) {
