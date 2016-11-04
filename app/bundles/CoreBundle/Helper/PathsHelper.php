@@ -106,8 +106,6 @@ class PathsHelper
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
-        } elseif ($name == 'assets') {
-            return realpath($this->assetPath);
         } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
             //these are absolute regardless as they are configurable
             $globalPath = $this->dashboardImportDir;

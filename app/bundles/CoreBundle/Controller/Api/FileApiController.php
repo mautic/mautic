@@ -156,7 +156,11 @@ class FileApiController extends CommonApiController
             throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
         }
 
-        $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+        if ($dir === 'images') {
+            $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+        } elseif ($dir === 'assets') {
+            $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+        }
 
         if ($absoluteDir === false) {
             throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
