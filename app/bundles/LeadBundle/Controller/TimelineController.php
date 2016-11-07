@@ -68,9 +68,6 @@ class TimelineController extends CommonController
             ]
         );
     }
-<<<<<<< HEAD
-}
-=======
 
     public function pluginIndexAction(Request $request, $integration, $page = 1)
     {
@@ -103,6 +100,7 @@ class TimelineController extends CommonController
         // get all events grouped by lead
         $events = $this->getAllEngagements($leads, $filters, $order, $page, $limit);
 
+        // count new events on timeline
         $str = $this->request->server->get('QUERY_STRING');
         $str = substr($str, strpos($str, '?') + 1);
         parse_str($str, $query);
@@ -159,6 +157,11 @@ class TimelineController extends CommonController
 
         $events = $this->getEngagements($lead, $filters, $order, $page);
 
+        // count new events on timeline
+        $str = $this->request->server->get('QUERY_STRING');
+        $str = substr($str, strpos($str, '?') + 1);
+        parse_str($str, $query);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -166,6 +169,8 @@ class TimelineController extends CommonController
                     'page'        => $page,
                     'integration' => $integration,
                     'events'      => $events,
+                    'tmpl'        => (!$this->request->isXmlHttpRequest()) ? 'index' : '',
+                    'newCount'    => (array_key_exists('count', $query) && $query['count']) ? $query['count'] : 0,
                 ],
                 'passthroughVars' => [
                     'route'         => false,
@@ -177,4 +182,3 @@ class TimelineController extends CommonController
         );
     }
 }
->>>>>>> refs/remotes/mautic/staging
