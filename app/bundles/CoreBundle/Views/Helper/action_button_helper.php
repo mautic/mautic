@@ -102,3 +102,6 @@ if (isset($customButtons)) {
 }
 
 $view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
+
+// Fetch custom buttons from plugins
+$view['buttons']->fetchCustomButtons($buttonLocation, $app->getRequest(), isset($item) ? $item : null);

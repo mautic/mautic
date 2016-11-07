@@ -19,6 +19,7 @@ if (isset($preCustomButtons) or isset($customButtons) or isset($postCustomButton
     $groupType   = 'button-dropdown';
 }
 
+$buttonLocation = \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_PAGE_ACTIONS;
 include 'action_button_helper.php';
 
 echo '<div class="std-toolbar btn-group">';

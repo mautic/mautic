@@ -8,7 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$wrap = true;
+$wrap           = true;
+$buttonLocation = \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_TOOLBAR_ACTIONS;
 include 'action_button_helper.php';
 ?>
 <div class="panel-body">

@@ -8,7 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$groupType = 'dropdown';
+
+$groupType      = 'dropdown';
+$buttonLocation = \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_LIST_ACTIONS;
 include 'action_button_helper.php';
 
 if (is_array($item)) {
