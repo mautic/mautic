@@ -229,14 +229,14 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (is_callable([$mailer, 'setApiKey'])) {
+                if (method_exists($mailer, 'setApiKey')) {
                     if (empty($settings['api_key'])) {
                         $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
                     }
                     $mailer->setApiKey($settings['api_key']);
                 }
 
-                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
+                if (method_exists($mailer, 'setUsername') && method_exists($mailer, 'setPassword')) {
                     if (empty($settings['password'])) {
                         $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
                     }
