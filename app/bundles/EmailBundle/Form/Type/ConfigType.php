@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -217,6 +216,7 @@ class ConfigType extends AbstractType
                     'mail'                       => 'mautic.email.config.mailer_transport.mail',
                     'mautic.transport.postmark'  => 'mautic.email.config.mailer_transport.postmark',
                     'mautic.transport.sendgrid'  => 'mautic.email.config.mailer_transport.sendgrid',
+                    'mautic.transport.elasticemail'  => 'mautic.email.config.mailer_transport.elasticemail',
                     'sendmail'                   => 'mautic.email.config.mailer_transport.sendmail',
                     'mautic.transport.sparkpost' => 'mautic.email.config.mailer_transport.sparkpost',
                 ],
@@ -344,6 +344,7 @@ class ConfigType extends AbstractType
             ], "config_emailconfig_mailer_transport":[
                 "mautic.transport.mandrill",
                 "mautic.transport.sendgrid",
+                "mautic.transport.elasticemail",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
                 "gmail"
@@ -356,6 +357,7 @@ class ConfigType extends AbstractType
                 "login",
                 "cram-md5"
             ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.elasticemail",
                 "mautic.transport.sendgrid",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
