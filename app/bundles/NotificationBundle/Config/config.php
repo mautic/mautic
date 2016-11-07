@@ -161,5 +161,6 @@ return [
         'notification_app_id'        => null,
         'notification_rest_api_key'  => null,
         'notification_safari_web_id' => null,
+        'gcm_sender_id' => '482941778795',
     ],
 ];

@@ -24,9 +24,10 @@ class JsController extends CommonController
      */
     public function manifestAction()
     {
+        $gcm_sender_id      = $this->factory->getParameter('gcm_sender_id', '446150739532');
         $data = [
             'start_url'             => '/',
-            'gcm_sender_id'         => '446150739532',
+            'gcm_sender_id'         => $gcm_sender_id,
             'gcm_user_visible_only' => true,
         ];
 
