@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -102,16 +103,17 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             foreach ($indexes as $name) {
                 $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
                 if ('textarea' != $type) {
-                    $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search');
+                    $indexHelper->addIndex([$name], $name.'_search');
                 }
             }
             if ($object == 'lead') {
                 // Add an attribution index
-                $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
             } else {
-                $indexHelper->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
-                $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
+                $indexHelper->addIndex(['companyname', 'companyemail'], 'company_filter');
+                $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
             }
+
             $indexHelper->executeChanges();
         }
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -42,7 +43,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-basic',
+                    'class' => 'form-control editor editor-dynamic-content',
                 ],
             ]
         );

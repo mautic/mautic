@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -685,9 +686,16 @@ class FieldModel extends FormModel
      */
     public function getFieldListWithProperties($object = 'lead')
     {
+        $forceFilters[] = [
+            'column' => 'f.object',
+            'expr'   => 'eq',
+            'value'  => $object,
+        ];
         $contactFields = $this->getEntities(
             [
-                'object'           => $object,
+                'filter' => [
+                    'force' => $forceFilters,
+                ],
                 'ignore_paginator' => true,
                 'hydration_mode'   => 'hydrate_array',
             ]
@@ -811,6 +819,8 @@ class FieldModel extends FormModel
             case 'country':
             case 'email':
             case 'lookup':
+            case 'select':
+            case 'multiselect':
             case 'region':
             case 'tel':
             case 'text':

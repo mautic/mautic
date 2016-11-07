@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -761,14 +762,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Creates a points change entry.
      *
-     * @param   $type
-     * @param   $name
-     * @param   $action
+     * @param $stage
+     * @param $name
+     * @param $action
      */
-    public function stageChangeLogEntry($type, $name, $action)
+    public function stageChangeLogEntry($stage, $name, $action)
     {
         //create a new points change event
         $event = new StagesChangeLog();
+        $event->setStage($stage);
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());

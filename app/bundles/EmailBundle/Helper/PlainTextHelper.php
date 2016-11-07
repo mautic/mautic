@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @copyright   2005-2007 Jon Abernathy <jon@chuggnutt.com>
  * @author      Mautic

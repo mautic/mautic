@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,7 +27,7 @@ class FrequencyRuleRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAppliedFrequencyRules($channel, $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime)
+    public function getAppliedFrequencyRules($channel, $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -40,12 +41,6 @@ class FrequencyRuleRepository extends CommonRepository
         if ($channel) {
             $q->andWhere('fr.channel = :channel or fr.channel is null')
                 ->setParameter('channel', $channel);
-        }
-
-        if ($listId) {
-            $q->leftJoin('fr', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = fr.lead_id')
-                ->andWhere('cs.leadlist_id = :list_id')
-                ->setParameter('list_id', $listId);
         }
 
         if (!empty($defaultFrequencyTime)) {

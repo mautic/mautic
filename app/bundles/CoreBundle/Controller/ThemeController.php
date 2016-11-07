@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -52,34 +53,43 @@ class ThemeController extends FormController
         if ($this->request->getMethod() == 'POST') {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $fileData  = $form['file']->getData();
-                    $fileName  = InputHelper::filename($fileData->getClientOriginalName());
-                    $themeName = basename($fileName, '.zip');
+                    $fileData = $form['file']->getData();
 
-                    if (in_array($themeName, $this->defaultThemes)) {
+                    if (!$fileData) {
                         $form->addError(
                             new FormError(
-                                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
+                                $this->translator->trans('mautic.core.theme.upload.empty', [], 'validators')
                             )
                         );
-                    } elseif (!empty($fileData)) {
-                        try {
-                            $fileData->move($dir, $fileName);
-                            $themeHelper->install($dir.'/'.$fileName);
-                            $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
-                        } catch (\Exception $e) {
+                    } else {
+                        $fileName  = InputHelper::filename($fileData->getClientOriginalName());
+                        $themeName = basename($fileName, '.zip');
+
+                        if (in_array($themeName, $this->defaultThemes)) {
                             $form->addError(
                                 new FormError(
-                                    $this->translator->trans($e->getMessage(), [], 'validators')
+                                    $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
+                                )
+                            );
+                        } elseif (!empty($fileData)) {
+                            try {
+                                $fileData->move($dir, $fileName);
+                                $themeHelper->install($dir.'/'.$fileName);
+                                $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                            } catch (\Exception $e) {
+                                $form->addError(
+                                    new FormError(
+                                        $this->translator->trans($e->getMessage(), [], 'validators')
+                                    )
+                                );
+                            }
+                        } else {
+                            $form->addError(
+                                new FormError(
+                                    $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
                                 )
                             );
                         }
-                    } else {
-                        $form->addError(
-                            new FormError(
-                                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
-                            )
-                        );
                     }
                 }
             }

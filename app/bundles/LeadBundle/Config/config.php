@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,21 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_plugin_timeline_index' => [
+                'path'         => '/plugin/{integration}/timeline/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginIndex',
+                'requirements' => [
+                    'integration' => '.+',
+                ],
+            ],
+            'mautic_plugin_timeline_view' => [
+                'path'         => '/plugin/{integration}/timeline/view/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:pluginView',
+                'requirements' => [
+                    'integration' => '.+',
+                    'leadId'      => '\d+',
+                ],
+            ],
             'mautic_contact_emailtoken_index' => [
                 'path'       => '/contacts/emailtokens/{page}',
                 'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index',
@@ -403,7 +419,7 @@ return [
                     'router',
                     'database_connection',
                 ],
-                'alias'     => 'company_list',
+                'alias' => 'company_list',
             ],
         ],
         'other' => [

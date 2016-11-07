@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -97,7 +98,7 @@ class Submission
             ->columnName('date_submitted')
             ->build();
 
-        $builder->addField('referer', 'string');
+        $builder->addField('referer', 'text');
 
         $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')

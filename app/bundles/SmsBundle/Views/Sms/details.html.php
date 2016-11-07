@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -31,8 +32,13 @@ $view['slots']->set(
                     $permissions['sms:smses:editother'],
                     $sms->getCreatedBy()
                 ),
-                'delete' => $permissions['sms:smses:create'],
-                'close'  => $view['security']->hasEntityAccess(
+                'clone'  => $permissions['sms:smses:create'],
+                'delete' => $view['security']->hasEntityAccess(
+                    $permissions['sms:smses:deleteown'],
+                    $permissions['sms:smses:deleteother'],
+                    $sms->getCreatedBy()
+                ),
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['sms:smses:viewown'],
                     $permissions['sms:smses:viewother'],
                     $sms->getCreatedBy()

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -188,8 +189,8 @@ $view['slots']->set(
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
                             <li class="<?php if ($step === 0) {
-                                echo 'active';
-                            } ?>">
+    echo 'active';
+} ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                                 </a>
@@ -218,7 +219,7 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                     <?php else: ?>
-                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>

@@ -264,8 +264,8 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-                heightMin: 300
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                heightMin: 100
             }));
 
             tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
@@ -329,8 +329,8 @@ Mautic.initDynamicContentItem = function (tabId) {
 
         altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-            heightMin: 300
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+            heightMin: 100
         }));
 
         Mautic.initRemoveEvents(removeButton);
@@ -373,6 +373,8 @@ Mautic.initDynamicContentItem = function (tabId) {
     });
 
     Mautic.initRemoveEvents($el.find('.remove-item'));
+
+
 };
 
 Mautic.updateDynamicContentDropdown = function () {
@@ -467,7 +469,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -505,7 +507,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     var fieldOptions = fieldCallback = '';
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect') {
             // Generate the options
             fieldOptions = selectedOption.data("field-list");
 
@@ -617,6 +619,7 @@ Mautic.convertDynamicContentFilterInput = function(el) {
     }
 
     var newName = '';
+    var lastPos;
 
     if (filterEl.is('select')) {
         var isMultiple  = filterEl.attr('multiple');
@@ -635,7 +638,10 @@ Mautic.convertDynamicContentFilterInput = function(el) {
             filterEl.removeAttr('multiple');
 
             // Update the name
-            newName =  filterEl.attr('name').replace(/[\[\]']+/g, '');
+            newName = filterEl.attr('name');
+            lastPos = newName.lastIndexOf('[]');
+            newName = newName.substring(0, lastPos);
+
             filterEl.attr('name', newName);
 
             placeholder = mauticLang['chosenChooseOne'];

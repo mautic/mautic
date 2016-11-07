@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -154,8 +155,8 @@ class CampaignSubscriber extends CommonSubscriber
             $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
             $options = [
                 'source'         => ['campaign.event', $event->getEvent()['id']],
-                'email_attempts' => $config['attempts'],
-                'email_priority' => $config['priority'],
+                'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
+                'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
                 'email_type'     => $type,
             ];
 
