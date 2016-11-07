@@ -408,6 +408,30 @@ class ListModel extends FormModel
                 'object' => 'lead',
 
             ],
+            'referer' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        'like',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'hit_url_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
                 'properties' => [

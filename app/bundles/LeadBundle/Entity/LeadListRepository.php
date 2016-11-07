@@ -863,7 +863,66 @@ class LeadListRepository extends CommonRepository
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
+                case 'hit_url_date':
+                    $operand = (($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('id')
+                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
+                    switch ($func) {
+                        case 'gt':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                    ->gt($alias.'.date_hit', $exprParameter), $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                        case 'lt':
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                    ->lt($alias.'.date_hit', $exprParameter), $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                    }
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere($subqb->expr()
+                            ->eq($alias.'.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
+                case 'referer':
+                    $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('id')
+                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
 
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                    ->eq($alias.'.referer', $exprParameter), $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                        case 'like':
+                        case '!like':
+                            $details['filter'] = '%'.$details['filter'].'%';
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                    ->like($alias.'.referer', $exprParameter), $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                    }
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere($subqb->expr()
+                            ->eq($alias.'.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
                 case 'dnc_bounced_sms':
