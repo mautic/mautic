@@ -40,6 +40,33 @@ class ButtonHelper extends Helper
     const LOCATION_PAGE_ACTIONS = 'page_actions';
 
     /**
+     * Navbar actions.
+     */
+    const LOCATION_NAVBAR = 'navbar_actions';
+
+    /**
+     * Buttons are displayed in group and/or dropdown depending on button count.
+     */
+    const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
+
+    /**
+     * Buttons are displayed in dropdown depending on button count.
+     */
+    const TYPE_DROPDOWN = 'dropdown';
+
+    /**
+     * Buttons are grouped together.
+     */
+    const TYPE_GROUP = 'group';
+
+    /**
+     * Location of the buttons.
+     *
+     * @var
+     */
+    private $location;
+
+    /**
      * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
     private $templating;
@@ -54,17 +81,40 @@ class ButtonHelper extends Helper
      */
     private $dispatcher;
 
+    /**
+     * @var
+     */
     private $wrapOpeningTag;
 
+    /**
+     * @var
+     */
     private $wrapClosingTag;
 
-    private $groupType;
+    /**
+     * @var
+     */
+    private $groupType = self::TYPE_GROUP;
 
+    /**
+     * @var
+     */
     private $menuLink;
 
+    /**
+     * @var
+     */
     private $preCustomButtons;
 
+    /**
+     * @var
+     */
     private $postCustomButtons;
+
+    /**
+     * @var int
+     */
+    private $buttonCount = 0;
 
     /**
      * ButtonHelper constructor.
@@ -83,37 +133,66 @@ class ButtonHelper extends Helper
     /**
      * @param $wrapOpeningTag
      * @param $wrapClosingTag
+     *
+     * @return $this
      */
     public function setWrappingTags($wrapOpeningTag, $wrapClosingTag)
     {
         $this->wrapOpeningTag = $wrapOpeningTag;
         $this->wrapClosingTag = $wrapClosingTag;
+
+        return $this;
     }
 
     /**
      * @param $groupType
+     *
+     * @return $this
      */
     public function setGroupType($groupType)
     {
         $this->groupType = $groupType;
+
+        return $this;
     }
 
     /**
      * @param $menuLink
+     *
+     * @return $this
      */
     public function setMenuLink($menuLink)
     {
         $this->menuLink = $menuLink;
+
+        return $this;
     }
 
     /**
-     * @param $preCustomButtons
-     * @param $postCustomButtons
+     * @param       $preCustomButtons
+     * @param array $postCustomButtons
+     *
+     * @return $this
      */
-    public function setCustomButtons($preCustomButtons, $postCustomButtons)
+    public function setCustomButtons($preCustomButtons, $postCustomButtons = [])
     {
         $this->preCustomButtons  = $preCustomButtons;
         $this->postCustomButtons = $postCustomButtons;
+
+        return $this;
+    }
+
+    /**
+     * Render custom buttons.
+     *
+     * @param        $buttonCount
+     * @param string $dropdownHtml
+     *
+     * @return string
+     */
+    public function renderCustomButtons(&$buttonCount = 0, $dropdownHtml = '')
+    {
+        return $this->renderPreCustomButtons($buttonCount, $dropdownHtml).$this->renderPostCustomButtons($buttonCount, $dropdownHtml);
     }
 
     /**
@@ -148,7 +227,7 @@ class ButtonHelper extends Helper
 
         if (!empty($this->postCustomButtons)) {
             foreach ($this->postCustomButtons as $c) {
-                if ($this->groupType == 'button-dropdown' && $buttonCount === 1) {
+                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === 1) {
                     $postCustomButtonContent .= $dropdownHtml;
                 }
                 $postCustomButtonContent .= $this->buildCustom($c, $buttonCount);
@@ -168,21 +247,44 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param         $location
      * @param Request $request
-     * @param mixed   $item
+     * @param null    $item
+     *
+     * @return $this
      */
-    public function fetchCustomButtons($location, Request $request, $item = null)
+    public function fetchCustomButtons(Request $request, $item = null)
     {
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
                 CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS,
-                new CustomButtonEvent($location, $request, $this->preCustomButtons, $this->postCustomButtons, $item)
+                new CustomButtonEvent($this->location, $request, $this->preCustomButtons, $this->postCustomButtons, $item)
             );
 
             $this->preCustomButtons  = $event->getPrependedButtons();
             $this->postCustomButtons = $event->getAppendedButtons();
         }
+
+        return $this;
+    }
+
+    /**
+     * @param $buttonCount
+     *
+     * @return $this
+     */
+    public function setButtonCount($buttonCount)
+    {
+        $this->buttonCount = (int) $buttonCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getButtonCount()
+    {
+        return $this->buttonCount + count($this->postCustomButtons) + count($this->preCustomButtons);
     }
 
     /**
@@ -196,22 +298,22 @@ class ButtonHelper extends Helper
         $buttons = '';
 
         //Wrap links in a tag
-        if ($this->groupType == 'dropdown' || ($this->groupType == 'button-dropdown' && $buttonCount > 0)) {
+        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount > 0)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
 
         if (isset($c['confirm'])) {
-            if (($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
+            if (($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === 0))) {
                 if (isset($c['confirm']['btnClass']) && !strstr($c['confirm']['btnClass'], 'btn-')) {
                     $c['confirm']['btnClass'] .= ' btn btn-default';
                 } elseif (!isset($c['confirm']['btnClass'])) {
                     $c['confirm']['btnClass'] = 'btn btn-default';
                 }
-            } elseif (in_array($this->groupType, ['button-dropdown', 'dropdown'])) {
+            } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
                 if (!isset($c['confirm']['btnClass'])) {
                     $c['confirm']['btnClass'] = '';
-                } elseif ($this->groupType == 'button-dropdown') {
+                } elseif ($this->groupType == self::TYPE_BUTTON_DROPDOWN) {
                     $search = [
                         'btn-default',
                         'btn-primary',
@@ -239,13 +341,13 @@ class ButtonHelper extends Helper
                 $c['attr']['class'] = $c['btnClass'];
             }
 
-            if (($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
+            if (($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === 0))) {
                 if (!isset($c['attr']['class'])) {
                     $c['attr']['class'] = 'btn btn-default';
                 } elseif (!strstr($c['attr']['class'], 'btn-')) {
                     $c['attr']['class'] .= ' btn btn-default';
                 }
-            } elseif (($this->groupType == 'dropdown' || ($this->groupType == 'button-dropdown' && $buttonCount > 0))
+            } elseif (($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount > 0))
                 && isset($c['attr']['class'])
             ) {
                 // Remove btn classes
@@ -292,5 +394,41 @@ class ButtonHelper extends Helper
         }
 
         return $buttons;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    /**
+     * @param mixed $location
+     *
+     * @return ButtonHelper
+     */
+    public function setLocation($location)
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * Reset the buttons.
+     *
+     * @param     $buttonLocation
+     * @param     $groupType
+     * @param int $buttonCount
+     */
+    public function reset($buttonLocation, $groupType = self::TYPE_GROUP, $buttonCount = 0)
+    {
+        $this->location    = $buttonLocation;
+        $this->groupType   = $groupType;
+        $this->buttonCount = $buttonCount;
+
+        return $this;
     }
 }
