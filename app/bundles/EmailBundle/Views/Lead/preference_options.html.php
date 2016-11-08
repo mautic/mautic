@@ -87,7 +87,21 @@ else:
 endif; ?>
      </div>
 <?php if ($showContactCategories):?>
-        <div id="global-categories"><?php echo $view['form']->row($form['global_categories']); ?></div>
+        <div id="global-categories">
+            <div><?php echo  $view['form']->label($form['global_categories']); ?></div>
+            <?php $categoryNumber = count($form['global_categories']->vars['choices']);
+            for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
+            <?php
+            if (in_array($form['global_categories']->vars['choices'][$i]->value, $form['global_categories']->vars['value'])) :
+                ?>
+                <div id="category-<?php echo $i; ?>">
+                    <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
+                    <?php echo $view['form']->label($form['global_categories'][$i]); ?>
+                </div>
+            <?php endif; ?>
+            <?php endfor;
+            unset($form['global_categories']);
+            ?></div>
 <?php
 else:
     unset($form['global_categories']);

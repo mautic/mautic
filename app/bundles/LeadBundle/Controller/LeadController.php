@@ -968,6 +968,7 @@ class LeadController extends FormController
             $data['lead_channels'] = $channels;
             $data['leadId']        = $lead->getId();
             $data['categories']    = $categories;
+            $data['public_view']   = false;
 
             foreach ($allChannels as $channel) {
                 foreach ($frequencyRules as $frequencyRule) {
@@ -995,9 +996,8 @@ class LeadController extends FormController
                 'lead_contact_frequency_rules',
                 [],
                 [
-                    'action'      => $action,
-                    'data'        => $data,
-                    'public_view' => false,
+                    'action' => $action,
+                    'data'   => $data,
                 ]
             );
             if ($this->request->getMethod() == 'POST') {

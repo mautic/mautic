@@ -178,6 +178,7 @@ class PublicController extends CommonFormController
                         $data['lead_channels'] = $channels;
                         $data['leadId']        = $lead->getId();
                         $data['categories']    = $categories;
+                        $data['public_view']   = true;
 
                         foreach ($allChannels as $channel) {
                             foreach ($frequencyRules as $frequencyRule) {
@@ -205,10 +206,9 @@ class PublicController extends CommonFormController
                             'lead_contact_frequency_rules',
                             [],
                             [
-                                'action'      => $action,
-                                'channels'    => $channels,
-                                'data'        => $data,
-                                'public_view' => true,
+                                'action'   => $action,
+                                'channels' => $channels,
+                                'data'     => $data,
                             ]
                         );
 

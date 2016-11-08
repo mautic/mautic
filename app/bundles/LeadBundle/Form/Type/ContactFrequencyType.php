@@ -55,6 +55,8 @@ class ContactFrequencyType extends AbstractType
                         'required'   => false,
                         'data'       => $data['lead_channels'],
                 ]);
+                $lead             = $this->leadModel->getEntity($data['leadId']);
+                $preferredChannel = $this->leadModel->getPreferredChannel($lead);
                 $form->add(
                     'preferred_channel',
                     'choice',
@@ -70,6 +72,7 @@ class ContactFrequencyType extends AbstractType
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
                         ],
+                        'data' => (!empty($preferredChannel)) ? $preferredChannel['channel'] : [],
                     ]
                 );
                 foreach ($data['channels'] as $channel) {
@@ -138,7 +141,7 @@ class ContactFrequencyType extends AbstractType
                         ]
                     );
                 }
-                $lead      = $this->leadModel->getEntity($data['leadId']);
+
                 $leadLists = $this->leadModel->getLists($lead);
 
                 $lists = [];
@@ -153,7 +156,7 @@ class ContactFrequencyType extends AbstractType
                         'label'      => 'mautic.lead.form.list',
                         'label_attr' => ['class' => 'control-label'],
                         'multiple'   => true,
-                        'expanded'   => $options,
+                        'expanded'   => $data['public_view'],
                         'required'   => false,
                         'data'       => $lists,
                     ]
@@ -168,6 +171,7 @@ class ContactFrequencyType extends AbstractType
                         'label'      => 'mautic.lead.form.categories',
                         'label_attr' => ['class' => 'control-label'],
                         'multiple'   => true,
+                        'expanded'   => $data['public_view'],
                         'required'   => false,
                         'data'       => $leadCategories,
                     ]

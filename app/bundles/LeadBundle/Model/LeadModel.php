@@ -1364,7 +1364,6 @@ class LeadModel extends FormModel
                     $frequencyRule->setPauseFromDate($data['contact_pause_start_date_'.$ch]);
                     $frequencyRule->setPauseToDate($data['contact_pause_end_date_'.$ch]);
                 }
-
                 $frequencyRule->setLead($lead);
                 if ($data['preferred_channel'] == $ch) {
                     $frequencyRule->setPreferredChannel(true);
@@ -1398,7 +1397,6 @@ class LeadModel extends FormModel
         $deletedCategories = array_diff($leadCategories, $data['global_categories']);
 
         if (!empty($deletedCategories)) {
-            $this->logger->error(print_r('hello', true));
             $this->removeFromCategories($deletedCategories);
         }
 
@@ -2326,5 +2324,15 @@ class LeadModel extends FormModel
         $channels = $event->getChannels();
 
         return $channels;
+    }
+
+    public function getPreferredChannel(Lead $lead)
+    {
+        $preferredChannel = $this->getFrequencyRuleRepository()->getPreferredChannel($lead->getId());
+        if (!empty($preferredChannel)) {
+            return $preferredChannel[0];
+        }
+
+        return [];
     }
 }
