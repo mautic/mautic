@@ -16,6 +16,7 @@ use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -342,7 +343,7 @@ class LeadApiController extends CommonApiController
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
      * @param $parameters
-     * @param $entity
+     * @param Lead $entity
      * @param $action
      *
      * @return mixed|void
@@ -350,6 +351,23 @@ class LeadApiController extends CommonApiController
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
         unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
+
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+            // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
+            // is not defined in the request
+
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $fields     = $fieldModel->getFieldListWithProperties();
+
+            foreach ($fields as $alias => $field) {
+                // Set the default value if the parameter is not included in the request, there is no value for the given entity, and a default is defined
+                $currentValue = $entity->getFieldValue($alias);
+                if (!isset($parameters[$alias]) && ('' === $currentValue || null == $currentValue) && '' !== $field['defaultValue'] && null !== $field['defaultValue']) {
+                    $parameters[$alias] = $field['defaultValue'];
+                }
+            }
+        }
 
         return $parameters;
     }
@@ -363,9 +381,7 @@ class LeadApiController extends CommonApiController
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
         if ($entity instanceof Lead) {
-            $fields        = $entity->getFields();
-            $all           = $this->model->flattenFields($fields);
-            $fields['all'] = $all;
+            $fields['all'] = $entity->getProfileFields();
             $entity->setFields($fields);
         }
     }
