@@ -831,89 +831,47 @@ class LeadListRepository extends CommonRepository
 
             switch ($details['field']) {
                 case 'hit_url':
-                    $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
-
+                case 'hit_url_date':
+                case 'referer':
+                    $operand = (($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
+                    $dbfield = $details['field'];
+                    if ($details['field'] == 'hit_url') {
+                        $dbfield='url';
+                    } elseif ($details['field'] == 'hit_url_date') {
+                        $dbfield='date_hit';
+                    }
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('id')
                         ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
                     switch ($func) {
                         case 'eq':
-                        case 'neq':
                             $parameters[$parameter] = $details['filter'];
-
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->eq($alias.'.url', $exprParameter), $q->expr()
+                                ->eq($alias.'.'.$dbfield, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'like':
-                        case '!like':
                             $details['filter'] = '%'.$details['filter'].'%';
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->like($alias.'.url', $exprParameter), $q->expr()
+                                ->like($alias.'.'.$dbfield, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
-                    }
-                    // Specific lead
-                    if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
-                    }
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
-                    break;
-                case 'hit_url_date':
-                    $operand = (($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
-                    $subqb = $this->_em->getConnection()
-                        ->createQueryBuilder()
-                        ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
-                    switch ($func) {
                         case 'gt':
                             $parameters[$parameter] = $details['filter'];
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                    ->gt($alias.'.date_hit', $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
+                                ->gt($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'lt':
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                    ->lt($alias.'.date_hit', $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
-                            break;
-                    }
-                    // Specific lead
-                    if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
-                    }
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
-                    break;
-                case 'referer':
-                    $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
-                    $subqb = $this->_em->getConnection()
-                        ->createQueryBuilder()
-                        ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
-                    switch ($func) {
-                        case 'eq':
-                        case 'neq':
                             $parameters[$parameter] = $details['filter'];
-
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                    ->eq($alias.'.referer', $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
-                            break;
-                        case 'like':
-                        case '!like':
-                            $details['filter'] = '%'.$details['filter'].'%';
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                    ->like($alias.'.referer', $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
+                                ->lt($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id')));
                             break;
                     }
                     // Specific lead
