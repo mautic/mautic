@@ -788,13 +788,15 @@ var Mautic = {
                 editableAtwhoQueryAttrs: {"data-fr-verified": true},
                 data: mQuery.map(tokens, function(value, i) {
                     return {'id':i, 'name':value};
-                })
+                }),
+                acceptSpaceBar: true
             });
 
             if (froala) {
                 froala.events.on('keydown', function (e) {
                     if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB ||
-                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) &&
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER ||
+                        e.which == mQuery.FroalaEditor.KEYCODE.SPACE) &&
                         froala.$el.atwho('isSelecting')) {
                         return false;
                     }
