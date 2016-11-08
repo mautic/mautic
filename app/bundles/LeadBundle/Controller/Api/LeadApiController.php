@@ -16,6 +16,7 @@ use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -391,6 +392,15 @@ class LeadApiController extends CommonApiController
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
+        }
+
+        if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
+            foreach ($parameters['doNotContact'] as $dnc) {
+                $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
+                $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
+                $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
+                $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+            }
         }
 
         //set the custom field values
