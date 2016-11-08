@@ -644,7 +644,7 @@ class LeadListRepository extends CommonRepository
             if ($details['type'] == 'datetime' || $details['type'] == 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
-                $isTimestamp = ($columnType instanceof UTCDateTimeType || $details['type'] == 'datetime');
+                $isTimestamp = ($details['type'] == 'datetime' || $columnType instanceof UTCDateTimeType);
                 $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $not) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
@@ -828,49 +828,53 @@ class LeadListRepository extends CommonRepository
 
             // Generate a unique alias
             $alias = $this->generateRandomParameterName();
-
             switch ($details['field']) {
                 case 'hit_url':
                 case 'hit_url_date':
                 case 'referer':
+                case 'lead_email_received_date':
                     $operand = (($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
-                    $dbfield = $details['field'];
+                    $column = $details['field'];
+                    $table = 'page_hits';
                     if ($details['field'] == 'hit_url') {
-                        $dbfield='url';
+                        $column='url';
                     } elseif ($details['field'] == 'hit_url_date') {
-                        $dbfield='date_hit';
+                        $column='date_hit';
+                    } elseif ($details['field'] == 'lead_email_received_date') {
+                        $column='date_read';
+                        $table = 'email_stats';
                     }
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('id')
-                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
                     switch ($func) {
                         case 'eq':
                             $parameters[$parameter] = $details['filter'];
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->eq($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->eq($alias.'.'.$column, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'like':
                             $details['filter'] = '%'.$details['filter'].'%';
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->like($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->like($alias.'.'.$column, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'gt':
                             $parameters[$parameter] = $details['filter'];
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->gt($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->gt($alias.'.'.$column, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'lt':
                             $parameters[$parameter] = $details['filter'];
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
-                                ->lt($alias.'.'.$dbfield, $exprParameter), $q->expr()
+                                ->lt($alias.'.'.$column, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                     }
@@ -931,6 +935,7 @@ class LeadListRepository extends CommonRepository
                 case 'leadlist':
                 case 'tags':
                 case 'lead_email_received':
+                case 'lead_email_received_date':
 
                     // Special handling of lead lists and tags
                     $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';

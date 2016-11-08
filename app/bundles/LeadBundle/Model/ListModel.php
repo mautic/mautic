@@ -333,6 +333,17 @@ class ListModel extends FormModel
                 'object' => 'lead',
 
             ],
+            'lead_email_received_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => [
