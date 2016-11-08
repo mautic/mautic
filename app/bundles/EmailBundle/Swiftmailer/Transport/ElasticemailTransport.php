@@ -64,7 +64,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
         $status = rawurldecode($request->get('status'));
         $category = rawurldecode($request->get('category'));
         // https://elasticemail.com/support/delivery/http-web-notification
-        if (in_array($status, array('AbuseReport', 'Unsubscribed'))) {
+        if (in_array($status, array('AbuseReport', 'Unsubscribed' ))) {
             $rows[DoNotContact::UNSUBSCRIBED]['emails'][$email] = $status;
         } elseif (in_array($category, array('NotDelivered','NoMailbox', 'AccountProblem', 'DNSProblem', 'Unknown', 'Spam'))) {
             // just hard bounces https://elasticemail.com/support/user-interface/activity/bounced-category-filters

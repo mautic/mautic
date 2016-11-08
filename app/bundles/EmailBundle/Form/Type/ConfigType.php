@@ -216,7 +216,7 @@ class ConfigType extends AbstractType
                     'mail'                       => 'mautic.email.config.mailer_transport.mail',
                     'mautic.transport.postmark'  => 'mautic.email.config.mailer_transport.postmark',
                     'mautic.transport.sendgrid'  => 'mautic.email.config.mailer_transport.sendgrid',
-                    'mautic.transport.elasticemail'  => 'mautic.email.config.mailer_transport.elasticemail',
+                    'mautic.transport.elasticemail'  =>  'mautic.email.config.mailer_transport.elasticemail',
                     'sendmail'                   => 'mautic.email.config.mailer_transport.sendmail',
                     'mautic.transport.sparkpost' => 'mautic.email.config.mailer_transport.sparkpost',
                 ],
