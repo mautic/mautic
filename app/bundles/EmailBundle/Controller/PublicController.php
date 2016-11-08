@@ -115,77 +115,26 @@ class PublicController extends CommonFormController
         $model      = $this->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
+        $message    = '';
 
         if (!empty($stat)) {
-            $email = $stat->getEmail();
-            $lead  = $stat->getLead();
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-            if ($lead) {
-                // Set the lead as current lead
-                $leadModel->setCurrentLead($lead);
+            $email                  = $stat->getEmail();
+            $lead                   = $stat->getLead();
+            $showContactPreferences = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_preferences'));
+            if (!$showContactPreferences) {
+                $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-                $frequencyRules = $leadModel->getFrequencyRule($lead);
-                $data           = [];
-                foreach ($frequencyRules as $frequencyRule) {
-                    $data['frequency_number'] = $frequencyRule['frequency_number'];
-                    $data['frequency_time']   = $frequencyRule['frequency_time'];
-                }
-
-                $action      = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
-                $channels    = $leadModel->getContactPreferredChannels($lead);
-                $allChannels = $leadModel->getAllChannels();
-
-            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-            $listModel = $this->getModel('lead.list');
-                $lists = $listModel->getUserLists();
-
-            // Get a list of lists for the lead
-            $leadsLists = $leadModel->getLists($lead, true, true);
-
-                $form = $this->get('form.factory')->create(
-                'lead_contact_frequency_rules',
-                [],
-                [
-                    'action'   => $action,
-                    'channels' => $channels,
-                    'data'     => $data,
-                ]
-            );
-                $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-                'MauticLeadBundle:Lead:frequency.html.php',
-                [
-                    'action'       => $action,
-                    'form'         => $form->createView(),
-                    'currentRoute' => $this->generateUrl(
-                        'mautic_contact_action',
-                        [
-                            'objectAction' => 'contactFrequency',
-                            'objectId'     => $lead->getId(),
-                        ]
-                    ),
-                    'channels'     => $allChannels,
-                    'leadChannels' => $channels,
-                    'lead'         => $lead,
-                    'lists'        => $lists,
-                    'leadLists'    => $leadsLists,
-                ]
-            );
-                $formContent = $html;
-            }
-            $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
-            $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
-            if (!$message) {
-                $message = $translator->trans(
+                $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
+                if (!$message) {
+                    $message = $translator->trans(
                     'mautic.email.unsubscribed.success',
                     [
                         '%resubscribeUrl%' => '|URL|',
                         '%email%'          => '|EMAIL|',
                     ]
                 );
-            }
-            $message = str_replace(
+                }
+                $message = str_replace(
                 [
                     '|URL|',
                     '|EMAIL|',
@@ -196,10 +145,145 @@ class PublicController extends CommonFormController
                 ],
                 $message
             );
-
+            }
             if ($email !== null) {
                 $template = $email->getTemplate();
+                if ($showContactPreferences) {
+                    //preference center settings
+                    $showContactFrequency         = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_frequency'));
+                    $showContactPauseDates        = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_pause_dates'));
+                    $showContactPreferredChannels = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_preferred_channels'));
+                    $showContactCategories        = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_categories'));
+                    $showContactSegments          = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_segments'));
+                    /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                    $leadModel = $this->getModel('lead');
+                    if ($lead) {
+                        // Set the lead as current lead
+                        $leadModel->setCurrentLead($lead);
+                        $frequencyRules = $leadModel->getFrequencyRule($lead);
+                        $data           = [];
 
+                        foreach ($frequencyRules as $frequencyRule) {
+                            $data['frequency_number'] = $frequencyRule['frequency_number'];
+                            $data['frequency_time']   = $frequencyRule['frequency_time'];
+                        }
+
+                        $action      = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+                        $channels    = $leadModel->getContactChannels($lead);
+                        $allChannels = $leadModel->getAllChannels();
+                        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+                        $categoryModel         = $this->getModel('category.category');
+                        $categories            = $categoryModel->getLookupResults('global');
+                        $data['channels']      = $allChannels;
+                        $data['lead_channels'] = $channels;
+                        $data['leadId']        = $lead->getId();
+                        $data['categories']    = $categories;
+
+                        foreach ($allChannels as $channel) {
+                            foreach ($frequencyRules as $frequencyRule) {
+                                if ($channel == $frequencyRule['channel']) {
+                                    $data['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
+                                    $data['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
+                                    if ($frequencyRule['pause_from_date']) {
+                                        $data['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
+                                    }
+                                    if ($frequencyRule['pause_to_date']) {
+                                        $data['contact_pause_end_date_'.$channel] = new \DateTime($frequencyRule['pause_to_date']);
+                                    }
+                                }
+                            }
+                        }
+
+                        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+                        $listModel = $this->getModel('lead.list');
+                        $lists     = $listModel->getUserLists();
+
+                        // Get a list of lists for the lead
+                        $leadsLists = $leadModel->getLists($lead, true, true);
+
+                        $form = $this->get('form.factory')->create(
+                            'lead_contact_frequency_rules',
+                            [],
+                            [
+                                'action'      => $action,
+                                'channels'    => $channels,
+                                'data'        => $data,
+                                'public_view' => true,
+                            ]
+                        );
+
+                        if ($this->request->getMethod() == 'POST') {
+                            if (!$this->isFormCancelled($form)) {
+                                if ($valid = $this->isFormValid($form)) {
+                                    $formData = $form->getData();
+                                    foreach ($formData['doNotContactChannels'] as $contactChannel) {
+                                        if (!isset($formData['lead_channels'][$contactChannel])) {
+                                            $leadModel->removeDncForLead($lead, $contactChannel);
+                                        }
+                                    }
+                                    if (!empty($deletedChannels = array_diff_key($formData['lead_channels'], $formData['doNotContactChannels']))) {
+                                        foreach ($deletedChannels as $deletedChannel) {
+                                            $leadModel->addDncForLead($lead, $deletedChannel, 'user', 3);
+                                        }
+                                    }
+                                    $leadModel->setFrequencyRules($lead, $formData, $leadsLists);
+                                }
+                            }
+
+                            if ($valid) {
+                                $viewParameters = [
+                                    'objectId'                     => $lead->getId(),
+                                    'objectAction'                 => 'view',
+                                    'lists'                        => $lists,
+                                    'leadsLists'                   => $leadsLists,
+                                    'lead'                         => $lead,
+                                    'idHash'                       => $idHash,
+                                    'showContactFrequency'         => $showContactFrequency,
+                                    'showContactPauseDates'        => $showContactPauseDates,
+                                    'showContactPreferredChannels' => $showContactPreferredChannels,
+                                    'showContactCategories'        => $showContactCategories,
+                                    'showContactSegments'          => $showContactSegments,
+                                ];
+
+                                return $this->postActionRedirect(
+                                    [
+                                        'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', $viewParameters),
+                                        'viewParameters'  => $viewParameters,
+                                        'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                                        'passthroughVars' => [
+                                            'closeModal' => 1,
+                                        ],
+                                    ]
+                                );
+                            }
+                        }
+                        $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+                            'MauticEmailBundle:Lead:preference_options.html.php',
+                            [
+                                'action'       => $action,
+                                'form'         => $form->createView(),
+                                'currentRoute' => $this->generateUrl(
+                                    'mautic_contact_action',
+                                    [
+                                        'objectAction' => 'contactFrequency',
+                                        'objectId'     => $lead->getId(),
+                                    ]
+                                ),
+                                'channels'                     => $allChannels,
+                                'leadChannels'                 => $channels,
+                                'lead'                         => $lead,
+                                'lists'                        => $lists,
+                                'leadLists'                    => $leadsLists,
+                                'showContactFrequency'         => $showContactFrequency,
+                                'showContactPauseDates'        => $showContactPauseDates,
+                                'showContactPreferredChannels' => $showContactPreferredChannels,
+                                'showContactCategories'        => $showContactCategories,
+                                'showContactSegments'          => $showContactSegments,
+                            ]
+                        );
+                        $formContent = $html;
+                    }
+                }
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
                 $unsubscribeForm = $email->getUnsubscribeForm();
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {

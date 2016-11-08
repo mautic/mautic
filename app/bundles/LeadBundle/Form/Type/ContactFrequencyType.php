@@ -39,7 +39,7 @@ class ContactFrequencyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $formModifier = function (FormEvent $event) {
+        $formModifier = function (FormEvent $event, $options) {
             $form = $event->getForm();
             $data = $event->getData();
 
@@ -54,7 +54,6 @@ class ContactFrequencyType extends AbstractType
                         'label'      => 'mautic.lead.do.not.contact',
                         'required'   => false,
                         'data'       => $data['lead_channels'],
-                        'mapped'     => false,
                 ]);
                 $form->add(
                     'preferred_channel',
@@ -154,6 +153,7 @@ class ContactFrequencyType extends AbstractType
                         'label'      => 'mautic.lead.form.list',
                         'label_attr' => ['class' => 'control-label'],
                         'multiple'   => true,
+                        'expanded'   => $options,
                         'required'   => false,
                         'data'       => $lists,
                     ]
@@ -210,7 +210,7 @@ class ContactFrequencyType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['channels']);
+        $resolver->setOptional(['channels', 'public_view']);
     }
 
     /**

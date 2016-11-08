@@ -11,9 +11,9 @@
 $leadId   = $lead->getId();
 $leadName = $lead->getPrimaryIdentifier();
 ?>
-<div class="table-responsive">
+
     <?php echo $view['form']->start($form); ?>
-    <table class="table table-hover table-bordered" id="contact-timeline">
+    <table class="table table-hover table-bordered" width="100%" id="contact-timeline">
         <thead>
         <tr>
             <th>
@@ -93,4 +93,3 @@ $leadName = $lead->getPrimaryIdentifier();
     </table>
     <?php echo $view['form']->end($form); ?>
 
-</div>

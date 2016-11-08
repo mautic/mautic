@@ -995,8 +995,9 @@ class LeadController extends FormController
                 'lead_contact_frequency_rules',
                 [],
                 [
-                    'action' => $action,
-                    'data'   => $data,
+                    'action'      => $action,
+                    'data'        => $data,
+                    'public_view' => false,
                 ]
             );
             if ($this->request->getMethod() == 'POST') {
