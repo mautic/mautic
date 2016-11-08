@@ -22,7 +22,7 @@ $message = $view['slots']->get('message', 'mautic.core.error.generic');
 <div class="pa-20 mautibot-error">
     <div class="row mt-lg pa-md">
         <div class="mautibot-image col-xs-4 col-md-3">
-            <img class="img-responsive mautibot" src="<?php echo $src; ?>" />
+            <img class="img-responsive" src="<?php echo $src; ?>" />
         </div>
         <div class="mautibot-content col-xs-8 col-md-9">
             <blockquote class="np break-word">
