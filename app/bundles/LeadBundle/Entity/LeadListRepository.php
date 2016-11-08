@@ -935,8 +935,6 @@ class LeadListRepository extends CommonRepository
                 case 'leadlist':
                 case 'tags':
                 case 'lead_email_received':
-                case 'lead_email_received_date':
-
                     // Special handling of lead lists and tags
                     $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
 
