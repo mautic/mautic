@@ -95,6 +95,19 @@ return [
                 'path'            => '/contacts',
                 'controller'      => 'MauticLeadBundle:Api\LeadApi',
             ],
+            'mautic_api_dncaddcontact' => [
+                'path'       => '/contacts/{id}/dnc/add/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addDnc',
+                'method'     => 'POST',
+                'defaults'   => [
+                    'channel' => 'email',
+                ],
+            ],
+            'mautic_api_dncremovecontact' => [
+                'path'       => '/contacts/{id}/dnc/remove/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
+                'method'     => 'POST',
+            ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes',

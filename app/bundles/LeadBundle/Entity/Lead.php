@@ -338,6 +338,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'stage',
                     'dateIdentified',
                     'preferredProfileImage',
+                    'doNotContact',
                 ]
             )
             ->build();

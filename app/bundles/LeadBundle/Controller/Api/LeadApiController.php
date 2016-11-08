@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -290,6 +291,57 @@ class LeadApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * Adds a DNC to the contact.
+     *
+     * @param int    $id
+     * @param string $channel
+     */
+    public function addDncAction($id, $channel)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        $channelId = (int) $this->request->request->get('channelId');
+        $reason    = (int) $this->request->request->get('reason');
+        $comments  = InputHelper::clean($this->request->request->get('comments'));
+        $result    = $this->model->addDncForLead($entity, $channel, $comments, $reason);
+        $view      = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Removes a DNC from the contact.
+     *
+     * @param int $id
+     * @param int $channel
+     */
+    public function removeDncAction($id, $channel)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        $result = $this->model->removeDncForLead($entity, $channel);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
     }
 
     /**
