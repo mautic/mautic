@@ -360,15 +360,28 @@ class CommonApiController extends FOSRestController implements MauticController
         $form         = $this->createEntityForm($entity);
         $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
 
-        // Special handling of boolean fields because Symfony fails to recognize true values on PATCH but also adds
-        // support for all boolean types (on, off, true, false, 1, 0)
+        // Special handling of some fields
         foreach ($form as $name => $child) {
-            if ('yesno_button_group' == $child->getConfig()->getType()->getName() && isset($submitParams[$name])) {
-                $setter = "set".ucfirst($name);
-                $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
-                $entity->$setter($data);
+            if (isset($submitParams[$name])) {
+                switch ($child->getConfig()->getType()->getName()) {
+                    case 'yesno_button_group':
+                        // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                        $setter = 'set'.ucfirst($name);
+                        $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
+                        $entity->$setter((int) $data);
 
-                unset($form[$name]);
+                        // Manually handled so remove from form processing
+                        unset($form[$name], $submitParams[$name]);
+                        break;
+                    case 'choice':
+                        if ($child->getConfig()->getOption('multiple')) {
+                            // Ensure the value is an array
+                            if (!is_array($submitParams[$name])) {
+                                $submitParams[$name] = [$submitParams[$name]];
+                            }
+                        }
+                        break;
+                }
             }
         }
 
@@ -411,8 +424,8 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function getEntityDefaultProperties($entity)
     {
-        $class      = get_class($entity);
-        $chain      = array_reverse(class_parents($entity), true) + [$class => $class];
+        $class         = get_class($entity);
+        $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 
         $classMetdata = new ClassMetadata($class);
@@ -477,7 +490,6 @@ class CommonApiController extends FOSRestController implements MauticController
     public function getFormErrorMessages(\Symfony\Component\Form\Form $form)
     {
         $errors = [];
-
         foreach ($form->getErrors() as $key => $error) {
             if ($form->isRoot()) {
                 $errors['#'][] = $error->getMessage();
