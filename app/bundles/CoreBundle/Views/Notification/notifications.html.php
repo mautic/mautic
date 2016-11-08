@@ -33,7 +33,7 @@
                     ]); ?>
                     <?php $class = (!empty($notifications)) ? ' hide' : ''; ?>
                     <div style="width: 100px; margin: 75px auto 0 auto;" class="<?php echo $class; ?>" id="notificationMautibot">
-                        <img class="img img-responsive" src="<?php echo $view['mautibot']->getImage('wave'); ?>" />
+                        <img class="img img-responsive mautibot" src="<?php echo $view['mautibot']->getImage('wave'); ?>" />
                     </div>
                 </div>
             </div>
