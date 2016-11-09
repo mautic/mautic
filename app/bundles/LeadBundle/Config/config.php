@@ -108,6 +108,10 @@ return [
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
             ],
+            'mautic_api_getcontactevents' => [
+                'path'       => '/contacts/{id}/events',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
+            ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes',

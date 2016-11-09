@@ -295,6 +295,50 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Obtains a list of contact events.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getEventsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
+        }
+
+        $filters = InputHelper::clean($this->request->get('filters', []));
+
+        if (!isset($filters['search'])) {
+            $filters['search'] = '';
+        }
+
+        if (!isset($filters['includeEvents'])) {
+            $filters['includeEvents'] = [];
+        }
+
+        if (!isset($filters['excludeEvents'])) {
+            $filters['excludeEvents'] = [];
+        }
+
+        $order = InputHelper::clean($this->request->get('order', [
+            'timestamp',
+            'DESC',
+        ]));
+        $page        = (int) $this->request->get('page', 1);
+        $engagements = $this->model->getEngagements($entity, $filters, $order, $page);
+        $view        = $this->view($engagements);
+
+        return $this->handleView($view);
+    }
+
+    /**
      * Adds a DNC to the contact.
      *
      * @param int    $id
@@ -306,6 +350,10 @@ class LeadApiController extends CommonApiController
 
         if ($entity === null) {
             return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
         }
 
         $channelId = (int) $this->request->request->get('channelId');
@@ -333,6 +381,10 @@ class LeadApiController extends CommonApiController
 
         if ($entity === null) {
             return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
         }
 
         $result = $this->model->removeDncForLead($entity, $channel);
