@@ -91,6 +91,19 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'welcomenotification_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.welcome.enabled',
+                'data'  => (bool) $options['data']['welcomeNotification_enabled'],
+                'attr'  => [
+                    'tooltip' => 'mautic.notification.config.form.notification.welcome.tooltip',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
     }
 
     /**
