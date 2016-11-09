@@ -121,13 +121,14 @@ class StatsEvent extends Event
     public function setRepository(CommonRepository $repository)
     {
         $this->repository = $repository;
-        $this->repository->getRows(
-            $this->getStart(),
-            $this->getLimit(),
-            $this->getOrder(),
-            $this->getWhere()
+        $this->setResults(
+            $this->repository->getRows(
+                $this->getStart(),
+                $this->getLimit(),
+                $this->getOrder(),
+                $this->getWhere()
+            )
         );
-        $this->setResults($this->results);
     }
 
     /**
