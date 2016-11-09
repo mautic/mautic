@@ -750,7 +750,7 @@ class CompanyController extends FormController
 
             if ($valid) {
                 $viewParameters = [
-                    'objectId'     => $secondaryCompany->getId(),
+                    'objectId'     => $primaryCompany->getId(),
                     'objectAction' => 'edit',
                 ];
 
