@@ -25,19 +25,19 @@ if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && c
 }
 
 $fieldHtml        = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$companyFieldHtml = ($hasFields) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
+$companyFieldHtml = (isset($form['featureSettings']['companyFields']) && count($form['featureSettings']['companyFields'])) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
 $fieldLabel       = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
 $fieldTabClass    = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 unset($form['featureSettings']['companyFields']);
 ?>
 
-<?php if (!empty($description)): ?>
+<?php if (!empty($description)) : ?>
     <div class="alert alert-info">
         <?php echo $description; ?>
     </div>
 <?php endif; ?>
-<ul class="nav nav-tabs pr-md pl-md">
+<ul class="nav nav-tabs">
     <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
         <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
@@ -45,7 +45,9 @@ unset($form['featureSettings']['companyFields']);
     <?php if ($hasFields): ?>
         <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
     <?php endif; ?>
-    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#company-fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
+    <?php if (!empty($companyFieldHtml)) : ?>
+    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#company-fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.companyfieldmapping'); ?></a></li>
+    <?php endif; ?>
 </ul>
 
 <?php echo $view['form']->start($form); ?>

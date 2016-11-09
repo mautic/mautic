@@ -198,26 +198,33 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         //find out if start date is not our of range for org
+        static $organization = [];
+        static $fields       = [];
+
         if (isset($query['start'])) {
-            $queryUrl     = $this->integration->getQueryUrl();
-            $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            $queryUrl = $this->integration->getQueryUrl();
+
+            if (empty($organization)) {
+                $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            }
 
             if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
                 $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
-        if ($object == 'Account') {
+        if ($object == 'Account' and empty($fields['company'])) {
             $fields = $this->integration->getFormCompanyFields();
             $fields = $fields['company'];
         } else {
             $settings['feature_settings']['objects'][] = $object;
-            $fields                                    = $this->integration->getAvailableLeadFields($settings);
-            $fields                                    = $fields[0];
-            $fields                                    = $this->integration->ammendToSfFields($fields);
+            if (empty($fields)) {
+                $fields = $this->integration->getAvailableLeadFields($settings);
+            }
+            $fields = $fields[0];
+            $fields = $this->integration->ammendToSfFields($fields);
         }
 
         $fields['id'] = ['id' => []];
-        $result       = [];
 
         if (!empty($fields) and isset($query['start'])) {
             $fields        = implode(', ', array_keys($fields));
@@ -228,17 +235,5 @@ class SalesforceApi extends CrmApi
         }
 
         return $result;
-    }
-
-    /**
-     * Get Salesforce leads.
-     *
-     * @param string $query
-     *
-     * @return mixed
-     */
-    public function getSalesForceLeadById($id, $params, $object)
-    {
-        return $this->request($id.'/', $params, 'GET', false, $object);
     }
 }

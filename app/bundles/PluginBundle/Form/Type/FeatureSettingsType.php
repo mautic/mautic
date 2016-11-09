@@ -53,9 +53,9 @@ class FeatureSettingsType extends AbstractType
             ];
             try {
                 $fields                   = $integration_object->getFormLeadFields($settings);
-                $fields                   = $fields[0];
+                $fields                   = (isset($fields[0])) ? $fields[0] : $fields;
                 $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
-                if (isset($integrationCompanyFields['company'])) {
+                if (isset($integrationCompanyFields['company']) and !empty($integrationCompanyFields)) {
                     $integrationCompanyFields = $integrationCompanyFields['company'];
                 }
 
@@ -94,17 +94,17 @@ class FeatureSettingsType extends AbstractType
                 'special_instructions' => $specialInstructions,
                 'alert_type'           => $alertType,
             ]);
-
-            $form->add('companyFields', 'integration_company_fields', [
-                'label'          => 'mautic.integration.comapanyfield_matches',
-                'required'       => false,
-                'company_fields' => $companyFields,
-                //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
-                'integration_company_fields' => $integrationCompanyFields,
-                'special_instructions'       => $specialInstructions,
-                'alert_type'                 => $alertType,
-            ]);
-
+            if (!empty($integrationCompanyFields)) {
+                $form->add('companyFields', 'integration_company_fields', [
+                    'label'          => 'mautic.integration.comapanyfield_matches',
+                    'required'       => false,
+                    'company_fields' => $companyFields,
+                    //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
+                    'integration_company_fields' => $integrationCompanyFields,
+                    'special_instructions'       => $specialInstructions,
+                    'alert_type'                 => $alertType,
+                ]);
+            }
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
             }
