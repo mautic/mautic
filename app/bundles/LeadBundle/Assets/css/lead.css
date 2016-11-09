@@ -213,5 +213,15 @@ ul.tag-cloud li {
     color:lightgrey;
 }
 .channel-enabled{
-    color:black;
+    color:#47535f;
+}
+.frequency-table, .frequency-table td{
+    border-bottom: none!important;
+    border-top: none!important;
+}
+
+.frequency-values{
+    padding-left: 10px;
+    padding-top: 27px;
+    padding-bottom: 15px;
 }

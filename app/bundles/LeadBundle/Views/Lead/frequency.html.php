@@ -13,20 +13,20 @@ $leadName = $lead->getPrimaryIdentifier();
 ?>
 
     <?php echo $view['form']->start($form); ?>
-    <table class="table table-hover table-bordered" width="100%" id="contact-timeline">
-        <thead>
-        <tr>
+    <table class="table" width="100%" id="contact-timeline">
+        <thead >
+        <tr >
             <th>
                 <div>All</div>
                 <input type="checkbox" id="lead_contact_frequency_rules_doNotContactChannels_0" name="check_all"
                        onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,this.value);" value="all">
             </th>
             <th>
-                <h4><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></h4>
+                <?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?>
             </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody >
 
 
         <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
@@ -45,25 +45,24 @@ $leadName = $lead->getPrimaryIdentifier();
                            value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
                 </th>
                 <td class="col-md-11">
-                    <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> col-md-12">
-                        <h5><?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?></h5>
+                    <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> col-md-12 fw-sb">
+                        <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?>
                     </div>
 
-                    <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> col-md-12">
-                        <hr class="mnr-md mnl-md">
-                        <div class="col-md-6">
+                    <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> frequency-values">
+                        <div class="col-md-6 ">
                 <div class="pull-left">
                     <?php echo $view['form']->label($form['frequency_number_'.$channel->value]); ?>
                             <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
                 </div>
                             <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
-                            <span class="clearfix">
+                            <span>
                     <?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?>
                 </span>
                         </div>
                         <div class="col-md-6">
                             <div>
-                                <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
+                                <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                             </div>
                             <div class="pull-right">
                                 <?php echo $view['form']->label($form['contact_pause_start_date_'.$channel->value]); ?>
@@ -75,19 +74,24 @@ $leadName = $lead->getPrimaryIdentifier();
                             </div>
 
                         </div>
+                        <div class="clearfix"></div>
                     </div>
                 </td>
             </tr>
         <?php endforeach; ?>
+        </tbody>
+    </table>
+    <table cellspacing="10" width="100%">
+    <tbody>
         <?php unset($form['doNotContactChannels']); ?>
-        <tr>
-            <td colspan="2"><?php echo $view['form']->row($form['preferred_channel']); ?></td>
+        <tr class="frequency-table">
+            <td class="row">
+                <div class="col-md-6"><?php echo $view['form']->row($form['preferred_channel']); ?></div>
+                <div class="col-md-6"><?php echo $view['form']->row($form['global_categories']); ?></div>
+            </td>
         </tr>
-        <tr>
-            <td colspan="2"><?php echo $view['form']->row($form['lead_lists']); ?></td>
-        </tr>
-        <tr>
-            <td colspan="2"><?php echo $view['form']->row($form['global_categories']); ?></td>
+        <tr class="frequency-table">
+            <td class="row"><div class="col-md-12"><?php echo $view['form']->row($form['lead_lists']); ?></div></td>
         </tr>
         </tbody>
     </table>

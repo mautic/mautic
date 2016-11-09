@@ -13,14 +13,27 @@ $leadName      = $lead->getPrimaryIdentifier();
 $channelNumber = 0;
 ?>
 <?php echo $view['form']->start($form); ?>
-            <h4><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></h4>
+<table class="table table-bordered"  id="contact-timeline">
+    <thead>
+    <tr>
+        <th colspan="2">
+            <?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
     <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
-                <div>
+    <tr>
+        <td style="vertical-align: top" colspan="2">
+        <div>
                     <?php echo $view['form']->widget($form['doNotContactChannels'][$channelNumber]); ++$channelNumber; ?>
                 <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>" class=" col-md-12">
                     <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?>
                 </label>
                 </div>
+        </td>
+    </tr><tr>
+        <td class="col-md-11" colspan="2">
                 <div id="frequency_<?php echo $channel->value; ?>" class="col-md-12">
                     <?php if ($showContactFrequency):?>
                     <div class="col-md-6">
@@ -57,16 +70,20 @@ $channelNumber = 0;
                         unset($form['contact_pause_end_date_'.$channel->value]);
                     endif; ?>
                 </div>
-        <hr class="mnr-md mnl-md">
+        </td>
+    </tr>
     <?php endforeach; ?>
+    <tr>
 <?php if ($showContactPreferredChannels):?>
+    <td>
     <div id="preferred_channel"><?php echo $view['form']->row($form['preferred_channel']); ?></div>
+    </td>
 <?php
 else:
     unset($form['preferred_channel']);
 endif; ?>
-<?php if ($showContactSegments):?>
-     <div id="contact-segments"> <div><?php echo  $view['form']->label($form['lead_lists']); ?></div>
+<?php if ($showContactSegments && !empty($form['lead_lists']->vars['value'])):?>
+     <td><div id="contact-segments"> <div><?php echo  $view['form']->label($form['lead_lists']); ?></div>
     <?php
         $segmentNumber = count($form['lead_lists']->vars['choices']);
         for ($i = ($segmentNumber - 1); $i >= 0; --$i): ?>
@@ -81,13 +98,17 @@ endif; ?>
         <?php endfor;
         unset($form['lead_lists']);
         ?>
-<?php
+
+     </div>
+     </td>
+    <?php
 else:
     unset($form['lead_lists']);
 endif; ?>
-     </div>
-<?php if ($showContactCategories):?>
-        <div id="global-categories">
+    </tr>
+    <tr>
+<?php if ($showContactCategories && !empty($form['global_categories']->vars['value'])):?>
+        <td colspan="2"><div id="global-categories">
             <div><?php echo  $view['form']->label($form['global_categories']); ?></div>
             <?php $categoryNumber = count($form['global_categories']->vars['choices']);
             for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
@@ -102,9 +123,12 @@ endif; ?>
             <?php endfor;
             unset($form['global_categories']);
             ?></div>
+        </td>
 <?php
 else:
     unset($form['global_categories']);
 endif; ?>
+    </tr>
+    </tbody>
+</table>
 <?php echo $view['form']->end($form); ?>
-

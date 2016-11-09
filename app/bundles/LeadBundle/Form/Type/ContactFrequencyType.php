@@ -53,7 +53,7 @@ class ContactFrequencyType extends AbstractType
                         'multiple'   => true,
                         'label'      => 'mautic.lead.do.not.contact',
                         'required'   => false,
-                        'data'       => $data['lead_channels'],
+                        'data'       => (!empty($data['lead_channels'])) ? $data['lead_channels'] : [],
                 ]);
                 $lead             = $this->leadModel->getEntity($data['leadId']);
                 $preferredChannel = $this->leadModel->getPreferredChannel($lead);
@@ -72,7 +72,7 @@ class ContactFrequencyType extends AbstractType
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
                         ],
-                        'data' => (!empty($preferredChannel)) ? $preferredChannel['channel'] : [],
+                        'data' => (!empty($preferredChannel)) ? $preferredChannel['channel'] : '',
                     ]
                 );
                 foreach ($data['channels'] as $channel) {
@@ -82,7 +82,7 @@ class ContactFrequencyType extends AbstractType
                         [
                             'precision'  => 0,
                             'label'      => 'mautic.lead.list.frequency.number',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'text-muted fw-n'],
                             'required'   => true,
                             'attr'       => [
                                 'class' => 'frequency',
@@ -101,7 +101,7 @@ class ContactFrequencyType extends AbstractType
                                 'MONTH' => 'month',
                             ],
                             'label'      => 'mautic.lead.list.frequency.times',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'text-muted fw-n'],
                             'multiple'   => false,
                             'attr'       => [
                                 'class' => 'form-control',
@@ -116,7 +116,7 @@ class ContactFrequencyType extends AbstractType
                             [
                                 'widget'     => 'single_text',
                                 'label'      => 'mautic.lead.frequency.contact.start.date',
-                                'label_attr' => ['class' => 'control-label'],
+                                'label_attr' => ['class' => 'text-muted fw-n'],
                                 'attr'       => [
                                     'data-toggle' => 'date',
                                 ],
@@ -131,7 +131,7 @@ class ContactFrequencyType extends AbstractType
                         [
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'text-muted fw-n'],
                             'attr'       => [
                                 'data-toggle' => 'date',
                             ],
