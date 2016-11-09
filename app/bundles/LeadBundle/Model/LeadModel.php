@@ -2212,7 +2212,10 @@ class LeadModel extends FormModel
         }
 
         if (!$newPrimaryCompany) {
-            $lead->addUpdatedField('company', '');
+            $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
+            if (!empty($latestCompany)) {
+                $lead->addUpdatedField('company', $latestCompany['companyname']);
+            }
         }
 
         if (!empty($companyArray)) {
