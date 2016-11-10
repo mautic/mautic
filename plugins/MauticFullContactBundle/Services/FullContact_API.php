@@ -1,16 +1,21 @@
 <?php
 
-class Services_FullContact_API extends Services_FullContact_Person
+namespace MauticPlugin\MauticFullContactBundle\Services;
+
+use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_API;
+use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_Base;
+
+class FullContact_API extends FullContact_Person
 {
     public function __construct($api_key)
     {
         parent::__construct($api_key);
-        trigger_error("The FullContactAPI class has been deprecated. Please use Services_FullContact instead.", E_USER_NOTICE);
+        trigger_error("The FullContactAPI class has been deprecated. Please use FullContact instead.", E_USER_NOTICE);
     }
 
     /**
      * Instead of using this implementation, you should create a
-     *   Services_FullContact_Person class and use the lookup method you prefer.
+     *   FullContact_Person class and use the lookup method you prefer.
      *
      * @deprecated
      *
@@ -20,12 +25,12 @@ class Services_FullContact_API extends Services_FullContact_Person
      *   E.g. email -- tested with email and phone)
      * @param String (optional) - timeout
      *
-     * @return Array - All information associated with this email address
+     * @return array - All information associated with this email address
      */
     public function doLookup($search = null, $type="email", $timeout = 30)
     {
         if (is_null($search)) {
-            throw new Services_FullContact_Exception_Base("To search, you must supply a search term.");
+            throw new FullContact_Exception_Base("To search, you must supply a search term.");
         }
  
         switch($type)
@@ -40,12 +45,12 @@ class Services_FullContact_API extends Services_FullContact_Person
                 $this->lookupByTwitter($search);
                 break;
             default:
-                throw new FullContactAPIException("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]");
+                throw new FullContact_Exception_API("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]");
                 break;
         }
 
         $result = json_decode($this->response_json, true);
-        $result['is_error'] = !in_array($this->response_code, array(200, 201, 204));
+        $result['is_error'] = !in_array($this->response_code, array(200, 201, 204), true);
 
         return $result;
     }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+namespace MauticPlugin\MauticFullContactBundle\Services;
+
 /**
  * This class handles everything related to the Person lookup API.
  *
@@ -21,7 +23,7 @@
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class Services_FullContact_Person extends Services_FullContact
+class FullContact_Person extends FullContact_Base
 {
     /**
      * Supported lookup methods
@@ -29,6 +31,7 @@ class Services_FullContact_Person extends Services_FullContact
      */
     protected $_supportedMethods = ['email', 'phone', 'twitter'];
     protected $_resourceUri = '/person.json';
+//    protected $_baseUri = 'https://requestbin.fullcontact.com/17kl0v91/';
 
     public function lookupByEmail($search)
     {

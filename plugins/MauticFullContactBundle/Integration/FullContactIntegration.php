@@ -11,9 +11,12 @@
 namespace MauticPlugin\MauticFullContactBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 class FullContactIntegration extends AbstractIntegration
 {
+    
     public function getName()
     {
         return 'FullContact';
@@ -37,9 +40,78 @@ class FullContactIntegration extends AbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-
+        // Do not rename field. fullcontact.js depends on it
         return [
             'apikey' => 'mautic.integration.fullcontact.apikey',
         ];
+    }
+
+    /**
+     * @param FormBuilder|Form $builder
+     * @param array $data
+     * @param string $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea === 'keys') {
+            
+            $builder->add(
+                'test_api',
+                'button',
+                array(
+                    'label' => 'mautic.plugin.fullcontact.test_api',
+                    'attr' => array(
+                        'class' => 'btn btn-primary',
+                        'style' => 'margin-bottom: 10px',
+                        'onclick' => 'Mautic.testFullContactApi(this)',
+                    ),
+                )
+            );
+
+            $builder->add(
+                'stats',
+                'textarea',
+                array(
+                    'label_attr' => array('class' => 'control-label'),
+                    'label' => 'mautic.plugin.fullcontact.stats',
+                    'required' => false,
+                    'attr' => array(
+                        'class' => 'form-control',
+                        'rows' => '10',
+                        'readonly' => 'readonly',
+                    ),
+                )
+            );
+
+            $builder->add(
+                'auto_update',
+                'yesno_button_group',
+                [
+                    'label' => 'mautic.plugin.fullcontact.auto_update',
+                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'attr'  => [
+                        'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
+                    ],
+                ]
+            );
+
+        }
+    }
+
+    /**
+     * Allows integration to set a custom form template.
+     *
+     * @return string
+     */
+    public function getFormTemplate()
+    {
+        return 'MauticFullContactBundle:Integration:form.html.php';
+    }
+
+    public function shouldAutoUpdateContact()
+    {
+        $featureSettings = $this->getKeys();
+
+        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
     }
 }

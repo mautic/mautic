@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-function Services_FullContact_autoload($className)
-{
-    $library_name = 'Services_FullContact';
+namespace MauticPlugin\MauticFullContactBundle\Services;
 
-    if (substr($className, 0, strlen($library_name)) != $library_name) {
-        return false;
-    }
-    $file = str_replace('_', '/', $className);
-    $file = str_replace('Services/', '', $file);
-
-    return include dirname(__FILE__)."/$file.php";
-}
-
-spl_autoload_register('Services_FullContact_autoload');
+use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit;
+use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NotImplemented;
 
 /**
  * This class handles the actually HTTP request to the FullContact endpoint.
@@ -36,7 +26,7 @@ spl_autoload_register('Services_FullContact_autoload');
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class Services_FullContact
+class FullContact_Base
 {
     const REQUEST_LATENCY = 0.2;
     const USER_AGENT = 'caseysoftware/fullcontact-php-0.9.0';
@@ -49,6 +39,7 @@ class Services_FullContact
     protected $_apiKey = null;
     protected $_webhookUrl = null;
     protected $_webhookId = null;
+    protected $_webhookJson = false;
     protected $_supportedMethods = [];
 
     public $response_obj = null;
@@ -81,10 +72,10 @@ class Services_FullContact
     }
 
     /**
-     * The base constructor needs the API key available from here:
+     * The base constructor Sets the API key available from here:
      * http://fullcontact.com/getkey
      *
-     * @param type $api_key
+     * @param string $api_key
      */
     public function __construct($api_key)
     {
@@ -99,12 +90,14 @@ class Services_FullContact
      * @author  David Boskovic <me@david.gs> @dboskovic
      * @param   string $url
      * @param   string $id
+     * @param   bool $json
      * @return  object
      */
-    public function setWebhookUrl($url, $id = null)
+    public function setWebhookUrl($url, $id = null, $json = false)
     {
         $this->_webhookUrl = $url;
         $this->_webhookId = $id;
+        $this->_webhookJson = $json;
 
         return $this;
     }
@@ -116,17 +109,22 @@ class Services_FullContact
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
      * @param   array $params
+     * @param   array $postData
      * @return  object
-     * @throws \Services_FullContact_Exception_NoCredit
-     * @throws  Services_FullContact_Exception_NotImplemented
+     * @throws FullContact_Exception_NoCredit
+     * @throws FullContact_Exception_NotImplemented
      */
-    protected function _execute($params = array())
+    protected function _execute($params = [], $postData = null)
     {
-        if (!in_array($params['method'], $this->_supportedMethods, true)) {
-            throw new Services_FullContact_Exception_NotImplemented(
+        if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
+            throw new FullContact_Exception_NotImplemented(
                 __CLASS__.
                 " does not support the [".$params['method']."] method"
             );
+        }
+
+        if (array_key_exists('method', $params)) {
+            unset($params['method']);
         }
 
         $this->_wait_for_rate_limit();
@@ -141,6 +139,10 @@ class Services_FullContact
             $params['webhookId'] = $this->_webhookId;
         }
 
+        if ($this->_webhookJson) {
+            $params['webhookBody'] = 'json';
+        }
+
         $fullUrl = $this->_baseUri.$this->_version.$this->_resourceUri.
             '?'.http_build_query($params);
 
@@ -149,6 +151,12 @@ class Services_FullContact
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
+
+        if (null !== $postData) {
+            curl_setopt($connection, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($connection, CURLOPT_POSTFIELDS, json_encode($postData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            curl_setopt($connection, CURLOPT_POST, 1);
+        }
 
         //execute request
         $resp = curl_exec($connection);
@@ -172,11 +180,12 @@ class Services_FullContact
         $this->response_obj = json_decode($this->response_json);
 
         if ('403' === $this->response_code) {
-            throw new Services_FullContact_Exception_NoCredit($this->response_obj->message);
+            throw new FullContact_Exception_NoCredit($this->response_obj->message);
+        } else {
+            if ('200' === $this->response_code) {
+                $this->_update_rate_limit($headers);
+            }
         }
-
-        $this->_update_rate_limit($headers);
-
         return $this->response_obj;
     }
 }

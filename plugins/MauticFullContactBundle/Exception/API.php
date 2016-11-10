@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-class Services_FullContact_Exception_NoCredit extends Services_FullContact_Exception_Base
+namespace MauticPlugin\MauticFullContactBundle\Exception;
+
+class FullContact_Exception_API extends FullContact_Exception_Base
 {
     
 }

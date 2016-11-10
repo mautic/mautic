@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+namespace MauticPlugin\MauticFullContactBundle\Services;
+
 /**
  * This class handles everything related to the Company lookup API.
  *
@@ -21,7 +23,7 @@
  * @author   Adam Curtis <me@alc.im>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class Services_FullContact_Company extends Services_FullContact
+class FullContact_Company extends FullContact_Base
 {
     /**
      * Supported lookup methods

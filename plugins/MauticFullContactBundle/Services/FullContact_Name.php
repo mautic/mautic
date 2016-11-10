@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+namespace MauticPlugin\MauticFullContactBundle\Services;
+
 /**
  * This class handles everything related to names that aren't person-based info lookup
  *
@@ -21,7 +23,7 @@
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class Services_FullContact_Name extends Services_FullContact
+class FullContact_Name extends FullContact_Base
 {
     /**
      * Supported lookup methods

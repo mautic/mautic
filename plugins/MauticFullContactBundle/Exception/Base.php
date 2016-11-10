@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-class Services_FullContact_Exception_Base extends Exception
+namespace MauticPlugin\MauticFullContactBundle\Exception;
+
+use Exception;
+
+class FullContact_Exception_Base extends Exception
 {
 
 }

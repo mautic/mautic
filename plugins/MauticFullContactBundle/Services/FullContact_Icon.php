@@ -14,7 +14,24 @@
  * limitations under the License.
  */
 
-class Services_FullContact_Exception_NotImplemented extends Services_FullContact_Exception_Base
+namespace MauticPlugin\MauticFullContactBundle\Services;
+
+/**
+ * This class just tells us what icons we have available
+ *
+ * @package  Services\FullContact
+ * @author   Keith Casey <contrib@caseysoftware.com>
+ * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
+ */
+class FullContact_Icon extends FullContact_Base
 {
-    
+    protected $_supportedMethods = array('available');
+    protected $_resourceUri = '/icon/';
+
+    public function available()
+    {
+        $this->_execute(array('method' => 'available'));
+
+        return $this->response_obj;
+    }
 }
