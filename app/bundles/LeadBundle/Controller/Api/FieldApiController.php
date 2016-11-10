@@ -34,6 +34,14 @@ class FieldApiController extends CommonApiController
         if ($this->fieldObject === 'contact') {
             $this->fieldObject = 'lead';
         }
+
+        $repo                = $this->model->getRepository();
+        $tableAlias          = $repo->getTableAlias();
+        $this->listFilters[] = [
+            'column' => $tableAlias.'.object',
+            'expr'   => 'eq',
+            'value'  => $this->fieldObject,
+        ];
     }
 
     /**
