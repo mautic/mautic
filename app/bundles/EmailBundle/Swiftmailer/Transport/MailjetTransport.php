@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MailjetlTransport.
  */
-class MailjetTransport extends AbstractTokenSmtpTransport implements InterfaceCallbackTransport
+class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
     /**
      * {@inheritdoc}
@@ -29,47 +29,16 @@ class MailjetTransport extends AbstractTokenSmtpTransport implements InterfaceCa
         $this->setAuthMode('login');
     }
 
-    /**
-     * Return the max number of to addresses allowed per batch.
-     * If there is no limit, return 0.
-     *
-     * @return int
-     */
-    public function getMaxBatchLimit()
-    {
-        // not use with mailjet
-        return 0;
-    }
-
-    /**
-     * Get the count for the max number of recipients per batch.
-     *
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     *                                  Number of emails about to be added
-     * @param string         $type
-     *                                  Type of emails being added (to, cc, bcc)
-     *
-     * @return mixed
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
-    {
-        // not use with mailjet
-        return 0;
-    }
-
-    /**
-     * Do whatever is necessary to $this->message in order to deliver a batched payload.
-     * i.e. add custom headers, etc.
-     */
-    protected function prepareMessage()
+    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
 
         // add leadIdHash to track this email
-        if (isset($this->message->leadIdHash)) {
+        if (isset($message->leadIdHash)) {
             // contact leadidHeash and email to be sure not applying email stat to bcc
-            $this->message->getHeaders()->addTextHeader('X-MJ-CUSTOMID', $this->message->leadIdHash.'-'.key($this->message->getTo()));
+            $message->getHeaders()->addTextHeader('X-MJ-CUSTOMID', $message->leadIdHash.'-'.key($message->getTo()));
         }
+
+        parent::send($message, $failedRecipients);
     }
 
     /**
@@ -93,13 +62,13 @@ class MailjetTransport extends AbstractTokenSmtpTransport implements InterfaceCa
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
         $postData = json_decode($request->getContent(), true);
-//         $this->factory->getLogger()->log('error',serialize($postData)); //used to debug mailjet webhook
+        $this->factory->getLogger()->debug('error', serialize($postData)); //used to debug mailjet webhook
         $rows = [
-            'bounced' => [
+            DoNotContact::BOUNCED => [
                 'hashIds' => [],
                 'emails'  => [],
             ],
-            'unsubscribed' => [
+            DoNotContact::UNSUBSCRIBED => [
                 'hashIds' => [],
                 'emails'  => [],
             ],
