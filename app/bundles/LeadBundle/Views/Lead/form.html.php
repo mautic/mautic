@@ -208,9 +208,13 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                     <div class="row">
                                         <?php foreach ($groupFields as $alias => $field): ?>
                                             <?php
-                                            if ($alias == 'company' || !isset($form[$alias]) || $form[$alias]->isRendered()) {
+                                            if ($isCompany = ('company' === $alias) || !isset($form[$alias]) || $form[$alias]->isRendered()):
+                                                // Company rendered so that it doesn't show up at the bottom of the form
+                                                if ($isCompany):
+                                                    $form[$alias]->setRendered();
+                                                endif;
                                                 continue;
-                                            }
+                                            endif;
                                             ?>
                                             <div class="col-sm-8">
                                                 <?php echo $view['form']->row($form[$alias]); ?>
