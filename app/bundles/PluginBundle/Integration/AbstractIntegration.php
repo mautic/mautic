@@ -1295,9 +1295,8 @@ abstract class AbstractIntegration
             }
         }
 
-        $leadFields      = $config['leadFields'];
-        $availableFields = $this->getAvailableLeadFields($config);
-        $matched         = [];
+        $leadFields = $config['leadFields'];
+        $matched    = [];
 
         foreach ($gleanedData as $key => $field) {
             if (isset($leadFields[$key]) && isset($gleanedData[$key])) {
@@ -1330,7 +1329,6 @@ abstract class AbstractIntegration
 
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
-
         if (empty($matchedFields)) {
             return;
         }
