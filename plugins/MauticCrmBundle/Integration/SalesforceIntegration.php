@@ -579,8 +579,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $salesForceLeadData[$sfId]['id']      = $ids['integration_entity_id'];
                                 $salesForceLeadData[$sfId]['leadId']  = $ids['internal_entity_id'];
                                 $salesForceLeadData[$sfId]['leadUrl'] = $this->factory->getRouter()->generate(
-                                    'mautic_contact_action',
-                                    ['objectAction' => 'view', 'objectId' => $leadId],
+                                    'mautic_plugin_timeline_view',
+                                    ['integration' => 'Salesforce', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 );
                             }
