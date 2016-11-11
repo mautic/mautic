@@ -11,14 +11,30 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
-
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ButtonSubscriber extends CommonSubscriber
 {
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * LeadSubscriber constructor.
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container) {
+        parent::__construct();
+        $this->container = $container;
+    }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -31,6 +47,15 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
+        // get api_key from plugin settings
+        $integrationHelper = $this->container->get('mautic.helper.integration');
+        /** @var FullContactIntegration $myIntegration */
+        $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
+
+        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
+            return;
+        }
+
         if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
 
             $event->appendButton(

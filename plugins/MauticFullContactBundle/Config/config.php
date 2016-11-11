@@ -36,6 +36,9 @@ return [
         'events' => [
             'mautic.plugin.fullcontact.button.subscriber' => [
                 'class' => 'MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber',
+                'arguments' => [
+                    'service_container'
+                ],
             ],
             'mautic.plugin.fullcontact.lead.subscriber' => [
                 'class' => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',

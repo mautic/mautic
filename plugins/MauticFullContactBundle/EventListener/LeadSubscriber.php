@@ -48,13 +48,18 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     public function leadPostSave(LeadEvent $event) {
+        $integrationHelper = $this->container->get('mautic.helper.integration');
+        /** @var FullContactIntegration $myIntegration */
+        $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
+
+        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
+            return;
+        }
+
         $lead = $event->getLead();
         $logger = $this->container->get('monolog.logger.mautic');
 
         // get api_key from plugin settings
-        $integrationHelper = $this->container->get('mautic.helper.integration');
-        /** @var FullContactIntegration $myIntegration */
-        $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
         $keys = $myIntegration->getDecryptedApiKeys();
 
         if ($myIntegration->shouldAutoUpdate()) {
@@ -83,13 +88,18 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     public function companyPostSave(CompanyEvent $event) {
+        $integrationHelper = $this->container->get('mautic.helper.integration');
+        /** @var FullContactIntegration $myIntegration */
+        $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
+
+        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
+            return;
+        }
+
         $company = $event->getCompany();
         $logger = $this->container->get('monolog.logger.mautic');
 
         // get api_key from plugin settings
-        $integrationHelper = $this->container->get('mautic.helper.integration');
-        /** @var FullContactIntegration $myIntegration */
-        $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
         $keys = $myIntegration->getDecryptedApiKeys();
 
         if ($myIntegration->shouldAutoUpdate()) {
