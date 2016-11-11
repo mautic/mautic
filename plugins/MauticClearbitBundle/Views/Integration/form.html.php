@@ -30,8 +30,6 @@ $fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['la
 $fieldTabClass = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 
-echo $view['assets']->includeScript('plugins/MauticClearbitBundle/Assets/js/clearbit.js');
-
 ?>
 
 <?php if (!empty($description)): ?>

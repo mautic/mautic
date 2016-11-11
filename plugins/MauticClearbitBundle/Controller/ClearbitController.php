@@ -13,8 +13,10 @@ namespace MauticPlugin\MauticClearbitBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
+use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ClearbitController extends FormController
 {
@@ -89,6 +91,7 @@ class ClearbitController extends FormController
             if ('POST' === $this->request->getMethod()) {
                 // get api_key from plugin settings
                 $integrationHelper = $this->get('mautic.helper.integration');
+                /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $clearbit = new Clearbit_Person($keys['apikey']);
@@ -97,15 +100,8 @@ class ClearbitController extends FormController
                     $webhookId = 'clearbit#'.$objectId;
 
                     if (false === apc_fetch($webhookId.$lead->getEmail())) {
-                        $clearbit->setWebhookUrl(
-                            $this->generateUrl(
-                                'mautic_plugin_clearbit_index',
-                                [],
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            ),
-                            $webhookId
-                        );
-                        $res = $clearbit->lookupByEmailMD5(md5($lead->getEmail()));
+                        $clearbit->setWebhookId($webhookId);
+                        $res = $clearbit->lookupByEmail($lead->getEmail());
                         apc_add($webhookId.$lead->getEmail(), $res);
                     }
                     $this->addFlash(
@@ -254,34 +250,16 @@ class ClearbitController extends FormController
             if ('POST' === $this->request->getMethod()) {
                 // get api_key from plugin settings
                 $integrationHelper = $this->get('mautic.helper.integration');
+                /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $clearbit = new Clearbit_Person($keys['apikey']);
                 try {
-                    // TODO: batch is not working on clearbit
-//                    $result = $clearbit->sendRequests(
-//                        array_map(
-//                            function ($e) {
-//                                return 'https://api.clearbit.com/v2/person.json?emailMD5='.md5(
-//                                    $e
-//                                ).'&webhookUrl='.urlencode('https://requestbin.clearbit.com/17kl0v91');
-//                            },
-//                            $lookupEmails
-//                        )
-//                    );
-
                     foreach ($lookupEmails as $id => $lookupEmail) {
                         $webhookId = 'clearbit#'.$id;
                         if (false === apc_fetch($webhookId.$lookupEmail)) {
-                            $clearbit->setWebhookUrl(
-                                $this->generateUrl(
-                                    'mautic_plugin_clearbit_index',
-                                    [],
-                                    UrlGeneratorInterface::ABSOLUTE_URL
-                                ),
-                                $webhookId
-                            );
-                            $res = $clearbit->lookupByEmailMD5(md5($lookupEmail));
+                            $clearbit->setWebhookId($webhookId);
+                            $res = $clearbit->lookupByEmail($lookupEmail);
                             apc_add($webhookId.$lookupEmail, $res);
                         }
                     }
@@ -383,6 +361,7 @@ class ClearbitController extends FormController
             if ('POST' === $this->request->getMethod()) {
                 // get api_key from plugin settings
                 $integrationHelper = $this->get('mautic.helper.integration');
+                /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $clearbit = new Clearbit_Company($keys['apikey']);
@@ -392,15 +371,8 @@ class ClearbitController extends FormController
                     $website = $company->getFieldValue('companywebsite', 'core');
                     $parse = parse_url($website);
                     if (false === apc_fetch($webhookId.$parse['host'])) {
-                        $webhookUrl = $this->generateUrl(
-                            'mautic_plugin_clearbit_compindex',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        );
-                        $clearbit->setWebhookUrl(
-                            $webhookUrl,
-                            $webhookId
-                        );
+
+                        $clearbit->setWebhookId($webhookId);
 
                         $res = $clearbit->lookupByDomain($parse['host']);
                         apc_add($webhookId.$parse['host'], $res);
@@ -548,33 +520,15 @@ class ClearbitController extends FormController
             if ('POST' === $this->request->getMethod()) {
                 // get api_key from plugin settings
                 $integrationHelper = $this->get('mautic.helper.integration');
+                /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $clearbit = new Clearbit_Company($keys['apikey']);
                 try {
-                    // TODO: batch is not working on clearbit
-//                    $result = $clearbit->sendRequests(
-//                        array_map(
-//                            function ($e) {
-//                                return 'https://api.clearbit.com/v2/person.json?emailMD5='.md5(
-//                                    $e
-//                                ).'&webhookUrl='.urlencode('https://requestbin.clearbit.com/17kl0v91');
-//                            },
-//                            $lookupEmails
-//                        )
-//                    );
-
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
                         $webhookId = 'clearbitcomp#'.$id;
                         if (false === apc_fetch($webhookId.$lookupWebsite)) {
-                            $clearbit->setWebhookUrl(
-                                $this->generateUrl(
-                                    'mautic_plugin_clearbit_compindex',
-                                    [],
-                                    UrlGeneratorInterface::ABSOLUTE_URL
-                                ),
-                                $webhookId
-                            );
+                            $clearbit->setWebhookId($webhookId);
                             $res = $clearbit->lookupByDomain($lookupWebsite);
                             apc_add($webhookId.$lookupWebsite, $res);
                         }

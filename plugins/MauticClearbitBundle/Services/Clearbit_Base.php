@@ -1,44 +1,33 @@
 <?php
 
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/*
+ * @copyright   2016 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * @link        https://mautic.org
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticClearbitBundle\Services;
 
-
 /**
  * This class handles the actually HTTP request to the Clearbit endpoint.
  *
- * @package  Services\Clearbit
- * @author   Keith Casey <contrib@caseysoftware.com>
- * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
 class Clearbit_Base
 {
     const REQUEST_LATENCY = 0.2;
-    const USER_AGENT = 'caseysoftware/clearbit-php-0.9.0';
+    const USER_AGENT = 'mautic/clearbit-php-0.1.0';
 
     private $_next_req_time = null;
 
-    protected $_baseUri = 'https://api.clearbit.com/';
+    protected $_baseUri = '';
+    protected $_resourceUri = '';
     protected $_version = 'v2';
 
     protected $_apiKey = null;
-    protected $_webhookUrl = null;
     protected $_webhookId = null;
-    protected $_webhookJson = false;
-    protected $_supportedMethods = [];
 
     public $response_obj = null;
     public $response_code = null;
@@ -62,8 +51,8 @@ class Clearbit_Base
      */
     private function _update_rate_limit($hdr)
     {
-        $remaining = (float)$hdr['X-Rate-Limit-Remaining'];
-        $reset = (float)$hdr['X-Rate-Limit-Reset'];
+        $remaining = (float)$hdr['X-RateLimit-Remaining'];
+        $reset = (float)$hdr['X-RateLimit-Reset'];
         $spacing = $reset / (1.0 + $remaining);
         $delay = $spacing - self::REQUEST_LATENCY;
         $this->_next_req_time = new \DateTime('now + ' . $delay . ' seconds');
@@ -71,7 +60,7 @@ class Clearbit_Base
 
     /**
      * The base constructor Sets the API key available from here:
-     * http://clearbit.com/getkey
+     * https://dashboard.clearbit.com/keys
      *
      * @param string $api_key
      */
@@ -82,63 +71,25 @@ class Clearbit_Base
     }
 
     /**
-     * This sets the webhook url for all requests made for this service
-     * instance. To unset, just use setWebhookUrl(null).
-     *
-     * @author  David Boskovic <me@david.gs> @dboskovic
-     * @param   string $url
      * @param   string $id
-     * @param   bool $json
      * @return  object
      */
-    public function setWebhookUrl($url, $id = null, $json = false)
+    public function setWebhookId($id = null)
     {
-        $this->_webhookUrl = $url;
         $this->_webhookId = $id;
-        $this->_webhookJson = $json;
-
         return $this;
     }
 
     /**
-     * This is a pretty close copy of my work on the Contactually PHP library
-     *   available here: http://github.com/caseysoftware/contactually-php
-     *
-     * @author  Keith Casey <contrib@caseysoftware.com>
-     * @author  David Boskovic <me@david.gs> @dboskovic
      * @param   array $params
-     * @param   array $postData
      * @return  object
-     * @throws Clearbit_Exception_NoCredit
-     * @throws Clearbit_Exception_NotImplemented
      */
-    protected function _execute($params = [], $postData = null)
+    protected function _execute($params = [])
     {
-        if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
-            throw new Clearbit_Exception_NotImplemented(
-                __CLASS__.
-                " does not support the [".$params['method']."] method"
-            );
-        }
-
-        if (array_key_exists('method', $params)) {
-            unset($params['method']);
-        }
-
         $this->_wait_for_rate_limit();
 
-        $params['apiKey'] = $this->_apiKey;
-
-        if ($this->_webhookUrl) {
-            $params['webhookUrl'] = $this->_webhookUrl;
-        }
-
         if ($this->_webhookId) {
-            $params['webhookId'] = $this->_webhookId;
-        }
-
-        if ($this->_webhookJson) {
-            $params['webhookBody'] = 'json';
+            $params['webhook_id'] = $this->_webhookId;
         }
 
         $fullUrl = $this->_baseUri.$this->_version.$this->_resourceUri.
@@ -149,12 +100,7 @@ class Clearbit_Base
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
-
-        if (null !== $postData) {
-            curl_setopt($connection, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            curl_setopt($connection, CURLOPT_POSTFIELDS, json_encode($postData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            curl_setopt($connection, CURLOPT_POST, 1);
-        }
+        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $this->_apiKey]);
 
         //execute request
         $resp = curl_exec($connection);
@@ -177,8 +123,8 @@ class Clearbit_Base
         $this->response_code = curl_getinfo($connection, CURLINFO_HTTP_CODE);
         $this->response_obj = json_decode($this->response_json);
 
-        if ('403' === $this->response_code) {
-            throw new Clearbit_Exception_NoCredit($this->response_obj->message);
+        if (!in_array($this->response_code, [200, 201, 202], true)) {
+            throw new \Exception($this->response_obj->error->message);
         } else {
             if ('200' === $this->response_code) {
                 $this->_update_rate_limit($headers);

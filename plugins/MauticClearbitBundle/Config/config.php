@@ -19,10 +19,6 @@ return [
                 'path' => '/clearbit/callback',
                 'controller' => 'MauticClearbitBundle:Public:callback',
             ],
-            'mautic_plugin_clearbit_compindex'=>[
-                'path' => '/clearbit/compcallback',
-                'controller' => 'MauticClearbitBundle:Public:compcallback',
-            ],
         ],
         'main' => [
             'mautic_plugin_clearbit_action' => [

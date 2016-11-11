@@ -21,178 +21,128 @@ class PublicController extends FormController
     /**
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function callbackAction()
     {
-        if (!$this->request->request->has('result') || !$this->request->request->has('webhookId')) {
+        if (!$this->request->request->has('body') || !$this->request->request->has('id') ||
+            !$this->request->request->has('type') || !$this->request->request->has('status') ||
+            200 !== $this->request->request->get('status')
+        ) {
             return new Response('ERROR');
         }
 
-        $data = $this->request->request->get('result', [], true);
-        $id = $this->request->request->get('webhookId', [], true);
-        $id = substr($id, strlen('clearbit#'));
-        $result = json_decode($data, true);
+        /** @var array $result */
+        $result = $this->request->request->get('body', [], true);
+        $id = $this->request->request->get('id', [], true);
 
-        $org = null;
-        if (array_key_exists('organizations', $result)) {
-            foreach ($result['organizations'] as $organization) {
-                if ($organization['isPrimary']) {
-                    $org = $organization;
-                    break;
+        $logger = $this->get('monolog.logger.mautic');
+
+        try {
+
+            if ('person' === $this->request->request->get('type', [], true)) {
+                $id = substr($id, strlen('clearbit#'));
+
+                $loc = [];
+                if (array_key_exists('geo', $result)) {
+                    $loc = $result['geo'];
                 }
-            }
 
-            if (null === $org && 0 !== count($result['organizations'])) {
-                // primary not found, use the first one if exists
-                $org = $result['organizations'][0];
-            }
-        }
-
-        $loc = null;
-        if (array_key_exists('demographics', $result) && array_key_exists('locationDeduced', $result['demographics'])) {
-            $loc = $result['demographics']['locationDeduced'];
-        }
-
-        $social = [];
-        $socialProfiles = [];
-        if (array_key_exists('socialProfiles', $result)) {
-            $socialProfiles = $result['socialProfiles'];
-        }
-        foreach (['facebook', 'foursquare', 'googleplus', 'instagram', 'linkedin', 'twitter'] as $p) {
-            foreach ($socialProfiles as $socialProfile) {
-                if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p) {
-                    $social[$p] = (array_key_exists('url', $socialProfile)) ? $socialProfile['url'] : '';
-                    break;
-                }
-            }
-        }
-
-        $data = [];
-
-        if (array_key_exists('contactInfo', $result)) {
-            $data = [
-                'lastname' => array_key_exists(
-                    'familyName',
-                    $result['contactInfo']
-                ) ? $result['contactInfo']['familyName'] : '',
-                'firstname' => array_key_exists(
-                    'givenName',
-                    $result['contactInfo']
-                ) ? $result['contactInfo']['givenName'] : '',
-                'website' => (array_key_exists('websites', $result['contactInfo']) && count(
-                        $result['contactInfo']['websites']
-                    )) ? $result['contactInfo']['websites'][0]['url'] : '',
-                'skype' => (array_key_exists('chats', $result['contactInfo']) && array_key_exists(
-                        'skype',
-                        $result['contactInfo']['chats']
-                    )) ? $result['contactInfo']['chats']['skype']['handle'] : '',
-            ];
-        }
-        $data = array_merge(
-            $data,
-            [
-                'company' => (null !== $org) ? $org['name'] : '',
-                'position' => (null !== $org) ? $org['title'] : '',
-                'city' => (null !== $loc && array_key_exists('city', $loc) && array_key_exists(
-                        'name',
-                        $loc['city']
-                    )) ? $loc['city']['name'] : '',
-                'state' => (null !== $loc && array_key_exists('state', $loc) && array_key_exists(
-                        'name',
-                        $loc['state']
-                    )) ? $loc['state']['name'] : '',
-                'country' => (null !== $loc && array_key_exists('country', $loc) && array_key_exists(
-                        'name',
-                        $loc['country']
-                    )) ? $loc['country']['name'] : '',
-            ]
-        );
-
-        $data = array_merge($data, $social);
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->getModel('lead');
-        /** @var Lead $lead */
-        $lead = $model->getEntity($id);
-        $model->setFieldValues($lead, $data);
-        $model->saveEntity($lead);
-
-        return new Response('OK');
-    }
-
-    /**
-     *
-     * @return Response
-     */
-    public function compcallbackAction()
-    {
-        if (!$this->request->request->has('result') || !$this->request->request->has('webhookId')) {
-            return new Response('ERROR');
-        }
-
-        $result = $this->request->request->get('result', [], true);
-        $id = $this->request->request->get('webhookId', [], true);
-        $id = substr($id, strlen('clearbitcomp#'));
-
-        $org = [];
-        $loc = [];
-        $phone = [];
-        $fax = [];
-        $email = [];
-        if (array_key_exists('organization', $result)) {
-            $org = $result['organization'];
-            if (array_key_exists('contactInfo', $result['organization'])) {
-                if (array_key_exists('addresses', $result['organization']['contactInfo']) && count(
-                        $result['organization']['contactInfo']['addresses']
-                    )
-                ) {
-                    $loc = $result['organization']['contactInfo']['addresses'][0];
-                }
-                if (array_key_exists('emailAddresses', $result['organization']['contactInfo']) && count(
-                        $result['organization']['contactInfo']['emailAddresses']
-                    )
-                ) {
-                    $email = $result['organization']['contactInfo']['emailAddresses'][0];
-                }
-                if (array_key_exists('phoneNumbers', $result['organization']['contactInfo']) && count(
-                        $result['organization']['contactInfo']['phoneNumbers']
-                    )
-                ) {
-                    $phone = $result['organization']['contactInfo']['phoneNumbers'][0];
-                    foreach ($result['organization']['contactInfo']['phoneNumbers'] as $phoneNumber) {
-                        if (array_key_exists('label', $phoneNumber) && 0 >= strpos(
-                                strtolower($phoneNumber['label']),
-                                'fax'
-                            )
-                        ) {
-                            $fax = $phoneNumber;
+                $social = [];
+                foreach ([
+                             'facebook' => 'http://www.facebook.com/',
+                             'googleplus' => 'http://plus.google.com/',
+                             'linkedin' => 'http://www.linkedin.com/',
+                             'twitter' => 'http://www.twitter.com/',
+                         ] as $p => $u) {
+                    foreach ($result as $type => $socialProfile) {
+                        if ($type === $p) {
+                            $social[$p] = (array_key_exists('handle', $socialProfile) && $socialProfile['handle']) ? $u.$socialProfile['handle'] : '';
+                            break;
                         }
                     }
                 }
+
+                $data = array_merge(
+                    $social,
+                    [
+                        'lastname' => (array_key_exists('name', $result) && array_key_exists(
+                            'familyName',
+                            $result['name']
+                        )) ? $result['name']['familyName'] : '',
+                        'firstname' => (array_key_exists('name', $result) && array_key_exists(
+                            'givenName',
+                            $result['name']
+                        )) ? $result['name']['givenName'] : '',
+                        'website' => array_key_exists('site', $result) ? $result['site'] : '',
+                        'company' => (array_key_exists('employment', $result) && array_key_exists(
+                                'name',
+                                $result['employment']
+                            )) ? $result['employment']['name'] : '',
+                        'position' => (array_key_exists('employment', $result) && array_key_exists(
+                                'title',
+                                $result['employment']
+                            )) ? $result['employment']['title'] : '',
+                        'city' => array_key_exists('city', $loc) ? $loc['city'] : '',
+                        'state' => array_key_exists('state', $loc)? $loc['state'] : '',
+                        'country' => array_key_exists('country', $loc) ? $loc['country'] : '',
+                    ]
+                );
+
+                /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+                $model = $this->getModel('lead');
+                /** @var Lead $lead */
+                $lead = $model->getEntity($id);
+                $model->setFieldValues($lead, $data);
+                $model->saveEntity($lead);
+
+            } else {
+
+                /******************  COMPANY STUFF  *********************/
+
+                if ('company' === $this->request->request->get('type', [], true)) {
+                    $id = substr($id, strlen('clearbitcomp#'));
+                    $loc = [];
+                    if (array_key_exists('geo', $result)) {
+                        $loc = $result['geo'];
+                    }
+
+                    $data = [
+                        'companyaddress1' => (array_key_exists('streetNumber', $loc) && array_key_exists(
+                                'streetName',
+                                $loc
+                            )) ? $loc['streetNumber'].' '.$loc['streetName'] : '',
+                        'companycity' => array_key_exists('city', $loc) ? $loc['city'] : '',
+                        'companystate' => array_key_exists('state', $loc) ? $loc['state'] : '',
+                        'companyzipcode' => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
+                        'companycountry' => array_key_exists('country', $loc) ? $loc['country'] : '',
+                        'companyemail' => (array_key_exists('site', $result) && array_key_exists(
+                                'emailAddresses',
+                                $result['site']
+                            ) && count($result['site']['emailAddresses'])) ? $result['site']['emailAddresses'][0] : '',
+                        'companyphone' => array_key_exists('phone', $result) ? $result['phone'] : '',
+                        'companydescription' => array_key_exists('description', $result) ? $result['description'] : '',
+                        'companynumber_of_employees' =>
+                            (array_key_exists('metrics', $result) && array_key_exists(
+                                    'employees',
+                                    $result['metrics']
+                                )) ? $result['metrics']['employees'] : '',
+                    ];
+
+                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+                    $model = $this->getModel('lead.company');
+                    /** @var Company $company */
+                    $company = $model->getEntity($id);
+                    $model->setFieldValues($company, $data);
+                    $model->saveEntity($company);
+                }
             }
+
+        } catch (\Exception $ex) {
+            $logger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
         }
-
-        $data = [
-            'companyaddress1' => array_key_exists('addressLine1', $loc) ? $loc['addressLine1'] : '',
-            'companyaddress2' => array_key_exists('addressLine2', $loc) ? $loc['addressLine2'] : '',
-            'companyemail' => array_key_exists('value', $email) ? $email['value'] : '',
-            'companyphone' => array_key_exists('number', $phone) ? $phone['number'] : '',
-            'companycity' => array_key_exists('locality', $loc) ? $loc['locality'] : '',
-            'companyzipcode' => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
-            'companystate' => array_key_exists('region', $loc) ? $loc['region']['name'] : '',
-            'companycountry' => array_key_exists('country', $loc) ? $loc['country']['name'] : '',
-            'companydescription' => array_key_exists('name', $org) ? $org['name'] : '',
-            'companynumber_of_employees' => array_key_exists('approxEmployees', $org) ? $org['approxEmployees'] : '',
-            'companyfax' => array_key_exists('number', $fax) ? $fax['number'] : '',
-        ];
-
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $model = $this->getModel('lead.company');
-        /** @var Company $company */
-        $company = $model->getEntity($id);
-        $model->setFieldValues($company, $data);
-        $model->saveEntity($company);
 
         return new Response('OK');
     }
+
 }

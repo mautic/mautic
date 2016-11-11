@@ -10,15 +10,15 @@
 
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
-
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
+use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class LeadSubscriber extends CommonSubscriber
 {
@@ -67,16 +67,8 @@ class LeadSubscriber extends CommonSubscriber
                 $webhookId = 'clearbit#'.$lead->getId();
                 if (FALSE === apc_fetch($webhookId.$lead->getEmail())) {
                     /** @var Router $router */
-                    $router = $this->container->get('router');
-                    $clearbit->setWebhookUrl(
-                        $router->generate(
-                            'mautic_plugin_clearbit_index',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
-                    $res = $clearbit->lookupByEmailMD5(md5($lead->getEmail()));
+                    $clearbit->setWebhookId($webhookId);
+                    $res = $clearbit->lookupByEmail($lead->getEmail());
                     apc_add($webhookId.$lead->getEmail(), $res);
                 }
             } catch (\Exception $ex) {
@@ -108,15 +100,7 @@ class LeadSubscriber extends CommonSubscriber
                 $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
                 if (FALSE === apc_fetch($webhookId.$parse['host'])) {
                     /** @var Router $router */
-                    $router = $this->container->get('router');
-                    $clearbit->setWebhookUrl(
-                        $router->generate(
-                            'mautic_plugin_clearbit_compindex',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
+                    $clearbit->setWebhookId($webhookId);
                     $res = $clearbit->lookupByDomain($parse['host']);
                     apc_add($webhookId.$parse['host'], $res);
                 }
