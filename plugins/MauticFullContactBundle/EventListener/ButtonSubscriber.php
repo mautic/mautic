@@ -31,56 +31,109 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        if (0 !== strpos($event->getRoute(), 'mautic_contact_')) {
-            return;
-        }
-        $event->appendButton(
-            [
-                'attr'      => [
-                    'class'       => 'btn btn-default btn-sm btn-nospin',
-                    'data-toggle' => 'ajaxmodal',
-                    'data-target' => '#MauticSharedModal',
-                   // 'href'        => $this->router->generate('mautic_plugin_fullcontact_action', ['objectAction' => 'batchLookupPerson']),
-                    'onclick' => 'this.href=\'' .
-                        $this->router->generate('mautic_plugin_fullcontact_action', ['objectAction' => 'batchLookupPerson']).
-                         '?\' + mQuery.param({\'lead_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
-                    'data-header' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
-                ],
-                'tooltip'   => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
-                'iconClass' => 'fa fa-search',
-            ],
-            ButtonHelper::LOCATION_TOOLBAR_ACTIONS
-        );
+        if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
 
-        if ($event->getItem()) {
-            $lookupContactButton = [
-                'attr'      => [
-                    'data-toggle' => 'ajaxmodal',
-                    'data-target' => '#MauticSharedModal',
-                    'data-header' => $this->translator->trans(
-                        'mautic.plugin.fullcontact.lookup.header',
-                        ['%email%' => $event->getItem()->getEmail()]
-                    ),
-                    'href'        => $this->router->generate(
-                        'mautic_plugin_fullcontact_action',
-                        ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupPerson']
-                    ),
+            $event->appendButton(
+                [
+                    'attr' => [
+                        'class' => 'btn btn-default btn-sm btn-nospin',
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        // 'href'        => $this->router->generate('mautic_plugin_fullcontact_action', ['objectAction' => 'batchLookupPerson']),
+                        'onclick' => 'this.href=\''.
+                            $this->router->generate(
+                                'mautic_plugin_fullcontact_action',
+                                ['objectAction' => 'batchLookupPerson']
+                            ).
+                            '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                        'data-header' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
+                    ],
+                    'tooltip' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
+                    'iconClass' => 'fa fa-search',
                 ],
-                'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                'iconClass' => 'fa fa-search',
-            ];
+                ButtonHelper::LOCATION_TOOLBAR_ACTIONS
+            );
 
-            $event
-                ->appendButton(
-                    $lookupContactButton,
-                    ButtonHelper::LOCATION_PAGE_ACTIONS,
-                    ['mautic_contact_action', ['objectAction' => 'view']]
-                )
-                ->appendButton(
-                    $lookupContactButton,
-                    ButtonHelper::LOCATION_LIST_ACTIONS,
-                    'mautic_contact_index'
+            if ($event->getItem()) {
+                $lookupContactButton = [
+                    'attr' => [
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        'data-header' => $this->translator->trans(
+                            'mautic.plugin.fullcontact.lookup.header',
+                            ['%item%' => $event->getItem()->getEmail()]
+                        ),
+                        'href' => $this->router->generate(
+                            'mautic_plugin_fullcontact_action',
+                            ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupPerson']
+                        ),
+                    ],
+                    'btnText' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
+                    'iconClass' => 'fa fa-search',
+                ];
+
+                $event
+                    ->appendButton(
+                        $lookupContactButton,
+                        ButtonHelper::LOCATION_PAGE_ACTIONS,
+                        ['mautic_contact_action', ['objectAction' => 'view']]
+                    )
+                    ->appendButton(
+                        $lookupContactButton,
+                        ButtonHelper::LOCATION_LIST_ACTIONS,
+                        'mautic_contact_index'
+                    );
+            }
+        } else {
+            if (0 === strpos($event->getRoute(), 'mautic_company_')) {
+                $event->appendButton(
+                    [
+                        'attr' => [
+                            'class' => 'btn btn-default btn-sm btn-nospin',
+                            'data-toggle' => 'ajaxmodal',
+                            'data-target' => '#MauticSharedModal',
+                            'onclick' => 'this.href=\''.
+                                $this->router->generate(
+                                    'mautic_plugin_fullcontact_action',
+                                    ['objectAction' => 'batchLookupCompany']
+                                ).
+                                '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                            'data-header' => $this->translator->trans(
+                                'mautic.plugin.fullcontact.toolbar_compbutton.tooltip'
+                            ),
+                        ],
+                        'tooltip' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_compbutton.tooltip'),
+                        'iconClass' => 'fa fa-search',
+                    ],
+                    ButtonHelper::LOCATION_TOOLBAR_ACTIONS
                 );
+
+                if ($event->getItem()) {
+                    $lookupCompanyButton = [
+                        'attr' => [
+                            'data-toggle' => 'ajaxmodal',
+                            'data-target' => '#MauticSharedModal',
+                            'data-header' => $this->translator->trans(
+                                'mautic.plugin.fullcontact.lookup.header',
+                                ['%item%' => $event->getItem()->getName()]
+                            ),
+                            'href' => $this->router->generate(
+                                'mautic_plugin_fullcontact_action',
+                                ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupCompany']
+                            ),
+                        ],
+                        'btnText' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
+                        'iconClass' => 'fa fa-search',
+                    ];
+
+                    $event
+                        ->appendButton(
+                            $lookupCompanyButton,
+                            ButtonHelper::LOCATION_LIST_ACTIONS,
+                            'mautic_company_index'
+                        );
+                }
+            }
         }
     }
 }

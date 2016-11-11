@@ -108,7 +108,7 @@ class FullContactIntegration extends AbstractIntegration
         return 'MauticFullContactBundle:Integration:form.html.php';
     }
 
-    public function shouldAutoUpdateContact()
+    public function shouldAutoUpdate()
     {
         $featureSettings = $this->getKeys();
 

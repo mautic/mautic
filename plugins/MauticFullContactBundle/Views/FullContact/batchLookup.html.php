@@ -10,12 +10,12 @@
  */
 $attr = $form->vars['attr'];
 ?>
-    <div class="alert alert-info">Click submit to lookup the information for the selected contact(s).</div>
+    <div class="alert alert-info">Click submit to lookup the information for the selected item(s).</div>
     <div style="margin-top: 10px">
         <ul class="list-group" style="max-height: 400px;overflow-y: auto">
             <?php
-            foreach ($lookupEmails as $email) {
-                echo '<li class="list-group-item">'.$email.'</li>';
+            foreach ($lookupItems as $item) {
+                echo '<li class="list-group-item">'.$item.'</li>';
             }
             ?>
         </ul>
@@ -24,8 +24,8 @@ $attr = $form->vars['attr'];
     <script>
         (function () {
             var ids = Mautic.getCheckedListIds(false, true);
-            if (mQuery('#lead_batch_lookup_ids').length) {
-                mQuery('#lead_batch_lookup_ids').val(ids);
+            if (mQuery('#fullcontact_batch_lookup_ids').length) {
+                mQuery('#fullcontact_batch_lookup_ids').val(ids);
             }
         })();
     </script>

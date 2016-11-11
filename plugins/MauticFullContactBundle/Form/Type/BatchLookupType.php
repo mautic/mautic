@@ -47,6 +47,6 @@ class BatchLookupType extends AbstractType
      */
     public function getName()
     {
-        return 'lead_batch_lookup';
+        return 'fullcontact_batch_lookup';
     }
 }

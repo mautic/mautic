@@ -19,6 +19,10 @@ return [
                 'path' => '/fullcontact/callback',
                 'controller' => 'MauticFullContactBundle:Public:callback',
             ],
+            'mautic_plugin_fullcontact_compindex'=>[
+                'path' => '/fullcontact/compcallback',
+                'controller' => 'MauticFullContactBundle:Public:compcallback',
+            ],
         ],
         'main' => [
             'mautic_plugin_fullcontact_action' => [
@@ -41,13 +45,13 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.lead_lookup' => [
+            'mautic.form.type.fullcontact_lookup' => [
                 'class' => 'MauticPlugin\MauticFullContactBundle\Form\Type\LookupType',
-                'alias' => 'lead_lookup',
+                'alias' => 'fullcontact_lookup',
             ],
-            'mautic.form.type.lead_batch_lookup' => [
+            'mautic.form.type.fullcontact_batch_lookup' => [
                 'class' => 'MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType',
-                'alias' => 'lead_batch_lookup',
+                'alias' => 'fullcontact_batch_lookup',
             ],
         ],
     ],

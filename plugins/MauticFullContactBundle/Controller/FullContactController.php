@@ -11,8 +11,9 @@
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\MauticFullContactBundle\Services\FullContact_Batch;
+use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -28,7 +29,7 @@ class FullContactController extends FormController
     public function lookupPersonAction($objectId = '')
     {
         if ('POST' === $this->request->getMethod()) {
-            $data = $this->request->request->get('lead_lookup', [], true);
+            $data = $this->request->request->get('fullcontact_lookup', [], true);
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -54,7 +55,7 @@ class FullContactController extends FormController
                 ]
             );
         }
-        
+
         if ('GET' === $this->request->getMethod()) {
 
             $route = $this->generateUrl(
@@ -68,7 +69,7 @@ class FullContactController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_lookup',
+                            'fullcontact_lookup',
                             [
                                 'objectId' => $objectId,
                             ],
@@ -76,9 +77,9 @@ class FullContactController extends FormController
                                 'action' => $route,
                             ]
                         )->createView(),
-                        'email' => $lead->getEmail(),
+                        'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookupPerson.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
                     'passthroughVars' => [
                         'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -97,7 +98,7 @@ class FullContactController extends FormController
 
                     $webhookId = 'fullcontact#'.$objectId;
 
-                    if (FALSE === apc_fetch($webhookId)) {
+                    if (false === apc_fetch($webhookId.$lead->getEmail())) {
                         $fullcontact->setWebhookUrl(
                             $this->generateUrl(
                                 'mautic_plugin_fullcontact_index',
@@ -107,7 +108,7 @@ class FullContactController extends FormController
                             $webhookId
                         );
                         $res = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
-                        apc_add($webhookId, $res);
+                        apc_add($webhookId.$lead->getEmail(), $res);
                     }
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
@@ -146,9 +147,9 @@ class FullContactController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         if ('GET' === $this->request->getMethod()) {
-            $data = $this->request->query->get('lead_batch_lookup', [], true);
+            $data = $this->request->query->get('fullcontact_batch_lookup', [], true);
         } else {
-            $data = $this->request->request->get('lead_batch_lookup', [], true);
+            $data = $this->request->request->get('fullcontact_batch_lookup', [], true);
         }
 
         $entities = [];
@@ -236,15 +237,15 @@ class FullContactController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch_lookup',
+                            'fullcontact_batch_lookup',
                             [],
                             [
                                 'action' => $route,
                             ]
                         )->createView(),
-                        'lookupEmails' => array_values($lookupEmails),
+                        'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookupPerson.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
                     'passthroughVars' => [
                         'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -274,7 +275,7 @@ class FullContactController extends FormController
 
                     foreach ($lookupEmails as $id => $lookupEmail) {
                         $webhookId = 'fullcontact#'.$id;
-                        if (FALSE === apc_fetch($webhookId)) {
+                        if (false === apc_fetch($webhookId.$lookupEmail)) {
                             $fullcontact->setWebhookUrl(
                                 $this->generateUrl(
                                     'mautic_plugin_fullcontact_index',
@@ -284,12 +285,307 @@ class FullContactController extends FormController
                                 $webhookId
                             );
                             $res = $fullcontact->lookupByEmailMD5(md5($lookupEmail));
-                            apc_add($webhookId, $res);
+                            apc_add($webhookId.$lookupEmail, $res);
                         }
                     }
 
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
+                        [
+                            'pluralCount' => $count,
+                            '%count%' => $count,
+                        ]
+                    );
+                } catch (\Exception $ex) {
+                    $this->addFlash(
+                        $ex->getMessage(),
+                        [],
+                        'error'
+                    );
+                }
+
+                return new JsonResponse(
+                    [
+                        'closeModal' => true,
+                        'flashes' => $this->getFlashContent(),
+                    ]
+                );
+
+            }
+        }
+    }
+
+    /***************** COMPANY ***********************/
+
+    /**
+     * @param string $objectId
+     *
+     * @return JsonResponse
+     */
+    public function lookupCompanyAction($objectId = '')
+    {
+        if ('POST' === $this->request->getMethod()) {
+            $data = $this->request->request->get('fullcontact_lookup', [], true);
+            $objectId = $data['objectId'];
+        }
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model = $this->getModel('lead.company');
+        /** @var Company $company */
+        $company = $model->getEntity($objectId);
+
+        if ('GET' === $this->request->getMethod()) {
+
+            $route = $this->generateUrl(
+                'mautic_plugin_fullcontact_action',
+                [
+                    'objectAction' => 'lookupCompany',
+                ]
+            );
+
+            $website = $company->getFieldValue('companywebsite', 'core');
+
+            if (!$website) {
+                $this->addFlash(
+                    $this->translator->trans('mautic.plugin.fullcontact.compempty'),
+                    [],
+                    'error'
+                );
+
+                return new JsonResponse(
+                    [
+                        'closeModal' => true,
+                        'flashes' => $this->getFlashContent(),
+                    ]
+                );
+            }
+            $parse = parse_url($website);
+
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'form' => $this->createForm(
+                            'fullcontact_lookup',
+                            [
+                                'objectId' => $objectId,
+                            ],
+                            [
+                                'action' => $route,
+                            ]
+                        )->createView(),
+                        'lookupItem' => $parse['host'],
+                    ],
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'passthroughVars' => [
+                        'activeLink' => '#mautic_company_index',
+                        'mauticContent' => 'company',
+                        'route' => $route,
+                    ],
+                ]
+            );
+        } else {
+            if ('POST' === $this->request->getMethod()) {
+                // get api_key from plugin settings
+                $integrationHelper = $this->get('mautic.helper.integration');
+                $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $fullcontact = new FullContact_Company($keys['apikey']);
+                try {
+
+                    $webhookId = 'fullcontactcomp#'.$objectId;
+                    $website = $company->getFieldValue('companywebsite', 'core');
+                    $parse = parse_url($website);
+                    if (false === apc_fetch($webhookId.$parse['host'])) {
+                        $webhookUrl = $this->generateUrl(
+                            'mautic_plugin_fullcontact_compindex',
+                            [],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        );
+                        $fullcontact->setWebhookUrl(
+                            $webhookUrl,
+                            $webhookId
+                        );
+
+                        $res = $fullcontact->lookupByDomain($parse['host']);
+                        apc_add($webhookId.$parse['host'], $res);
+                    }
+                    $this->addFlash(
+                        'mautic.company.batch_companies_affected',
+                        [
+                            'pluralCount' => 1,
+                            '%count%' => 1,
+                        ]
+                    );
+                } catch (\Exception $ex) {
+                    $this->addFlash(
+                        $ex->getMessage(),
+                        [],
+                        'error'
+                    );
+                }
+
+                return new JsonResponse(
+                    [
+                        'closeModal' => true,
+                        'flashes' => $this->getFlashContent(),
+                    ]
+                );
+
+            }
+        }
+    }
+
+    /**
+     *
+     * @return JsonResponse
+     * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit
+     */
+    public function batchLookupCompanyAction()
+    {
+        $logger = $this->get('monolog.logger.mautic');
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model = $this->getModel('lead.company');
+        if ('GET' === $this->request->getMethod()) {
+            $data = $this->request->query->get('fullcontact_batch_lookup', [], true);
+        } else {
+            $data = $this->request->request->get('fullcontact_batch_lookup', [], true);
+        }
+
+        $entities = [];
+        if (array_key_exists('ids', $data)) {
+            $ids = $data['ids'];
+
+            if (!is_array($ids)) {
+                $ids = json_decode($ids, true);
+            }
+
+            if (is_array($ids) && count($ids)) {
+                $entities = $model->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'comp.id',
+                                    'expr' => 'in',
+                                    'value' => $ids,
+                                ],
+                            ],
+                        ],
+                        'ignore_paginator' => true,
+                    ]
+                );
+            }
+        }
+
+        $lookupWebsites = [];
+        if ($count = count($entities)) {
+            /** @var Company $company */
+            foreach ($entities as $company) {
+                if ($company->getFieldValue('companywebsite', 'core')) {
+                    $website = $company->getFieldValue('companywebsite', 'core');
+                    $parse = parse_url($website);
+                    $lookupWebsites[$company->getId()] = $parse['host'];
+                }
+            }
+
+            $count = count($lookupWebsites);
+        }
+
+        if (0 === $count) {
+            $this->addFlash(
+                $this->translator->trans('mautic.plugin.fullcontact.compempty'),
+                [],
+                'error'
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes' => $this->getFlashContent(),
+                ]
+            );
+        } else {
+            if ($count > 20) {
+                $this->addFlash(
+                    $this->translator->trans('mautic.plugin.fullcontact.comptoomany'),
+                    [],
+                    'error'
+                );
+
+                return new JsonResponse(
+                    [
+                        'closeModal' => true,
+                        'flashes' => $this->getFlashContent(),
+                    ]
+                );
+            }
+        }
+        if ('GET' === $this->request->getMethod()) {
+
+            $route = $this->generateUrl(
+                'mautic_plugin_fullcontact_action',
+                [
+                    'objectAction' => 'batchLookupCompany',
+                ]
+            );
+
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'form' => $this->createForm(
+                            'fullcontact_batch_lookup',
+                            [],
+                            [
+                                'action' => $route,
+                            ]
+                        )->createView(),
+                        'lookupItems' => array_values($lookupWebsites),
+                    ],
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'passthroughVars' => [
+                        'activeLink' => '#mautic_company_index',
+                        'mauticContent' => 'companyBatch',
+                        'route' => $route,
+                    ],
+                ]
+            );
+        } else {
+            if ('POST' === $this->request->getMethod()) {
+                // get api_key from plugin settings
+                $integrationHelper = $this->get('mautic.helper.integration');
+                $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $fullcontact = new FullContact_Company($keys['apikey']);
+                try {
+                    // TODO: batch is not working on fullcontact
+//                    $result = $fullcontact->sendRequests(
+//                        array_map(
+//                            function ($e) {
+//                                return 'https://api.fullcontact.com/v2/person.json?emailMD5='.md5(
+//                                    $e
+//                                ).'&webhookUrl='.urlencode('https://requestbin.fullcontact.com/17kl0v91');
+//                            },
+//                            $lookupEmails
+//                        )
+//                    );
+
+                    foreach ($lookupWebsites as $id => $lookupWebsite) {
+                        $webhookId = 'fullcontactcomp#'.$id;
+                        if (false === apc_fetch($webhookId.$lookupWebsite)) {
+                            $fullcontact->setWebhookUrl(
+                                $this->generateUrl(
+                                    'mautic_plugin_fullcontact_compindex',
+                                    [],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                $webhookId
+                            );
+                            $res = $fullcontact->lookupByDomain($lookupWebsite);
+                            apc_add($webhookId.$lookupWebsite, $res);
+                        }
+                    }
+
+                    $this->addFlash(
+                        'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => $count,
                             '%count%' => $count,

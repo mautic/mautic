@@ -55,6 +55,6 @@ class LookupType extends AbstractType
      */
     public function getName()
     {
-        return 'lead_lookup';
+        return 'fullcontact_lookup';
     }
 }

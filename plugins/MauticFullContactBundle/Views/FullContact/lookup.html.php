@@ -14,7 +14,7 @@ $attr = $form->vars['attr'];
     <div style="margin-top: 10px">
         <ul class="list-group" style="max-height: 400px;overflow-y: auto">
             <?php
-                echo '<li class="list-group-item">'.$email.'</li>';
+                echo '<li class="list-group-item">'.$lookupItem.'</li>';
             ?>
         </ul>
     </div>
