@@ -48,6 +48,11 @@ unset($form['featureSettings']['leadFields']);
     <div class="tab-pane fade in active bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
+        <div class="well well-sm">
+            <p>
+            For the plugin to work, you must use the following as the Webhook URL in your account settings on the <a href="https://dashboard.clearbit.com/account" target="_blank">Clearbit dashboard</a>:</p>
+            <input type="text" readonly="" onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $this->container->get('router')->generate('mautic_plugin_clearbit_index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)?>" class="form-control">
+        </div>
     </div>
 
 </div>
