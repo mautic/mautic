@@ -301,6 +301,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_action_addutmtags',
             ],
+            'mautic.form.type.lead.submitaction.addutmtags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_removedonotcontact',
+            ],
             'mautic.form.type.lead.submitaction.changelist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
                 'arguments' => 'mautic.factory',

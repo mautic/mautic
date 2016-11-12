@@ -79,5 +79,16 @@ class FormSubscriber extends CommonSubscriber
             'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags',
         ];
         $event->addSubmitAction('lead.addutmtags', $action);
+
+        // add Do Not Contact
+        $action = [
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.removedonotcontact',
+            'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
+            'formType'    => 'lead_action_removedonotcontact',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::RemoveDoNotContact',
+        ];
+        $event->addSubmitAction('lead.RemoveDoNotContact', $action);
     }
 }
