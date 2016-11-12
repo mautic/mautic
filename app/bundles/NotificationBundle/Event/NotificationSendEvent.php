@@ -82,23 +82,6 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * @return Lead
-
-     * @var Notification
-     */
-    protected $entity;
-
-    /**
-     * @param array      $args
-     */
-    public function __construct($args = array())
-    {
-        if (isset($args['lead'])) {
-            $this->lead = $args['lead'];
-        }
-    }
-
-    /**
      * Returns the Email entity
      *
      * @return Notification
