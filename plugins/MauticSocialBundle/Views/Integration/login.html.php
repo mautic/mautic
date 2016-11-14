@@ -79,7 +79,7 @@ HTML;
 		<?php
         echo $html;
             foreach ($integrations as $integration) {
-                echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl('media/images/btn_'.$integration.'.png').'"></a>';
+                echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$settings['buttonImageUrl'].'btn_'.$integration.'.png"></a>';
             }
 
         ?>
