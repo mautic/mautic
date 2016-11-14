@@ -368,10 +368,15 @@ class CommonApiController extends FOSRestController implements MauticController
                         // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                         $setter = 'set'.ucfirst($name);
                         $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
-                        $entity->$setter((int) $data);
 
-                        // Manually handled so remove from form processing
-                        unset($form[$name], $submitParams[$name]);
+                        try {
+                            $entity->$setter((int) $data);
+
+                            // Manually handled so remove from form processing
+                            unset($form[$name], $submitParams[$name]);
+                        } catch (\InvalidArgumentException $exception) {
+                            // Setter not found
+                        }
                         break;
                     case 'choice':
                         if ($child->getConfig()->getOption('multiple')) {
