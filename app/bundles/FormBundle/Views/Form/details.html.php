@@ -205,7 +205,7 @@ $showActions = count($activeFormActions);
                                             <h6 class="text-white dark-sm"><?php echo $action->getDescription(); ?></h6>
                                         </div>
                                         <div class="col-md-4 va-m text-right">
-                                            <em class="text-white dark-sm"><?php echo $action->getType(); ?></em>
+                                            <em class="text-white dark-sm"><?php echo $view['translator']->trans($action->getType()); ?></em>
                                         </div>
                                     </div>
                                 </li>

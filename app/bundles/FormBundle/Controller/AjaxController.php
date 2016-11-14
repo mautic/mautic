@@ -27,6 +27,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function reorderFieldsAction(Request $request, $name = 'fields')
     {
+        if ('form' === $name) {
+            $name = 'fields';
+        }
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
