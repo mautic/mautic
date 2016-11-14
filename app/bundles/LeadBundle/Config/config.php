@@ -301,7 +301,7 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_action_addutmtags',
             ],
-            'mautic.form.type.lead.submitaction.addutmtags' => [
+            'mautic.form.type.lead.submitaction.removedonotcontact' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_action_removedonotcontact',

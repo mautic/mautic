@@ -45,11 +45,11 @@ class EventHelper
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        $emailRepo = $factory->getModel('email');
+        $email = $factory->getModel('email');
         $lead      = $leadModel->getCurrentLead();
-        $email_address = $lead->getEmail();
-        if ($email_address) {
-            $emailRepo->removeDoNotContact($email_address);
+        $emailAddress = $lead->getEmail();
+        if ($emailAddress) {
+            $email->removeDoNotContact($emailAddress);
         }
     }
 

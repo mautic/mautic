@@ -20,16 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ActionRemoveDoNotContact extends AbstractType
 {
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
