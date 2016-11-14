@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -331,6 +332,10 @@ class PublicController extends CommonFormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
+
+        if ($emailEntity === null) {
+            return $this->notFound();
+        }
 
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())

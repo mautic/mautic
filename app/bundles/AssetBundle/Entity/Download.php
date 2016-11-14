@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -106,7 +107,7 @@ class Download
 
         $builder->addField('code', 'integer');
 
-        $builder->createField('referer', 'string')
+        $builder->createField('referer', 'text')
             ->nullable()
             ->build();
 

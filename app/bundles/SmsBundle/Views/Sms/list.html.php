@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -77,6 +78,8 @@ if (count($items)):
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                         'item'            => $item,
                         'templateButtons' => [
+                            'edit'   => $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $item->getCreatedBy()),
+                            'clone'  => $permissions['sms:smses:create'],
                             'delete' => $view['security']->hasEntityAccess($permissions['sms:smses:deleteown'], $permissions['sms:smses:deleteother'], $item->getCreatedBy()),
                         ],
                         'routeBase'     => 'sms',

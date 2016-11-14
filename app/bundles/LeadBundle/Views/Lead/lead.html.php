@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -218,7 +219,7 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                     <?php else: ?>
-                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>

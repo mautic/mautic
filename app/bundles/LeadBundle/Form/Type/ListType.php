@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -155,6 +156,7 @@ class ListType extends AbstractType
                         'emails'    => $this->emailChoices,
                         'tags'      => $this->tagChoices,
                         'stage'     => $this->stageChoices,
+                        'locales'   => $this->localeChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -172,6 +173,12 @@ class TokenSubscriber extends CommonSubscriber
                     break;
                 case '!like':
                     $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
+                    break;
+                case 'in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
+                    break;
+                case '!in':
+                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
                     break;
             }
         }

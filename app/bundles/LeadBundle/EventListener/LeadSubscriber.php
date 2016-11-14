@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -434,17 +435,15 @@ class LeadSubscriber extends CommonSubscriber
     {
         $lead    = $event->getLead();
         $utmTags = $this->em->getRepository('MauticLeadBundle:UtmTag')->getUtmTagsByLead($lead, $event->getQueryOptions());
-
         // Add to counter
         $event->addToCounter($eventTypeKey, $utmTags);
 
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($utmTags['results'] as $utmTag) {
-                if (!empty($utmTag['query'])) {
-                    $icon = 'fa-tag';
-                    if (isset($utmTag['utm_medium'])) {
-                        switch (strtolower($utmTag['utm_medium'])) {
+                $icon = 'fa-tag';
+                if (isset($utmTag['utm_medium'])) {
+                    switch (strtolower($utmTag['utm_medium'])) {
                             case 'social':
                             case 'socialmedia':
                                 $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
@@ -467,13 +466,12 @@ class LeadSubscriber extends CommonSubscriber
                                 $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
                                 break;
                         }
-                    }
-
-                    $event->addEvent(
+                }
+                $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
-                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $utmTag['utm_campaign'] : '',
+                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
                             'extra'      => [
@@ -482,7 +480,6 @@ class LeadSubscriber extends CommonSubscriber
                             'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php',
                         ]
                     );
-                }
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit

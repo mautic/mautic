@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +41,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 0;
+    const PATCH_VERSION = 2;
 
     /**
      * Extra version identifier.
@@ -49,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-dev';
 
     /**
      * @var array

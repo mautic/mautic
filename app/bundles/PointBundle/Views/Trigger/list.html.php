@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,7 +27,7 @@ if ($tmpl == 'index') {
             echo "<th class='col-pointtrigger-color'></th>";
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.name',
                 'text'       => 'mautic.core.name',
                 'class'      => 'col-pointtrigger-name',
@@ -35,20 +36,20 @@ if ($tmpl == 'index') {
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                 'sessionVar' => 'pointtrigger',
-                'orderBy'    => 'c.title',
+                'orderBy'    => 'cat.title',
                 'text'       => 'mautic.core.category',
                 'class'      => 'col-pointtrigger-category visible-md visible-lg',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.points',
                 'text'       => 'mautic.point.trigger.thead.points',
                 'class'      => 'col-pointtrigger-points',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.id',
                 'text'       => 'mautic.core.id',
                 'class'      => 'col-pointtrigger-id visible-md visible-lg',

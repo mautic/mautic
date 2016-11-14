@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -117,7 +118,7 @@ if ($tmpl == 'index') {
                         <?php   endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':'.$fields['core']['companyname']['value']]); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
+                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'.$fields['core']['companyname']['value'].'"']); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice('mautic.lead.company.viewleads_count', $leadCounts[$item->getId()], ['%count%' => $leadCounts[$item->getId()]]); ?>
                         </a>
                     </td>

@@ -261,23 +261,26 @@ Mautic.convertLeadFilterInput = function(el) {
         mQuery(filterId).parent().removeClass('has-error');
     }
 
-    var disabled = (operator == 'empty' || operator == '!empty') ? true : false;
+    var disabled = (operator == 'empty' || operator == '!empty');
     mQuery(filterId).prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
     }
 
+    var newName = '';
+    var lastPos;
+
     if (mQuery(filterId).is('select')) {
         var isMultiple  = mQuery(filterId).attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in') ? true : false;
+        var multiple    = (operator == 'in' || operator == '!in');
         var placeholder = mQuery(filterId).attr('data-placeholder');
 
         if (multiple && !isMultiple) {
             mQuery(filterId).attr('multiple', 'multiple');
 
             // Update the name
-            var newName =  mQuery(filterId).attr('name') + '[]';
+            newName =  mQuery(filterId).attr('name') + '[]';
             mQuery(filterId).attr('name', newName);
 
             placeholder = mauticLang['chosenChooseMore'];
@@ -285,7 +288,10 @@ Mautic.convertLeadFilterInput = function(el) {
             mQuery(filterId).removeAttr('multiple');
 
             // Update the name
-            var newName =  mQuery(filterId).attr('name').replace(/[\[\]']+/g,'')
+            newName = filterEl.attr('name');
+            lastPos = newName.lastIndexOf('[]');
+            newName = newName.substring(0, lastPos);
+
             mQuery(filterId).attr('name', newName);
 
             placeholder = mauticLang['chosenChooseOne'];
