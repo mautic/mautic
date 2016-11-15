@@ -4,7 +4,12 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
+/**
+ * @property SalesforceIntegration $integration
+ */
 class SalesforceApi extends CrmApi
 {
     protected $object          = 'Lead';
@@ -201,17 +206,13 @@ class SalesforceApi extends CrmApi
      */
     public function getLeads($query, $object)
     {
-        //find out if start date is not our of range for org
-        static $organization = [];
+        $organizationCreatedDate = $this->getOrganizationCreatedDate();
 
         if (isset($query['start'])) {
             $queryUrl = $this->integration->getQueryUrl();
 
-            if (empty($organization)) {
-                $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
-            }
-            if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
-                $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
+            if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
+                $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
         }
 
@@ -239,5 +240,39 @@ class SalesforceApi extends CrmApi
         }
 
         return $result;
+    }
+
+    /**
+     * Get Salesforce leads.
+     */
+    public function getSalesForceLeadById($id, $params, $object)
+    {
+        return $this->request($id.'/', $params, 'GET', false, $object);
+    }
+
+    /**
+     * @return FilesystemAdapter
+     *
+     * @TODO This should probably be moved to a service and system-wide
+     */
+    public function getCache()
+    {
+        return new FilesystemAdapter();
+    }
+
+    public function getOrganizationCreatedDate()
+    {
+        $cache = $this->getCache();
+
+        $organizationCreatedDate = $cache->getItem('integration.salesforce.organization_created_date');
+
+        if (!$organizationCreatedDate->isHit()) {
+            $queryUrl     = $this->integration->getQueryUrl();
+            $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            $organizationCreatedDate->set($organization['records'][0]['CreatedDate']);
+            $cache->save($organizationCreatedDate);
+        }
+
+        return $organizationCreatedDate->get();
     }
 }
