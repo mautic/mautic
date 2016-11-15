@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * @property SalesforceIntegration $integration
@@ -88,11 +87,11 @@ class SalesforceApi extends CrmApi
             $object = 'Account'; //salesforce object name
         }
 
-        $leadFields = $this->getCache()->getItem('integration.salesforce.leadFields.'.$object);
+        $leadFields = $this->integration->getCache()->getItem('leadFields.'.$object);
 
         if (!$leadFields->isHit()) {
             $leadFields->set($this->request('describe', [], 'GET', false, $object));
-            $this->getCache()->save($leadFields);
+            $this->integration->getCache()->save($leadFields);
         }
 
         return $leadFields->get();
@@ -249,21 +248,11 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
-    /**
-     * @return FilesystemAdapter
-     *
-     * @TODO This should probably be moved to a service and system-wide
-     */
-    public function getCache()
-    {
-        return new FilesystemAdapter();
-    }
-
     public function getOrganizationCreatedDate()
     {
-        $cache = $this->getCache();
+        $cache = $this->integration->getCache();
 
-        $organizationCreatedDate = $cache->getItem('integration.salesforce.organization_created_date');
+        $organizationCreatedDate = $cache->getItem('organization.created_date');
 
         if (!$organizationCreatedDate->isHit()) {
             $queryUrl     = $this->integration->getQueryUrl();

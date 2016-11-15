@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -835,5 +836,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         unset($pointChangeLog, $emailStats, $formSubmissions);
 
         return $leadActivity;
+    }
+
+    /**
+     * @return FilesystemAdapter
+     *
+     * @TODO This should probably be moved to a service and system-wide
+     */
+    public function getCache()
+    {
+        $cacheDir = $this->dispatcher->getContainer()->get('mautic.helper.paths')->getSystemPath('cache');
+
+        return new FilesystemAdapter('integration.salesforce', 0, $cacheDir);
     }
 }
