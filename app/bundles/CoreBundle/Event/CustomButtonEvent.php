@@ -59,10 +59,12 @@ class CustomButtonEvent extends Event
     public function __construct($location, Request $request, array $prependedButtons = [], array $appendedButtons = [], $item = null)
     {
         $this->location         = $location;
-        $this->request          = $request;
         $this->prependedButtons = $prependedButtons;
         $this->appendedButtons  = $appendedButtons;
         $this->item             = $item;
+
+        // The original request will be stored in the subrequest
+        $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
     }
 
     /**
