@@ -1,8 +1,9 @@
 <?php
-/**
+
+/*
  *	Filemanager PHP connector
  *  This file should at least declare auth() function
- *  and instantiate the Filemanager as '$fm'
+ *  and instantiate the Filemanager as '$fm'.
  *
  *  IMPORTANT : by default Read and Write access is granted to everyone
  *  Copy/paste this file to 'user.config.php' file to implement your own auth() function
@@ -16,26 +17,52 @@
  *	@copyright	Authors
  */
 
-if (!isset($_COOKIE['mautic_session_name'])) {
-    die();
-}
-session_name($_COOKIE['mautic_session_name']);
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-session_start();
+// Boot Symfony
+try {
+    require_once __DIR__.'/../../../../../../../../../autoload.php';
+    require_once __DIR__.'/../../../../../../../../../bootstrap.php.cache';
+    require_once __DIR__.'/../../../../../../../../../AppKernel.php';
+    $kernel = new AppKernel('prod', false);
+    $kernel->boot();
+    $container = $kernel->getContainer();
+    $request   = Request::createFromGlobals();
+    $container->enterScope('request');
+    $container->set('request', $request, 'request');
+
+    // Dispatch REQUEST event to setup authentication
+    $httpKernel = $container->get('http_kernel');
+    $event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
+    $container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
+
+    $session       = $container->get('session');
+    $securityToken = $container->get('security.token_storage');
+    $token         = $securityToken->getToken();
+    $authenticated = ($token instanceof TokenInterface) ? count($token->getRoles()) : false;
+} catch (\Exception $exception) {
+    error_log($exception);
+    $authenticated = false;
+}
 
 /**
- *	Check if user is authorized
+ *	Check if user is authorized.
  *
  *
- *	@return boolean true if access granted, false if no access
+ *	@return bool true if access granted, false if no access
  */
-function auth() {
+function auth()
+{
+    global $authenticated;
     // You can insert your own code over here to check if the user is authorized.
     // If you use a session variable, you've got to start the session first (session_start())
 
-    return (!empty($_SESSION['_sf2_attributes']['mautic.user']));
+    return $authenticated;
 }
-
 
 // @todo Work on plugins registration
 // if (isset($config['plugin']) && !empty($config['plugin'])) {
@@ -50,10 +77,10 @@ function auth() {
 
 $fm = new Filemanager();
 
-if (isset($_SESSION['_sf2_attributes'])) {
-    $userDir = $_SESSION['_sf2_attributes']['mautic.imagepath'];
-    $baseDir = $_SESSION['_sf2_attributes']['mautic.basepath'];
-    $docRoot = $_SESSION['_sf2_attributes']['mautic.docroot'];
+if ($authenticated) {
+    $userDir = $session->get('mautic.imagepath', false);
+    $baseDir = $session->get('mautic.basepath', false);
+    $docRoot = $session->get('mautic.docroot', false);
 
     if (substr($userDir, -1) !== '/') {
         $userDir .= '/';

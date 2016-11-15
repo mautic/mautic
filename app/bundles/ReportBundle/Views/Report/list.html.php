@@ -1,13 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticReportBundle:Report:index.html.php');
+}
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive panel-collapse pull out page-list">
@@ -15,25 +18,25 @@ if ($tmpl == 'index')
             <thead>
                 <tr>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'checkall' => 'true',
-                        'target'   => '#reportTable'
-                    ));
+                        'target'   => '#reportTable',
+                    ]);
 
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-report-name',
-                        'default'    => true
-                    ));
+                        'default'    => true,
+                    ]);
 
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'report',
                         'orderBy'    => 'r.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'col-report-id visible-md visible-lg'
-                    ));
+                        'class'      => 'col-report-id visible-md visible-lg',
+                    ]);
                     ?>
                 </tr>
             </thead>
@@ -42,22 +45,22 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                            'item'      => $item,
-                            'templateButtons' => array(
-                                'edit'      => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $item->getCreatedBy()),
-                                'clone'     => $permissions['report:reports:create'],
-                                'delete'    => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $item->getCreatedBy()),
-                            ),
-                            'routeBase'  => 'report',
-                            'langVar'    => 'report.report'
-                        ));
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                            'item'            => $item,
+                            'templateButtons' => [
+                                'edit'   => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $item->getCreatedBy()),
+                                'clone'  => $permissions['report:reports:create'],
+                                'delete' => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $item->getCreatedBy()),
+                            ],
+                            'routeBase' => 'report',
+                            'langVar'   => 'report.report',
+                        ]);
                         ?>
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'report.report')); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_report_view', array("objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'report.report']); ?>
+                            <a href="<?php echo $view['router']->path('mautic_report_view', ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -71,14 +74,14 @@ if ($tmpl == 'index')
             </tbody>
         </table>
         <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => $totalItems,
-            "page"            => $page,
-            "limit"           => $limit,
-            "menuLinkId"      => 'mautic_report_index',
-            "baseUrl"         => $view['router']->generate('mautic_report_index'),
-            'sessionVar'      => 'report'
-        )); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+            'totalItems' => $totalItems,
+            'page'       => $page,
+            'limit'      => $limit,
+            'menuLinkId' => 'mautic_report_index',
+            'baseUrl'    => $view['router']->path('mautic_report_index'),
+            'sessionVar' => 'report',
+        ]); ?>
         </div>
     </div>
 <?php else: ?>

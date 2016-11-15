@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,16 +13,16 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class ColumnSchemaHelper
+ * Class ColumnSchemaHelper.
  *
  * Used to manipulate the schema of an existing table
  */
 class ColumnSchemaHelper
 {
-
     /**
      * @var Connection
      */
@@ -42,12 +44,12 @@ class ColumnSchemaHelper
     protected $tableName;
 
     /**
-     * @var string
+     * @var Table
      */
     protected $fromTable;
 
     /**
-     * @var string
+     * @var Table
      */
     protected $toTable;
 
@@ -63,14 +65,14 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Set the table to be manipulated
+     * Set the table to be manipulated.
      *
      * @param string $table
      * @param bool   $addPrefix
      */
     public function setName($table, $addPrefix = true)
     {
-        $this->tableName = ($addPrefix) ? $this->prefix . $table : $table;
+        $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
         //make sure the table exists
         $this->checkTableExists($this->tableName, true);
@@ -81,7 +83,7 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get the SchemaManager
+     * Get the SchemaManager.
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
@@ -91,7 +93,7 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get table details
+     * Get table details.
      *
      * @return \Doctrine\DBAL\Schema\Table
      */
@@ -101,7 +103,7 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get array of Doctrine\DBAL\Schema\Column instances for the table
+     * Get array of Doctrine\DBAL\Schema\Column instances for the table.
      *
      * @return array
      */
@@ -110,11 +112,12 @@ class ColumnSchemaHelper
         if (empty($this->columns)) {
             $this->columns = $this->toTable->getColumns();
         }
+
         return $this->columns;
     }
 
     /**
-     * Add an array of columns to the table
+     * Add an array of columns to the table.
      *
      * @param array $columns
      *
@@ -138,15 +141,14 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Add a column to the table
+     * Add a column to the table.
      *
      * @param array $column
-     *  ['name']    string (required) unique name of column; cannot already exist
-     *  ['type']    string (optional) Doctrine type for column; defaults to text
-     *  ['options'] array  (optional) Defining options for column
+     *                           ['name']    string (required) unique name of column; cannot already exist
+     *                           ['type']    string (optional) Doctrine type for column; defaults to text
+     *                           ['options'] array  (optional) Defining options for column
      * @param bool  $checkExists Check if table exists; pass false if this has already been done
      *
-     * @return void
      * @throws SchemaException
      */
     public function addColumn(array $column, $checkExists = true)
@@ -160,17 +162,15 @@ class ColumnSchemaHelper
         }
 
         $type    = (isset($column['type'])) ? $column['type'] : 'text';
-        $options = (isset($column['options'])) ? $column['options'] : array();
+        $options = (isset($column['options'])) ? $column['options'] : [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
     }
 
     /**
-     * Drops a column from table
+     * Drops a column from table.
      *
      * @param $columnName
-     *
-     * @return void
      */
     public function dropColumn($columnName)
     {
@@ -180,9 +180,7 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Computes and executes the changes
-     *
-     * @return void
+     * Computes and executes the changes.
      */
     public function executeChanges()
     {
@@ -196,12 +194,13 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Determine if a column already exists
+     * Determine if a column already exists.
      *
      * @param string $column
      * @param bool   $throwException
      *
      * @return bool
+     *
      * @throws SchemaException
      */
     public function checkColumnExists($column, $throwException = false)
@@ -219,12 +218,13 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Determine if a table exists
+     * Determine if a table exists.
      *
      * @param            $table
      * @param bool|false $throwException
      *
      * @return bool
+     *
      * @throws SchemaException
      */
     public function checkTableExists($table, $throwException = false)

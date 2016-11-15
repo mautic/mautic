@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Migration 1.0.3 to 1.0.4
+ * Migration 1.0.3 to 1.0.4.
  */
 class Version20150504000000 extends AbstractMauticMigration
 {
@@ -27,7 +29,7 @@ class Version20150504000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         // Test to see if this migration has already been applied
-        $table = $schema->getTable($this->prefix . 'lead_fields');
+        $table = $schema->getTable($this->prefix.'lead_fields');
         if ($table->hasColumn('is_unique_identifer')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
@@ -40,7 +42,7 @@ class Version20150504000000 extends AbstractMauticMigration
     {
         // Set email as a unique ID
         $q = $this->connection->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'lead_fields')
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_fields')
             ->set('is_unique_identifer', ':true')
             ->where(
                 $q->expr()->eq('alias', $q->expr()->literal('email'))
@@ -52,36 +54,11 @@ class Version20150504000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function postgresqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD non_action_path_taken BOOLEAN DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('COMMENT ON COLUMN ' . $this->prefix . 'campaign_lead_event_log.metadata IS \'(DC2Type:array)\'');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer BOOLEAN DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function mysqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP FOREIGN KEY ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', ADD non_action_path_taken TINYINT(1) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer TINYINT(1) DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function mssqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD non_action_path_taken BIT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer BIT');
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log DROP FOREIGN KEY '.$this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log ADD metadata LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', ADD non_action_path_taken TINYINT(1) DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'campaign_lead_event_log ADD CONSTRAINT '.$this->generatePropertyName('campaign_lead_event_log', 'fk', ['campaign_id']).' FOREIGN KEY (campaign_id) REFERENCES '.$this->prefix.'campaigns (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'lead_fields ADD is_unique_identifer TINYINT(1) DEFAULT NULL');
     }
 }

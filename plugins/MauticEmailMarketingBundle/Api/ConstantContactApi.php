@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,22 +13,22 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ConstantContactApi extends EmailMarketingApi{
-
+class ConstantContactApi extends EmailMarketingApi
+{
     private $version = 'v2';
 
-    protected function request($endpoint, $parameters = array(), $method = 'GET', $query = array())
+    protected function request($endpoint, $parameters = [], $method = 'GET', $query = [])
     {
         $url = sprintf('https://api.constantcontact.com/%s/%s?api_key=%s', $this->version, $endpoint, $this->keys['client_id']);
 
-        $response = $this->integration->makeRequest($url, $parameters, $method, array(
+        $response = $this->integration->makeRequest($url, $parameters, $method, [
             'encode_parameters' => 'json',
             'append_auth_token' => true,
-            'query'             => $query
-        ));
+            'query'             => $query,
+        ]);
 
         if (is_array($response) && !empty($response[0]['error_message'])) {
-            $errors = array();
+            $errors = [];
             foreach ($response as $error) {
                 $errors[] = $error['error_message'];
             }
@@ -39,6 +41,7 @@ class ConstantContactApi extends EmailMarketingApi{
 
     /**
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getLists()
@@ -53,22 +56,23 @@ class ConstantContactApi extends EmailMarketingApi{
      * @param array $config
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    public function subscribeLead($email, $listId, $fields = array(), $config = array())
+    public function subscribeLead($email, $listId, $fields = [], $config = [])
     {
-        $parameters = array_merge($fields, array(
-            'lists'   => array(
-                array('id' => "$listId")
-            ),
-            'email_addresses' => array(
-                array('email_address' => $email)
-            ),
-        ));
+        $parameters = array_merge($fields, [
+            'lists' => [
+                ['id' => "$listId"],
+            ],
+            'email_addresses' => [
+                ['email_address' => $email],
+            ],
+        ]);
 
-        $query = array(
-            'action_by' => $config['action_by']
-        );
+        $query = [
+            'action_by' => $config['action_by'],
+        ];
 
         return $this->request('contacts', $parameters, 'POST', $query);
     }

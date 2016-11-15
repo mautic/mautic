@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,13 +19,10 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class EmailType
- *
- * @package Mautic\EmailBundle\Form\Type
+ * Class EmailType.
  */
 class EmailType extends AbstractType
 {
-
     /**
      * @var MauticFactory
      */
@@ -40,53 +39,67 @@ class EmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('body' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
 
         $builder->add(
             'subject',
             'text',
-            array(
+            [
                 'label'      => 'mautic.email.subject',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false
-            )
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
         );
 
-        $user    = $this->factory->getUser();
+        $user = $this->factory->getUser();
+
+        $default = (empty($options['data']['fromname'])) ? $user->getFirstName().' '.$user->getLastName() : $options['data']['fromname'];
+        $builder->add(
+            'fromname',
+            'text',
+             [
+                'label'      => 'mautic.lead.email.from_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+                'data'       => $default,
+            ]
+        );
+
         $default = (empty($options['data']['from'])) ? $user->getEmail() : $options['data']['from'];
         $builder->add(
             'from',
             'text',
-            array(
-                'label'      => 'mautic.lead.email.from_email',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false,
-                'data'       => $default,
-                'constraints' => array(
-                    new NotBlank(array(
-                        'message' => 'mautic.core.email.required'
-                    )),
-                    new Email(array(
-                        'message' => 'mautic.core.email.required'
-                    )),
-                )
-            )
+            [
+                'label'       => 'mautic.lead.email.from_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'data'        => $default,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'mautic.core.email.required',
+                    ]),
+                    new Email([
+                        'message' => 'mautic.core.email.required',
+                    ]),
+                ],
+            ]
         );
 
         $builder->add(
             'body',
             'textarea',
-            array(
+            [
                 'label'      => 'mautic.email.form.body',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'                => 'form-control editor-basic-fullpage editor-builder-tokens',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens editor-email',
                     'data-token-callback'  => 'email:getBuilderTokens',
-                    'data-token-activator' => '{'
-                )
-            )
+                    'data-token-activator' => '{',
+                ],
+            ]
         );
 
         $builder->add('list', 'hidden');
@@ -94,28 +107,28 @@ class EmailType extends AbstractType
         $builder->add(
             'templates',
             'email_list',
-            array(
+            [
                 'label'      => 'mautic.lead.email.template',
-                'label_attr' => array('class' => 'control-label'),
+                'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
-                'attr'       => array(
+                'attr'       => [
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.getLeadEmailContent(this)'
-                ),
-                'multiple'   => false
-            )
+                    'onchange' => 'Mautic.getLeadEmailContent(this)',
+                ],
+                'multiple' => false,
+            ]
         );
 
-        $builder->add('buttons', 'form_buttons', array(
-            'apply_text'   => false,
-            'save_text'    => 'mautic.email.send',
-            'save_class'   => 'btn btn-primary',
-            'save_icon'    => 'fa fa-send',
-            'cancel_icon'  => 'fa fa-times'
-        ));
+        $builder->add('buttons', 'form_buttons', [
+            'apply_text'  => false,
+            'save_text'   => 'mautic.email.send',
+            'save_class'  => 'btn btn-primary',
+            'save_icon'   => 'fa fa-send',
+            'cancel_icon' => 'fa fa-times',
+        ]);
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -124,6 +137,6 @@ class EmailType extends AbstractType
      */
     public function getName()
     {
-        return "lead_quickemail";
+        return 'lead_quickemail';
     }
 }

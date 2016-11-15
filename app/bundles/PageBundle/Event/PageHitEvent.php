@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,48 +16,56 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 /**
- * Class PageHitEvent
+ * Class PageHitEvent.
  */
 class PageHitEvent extends CommonEvent
 {
+    /**
+     * @var
+     */
+    protected $request;
 
     /**
      * @var
      */
-    private $request;
-
-    /**
-     * @var
-     */
-    private $code;
+    protected $code;
 
     /**
      * @var Page
      */
-    private $page;
+    protected $page;
 
     /**
      * @var array
      */
-    private $clickthroughData = array();
+    protected $clickthroughData = [];
 
     /**
+     * @var bool
+     */
+    protected $unique;
+
+    /**
+     * PageHitEvent constructor.
+     *
      * @param Hit   $hit
      * @param       $request
      * @param       $code
      * @param array $clickthrough
+     * @param bool  $isUnique
      */
-    public function __construct(Hit $hit, $request, $code, $clickthrough = array())
+    public function __construct(Hit $hit, $request, $code, $clickthrough = [], $isUnique = false)
     {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
         $this->request          = $request;
         $this->code             = $code;
         $this->clickthroughData = $clickthrough;
+        $this->unique           = $isUnique;
     }
 
     /**
-     * Returns the Page entity
+     * Returns the Page entity.
      *
      * @return Page
      */
@@ -65,7 +75,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Get page request
+     * Get page request.
      *
      * @return string
      */
@@ -75,7 +85,7 @@ class PageHitEvent extends CommonEvent
     }
 
     /**
-     * Get HTML code
+     * Get HTML code.
      *
      * @return mixed
      */
@@ -98,5 +108,15 @@ class PageHitEvent extends CommonEvent
     public function getClickthroughData()
     {
         return $this->clickthroughData;
+    }
+
+    /**
+     * Returns if this page hit is unique.
+     *
+     * @return bool
+     */
+    public function isUnique()
+    {
+        return $this->unique;
     }
 }

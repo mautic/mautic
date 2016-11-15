@@ -1,35 +1,50 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
- * Class SearchSubscriber
- *
- * @package Mautic\ApiBundle\EventListener
+ * Class SearchSubscriber.
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var ClientModel
+     */
+    protected $apiClientModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param ClientModel $apiClientModel
+     */
+    public function __construct(ClientModel $apiClientModel)
+    {
+        $this->apiClientModel = $apiClientModel;
+    }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0)
-        );
+        return [
+            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+        ];
     }
 
     /**
@@ -43,32 +58,32 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $clients = $this->factory->getModel('api.client')->getEntities(
-                array(
+            $clients = $this->apiClientModel->getEntities(
+                [
                     'limit'  => 5,
-                    'filter' => $str
-                ));
+                    'filter' => $str,
+                ]);
 
             if (count($clients) > 0) {
-                $clientResults = array();
-                $canEdit     = $this->security->isGranted('api:clients:edit');
+                $clientResults = [];
+                $canEdit       = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
                     $clientResults[] = $this->templating->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'client'  => $client,
-                            'canEdit' => $canEdit
-                        )
+                            'canEdit' => $canEdit,
+                        ]
                     )->getContent();
                 }
                 if (count($clients) > 5) {
                     $clientResults[] = $this->templating->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
-                        array(
+                        [
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($clients) - 5)
-                        )
+                            'remaining'    => (count($clients) - 5),
+                        ]
                     )->getContent();
                 }
                 $clientResults['count'] = count($clients);
@@ -82,11 +97,11 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security   = $this->security;
+        $security = $this->security;
         if ($security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
-                $this->factory->getModel('api.client')->getCommandList()
+                $this->apiClientModel->getCommandList()
             );
         }
     }

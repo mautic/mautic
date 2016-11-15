@@ -34,10 +34,9 @@
 @text-color:            lighten(@gray-dark, 5%);
 
 //** Global textual link color.
-@link-color:            lighten(@brand-primary, 10%);
+@link-color:            @brand-primary;
 //** Link hover color set via `darken()` function.
-@link-hover-color:      @brand-primary;
-
+@link-hover-color:      darken(@brand-primary, 10%);
 
 //== Typography
 //

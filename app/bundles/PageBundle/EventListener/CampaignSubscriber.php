@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,57 +13,143 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class CampaignSubscriber
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
+     * CampaignSubscriber constructor.
+     *
+     * @param PageModel  $pageModel
+     * @param EventModel $campaignEventModel
+     */
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
+    {
+        $this->pageModel          = $pageModel;
+        $this->campaignEventModel = $campaignEventModel;
+    }
 
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            PageEvents::PAGE_ON_HIT           => array('onPageHit', 0)
-        );
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
+            PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
+            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+        ];
     }
 
     /**
-     * Add event triggers and actions
+     * Add event triggers and actions.
      *
      * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         //Add trigger
-        $pageHitTrigger = array(
+        $pageHitTrigger = [
             'label'       => 'mautic.page.campaign.event.pagehit',
             'description' => 'mautic.page.campaign.event.pagehit_descr',
             'formType'    => 'campaignevent_pagehit',
-            'callback'    => '\Mautic\PageBundle\Helper\CampaignEventHelper::onPageHit'
-        );
-        $event->addLeadDecision('page.pagehit', $pageHitTrigger);
+            'eventName'   => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+        ];
+        $event->addDecision('page.pagehit', $pageHitTrigger);
     }
 
     /**
-     * Trigger actions for page hits
+     * Trigger actions for page hits.
      *
      * @param PageHitEvent $event
      */
     public function onPageHit(PageHitEvent $event)
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model  = $this->factory->getModel('campaign');
-        $hit    = $event->getHit();
-        $page   = $hit->getPage();
-        $typeId = $page instanceof Page ? 'page.pagehit.' . $page->getId() : null;
-        $model->triggerEvent('page.pagehit', $hit, $typeId);
+        $hit       = $event->getHit();
+        $channel   = 'page';
+        $channelId = null;
+
+        if ($redirect = $hit->getRedirect()) {
+            $channel   = 'page.redirect';
+            $channelId = $redirect->getId();
+        } elseif ($page = $hit->getPage()) {
+            $channelId = $page->getId();
+        }
+
+        $this->campaignEventModel->triggerEvent('page.pagehit', $hit, $channel, $channelId);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    {
+        $eventDetails = $event->getEventDetails();
+        $config       = $event->getConfig();
+
+        if ($eventDetails == null) {
+            return true;
+        }
+
+        $pageHit = $eventDetails->getPage();
+
+        // Check Landing Pages
+        if ($pageHit instanceof Page) {
+            list($parent, $children) = $pageHit->getVariants();
+            //use the parent (self or configured parent)
+            $pageHitId = $parent->getId();
+        } else {
+            $pageHitId = 0;
+        }
+
+        $limitToPages = $config['pages'];
+
+        $urlMatches = [];
+
+        // Check Landing Pages URL or Tracing Pixel URL
+        if (isset($config['url']) && $config['url']) {
+            $pageUrl     = $eventDetails->getUrl();
+            $limitToUrls = explode(',', $config['url']);
+
+            foreach ($limitToUrls as $url) {
+                $url              = trim($url);
+                $urlMatches[$url] = fnmatch($url, $pageUrl);
+            }
+        }
+
+        // **Page hit is true if:**
+        // 1. no landing page is set and no URL rule is set
+        $applyToAny = (empty($config['url']) && empty($limitToPages));
+
+        // 2. some landing pages are set and page ID match
+        $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));
+
+        // 3. URL rule is set and match with URL hit
+        $urlIsHit = (!empty($config['url']) && in_array(true, $urlMatches));
+
+        if ($applyToAny || $langingPageIsHit || $urlIsHit) {
+            return $event->setResult(true);
+        }
+
+        return $event->setResult(false);
     }
 }

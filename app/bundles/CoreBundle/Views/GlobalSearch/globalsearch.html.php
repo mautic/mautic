@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -18,9 +20,9 @@
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
                 <div class="scroll-content slimscroll" style="height:250px;" id="globalSearchResults">
-                    <?php echo $view->render('MauticCoreBundle:GlobalSearch:results.html.php', array(
-                        'results' => $results
-                    )); ?>
+                    <?php echo $view->render('MauticCoreBundle:GlobalSearch:results.html.php', [
+                        'results' => $results,
+                    ]); ?>
                 </div>
             </div>
         </div>
@@ -31,6 +33,6 @@
         <a href="javascript: void(0);" class="search-button">
             <i class="fa fa-search fs-16"></i>
         </a>
-        <input type="search" value="<?php echo $searchString; ?>" class="form-control search" id="globalSearchInput" name="global_search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.everything.placeholder'); ?>" value="" autocomplete="false" data-toggle="livesearch" data-target="#globalSearchResults" data-action="<?php echo $view['router']->generate('mautic_core_ajax', array('action' => 'globalSearch')); ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
+        <input type="search" value="<?php echo $searchString; ?>" class="form-control search" id="globalSearchInput" name="global_search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.everything.placeholder'); ?>" value="" autocomplete="false" data-toggle="livesearch" data-target="#globalSearchResults" data-action="<?php echo $view['router']->path('mautic_core_ajax', ['action' => 'globalSearch']); ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
     </div>
 </li>

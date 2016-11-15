@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,22 +13,42 @@ namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
 
-
 /**
- * Class InputHelper
+ * Class InputHelper.
  */
 class InputHelper
 {
     /**
+     * String filter.
+     *
      * @var InputFilter
      */
-    private static $filter;
+    private static $stringFilter;
 
-    private static function getFilter()
+    /**
+     * HTML filter.
+     *
+     * @var InputFilter
+     */
+    private static $htmlFilter;
+
+    /**
+     * @var
+     */
+    private static $strictHtmlFilter;
+
+    /**
+     * @param bool $html
+     * @param bool $strict
+     *
+     * @return InputFilter
+     */
+    private static function getFilter($html = false, $strict = false)
     {
-        if (empty(self::$filter)) {
-            self::$filter = new InputFilter(array(), array(), 1, 1);
-            self::$filter->tagBlacklist = array(
+        if (empty(self::$htmlFilter)) {
+            // Most of Mautic's HTML uses include full HTML documents so use blacklist method
+            self::$htmlFilter               = new InputFilter([], [], 1, 1);
+            self::$htmlFilter->tagBlacklist = [
                 'applet',
                 'bgsound',
                 'base',
@@ -34,25 +56,50 @@ class InputHelper
                 'embed',
                 'frame',
                 'frameset',
-                //'iframe',
                 'ilayer',
                 'layer',
                 'object',
-                'xml'
-            );
+                'xml',
+            ];
 
-            self::$filter->attrBlacklist = array(
+            self::$htmlFilter->attrBlacklist = [
                 'codebase',
                 'dynsrc',
-                'lowsrc'
-            );
+                'lowsrc',
+            ];
+
+            // Strict HTML - basic one liner formating really
+            self::$strictHtmlFilter = new InputFilter(
+                [
+                    'b',
+                    'i',
+                    'u',
+                    'em',
+                    'strong',
+                    'a',
+                    'span',
+                ], [], 0, 1);
+
+            self::$strictHtmlFilter->attrBlacklist = [
+                'codebase',
+                'dynsrc',
+                'lowsrc',
+            ];
+
+            // Standard behavior if HTML is not specifically used
+            self::$stringFilter = new InputFilter();
         }
 
-        return self::$filter;
+        switch (true) {
+            case $html:
+                return ($strict) ? self::$strictHtmlFilter : self::$htmlFilter;
+            default:
+                return self::$stringFilter;
+        }
     }
 
     /**
-     * Wrapper to InputHelper
+     * Wrapper to InputHelper.
      *
      * @param $name
      * @param $arguments
@@ -86,12 +133,15 @@ class InputHelper
                         } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
                             $useMask = $mask[$k];
                         }
+                    } elseif (is_array($v)) {
+                        // Likely a collection so use the same mask
+                        $useMask = $mask;
                     }
                 } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
                     $useMask = $mask;
                 }
 
-                if (is_array($v) && is_array($useMask)) {
+                if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
                 } elseif ($useMask == 'filter') {
                     $v = self::getFilter()->clean($v, $useMask);
@@ -102,21 +152,14 @@ class InputHelper
 
             return $value;
         } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
-            if (is_array($value)) {
-                foreach ($value as $k => &$v) {
-                    $v = self::$mask($v, $urldecode);
-                }
-                return $value;
-            } else {
-                return self::$mask($value, $urldecode);
-            }
+            return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);
         }
     }
 
     /**
-     * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32
+     * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -139,7 +182,7 @@ class InputHelper
     }
 
     /**
-     * Strips tags
+     * Strips tags.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -156,7 +199,7 @@ class InputHelper
     }
 
     /**
-     * Strips non-alphanumeric characters
+     * Strips non-alphanumeric characters.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -165,28 +208,42 @@ class InputHelper
      *
      * @return string
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = array())
+    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
         if ($convertSpacesTo) {
-            $value = str_replace(' ', $convertSpacesTo, $value);
+            $value               = str_replace(' ', $convertSpacesTo, $value);
             $allowedCharacters[] = $convertSpacesTo;
         }
 
         if (!empty($allowedCharacters)) {
-            $regex = "/[^0-9a-z".implode('', $allowedCharacters)."]+/i";
+            $regex = '/[^0-9a-z'.implode('', $allowedCharacters).']+/i';
         } else {
-            $regex = "/[^0-9a-z]+/i";
+            $regex = '/[^0-9a-z]+/i';
         }
 
-        return trim(preg_replace($regex, "", $value));
+        return trim(preg_replace($regex, '', $value));
     }
 
     /**
-     * Returns raw value
+     * Returns a satnitized string which can be used in a file system.
+     *
+     * @param  $value
+     *
+     * @return string
+     */
+    public static function filename($value)
+    {
+        $value = str_replace(' ', '_', $value);
+
+        return preg_replace("/[^a-z0-9\.\_]/", '', strtolower($value));
+    }
+
+    /**
+     * Returns raw value.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -203,43 +260,7 @@ class InputHelper
     }
 
     /**
-     * Returns float value
-     *
-     * @param mixed $value
-     *
-     * @return float
-     */
-    public static function float($value)
-    {
-        return (float) filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND);
-    }
-
-    /**
-     * Returns int value
-     *
-     * @param mixed $value
-     *
-     * @return int
-     */
-    public static function int($value)
-    {
-        return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-    }
-
-    /**
-     * Returns boolean value
-     *
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    public static function boolean($value)
-    {
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
-     * Removes all characters except those allowed in URLs
+     * Removes all characters except those allowed in URLs.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -250,14 +271,14 @@ class InputHelper
      *
      * @return mixed|string
      */
-    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array(), $ignoreFragment = false)
+    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], $ignoreFragment = false)
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
         if (empty($allowedProtocols)) {
-            $allowedProtocols = array('https', 'http', 'ftp');
+            $allowedProtocols = ['https', 'http', 'ftp'];
         }
         if (empty($defaultProtocol)) {
             $defaultProtocol = 'http';
@@ -286,14 +307,14 @@ class InputHelper
             }
 
             $value =
-                (!empty($parts["scheme"])   ? $parts["scheme"]."://" :"") .
-                (!empty($parts["user"])     ? $parts["user"].":"     :"") .
-                (!empty($parts["pass"])     ? $parts["pass"]."@"     :"") .
-                (!empty($parts["host"])     ? $parts["host"]         :"") .
-                (!empty($parts["port"])     ? ":".$parts["port"]     :"") .
-                (!empty($parts["path"])     ? $parts["path"]         :"") .
-                (!empty($parts["query"])    ? "?".$parts["query"]    :"") .
-                (!$ignoreFragment && !empty($parts["fragment"]) ? "#".$parts["fragment"] :"");
+                (!empty($parts['scheme']) ? $parts['scheme'].'://' : '').
+                (!empty($parts['user']) ? $parts['user'].':' : '').
+                (!empty($parts['pass']) ? $parts['pass'].'@' : '').
+                (!empty($parts['host']) ? $parts['host'] : '').
+                (!empty($parts['port']) ? ':'.$parts['port'] : '').
+                (!empty($parts['path']) ? $parts['path'] : '').
+                (!empty($parts['query']) ? '?'.$parts['query'] : '').
+                (!$ignoreFragment && !empty($parts['fragment']) ? '#'.$parts['fragment'] : '');
         } else {
             //must have a really bad URL since parse_url returned false so let's just clean it
             $value = self::clean($value);
@@ -306,7 +327,7 @@ class InputHelper
     }
 
     /**
-     * Removes all characters except those allowed in emails
+     * Removes all characters except those allowed in emails.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -325,7 +346,7 @@ class InputHelper
     }
 
     /**
-     * Returns a clean array
+     * Returns a clean array.
      *
      * @param            $value
      * @param bool|false $urldecode
@@ -337,14 +358,14 @@ class InputHelper
         $value = self::clean($value, $urldecode);
 
         if (!is_array($value)) {
-            $value = array($value);
+            $value = [$value];
         }
 
         return $value;
     }
 
     /**
-     * Returns clean HTML
+     * Returns clean HTML.
      *
      * @param $value
      *
@@ -358,18 +379,18 @@ class InputHelper
             }
         } else {
             // Special handling for doctype
-            $doctypeFound = preg_match("/(<!DOCTYPE(.*?)>)/is", $value, $doctype);
+            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
 
             // Special handling for CDATA tags
-            $value = str_replace(array('<![CDATA[', ']]>'), array('<mcdata>', '</mcdata>'), $value, $cdataCount);
+            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
 
             // Special handling for conditional blocks
             $value = preg_replace("/<!--\[if(.*?)\]>(.*?)<!\[endif\]-->/is", '<mcondition><mif>$1</mif>$2</mcondition>', $value, -1, $conditionsFound);
 
             // Special handling for HTML comments
-            $value = str_replace(array('<!--', '-->'), array('<mcomment>', '</mcomment>'), $value, $commentCount);
+            $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            $value = self::getFilter()->clean($value, 'html');
+            $value = self::getFilter(true)->clean($value, 'html');
 
             // Was a doctype found?
             if ($doctypeFound) {
@@ -377,7 +398,7 @@ class InputHelper
             }
 
             if ($cdataCount) {
-                $value = str_replace(array('<mcdata>', '</mcdata>'), array('<![CDATA[', ']]>'), $value);
+                $value = str_replace(['<mcdata>', '</mcdata>'], ['<![CDATA[', ']]>'], $value);
             }
 
             if ($conditionsFound) {
@@ -386,7 +407,7 @@ class InputHelper
             }
 
             if ($commentCount) {
-                $value = str_replace(array('<mcomment>', '</mcomment>'), array('<!--', '-->'), $value   );
+                $value = str_replace(['<mcomment>', '</mcomment>'], ['<!--', '-->'], $value);
             }
         }
 
@@ -394,7 +415,25 @@ class InputHelper
     }
 
     /**
-     * Converts UTF8 into Latin
+     * Allows tags 'b', 'i', 'u', 'em', 'strong', 'a', 'span'.
+     *
+     * @param $data
+     *
+     * @return mixed|string
+     */
+    public static function strict_html($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::strict_html($val);
+            }
+        }
+
+        return self::getFilter(true, true)->clean($value, 'html');
+    }
+
+    /**
+     * Converts UTF8 into Latin.
      *
      * @param $value
      *
@@ -402,6 +441,12 @@ class InputHelper
      */
     public static function transliterate($value)
     {
+        $transId = 'Any-Latin; Latin-ASCII';
+        if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
+            // Use intl by default
+            return $trans->transliterate($value);
+        }
+
         return \URLify::transliterate($value);
     }
 }

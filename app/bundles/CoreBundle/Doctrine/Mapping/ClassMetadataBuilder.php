@@ -1,26 +1,38 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
- * Class ClassMetadataBuilder
+ * Class ClassMetadataBuilder.
  *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @link https://github.com/doctrine/doctrine2/pull/1326/
- *
- * @package Mautic\CoreBundle\Doctrine\Metadata
  */
 class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder
 {
+    /**
+     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
+     */
+    public function __construct(ClassMetadataInfo $cm)
+    {
+        parent::__construct($cm);
+
+        // Default all Mautic entities to explicit
+        $this->setChangeTrackingPolicyDeferredExplicit();
+    }
+
     /**
      * Creates a ManyToOne Association Builder.
      *
@@ -35,10 +47,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new AssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::MANY_TO_ONE
         );
     }
@@ -55,10 +67,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new AssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::ONE_TO_ONE
         );
     }
@@ -75,10 +87,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new ManyToManyAssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::MANY_TO_MANY
         );
     }
@@ -95,16 +107,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new OneToManyAssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::ONE_TO_MANY
         );
     }
 
     /**
-     * Add Id column
+     * Add Id column.
      */
     public function addId()
     {
@@ -115,14 +127,13 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add id, name, and description columns
+     * Add id, name, and description columns.
      *
      * @param string $nameColumn
      * @param string $descriptionColumn
      */
-    public function addIdColumns ($nameColumn = 'name', $descriptionColumn = 'description')
+    public function addIdColumns($nameColumn = 'name', $descriptionColumn = 'description')
     {
-
         $this->addId();
 
         if ($nameColumn) {
@@ -138,7 +149,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add category to metadata
+     * Add category to metadata.
      */
     public function addCategory()
     {
@@ -148,7 +159,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add publish up and down dates to metadata
+     * Add publish up and down dates to metadata.
      */
     public function addPublishDates()
     {
@@ -164,7 +175,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Added dateAdded column
+     * Added dateAdded column.
      *
      * @param bool|false $nullable
      */
@@ -181,7 +192,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add a lead column
+     * Add a lead column.
      *
      * @param bool|false $nullable
      * @param string     $onDelete
@@ -206,7 +217,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Adds IP address
+     * Adds IP address.
      *
      * @param bool|false $nullable
      */
@@ -220,7 +231,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add a nullable field
+     * Add a nullable field.
      *
      * @param        $name
      * @param string $type
@@ -239,7 +250,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add a field with a custom column name
+     * Add a field with a custom column name.
      *
      * @param            $name
      * @param            $type
@@ -259,7 +270,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     }
 
     /**
-     * Add partial index
+     * Add partial index.
      *
      * @param array $columns
      * @param       $name
@@ -272,15 +283,15 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         $cm = $this->getClassMetadata();
 
         if (!isset($cm->table['indexes'])) {
-            $cm->table['indexes'] = array();
+            $cm->table['indexes'] = [];
         }
 
-        $cm->table['indexes'][$name] = array('
+        $cm->table['indexes'][$name] = ['
             columns'  => $columns,
-            'options' => array(
-                'where' => $where
-            )
-        );
+            'options' => [
+                'where' => $where,
+            ],
+        ];
 
         return $this;
     }

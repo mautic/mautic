@@ -1,14 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-if (!isset($target))
+if (!isset($target)) {
     $target = '.page-list';
+}
 
 if (!empty($checkall)):
 ?>
@@ -20,15 +22,19 @@ if (!empty($checkall)):
         </label>
     </div>
 </th>
+<?php elseif (empty($sessionVar)) : ?>
+<th<?php echo (!empty($class)) ? ' class="'.$class.'"' : ''; ?>>
+    <span><?php echo $view['translator']->trans($text); ?></span>
+</th>
 <?php
 else:
-$defaultOrder = (!empty($default)) ? $orderBy : "";
+$defaultOrder = (!empty($default)) ? $orderBy : '';
 $order        = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
-$dir          = (!empty($dir))? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", "ASC");
-$filters      = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", array());
+$dir          = (!empty($dir)) ? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", 'ASC');
+$filters      = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", []);
 $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
 ?>
-<th<?php echo (!empty($class)) ? ' class="' . $class . '"': ""; ?>>
+<th<?php echo (!empty($class)) ? ' class="'.$class.'"' : ''; ?>>
     <div class="thead-filter">
         <?php if (!empty($orderBy)): ?>
         <a href="javascript: void(0);" onclick="Mautic.reorderTableData('<?php echo $sessionVar; ?>','<?php echo $orderBy; ?>','<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
@@ -43,12 +49,12 @@ $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
 
         <?php if (!empty($filterBy)): ?>
         <?php $value = (isset($filters[$filterBy])) ? $filters[$filterBy]['value'] : ''; ?>
-        <div class="input-group">
-            <?php $toggle = (!empty($dataToggle)) ? ' data-toggle="'.$dataToggle.'"' : ""; ?>
+        <div class="input-group input-group-sm">
+            <?php $toggle = (!empty($dataToggle)) ? ' data-toggle="'.$dataToggle.'"' : ''; ?>
             <input type="text" placeholder="<?php echo $view['translator']->trans('mautic.core.form.thead.filter'); ?>" autocomplete="false" class="form-control input-sm" value="<?php echo $value; ?>"<?php echo $toggle; ?> onchange="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);" />
-            <?php $inputClass =  (!empty($value)) ? 'fa-times' : 'fa-filter'; ?>
+            <?php $inputClass = (!empty($value)) ? 'fa-times' : 'fa-filter'; ?>
             <span class="input-group-btn">
-                <button class="btn btn-default btn-sm" onclick="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',<?php echo (!empty($value)) ? "''," : "this.value,"; ?>'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
+                <button class="btn btn-default btn-xs" onclick="Mautic.filterTableData('<?php echo $sessionVar; ?>','<?php echo $filterBy; ?>',<?php echo (!empty($value)) ? "''," : 'mQuery(this).parent().prev().val(),'; ?>'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
                     <i class="fa fa-fw fa-lg <?php echo $inputClass; ?>"></i>
                 </button>
             </span>

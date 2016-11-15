@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -14,22 +16,25 @@ $index  = count($form['filters']->vars['value']) ? max(array_keys($form['filters
 
 if (!empty($id)) {
     $name   = $form->vars['data']->getName();
-    $header = $view['translator']->trans('mautic.lead.list.header.edit', array("%name%" => $name));
+    $header = $view['translator']->trans('mautic.lead.list.header.edit', ['%name%' => $name]);
 } else {
     $header = $view['translator']->trans('mautic.lead.list.header.new');
 }
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
-$templates = array(
+$templates = [
     'countries' => 'country-template',
     'regions'   => 'region-template',
     'timezones' => 'timezone-template',
     'select'    => 'select-template',
     'lists'     => 'leadlist-template',
-    'tags'      => 'tags-template'
-);
+    'emails'    => 'lead_email_received-template',
+    'tags'      => 'tags-template',
+    'stage'     => 'stage-template',
+    'locales'   => 'locale-template',
+];
 
-$mainErrors   = ($view['form']->containsErrors($form, array('filters'))) ? 'class="text-danger"' : '';
+$mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
 $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
 ?>
 
@@ -80,24 +85,22 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                 <select class="chosen form-control" id="available_filters">
                                     <option value=""></option>
                                     <?php
-                                    foreach ($fields as $value => $params):
-                                        $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                        if (!is_array($list) && strpos($list, '|') !== false):
-                                            $parts = explode('||', $list);
-                                            if (count($parts) > 1):
-                                                $labels = explode('|', $parts[0]);
-                                                $values = explode('|', $parts[1]);
-                                                $list = array_combine($values, $labels);
-                                            else:
-                                                $list = explode('|', $list);
-                                                $list = array_combine($list, $list);
-                                            endif;
-                                        endif;
-                                        $list      = json_encode($list);
-                                        $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                        $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
-                                        ?>
-                                        <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                    foreach ($fields as $object => $field):
+                                        $header = $object;
+                                        $icon   = ($object == 'company') ? 'fa-building' : 'fa-user';
+                                    ?>
+                                    <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
+                                        <?php foreach ($field as $value => $params):
+                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
+                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
+                                            $object    = $object;
+                                            $list      = json_encode($choices);
+                                            $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
+                                            $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
+                                            ?>
+                                            <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>" class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -122,20 +125,21 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="' . $view['translator']->trans('mautic.lead.tags.select_or_create') . '" data-no-results-text="' . $view['translator']->trans('mautic.lead.tags.enter_to_create') . '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
                 foreach ($form->vars[$dataKey] as $value => $label):
                     if (is_array($label)):
-                        echo "<optgroup label=\"$value\">$value</optgroup>\n";
+                        echo "<optgroup label=\"$value\">\n";
                         foreach ($label as $optionValue => $optionLabel):
                             echo "<option value=\"$optionValue\">$optionLabel</option>\n";
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId))
+                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
+                        }
                         echo "<option value=\"$value\">$label</option>\n";
                     endif;
                 endforeach;

@@ -8,8 +8,7 @@ Mautic.initiateIntegrationAuthorization = function() {
 
 Mautic.loadIntegrationAuthWindow = function(response) {
     if (response.newContent) {
-        response.target = '#IntegrationEditModal .modal-body-content';
-        Mautic.processPageContent(response);
+        Mautic.processModalContent(response, '#IntegrationEditModal');
     } else {
         Mautic.stopPageLoadingBar();
         Mautic.stopIconSpinPostEvent();
@@ -19,7 +18,7 @@ Mautic.loadIntegrationAuthWindow = function(response) {
             var generator = window.open(response.authUrl, 'integrationauth', 'height=500,width=500');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(response.popupBlockerMessage);
+                alert(mauticLang.popupBlockerMessage);
             }
         }
     }

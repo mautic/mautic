@@ -1,26 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
- * Class FacebookIntegration
+ * Class FacebookIntegration.
  */
 class FacebookIntegration extends SocialIntegration
 {
-    /**
-     * Used in getUserData to prevent a double user search call with getUserId
-     *
-     * @var bool
-     */
-    private $preventDoubleCall = false;
-
     /**
      * {@inheritdoc}
      */
@@ -34,9 +29,9 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getIdentifierFields()
     {
-        return array(
-            'facebook'
-        );
+        return [
+            'facebook',
+        ];
     }
 
     /**
@@ -44,9 +39,11 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getSupportedFeatures()
     {
-        return array(
-            'share_button'
-        );
+        return [
+            'share_button',
+            'login_button',
+            'public_profile',
+        ];
     }
 
     /**
@@ -75,13 +72,16 @@ class FacebookIntegration extends SocialIntegration
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
-        if ($postAuthorization) {
+        // Facebook is inconsistent in that it returns errors as json and data as parameter list
+        $values = parent::parseCallbackResponse($data, $postAuthorization);
+
+        if (null === $values) {
             parse_str($data, $values);
 
-            return $values;
-        } else {
-            return parent::parseCallbackResponse($data, $postAuthorization);
+            $this->factory->getSession()->set($this->getName().'_tokenResponse', $values);
         }
+
+        return $values;
     }
 
     /**
@@ -95,7 +95,7 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * Get public data
+     * Get public data.
      *
      * @param $identifier
      * @param $socialCache
@@ -104,80 +104,72 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        //tell getUserId to return a user array if it obtains it
-        $this->preventDoubleCall = true;
+        $this->persistNewLead = false;
+        $accessToken          = $this->getContactAccessToken($socialCache);
 
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-            if (is_object($id)) {
-                //getUserId has already obtained the data
-                $data = $id;
-            } else {
-                $url    = $this->getApiUrl("$id");
-                //@todo - can't use access token to do a global search; may not work after April
-                $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
-            }
+        if (!isset($accessToken['access_token'])) {
+            return;
+        }
 
-            if (is_object($data) && !isset($data->error)) {
-                $info                  = $this->matchUpData($data);
-                if (isset($data->username)) {
-                    $info['profileHandle'] = $data->username;
-                } elseif (isset($data->link)) {
-                    $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
-                } else {
-                    $info['profileHandle'] = $data->id;
+        $url    = $this->getApiUrl('v2.5/me');
+        $fields = array_keys($this->getAvailableLeadFields());
+
+        $parameters = [
+            'access_token' => $accessToken['access_token'],
+            'fields'       => implode(',', $fields),
+        ];
+
+        $data = $this->makeRequest($url, $parameters, 'GET', ['auth_type' => 'rest']);
+
+        if (is_object($data) && isset($data->id)) {
+            $info = $this->matchUpData($data);
+
+            if (isset($data->username)) {
+                $info['profileHandle'] = $data->username;
+            } elseif (isset($data->link)) {
+                if (preg_match("/www.facebook.com\/(app_scoped_user_id\/)?(.*?)($|\/)/", $data->link, $matches)) {
+                    $info['profileHandle'] = $matches[2];
                 }
-
-                $info['profileImage']  = "https://graph.facebook.com/{$data->id}/picture?type=large";
-
-                $socialCache['profile'] = $info;
+            } else {
+                $info['profileHandle'] = $data->id;
             }
-            $this->preventDoubleCall = false;
+            $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
+
+            $socialCache['id']          = $data->id;
+            $socialCache['profile']     = $info;
+            $socialCache['lastRefresh'] = new \DateTime();
+            $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
+
+            $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
+
+            return $data;
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUserId($identifier, &$socialCache)
+    public function getAvailableLeadFields($settings = [])
     {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
-        $identifiers = $this->cleanIdentifier($identifier);
-
-        if (isset($identifiers['facebook'])) {
-            $url    = $this->getApiUrl($identifiers["facebook"]);
-            //@todo - can't use access token to do a global search; may not work after April
-            $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
-
-            if ($data && isset($data->id)) {
-                $socialCache['id'] = $data->id;
-
-                //return the entire data set if the function has been called from getUserData()
-                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableLeadFields($settings = array())
-    {
-        // Until lead profile support is restored
-        return array();
-
-        return array(
-            'first_name' => array('type' => 'string'),
-            'last_name'  => array('type' => 'string'),
-            'name'       => array('type' => 'string'),
-            'gender'     => array('type' => 'string'),
-            'locale'     => array('type' => 'string')
-        );
+        return [
+            'about'       => ['type' => 'string'],
+            'bio'         => ['type' => 'string'],
+            'birthday'    => ['type' => 'string'],
+            'email'       => ['type' => 'string'],
+            'first_name'  => ['type' => 'string'],
+            'gender'      => ['type' => 'string'],
+            'last_name'   => ['type' => 'string'],
+            'link'        => ['type' => 'string'],
+            'locale'      => ['type' => 'string'],
+            'middle_name' => ['type' => 'string'],
+            'name'        => ['type' => 'string'],
+            'political'   => ['type' => 'string'],
+            'quotes'      => ['type' => 'string'],
+            'religion'    => ['type' => 'string'],
+            'timezone'    => ['type' => 'string'],
+            'website'     => ['type' => 'string'],
+        ];
     }
 }

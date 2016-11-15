@@ -527,7 +527,7 @@ body > #app-wrapper {
   background-color: rgba(255, 255, 255, 0.06);
 }
 .app-sidebar .sidebar-header {
-  z-index: 10;
+  z-index: 100;
   height: 60px;
   padding-left: 15px;
   padding-right: 15px;
@@ -1541,6 +1541,19 @@ a.media {
   color: #f2f2f2;
   background-color: #4e5d9d;
 }
+.extra-menu {
+  height: 60px;
+  padding-top: 20px;
+  position: absolute;
+  right: 15px;
+}
+.extra-menu a {
+  font-size: 1.1em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.extra-menu a:hover {
+  color: #fff;
+}
 .list-group-item > a {
   position: relative;
   z-index: 1;
@@ -1615,16 +1628,6 @@ ul.dropdown-menu-form {
   padding: 0 5px 0 30px;
   max-height: 300px;
   overflow-y: auto;
-}
-@media (max-width: 767px) {
-  .table-responsive .dropdown-menu {
-    position: static !important;
-  }
-}
-@media (min-width: 768px) {
-  .table-responsive {
-    overflow: visible;
-  }
 }
 .nav > li > a {
   font-weight: normal;
@@ -1840,6 +1843,9 @@ ul.dropdown-menu-form {
   padding-right: 32px;
   width: 100%;
   overflow: hidden;
+}
+.mautic-brand.pull-left {
+  width: 75%;
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
@@ -4257,32 +4263,8 @@ lesshat-selector { -lh-property: 0 ;
   margin: 6px 12px;
   white-space: normal;
 }
-.builder .list-group-item.ui-draggable-dragging {
-  background-color: #fff;
-}
-.builder .over-droppable {
-  border: dashed 2px #4e5e9e;
-  -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  font-weight: bold;
-  font-size: 2em;
-}
 .builder .builder-panel-top {
-  position: fixed;
-  top: 0;
-  z-index: 1030;
-  background-color: #d5d4d4;
-  padding-top: 10px;
-  width: 255px;
-}
-.builder .builder-tokens {
-  margin-top: 140px;
-}
-.builder #customHtmlDropzone {
-  height: 95px;
-  display: table;
-  width: 100%;
+  margin-bottom: 10px;
 }
 .builder .template-dnd-help,
 .builder .custom-dnd-help {
@@ -4302,7 +4284,7 @@ lesshat-selector { -lh-property: 0 ;
   z-index: 1030;
 }
 .builder-panel {
-  position: fixed;
+  position: absolute;
   top: 0;
   bottom: 0;
   right: 0;
@@ -4337,6 +4319,7 @@ lesshat-selector { -lh-property: 0 ;
     padding-left: 30px !important;
     padding-right: 30px !important;
     border-top: 1px solid #757575;
+    position: fixed;
   }
   .builder .builder-content {
     right: 0;
@@ -4517,9 +4500,7 @@ label.required:after {
   z-index: 9999;
 }
 body.noscroll {
-  position: fixed;
-  overflow-y: scroll;
-  width: 100%;
+  overflow: hidden;
 }
 .form-select-modal .panel-body {
   min-height: 150px;
@@ -4536,4 +4517,161 @@ body.noscroll {
 .table .input-group-sm .dropdown-toggle {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+.input-group .input-group-btn button {
+  height: 32px;
+}
+.theme-selected {
+  border: 1px solid #4e5e9e;
+  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
+  box-shadow: 0px 0px 40px #f3f3f3;
+}
+#app-content.content-only .toolbar-form-buttons.pull-right {
+  padding-right: 20px;
+}
+.fr-toolbar {
+  border-top: 2px solid #4e5d9d;
+}
+.modal-body-content iframe.fr-iframe {
+  min-height: 300px;
+}
+.CodeMirror {
+  border: 1px solid #d5d5d5;
+  border-radius: 3px;
+}
+table.table > tbody > tr > td.long-text {
+  max-width: 500px;
+  min-width: 300px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
+}
+/*!
+ * bootstrap-vertical-tabs - v1.1.0
+ * https://dbtek.github.io/bootstrap-vertical-tabs
+ * 2014-06-06
+ * Copyright (c) 2014 Ä°smail Demirbilek
+ * License: MIT
+ */
+.tabs-left,
+.tabs-right {
+  border-bottom: none;
+  padding-top: 2px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.tabs-left {
+  border-right: 1px solid #ddd;
+  padding-right: 0 !important;
+}
+.tabs-right {
+  border-left: 1px solid #ddd;
+  padding-left: 0 !important;
+}
+.tabs-left > li,
+.tabs-right > li {
+  float: none;
+  margin-bottom: 2px;
+}
+.tabs-left > li {
+  margin-right: -1px;
+}
+.tabs-right > li {
+  margin-left: -1px;
+}
+.tabs-left > li.active > a,
+.tabs-left > li.active > a:hover,
+.tabs-left > li.active > a:focus {
+  border-bottom-color: #ddd;
+  border-right-color: transparent;
+}
+.tabs-right > li.active > a,
+.tabs-right > li.active > a:hover,
+.tabs-right > li.active > a:focus {
+  border-bottom: 1px solid #ddd;
+  border-left-color: transparent;
+}
+.tabs-left > li > a {
+  border-radius: 4px 0 0 4px;
+  margin-right: 0;
+  display: block;
+}
+.tabs-right > li > a {
+  border-radius: 0 4px 4px 0;
+  margin-right: 0;
+}
+.vertical-text {
+  margin-top: 50px;
+  border: none;
+  position: relative;
+}
+.vertical-text > li {
+  height: 20px;
+  width: 120px;
+  margin-bottom: 100px;
+}
+.vertical-text > li > a {
+  border-bottom: 1px solid #ddd;
+  border-right-color: transparent;
+  text-align: center;
+  border-radius: 4px 4px 0px 0px;
+}
+.vertical-text > li.active > a,
+.vertical-text > li.active > a:hover,
+.vertical-text > li.active > a:focus {
+  border-bottom-color: transparent;
+  border-right-color: #ddd;
+  border-left-color: #ddd;
+}
+.vertical-text.tabs-left {
+  left: -50px;
+}
+.vertical-text.tabs-right {
+  right: -50px;
+}
+.vertical-text.tabs-right > li {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.vertical-text.tabs-left > li {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+.dynamicContentFilterContainer .btn-primary:hover {
+  color: #5d6c7c;
+}
+#dynamicContentContainer .remove-item {
+  display: block;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul {
+  white-space: nowrap;
+  overflow: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul li {
+  display: inline-block;
+  vertical-align: top;
+  float: none;
+}
+div[data-filter-container] .in-group {
+  margin-left: 20px;
+}
+div[data-filter-container] .panel {
+  margin-bottom: 0;
+  margin-top: 20px;
+}
+div[data-filter-container] .panel.in-group {
+  margin-top: 0;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }

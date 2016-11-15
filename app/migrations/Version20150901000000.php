@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +16,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Class Version20150901000000
+ * Class Version20150901000000.
  */
-
 class Version20150901000000 extends AbstractMauticMigration
 {
     /**
@@ -36,16 +37,8 @@ class Version20150901000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_tag_search ON ' . $this->prefix . 'lead_tags (tag)');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_tag_search ON ' . $this->prefix . 'lead_tags (tag)');
+        $this->addSql('CREATE INDEX '.$this->prefix.'lead_tag_search ON '.$this->prefix.'lead_tags (tag)');
     }
 }

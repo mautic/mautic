@@ -1,13 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticCategoryBundle:Category:index.html.php');
+}
 ?>
 
 <?php if (count($items)): ?>
@@ -16,38 +19,38 @@ if ($tmpl == 'index')
             <thead>
             <tr>
                 <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'checkall' => 'true',
-                    'target'   => '#categoryTable'
-                ));
+                    'target'   => '#categoryTable',
+                ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'category',
                     'text'       => '',
-                    'class'      => 'col-category-color'
-                ));
+                    'class'      => 'col-category-color',
+                ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'category',
                     'orderBy'    => 'c.title',
                     'text'       => 'mautic.core.title',
                     'class'      => 'col-category-title',
-                    'default'    => true
-                ));
+                    'default'    => true,
+                ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'category',
                     'orderBy'    => 'c.bundle',
                     'text'       => 'mautic.core.type',
-                    'class'      => 'visible-md visible-lg col-page-bundle'
-                ));
+                    'class'      => 'visible-md visible-lg col-page-bundle',
+                ]);
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'category',
                     'orderBy'    => 'c.id',
                     'text'       => 'mautic.core.id',
-                    'class'      => 'visible-md visible-lg col-page-id'
-                ));
+                    'class'      => 'visible-md visible-lg col-page-id',
+                ]);
                 ?>
             </tr>
             </thead>
@@ -56,24 +59,24 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
-                        $bundleName = $view['translator']->trans('mautic.' . $item->getBundle() . '.' . $item->getBundle());
-                        $title = $view['translator']->trans('mautic.category.header.edit', array("%type%" => $bundleName, "%name%" => $item->getTitle()));
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
+                        $bundleName = $view['translator']->trans('mautic.'.$item->getBundle().'.'.$item->getBundle());
+                        $title      = $view['translator']->trans('mautic.category.header.edit', ['%type%' => $bundleName, '%name%' => $item->getTitle()]);
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                             'item'            => $item,
-                            'templateButtons' => array(
-                                'edit'   => $permissions[$bundle . ':categories:edit'],
-                                'delete' => $permissions[$bundle . ':categories:delete'],
-                            ),
-                            'editMode'        => 'ajaxmodal',
-                            'editAttr'        => array(
+                            'templateButtons' => [
+                                'edit'   => $permissions[$bundle.':categories:edit'],
+                                'delete' => $permissions[$bundle.':categories:delete'],
+                            ],
+                            'editMode' => 'ajaxmodal',
+                            'editAttr' => [
                                 'data-target' => '#MauticSharedModal',
                                 'data-header' => $title,
-                            ),
-                            'routeBase'       => 'category',
-                            'query'           => array(
-                                'bundle' => $bundle
-                            )
-                        ));
+                            ],
+                            'routeBase' => 'category',
+                            'query'     => [
+                                'bundle' => $bundle,
+                            ],
+                        ]);
                         ?>
                     </td>
                     <td>
@@ -81,12 +84,12 @@ if ($tmpl == 'index')
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'category', 'query' => 'bundle=' . $bundle)); ?>
-                            <?php if ($permissions[$bundle . ':categories:edit']): ?>
-                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'category', 'query' => 'bundle='.$bundle]); ?>
+                            <?php if ($permissions[$bundle.':categories:edit']): ?>
+                            <a href="<?php echo $view['router']->path('mautic_category_action', ['bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
                             <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
-                            <?php if ($permissions[$bundle . ':categories:edit']): ?>
+                            <?php if ($permissions[$bundle.':categories:edit']): ?>
                             </a>
                             <?php endif; ?>
                         </div>
@@ -96,7 +99,11 @@ if ($tmpl == 'index')
                         </div>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $view['translator']->trans($categoryTypes[$item->getBundle()]); ?></td>
+                    <td class="visible-md visible-lg">
+                    <?php if (isset($categoryTypes[$item->getBundle()])) : ?>
+                        <?php echo $view['translator']->trans($categoryTypes[$item->getBundle()]); ?>
+                    <?php endif; ?>
+                    </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -104,18 +111,18 @@ if ($tmpl == 'index')
         </table>
 
         <div class="panel-footer">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-                "totalItems" => count($items),
-                "page"       => $page,
-                "limit"      => $limit,
-                "menuLinkId" => 'mautic_category_index',
-                "baseUrl"    => $view['router']->generate('mautic_category_index', array(
-                    'bundle' => ($bundle == 'category') ? 'all' : $bundle
-                )),
-                'sessionVar' => 'category'
-            )); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+                'totalItems' => count($items),
+                'page'       => $page,
+                'limit'      => $limit,
+                'menuLinkId' => 'mautic_category_index',
+                'baseUrl'    => $view['router']->path('mautic_category_index', [
+                    'bundle' => ($bundle == 'category') ? 'all' : $bundle,
+                ]),
+                'sessionVar' => 'category',
+            ]); ?>
         </div>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('tip' => 'mautic.category.noresults.tip')); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'mautic.category.noresults.tip']); ?>
 <?php endif; ?>

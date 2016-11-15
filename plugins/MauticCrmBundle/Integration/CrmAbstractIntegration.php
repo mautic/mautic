@@ -1,26 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class CrmAbstractIntegration
- *
- * @package MauticPlugin\MauticCrmBundle\Integration
+ * Class CrmAbstractIntegration.
  */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
-
     protected $auth;
 
     /**
@@ -53,18 +51,18 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return array('push_lead');
+        return ['push_lead', 'get_leads'];
     }
 
     /**
      * @param $lead
      */
-    public function pushLead($lead, $config = array())
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
         if (empty($config['leadFields'])) {
-            return array();
+            return [];
         }
 
         $mappedData = $this->populateLeadData($lead, $config);
@@ -77,23 +75,67 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $this->getApiHelper()->createLead($mappedData);
+                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+
                 return true;
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
         }
+
         return false;
     }
 
     /**
-     * Amend mapped lead data before pushing to CRM
+     * @param $lead
+     */
+    public function getLeads($params = [])
+    {
+        $executed = null;
+
+        $query = $this->getFetchQuery($params);
+
+        try {
+            if ($this->isAuthorized()) {
+                $result = $this->getApiHelper()->getLeads($query);
+
+                $executed = $this->amendLeadDataBeforeMauticPopulate($result);
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
+
+    /**
+     * Amend mapped lead data before pushing to CRM.
      *
      * @param $mappedData
      */
     public function amendLeadDataBeforePush(&$mappedData)
     {
+    }
 
+    /**
+     * get query to fetch lead data.
+     *
+     * @param $config
+     */
+    public function getFetchQuery($config)
+    {
+    }
+
+    /**
+     * Amend mapped lead data before creating to Mautic.
+     *
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    {
+        return null;
     }
 
     /**
@@ -112,7 +154,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return 'client_secret';
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -122,18 +163,27 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the API helper
+     * Get the API helper.
      *
-     * @return Object
+     * @return object
      */
     public function getApiHelper()
     {
         static $helper;
         if (empty($helper)) {
-            $class = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
+            $class  = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
             $helper = new $class($this);
         }
 
         return $helper;
+    }
+
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
+    {
+        return [];
+    }
+
+    public function pushLeadActivity($params = [])
+    {
     }
 }

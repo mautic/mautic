@@ -1,84 +1,111 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ConfigBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
- * Class SysinfoModel
+ * Class SysinfoModel.
  */
-class SysinfoModel extends CommonModel
+class SysinfoModel extends AbstractCommonModel
 {
     protected $phpInfo;
     protected $folders;
 
     /**
-	 * Method to get the PHP info
-	 *
-	 * @return string
-	 */
-	public function getPhpInfo()
-	{
-		if (!is_null($this->phpInfo))
-		{
-			return $this->phpInfo;
-		}
-
-        if (function_exists('phpinfo')) {
-    		ob_start();
-    		date_default_timezone_set('UTC');
-    		phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES);
-    		$phpInfo = ob_get_contents();
-    		ob_end_clean();
-    		preg_match_all('#<body[^>]*>(.*)</body>#siU', $phpInfo, $output);
-    		$output = preg_replace('#<table[^>]*>#', '<table class="table table-striped">', $output[1][0]);
-    		$output = preg_replace('#(\w),(\w)#', '\1, \2', $output);
-    		$output = preg_replace('#<hr />#', '', $output);
-    		$output = str_replace('<div class="center">', '', $output);
-    		$output = preg_replace('#<tr class="h">(.*)<\/tr>#', '<thead><tr class="h">$1</tr></thead><tbody>', $output);
-    		$output = str_replace('</table>', '</tbody></table>', $output);
-    		$output = str_replace('</div>', '', $output);
-    		$this->phpInfo = $output;
-        } elseif (function_exists('phpversion')) {
-             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.phpversion', array('%phpversion%' => phpversion()));
-        } else {
-             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.missing');
-        }
-
-		return $this->phpInfo;
-	}
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
 
     /**
-	 * Method to get important folders with a writable flag
-	 *
-	 * @return array
-	 */
-	public function getFolders()
-	{
-		if (!is_null($this->folders))
-		{
-			return $this->folders;
-		}
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
 
-        $importantFolders = array(
-            $this->factory->getSystemPath('local_config'),
-            $this->factory->getParameter('cache_path'),
-            $this->factory->getParameter('log_path'),
-            $this->factory->getParameter('upload_dir'),
-            $this->factory->getSystemPath('images', true),
-            $this->factory->getSystemPath('translations', true),
-        );
+    /**
+     * SysinfoModel constructor.
+     *
+     * @param PathsHelper          $pathsHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->pathsHelper          = $pathsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
+    /**
+     * Method to get the PHP info.
+     *
+     * @return string
+     */
+    public function getPhpInfo()
+    {
+        if (!is_null($this->phpInfo)) {
+            return $this->phpInfo;
+        }
+
+        if (function_exists('phpinfo')) {
+            ob_start();
+            $currentTz = date_default_timezone_get();
+            date_default_timezone_set('UTC');
+            phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES);
+            $phpInfo = ob_get_contents();
+            ob_end_clean();
+            preg_match_all('#<body[^>]*>(.*)</body>#siU', $phpInfo, $output);
+            $output        = preg_replace('#<table[^>]*>#', '<table class="table table-striped">', $output[1][0]);
+            $output        = preg_replace('#(\w),(\w)#', '\1, \2', $output);
+            $output        = preg_replace('#<hr />#', '', $output);
+            $output        = str_replace('<div class="center">', '', $output);
+            $output        = preg_replace('#<tr class="h">(.*)<\/tr>#', '<thead><tr class="h">$1</tr></thead><tbody>', $output);
+            $output        = str_replace('</table>', '</tbody></table>', $output);
+            $output        = str_replace('</div>', '', $output);
+            $this->phpInfo = $output;
+            //ensure TZ is set back to default
+            date_default_timezone_set($currentTz);
+        } elseif (function_exists('phpversion')) {
+            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
+        } else {
+            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.missing');
+        }
+
+        return $this->phpInfo;
+    }
+
+    /**
+     * Method to get important folders with a writable flag.
+     *
+     * @return array
+     */
+    public function getFolders()
+    {
+        if (!is_null($this->folders)) {
+            return $this->folders;
+        }
+
+        $importantFolders = [
+            $this->pathsHelper->getSystemPath('local_config'),
+            $this->coreParametersHelper->getParameter('cache_path'),
+            $this->coreParametersHelper->getParameter('log_path'),
+            $this->coreParametersHelper->getParameter('upload_dir'),
+            $this->pathsHelper->getSystemPath('images', true),
+            $this->pathsHelper->getSystemPath('translations', true),
+        ];
 
         // Show the spool folder only if the email queue is configured
-        if ($this->factory->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->factory->getParameter('mailer_spool_path');
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
         }
 
         foreach ($importantFolders as $folder) {
@@ -89,11 +116,11 @@ class SysinfoModel extends CommonModel
             $this->folders[$folderKey] = $isWritable;
         }
 
-		return $this->folders;
-	}
+        return $this->folders;
+    }
 
     /**
-     * Method to tail (a few last rows) of a file
+     * Method to tail (a few last rows) of a file.
      *
      * @param int $lines
      *
@@ -101,7 +128,7 @@ class SysinfoModel extends CommonModel
      */
     public function getLogTail($lines = 10)
     {
-        $log = $this->factory->getParameter('log_path') . '/mautic_' . $this->factory->getEnvironment() . '-' . date('Y-m-d') . '.php';
+        $log = $this->coreParametersHelper->getParameter('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
         if (!file_exists($log)) {
             return null;
@@ -111,7 +138,7 @@ class SysinfoModel extends CommonModel
     }
 
     /**
-     * Method to tail (a few last rows) of a file
+     * Method to tail (a few last rows) of a file.
      *
      * @param     $filename
      * @param int $lines
@@ -121,9 +148,9 @@ class SysinfoModel extends CommonModel
      */
     public function tail($filename, $lines = 10, $buffer = 4096)
     {
-        $f = fopen($filename, "rb");
+        $f      = fopen($filename, 'rb');
         $output = '';
-        $chunk = '';
+        $chunk  = '';
 
         fseek($f, -1, SEEK_END);
 
@@ -144,6 +171,7 @@ class SysinfoModel extends CommonModel
         }
 
         fclose($f);
+
         return $output;
     }
 }

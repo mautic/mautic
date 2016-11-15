@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class EmailEvent
- *
- * @package Mautic\EmailBundle\Event
+ * Class EmailEvent.
  */
 class EmailEvent extends CommonEvent
 {
@@ -25,12 +25,12 @@ class EmailEvent extends CommonEvent
      */
     public function __construct(Email &$email, $isNew = false)
     {
-        $this->entity  =& $email;
-        $this->isNew   = $isNew;
+        $this->entity = &$email;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Email entity
+     * Returns the Email entity.
      *
      * @return Email
      */
@@ -40,7 +40,7 @@ class EmailEvent extends CommonEvent
     }
 
     /**
-     * Sets the Email entity
+     * Sets the Email entity.
      *
      * @param Email $email
      */

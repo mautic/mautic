@@ -1,18 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
-$properties     = (isset($form['properties'])) ? $form['properties'] : array();
+$properties     = (isset($form['properties'])) ? $form['properties'] : [];
 
-$showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']);
+$showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
+$showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
 
-$placeholder    = '';
+$placeholder = '';
 if (isset($properties['placeholder'])):
     $placeholder = $view['form']->rowIfExists($properties, 'placeholder', $template);
     unset($properties['placeholder']);
@@ -26,7 +29,16 @@ if (isset($properties['labelAttributes'])):
     unset($form['properties']['labelAttributes']);
 endif;
 
-$showProperties = (isset($form['properties']) && count($form['properties']));
+$showProperties = false;
+if (isset($form['properties']) && count($form['properties'])):
+    // Only show if there is at least one non-hidden field
+    foreach ($form['properties'] as $property):
+        if ('hidden' != $property->vars['block_prefixes'][1]):
+            $showProperties = true;
+            break;
+        endif;
+    endforeach;
+endif;
 
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
@@ -44,7 +56,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a<?php if ($generalTabError) echo ' class="text-danger" '; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError) {
+    echo ' class="text-danger" ';
+} ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
                     <?php if ($generalTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -70,7 +84,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a<?php if ($propertiesTabError) echo ' class="text-danger" '; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError) {
+    echo ' class="text-danger" ';
+} ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
                     <?php if ($propertiesTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -83,6 +99,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <li role="presentation">
                 <a href="#attributes" aria-controls="attributes" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.attributes'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <li role="progressive-profiling">
+                <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.progressive.profiling'); ?>
                 </a>
             </li>
             <?php endif; ?>
@@ -123,22 +147,44 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showProperties): ?>
             <div role="tabpanel" class="tab-pane" id="properties">
                 <?php echo $view['form']->errors($form['properties']); ?>
-                <div class="row">
-                    <?php if (isset($properties['list']) && count($properties) === 1): ?>
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['properties']); ?>
+                <?php if (isset($properties['syncList'])): ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?php echo $view['form']->row($form['properties']['syncList']); ?>
                         </div>
-                    <?php else: ?>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($properties['list'])): ?>
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php echo $view['form']->row($form['properties']['list']); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (isset($properties['optionlist'])): ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?php echo $view['form']->row($form['properties']['optionlist']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <div class="row">
+                    <?php
+                    foreach ($properties as $name => $property):
+                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') {
+                        continue;
+                    }
 
-                        <?php foreach ($properties as $name => $property): ?>
-                            <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
-                            <?php $col = ($name == 'text') ? 12 : 6; ?>
-                            <div class="col-md-<?php echo $col; ?>">
-                                <?php echo $view['form']->row($form['properties'][$name]); ?>
-                            </div>
-                        <?php endforeach; ?>
-
+                    if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                        echo $view['form']->row($form['properties'][$name]);
+                    else:
+                    $col = ($name == 'text') ? 12 : 6;
+                    ?>
+                    <div class="col-md-<?php echo $col; ?>">
+                        <?php echo $view['form']->row($form['properties'][$name]); ?>
+                    </div>
                     <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <?php endif; ?>
@@ -147,10 +193,21 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showAttributes): ?>
             <div role="tabpanel" class="tab-pane" id="attributes">
                 <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'alias', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>
                     <?php echo $customAttributes; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <div role="tabpanel" class="tab-pane" id="progressive-profiling">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

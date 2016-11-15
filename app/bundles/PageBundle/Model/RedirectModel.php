@@ -1,22 +1,39 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Redirect;
 
 /**
- * Class RedirectModel
+ * Class RedirectModel.
  */
 class RedirectModel extends FormModel
 {
+    /**
+     * @var UrlHelper
+     */
+    protected $urlHelper;
+
+    /**
+     * RedirectModel constructor.
+     *
+     * @param UrlHelper $urlHelper
+     */
+    public function __construct(UrlHelper $urlHelper)
+    {
+        $this->urlHelper = $urlHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -29,133 +46,124 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param Redirect $redirect
-     * @param array    $clickthrough
-     *
-     * @return string
-     */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array())
-    {
-        $url  = $this->buildUrl('mautic_page_trackable', array('redirectId' => $redirect->getRedirectId()), true, $clickthrough);
-
-        return $url;
-    }
-
-    /**
-     * @param      $url
-     * @param null $forEmail
-     * @param bool $createEntity
-     *
-     * @return Redirect|null
-     */
-    public function getRedirectByUrl($url, $forEmail = null, $createEntity = true)
-    {
-        // Ensure the URL saved to the database does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $url);
-
-        $repo     = $this->getRepository();
-        $criteria = array('url' => $url);
-
-        $criteria['email'] = $forEmail;
-
-        $redirect = $repo->findOneBy($criteria);
-
-        if ($redirect == null && $createEntity) {
-            $redirect = new Redirect();
-            $redirect->setUrl($url);
-            $redirect->setEmail($forEmail);
-
-            $redirect->setRedirectId();
-            $this->setTimestamps($redirect, true);
-        }
-
-        return $redirect;
-    }
-
-    /**
-     * @param      $urls
-     * @param null $forEmail
-     * @param bool $createEntity
-     *
-     * @return array
-     */
-    public function getRedirectListByUrls($urls, $forEmail = null, $createEntity = true)
-    {
-        $repo      = $this->getRepository();
-        $redirects = $repo->findByUrls(array_values($urls), $forEmail);
-
-        $byUrl = array();
-        foreach ($redirects as $redirect) {
-            $byUrl[$redirect->getUrl()] = $redirect;
-        }
-
-        $return = array();
-        foreach ($urls as $key => $url) {
-            if (isset($byUrl[$url])) {
-                $return[$key] = $byUrl[$url];
-            } elseif ($createEntity) {
-                $redirect = new Redirect();
-                $redirect->setUrl($url);
-                $redirect->setEmail($forEmail);
-                $redirect->setRedirectId();
-                $this->setTimestamps($redirect, true);
-
-                $return[$key] = $redirect;
-            }
-        }
-
-        unset($redirects, $byUrl);
-
-        return $return;
-    }
-
-    /**
-     * @param      $ids
-     * @param null $forEmail
-     *
-     * @return array
-     */
-    public function getRedirectListByIds($ids, $forEmail = null)
-    {
-        $repo      = $this->getRepository();
-        $redirects = $repo->findByIds(array_values($ids), $forEmail);
-
-        $byId = array();
-        foreach ($redirects as $redirect) {
-            $byId[$redirect->getRedirectId()] = $redirect;
-        }
-
-        $return = array();
-        foreach ($ids as $key => $id) {
-            if (isset($byId[$id])) {
-                $return[$key] = $byId[$id];
-            }
-        }
-
-        unset($redirects, $byId);
-
-        return $return;
-    }
-
-    /**
      * @param $identifier
      *
      * @return null|Redirect
      */
     public function getRedirectById($identifier)
     {
-        return $this->getRepository()->findOneBy(array('redirectId' => $identifier));
+        return $this->getRepository()->findOneBy(['redirectId' => $identifier]);
     }
 
     /**
-     * @param $source
-     * @param $id
+     * Generate a Mautic redirect/passthrough URL.
      *
-     * @return mixed
+     * @param Redirect $redirect
+     * @param array    $clickthrough
+     * @param bool     $shortenUrl
+     *
+     * @return string
      */
-    public function getRedirectListBySource($source, $id)
+    public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false)
     {
-        return $this->getRepository()->findBySource($source, $id);
+        $url = $this->buildUrl(
+            'mautic_url_redirect',
+            ['redirectId' => $redirect->getRedirectId()],
+            true,
+            $clickthrough,
+            $shortenUrl
+        );
+
+        if ($shortenUrl) {
+            $url = $this->urlHelper->buildShortUrl($url);
+        }
+
+        return $url;
     }
 
+    /**
+     * Get a Redirect entity by URL.
+     *
+     * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
+     *
+     * @param  $url
+     *
+     * @return Redirect|null
+     */
+    public function getRedirectByUrl($url)
+    {
+        // Ensure the URL saved to the database does not have encoded ampersands
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
+
+        $repo     = $this->getRepository();
+        $redirect = $repo->findOneBy(['url' => $url]);
+
+        if ($redirect == null) {
+            $redirect = $this->createRedirectEntity($url);
+        }
+
+        return $redirect;
+    }
+
+    /**
+     * Get Redirect entities by an array of URLs.
+     *
+     * @param array $urls
+     *
+     * @return array
+     */
+    public function getRedirectsByUrls(array $urls)
+    {
+        $redirects   = $this->getRepository()->findByUrls(array_values($urls));
+        $newEntities = [];
+        $return      = [];
+        $byUrl       = [];
+
+        foreach ($redirects as $redirect) {
+            $byUrl[$redirect->getUrl()] = $redirect;
+        }
+
+        foreach ($urls as $key => $url) {
+            if (empty($url)) {
+                continue;
+            }
+
+            if (isset($byUrl[$url])) {
+                $return[$key] = $byUrl[$url];
+            } else {
+                $redirect      = $this->createRedirectEntity($url);
+                $newEntities[] = $redirect;
+                $return[$key]  = $redirect;
+            }
+        }
+
+        // Save new entities
+        if (count($newEntities)) {
+            $this->getRepository()->saveEntities($newEntities);
+        }
+
+        unset($redirects, $newEntities, $byUrl);
+
+        return $return;
+    }
+
+    /**
+     * Create a Redirect entity for URL.
+     *
+     * @param $url
+     *
+     * @return Redirect
+     */
+    public function createRedirectEntity($url)
+    {
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId();
+
+        $this->setTimestamps($redirect, true);
+
+        return $redirect;
+    }
 }

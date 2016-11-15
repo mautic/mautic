@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,8 +15,8 @@ $root = $container->getParameter('kernel.root_dir');
 // Include local paths
 include 'paths.php';
 
-// Closure to replace %kernel_root_dir% placeholders
-$replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder) {
+// Closure to replace %kernel.root_dir% placeholders
+$replaceRootPlaceholder = function (&$value) use ($root, &$replaceRootPlaceholder) {
     if (is_array($value)) {
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);

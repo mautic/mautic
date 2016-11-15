@@ -35,3 +35,7 @@
 #triggerEvents .form-buttons {
     float: right;
 }
+
+.col-pointtrigger-color {
+    width: 50px;
+}

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,17 +15,17 @@ use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * PermissionRepository
+ * PermissionRepository.
  */
 class PermissionRepository extends CommonRepository
 {
-
     /**
-     * Delete all permissions for a specific role
+     * Delete all permissions for a specific role.
      *
      * @param Role $role
      */
-    public function purgeRolePermissions(Role $role) {
+    public function purgeRolePermissions(Role $role)
+    {
         $query = $this
             ->createQueryBuilder('p')
             ->delete('MauticUserBundle:Permission', 'p')
@@ -34,14 +36,15 @@ class PermissionRepository extends CommonRepository
     }
 
     /**
-     * Retrieves array of permissions for a set role.  If $forForm, then the array will contain
+     * Retrieves array of permissions for a set role.  If $forForm, then the array will contain.
      *
      * @param Role $role
      * @param bool $forForm
      *
      * @return array
      */
-    public function getPermissionsByRole(Role $role, $forForm = false) {
+    public function getPermissionsByRole(Role $role, $forForm = false)
+    {
         $results = $this
             ->createQueryBuilder('p')
             ->where('p.role = :role')
@@ -52,13 +55,13 @@ class PermissionRepository extends CommonRepository
             ->getResult(Query::HYDRATE_ARRAY);
 
         //rearrange the array to meet needs
-        $permissions = array();
+        $permissions = [];
         foreach ($results as $r) {
             if ($forForm) {
-                $permissions[$r['bundle']][$r['id']] = array(
-                    "name"      => $r['name'],
-                    "bitwise"   => $r['bitwise']
-                );
+                $permissions[$r['bundle']][$r['id']] = [
+                    'name'    => $r['name'],
+                    'bitwise' => $r['bitwise'],
+                ];
             } else {
                 $permissions[$r['bundle']][$r['name']] = $r['bitwise'];
             }

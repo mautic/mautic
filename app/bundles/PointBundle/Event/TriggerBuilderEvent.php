@@ -1,40 +1,39 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class TriggerBuilderEvent
- *
- * @package Mautic\PointBundle\Event
+ * Class TriggerBuilderEvent.
  */
 class TriggerBuilderEvent extends Event
 {
-
     /**
      * @var array
      */
-    private $events = array();
+    private $events = [];
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -42,21 +41,20 @@ class TriggerBuilderEvent extends Event
     /**
      * Adds an action to the list of available .
      *
-     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array $event - can contain the following keys:
-     *  'label'           => (required) what to display in the list
-     *  'description'     => (optional) short description of event
-     *  'template'        => (optional) template to use for the action's HTML in the point builder
-     *      i.e AcmeMyBundle:PointAction:theaction.html.php
-     *  'formType'        => (optional) name of the form type SERVICE for the action
-     *  'formTypeOptions' => (optional) array of options to pass to formType
-     *  'callback'        => (required) callback function that will be passed when the action is triggered
-     *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          Mautic\PointBundle\Entity\TriggerEvent  $event
-     *          Mautic\LeadBundle\Entity\Lead           $lead
+     * @param string $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $event - can contain the following keys:
+     *                      'label'           => (required) what to display in the list
+     *                      'description'     => (optional) short description of event
+     *                      'template'        => (optional) template to use for the action's HTML in the point builder
+     *                      i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                      'formType'        => (optional) name of the form type SERVICE for the action
+     *                      'formTypeOptions' => (optional) array of options to pass to formType
+     *                      'callback'        => (required) callback function that will be passed when the action is triggered
+     *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *                      Mautic\CoreBundle\Factory\MauticFactory $factory
+     *                      Mautic\PointBundle\Entity\TriggerEvent  $event
+     *                      Mautic\LeadBundle\Entity\Lead           $lead
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function addEvent($key, array $event)
@@ -67,8 +65,8 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label', 'callback'),
-            array('callback'),
+            ['group', 'label', 'callback'],
+            ['callback'],
             $event
         );
 
@@ -80,7 +78,7 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * Get events
+     * Get events.
      *
      * @return array
      */
@@ -90,6 +88,7 @@ class TriggerBuilderEvent extends Event
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });
+
         return $this->events;
     }
 
@@ -98,7 +97,6 @@ class TriggerBuilderEvent extends Event
      * @param array $methods
      * @param array $component
      *
-     * @return void
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
@@ -111,7 +109,7 @@ class TriggerBuilderEvent extends Event
 
         foreach ($methods as $m) {
             if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException($component[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
+                throw new InvalidArgumentException($component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }
     }

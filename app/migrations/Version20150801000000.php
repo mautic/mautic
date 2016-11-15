@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Addon to Plugin conversion
+ * Addon to Plugin conversion.
  */
 class Version20150801000000 extends AbstractMauticMigration
 {
@@ -26,7 +28,7 @@ class Version20150801000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix . 'plugins')) {
+        if ($schema->hasTable($this->prefix.'plugins')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -34,39 +36,19 @@ class Version20150801000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP FOREIGN KEY ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
+        $this->addSql('ALTER TABLE '.$this->prefix.'addon_integration_settings DROP FOREIGN KEY '.$this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
 
-        $this->addSql('RENAME TABLE ' . $this->prefix . 'addons TO ' . $this->prefix . 'plugins');
+        $this->addSql('RENAME TABLE '.$this->prefix.'addons TO '.$this->prefix.'plugins');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
+        $this->addSql('ALTER TABLE '.$this->prefix.'plugins DROP COLUMN is_enabled');
 
-        $this->addSql('RENAME TABLE ' . $this->prefix . 'addon_integration_settings TO ' . $this->prefix . 'plugin_integration_settings');
+        $this->addSql('RENAME TABLE '.$this->prefix.'addon_integration_settings TO '.$this->prefix.'plugin_integration_settings');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings CHANGE addon_id plugin_id int(11) DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'plugin_integration_settings CHANGE addon_id plugin_id int(11) DEFAULT NULL');
 
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . '  FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE');
-    }
-
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings DROP CONSTRAINT ' . $this->findPropertyName('addon_integration_settings', 'fk', 'CC642678'));
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addons RENAME TO ' . $this->prefix . 'plugins');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugins DROP COLUMN is_enabled');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'addon_integration_settings RENAME TO ' . $this->prefix . 'plugin_integration_settings');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings RENAME COLUMN addon_id TO plugin_id');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'plugin_integration_settings ADD CONSTRAINT ' . $this->generatePropertyName('plugin_integration_settings', 'fk', array('plugin_id')) . ' FOREIGN KEY (plugin_id) REFERENCES ' . $this->prefix . 'plugins (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-
-        $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addons_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE ' . $this->prefix . 'addon_integration_settings_id_seq CASCADE');
-        $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugin_integration_settings_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE SEQUENCE ' . $this->prefix . 'plugins_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('ALTER TABLE '.$this->prefix.'plugin_integration_settings ADD CONSTRAINT '.$this->generatePropertyName('plugin_integration_settings', 'fk', ['plugin_id']).'  FOREIGN KEY (plugin_id) REFERENCES '.$this->prefix.'plugins (id) ON DELETE CASCADE');
     }
 
     public function postUp(Schema $schema)

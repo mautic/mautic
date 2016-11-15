@@ -1,25 +1,29 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class FieldType
+ * Class FieldType.
  */
 class FieldType extends AbstractType
 {
+    use FormFieldTrait;
 
     /**
      * {@inheritdoc}
@@ -27,35 +31,38 @@ class FieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Populate settings
-        $cleanMasks = array(
+        $cleanMasks = [
             'labelAttributes'     => 'string',
             'inputAttributes'     => 'string',
-            'containerAttributes' => 'string'
-        );
+            'containerAttributes' => 'string',
+            'label'               => 'strict_html',
+        ];
 
-        $addHelpMessage =
-        $addShowLabel =
-        $addDefaultValue =
-        $addLabelAttributes =
-        $addInputAttributes =
+        $addHelpMessage         =
+        $addShowLabel           =
+        $allowCustomAlias       =
+        $addDefaultValue        =
+        $addLabelAttributes     =
+        $addInputAttributes     =
         $addContainerAttributes =
-        $addLeadFieldList =
-        $addSaveResult =
-        $addIsRequired = true;
+        $addLeadFieldList       =
+        $addSaveResult          =
+        $addBehaviorFields      =
+        $addIsRequired          = true;
 
         if (!empty($options['customParameters'])) {
             $type = 'custom';
 
-            $customParams    =& $options['customParameters'];
-            $formTypeOptions = array(
+            $customParams    = $options['customParameters'];
+            $formTypeOptions = [
                 'required' => false,
-                'label'    => false
-            );
+                'label'    => false,
+            ];
             if (!empty($customParams['formTypeOptions'])) {
                 $formTypeOptions = array_merge($formTypeOptions, $customParams['formTypeOptions']);
             }
 
-            $addFields = array(
+            $addFields = [
                 'labelText',
                 'addHelpMessage',
                 'addShowLabel',
@@ -68,19 +75,21 @@ class FieldType extends AbstractType
                 'addContainerAttributes',
                 'containerAttributesText',
                 'addLeadFieldList',
-                'addaddSaveResult',
-                'addIsRequired'
-            );
+                'addSaveResult',
+                'addBehaviorFields',
+                'addIsRequired',
+                'addHtml',
+            ];
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
-                    $$f = (boolean) $customParams['builderOptions'][$f];
+                    $$f = (bool) $customParams['builderOptions'][$f];
                 }
             }
         } else {
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -90,13 +99,26 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
+                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'hidden':
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    break;
+                case 'pagebreak':
+                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    break;
+                case 'email':
+                    $addBehaviorFields = false;
+                    break;
+                case 'select':
+                    $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
+                    break;
+                case 'checkboxgrp':
+                case 'radiogrp':
+                    $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
             }
         }
@@ -105,91 +127,44 @@ class FieldType extends AbstractType
         $builder->add(
             'label',
             'text',
-            array(
+            [
                 'label'       => !empty($labelText) ? $labelText : 'mautic.form.field.form.label',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control'),
-                'constraints' => array(
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'constraints' => [
                     new Assert\NotBlank(
-                        array('message' => 'mautic.form.field.label.notblank')
-                    )
-                )
-            )
+                        ['message' => 'mautic.form.field.label.notblank']
+                    ),
+                ],
+            ]
         );
 
-        if (!empty($options['customParameters'])) {
-            $builder->add('properties', $customParams['formType'], $formTypeOptions);
-        } else {
-            switch ($type) {
-                case 'select':
-                case 'country':
-                    $builder->add(
-                        'properties',
-                        'formfield_select',
-                        array(
-                            'field_type' => $type,
-                            'label'      => false,
-                            'parentData' => $options['data']
-                        )
-                    );
-                    break;
-                case 'checkboxgrp':
-                case 'radiogrp':
-                    $builder->add(
-                        'properties',
-                        'formfield_group',
-                        array(
-                            'label' => false,
-                            'data'  => (isset($options['data']['properties'])) ? $options['data']['properties'] : array()
-                        )
-                    );
-                    break;
-                case 'freetext':
-                    $builder->add(
-                        'properties',
-                        'formfield_text',
-                        array(
-                            'required' => false,
-                            'label'    => false,
-                            'editor'   => true
-                        )
-                    );
-                    break;
-                case 'date':
-                case 'email':
-                case 'number':
-                case 'tel':
-                case 'text':
-                case 'url':
-                    $builder->add(
-                        'properties',
-                        'formfield_placeholder',
-                        array(
-                            'label' => false
-                        )
-                    );
-                    break;
-                case 'captcha':
-                    $builder->add(
-                        'properties',
-                        'formfield_captcha',
-                        array(
-                            'label' => false
-                        )
-                    );
-                    break;
-            }
+        if ($allowCustomAlias) {
+            $builder->add(
+                'alias',
+                'text',
+                [
+                    'label'      => 'mautic.form.field.form.alias',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.form.alias.tooltip',
+                    ],
+                    'disabled' => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                    'required' => false,
+                ]
+            );
         }
 
         if ($addShowLabel) {
-            $default = (!isset($options['data']['showLabel'])) ? true : (boolean) $options['data']['showLabel'];
+            $default = (!isset($options['data']['showLabel'])) ? true : (bool) $options['data']['showLabel'];
             $builder->add(
                 'showLabel',
                 'yesno_button_group',
-                array(
+                [
                     'label' => (!empty($showLabelText)) ? $showLabelText : 'mautic.form.field.form.showlabel',
-                    'data'  => $default
-                )
+                    'data'  => $default,
+                ]
             );
         }
 
@@ -197,12 +172,12 @@ class FieldType extends AbstractType
             $builder->add(
                 'defaultValue',
                 ($type == 'textarea') ? 'textarea' : 'text',
-                array(
+                [
                     'label'      => 'mautic.core.defaultvalue',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control'),
-                    'required'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                ]
             );
         }
 
@@ -210,38 +185,38 @@ class FieldType extends AbstractType
             $builder->add(
                 'helpMessage',
                 'text',
-                array(
+                [
                     'label'      => 'mautic.form.field.form.helpmessage',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.helpmessage'
-                    ),
-                    'required'   => false
-                )
+                        'tooltip' => 'mautic.form.field.help.helpmessage',
+                    ],
+                    'required' => false,
+                ]
             );
         }
 
         if ($addIsRequired) {
-            $default = (!isset($options['data']['isRequired'])) ? false : (boolean) $options['data']['isRequired'];
+            $default = (!isset($options['data']['isRequired'])) ? false : (bool) $options['data']['isRequired'];
             $builder->add(
                 'isRequired',
                 'yesno_button_group',
-                array(
+                [
                     'label' => 'mautic.core.required',
-                    'data'  => $default
-                )
+                    'data'  => $default,
+                ]
             );
 
             $builder->add(
                 'validationMessage',
                 'text',
-                array(
+                [
                     'label'      => 'mautic.form.field.form.validationmsg',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control'),
-                    'required'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                ]
             );
         }
 
@@ -249,16 +224,16 @@ class FieldType extends AbstractType
             $builder->add(
                 'labelAttributes',
                 'text',
-                array(
+                [
                     'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.attr',
-                        'maxlength' => '255'
-                    ),
-                    'required'   => false
-                )
+                        'maxlength' => '255',
+                    ],
+                    'required' => false,
+                ]
             );
         }
 
@@ -266,16 +241,16 @@ class FieldType extends AbstractType
             $builder->add(
                 'inputAttributes',
                 'text',
-                array(
+                [
                     'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.attr',
-                        'maxlength' => '255'
-                    ),
-                    'required'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'     => 'form-control',
+                        'tooltip'   => 'mautic.form.field.help.attr',
+                        'maxlength' => '255',
+                    ],
+                    'required' => false,
+                ]
             );
         }
 
@@ -283,37 +258,80 @@ class FieldType extends AbstractType
             $builder->add(
                 'containerAttributes',
                 'text',
-                array(
+                [
                     'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.container_attr',
-                        'maxlength' => '255'
-                    ),
-                    'required'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'     => 'form-control',
+                        'tooltip'   => 'mautic.form.field.help.container_attr',
+                        'maxlength' => '255',
+                    ],
+                    'required' => false,
+                ]
             );
         }
 
         if ($addSaveResult) {
             $default = (!isset($options['data']['saveResult']) || $options['data']['saveResult'] === null) ? true
-                : (boolean) $options['data']['saveResult'];
+                : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
                 'yesno_button_group',
-                array(
+                [
                     'label' => 'mautic.form.field.form.saveresult',
                     'data'  => $default,
-                    'attr'  => array(
-                        'tooltip' => 'mautic.form.field.help.saveresult'
-                    )
-                )
+                    'attr'  => [
+                        'tooltip' => 'mautic.form.field.help.saveresult',
+                    ],
+                ]
+            );
+        }
+
+        if ($addBehaviorFields) {
+            $default = (!isset($options['data']['showWhenValueExists']) || $options['data']['showWhenValueExists'] === null) ? true
+                : (bool) $options['data']['showWhenValueExists'];
+            $builder->add(
+                'showWhenValueExists',
+                'yesno_button_group',
+                [
+                    'label' => 'mautic.form.field.form.show.when.value.exists',
+                    'data'  => $default,
+                    'attr'  => [
+                        'tooltip' => 'mautic.form.field.help.show.when.value.exists',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'showAfterXSubmissions',
+                'text',
+                [
+                    'label'      => 'mautic.form.field.form.show.after.x.submissions',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.help.show.after.x.submissions',
+                    ],
+                    'required' => false,
+                ]
+            );
+
+            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
+            $builder->add(
+                'isAutoFill',
+                'yesno_button_group',
+                [
+                    'label' => 'mautic.form.field.form.auto_fill',
+                    'data'  => $isAutoFillValue,
+                    'attr'  => [
+                        'class'   => 'auto-fill-data',
+                        'tooltip' => 'mautic.form.field.help.auto_fill',
+                    ],
+                ]
             );
         }
 
         if ($addLeadFieldList) {
-
             if (!isset($options['data']['leadField'])) {
                 switch ($type) {
                     case 'email':
@@ -329,7 +347,6 @@ class FieldType extends AbstractType
                         $data = '';
                         break;
                 }
-
             } elseif (isset($options['data']['leadField'])) {
                 $data = $options['data']['leadField'];
             } else {
@@ -339,17 +356,24 @@ class FieldType extends AbstractType
             $builder->add(
                 'leadField',
                 'choice',
-                array(
-                    'choices'    => $options['leadFields'],
+                [
+                    'choices'     => $options['leadFields'],
+                    'choice_attr' => function ($val, $key, $index) use ($options) {
+                        if (!empty($options['leadFieldProperties'][$val]) && (in_array($options['leadFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
+                            return ['data-list-type' => 1];
+                        }
+
+                        return [];
+                    },
                     'label'      => 'mautic.form.field.form.lead_field',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.lead_field'
-                    ),
-                    'required'   => false,
-                    'data'       => $data
-                )
+                        'tooltip' => 'mautic.form.field.help.lead_field',
+                    ],
+                    'required' => false,
+                    'data'     => $data,
+                ]
             );
         }
 
@@ -367,26 +391,106 @@ class FieldType extends AbstractType
         $builder->add(
             'buttons',
             'form_buttons',
-            array(
+            [
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
                 'apply_text'      => false,
-                'container_class' => 'bottom-form-buttons'
-            )
+                'container_class' => 'bottom-form-buttons',
+            ]
         );
 
         $builder->add(
             'formId',
             'hidden',
-            array(
-                'mapped' => false
-            )
+            [
+                'mapped' => false,
+            ]
         );
+
+        // Put properties last so that the other values are available to form events
+        if (!empty($options['customParameters'])) {
+            $builder->add('properties', $customParams['formType'], $formTypeOptions);
+        } else {
+            $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+            switch ($type) {
+                case 'select':
+                case 'country':
+                    $builder->add(
+                        'properties',
+                        'formfield_select',
+                        [
+                            'field_type' => $type,
+                            'label'      => false,
+                            'parentData' => $options['data'],
+                            'data'       => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'checkboxgrp':
+                case 'radiogrp':
+                    $builder->add(
+                        'properties',
+                        'formfield_group',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'freetext':
+                    $builder->add(
+                        'properties',
+                        'formfield_text',
+                        [
+                            'required' => false,
+                            'label'    => false,
+                            'editor'   => true,
+                            'data'     => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'date':
+                case 'email':
+                case 'number':
+                case 'tel':
+                case 'text':
+                case 'url':
+                    $builder->add(
+                        'properties',
+                        'formfield_placeholder',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'captcha':
+                    $builder->add(
+                        'properties',
+                        'formfield_captcha',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'pagebreak':
+                    $builder->add(
+                        'properties',
+                        FormFieldPageBreakType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+            }
+        }
 
         $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -396,14 +500,14 @@ class FieldType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'customParameters' => false
-            )
+            [
+                'customParameters' => false,
+            ]
         );
 
-        $resolver->setOptional(array('customParameters'));
+        $resolver->setOptional(['customParameters', 'leadFieldProperties']);
 
-        $resolver->setRequired(array('leadFields'));
+        $resolver->setRequired(['leadFields']);
     }
 
     /**
@@ -411,6 +515,6 @@ class FieldType extends AbstractType
      */
     public function getName()
     {
-        return "formfield";
+        return 'formfield';
     }
 }

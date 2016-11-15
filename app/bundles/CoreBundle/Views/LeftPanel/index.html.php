@@ -1,18 +1,19 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-// $pinned = ($app->getSession()->get("left-panel", 'default') == 'unpinned') ? ' unpinned' : '';
+$extraMenu = $view['menu']->render('extra');
 ?>
 <!-- start: sidebar-header -->
 <div class="sidebar-header">
     <!-- brand -->
-    <a class="mautic-brand" href="#">
+    <a class="mautic-brand<?php echo (!empty($extraMenu)) ? ' pull-left pl-0 pr-0' : ''; ?>" href="#">
         <!-- logo figure -->
         <svg version="1.1" class="mautic-logo-figure" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve">
             <path class="circle" d="M64,119.843c-30.937,0-56.108-25.17-56.108-56.108C7.893,32.799,33.063,7.629,64,7.629
@@ -51,6 +52,14 @@
         </svg>
         <!--/ logo text -->
     </a>
+    <?php if (!empty($extraMenu)): ?>
+        <div class="dropdown extra-menu">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                <i class="fa fa-chevron-down fa-lg"></i>
+            </a>
+            <?php echo $extraMenu; ?>
+        </div>
+    <?php endif; ?>
     <!--/ brand -->
 </div>
 <!--/ end: sidebar-header -->
@@ -61,7 +70,7 @@
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
-            <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
+            <?php echo $view['menu']->render('main'); ?>
 
             <!-- start: left nav -->
             <ul class="nav sidebar-left-dark">

@@ -1,24 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadfield');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
-    $isNew   = false;
-    $field   = $form->vars['data']->getLabel();
-    $header  = $view['translator']->trans('mautic.lead.field.header.edit', array("%name%" => $field));
+    $isNew  = false;
+    $field  = $form->vars['data']->getLabel();
+    $header = $view['translator']->trans('mautic.lead.field.header.edit', ['%name%' => $field]);
 } else {
     $isNew  = true;
     $header = $view['translator']->trans('mautic.lead.field.header.new');
 }
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
 $selectTemplate      = $view['form']->row($form['properties_select_template']);
 $defaultTemplate     = $view['form']->widget($form['default_template']);
@@ -58,7 +59,7 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];
             $errors        = count($form['properties']->vars['errors']);
-            $feedbackClass = (!empty($errors)) ? " has-error" : "";
+            $feedbackClass = (!empty($errors)) ? ' has-error' : '';
             ?>
 
             <div class="row">
@@ -67,23 +68,24 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                         <?php
                         switch ($type):
                         case 'boolean':
-                            echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', array(
+                            echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', [
                                 'yes' => isset($properties['yes']) ? $properties['yes'] : '',
-                                'no'  => isset($properties['no'])  ? $properties['no'] : ''
-                            ));
+                                'no'  => isset($properties['no']) ? $properties['no'] : '',
+                            ]);
                             break;
                         case 'number':
-                            echo $view->render('MauticLeadBundle:Field:properties_number.html.php', array(
+                            echo $view->render('MauticLeadBundle:Field:properties_number.html.php', [
                                 'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
-                                'precision' => isset($properties['precision']) ? $properties['precision'] : ''
-                            ));
+                                'precision' => isset($properties['precision']) ? $properties['precision'] : '',
+                            ]);
                             break;
                         case 'select':
+                        case 'multiselect':
                         case 'lookup':
-                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
-                                'selectTemplate' => $selectTemplate
-                            ));
+                                'selectTemplate' => $selectTemplate,
+                            ]);
                             break;
                         endswitch;
                         ?>
@@ -120,6 +122,18 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                     <?php echo $view['form']->row($form['isPubliclyUpdatable']); ?>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['isUniqueIdentifer']); ?>
+                </div>
+                <div class="unique-identifier-warning col-md-6" style="<?php if (!$form['isUniqueIdentifer']->vars['data']) {
+                            echo 'display:none;';
+                        } ?>">
+                    <div class="alert alert-danger">
+                        <?php echo $view['translator']->trans('mautic.lead.field.form.isuniqueidentifer.warning'); ?>
+                    </div>
+                </div>
+            </div>
             <?php echo $view['form']->rest($form); ?>
         </div>
     </div>
@@ -137,10 +151,9 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
 <?php
     echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
-    echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
-    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
-        'selectTemplate' => $selectTemplate
-    ));
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+        'selectTemplate' => $selectTemplate,
+    ]);
 ?>
 </div>
 <?php endif; ?>

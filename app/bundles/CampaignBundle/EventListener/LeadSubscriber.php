@@ -1,63 +1,81 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\CampaignBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param CampaignModel $campaignModel
+     * @param LeadModel     $leadModel
+     */
+    public function __construct(CampaignModel $campaignModel, LeadModel $leadModel)
+    {
+        $this->campaignModel = $campaignModel;
+        $this->leadModel     = $leadModel;
+    }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::LEAD_LIST_BATCH_CHANGE  => array('onLeadListBatchChange', 0),
-            LeadEvents::LEAD_LIST_CHANGE        => array('onLeadListChange', 0),
-            LeadEvents::TIMELINE_ON_GENERATE    => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE         => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::LEAD_LIST_BATCH_CHANGE => ['onLeadListBatchChange', 0],
+            LeadEvents::LEAD_LIST_CHANGE       => ['onLeadListChange', 0],
+            LeadEvents::TIMELINE_ON_GENERATE   => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE        => ['onLeadMerge', 0],
+        ];
     }
 
     /**
-     * Add/remove leads from campaigns based on batch lead list changes
+     * Add/remove leads from campaigns based on batch lead list changes.
      *
      * @param ListChangeEvent $event
      */
-    public function onLeadListBatchChange (ListChangeEvent $event)
+    public function onLeadListBatchChange(ListChangeEvent $event)
     {
-        static $campaignLists = array(), $listCampaigns = array(), $campaignReferences = array();
+        static $campaignLists = [], $listCampaigns = [], $campaignReferences = [];
 
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model     = $this->factory->getModel('campaign');
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
-        $leads     = $event->getLeads();
-        $list      = $event->getList();
-        $action    = $event->wasAdded() ? 'added' : 'removed';
-        $em        = $this->factory->getEntityManager();
+        $leads  = $event->getLeads();
+        $list   = $event->getList();
+        $action = $event->wasAdded() ? 'added' : 'removed';
+        $em     = $this->em;
 
         //get campaigns for the list
         if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $model->getRepository()->getPublishedCampaignsByLeadLists(array($list->getId()), true);
+            $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
         }
 
         $leadLists = $em->getRepository('MauticLeadBundle:LeadList')->getLeadLists($leads, true, true);
@@ -69,18 +87,18 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 if ($action == 'added') {
-                    $model->addLeads($campaignReferences[$c['id']], $leads, false, true);
+                    $this->campaignModel->addLeads($campaignReferences[$c['id']], $leads, false, true);
                 } else {
                     if (!isset($campaignLists[$c['id']])) {
-                        $campaignLists[$c['id']] = array();
+                        $campaignLists[$c['id']] = [];
                         foreach ($c['lists'] as $l) {
                             $campaignLists[$c['id']][] = $l['id'];
                         }
                     }
 
-                    $removeLeads = array();
+                    $removeLeads = [];
                     foreach ($leads as $l) {
-                        $lists = (isset($leadLists[$l])) ? $leadLists[$l] : array();
+                        $lists = (isset($leadLists[$l])) ? $leadLists[$l] : [];
                         if (array_intersect(array_keys($lists), $campaignLists[$c['id']])) {
                             continue;
                         } else {
@@ -88,36 +106,31 @@ class LeadSubscriber extends CommonSubscriber
                         }
                     }
 
-                    $model->removeLeads($campaignReferences[$c['id']], $removeLeads, false, true);
+                    $this->campaignModel->removeLeads($campaignReferences[$c['id']], $removeLeads, false, true);
                 }
             }
         }
 
         // Save memory with batch processing
-        unset($event, $em, $model, $leadModel, $leads, $list, $listCampaigns, $leadLists);
+        unset($event, $em, $model, $leads, $list, $listCampaigns, $leadLists);
     }
 
     /**
-     * Add/remove leads from campaigns based on lead list changes
+     * Add/remove leads from campaigns based on lead list changes.
      *
      * @param ListChangeEvent $event
      */
-    public function onLeadListChange (ListChangeEvent $event)
+    public function onLeadListChange(ListChangeEvent $event)
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model     = $this->factory->getModel('campaign');
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-        $lead      = $event->getLead();
-        $list      = $event->getList();
-        $action    = $event->wasAdded() ? 'added' : 'removed';
-        $repo      = $model->getRepository();
-        $em        = $this->factory->getEntityManager();
+        $lead   = $event->getLead();
+        $list   = $event->getList();
+        $action = $event->wasAdded() ? 'added' : 'removed';
+        $repo   = $this->campaignModel->getRepository();
 
         //get campaigns for the list
-        $listCampaigns = $repo->getPublishedCampaignsByLeadLists(array($list->getId()), true);
+        $listCampaigns = $repo->getPublishedCampaignsByLeadLists($list->getId());
 
-        $leadLists   = $leadModel->getLists($lead, true);
+        $leadLists   = $this->leadModel->getLists($lead, true);
         $leadListIds = array_keys($leadLists);
 
         // If the lead was removed then don't count it
@@ -128,20 +141,20 @@ class LeadSubscriber extends CommonSubscriber
 
         if (!empty($listCampaigns)) {
             foreach ($listCampaigns as $c) {
-                $campaign = $em->getReference('MauticCampaignBundle:Campaign', $c['id']);
+                $campaign = $this->em->getReference('MauticCampaignBundle:Campaign', $c['id']);
 
                 if (!isset($campaignLists[$c['id']])) {
                     $campaignLists[$c['id']] = array_keys($c['lists']);
                 }
 
                 if ($action == 'added') {
-                    $model->addLead($campaign, $lead);
+                    $this->campaignModel->addLead($campaign, $lead);
                 } else {
                     if (array_intersect($leadListIds, $campaignLists[$c['id']])) {
                         continue;
                     }
 
-                    $model->removeLead($campaign, $lead);
+                    $this->campaignModel->removeLead($campaign, $lead);
                 }
 
                 unset($campaign);
@@ -150,73 +163,76 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey  = 'campaign.evented';
+        $eventTypeKey  = 'campaign.event';
         $eventTypeName = $this->translator->trans('mautic.campaign.triggered');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
-        $filters = $event->getEventFilters();
-
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
+        $lead = $event->getLead();
 
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $logRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $logs          = $logRepository->getLeadLogs($lead->getId(), $event->getQueryOptions());
+        $eventSettings = $this->campaignModel->getEvents();
 
-        $logs = $logRepository->getLeadLogs($lead->getId(), $options);
+        // Add total number to counter
+        $event->addToCounter($eventTypeKey, $logs);
 
-        $model         = $this->factory->getModel('campaign');
-        $eventSettings = $model->getEvents();
+        if (!$event->isEngagementCount()) {
+            foreach ($logs['results'] as $log) {
+                // Hide this from the time line all together
+                if (!empty($log['metadata']['failed'])) {
+                    $event->subtractFromCounter($eventTypeKey);
 
-        // Add the hits to the event array
-        foreach ($logs as $log) {
-            if (!is_array($log['metadata'])) {
-                $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
+                    continue;
+                }
+
+                $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
+                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
+
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
+                            'label' => $log['event_name'].' / '.$log['campaign_name'],
+                            'href'  => $this->router->generate(
+                                'mautic_campaign_action',
+                                ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
+                            ),
+                        ],
+                        'eventType' => $eventTypeName,
+                        'timestamp' => $log['dateTriggered'],
+                        'extra'     => [
+                            'log' => $log,
+                        ],
+                        'contentTemplate' => $template,
+                        'icon'            => 'fa-clock-o',
+                    ]
+                );
             }
-            $template        = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
-                ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
-
-            $event->addEvent(
-                array(
-                    'event'           => $eventTypeKey,
-                    'eventLabel'      => $eventTypeName,
-                    'timestamp'       => $log['dateTriggered'],
-                    'extra'           => array(
-                        'log' => $log
-                    ),
-                    'contentTemplate' => $template
-                )
-            );
         }
     }
 
     /**
-     * Update records after lead merge
+     * Update records after lead merge.
      *
      * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
 
-        $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

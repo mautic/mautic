@@ -1,14 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
 
 /**
@@ -19,74 +23,72 @@ use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
 class DoctrineStep implements StepInterface
 {
     /**
-     * Database driver
-     *
+     * Database driver.
      */
     public $driver = 'pdo_mysql';
 
     /**
-     * Database host
+     * Database host.
      */
     public $host = 'localhost';
 
     /**
-     * Database table prefix
+     * Database table prefix.
      *
      * @var string
      */
     public $table_prefix;
 
     /**
-     * Database connection port
+     * Database connection port.
      */
     public $port = 3306;
 
     /**
-     * Database name
-     *
+     * Database name.
      */
     public $name;
 
     /**
-     * Database user
+     * Database user.
      */
     public $user;
 
     /**
-     * Database user's password
+     * Database user's password.
      *
      * @var string
      */
     public $password;
 
     /**
-     * Path to database
-     *
-     * @var string
-     */
-    public $path;
-
-    /**
-     * Backup tables if they exist; otherwise drop them
+     * Backup tables if they exist; otherwise drop them.
      *
      * @var bool
      */
     public $backup_tables = true;
 
     /**
-     * Prefix for backup tables
+     * Prefix for backup tables.
      *
      * @var string
      */
     public $backup_prefix = 'bak_';
 
     /**
-     * Constructor
-     *
-     * @param array $parameters
+     * @var
      */
-    public function __construct(array $parameters)
+    public $server_version = '5.5';
+
+    /**
+     * Constructor.
+     *
+     * @param Configurator $configurator
+     */
+    public function __construct(Configurator $configurator)
     {
+        $parameters = $configurator->getParameters();
+
         foreach ($parameters as $key => $value) {
             if (0 === strpos($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
@@ -109,7 +111,7 @@ class DoctrineStep implements StepInterface
      */
     public function checkRequirements()
     {
-        $messages = array();
+        $messages = [];
 
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
@@ -128,7 +130,7 @@ class DoctrineStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -136,7 +138,7 @@ class DoctrineStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        $parameters = array();
+        $parameters = [];
 
         foreach ($data as $key => $value) {
             // Exclude backup params from the config
@@ -157,7 +159,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * Return the key values of the available driver array
+     * Return the key values of the available driver array.
      *
      * @return array
      */
@@ -167,25 +169,25 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * Fetches the available database drivers for the environment
+     * Fetches the available database drivers for the environment.
      *
      * @return array
      */
     public static function getDrivers()
     {
-        $mauticSupported = array(
+        $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
             'mysqli'    => 'MySQLi',
-            'pdo_pgsql' => 'PostgreSQL',
+            //'pdo_pgsql' => 'PostgreSQL',
             //'pdo_sqlite' => 'SQLite',
             //'pdo_sqlsrv' => 'SQL Server',
             //'pdo_oci'    => 'Oracle (PDO)',
             //'pdo_ibm'    => 'IBM DB2 (PDO)',
             //'oci8'       => 'Oracle (native)',
             //'ibm_db2'    => 'IBM DB2 (native)',
-        );
+        ];
 
-        $supported = array();
+        $supported = [];
 
         // Add PDO drivers if supported
         if (class_exists('\PDO')) {

@@ -1,24 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PagePublishDatesType
+ * Class PagePublishDatesType.
  */
 class PagePublishDatesType extends AbstractType
 {
@@ -27,42 +27,42 @@ class PagePublishDatesType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $builder->add('publishUp', 'datetime', array(
+        $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
-        $builder->add('publishDown', 'datetime', array(
+        $builder->add('publishDown', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'       => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format'     => 'yyyy-MM-dd HH:mm',
-            'required'   => false
-        ));
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
         $builder->add('sessionId', 'hidden');
 
-        $builder->add('buttons', 'form_buttons', array(
+        $builder->add('buttons', 'form_buttons', [
             'container_class' => 'lead-note-buttons',
             'apply_text'      => false,
-            'save_text'       => 'mautic.core.form.save'
-        ));
+            'save_text'       => 'mautic.core.form.save',
+        ]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -74,9 +74,9 @@ class PagePublishDatesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'Mautic\PageBundle\Entity\Page'
-        ));
+        $resolver->setDefaults([
+            'data_class' => 'Mautic\PageBundle\Entity\Page',
+        ]);
     }
 
     /**

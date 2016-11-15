@@ -1,15 +1,17 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
+$searchBtnClass = (!empty($searchValue)) ? 'fa-eraser' : 'fa-search';
 ?>
 <div class="input-group ma-5">
-    <input type="search" class="form-control" id="leadEmailTokenSearch" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="false" data-toggle="livesearch" data-target="#leadEmailTokens" data-action="<?php echo $view['router']->generate('mautic_lead_emailtoken_index', array('page' => $page)); ?>" />
+    <input type="search" class="form-control" id="leadEmailTokenSearch" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" value="<?php echo $searchValue; ?>" autocomplete="false" data-toggle="livesearch" data-target="#leadEmailTokens" data-action="<?php echo $view['router']->path('mautic_contact_emailtoken_index', ['page' => $page]); ?>" />
     <div class="input-group-btn">
         <button type="button" class="btn btn-default btn-search btn-filter" data-livesearch-parent="leadEmailTokenSearch">
             <i class="fa <?php echo $searchBtnClass; ?> fa-fw"></i>

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,9 +14,7 @@ namespace Mautic\CampaignBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignDecisionEvent
- *
- * @package Mautic\CampaignBundle\Event
+ * Class CampaignDecisionEvent.
  */
 class CampaignDecisionEvent extends Event
 {
@@ -23,7 +23,6 @@ class CampaignDecisionEvent extends Event
     protected $decisionType;
     protected $decisionEventDetails;
     protected $eventSettings;
-    protected $logEntities;
     protected $isRootLevel;
     protected $decisionTriggered = false;
 
@@ -33,17 +32,15 @@ class CampaignDecisionEvent extends Event
      * @param $decisionEventDetails
      * @param $events
      * @param $eventSettings
-     * @param $logEntities
      * @param $isRootLevel
      */
-    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $logEntities = null, $isRootLevel = false)
+    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false)
     {
         $this->lead                 = $lead;
         $this->decisionType         = $decisionType;
         $this->decisionEventDetails = $decisionEventDetails;
         $this->events               = $events;
         $this->eventSettings        = $eventSettings;
-        $this->logEntities          = $logEntities;
         $this->isRootLevel          = $isRootLevel;
     }
 
@@ -88,22 +85,12 @@ class CampaignDecisionEvent extends Event
     public function getEventSettings($eventType = null, $type = null)
     {
         if ($type) {
-
             return (!empty($this->eventSettings[$eventType][$type])) ? $this->eventSettings[$eventType][$type] : false;
         } elseif ($eventType) {
-
             return (!empty($this->eventSettings[$eventType])) ? $this->eventSettings[$eventType] : false;
         }
 
         return $this->eventSettings;
-    }
-
-    /**
-     * @return null|array
-     */
-    public function getLogEntities()
-    {
-        return $this->logEntities;
     }
 
     /**
@@ -117,7 +104,7 @@ class CampaignDecisionEvent extends Event
     }
 
     /**
-     * Set if the decision has already been triggered and if so, child events will be executed
+     * Set if the decision has already been triggered and if so, child events will be executed.
      *
      * @param bool|true $triggered
      */
@@ -127,7 +114,7 @@ class CampaignDecisionEvent extends Event
     }
 
     /**
-     * Returns if the decision has already been triggered
+     * Returns if the decision has already been triggered.
      *
      * @return mixed
      */

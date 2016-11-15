@@ -1,18 +1,19 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $fields    = $form->children;
 $fieldKeys = array_keys($fields);
-$template = '<div class="col-md-6">{content}</div>';
+$template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, array('mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type')))): ?>
+<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type']))): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.mail'); ?></h3>
@@ -24,6 +25,7 @@ $template = '<div class="col-md-6">{content}</div>';
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_is_owner', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_from_name']) || isset($fields['mailer_from_email'])): ?>
@@ -45,6 +47,9 @@ $template = '<div class="col-md-6">{content}</div>';
                     </div>
                 </div>
             <?php endif; ?>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
+            </div>
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
@@ -59,6 +64,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
@@ -83,19 +89,35 @@ $template = '<div class="col-md-6">{content}</div>';
     </div>
 <?php endif; ?>
 
-<?php if (isset($fields['monitored_email'])): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.frequency_rules'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php if (function_exists('imap_open')): ?>
-        <?php echo $view['form']->widget($form['monitored_email']); ?>
-        <?php else: ?>
-            <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
-        <?php endif; ?>
+        <div class="row">
+            <div class="col-md-12">
+                <?php echo $view['form']->row($fields['email_frequency_number']); ?>
+            </div>
+            <div class="col-md-12">
+                <?php echo $view['form']->row($fields['email_frequency_time']); ?>
+            </div>
+        </div>
     </div>
 </div>
+
+<?php if (isset($fields['monitored_email'])): ?>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
+        </div>
+        <div class="panel-body">
+            <?php if (function_exists('imap_open')): ?>
+                <?php echo $view['form']->widget($form['monitored_email']); ?>
+            <?php else: ?>
+                <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
+            <?php endif; ?>
+        </div>
+    </div>
 <?php endif; ?>
 
 <div class="panel panel-primary">
@@ -110,6 +132,13 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
         </div>
     </div>
 </div>

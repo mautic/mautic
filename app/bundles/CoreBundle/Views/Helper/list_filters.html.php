@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -14,37 +16,39 @@
         foreach ($filters as $filterName => $filter):
 
         $filterName = $view['translator']->trans($filterName);
-        $attr = array(
-                'id="' . $filterName . '"',
-                'name="' . $filterName . '"'
-            );
+        $attr       = [
+                'id="'.$filterName.'"',
+                'name="'.$filterName.'"',
+            ];
         if (!empty($filter['multiple'])) {
             $attr[] = 'multiple';
         }
 
         if (!empty($filter['placeholder'])) {
-            $attr[] = 'data-placeholder="' . $filter['placeholder'] . '"';
+            $attr[] = 'data-placeholder="'.$filter['placeholder'].'"';
         } else {
-            $attr[] = 'data-placeholder="' . $view['translator']->trans('mautic.core.list.filter') . '"';
+            $attr[] = 'data-placeholder="'.$view['translator']->trans('mautic.core.list.filter').'"';
         }
 
         if (!empty($filter['onchange'])) {
-            $attr[] = 'onchange="' . $filter['onchange'] . '"';
+            $attr[] = 'onchange="'.$filter['onchange'].'"';
         } else {
             $attr[] = 'data-toggle="listfilter"';
-            $attr[] = 'data-target="' . (!empty($target) ? $target : '.page-list') . '"';
+            $attr[] = 'data-target="'.(!empty($target) ? $target : '.page-list').'"';
         }
 
-        $attr[] = 'data-tmpl="' . (!empty($tmpl) ? $tmpl : 'list') . '"';
+        $attr[] = 'data-tmpl="'.(!empty($tmpl) ? $tmpl : 'list').'"';
 
         if (!empty($filter['prefix-exceptions'])) {
-            $attr[] = 'data-prefix-exceptions="' . implode(',', $filter['prefix-exceptions']) . '"';
+            $attr[] = 'data-prefix-exceptions="'.implode(',', $filter['prefix-exceptions']).'"';
         }
         ?>
         <select <?php echo implode(' ', $attr); ?>>
             <?php if (isset($filter['groups'])): ?>
             <?php foreach ($filter['groups'] as $groupLabel => $groupFilter): ?>
-            <optgroup label="<?php echo $view['translator']->trans($groupLabel); ?>"<?php if (isset($groupFilter['prefix'])) echo ' data-prefix="' . $groupFilter['prefix'] . '"'; ?>>
+            <optgroup label="<?php echo $view['translator']->trans($groupLabel); ?>"<?php if (isset($groupFilter['prefix'])) {
+            echo ' data-prefix="'.$groupFilter['prefix'].'"';
+        } ?>>
                 <?php if (isset($groupFilter['options'])): ?>
                 <?php foreach ($groupFilter['options'] as $value => $label):
                     if (is_array($label)):
@@ -54,8 +58,9 @@
 
                     $selected = (isset($groupFilter['values']) && in_array($value, $groupFilter['values'])) ? ' selected' : '';
 
-                    if (isset($groupFilter['prefix']))
-                        $value = $groupFilter['prefix'] . ':' . $value;
+                    if (isset($groupFilter['prefix'])) {
+                        $value = $groupFilter['prefix'].':'.$value;
+                    }
 
                 ?>
                 <option value="<?php echo $value; ?>"<?php echo $selected; ?>><?php echo $label; ?></option>

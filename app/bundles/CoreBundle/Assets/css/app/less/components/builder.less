@@ -13,36 +13,8 @@
     white-space: normal;
   }
 
-  .list-group-item.ui-draggable-dragging {
-    background-color: #fff;
-  }
-
-  .over-droppable {
-    border: dashed 2px #4e5e9e;
-    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75);
-    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75);
-    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, .75);
-    font-weight: bold;
-    font-size: 2em;
-  }
-
   .builder-panel-top {
-    position: fixed;
-    top: 0;
-    z-index: 1030;
-    background-color: #d5d4d4;
-    padding-top: 10px;
-    width: 255px;
-  }
-
-  .builder-tokens {
-    margin-top: 140px;
-  }
-
-  #customHtmlDropzone {
-    height: 95px;
-    display: table;
-    width: 100%;
+    margin-bottom: 10px;
   }
 
   .template-dnd-help, .custom-dnd-help {
@@ -65,7 +37,7 @@
 }
 
 .builder-panel {
-  position: fixed;
+  position: absolute;
   top: 0;
   bottom: 0;
   right: 0;
@@ -107,6 +79,7 @@
       padding-left: 30px !important;
       padding-right: 30px !important;
       border-top: 1px solid #757575;
+      position: fixed;
     }
     .builder-content {
       right: 0;
