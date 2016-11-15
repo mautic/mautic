@@ -88,7 +88,14 @@ class SalesforceApi extends CrmApi
             $object = 'Account'; //salesforce object name
         }
 
-        return $this->request('describe', [], 'GET', false, $object);
+        $leadFields = $this->getCache()->getItem('integration.salesforce.leadFields.'.$object);
+
+        if (!$leadFields->isHit()) {
+            $leadFields->set($this->request('describe', [], 'GET', false, $object));
+            $this->getCache()->save($leadFields);
+        }
+
+        return $leadFields->get();
     }
 
     /**
@@ -240,14 +247,6 @@ class SalesforceApi extends CrmApi
         }
 
         return $result;
-    }
-
-    /**
-     * Get Salesforce leads.
-     */
-    public function getSalesForceLeadById($id, $params, $object)
-    {
-        return $this->request($id.'/', $params, 'GET', false, $object);
     }
 
     /**
