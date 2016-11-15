@@ -425,9 +425,11 @@ class ButtonHelper extends Helper
      */
     public function reset($buttonLocation, $groupType = self::TYPE_GROUP, $buttonCount = 0)
     {
-        $this->location    = $buttonLocation;
-        $this->groupType   = $groupType;
-        $this->buttonCount = $buttonCount;
+        $this->location          = $buttonLocation;
+        $this->groupType         = $groupType;
+        $this->buttonCount       = $buttonCount;
+        $this->preCustomButtons  = [];
+        $this->postCustomButtons = [];
 
         return $this;
     }
