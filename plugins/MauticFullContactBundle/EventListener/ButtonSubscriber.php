@@ -52,7 +52,7 @@ class ButtonSubscriber extends CommonSubscriber
         /** @var FullContactIntegration $myIntegration */
         $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
 
-        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
+        if (false === $myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
