@@ -199,7 +199,6 @@ class SalesforceApi extends CrmApi
     {
         //find out if start date is not our of range for org
         static $organization = [];
-        static $fields       = [];
 
         if (isset($query['start'])) {
             $queryUrl = $this->integration->getQueryUrl();
@@ -207,27 +206,23 @@ class SalesforceApi extends CrmApi
             if (empty($organization)) {
                 $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
             }
-
             if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
                 $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
-        if ($object == 'Account' and empty($fields['company'])) {
+        if ($object == 'Account') {
             $fields = $this->integration->getFormCompanyFields();
             $fields = $fields['company'];
         } else {
             $settings['feature_settings']['objects'][] = $object;
-            if (empty($fields)) {
-                $fields = $this->integration->getAvailableLeadFields($settings);
-            }
-            $fields = $fields[0];
-            $fields = $this->integration->ammendToSfFields($fields);
+            $fields                                    = $this->integration->getAvailableLeadFields($settings);
+            $fields                                    = $this->integration->ammendToSfFields($fields, $object);
         }
-
+        print_r($fields);
         $fields['id'] = ['id' => []];
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields        = implode(', ', array_keys($fields));
+            $fields        = implode(', ', array_keys($fields[$object]));
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {

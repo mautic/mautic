@@ -52,13 +52,16 @@ class FeatureSettingsType extends AbstractType
                 'feature_settings'   => $data,
             ];
             try {
-                $fields                   = $integration_object->getFormLeadFields($settings);
-                $fields                   = (isset($fields[0])) ? $fields[0] : $fields;
-                $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
-                if (isset($integrationCompanyFields['company']) and !empty($integrationCompanyFields)) {
-                    $integrationCompanyFields = $integrationCompanyFields['company'];
+                $fields = $integration_object->getFormLeadFields($settings);
+                $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                if (isset($settings['objects']) and in_array('company', $settings['objects'])) {
+                    $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                    if (isset($integrationCompanyFields['company']) and !empty($integrationCompanyFields)) {
+                        $integrationCompanyFields = $integrationCompanyFields['company'];
+                    }
+                } else {
+                    $integrationCompanyFields = [];
                 }
-
                 if (!is_array($fields)) {
                     $fields = [];
                 }

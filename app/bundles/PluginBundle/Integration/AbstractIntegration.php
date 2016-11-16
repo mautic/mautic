@@ -1680,7 +1680,7 @@ abstract class AbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects']['company'] = 'Company';
+        $settings['feature_settings']['objects']['company'] = 'Account';
 
         return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
     }
