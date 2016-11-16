@@ -8,18 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$buttonCount = 0;
-$groupType   = 'group';
 
-// if any custom buttons are defined in the template $buttonCount=1 should display these in a dropdown,
-// a larger number will display them in a group
-// 0 will not display them
-if (isset($preCustomButtons) or isset($customButtons) or isset($postCustomButtons)) {
-    $buttonCount = 1;
-    $groupType   = 'button-dropdown';
-}
-
-$buttonLocation = \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_PAGE_ACTIONS;
+$view['buttons']->reset(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_PAGE_ACTIONS);
 include 'action_button_helper.php';
 
 echo '<div class="std-toolbar btn-group">';
@@ -67,7 +57,6 @@ foreach ($templateButtons as $action => $enabled) {
             echo "</a>\n";
             break;
         case 'delete':
-
             echo $view->render(
                 'MauticCoreBundle:Helper:confirm.html.php',
                 [
@@ -88,7 +77,12 @@ foreach ($templateButtons as $action => $enabled) {
     }
 }
 
-if ($buttonCount > 0) {
+if ($view['buttons']->getButtonCount() > 0) {
+    // if any custom buttons are defined in the template $buttonCount=1 should display these in a dropdown,
+    // a larger number will display them in a group
+    // 0 will not display them
+    $view['buttons']->setGroupType(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::TYPE_BUTTON_DROPDOWN);
+    $buttonCount = 1;
     echo '<div class="dropdown-toolbar btn-group">';
 
     $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
