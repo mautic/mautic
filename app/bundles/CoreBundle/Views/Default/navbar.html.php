@@ -41,6 +41,15 @@
             </a>
         </li>
     </ul>
+    <div class="navbar-toolbar pull-right mt-15 mr-10">
+    <?php
+    echo $view['buttons']->reset(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_NAVBAR)
+        ->fetchCustomButtons($app->getRequest())
+        ->renderCustomButtons();
+    ?>
+    </div>
+
+
     <!--/ end: right nav -->
 </div>
 <!--/ end: navbar nocollapse -->

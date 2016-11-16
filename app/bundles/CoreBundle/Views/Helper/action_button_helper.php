@@ -13,6 +13,7 @@
 if (!isset($buttonCount)) {
     $buttonCount = 0;
 }
+$view['buttons']->setButtonCount($buttonCount);
 
 //Function used to get identifier string for entity
 $nameGetter = (!empty($nameGetter)) ? $nameGetter : 'getName';
@@ -68,12 +69,6 @@ if (!isset($indexRoute)) {
     $indexRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_index' : '';
 }
 
-//Set a default button type (group or dropdown)
-if (!isset($groupType)) {
-    $groupType = 'group';
-}
-$view['buttons']->setGroupType($groupType);
-
 //Extra HTML to be inserted after the buttons
 if (!isset($extraHtml)) {
     $extraHtml = '';
@@ -104,4 +99,10 @@ if (isset($customButtons)) {
 $view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
 
 // Fetch custom buttons from plugins
-$view['buttons']->fetchCustomButtons($buttonLocation, $app->getRequest(), isset($item) ? $item : null);
+$view['buttons']->fetchCustomButtons($app->getRequest(), isset($item) ? $item : null);
+$buttonCount = $view['buttons']->getButtonCount();
+
+//Set a default button type (group or dropdown)
+if (isset($groupType)) {
+    $view['buttons']->setGroupType($groupType);
+}

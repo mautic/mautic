@@ -8,8 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$wrap           = true;
-$buttonLocation = \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_TOOLBAR_ACTIONS;
+$wrap = true;
+$view['buttons']->reset(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_TOOLBAR_ACTIONS);
 include 'action_button_helper.php';
 ?>
 <div class="panel-body">
@@ -36,9 +36,7 @@ include 'action_button_helper.php';
         </div>
 
         <div class="col-xs-6 col-lg-4 va-m text-right">
-            <?php //TODO - Support more buttons
-            include 'action_button_helper.php';
-            $buttonCount = 0;
+            <?php
             echo $view['buttons']->renderPreCustomButtons($buttonCount);
 
             if (!empty($templateButtons['delete'])):
