@@ -51,7 +51,7 @@ class ButtonSubscriber extends CommonSubscriber
         /** @var ClearbitIntegration $myIntegration */
         $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
 
-        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
+        if (false === $myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
@@ -63,7 +63,6 @@ class ButtonSubscriber extends CommonSubscriber
                         'class' => 'btn btn-default btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
-                        // 'href'        => $this->router->generate('mautic_plugin_clearbit_action', ['objectAction' => 'batchLookupPerson']),
                         'onclick' => 'this.href=\''.
                             $this->router->generate(
                                 'mautic_plugin_clearbit_action',
