@@ -88,6 +88,7 @@ class FormSubscriber extends CommonSubscriber
             'formType'    => 'lead_action_removedonotcontact',
             'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::RemoveDoNotContact',
+            'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.RemoveDoNotContact', $action);
     }
