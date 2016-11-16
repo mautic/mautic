@@ -37,6 +37,18 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+        $builder->add(
+            'api_basic_auth_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.api.config.form.api.basic_auth_enabled',
+                'data'  => (bool) $options['data']['api_enable_basic_auth'],
+                // 'attr'  => [
+                //     'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
+                // ],
+            ]
+        );
+        // '',
 
         $builder->add(
             'api_oauth2_access_token_lifetime',
