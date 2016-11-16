@@ -64,7 +64,6 @@ class ButtonSubscriber extends CommonSubscriber
                         'class' => 'btn btn-default btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
-                        // 'href'        => $this->router->generate('mautic_plugin_fullcontact_action', ['objectAction' => 'batchLookupPerson']),
                         'onclick' => 'this.href=\''.
                             $this->router->generate(
                                 'mautic_plugin_fullcontact_action',
