@@ -2188,15 +2188,17 @@ class LeadModel extends FormModel
 
         if (!empty($contactCompanies)) {
             foreach ($contactCompanies as $contactCompany) {
-                $company = $this->companyModel->getEntity($contactCompany['company_id']);
-                $company->setScore($score);
+                $company  = $this->companyModel->getEntity($contactCompany['company_id']);
+                $oldScore = $company->getScore();
+                $newScore = $score + $oldScore;
+                $company->setScore($newScore);
                 $entities[] = $company;
                 $success    = true;
             }
         }
 
         if (!empty($entities)) {
-            $this->companyModel->getCompanyLeadRepository()->saveEntities($entities);
+            $this->companyModel->getRepository()->saveEntities($entities);
         }
 
         return $success;
