@@ -19,10 +19,6 @@ return [
                 'path' => '/fullcontact/callback',
                 'controller' => 'MauticFullContactBundle:Public:callback',
             ],
-            'mautic_plugin_fullcontact_compindex'=>[
-                'path' => '/fullcontact/compcallback',
-                'controller' => 'MauticFullContactBundle:Public:compcallback',
-            ],
         ],
         'main' => [
             'mautic_plugin_fullcontact_action' => [

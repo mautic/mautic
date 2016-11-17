@@ -10,11 +10,11 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
-
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
@@ -66,8 +66,12 @@ class LeadSubscriber extends CommonSubscriber
 
             $fullcontact = new FullContact_Person($keys['apikey']);
             try {
-                $webhookId = 'fullcontact#'.$lead->getId();
-                if (FALSE === apc_fetch($webhookId.$lead->getEmail())) {
+                /** @var User $user */
+                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $webhookId = 'fullcontact#'.$lead->getId().'#'.$user->getId();
+                $cache = $lead->getSocialCache();
+                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */
                     $router = $this->container->get('router');
                     $fullcontact->setWebhookUrl(
@@ -79,7 +83,11 @@ class LeadSubscriber extends CommonSubscriber
                         $webhookId
                     );
                     $res = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
-                    apc_add($webhookId.$lead->getEmail(), $res);
+                    $cache[$cacheId] = serialize($res);
+                    $lead->setSocialCache($cache);
+                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+                    $model = $this->container->get('mautic.factory')->getModel('lead');
+                    $model->saveEntity($lead);
                 }
             } catch (\Exception $ex) {
                 $logger->log('error', 'Error while using FullContact: '.$ex->getMessage());
@@ -106,21 +114,29 @@ class LeadSubscriber extends CommonSubscriber
 
             $fullcontact = new FullContact_Company($keys['apikey']);
             try {
-                $webhookId = 'fullcontactcomp#'.$company->getId();
+                /** @var User $user */
+                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $webhookId = 'fullcontactcomp#'.$company->getId().'#'.$user->getId();
                 $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
-                if (FALSE === apc_fetch($webhookId.$parse['host'])) {
+                $cache = $company->getSocialCache();
+                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */
                     $router = $this->container->get('router');
                     $fullcontact->setWebhookUrl(
                         $router->generate(
-                            'mautic_plugin_fullcontact_compindex',
+                            'mautic_plugin_fullcontact_index',
                             [],
                             UrlGeneratorInterface::ABSOLUTE_URL
                         ),
                         $webhookId
                     );
                     $res = $fullcontact->lookupByDomain($parse['host']);
-                    apc_add($webhookId.$parse['host'], $res);
+                    $cache[$cacheId] = serialize($res);
+                    $company->setSocialCache($cache);
+                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+                    $model = $this->container->get('mautic.factory')->getModel('lead.company');
+                    $model->saveEntity($company);
                 }
             } catch (\Exception $ex) {
                 $logger->log('error', 'Error while using FullContact: '.$ex->getMessage());

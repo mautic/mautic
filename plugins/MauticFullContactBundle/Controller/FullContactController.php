@@ -96,9 +96,11 @@ class FullContactController extends FormController
                 $fullcontact = new FullContact_Person($keys['apikey']);
                 try {
 
-                    $webhookId = 'fullcontact#'.$objectId;
+                    $webhookId = 'fullcontact#'.$objectId.'#'.$this->user->getId();
 
-                    if (false === apc_fetch($webhookId.$lead->getEmail())) {
+                    $cache = $lead->getSocialCache();
+                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    if (!array_key_exists($cacheId, $cache)) {
                         $fullcontact->setWebhookUrl(
                             $this->generateUrl(
                                 'mautic_plugin_fullcontact_index',
@@ -108,7 +110,9 @@ class FullContactController extends FormController
                             $webhookId
                         );
                         $res = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
-                        apc_add($webhookId.$lead->getEmail(), $res);
+                        $cache[$cacheId] = serialize($res);
+                        $lead->setSocialCache($cache);
+                        $model->saveEntity($lead);
                     }
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
@@ -143,7 +147,6 @@ class FullContactController extends FormController
      */
     public function batchLookupPersonAction()
     {
-        $logger = $this->get('monolog.logger.mautic');
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         if ('GET' === $this->request->getMethod()) {
@@ -261,21 +264,12 @@ class FullContactController extends FormController
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $fullcontact = new FullContact_Person($keys['apikey']);
                 try {
-                    // TODO: batch is not working on fullcontact
-//                    $result = $fullcontact->sendRequests(
-//                        array_map(
-//                            function ($e) {
-//                                return 'https://api.fullcontact.com/v2/person.json?emailMD5='.md5(
-//                                    $e
-//                                ).'&webhookUrl='.urlencode('https://requestbin.fullcontact.com/17kl0v91');
-//                            },
-//                            $lookupEmails
-//                        )
-//                    );
-
                     foreach ($lookupEmails as $id => $lookupEmail) {
-                        $webhookId = 'fullcontact#'.$id;
-                        if (false === apc_fetch($webhookId.$lookupEmail)) {
+                        $lead = $model->getEntity($id);
+                        $webhookId = 'fullcontact#'.$id.'#'.$this->user->getId();
+                        $cache = $lead->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
                                 $this->generateUrl(
                                     'mautic_plugin_fullcontact_index',
@@ -285,7 +279,9 @@ class FullContactController extends FormController
                                 $webhookId
                             );
                             $res = $fullcontact->lookupByEmailMD5(md5($lookupEmail));
-                            apc_add($webhookId.$lookupEmail, $res);
+                            $cache[$cacheId] = serialize($res);
+                            $lead->setSocialCache($cache);
+                            $model->saveEntity($lead);
                         }
                     }
 
@@ -391,12 +387,14 @@ class FullContactController extends FormController
                 $fullcontact = new FullContact_Company($keys['apikey']);
                 try {
 
-                    $webhookId = 'fullcontactcomp#'.$objectId;
+                    $webhookId = 'fullcontactcomp#'.$objectId.'#'.$this->user->getId();
                     $website = $company->getFieldValue('companywebsite', 'core');
                     $parse = parse_url($website);
-                    if (false === apc_fetch($webhookId.$parse['host'])) {
+                    $cache = $company->getSocialCache();
+                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    if (!array_key_exists($cacheId, $cache)) {
                         $webhookUrl = $this->generateUrl(
-                            'mautic_plugin_fullcontact_compindex',
+                            'mautic_plugin_fullcontact_index',
                             [],
                             UrlGeneratorInterface::ABSOLUTE_URL
                         );
@@ -406,7 +404,9 @@ class FullContactController extends FormController
                         );
 
                         $res = $fullcontact->lookupByDomain($parse['host']);
-                        apc_add($webhookId.$parse['host'], $res);
+                        $cache[$cacheId] = serialize($res);
+                        $company->setSocialCache($cache);
+                        $model->saveEntity($company);
                     }
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
@@ -441,7 +441,6 @@ class FullContactController extends FormController
      */
     public function batchLookupCompanyAction()
     {
-        $logger = $this->get('monolog.logger.mautic');
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
         if ('GET' === $this->request->getMethod()) {
@@ -556,31 +555,24 @@ class FullContactController extends FormController
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $fullcontact = new FullContact_Company($keys['apikey']);
                 try {
-                    // TODO: batch is not working on fullcontact
-//                    $result = $fullcontact->sendRequests(
-//                        array_map(
-//                            function ($e) {
-//                                return 'https://api.fullcontact.com/v2/person.json?emailMD5='.md5(
-//                                    $e
-//                                ).'&webhookUrl='.urlencode('https://requestbin.fullcontact.com/17kl0v91');
-//                            },
-//                            $lookupEmails
-//                        )
-//                    );
-
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
-                        $webhookId = 'fullcontactcomp#'.$id;
-                        if (false === apc_fetch($webhookId.$lookupWebsite)) {
+                        $company = $model->getEntity($id);
+                        $webhookId = 'fullcontactcomp#'.$id.'#'.$this->user->getId();
+                        $cache = $company->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
                                 $this->generateUrl(
-                                    'mautic_plugin_fullcontact_compindex',
+                                    'mautic_plugin_fullcontact_index',
                                     [],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 ),
                                 $webhookId
                             );
                             $res = $fullcontact->lookupByDomain($lookupWebsite);
-                            apc_add($webhookId.$lookupWebsite, $res);
+                            $cache[$cacheId] = serialize($res);
+                            $company->setSocialCache($cache);
+                            $model->saveEntity($company);
                         }
                     }
 

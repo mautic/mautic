@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']))) {
     if (isset($form['supportedFeatures'])) {
         $form['supportedFeatures']->setRendered();
@@ -50,6 +52,14 @@ echo $view['assets']->includeScript('plugins/MauticFullContactBundle/Assets/js/f
     <div class="tab-pane fade in active bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
+        <div class="well well-sm" style="margin-bottom:0 !important;">
+            <p>
+                The plugin will use the following as the Webhook URL for FullContact:</p>
+            <div class="alert alert-warning">
+                <strong>Warning!</strong> This must be a public accessible URL for the Webhook to work.
+            </div>
+            <input type="text" readonly="readonly" value="<?php echo $this->container->get('router')->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL)?>" class="form-control">
+        </div>
     </div>
 
 </div>
