@@ -130,9 +130,9 @@ class AjaxController extends CommonAjaxController
 
                 if (!empty($integrationFields)) {
                     // Get a list of custom form fields
-                    $companyFields                         = $this->getModel('plugin')->getCompanyFields();
-                    list($specialInstructions, $alertType) = $object->getFormNotes('companyfield_match');
                     $defaults                              = $object->getIntegrationSettings()->getFeatureSettings();
+                    $companyFields                         = $this->getModel('plugin')->getCompanyFields($defaults);
+                    list($specialInstructions, $alertType) = $object->getFormNotes('companyfield_match');
                     $data                                  = isset($defaults['companyFields']) ? $defaults['companyFields'] : [];
 
                     $form = $this->createForm('integration_company_fields', $data, [

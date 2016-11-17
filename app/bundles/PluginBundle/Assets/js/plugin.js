@@ -137,12 +137,12 @@ Mautic.getIntegrationCompanyFields = function (integration, el, settings) {
                 mQuery('#companyFieldsContainer').replaceWith(response.html);
                 Mautic.onPageLoad('#companyFieldsContainer');
 
-                if (mQuery('#fields-tab').length) {
-                    mQuery('#fields-tab').removeClass('hide');
+                if (mQuery('#company-fields-container').length) {
+                    mQuery('#company-fields-container').removeClass('hide');
                 }
             } else {
-                if (mQuery('#fields-tab').length) {
-                    mQuery('#fields-tab').addClass('hide');
+                if (mQuery('#company-fields-container').length) {
+                    mQuery('#company-fields-container').addClass('hide');
                 }
             }
             Mautic.removeLabelLoadingIndicator();

@@ -79,6 +79,10 @@ class SalesforceApi extends CrmApi
      */
     public function getLeadFields($object = null)
     {
+        if ($object == 'company') {
+            $object = 'Account'; //salesforce object name
+        }
+
         return $this->request('describe', [], 'GET', false, $object);
     }
 
@@ -210,19 +214,19 @@ class SalesforceApi extends CrmApi
                 $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
+
         if ($object == 'Account') {
             $fields = $this->integration->getFormCompanyFields();
             $fields = $fields['company'];
         } else {
             $settings['feature_settings']['objects'][] = $object;
             $fields                                    = $this->integration->getAvailableLeadFields($settings);
-            $fields                                    = $this->integration->ammendToSfFields($fields, $object);
+            $fields                                    = $this->integration->ammendToSfFields($fields);
         }
-        print_r($fields);
         $fields['id'] = ['id' => []];
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields        = implode(', ', array_keys($fields[$object]));
+            $fields        = implode(', ', array_keys($fields));
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {

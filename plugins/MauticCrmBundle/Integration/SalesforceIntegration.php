@@ -178,7 +178,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects']['company'] = 'Account';
+        $settings['feature_settings']['objects']['company'] = 'company';
 
         return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
     }
@@ -188,9 +188,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        static $salesFields = [];
-        $silenceExceptions  = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $salesForceObjects  = [];
+        static $leadObject = [];
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $salesForceObjects = [];
 
         if (isset($settings['feature_settings']['objects'])) {
             $salesForceObjects = $settings['feature_settings']['objects'];
@@ -199,15 +199,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $isRequired = function (array $field) {
             return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status']);
         };
-
         try {
-            if ($this->isAuthorized() and empty($salesFields)) {
+            if ($this->isAuthorized()) {
                 if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
                     foreach ($salesForceObjects as $key => $sfObject) {
                         if (isset($sfObject) and $sfObject == 'Activity') {
                             continue;
                         }
-                        $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
+                        $sfObject = trim($sfObject);
+                        if (!isset($leadObject[$sfObject])) {
+                            $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
+                        }
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
                                 if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
@@ -223,15 +225,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 } else {
                                     $type = 'string';
                                 }
-
-                                if ($key !== 'company') {
+                                if ($sfObject !== 'company') {
                                     $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
                                         'type'     => $type,
                                         'label'    => $sfObject.' - '.$fieldInfo['label'],
                                         'required' => $isRequired($fieldInfo),
                                     ];
                                 } else {
-                                    $salesFields[$key][$fieldInfo['name']] = [
+                                    $salesFields[$sfObject][$fieldInfo['name']] = [
                                         'type'     => $type,
                                         'label'    => $fieldInfo['label'],
                                         'required' => $isRequired($fieldInfo),
@@ -241,20 +242,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
                     }
                 } else {
-                    if (empty($salesFields)) {
-                        $leadObject = $this->getApiHelper()->getLeadFields('Lead');
-                        if (!empty($leadObject) && isset($leadObject['fields'])) {
-                            foreach ($leadObject['fields'] as $fieldInfo) {
-                                if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference'])) {
-                                    continue;
-                                }
+                    $leadObject = $this->getApiHelper()->getLeadFields('Lead');
+                    if (!empty($leadObject) && isset($leadObject['fields'])) {
+                        foreach ($leadObject['fields'] as $fieldInfo) {
+                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference'])) {
+                                continue;
+                            }
 
-                                $salesFields[$fieldInfo['name']] = [
+                            $salesFields[$fieldInfo['name']] = [
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['label'],
                                     'required' => $isRequired($fieldInfo),
                                 ];
-                            }
                         }
                     }
                 }
@@ -304,7 +303,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
         $params['fields']                          = implode(',', $fields);
 
-        $count = 0;
+        $count  = 0;
+        $entity = null;
+
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
                 $integrationEntities = [];
@@ -394,7 +395,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'Lead'     => 'mautic.salesforce.object.lead',
                         'Contact'  => 'mautic.salesforce.object.contact',
-                        'Account'  => 'mautic.salesforce.object.company',
+                        'company'  => 'mautic.salesforce.object.company',
                         'Activity' => 'mautic.salesforce.object.activity',
                     ],
                     'expanded'    => true,
@@ -516,14 +517,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 foreach ($salesForceObjects as $object) {
-                    if ($object === 'Account') {
-                        $executed = $this->getCompanies($params, $query);
-
-                        return $executed;
-                    }
-                    if ($object !== 'Activity') {
+                    if ($object !== 'Activity' and $object !== 'company') {
                         $result = $this->getApiHelper()->getLeads($query, $object);
-
                         $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                         if (isset($result['nextRecordsUrl'])) {
                             $query = $result['nextRecordsUrl'];
@@ -557,7 +552,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query, $salesForceObject);
-
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $salesForceObject);
                 if (isset($result['nextRecordsUrl'])) {
                     $query = $result['nextRecordsUrl'];
@@ -576,14 +570,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param $query
      * @param $object
      */
-    public function ammendToSfFields($fields, $object = 'Lead')
+    public function ammendToSfFields($fields)
     {
         $newFields = [];
         foreach ($fields as $key => $field) {
-            $key = explode('-', $key);
-            if ($key[1] == $object) {
-                $newFields[$object][trim($key[0])] = $field;
-            }
+            $key                      = explode('-', $key);
+            $newFields[trim($key[0])] = $field;
         }
 
         return $newFields;

@@ -96,7 +96,6 @@ unset($form['featureSettings']['companyFields']);
             <h4 class="mb-sm"><?php echo $view['translator']->trans($fieldLabel); ?></h4>
             <?php echo $fieldHtml; ?>
         </div>
-
     <?php endif; ?>
     <div class="tab-pane fade bdr-w-0" id="company-fields-container">
         <h4 class="mb-sm">Company Fields</h4>

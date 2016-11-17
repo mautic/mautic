@@ -43,8 +43,9 @@ class FeatureSettingsType extends AbstractType
 
         //add custom feature settings
         $integration_object->appendToForm($builder, $options['data'], 'features');
-        $leadFields    = $options['lead_fields'];
-        $companyFields = $options['company_fields'];
+        $leadFields               = $options['lead_fields'];
+        $companyFields            = $options['company_fields'];
+        $integrationCompanyFields = [];
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields) {
             $settings = [
@@ -54,22 +55,21 @@ class FeatureSettingsType extends AbstractType
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
                 $fields = (isset($fields[0])) ? $fields[0] : $fields;
-                if (isset($settings['objects']) and in_array('company', $settings['objects'])) {
+                unset($fields['company']);
+                if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
-                    if (isset($integrationCompanyFields['company']) and !empty($integrationCompanyFields)) {
+                    if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
-                } else {
-                    $integrationCompanyFields = [];
                 }
+
                 if (!is_array($fields)) {
                     $fields = [];
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fields                   = [];
-                $integrationCompanyFields = [];
-                $error                    = $e->getMessage();
+                $fields = [];
+                $error  = $e->getMessage();
             }
             list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
             /**
