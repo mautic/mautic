@@ -99,10 +99,14 @@ class ClearbitController extends FormController
 
                     $webhookId = 'clearbit#'.$objectId;
 
-                    if (false === apc_fetch($webhookId.$lead->getEmail())) {
+                    $cache = $lead->getSocialCache();
+                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    if (!array_key_exists($cacheId, $cache)) {
                         $clearbit->setWebhookId($webhookId);
                         $res = $clearbit->lookupByEmail($lead->getEmail());
-                        apc_add($webhookId.$lead->getEmail(), $res);
+                        $cache[$cacheId] = serialize($res);
+                        $lead->setSocialCache($cache);
+                        $model->saveEntity($lead);
                     }
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
@@ -256,11 +260,16 @@ class ClearbitController extends FormController
                 $clearbit = new Clearbit_Person($keys['apikey']);
                 try {
                     foreach ($lookupEmails as $id => $lookupEmail) {
+                        $lead = $model->getEntity($id);
                         $webhookId = 'clearbit#'.$id;
-                        if (false === apc_fetch($webhookId.$lookupEmail)) {
+                        $cache = $lead->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
                             $res = $clearbit->lookupByEmail($lookupEmail);
-                            apc_add($webhookId.$lookupEmail, $res);
+                            $cache[$cacheId] = serialize($res);
+                            $lead->setSocialCache($cache);
+                            $model->saveEntity($lead);
                         }
                     }
 
@@ -370,12 +379,14 @@ class ClearbitController extends FormController
                     $webhookId = 'clearbitcomp#'.$objectId;
                     $website = $company->getFieldValue('companywebsite', 'core');
                     $parse = parse_url($website);
-                    if (false === apc_fetch($webhookId.$parse['host'])) {
-
+                    $cache = $company->getSocialCache();
+                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    if (!array_key_exists($cacheId, $cache)) {
                         $clearbit->setWebhookId($webhookId);
-
                         $res = $clearbit->lookupByDomain($parse['host']);
-                        apc_add($webhookId.$parse['host'], $res);
+                        $cache[$cacheId] = serialize($res);
+                        $company->setSocialCache($cache);
+                        $model->saveEntity($company);
                     }
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
@@ -526,11 +537,16 @@ class ClearbitController extends FormController
                 $clearbit = new Clearbit_Company($keys['apikey']);
                 try {
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
+                        $company = $model->getEntity($id);
                         $webhookId = 'clearbitcomp#'.$id;
-                        if (false === apc_fetch($webhookId.$lookupWebsite)) {
+                        $cache = $company->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
                             $res = $clearbit->lookupByDomain($lookupWebsite);
-                            apc_add($webhookId.$lookupWebsite, $res);
+                            $cache[$cacheId] = serialize($res);
+                            $company->setSocialCache($cache);
+                            $model->saveEntity($company);
                         }
                     }
 

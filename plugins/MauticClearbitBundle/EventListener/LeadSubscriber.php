@@ -14,6 +14,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
@@ -65,11 +66,17 @@ class LeadSubscriber extends CommonSubscriber
             $clearbit = new Clearbit_Person($keys['apikey']);
             try {
                 $webhookId = 'clearbit#'.$lead->getId();
-                if (FALSE === apc_fetch($webhookId.$lead->getEmail())) {
+                $cache = $lead->getSocialCache();
+                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */
                     $clearbit->setWebhookId($webhookId);
                     $res = $clearbit->lookupByEmail($lead->getEmail());
-                    apc_add($webhookId.$lead->getEmail(), $res);
+                    $cache[$cacheId] = serialize($res);
+                    $lead->setSocialCache($cache);
+                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+                    $model =  $this->container->get('mautic.factory')->getModel('lead');
+                    $model->saveEntity($lead);
                 }
             } catch (\Exception $ex) {
                 $logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
@@ -98,11 +105,18 @@ class LeadSubscriber extends CommonSubscriber
             try {
                 $webhookId = 'clearbitcomp#'.$company->getId();
                 $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
-                if (FALSE === apc_fetch($webhookId.$parse['host'])) {
+
+                $cache = $company->getSocialCache();
+                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */
                     $clearbit->setWebhookId($webhookId);
                     $res = $clearbit->lookupByDomain($parse['host']);
-                    apc_add($webhookId.$parse['host'], $res);
+                    $cache[$cacheId] = serialize($res);
+                    $company->setSocialCache($cache);
+                    /** @var CompanyModel $model */
+                    $model =  $this->container->get('mautic.factory')->getModel('lead.company');
+                    $model->saveEntity($company);
                 }
             } catch (\Exception $ex) {
                 $logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());

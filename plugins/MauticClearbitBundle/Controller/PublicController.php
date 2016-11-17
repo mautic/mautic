@@ -42,13 +42,17 @@ class PublicController extends FormController
 
             if ('person' === $this->request->request->get('type', [], true)) {
                 $id = substr($id, strlen('clearbit#'));
+                /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+                $model = $this->getModel('lead');
+                /** @var Lead $lead */
+                $lead = $model->getEntity($id);
+                $currFields = $lead->getFields(true);
 
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
                     $loc = $result['geo'];
                 }
 
-                $social = [];
                 foreach ([
                              'facebook' => 'http://www.facebook.com/',
                              'googleplus' => 'http://plus.google.com/',
@@ -56,43 +60,58 @@ class PublicController extends FormController
                              'twitter' => 'http://www.twitter.com/',
                          ] as $p => $u) {
                     foreach ($result as $type => $socialProfile) {
-                        if ($type === $p) {
-                            $social[$p] = (array_key_exists('handle', $socialProfile) && $socialProfile['handle']) ? $u.$socialProfile['handle'] : '';
+                        if ($type === $p && empty($currFields[$p])) {
+                            $data[$p] = (array_key_exists('handle', $socialProfile) && $socialProfile['handle']) ? $u.$socialProfile['handle'] : '';
                             break;
                         }
                     }
                 }
 
-                $data = array_merge(
-                    $social,
-                    [
-                        'lastname' => (array_key_exists('name', $result) && array_key_exists(
-                            'familyName',
-                            $result['name']
-                        )) ? $result['name']['familyName'] : '',
-                        'firstname' => (array_key_exists('name', $result) && array_key_exists(
-                            'givenName',
-                            $result['name']
-                        )) ? $result['name']['givenName'] : '',
-                        'website' => array_key_exists('site', $result) ? $result['site'] : '',
-                        'company' => (array_key_exists('employment', $result) && array_key_exists(
-                                'name',
-                                $result['employment']
-                            )) ? $result['employment']['name'] : '',
-                        'position' => (array_key_exists('employment', $result) && array_key_exists(
-                                'title',
-                                $result['employment']
-                            )) ? $result['employment']['title'] : '',
-                        'city' => array_key_exists('city', $loc) ? $loc['city'] : '',
-                        'state' => array_key_exists('state', $loc)? $loc['state'] : '',
-                        'country' => array_key_exists('country', $loc) ? $loc['country'] : '',
-                    ]
-                );
+                if (array_key_exists('name', $result) && array_key_exists(
+                        'familyName',
+                        $result['name']
+                    ) && empty($currFields['lastname'])) {
+                    $data['lastname'] = $result['name']['familyName'];
+                }
 
-                /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-                $model = $this->getModel('lead');
-                /** @var Lead $lead */
-                $lead = $model->getEntity($id);
+                if (array_key_exists('name', $result) && array_key_exists(
+                        'givenName',
+                        $result['name']
+                    ) && empty($currFields['firstname'])) {
+                    $data['firstname'] = $result['name']['givenName'];
+                }
+
+                if (array_key_exists('site', $result) && empty($currFields['website'])) {
+                    $data['website'] = $result['site'];
+                }
+
+                if (array_key_exists('employment', $result) && array_key_exists(
+                        'name',
+                        $result['employment']
+                    ) && empty($currFields['company'])) {
+                    $data['company'] = $result['employment']['name'];
+                }
+
+                if (array_key_exists('employment', $result) && array_key_exists(
+                        'title',
+                        $result['employment']
+                    ) && empty($currFields['position'])) {
+                    $data['position'] = $result['employment']['title'];
+                }
+
+                if (array_key_exists('city', $loc) && empty($currFields['city'])) {
+                    $data['city'] = $loc['city'];
+                }
+                if (array_key_exists('state', $loc) && empty($currFields['state'])) {
+                    $data['state'] = $loc['state'];
+                }
+
+                if (array_key_exists('country', $loc) && empty($currFields['country'])) {
+                    $data['country'] = $loc['country'];
+                }
+
+                // TODO: create a cache column for companies
+
                 $model->setFieldValues($lead, $data);
                 $model->saveEntity($lead);
 
@@ -102,37 +121,64 @@ class PublicController extends FormController
 
                 if ('company' === $this->request->request->get('type', [], true)) {
                     $id = substr($id, strlen('clearbitcomp#'));
+                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+                    $model = $this->getModel('lead.company');
+                    /** @var Company $company */
+                    $company = $model->getEntity($id);
+                    $currFields = $company->getFields(true);
+
                     $loc = [];
                     if (array_key_exists('geo', $result)) {
                         $loc = $result['geo'];
                     }
 
-                    $data = [
-                        'companyaddress1' => (array_key_exists('streetNumber', $loc) && array_key_exists(
-                                'streetName',
-                                $loc
-                            )) ? $loc['streetNumber'].' '.$loc['streetName'] : '',
-                        'companycity' => array_key_exists('city', $loc) ? $loc['city'] : '',
-                        'companystate' => array_key_exists('state', $loc) ? $loc['state'] : '',
-                        'companyzipcode' => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
-                        'companycountry' => array_key_exists('country', $loc) ? $loc['country'] : '',
-                        'companyemail' => (array_key_exists('site', $result) && array_key_exists(
-                                'emailAddresses',
-                                $result['site']
-                            ) && count($result['site']['emailAddresses'])) ? $result['site']['emailAddresses'][0] : '',
-                        'companyphone' => array_key_exists('phone', $result) ? $result['phone'] : '',
-                        'companydescription' => array_key_exists('description', $result) ? $result['description'] : '',
-                        'companynumber_of_employees' =>
-                            (array_key_exists('metrics', $result) && array_key_exists(
-                                    'employees',
-                                    $result['metrics']
-                                )) ? $result['metrics']['employees'] : '',
-                    ];
+                    $data = [];
 
-                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-                    $model = $this->getModel('lead.company');
-                    /** @var Company $company */
-                    $company = $model->getEntity($id);
+                    if (array_key_exists('streetNumber', $loc) && array_key_exists(
+                            'streetName',
+                            $loc
+                        ) && empty($currFields['companyaddress1'])) {
+                        $data['companyaddress1'] = $loc['streetNumber'].' '.$loc['streetName'];
+                    }
+
+                    if (array_key_exists('city', $loc) && empty($currFields['companycity'])) {
+                        $data['companycity'] = $loc['city'];
+                    }
+
+                    if (array_key_exists('metrics', $result) && array_key_exists(
+                            'employees',
+                            $result['metrics']
+                        ) && empty($currFields['companynumber_of_employees'])) {
+                        $data['companynumber_of_employees'] = $result['metrics']['employees'];
+                    }
+
+                    if (array_key_exists('description', $result) && empty($currFields['companydescription'])) {
+                        $data['companydescription'] = $result['description'];
+                    }
+
+                    if (array_key_exists('phone', $result) && empty($currFields['companyphone'])) {
+                        $data['companyphone'] = $result['phone'];
+                    }
+
+                    if (array_key_exists('site', $result) && array_key_exists(
+                            'emailAddresses',
+                            $result['site']
+                        ) && count($result['site']['emailAddresses']) && empty($currFields['companyemail'])) {
+                        $data['companyemail'] = $result['site']['emailAddresses'][0];
+                    }
+
+                    if (array_key_exists('country', $loc) && empty($currFields['companycountry'])) {
+                        $data['companycountry'] = $loc['country'];
+                    }
+
+                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode'])) {
+                        $loc['postalCode'];
+                    }
+
+                    if (array_key_exists('state', $loc) && empty($currFields['companystate'])) {
+                        $data['companystate'] = $loc['state'];
+                    }
+
                     $model->setFieldValues($company, $data);
                     $model->saveEntity($company);
                 }
