@@ -79,7 +79,9 @@ HTML;
 		<?php
         echo $html;
             foreach ($integrations as $integration) {
-                echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$settings['buttonImageUrl'].'btn_'.$integration.'.png"></a>';
+                if (isset($settings['buttonImageUrl'])) {
+                    echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$settings['buttonImageUrl'].'btn_'.$integration.'.png"></a>';
+                }
             }
 
         ?>
