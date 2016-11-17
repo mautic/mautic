@@ -547,7 +547,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 }
 
                 $results = $this->em->getRepository('MauticLeadBundle:Company')->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
-                $this->logger->error(print_r($results, true));
                 break;
         }
 
