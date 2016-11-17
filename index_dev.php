@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic, NP
  * @author      Mautic
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
