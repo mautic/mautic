@@ -67,27 +67,31 @@ $leadName = $lead->getPrimaryIdentifier();
                                     <div class="frequency-select"><?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?></div>
                                 </div>
                             </div>
-                            <div class="clearfix"></div>
-                            <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> frequency-values col-md-6">
-                                <div>
-                                    <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
-                                </div>
-                                <div class="pull-right">
-                                    <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>
-                                    <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
-                                    <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
-                                </div>
-
-                            </div>
-                            <div class="clearfix"></div>
                     </td>
-                <td class="col-md-1" style="vertical-align: top"><div class="col-md-6">
+                <td class="col-md-1" style="vertical-align: top;"><div class="col-md-6">
                         <input type="checkbox" id="<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[doNotContactChannels][]" class="contact checkbox"
                                onclick="Mautic.isPreferredChannel(<?php echo $leadId; ?>,this.value);"
                                value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
                     </div>
                 </td>
+                </tr>
+                <tr style="border-top:none"><th style="border-top:none"></th>
+                    <td  style="border-top:none"></td>
+                    <td colspan="2" style="border-top:none">
+                        <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> frequency-values col-md-6" style="border-top:none">
+                            <div>
+                                <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
+                            </div>
+                            <div class="pull-right">
+                                <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>
+                                <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
+                                <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
+                            </div>
+
+                        </div>
+                        <div class="clearfix"></div>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
