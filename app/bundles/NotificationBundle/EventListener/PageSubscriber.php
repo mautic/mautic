@@ -66,7 +66,7 @@ class PageSubscriber extends CommonSubscriber
 
         $appId       = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId = $this->coreParametersHelper->getParameter('notification_safari_web_id');
-        $welcomenotification_enabled       = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
+        $welcomenotificationEnabled       = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
 
         $this->assetsHelper->addScript($this->router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
         $this->assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
@@ -76,9 +76,9 @@ class PageSubscriber extends CommonSubscriber
 
         $leadAssociationUrl = $this->router->generate('mautic_subscribe_notification', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $welcomenotification_text = '';
-        if (!$welcomenotification_enabled) {
-            $welcomenotification_text = "welcomeNotification: { \"disable\": true },";
+        $welcomenotificationText = '';
+        if (!$welcomenotificationEnabled) {
+            $welcomenotificationText = "welcomeNotification: { \"disable\": true },";
         }
 
         $oneSignalInit = <<<JS
@@ -89,7 +89,7 @@ class PageSubscriber extends CommonSubscriber
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
         autoRegister: true,
-        {$welcomenotification_text}
+        {$welcomenotificationText}
         notifyButton: {
             enable: false // Set to false to hide
         }
