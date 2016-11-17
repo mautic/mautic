@@ -85,7 +85,7 @@ class ContactFrequencyType extends AbstractType
                             'label_attr' => ['class' => 'text-muted fw-n'],
                             'required'   => true,
                             'attr'       => [
-                                'class' => 'frequency',
+                                'class' => 'frequency form-control pull-left',
                             ],
                             'required' => false,
                         ]
@@ -101,12 +101,9 @@ class ContactFrequencyType extends AbstractType
                                 'MONTH' => 'month',
                             ],
                             'label'      => 'mautic.lead.list.frequency.times',
-                            'label_attr' => ['class' => 'text-muted fw-n'],
+                            'label_attr' => ['class' => 'text-muted fw-n frequency-label'],
                             'multiple'   => false,
-                            'attr'       => [
-                                'class' => 'form-control',
-                            ],
-                            'required' => false,
+                            'required'   => false,
                         ]
                     );
 

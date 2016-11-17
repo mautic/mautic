@@ -197,7 +197,7 @@ ul.tag-cloud li {
     max-height: 200px;
 }
 .frequency{
-    width: 45px;
+    width: 45px!important;
 
 }
 .fa-user:before, .fa-building:before{
@@ -225,3 +225,11 @@ ul.tag-cloud li {
     padding-top: 27px;
     padding-bottom: 15px;
 }
+.frequency-select{
+    width:120px!important;
+    float: right;
+    padding-right: 5px;
+}
+.frequency-label{
+     padding: 8px;
+ }
