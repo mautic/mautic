@@ -833,7 +833,8 @@ class LeadListRepository extends CommonRepository
                 case 'hit_url_date':
                 case 'referer':
                 case 'lead_email_received_date':
-                    $operand = (($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
+                case 'notification':
+                    $operand = (($func == 'notEmpty') || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
                     $column = $details['field'];
                     $table = 'page_hits';
                     if ($details['field'] == 'hit_url') {
@@ -843,6 +844,9 @@ class LeadListRepository extends CommonRepository
                     } elseif ($details['field'] == 'lead_email_received_date') {
                         $column='date_read';
                         $table = 'email_stats';
+                    } elseif ($details['field'] == 'notification') {
+                        $column='id';
+                        $table = 'push_ids';
                     }
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
@@ -854,6 +858,13 @@ class LeadListRepository extends CommonRepository
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                 ->eq($alias.'.'.$column, $exprParameter), $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                        case 'empty':
+                        case 'notEmpty':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'like':
@@ -884,6 +895,7 @@ class LeadListRepository extends CommonRepository
                             ->eq($alias.'.lead_id', $leadId));
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    echo  $subqb->getSQL();
                     break;
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':

@@ -432,6 +432,19 @@ class ListModel extends FormModel
                 ],
                 'object' => 'lead',
             ],
+            'notification' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        'empty',
+                        '!empty',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
