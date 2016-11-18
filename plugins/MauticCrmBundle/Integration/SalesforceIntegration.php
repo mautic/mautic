@@ -191,10 +191,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         if (isset($sfObject) and $sfObject == 'Activity') {
                             continue;
                         }
+
                         $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
-                                if ((!$fieldInfo['updateable'] && !$fieldInfo['calculated']) || !isset($fieldInfo['name'])
+                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id')) || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
                                         ['reference']

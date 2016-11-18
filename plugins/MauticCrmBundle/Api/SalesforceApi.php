@@ -208,10 +208,9 @@ class SalesforceApi extends CrmApi
         }
         $settings['feature_settings']['objects'][] = $object;
 
-        $fields       = $this->integration->getAvailableLeadFields($settings);
-        $fields       = $this->integration->ammendToSfFields($fields);
-        $fields['id'] = ['id' => []];
-        $result       = [];
+        $fields = $this->integration->getAvailableLeadFields($settings);
+        $fields = $this->integration->ammendToSfFields($fields);
+        $result = [];
 
         if (!empty($fields) and isset($query['start'])) {
             $fields        = implode(', ', array_keys($fields));
