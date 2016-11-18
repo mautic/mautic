@@ -74,7 +74,7 @@ EOT
         if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
-        sleep(30);
+
         if (empty($timeout)) {
             $timeout = $container->getParameter('mautic.mailer_spool_clear_timeout');
         }
