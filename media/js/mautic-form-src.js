@@ -306,6 +306,8 @@
                 } else if (Form.hasClass(parent, cls)) {
                     ancestor = parent;
                     break;
+                } else {
+                    parent = parent.parentElement;
                 }
             }
 
