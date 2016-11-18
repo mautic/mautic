@@ -121,7 +121,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($integration) && !empty($settings)) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-            $helper = $this->factory->getHelper('integration');
+            $helper = $this->get('mautic.helper.integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
 
