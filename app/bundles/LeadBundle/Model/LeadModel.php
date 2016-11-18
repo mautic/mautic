@@ -697,8 +697,8 @@ class LeadModel extends FormModel
             $leadId = $this->request->cookies->get($trackingId);
             $ip     = $this->ipLookupHelper->getIpAddress();
 
-          // if no trackingId cookkie set the lead is not tracked yet so create a new one
-          if (empty($leadId)) {
+            // if no trackingId cookkie set the lead is not tracked yet so create a new one
+            if (empty($leadId)) {
 
                 //let's create a lead
                 $lead = new Lead();
