@@ -1,0 +1,24 @@
+version: '2'
+services:
+    mautic:
+        image: mautic/mautic
+        depends_on:
+            - mauticdb
+        ports:
+            - 8080:80
+        environment:
+            MAUTIC_DB_HOST: mauticdb
+            MAUTIC_DB_USER: mautic
+            MAUTIC_DB_PASSWORD: example
+        volumes:
+            - './:/var/www/html'
+
+    mauticdb:
+        image: mariadb:latest
+        volumes:
+            - ./.data/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: example
+            MYSQL_USERNAME: mautic
+            MYSQL_PASSWORD: example
+            MYSQL_DATABASE: mautic
