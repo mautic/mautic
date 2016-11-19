@@ -63,7 +63,6 @@ class PageSubscriber extends CommonSubscriber
         if (!$this->coreParametersHelper->getParameter('notification_enabled')) {
             return;
         }
-
         $appId       = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId = $this->coreParametersHelper->getParameter('notification_safari_web_id');
         $welcomenotificationEnabled       = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
