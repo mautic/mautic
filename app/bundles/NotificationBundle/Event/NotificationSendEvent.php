@@ -80,16 +80,6 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Returns the Email entity
-     *
-     * @return Notification
-     */
-    public function getNotification()
-    {
-        return $this->entity;
-    }
-
-    /**
      * @return array
      */
     public function getLead()
