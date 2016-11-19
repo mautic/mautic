@@ -12,14 +12,17 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+
 
 /**
  * Class FormSubscriber.
  */
 class FormSubscriber extends CommonSubscriber
 {
+
     /**
      * @return array
      */
@@ -27,6 +30,7 @@ class FormSubscriber extends CommonSubscriber
     {
         return [
             FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
+            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
         ];
     }
 
@@ -39,57 +43,71 @@ class FormSubscriber extends CommonSubscriber
     {
         //add lead generation submit action
         $action = [
-            'group'       => 'mautic.lead.lead.submitaction',
-            'label'       => 'mautic.lead.lead.submitaction.changepoints',
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
-            'formType'    => 'lead_submitaction_pointschange',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
-            'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::changePoints',
+            'formType' => 'lead_submitaction_pointschange',
+            'formTheme' => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
+            'callback' => '\Mautic\LeadBundle\Helper\FormEventHelper::changePoints',
         ];
         $event->addSubmitAction('lead.pointschange', $action);
 
         //add to lead list
         $action = [
-            'group'       => 'mautic.lead.lead.submitaction',
-            'label'       => 'mautic.lead.lead.events.changelist',
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
-            'formType'    => 'leadlist_action',
-            'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists',
+            'formType' => 'leadlist_action',
+            'callback' => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists',
         ];
         $event->addSubmitAction('lead.changelist', $action);
 
         // modify tags
         $action = [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.changetags',
-            'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => 'modify_lead_tags',
-            'callback'          => '\Mautic\LeadBundle\Helper\EventHelper::updateTags',
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType' => 'modify_lead_tags',
+            'callback' => '\Mautic\LeadBundle\Helper\EventHelper::updateTags',
             'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.changetags', $action);
 
         // add UTM tags
         $action = [
-            'group'       => 'mautic.lead.lead.submitaction',
-            'label'       => 'mautic.lead.lead.events.addutmtags',
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.events.addutmtags',
             'description' => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'    => 'lead_action_addutmtags',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
-            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags',
+            'formType' => 'lead_action_addutmtags',
+            'formTheme' => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
+            'callback' => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags',
         ];
         $event->addSubmitAction('lead.addutmtags', $action);
 
         // add Do Not Contact
         $action = [
-            'group'       => 'mautic.lead.lead.submitaction',
-            'label'       => 'mautic.lead.lead.events.removedonotcontact',
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.events.removedonotcontact',
             'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'    => 'lead_action_removedonotcontact',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
-            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::RemoveDoNotContact',
+            'formType' => 'lead_action_removedonotcontact',
+            'formTheme' => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
+            'eventName' => FormEvents::FORM_ON_SUBMIT,
             'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.RemoveDoNotContact', $action);
+    }
+
+
+    /**
+     * Trigger event for when a form is submitted.
+     *
+     * @param SubmissionEvent $event
+     */
+    public function onFormSubmit(SubmissionEvent $event)
+    {
+        $form = $event->getResults();
+        if(isset($form['email']) && !empty($form['email'])){
+            //$emailModel->removeDoNotContactEntry($form['email']);
+        }
     }
 }

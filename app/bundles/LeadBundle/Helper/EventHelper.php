@@ -41,23 +41,6 @@ class EventHelper
      * @param $action
      * @param $factory
      */
-    public static function RemoveDoNotContact($action, $factory, $config)
-    {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $factory->getModel('lead');
-        $email = $factory->getModel('email');
-        $lead      = $leadModel->getCurrentLead();
-        $emailAddress = $lead->getEmail();
-        if ($emailAddress) {
-            $email->removeDoNotContact($emailAddress);
-        }
-    }
-
-
-    /**
-     * @param $action
-     * @param $factory
-     */
     public static function addUtmTags($action, $factory, $config)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
