@@ -67,7 +67,7 @@ $leadName = $lead->getPrimaryIdentifier();
                                 </div>
                             </div>
                     </td>
-                <td class="col-md-1" style="vertical-align: top;">
+                <td class="col-md-1" style="vertical-align: top;" align="center">
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[preferred_channel]" class="contact checkbox"
                                value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
