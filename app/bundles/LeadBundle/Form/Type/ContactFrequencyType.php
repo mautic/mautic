@@ -88,6 +88,7 @@ class ContactFrequencyType extends AbstractType
                                 'class' => 'frequency form-control pull-left',
                             ],
                             'required' => false,
+                            'disabled' => in_array($channel, $data['lead_channels']) ? false : true,
                         ]
                     );
 
@@ -104,6 +105,7 @@ class ContactFrequencyType extends AbstractType
                             'label_attr' => ['class' => 'text-muted fw-n frequency-label'],
                             'multiple'   => false,
                             'required'   => false,
+                            'disabled'   => in_array($channel, $data['lead_channels']) ? false : true,
                         ]
                     );
 
@@ -116,6 +118,7 @@ class ContactFrequencyType extends AbstractType
                                 'label_attr' => ['class' => 'text-muted fw-n'],
                                 'attr'       => [
                                     'data-toggle' => 'date',
+                                    'class'       => 'frequency-date form-control',
                                 ],
                                 'format'   => 'yyyy-MM-dd',
                                 'required' => false,
@@ -128,9 +131,10 @@ class ContactFrequencyType extends AbstractType
                         [
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
-                            'label_attr' => ['class' => 'text-muted fw-n'],
+                            'label_attr' => ['class' => 'frequency-label text-muted fw-n'],
                             'attr'       => [
                                 'data-toggle' => 'date',
+                                'class'       => 'frequency-date form-control',
                             ],
                             'format'   => 'yyyy-MM-dd',
                             'required' => false,

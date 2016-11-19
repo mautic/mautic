@@ -63,24 +63,6 @@ if (!empty($fields['core']['email']['value'])) {
         'iconClass' => 'fa fa-send',
     ];
 }
-//View Lead List button
-$buttons[] = [
-    'attr' => [
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans(
-            'mautic.lead.lead.header.lists',
-            ['%name%' => $lead->getPrimaryIdentifier()]
-        ),
-        'data-footer' => 'false',
-        'href'        => $view['router']->path(
-            'mautic_contact_action',
-            ['objectId' => $lead->getId(), 'objectAction' => 'list']
-        ),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-pie-chart',
-];
 
 //View Contact Frequency button
 

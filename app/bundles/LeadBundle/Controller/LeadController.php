@@ -985,10 +985,6 @@ class LeadController extends FormController
                 }
             }
 
-            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-            $listModel = $this->getModel('lead.list');
-            $lists     = $listModel->getUserLists();
-
             // Get a list of lists for the lead
             $leadsLists = $model->getLists($lead, true, true);
 
@@ -1012,8 +1008,6 @@ class LeadController extends FormController
                     $viewParameters = [
                         'objectId'     => $lead->getId(),
                         'objectAction' => 'view',
-                        'lists'        => $lists,
-                        'leadsLists'   => $leadsLists,
                         'lead'         => $lead,
                     ];
 
@@ -1048,8 +1042,6 @@ class LeadController extends FormController
                         'channels'     => $allChannels,
                         'leadChannels' => $channels,
                         'lead'         => $lead,
-                        'lists'        => $lists,
-                        'leadLists'    => $leadsLists,
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
                     'passthroughVars' => [

@@ -233,3 +233,7 @@ ul.tag-cloud li {
 .frequency-label{
      padding: 8px;
  }
+.frequency-date{
+    width: 100px;
+    float:left;
+}

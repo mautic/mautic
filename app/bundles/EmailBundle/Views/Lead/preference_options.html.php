@@ -13,7 +13,7 @@ $leadName      = $lead->getPrimaryIdentifier();
 $channelNumber = 0;
 ?>
 <?php echo $view['form']->start($form); ?>
-<table class="table table-bordered"  id="contact-timeline">
+<table class="pure-table"  id="contact-timeline">
     <thead>
     <tr>
         <th colspan="2">
@@ -129,6 +129,7 @@ else:
     unset($form['global_categories']);
 endif; ?>
     </tr>
+    <tr><td colspan="2"><?php echo $view['form']->row($form['buttons']); ?></td></tr>
     </tbody>
 </table>
 <?php echo $view['form']->end($form); ?>

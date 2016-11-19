@@ -17,7 +17,6 @@ $leadName = $lead->getPrimaryIdentifier();
     <li class="active"><a data-toggle="tab" href="#channels"><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></a></li>
     <li><a data-toggle="tab" href="#categories"><?php echo $view['translator']->trans('mautic.lead.preferred.categories'); ?></a></li>
     <li><a data-toggle="tab" href="#segments"><?php echo $view['translator']->trans('mautic.lead.preferred.segments'); ?></a></li>
-    <li><a data-toggle="tab" href="#campaigns"><?php echo $view['translator']->trans('mautic.lead.preferred.campaigns'); ?></a></li>
 </ul>
 
 <div class="tab-content">
@@ -42,10 +41,10 @@ $leadName = $lead->getPrimaryIdentifier();
             <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
                 <?php
                 $contactMe     = isset($leadChannels[$channel->value]);
-                $bgClass       = $contactMe ? 'text-success' : 'text-danger';
                 $isContactable = $contactMe ? 'channel-enabled' : 'channel-disabled';
                 $hidden        = $contactMe ? '' : 'hide';
                 $checked       = $contactMe ? 'checked' : '';
+                $disabled      = isset($leadChannels[$channel->value]) ? '' : 'disabled';
                 ?>
                 <tr>
                     <th style="vertical-align: top" class="col-md-1">
@@ -68,25 +67,29 @@ $leadName = $lead->getPrimaryIdentifier();
                                 </div>
                             </div>
                     </td>
-                <td class="col-md-1" style="vertical-align: top;"><div class="col-md-6">
-                        <input type="checkbox" id="<?php echo $channel->value ?>"
-                               name="lead_contact_frequency_rules[doNotContactChannels][]" class="contact checkbox"
-                               onclick="Mautic.isPreferredChannel(<?php echo $leadId; ?>,this.value);"
-                               value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
-                    </div>
+                <td class="col-md-1" style="vertical-align: top;">
+                        <input type="radio" id="preferred_<?php echo $channel->value ?>"
+                               name="lead_contact_frequency_rules[preferred_channel]" class="contact checkbox"
+                               value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
+                    echo $checked;
+                } ?> <?php echo $disabled; ?>>
+
                 </td>
                 </tr>
                 <tr style="border-top:none"><th style="border-top:none"></th>
                     <td  style="border-top:none"></td>
                     <td colspan="2" style="border-top:none">
-                        <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?> frequency-values col-md-6" style="border-top:none">
+                        <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?>" >
                             <div>
                                 <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                             </div>
-                            <div class="pull-right">
+                            <div>
                                 <?php echo $view['form']->widget($form['contact_pause_start_date_'.$channel->value]); ?>
-                                <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
-                                <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
+                                <div style="float:left;">
+                                    <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
+                                </div>
+                                    <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
+
                             </div>
 
                         </div>
@@ -102,16 +105,27 @@ $leadName = $lead->getPrimaryIdentifier();
         unset($form['preferred_channel']);
         unset($form['doNotContactChannels']); ?>
 
-
-                <div class="col-md-6"><?php echo $view['form']->row($form['global_categories']); ?></div>
+        <table class="table" width="100%" id="contact-timeline">
+            <thead >
+            <tr >
+                <th>
+                <?php echo $view['form']->row($form['global_categories']); ?>
+                </th>
+            </tr>
+            </thead>
+        </table>
 
     </div>
     <div id="segments" class="tab-pane fade">
-        <?php echo $view['form']->row($form['lead_lists']); ?>
-    </div>
-    <div id="campaigns" class="tab-pane fade">
-        <h3>Campaigns</h3>
-        <p>Some content in menu 2.</p>
+        <table class="table" width="100%" id="contact-timeline">
+            <thead >
+            <tr >
+                <th>
+                    <?php echo $view['form']->row($form['lead_lists']); ?>
+                </th>
+            </tr>
+            </thead>
+        </table>
     </div>
 </div>
 <?php echo $view['form']->end($form); ?>
