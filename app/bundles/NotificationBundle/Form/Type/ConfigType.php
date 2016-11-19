@@ -97,7 +97,7 @@ class ConfigType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.notification.config.form.notification.welcome.enabled',
-                'data'  => (bool) $options['data']['welcomeNotification_enabled'],
+                'data'  => (bool) $options['data']['welcomeNotificationEnabled'],
                 'attr'  => [
                     'tooltip' => 'mautic.notification.config.form.notification.welcome.tooltip',
                     'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
