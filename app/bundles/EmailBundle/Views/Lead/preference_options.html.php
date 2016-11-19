@@ -17,8 +17,15 @@ $channelNumber = 0;
     <thead>
     <tr>
         <th colspan="2">
-            <?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?>
+            <?php
+            echo $view['translator']->trans('mautic.lead.message.preferences'); ?>
         </th>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <?php
+            echo $view['translator']->trans('mautic.lead.message.preferences.descr', ['%name%' => $leadName]); ?>
+        </td>
     </tr>
     </thead>
     <tbody>
