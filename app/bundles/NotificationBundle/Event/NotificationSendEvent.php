@@ -77,35 +77,6 @@ class NotificationSendEvent extends CommonEvent
     public function setHeading($heading)
     {
         $this->heading = $heading;
-
-        return $this;
-    }
-
-    /**
-     * @return Lead
-
-     * @var Notification
-     */
-    protected $entity;
-
-    /**
-     * @param array      $args
-     */
-    public function __construct($args = array())
-    {
-        if (isset($args['lead'])) {
-            $this->lead = $args['lead'];
-        }
-    }
-
-    /**
-     * Returns the Email entity
-     *
-     * @return Notification
-     */
-    public function getNotification()
-    {
-        return $this->entity;
     }
 
     /**
