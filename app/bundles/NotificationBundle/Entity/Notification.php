@@ -384,7 +384,7 @@ class Notification extends FormEntity
      */
     public function getButton()
     {
-        return $this->heading;
+        return $this->button;
     }
 
     /**
