@@ -11,7 +11,10 @@
 
 use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
-$view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS, ButtonHelper::TYPE_BUTTON_DROPDOWN);
+if (!isset($item)) {
+    $item = null;
+}
+$view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS, ButtonHelper::TYPE_BUTTON_DROPDOWN, $item);
 include 'action_button_helper.php';
 
 echo '<div class="std-toolbar btn-group">';
@@ -42,7 +45,7 @@ foreach ($templateButtons as $action => $enabled) {
             $icon     = 'remove';
             $path     = $view['router']->path($indexRoute);
             $primary  = true;
-            $priority = 255;
+            $priority = 200;
             break;
         case 'new':
         case'edit':

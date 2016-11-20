@@ -157,10 +157,6 @@ class ButtonHelper extends Helper
      */
     public function addButtons(array $buttons)
     {
-        foreach ($buttons as $key => $button) {
-            $this->validatePriority($buttons[$key]);
-        }
-
         $this->buttonCount += count($buttons);
         $this->buttons = array_merge($this->buttons, $buttons);
 
@@ -174,8 +170,6 @@ class ButtonHelper extends Helper
      */
     public function addButton(array $button)
     {
-        $this->validatePriority($button);
-
         $this->buttons[] = $button;
         ++$this->buttonCount;
 
@@ -388,6 +382,10 @@ class ButtonHelper extends Helper
      */
     protected function orderButtons()
     {
+        foreach ($this->buttons as $key => $button) {
+            $this->validatePriority($this->buttons[$key]);
+        }
+
         uasort(
             $this->buttons,
             function ($a, $b) {
@@ -431,9 +429,10 @@ class ButtonHelper extends Helper
      */
     protected function validatePriority(&$button)
     {
-        if (!empty($button['primary'])) {
-            // Give highest priority
-            $button['priority'] = 256;
+        if (!empty($button['primary']) && self::TYPE_BUTTON_DROPDOWN == $this->groupType) {
+            if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 201)) {
+                $button['priority'] = 201;
+            }
         } elseif (!isset($button['priority'])) {
             $button['priority'] = 0;
         }
@@ -491,19 +490,17 @@ class ButtonHelper extends Helper
      */
     protected function addMobileResponsiveClasses(&$button)
     {
-        // Default all text to hidden for mobile
-        if (isset($button['btnTextClass'])) {
-            $button['btnTextClass'] .= ' hidden-xs hidden-sm';
+        if (isset($button['confirm'])) {
+            $change = &$button['confirm'];
         } else {
-            $button['btnTextClass'] = 'hidden-xs hidden-sm';
+            $change = &$button;
         }
 
-        if (isset($button['confirm'])) {
-            if (isset($button['confirm']['btnTextClass'])) {
-                $button['confirm']['btnTextClass'] .= ' hidden-xs hidden-sm';
-            } else {
-                $button['confirm']['btnTextClass'] = 'hidden-xs hidden-sm';
-            }
+        // Default all text to hidden for mobile
+        if (isset($change['btnTextClass'])) {
+            $change['btnTextClass'] .= ' hidden-xs hidden-sm';
+        } else {
+            $change['btnTextClass'] = 'hidden-xs hidden-sm';
         }
     }
 
@@ -573,7 +570,7 @@ class ButtonHelper extends Helper
     {
         // Give preCustomButtons high priority
         foreach ($preCustomButtons as $key => $button) {
-            $preCustomButtons[$key]['priority'] = 255;
+            $preCustomButtons[$key]['priority'] = 199;
             $this->buttons[]                    = $preCustomButtons[$key];
             ++$this->buttonCount;
         }
