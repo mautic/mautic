@@ -235,13 +235,13 @@ class ButtonHelper extends Helper
         $content = '';
 
         if (!empty($this->buttons)) {
-            $buttonLocation = 1;
+            $buttonCount = 1;
 
             foreach ($this->buttons as $button) {
-                $content .= $this->buildButton($button, $buttonLocation);
-                ++$buttonLocation;
+                $content .= $this->buildButton($button, $buttonCount);
+                ++$buttonCount;
 
-                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonLocation === $this->listMarker && $this->buttonCount !== $this->listMarker) {
+                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === $this->listMarker && $this->buttonCount !== $this->listMarker) {
                     $content .= $dropdownHtml;
                 }
             }
@@ -273,16 +273,16 @@ class ButtonHelper extends Helper
     /**
      * Reset the buttons.
      *
-     * @param         $buttonLocation
+     * @param         $buttonCount
      * @param Request $request
      * @param string  $groupType
      * @param null    $item
      *
      * @return $this
      */
-    public function reset(Request $request, $buttonLocation, $groupType = self::TYPE_GROUP, $item = null)
+    public function reset(Request $request, $buttonCount, $groupType = self::TYPE_GROUP, $item = null)
     {
-        $this->location       = $buttonLocation;
+        $this->location       = $buttonCount;
         $this->groupType      = $groupType;
         $this->buttonCount    = 0;
         $this->buttons        = [];
@@ -304,16 +304,16 @@ class ButtonHelper extends Helper
 
     /**
      * @param     $button
-     * @param int $buttonLocation
+     * @param int $buttonCount
      *
      * @return string
      */
-    protected function buildButton($button, $buttonLocation = 0)
+    protected function buildButton($button, $buttonCount = 0)
     {
         $buttons = '';
 
         //Wrap links in a tag
-        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonLocation >= $this->listMarker && $this->buttonCount != $this->listMarker)) {
+        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount >= $this->listMarker && $this->buttonCount != $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -322,7 +322,7 @@ class ButtonHelper extends Helper
             $button['attr'] = [];
         }
 
-        if (($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonLocation < $this->listMarker || $this->buttonCount === $this->listMarker))) {
+        if (($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount < $this->listMarker || ($this->buttonCount === $this->listMarker && $buttonCount == $this->buttonCount)))) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -417,9 +417,9 @@ class ButtonHelper extends Helper
                 $lastButton       = end($this->buttons);
                 $this->listMarker = (!empty($lastButton['confirm']['template']) && 'delete' == $lastButton['confirm']['template']) ? 2 : 3;
                 reset($this->buttons);
-            } elseif (0 === $this->listMarker && $this->buttonCount) {
+            } elseif ($this->listMarker <= 1 && $this->buttonCount) {
                 // Show at least one button
-                $this->listMarker = 1;
+                $this->listMarker = 2;
             }
         }
     }

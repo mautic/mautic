@@ -93,17 +93,11 @@ foreach ($templateButtons as $action => $enabled) {
 }
 
 if ($view['buttons']->getButtonCount() > 0) {
-    // if any custom buttons are defined in the template $buttonCount=1 should display these in a dropdown,
-    // a larger number will display them in a group
-    // 0 will not display them
-   // $view['buttons']->setGroupType(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::TYPE_BUTTON_DROPDOWN);
-    //$buttonCount = 1;
     echo '<div class="dropdown-toolbar btn-group">';
 
     $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
         ."\n";
     $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">'."\n";
-
     echo $view['buttons']->renderButtons($dropdownOpenHtml);
 
     echo '</ul></div>';
