@@ -11,6 +11,56 @@
 if ($tmpl == 'index') {
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 }
+
+$customButtons = [];
+if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) {
+    $customButtons = [
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchLists']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.lists'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.lists'),
+            'iconClass' => 'fa fa-pie-chart',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchStages']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.stages'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.stages'),
+            'iconClass' => 'fa fa-tachometer',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchCampaigns']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            'iconClass' => 'fa fa-clock-o',
+        ],
+        [
+            'attr' => [
+                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchDnc']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.dnc'),
+            'iconClass' => 'fa fa-ban text-danger',
+        ],
+    ];
+}
 ?>
 
 <?php if (count($items)): ?>
@@ -20,8 +70,14 @@ if ($tmpl == 'index') {
             <tr>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'checkall' => 'true',
-                    'target'   => '#leadTable',
+                    'checkall'        => 'true',
+                    'target'          => '#leadTable',
+                    'templateButtons' => [
+                        'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother'],
+                    ],
+                    'customButtons' => $customButtons,
+                    'langVar'       => 'lead.lead',
+                    'routeBase'     => 'contact',
                 ]);
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [

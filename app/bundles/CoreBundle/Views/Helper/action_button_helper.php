@@ -9,11 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//Set vars commonly used
-if (!isset($buttonCount)) {
-    $buttonCount = 0;
+if (isset($customButtons)) {
+    $view['buttons']->addButtons($customButtons);
 }
-$view['buttons']->setButtonCount($buttonCount);
 
 //Function used to get identifier string for entity
 $nameGetter = (!empty($nameGetter)) ? $nameGetter : 'getName';
@@ -38,15 +36,7 @@ if (!isset($editMode)) {
 }
 
 if (!isset($editAttr)) {
-    $editAttr = '';
-} elseif (is_array($editAttr)) {
-    $string = '';
-    foreach ($editAttr as $attr => $val) {
-        $string .= " $attr=\"$val\"";
-    }
-    $editAttr = $string;
-} else {
-    $editAttr = " $editAttr";
+    $editAttr = [];
 }
 
 //Template/common buttons
@@ -84,25 +74,19 @@ $view['buttons']->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
 $menuLink = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
 $view['buttons']->setMenuLink($menuLink);
 
-//Build pre template custom buttons
-if (!isset($preCustomButtons)) {
-    $preCustomButtons = [];
-}
-
-//Build post template custom buttons
-if (isset($customButtons)) {
-    $postCustomButtons = $customButtons;
-} elseif (!isset($postCustomButtons)) {
-    $postCustomButtons = [];
-}
-
-$view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
-
-// Fetch custom buttons from plugins
-$view['buttons']->fetchCustomButtons($app->getRequest(), isset($item) ? $item : null);
-$buttonCount = $view['buttons']->getButtonCount();
-
 //Set a default button type (group or dropdown)
 if (isset($groupType)) {
     $view['buttons']->setGroupType($groupType);
 }
+
+// @deprecated 2.3; to be removed in 3.0; use $view['button']->addButton/addButtons instead
+//Build pre template custom buttons
+if (!isset($preCustomButtons)) {
+    $preCustomButtons = [];
+}
+if (!isset($postCustomButtons)) {
+    $postCustomButtons = [];
+}
+
+$view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
+$buttonCount = $view['buttons']->getButtonCount();

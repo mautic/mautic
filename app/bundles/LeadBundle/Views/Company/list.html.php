@@ -22,8 +22,12 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall' => 'true',
-                        'target'   => '#companyTable',
+                        'checkall'        => 'true',
+                        'target'          => '#companyTable',
+                        'routeBase'       => 'company',
+                        'templateButtons' => [
+                            'delete' => $permissions['lead:leads:deleteother'],
+                        ],
                     ]
                 );
 
@@ -54,11 +58,14 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'comp.companywebsite',
                     ]
                 );
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'sessionVar' => 'company',
-                    'text'       => 'mautic.lead.list.thead.leadcount',
-                    'class'      => 'visible-md visible-lg col-leadlist-leadcount',
-                ]);
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'company',
+                        'text'       => 'mautic.lead.list.thead.leadcount',
+                        'class'      => 'visible-md visible-lg col-leadlist-leadcount',
+                    ]
+                );
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
@@ -98,12 +105,12 @@ if ($tmpl == 'index') {
                                 'mautic_company_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
-                                <?php if (isset($fields['core']['companyname'])) :?>
-                                <?php echo $fields['core']['companyname']['value']; ?>
-                                <?php   endif; ?>
+                                <?php if (isset($fields['core']['companyname'])) : ?>
+                                    <?php echo $fields['core']['companyname']['value']; ?>
+                                <?php endif; ?>
                             </a>
                         </div>
-                        </td>
+                    </td>
                     <td>
                         <div class="text-muted mt-4">
                             <small>
@@ -113,13 +120,23 @@ if ($tmpl == 'index') {
                     </td>
 
                     <td class="visible-md visible-lg">
-                        <?php if (isset($fields['core']['companywebsite'])) :?>
-                        <?php echo $fields['core']['companywebsite']['value']; ?>
-                        <?php   endif; ?>
+                        <?php if (isset($fields['core']['companywebsite'])) : ?>
+                            <?php echo $fields['core']['companywebsite']['value']; ?>
+                        <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'.$fields['core']['companyname']['value'].'"']); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice('mautic.lead.company.viewleads_count', $leadCounts[$item->getId()], ['%count%' => $leadCounts[$item->getId()]]); ?>
+                        <a class="label label-primary" href="<?php echo $view['router']->path(
+                            'mautic_contact_index',
+                            [
+                                'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
+                                    .$fields['core']['companyname']['value'].'"',
+                            ]
+                        ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->transChoice(
+                                'mautic.lead.company.viewleads_count',
+                                $leadCounts[$item->getId()],
+                                ['%count%' => $leadCounts[$item->getId()]]
+                            ); ?>
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
