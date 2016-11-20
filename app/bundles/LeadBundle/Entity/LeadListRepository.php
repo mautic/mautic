@@ -895,7 +895,6 @@ class LeadListRepository extends CommonRepository
                             ->eq($alias.'.lead_id', $leadId));
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
-                    echo  $subqb->getSQL();
                     break;
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
