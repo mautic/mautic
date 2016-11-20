@@ -216,6 +216,9 @@ return [
             ],
             'mautic.lead.formbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\FormSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',

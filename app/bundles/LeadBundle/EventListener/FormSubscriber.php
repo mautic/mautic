@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\EmailBundle\Model\EmailModel;
 
 
 /**
@@ -22,6 +23,20 @@ use Mautic\FormBundle\FormEvents;
  */
 class FormSubscriber extends CommonSubscriber
 {
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * FormSubscriber constructor.
+     *
+     * @param EmailModel        $emailModel
+     */
+    public function __construct(EmailModel $emailModel)
+    {
+        $this->emailModel         = $emailModel;
+    }
 
     /**
      * @return array
@@ -107,7 +122,7 @@ class FormSubscriber extends CommonSubscriber
     {
         $form = $event->getResults();
         if(isset($form['email']) && !empty($form['email'])){
-            //$emailModel->removeDoNotContactEntry($form['email']);
+            $this->emailModel->removeDoNotContact($form['email']);
         }
     }
 }
