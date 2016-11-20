@@ -163,7 +163,8 @@ class CampaignSubscriber extends CommonSubscriber
             $playerID,
             $sendEvent->getMessage(),
             $sendEvent->getHeading(),
-            $url
+            $url,
+            $notification->getButton()
         );
 
         $event->setChannel('notification', $notification->getId());

@@ -10,6 +10,7 @@
  */
 /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
 $url = $notification->getUrl();
+$button = $notification->getButton();
 ?>
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -24,5 +25,8 @@ $url = $notification->getUrl();
     </div>
     <div class="panel-body">
         <p><?php echo $notification->getMessage()?></p>
+        <?php if ($url && $button) : ?>
+        <p><a href="<?php echo $url?>" class="btn"><?php echo $button?></a></p>
+        <?php endif; ?>
     </div>
 </div>

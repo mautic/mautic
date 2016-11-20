@@ -64,6 +64,11 @@ class Notification extends FormEntity
     private $message;
 
     /**
+     * @var string
+     */
+    private $button;
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -154,6 +159,9 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('message', 'text')
+            ->build();
+
+        $builder->createField('button', 'text')
             ->build();
 
         $builder->createField('notificationType', 'text')
@@ -369,6 +377,23 @@ class Notification extends FormEntity
     {
         $this->isChanged('heading', $heading);
         $this->heading = $heading;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButton()
+    {
+        return $this->heading;
+    }
+
+    /**
+     * @param string $heading
+     */
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
     }
 
     /**
