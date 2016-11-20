@@ -101,7 +101,7 @@ class OneSignalApi extends AbstractNotificationApi
         }
 
         if ($button && $url) {
-            $data['web_buttons'] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
+            $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
         }
 
         return $this->send('/notifications', $data);
