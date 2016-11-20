@@ -14,7 +14,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.category.h
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
     'templateButtons' => [
-       'new' => $permissions[$bundle.':categories:create'],
+       'new' => $permissions[$permissionBase.':create'],
     ],
     'routeBase' => 'category',
     'query'     => ['bundle' => $bundle, 'show_bundle_select' => true],
