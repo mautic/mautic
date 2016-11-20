@@ -352,8 +352,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getCompaniesByGroup($query, $column)
     {
-        $query->select('count(comp.id) as companies, '.$column);
-        $query->addGroupBy($column);
+        $query->select('count(comp.id) as companies, '.$column)
+            ->addGroupBy($column)
+            ->andWhere(
+                $query->expr()->andX(
+                    $query->expr()->isNotNull($column),
+                    $query->expr()->neq($column, $query->expr()->literal(''))
+                )
+            );
 
         $results = $query->execute()->fetchAll();
 

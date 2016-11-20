@@ -174,41 +174,8 @@ class ReportSubscriber extends CommonSubscriber
                     ],
                 ],
             ]);
-            $fieldColumns = [];
-            foreach ($leadFields as $f) {
-                switch ($f->getType()) {
-                    case 'boolean':
-                        $type = 'bool';
-                        break;
-                    case 'date':
-                        $type = 'date';
-                        break;
-                    case 'datetime':
-                        $type = 'datetime';
-                        break;
-                    case 'time':
-                        $type = 'time';
-                        break;
-                    case 'url':
-                        $type = 'url';
-                        break;
-                    case 'email':
-                        $type = 'email';
-                        break;
-                    case 'number':
-                        $type = 'float';
-                        break;
-                    default:
-                        $type = 'string';
-                        break;
-                }
-                $fieldColumns['l.'.$f->getAlias()] = [
-                    'label' => $f->getLabel(),
-                    'type'  => $type,
-                ];
-            }
 
-            $filters = $columns = array_merge($columns, $fieldColumns);
+            $filters = $columns = array_merge($columns, $this->getFieldColumns($leadFields, 'l.'));
 
             // Append segment filters
             $userSegments = $this->listModel->getUserLists();
@@ -310,41 +277,8 @@ class ReportSubscriber extends CommonSubscriber
                         ],
                     ],
                 ]);
-            $companyFieldColumns = [];
-            foreach ($companyFields as $f) {
-                switch ($f->getType()) {
-                    case 'boolean':
-                        $type = 'bool';
-                        break;
-                    case 'date':
-                        $type = 'date';
-                        break;
-                    case 'datetime':
-                        $type = 'datetime';
-                        break;
-                    case 'time':
-                        $type = 'time';
-                        break;
-                    case 'url':
-                        $type = 'url';
-                        break;
-                    case 'email':
-                        $type = 'email';
-                        break;
-                    case 'number':
-                        $type = 'float';
-                        break;
-                    default:
-                        $type = 'string';
-                        break;
-                }
-                $companyFieldColumns['comp.'.$f->getAlias()] = [
-                    'label' => $f->getLabel(),
-                    'type'  => $type,
-                ];
-            }
 
-            $companyFilters = $companyColumns = array_merge($companyColumns, $companyFieldColumns);
+            $companyFilters = $companyColumns = array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
 
             $data = [
                 'display_name' => 'mautic.lead.lead.companies',
@@ -711,7 +645,6 @@ class ReportSubscriber extends CommonSubscriber
                         ]
                     );
                     break;
-                    break;
                 case 'mautic.lead.graph.line.companies':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'comp');
@@ -744,6 +677,12 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.lead.company.table.top.cities':
                     $queryBuilder->select('comp.companycity as title, count(comp.companycity) as quantity')
                         ->groupBy('comp.companycity')
+                        ->andWhere(
+                            $queryBuilder->expr()->andX(
+                                $queryBuilder->expr()->isNotNull('comp.companycity'),
+                                $queryBuilder->expr()->neq('comp.companycity', $queryBuilder->expr()->literal(''))
+                            )
+                        )
                         ->orderBy('quantity', 'DESC');
                     $limit  = 10;
                     $offset = 0;
@@ -964,5 +903,50 @@ class ReportSubscriber extends CommonSubscriber
 
         $event->setData($data);
         unset($data);
+    }
+
+    /**
+     * @param $fields
+     * @param $prefix
+     *
+     * @return array
+     */
+    protected function getFieldColumns($fields, $prefix)
+    {
+        $columns = [];
+        foreach ($fields as $f) {
+            switch ($f->getType()) {
+                case 'boolean':
+                    $type = 'bool';
+                    break;
+                case 'date':
+                    $type = 'date';
+                    break;
+                case 'datetime':
+                    $type = 'datetime';
+                    break;
+                case 'time':
+                    $type = 'time';
+                    break;
+                case 'url':
+                    $type = 'url';
+                    break;
+                case 'email':
+                    $type = 'email';
+                    break;
+                case 'number':
+                    $type = 'float';
+                    break;
+                default:
+                    $type = 'string';
+                    break;
+            }
+            $columns[$prefix.$f->getAlias()] = [
+                'label' => $f->getLabel(),
+                'type'  => $type,
+            ];
+        }
+
+        return $columns;
     }
 }
