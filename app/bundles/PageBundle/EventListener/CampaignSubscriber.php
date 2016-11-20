@@ -145,7 +145,7 @@ class CampaignSubscriber extends CommonSubscriber
 
             foreach ($limitToReferers as $referer) {
                 $referer              = trim($referer);
-                $refererMatches[$url] = fnmatch($referer, $refererUrl);
+                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
             }
         }
 
