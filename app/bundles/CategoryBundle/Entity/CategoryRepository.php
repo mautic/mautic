@@ -45,15 +45,26 @@ class CategoryRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
+    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, $includeGlobal = true)
     {
         $q = $this->createQueryBuilder('c');
-        $q->select('partial c.{id, title, alias, color}');
+        $q->select('partial c.{id, title, alias, color, bundle}');
 
         $q->where('c.isPublished = :true')
             ->setParameter('true', true, 'boolean');
-        $q->andWhere('c.bundle = :bundle')
-            ->setParameter('bundle', $bundle);
+
+        $expr = $q->expr()->orX(
+            $q->expr()->eq('c.bundle', ':bundle')
+        );
+
+        if ($includeGlobal && 'global' !== $bundle) {
+            $expr->add(
+                $q->expr()->eq('c.bundle', $q->expr()->literal('global'))
+            );
+        }
+
+        $q->andWhere($expr)
+          ->setParameter('bundle', $bundle);
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('c.title', ':search'))

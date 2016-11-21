@@ -8,8 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+
 $wrap = true;
-$view['buttons']->reset(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_TOOLBAR_ACTIONS);
+$view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_TOOLBAR_ACTIONS, ButtonHelper::TYPE_GROUP);
 include 'action_button_helper.php';
 ?>
 <div class="panel-body">
@@ -36,23 +39,7 @@ include 'action_button_helper.php';
         </div>
 
         <div class="col-xs-6 col-lg-4 va-m text-right">
-            <?php
-            echo $view['buttons']->renderPreCustomButtons($buttonCount);
-
-            if (!empty($templateButtons['delete'])):
-                echo $view->render('MauticCoreBundle:Helper:confirm.html.php', [
-                    'message'       => $view['translator']->trans('mautic.'.$langVar.'.form.confirmbatchdelete'),
-                    'confirmAction' => $view['router']->path($actionRoute, array_merge(['objectAction' => 'batchDelete'], $query)),
-                    'template'      => 'batchdelete',
-                    'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
-                    'precheck'      => 'batchActionPrecheck',
-                    'target'        => (empty($target)) ? null : $target,
-                ]);
-                ++$buttonCount;
-            endif;
-
-            echo $view['buttons']->renderPostCustomButtons($buttonCount);
-            ?>
+            <?php echo $view['buttons']->renderButtons(); ?>
         </div>
     </div>
 </div>

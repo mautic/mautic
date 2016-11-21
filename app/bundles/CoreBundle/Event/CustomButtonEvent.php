@@ -32,12 +32,7 @@ class CustomButtonEvent extends Event
     /**
      * @var array
      */
-    protected $prependedButtons;
-
-    /**
-     * @var array
-     */
-    protected $appendedButtons;
+    protected $buttons = [];
 
     /**
      * Entity for list/view actions.
@@ -52,16 +47,14 @@ class CustomButtonEvent extends Event
      * @param         $location
      * @param Request $request
      * @param Router  $router
-     * @param array   $prependedButtons
-     * @param array   $appendedButtons
+     * @param array   $buttons
      * @param null    $item
      */
-    public function __construct($location, Request $request, array $prependedButtons = [], array $appendedButtons = [], $item = null)
+    public function __construct($location, Request $request, array $buttons = [], $item = null)
     {
-        $this->location         = $location;
-        $this->prependedButtons = $prependedButtons;
-        $this->appendedButtons  = $appendedButtons;
-        $this->item             = $item;
+        $this->location = $location;
+        $this->buttons  = $buttons;
+        $this->item     = $item;
 
         // The original request will be stored in the subrequest
         $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
@@ -99,21 +92,13 @@ class CustomButtonEvent extends Event
     /**
      * @return array
      */
-    public function getPrependedButtons()
+    public function getButtons()
     {
-        return $this->prependedButtons;
+        return $this->buttons;
     }
 
     /**
-     * @return array
-     */
-    public function getAppendedButtons()
-    {
-        return $this->appendedButtons;
-    }
-
-    /**
-     * Append an array of buttons.
+     * Add an array of buttons.
      *
      * @param array $buttons
      * @param null  $location
@@ -121,39 +106,25 @@ class CustomButtonEvent extends Event
      *
      * @return $this
      */
-    public function appendButtons(array $buttons, $location = null, $route = null)
+    public function addButtons(array $buttons, $location = null, $route = null)
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;
         }
 
-        $this->appendedButtons = array_merge($this->appendedButtons, $buttons);
-
-        return $this;
-    }
-
-    /**
-     * Prepend an array of buttons.
-     *
-     * @param array $buttons
-     * @param null  $location
-     * @param null  $route
-     *
-     * @return $this
-     */
-    public function prependButtons(array $buttons, $location = null, $route = null)
-    {
-        if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
-            return $this;
+        foreach ($buttons as $key => $button) {
+            if (!isset($button['priority'])) {
+                $buttons[$key]['priority'] = 0;
+            }
         }
 
-        $this->prependedButtons = array_merge($this->prependedButtons, $buttons);
+        $this->buttons = array_merge($this->buttons, $buttons);
 
         return $this;
     }
 
     /**
-     * Append a single button.
+     * Add a single button.
      *
      * @param array $button
      * @param null  $location
@@ -161,33 +132,17 @@ class CustomButtonEvent extends Event
      *
      * @return $this
      */
-    public function appendButton(array $button, $location = null, $route = null)
+    public function addButton(array $button, $location = null, $route = null)
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;
         }
 
-        $this->appendedButtons[] = $button;
-
-        return $this;
-    }
-
-    /**
-     * Prepend a single button.
-     *
-     * @param array $button
-     * @param null  $location
-     * @param null  $route
-     *
-     * @return $this
-     */
-    public function prependButton(array $button, $location = null, $route = null)
-    {
-        if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
-            return $this;
+        if (!isset($button['priority'])) {
+            $button['priority'] = 0;
         }
 
-        $this->prependedButtons[] = $button;
+        $this->buttons[] = $button;
 
         return $this;
     }
