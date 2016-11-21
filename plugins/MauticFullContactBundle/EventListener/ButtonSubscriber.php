@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ButtonSubscriber extends CommonSubscriber
 {
-
     /**
      * @var ContainerInterface
      */
@@ -28,9 +27,11 @@ class ButtonSubscriber extends CommonSubscriber
 
     /**
      * LeadSubscriber constructor.
+     *
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         parent::__construct();
         $this->container = $container;
     }
@@ -38,7 +39,7 @@ class ButtonSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0]
+            CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
         ];
     }
 
@@ -57,25 +58,24 @@ class ButtonSubscriber extends CommonSubscriber
         }
 
         if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
-
-            $event->appendButton(
+            $event->addButton(
                 [
                     'attr' => [
-                        'class' => 'btn btn-default btn-sm btn-nospin',
+                        'class'       => 'btn btn-default btn-sm btn-nospin',
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
-                        'onclick' => 'this.href=\''.
+                        'onclick'     => 'this.href=\''.
                             $this->router->generate(
                                 'mautic_plugin_fullcontact_action',
                                 ['objectAction' => 'batchLookupPerson']
                             ).
                             '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
-                        'data-header' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
+                        'data-header' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     ],
-                    'tooltip' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_button.tooltip'),
+                    'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     'iconClass' => 'fa fa-search',
                 ],
-                ButtonHelper::LOCATION_TOOLBAR_ACTIONS
+                ButtonHelper::LOCATION_BULK_ACTIONS
             );
 
             if ($event->getItem()) {
@@ -92,17 +92,17 @@ class ButtonSubscriber extends CommonSubscriber
                             ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupPerson']
                         ),
                     ],
-                    'btnText' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
+                    'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     'iconClass' => 'fa fa-search',
                 ];
 
                 $event
-                    ->appendButton(
+                    ->addButton(
                         $lookupContactButton,
                         ButtonHelper::LOCATION_PAGE_ACTIONS,
                         ['mautic_contact_action', ['objectAction' => 'view']]
                     )
-                    ->appendButton(
+                    ->addButton(
                         $lookupContactButton,
                         ButtonHelper::LOCATION_LIST_ACTIONS,
                         'mautic_contact_index'
@@ -110,26 +110,26 @@ class ButtonSubscriber extends CommonSubscriber
             }
         } else {
             if (0 === strpos($event->getRoute(), 'mautic_company_')) {
-                $event->appendButton(
+                $event->addButton(
                     [
                         'attr' => [
-                            'class' => 'btn btn-default btn-sm btn-nospin',
+                            'class'       => 'btn btn-default btn-sm btn-nospin',
                             'data-toggle' => 'ajaxmodal',
                             'data-target' => '#MauticSharedModal',
-                            'onclick' => 'this.href=\''.
+                            'onclick'     => 'this.href=\''.
                                 $this->router->generate(
                                     'mautic_plugin_fullcontact_action',
                                     ['objectAction' => 'batchLookupCompany']
                                 ).
                                 '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
                             'data-header' => $this->translator->trans(
-                                'mautic.plugin.fullcontact.toolbar_compbutton.tooltip'
+                                'mautic.plugin.fullcontact.button.caption'
                             ),
                         ],
-                        'tooltip' => $this->translator->trans('mautic.plugin.fullcontact.toolbar_compbutton.tooltip'),
+                        'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                         'iconClass' => 'fa fa-search',
                     ],
-                    ButtonHelper::LOCATION_TOOLBAR_ACTIONS
+                    ButtonHelper::LOCATION_BULK_ACTIONS
                 );
 
                 if ($event->getItem()) {
@@ -146,12 +146,12 @@ class ButtonSubscriber extends CommonSubscriber
                                 ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupCompany']
                             ),
                         ],
-                        'btnText' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
+                        'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                         'iconClass' => 'fa fa-search',
                     ];
 
                     $event
-                        ->appendButton(
+                        ->addButton(
                             $lookupCompanyButton,
                             ButtonHelper::LOCATION_LIST_ACTIONS,
                             'mautic_company_index'
