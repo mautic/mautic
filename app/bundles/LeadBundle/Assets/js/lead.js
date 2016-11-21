@@ -123,7 +123,10 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
-    mQuery(container + ' .fa-check').tooltip({html: true});
+
+    if (mQuery(container + ' .panel-companies').length) {
+        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+    }
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
