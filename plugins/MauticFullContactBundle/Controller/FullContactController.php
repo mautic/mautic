@@ -505,7 +505,11 @@ class FullContactController extends FormController
             foreach ($entities as $company) {
                 if ($company->getFieldValue('companywebsite')) {
                     if ($website = $company->getFieldValue('companywebsite')) {
-                        $parse                             = parse_url($website);
+                        $parse = parse_url($website);
+                        if (!isset($parse['host'])) {
+                            // Invalid URL
+                            continue;
+                        }
                         $lookupWebsites[$company->getId()] = $parse['host'];
                     }
                 }
