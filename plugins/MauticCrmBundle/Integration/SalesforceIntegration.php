@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -197,8 +198,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field) {
-            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status']);
+            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']);
         };
+
         try {
             if ($this->isAuthorized()) {
                 if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
@@ -212,7 +214,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
-                                if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
+                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id')) || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
                                         ['reference']
@@ -347,6 +349,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $integrationEntity->setLastSyncDate(new \DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
+                    } else {
+                        continue;
                     }
                     ++$count;
                 }
@@ -379,6 +383,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.salesforce.form.sandbox',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'updateOwner',
+                'choice',
+                [
+                    'choices' => [
+                        'updateOwner' => 'mautic.salesforce.updateOwner',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.updateOwner',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
@@ -466,7 +489,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
-                if ($createdLeadData['Id']) {
+                if (isset($createdLeadData['Id'])) {
                     $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
 
@@ -705,7 +728,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Assume JSON
             $data = json_decode($data, true);
         }
-
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config);
@@ -725,7 +747,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
         }
-
+        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
+            //return if uniqueIdentifiers have no data set to avoid duplicating leads.
+            return;
+        }
         // Default to new lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
@@ -762,6 +787,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $internalInfo                   = $lead->getInternal();
             $internalInfo[$this->getName()] = $data['internal'];
             $lead->setInternal($internalInfo);
+        }
+
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
+            && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
+            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
+                ->findOneBy(['email' => $data['Owner__Lead']['Email']]);
+            if ($mauticUser instanceof User) {
+                $lead->setOwner($mauticUser);
+            }
         }
 
         if ($persist) {
