@@ -182,7 +182,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field) {
-            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status']);
+            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']);
         };
 
         try {
@@ -192,10 +192,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         if (isset($sfObject) and $sfObject == 'Activity') {
                             continue;
                         }
+
                         $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
-                                if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
+                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id')) || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
                                         ['reference']
