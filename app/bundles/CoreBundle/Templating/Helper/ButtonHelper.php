@@ -224,16 +224,17 @@ class ButtonHelper extends Helper
 
     /**
      * @param string $dropdownHtml
+     * @param string $closingDropdownHtml
      *
      * @return string
      */
-    public function renderButtons($dropdownHtml = '')
+    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = '')
     {
         $this->fetchCustomButtons();
         $this->orderButtons();
 
-        $content = '';
-
+        $content              = '';
+        $dropdownHtmlAppended = false;
         if (!empty($this->buttons)) {
             $buttonCount = 1;
 
@@ -241,10 +242,17 @@ class ButtonHelper extends Helper
                 $content .= $this->buildButton($button, $buttonCount);
                 ++$buttonCount;
 
-                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === $this->listMarker && $this->buttonCount !== $this->listMarker) {
+                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === $this->listMarker
+                    && $this->buttonCount !== $this->listMarker
+                ) {
                     $content .= $dropdownHtml;
+                    $dropdownHtmlAppended = true;
                 }
             }
+        }
+
+        if ($dropdownHtmlAppended) {
+            $content .= $closingDropdownHtml;
         }
 
         return $content;
@@ -430,7 +438,7 @@ class ButtonHelper extends Helper
     protected function validatePriority(&$button)
     {
         if (!empty($button['primary']) && self::TYPE_BUTTON_DROPDOWN == $this->groupType) {
-            if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 201)) {
+            if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
                 $button['priority'] = 201;
             }
         } elseif (!isset($button['priority'])) {
