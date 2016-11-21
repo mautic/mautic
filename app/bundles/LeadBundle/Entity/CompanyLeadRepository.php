@@ -50,4 +50,45 @@ class CompanyLeadRepository extends CommonRepository
 
         return $result;
     }
+
+    /**
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getLatestCompanyForLead($leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
+        $q->orderBy('cl.date_added', 'DESC');
+        $result = $q->execute()->fetchAll();
+
+        return !empty($result) ? $result[0] : [];
+    }
+
+    /**
+     * @param $leadId
+     * @param $companyId
+     */
+    public function getCompanyLeadEntity($leadId, $companyId)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->where(
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.lead_id', ':leadId'),
+                    $qb->expr()->eq('cl.company_id', ':companyId')
+            )->setParameter('leadId', $leadId)
+            ->setParameter('companyId', $companyId);
+
+        $companies = $qb->execute()->fetchAll();
+
+        return $companies;
+    }
 }

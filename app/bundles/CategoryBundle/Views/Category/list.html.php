@@ -64,8 +64,8 @@ if ($tmpl == 'index') {
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                             'item'            => $item,
                             'templateButtons' => [
-                                'edit'   => $permissions[$bundle.':categories:edit'],
-                                'delete' => $permissions[$bundle.':categories:delete'],
+                                'edit'   => $permissions[$permissionBase.':edit'],
+                                'delete' => $permissions[$permissionBase.':delete'],
                             ],
                             'editMode' => 'ajaxmodal',
                             'editAttr' => [
@@ -85,11 +85,11 @@ if ($tmpl == 'index') {
                     <td>
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'category', 'query' => 'bundle='.$bundle]); ?>
-                            <?php if ($permissions[$bundle.':categories:edit']): ?>
+                            <?php if ($permissions[$permissionBase.':edit']): ?>
                             <a href="<?php echo $view['router']->path('mautic_category_action', ['bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
                             <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
-                            <?php if ($permissions[$bundle.':categories:edit']): ?>
+                            <?php if ($permissions[$permissionBase.':edit']): ?>
                             </a>
                             <?php endif; ?>
                         </div>
