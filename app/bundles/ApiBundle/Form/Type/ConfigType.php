@@ -37,8 +37,9 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
         $builder->add(
-            'api_basic_auth_enabled',
+            'api_enable_basic_auth',
             'yesno_button_group',
             [
                 'label' => 'mautic.api.config.form.api.basic_auth_enabled',
@@ -48,7 +49,6 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
-        // '',
 
         $builder->add(
             'api_oauth2_access_token_lifetime',
