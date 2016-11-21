@@ -98,6 +98,15 @@ class FieldType extends AbstractType
                     // Allow html
                     $cleanMasks['properties'] = 'html';
                     break;
+                case 'freehtml':
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $labelText           = 'mautic.form.field.form.header';
+                    $showLabelText       = 'mautic.form.field.form.showheader';
+                    $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
+                    $labelAttributesText = 'mautic.form.field.form.header_attributes';
+                    // Allow html
+                    $cleanMasks['properties'] = 'html';
+                    break;
                 case 'button':
                     $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
@@ -441,6 +450,18 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         'formfield_text',
+                        [
+                            'required' => false,
+                            'label'    => false,
+                            'editor'   => true,
+                            'data'     => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'freehtml':
+                    $builder->add(
+                        'properties',
+                        'formfield_html',
                         [
                             'required' => false,
                             'label'    => false,
