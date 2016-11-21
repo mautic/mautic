@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -49,9 +50,15 @@ class CategoryModel extends FormModel
         return 'getTitle';
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase($bundle = null)
     {
-        $bundle = $this->request->get('bundle');
+        if (null === $bundle) {
+            $bundle = $this->request->get('bundle');
+        }
+
+        if ('global' === $bundle || empty($bundle)) {
+            $bundle = 'category';
+        }
 
         return $bundle.':categories';
     }
@@ -192,8 +199,13 @@ class CategoryModel extends FormModel
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10)
     {
-        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        static $results = [];
 
-        return $results;
+        $key = $bundle.$filter.$limit;
+        if (!isset($results[$key])) {
+            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        }
+
+        return $results[$key];
     }
 }

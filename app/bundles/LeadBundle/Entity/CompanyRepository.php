@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributorcomp. All rights reserved
  * @author      Mautic
  *
@@ -108,12 +109,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry')
+        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, cl.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
-            ->orderBy('cl.date_added', 'DESC');
+            ->orderBy('cl.is_primary', 'DESC');
 
         if ($companyId) {
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
@@ -325,7 +326,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-
         $companies = $qb->execute()->fetchAll();
 
         // Group companies per contact
@@ -339,6 +339,52 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $contactCompanies;
+    }
+
+    /**
+     * Get companies grouped by column.
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getCompaniesByGroup($query, $column)
+    {
+        $query->select('count(comp.id) as companies, '.$column)
+            ->addGroupBy($column)
+            ->andWhere(
+                $query->expr()->andX(
+                    $query->expr()->isNotNull($column),
+                    $query->expr()->neq($column, $query->expr()->literal(''))
+                )
+            );
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get companies.
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    {
+        $query->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
     }
 
     public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')

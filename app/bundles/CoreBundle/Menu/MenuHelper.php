@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -67,17 +68,6 @@ class MenuHelper
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
                 continue;
-            }
-
-            if (isset($i['bundle'])) {
-                // Category shortcut
-                $bundleName = $i['bundle'];
-                $i          = [
-                    'access'          => $bundleName.':categories:view',
-                    'route'           => 'mautic_category_index',
-                    'id'              => 'mautic_'.$bundleName.'category_index',
-                    'routeParameters' => ['bundle' => $bundleName],
-                ];
             }
 
             // Check to see if menu is restricted

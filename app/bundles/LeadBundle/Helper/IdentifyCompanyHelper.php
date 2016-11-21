@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -45,7 +46,7 @@ class IdentifyCompanyHelper
         $leadAdded   = false;
 
         if (isset($parameters['company'])) {
-            $companyName = filter_var($parameters['company'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['email'])) {
             $companyName = $companyDomain = self::domainExists($parameters['email']);
         }
