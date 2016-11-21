@@ -16,6 +16,7 @@ use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -337,6 +338,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.salesforce.form.sandbox',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'updateOwner',
+                'choice',
+                [
+                    'choices' => [
+                        'updateOwner' => 'mautic.salesforce.updateOwner',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.updateOwner',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
@@ -688,6 +708,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $internalInfo                   = $lead->getInternal();
             $internalInfo[$this->getName()] = $data['internal'];
             $lead->setInternal($internalInfo);
+        }
+
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
+            && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
+            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
+                ->findOneBy([ 'email' => $data['Owner__Lead']['Email']]);
+            if ($mauticUser instanceof User) {
+                $lead->setOwner($mauticUser);
+            }
         }
 
         if ($persist) {
