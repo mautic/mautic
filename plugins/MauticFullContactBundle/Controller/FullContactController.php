@@ -22,22 +22,22 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FullContactController extends FormController
 {
-
     /**
      * @param string $objectId
      *
      * @return JsonResponse
+     *
      * @throws \InvalidArgumentException
      */
     public function lookupPersonAction($objectId = '')
     {
         if ('POST' === $this->request->getMethod()) {
-            $data = $this->request->request->get('fullcontact_lookup', [], true);
+            $data     = $this->request->request->get('fullcontact_lookup', [], true);
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
-        $lead = $model->getEntity($objectId);
+        $lead  = $model->getEntity($objectId);
 
         if (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:editown',
@@ -54,13 +54,12 @@ class FullContactController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes' => $this->getFlashContent(),
+                    'flashes'    => $this->getFlashContent(),
                 ]
             );
         }
 
         if ('GET' === $this->request->getMethod()) {
-
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -84,9 +83,9 @@ class FullContactController extends FormController
                     ],
                     'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
                     'passthroughVars' => [
-                        'activeLink' => '#mautic_contact_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
-                        'route' => $route,
+                        'route'         => $route,
                     ],
                 ]
             );
@@ -96,13 +95,17 @@ class FullContactController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var FullContactIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
-                $keys = $myIntegration->getDecryptedApiKeys();
-                $fullcontact = new FullContact_Person($keys['apikey']);
+                $keys          = $myIntegration->getDecryptedApiKeys();
+                $fullcontact   = new FullContact_Person($keys['apikey']);
                 try {
+                    $webhookId = sprintf(
+                        'fullcontact%s#%s#%d',
+                        (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
+                        $objectId,
+                        $this->user->getId()
+                    );
 
-                    $webhookId = sprintf('fullcontact%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
-
-                    $cache = $lead->getSocialCache()?:[];
+                    $cache   = $lead->getSocialCache() ?: [];
                     $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                     if (!array_key_exists($cacheId, $cache)) {
                         $fullcontact->setWebhookUrl(
@@ -113,7 +116,7 @@ class FullContactController extends FormController
                             ),
                             $webhookId
                         );
-                        $res = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
+                        $res             = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
                         $cache[$cacheId] = serialize($res);
                         $lead->setSocialCache($cache);
                         $model->saveEntity($lead);
@@ -122,7 +125,7 @@ class FullContactController extends FormController
                         'mautic.lead.batch_leads_affected',
                         [
                             'pluralCount' => 1,
-                            '%count%' => 1,
+                            '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -136,18 +139,18 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
-
             }
         }
+
         return new Response('Bad Request', 400);
     }
 
     /**
-     *
      * @return JsonResponse
+     *
      * @throws \InvalidArgumentException
      * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit
      */
@@ -176,8 +179,8 @@ class FullContactController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr' => 'in',
-                                    'value' => $ids,
+                                    'expr'   => 'in',
+                                    'value'  => $ids,
                                 ],
                             ],
                         ],
@@ -192,10 +195,11 @@ class FullContactController extends FormController
             /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->get('mautic.security')->hasEntityAccess(
-                    'lead:leads:editown',
-                    'lead:leads:editother',
-                    $lead->getPermissionUser()
-                )
+                        'lead:leads:editown',
+                        'lead:leads:editother',
+                        $lead->getPermissionUser()
+                    )
+                    && $lead->getEmail()
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();
                 }
@@ -214,7 +218,7 @@ class FullContactController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes' => $this->getFlashContent(),
+                    'flashes'    => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -228,13 +232,12 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
             }
         }
         if ('GET' === $this->request->getMethod()) {
-
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -256,9 +259,9 @@ class FullContactController extends FormController
                     ],
                     'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
                     'passthroughVars' => [
-                        'activeLink' => '#mautic_contact_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route' => $route,
+                        'route'         => $route,
                     ],
                 ]
             );
@@ -268,13 +271,18 @@ class FullContactController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var FullContactIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
-                $keys = $myIntegration->getDecryptedApiKeys();
-                $fullcontact = new FullContact_Person($keys['apikey']);
+                $keys          = $myIntegration->getDecryptedApiKeys();
+                $fullcontact   = new FullContact_Person($keys['apikey']);
                 try {
                     foreach ($lookupEmails as $id => $lookupEmail) {
-                        $lead = $model->getEntity($id);
-                        $webhookId = sprintf('fullcontact%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
-                        $cache = $lead->getSocialCache()?:[];
+                        $lead      = $model->getEntity($id);
+                        $webhookId = sprintf(
+                            'fullcontact%s#%s#%d',
+                            (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
+                            $id,
+                            $this->user->getId()
+                        );
+                        $cache   = $lead->getSocialCache() ?: [];
                         $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
@@ -285,7 +293,7 @@ class FullContactController extends FormController
                                 ),
                                 $webhookId
                             );
-                            $res = $fullcontact->lookupByEmailMD5(md5($lookupEmail));
+                            $res             = $fullcontact->lookupByEmailMD5(md5($lookupEmail));
                             $cache[$cacheId] = serialize($res);
                             $lead->setSocialCache($cache);
                             $model->saveEntity($lead);
@@ -296,7 +304,7 @@ class FullContactController extends FormController
                         'mautic.lead.batch_leads_affected',
                         [
                             'pluralCount' => $count,
-                            '%count%' => $count,
+                            '%count%'     => $count,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -310,12 +318,12 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
-
             }
         }
+
         return new Response('Bad Request', 400);
     }
 
@@ -325,12 +333,13 @@ class FullContactController extends FormController
      * @param string $objectId
      *
      * @return JsonResponse
+     *
      * @throws \InvalidArgumentException
      */
     public function lookupCompanyAction($objectId = '')
     {
         if ('POST' === $this->request->getMethod()) {
-            $data = $this->request->request->get('fullcontact_lookup', [], true);
+            $data     = $this->request->request->get('fullcontact_lookup', [], true);
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -339,7 +348,6 @@ class FullContactController extends FormController
         $company = $model->getEntity($objectId);
 
         if ('GET' === $this->request->getMethod()) {
-
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -347,7 +355,7 @@ class FullContactController extends FormController
                 ]
             );
 
-            $website = $company->getFieldValue('companywebsite', 'core');
+            $website = $company->getFieldValue('companywebsite');
 
             if (!$website) {
                 $this->addFlash(
@@ -359,7 +367,7 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
             }
@@ -381,9 +389,9 @@ class FullContactController extends FormController
                     ],
                     'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
                     'passthroughVars' => [
-                        'activeLink' => '#mautic_company_index',
+                        'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
-                        'route' => $route,
+                        'route'         => $route,
                     ],
                 ]
             );
@@ -393,15 +401,20 @@ class FullContactController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var FullContactIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
-                $keys = $myIntegration->getDecryptedApiKeys();
-                $fullcontact = new FullContact_Company($keys['apikey']);
+                $keys          = $myIntegration->getDecryptedApiKeys();
+                $fullcontact   = new FullContact_Company($keys['apikey']);
                 try {
-                    $webhookId = sprintf('fullcontactcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
-                    $website = $company->getFieldValue('companywebsite', 'core');
-                    $parse = parse_url($website);
-                    $cache = $company->getSocialCache()?:[];
+                    $webhookId = sprintf(
+                        'fullcontactcomp%s#%s#%d',
+                        (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
+                        $objectId,
+                        $this->user->getId()
+                    );
+                    $website = $company->getFieldValue('companywebsite');
+                    $parse   = parse_url($website);
+                    $cache   = $company->getSocialCache() ?: [];
                     $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
-                    if (!array_key_exists($cacheId, $cache)) {
+                    if (!array_key_exists($cacheId, $cache) && isset($parse['host'])) {
                         $webhookUrl = $this->generateUrl(
                             'mautic_plugin_fullcontact_index',
                             [],
@@ -412,7 +425,7 @@ class FullContactController extends FormController
                             $webhookId
                         );
 
-                        $res = $fullcontact->lookupByDomain($parse['host']);
+                        $res             = $fullcontact->lookupByDomain($parse['host']);
                         $cache[$cacheId] = serialize($res);
                         $company->setSocialCache($cache);
                         $model->saveEntity($company);
@@ -421,7 +434,7 @@ class FullContactController extends FormController
                         'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => 1,
-                            '%count%' => 1,
+                            '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -435,18 +448,18 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
-
             }
         }
+
         return new Response('Bad Request', 400);
     }
 
     /**
-     *
      * @return JsonResponse
+     *
      * @throws \InvalidArgumentException
      * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit
      */
@@ -475,8 +488,8 @@ class FullContactController extends FormController
                             'force' => [
                                 [
                                     'column' => 'comp.id',
-                                    'expr' => 'in',
-                                    'value' => $ids,
+                                    'expr'   => 'in',
+                                    'value'  => $ids,
                                 ],
                             ],
                         ],
@@ -490,10 +503,11 @@ class FullContactController extends FormController
         if ($count = count($entities)) {
             /** @var Company $company */
             foreach ($entities as $company) {
-                if ($company->getFieldValue('companywebsite', 'core')) {
-                    $website = $company->getFieldValue('companywebsite', 'core');
-                    $parse = parse_url($website);
-                    $lookupWebsites[$company->getId()] = $parse['host'];
+                if ($company->getFieldValue('companywebsite')) {
+                    if ($website = $company->getFieldValue('companywebsite')) {
+                        $parse                             = parse_url($website);
+                        $lookupWebsites[$company->getId()] = $parse['host'];
+                    }
                 }
             }
 
@@ -510,7 +524,7 @@ class FullContactController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes' => $this->getFlashContent(),
+                    'flashes'    => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -524,13 +538,12 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
             }
         }
         if ('GET' === $this->request->getMethod()) {
-
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -552,9 +565,9 @@ class FullContactController extends FormController
                     ],
                     'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
                     'passthroughVars' => [
-                        'activeLink' => '#mautic_company_index',
+                        'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',
-                        'route' => $route,
+                        'route'         => $route,
                     ],
                 ]
             );
@@ -564,13 +577,18 @@ class FullContactController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var FullContactIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('FullContact');
-                $keys = $myIntegration->getDecryptedApiKeys();
-                $fullcontact = new FullContact_Company($keys['apikey']);
+                $keys          = $myIntegration->getDecryptedApiKeys();
+                $fullcontact   = new FullContact_Company($keys['apikey']);
                 try {
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
-                        $company = $model->getEntity($id);
-                        $webhookId = sprintf('fullcontactcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
-                        $cache = $company->getSocialCache()?:[];
+                        $company   = $model->getEntity($id);
+                        $webhookId = sprintf(
+                            'fullcontactcomp%s#%s#%d',
+                            (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
+                            $id,
+                            $this->user->getId()
+                        );
+                        $cache   = $company->getSocialCache() ?: [];
                         $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
@@ -581,7 +599,7 @@ class FullContactController extends FormController
                                 ),
                                 $webhookId
                             );
-                            $res = $fullcontact->lookupByDomain($lookupWebsite);
+                            $res             = $fullcontact->lookupByDomain($lookupWebsite);
                             $cache[$cacheId] = serialize($res);
                             $company->setSocialCache($cache);
                             $model->saveEntity($company);
@@ -592,7 +610,7 @@ class FullContactController extends FormController
                         'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => $count,
-                            '%count%' => $count,
+                            '%count%'     => $count,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -606,12 +624,12 @@ class FullContactController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes' => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
-
             }
         }
+
         return new Response('Bad Request', 400);
     }
 }
