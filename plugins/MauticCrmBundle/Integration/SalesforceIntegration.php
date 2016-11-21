@@ -289,7 +289,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if ($dataObject) {
-                    $lead                  = $this->getMauticLead($dataObject, true, null, null);
+                    $lead = $this->getMauticLead($dataObject, true, null, null);
+                    if (!$lead) {
+                        continue;
+                    }
                     $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
@@ -443,7 +446,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
-                if ($createdLeadData['Id']) {
+                if (isset($createdLeadData['Id'])) {
                     $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
 
@@ -671,7 +674,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
         }
-
+        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
+            //return if uniqueIdentifiers have no data set to avoid duplicating leads.
+            return;
+        }
         // Default to new lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
