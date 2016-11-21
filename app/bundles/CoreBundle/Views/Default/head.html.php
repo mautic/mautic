@@ -11,7 +11,7 @@
 ?>
 <head>
     <meta charset="UTF-8" />
-    <title><?php if( !empty($view['slots']->get('headerTitle', '')) ): ?>
+    <title><?php if (!empty($view['slots']->get('headerTitle', ''))): ?>
         <?php echo strip_tags(str_replace('<', ' <', $view['slots']->get('headerTitle', ''))); ?> | 
     <?php endif; ?>
 	<?php echo $view['slots']->get('pageTitle', 'Mautic'); ?>

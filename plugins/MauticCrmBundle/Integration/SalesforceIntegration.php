@@ -720,7 +720,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
             && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
             $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
-                ->findOneBy([ 'email' => $data['Owner__Lead']['Email']]);
+                ->findOneBy(['email' => $data['Owner__Lead']['Email']]);
             if ($mauticUser instanceof User) {
                 $lead->setOwner($mauticUser);
             }

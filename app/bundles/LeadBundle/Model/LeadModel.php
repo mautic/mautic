@@ -2166,4 +2166,56 @@ class LeadModel extends FormModel
 
         return false;
     }
+
+    /**
+     * @param $companyId
+     * @param $leadId
+     */
+    public function setPrimaryCompany($companyId, $leadId)
+    {
+        $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($leadId);
+
+        $companyArray      = [];
+        $oldPrimaryCompany = $newPrimaryCompany = false;
+
+        $lead = $this->getEntity($leadId);
+
+        foreach ($companies as $company) {
+            $company     = $this->companyModel->getEntity($company['company_id']);
+            $companyLead = $this->companyModel->getCompanyLeadRepository()->findOneBy(
+                [
+                    'lead'    => $lead,
+                    'company' => $company,
+                ]
+            );
+            if ($companyLead) {
+                if ($companyLead->getPrimary()) {
+                    $oldPrimaryCompany = $companyLead->getCompany()->getId();
+                }
+
+                if ($company->getId() == $companyId and !$companyLead->getPrimary()) {
+                    $companyLead->setPrimary(true);
+                    $newPrimaryCompany = $companyId;
+                    $lead->addUpdatedField('company', $company->getName());
+                } else {
+                    $companyLead->setPrimary(false);
+                }
+                $companyArray[] = $companyLead;
+            }
+        }
+
+        if (!$newPrimaryCompany) {
+            $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
+            if (!empty($latestCompany)) {
+                $lead->addUpdatedField('company', $latestCompany['companyname']);
+            }
+        }
+
+        if (!empty($companyArray)) {
+            $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray);
+        }
+
+        return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
+    }
 }

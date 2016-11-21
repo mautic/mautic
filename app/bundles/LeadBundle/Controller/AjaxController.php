@@ -804,4 +804,23 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($fields);
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function setAsPrimaryCompanyAction(Request $request)
+    {
+        $dataArray['success'] = 1;
+        $companyId            = InputHelper::clean($request->request->get('companyId'));
+        $leadId               = InputHelper::clean($request->request->get('leadId'));
+
+        $leadModel      = $this->getModel('lead');
+        $primaryCompany = $leadModel->setPrimaryCompany($companyId, $leadId);
+
+        $dataArray = array_merge($dataArray, $primaryCompany);
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }
