@@ -30,7 +30,7 @@ class CompanyFieldsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['integration_company_fields'] as $field => $details) {
-            $label = (is_array($details)) ? $field : $details['label'];
+            $label = (is_array($details)) ? $field : $details;
             $field = InputHelper::alphanum($field, false, '_');
 
             $builder->add($field, 'choice', [
