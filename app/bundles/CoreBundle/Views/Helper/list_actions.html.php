@@ -71,6 +71,7 @@ if (is_array($item)) {
                                 'confirmAction' => $view['router']->path($actionRoute, array_merge(['objectAction' => 'delete', 'objectId' => $id], $query)),
                                 'template'      => 'delete',
                             ],
+                            'priority' => -1,
                         ]
                     );
             endif;

@@ -28,6 +28,7 @@ if (!empty($checkall)):
                         'confirmAction' => $view['router']->path($actionRoute, array_merge(['objectAction' => 'batchDelete'], $query)),
                         'template'      => 'batchdelete',
                     ],
+                    'priority' => -1,
                 ]
             );
             break;
