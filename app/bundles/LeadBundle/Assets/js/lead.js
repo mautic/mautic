@@ -123,8 +123,7 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
-    mQuery('.fa-check').tooltip({html: true});
-    mQuery('.fa-check').tooltip({html: true});
+    mQuery(container + ' .fa-check').tooltip({html: true});
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
