@@ -91,4 +91,19 @@ class CompanyLeadRepository extends CommonRepository
 
         return $companies;
     }
+
+    public function getEntitiesByLead(Lead $lead)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('cl')
+            ->from('MauticLeadBundle:CompanyLead', 'cl')
+            ->where(
+                $qb->expr()->eq('cl.manuallyRemoved', 0),
+                $qb->expr()->eq('cl.lead', ':lead')
+            )->setParameter('lead', $lead);
+
+        $companies = $qb->getQuery()->execute();
+
+        return $companies;
+    }
 }

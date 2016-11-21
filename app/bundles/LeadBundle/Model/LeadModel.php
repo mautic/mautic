@@ -2173,15 +2173,15 @@ class LeadModel extends FormModel
      */
     public function setPrimaryCompany($companyId, $leadId)
     {
-        $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($leadId);
-
         $companyArray      = [];
         $oldPrimaryCompany = $newPrimaryCompany = false;
 
         $lead = $this->getEntity($leadId);
 
-        foreach ($companies as $company) {
-            $company     = $this->companyModel->getEntity($company['company_id']);
+        $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
+
+        foreach ($companyLeads as $companyLead) {
+            $company     = $companyLead->getCompany();
             $companyLead = $this->companyModel->getCompanyLeadRepository()->findOneBy(
                 [
                     'lead'    => $lead,
