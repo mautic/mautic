@@ -837,20 +837,21 @@ class LeadListRepository extends CommonRepository
                     $operand = (($func == 'notEmpty') || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
                     $column = $details['field'];
                     $table = 'page_hits';
+                    $select = 'id';
                     if ($details['field'] == 'hit_url') {
-                        $column='url';
+                        $column = 'url';
                     } elseif ($details['field'] == 'hit_url_date') {
-                        $column='date_hit';
+                        $column = 'date_hit';
                     } elseif ($details['field'] == 'lead_email_received_date') {
-                        $column='date_read';
+                        $column = 'date_read';
                         $table = 'email_stats';
                     } elseif ($details['field'] == 'notification') {
-                        $column='id';
+                        $column = 'id';
                         $table = 'push_ids';
                     }
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
-                        ->select('id')
+                        ->select($select)
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
                     switch ($func) {
                         case 'eq':
@@ -895,6 +896,38 @@ class LeadListRepository extends CommonRepository
                             ->eq($alias.'.lead_id', $leadId));
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
+                case 'hit_url_count':
+                case 'lead_email_received_count':
+                    $operand = 'EXISTS';
+                    $column = $details['field'];
+                    $table = 'page_hits';
+                    $select = 'COUNT(id)';
+                    if ($details['field'] == 'lead_email_received_count') {
+                        $table = 'email_stats';
+                        $select = 'SUM(open_count)';
+                    }
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select($select)
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+
+                    $parameters[$parameter] = $details['filter'];
+                    $subqb->where($q->expr()
+                        ->andX($q->expr()
+                            ->eq($alias.'.lead_id', 'l.id')));
+                    switch ($func) {
+                        case 'gt':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->having($select .'>'. $details['filter']);
+                            break;
+                        case 'lt':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->having($select .'<'. $details['filter']);
+                            break;
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    echo $subqb->getSQL();
                     break;
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':

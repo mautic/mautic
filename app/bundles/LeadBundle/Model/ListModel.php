@@ -344,6 +344,17 @@ class ListModel extends FormModel
                 ],
                 'object'     => 'lead',
             ],
+            'lead_email_received_count' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received_count'),
+                'properties' => ['type' => 'number'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => [
@@ -448,6 +459,17 @@ class ListModel extends FormModel
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
+            'hit_url_count' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
+                'properties' => ['type' => 'number'],
                 'operators' => [
                     'include' => [
                         'gt',
