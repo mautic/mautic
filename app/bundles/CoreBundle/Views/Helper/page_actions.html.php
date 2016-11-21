@@ -17,8 +17,6 @@ if (!isset($item)) {
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS, ButtonHelper::TYPE_BUTTON_DROPDOWN, $item);
 include 'action_button_helper.php';
 
-echo '<div class="std-toolbar btn-group">';
-
 foreach ($templateButtons as $action => $enabled) {
     if (!$enabled) {
         continue;
@@ -93,7 +91,7 @@ foreach ($templateButtons as $action => $enabled) {
 }
 
 if ($view['buttons']->getButtonCount() > 0) {
-    echo '<div class="dropdown-toolbar btn-group">';
+    echo '<div class="std-toolbar btn-group">';
 
     $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
         ."\n";
@@ -103,5 +101,4 @@ if ($view['buttons']->getButtonCount() > 0) {
     echo '</ul></div>';
 }
 
-echo '</div>';
 echo $extraHtml;
