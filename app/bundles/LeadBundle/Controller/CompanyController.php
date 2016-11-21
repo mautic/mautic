@@ -746,25 +746,30 @@ class CompanyController extends FormController
                     //Both leads are good so now we merge them
                     $mainCompany = $model->companyMerge($primaryCompany, $secondaryCompany, false);
                 }
-            }
 
-            if ($valid) {
+                if ($valid) {
+                    $viewParameters = [
+                        'objectId'     => $primaryCompany->getId(),
+                        'objectAction' => 'edit',
+                    ];
+                }
+            } else {
                 $viewParameters = [
-                    'objectId'     => $primaryCompany->getId(),
+                    'objectId'     => $secondaryCompany->getId(),
                     'objectAction' => 'edit',
                 ];
-
-                return $this->postActionRedirect(
-                    [
-                        'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
-                        'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticLeadBundle:Company:edit',
-                        'passthroughVars' => [
-                            'closeModal' => 1,
-                        ],
-                    ]
-                );
             }
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticLeadBundle:Company:edit',
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                    ],
+                ]
+            );
         }
 
         $tmpl = $this->request->get('tmpl', 'index');

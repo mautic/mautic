@@ -13,10 +13,13 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CompanyType.
@@ -32,15 +35,27 @@ class CompanyType extends AbstractType
     private $em;
 
     /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * CompanyType constructor.
      *
      * @param EntityManager   $entityManager
      * @param CorePermissions $security
      */
-    public function __construct(EntityManager $entityManager, CorePermissions $security)
+    public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
     {
-        $this->em       = $entityManager;
-        $this->security = $security;
+        $this->em         = $entityManager;
+        $this->security   = $security;
+        $this->router     = $router;
+        $this->translator = $translator;
     }
 
     /**
@@ -95,6 +110,28 @@ class CompanyType extends AbstractType
                 'form_buttons'
             );
         }
+        $builder->add('buttons', 'form_buttons', [
+            'post_extra_buttons' => [
+                [
+                    'name'  => 'merge',
+                    'label' => 'mautic.lead.merge',
+                    'attr'  => [
+                        'class'       => 'btn btn-default btn-dnd',
+                        'icon'        => 'fa fa-building',
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        'data-header' => $this->translator->trans('mautic.lead.company.header.merge'),
+                        'href'        => $this->router->generate(
+                            'mautic_company_action',
+                            [
+                                'objectId'     => $options['data']->getId(),
+                                'objectAction' => 'merge',
+                            ]
+                        ),
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
