@@ -31,6 +31,7 @@ class CompanyMergeType extends AbstractType
             'company_list',
             [
                 'multiple'    => false,
+                'label'       => 'mautic.company.to.merge.into',
                 'required'    => true,
                 'modal_route' => false,
                 'main_entity' => $options['main_entity'],
@@ -47,8 +48,8 @@ class CompanyMergeType extends AbstractType
             'form_buttons',
             [
                 'apply_text' => false,
-                'save_text'  => 'mautic.company.merge',
-                'save_icon'  => 'fa fa-user',
+                'save_text'  => 'mautic.lead.merge',
+                'save_icon'  => 'fa fa-building',
             ]
         );
 

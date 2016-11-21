@@ -20,9 +20,9 @@ if (isset($preCustomButtons) or isset($customButtons) or isset($postCustomButton
 }
 
 include 'action_button_helper.php';
-if (!empty($templateButtons)) {
-    echo '<div class="std-toolbar btn-group">';
-}
+
+echo '<div class="std-toolbar btn-group">';
+
 foreach ($templateButtons as $action => $enabled) {
     if (!$enabled) {
         continue;
@@ -99,7 +99,6 @@ if ($buttonCount > 0) {
 
     echo '</ul></div>';
 }
-if (!empty($templateButtons)) {
-    echo '</div>';
-}
+
+echo '</div>';
 echo $extraHtml;
