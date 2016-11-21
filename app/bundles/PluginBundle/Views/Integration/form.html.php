@@ -98,7 +98,7 @@ unset($form['featureSettings']['companyFields']);
         </div>
     <?php endif; ?>
     <div class="tab-pane fade bdr-w-0" id="company-fields-container">
-        <h4 class="mb-sm">Company Fields</h4>
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>
 </div>

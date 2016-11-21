@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 /**
@@ -60,11 +59,9 @@ class IdentifyCompanyHelper
             $country = isset($parameters['country']) ? $parameters['country'] : null;
             $state   = isset($parameters['state']) ? $parameters['state'] : null;
 
-            $company = $companyRepo->identifyCompany($companyName, $city, $country, $state);
+            $companyEntity = $companyRepo->identifyCompany($companyName, $city, $country, $state);
 
             if (!empty($company)) {
-                //check if lead is already assigned to company
-                $companyEntity = $companyModel->getEntity($company['id']);
                 if ($lead) {
                     $companyLeadRepo = $companyModel->getCompanyLeadRepository();
                     if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company['id']))) {
