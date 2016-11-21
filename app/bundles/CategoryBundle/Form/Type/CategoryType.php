@@ -11,12 +11,13 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CategoryType.
@@ -27,12 +28,15 @@ class CategoryType extends AbstractType
     private $session;
 
     /**
-     * @param MauticFactory $factory
+     * CategoryType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param Session             $session
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator, Session $session)
     {
-        $this->translator = $factory->getTranslator();
-        $this->session    = $factory->getSession();
+        $this->translator = $translator;
+        $this->session    = $session;
     }
 
     /**
@@ -115,7 +119,7 @@ class CategoryType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'         => 'Mautic\CategoryBundle\Entity\Category',

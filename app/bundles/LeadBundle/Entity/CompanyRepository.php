@@ -325,7 +325,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-
         $companies = $qb->execute()->fetchAll();
 
         // Group companies per contact
@@ -339,5 +338,51 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $contactCompanies;
+    }
+
+    /**
+     * Get companies grouped by column.
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getCompaniesByGroup($query, $column)
+    {
+        $query->select('count(comp.id) as companies, '.$column)
+            ->addGroupBy($column)
+            ->andWhere(
+                $query->expr()->andX(
+                    $query->expr()->isNotNull($column),
+                    $query->expr()->neq($column, $query->expr()->literal(''))
+                )
+            );
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get companies.
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    {
+        $query->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
     }
 }

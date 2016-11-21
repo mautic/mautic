@@ -697,28 +697,20 @@ class LeadModel extends FormModel
             $leadId = $this->request->cookies->get($trackingId);
             $ip     = $this->ipLookupHelper->getIpAddress();
 
+            // if no trackingId cookkie set the lead is not tracked yet so create a new one
             if (empty($leadId)) {
-                //this lead is not tracked yet so get leads by IP and track that lead or create a new one
-                $leads = $this->getLeadsByIp($ip->getIpAddress());
 
-                if (count($leads)) {
-                    //just create a tracking cookie for the newest lead
-                    $lead   = $leads[0];
-                    $leadId = $lead->getId();
-                    $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
-                } else {
-                    //let's create a lead
-                    $lead = new Lead();
-                    $lead->addIpAddress($ip);
-                    $lead->setNewlyCreated(true);
+                //let's create a lead
+                $lead = new Lead();
+                $lead->addIpAddress($ip);
+                $lead->setNewlyCreated(true);
 
-                    // Set to prevent loops
-                    $this->currentLead = $lead;
+                // Set to prevent loops
+                $this->currentLead = $lead;
 
-                    $this->saveEntity($lead, false);
-                    $leadId = $lead->getId();
-                    $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
-                }
+                $this->saveEntity($lead, false);
+                $leadId = $lead->getId();
+                $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
 
                 $fields = $this->getLeadDetails($lead);
                 $lead->setFields($fields);
@@ -953,8 +945,8 @@ class LeadModel extends FormModel
             $oldTrackingId = $this->request->cookies->get('mautic_session_id');
             $trackingId    = hash('sha1', uniqid(mt_rand()));
 
-            //create a tracking cookie
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId);
+            //create a tracking cookie with a expire of two years
+            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
 
             return [$trackingId, $oldTrackingId];
         }
@@ -968,8 +960,8 @@ class LeadModel extends FormModel
                 $generated  = true;
             }
 
-            //create a tracking cookie
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId);
+            //create a tracking cookie with a expire of two years
+            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
         }
 
         return [$trackingId, $generated];
@@ -990,7 +982,8 @@ class LeadModel extends FormModel
             $this->cookieHelper->setCookie($oldTrackingId, null, -3600);
         }
 
-        $this->cookieHelper->setCookie($trackingId, $leadId);
+        // Create a cookie with a expire of two years
+        $this->cookieHelper->setCookie($trackingId, $leadId, 31536000);
     }
 
     /**
