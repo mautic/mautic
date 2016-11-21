@@ -206,6 +206,6 @@ ul.tag-cloud li {
 .inline-spacer {
     text-transform: capitalize;
 }
-.primary {
-    color:#fdb933;
+.panel-companies .primary {
+    color: #fdb933;
 }
