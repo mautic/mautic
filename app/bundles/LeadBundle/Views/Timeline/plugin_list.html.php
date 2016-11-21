@@ -84,7 +84,9 @@ $baseUrl = isset($lead) ? $view['router']->path(
 </style>
 <div class="tl-header">
     <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', ['%total%' => $events['total']]); ?>
-    <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events_for_contact', ['%contact%' => $lead->getName(), '%id%' => $lead->getId()]); ?>
+    <?php if (isset($lead)) {
+    echo $view['translator']->trans('mautic.lead.timeline.displaying_events_for_contact', ['%contact%' => $lead->getName(), '%id%' => $lead->getId()]);
+} ?>
     (<span class="tl-new"><?php echo $newCount; ?></span> <?php echo $view['translator']->trans(
         'mautic.lead.timeline.events_new'
     ); ?>)
