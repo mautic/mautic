@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$leadId = isset($lead) ? $lead->getId() : null;
 if (isset($tmpl) && $tmpl == 'index') {
     $view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
 }
@@ -123,28 +124,52 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo ' tr-new';
         }
         ?>">
-            <span class="timeline-row-id timeline-timestamp">
-                <?php echo $view['date']->toText($event['timestamp']); ?>
-                on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?>
-            </span>
-           <br />
-            <span class="timeline-type">
-                <?php if (isset($event['eventType'])): ?>
-                    <?php echo $event['eventType']; ?>
-        <?php endif; ?>: </span>
-
-            <span class="timeline-name ellipsis">
-                <?php if ($eventLabel !== $event['eventType']): ?>
-                    <?php echo $eventLabel; ?>
-                <?php endif; ?>
-                <?php if (isset($event['leadEmail'])): ?>
-                    <a href="mailto:<?php echo $event['leadEmail']; ?>" title="<?php echo $event['leadEmail']; ?>" target="_new">
-                        <?php echo $event['leadName']; ?>
+            <span class="timeline-row-id hide"><?php echo $view['date']->toText($event['timestamp']); ?>
+                               on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?></span>
+            <span class="timeline-row-lead-id hide"><?php echo isset($event['leadId']) ? $event['leadId'] : ''; ?></span>
+            <div class="btn-group" role="group" style="float: right;">
+                <span class="timeline-icon">
+                    <a href="javascript:void(0);"
+                       onclick="mQuery('#timeline-details-<?php echo $counter; ?>').toggleClass('hide')"
+                       data-activate-details="<?php echo $counter; ?>"
+                       class="btn btn-xs btn-nospin btn-default<?php if (empty($details)) {
+            echo ' disabled';
+        } ?>" data-toggle="tooltip"
+                       title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
+                        <span class="fa fa-fw <?php echo $icon ?>"></span>
                     </a>
-                <?php endif?>
-            </span>
+                </span>
+
+                <span class="timeline-icon">
+                    <a href="javascript:void(0);" class="btn btn-xs btn-nospin btn-default" data-toggle="tooltip"
+                       onclick="mQuery(this).toggleClass('btn-warning')"
+                       title="Mute notifications">
+                        <span class="fa fa-fw fa-bell-slash-o"></span>
+                    </a>
+                </span>
+            </div>
+            <?php if (isset($event['leadEmail'])):?>
+            <span class="timeline-lead ellipsis"><a href="mailto:<?php echo $event['leadEmail']; ?>"
+                                                    title="<?php echo $event['leadEmail']; ?>"
+                                                    target="_new"><?php echo $event['leadName']; ?></a></span>
+
+            <span class="timeline-timestamp"> <?php echo $view['date']->toText($event['timestamp']); ?>
+                              on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?></span>
+            <?php endif; ?>
+            <br/>
+
+            <span class="timeline-type"><?php if (isset($event['eventType'])) {
+            echo $event['eventType'];
+        } ?>: </span>
+
+            <br/>
+
+            <?php if ($eventLabel !== $event['eventType']): ?>
+                <span class="timeline-name ellipsis"><?php echo $eventLabel; ?></span>
+            <?php endif; ?>
+
             <?php if (!empty($details)): ?>
-                <div class="timeline-details " id="timeline-details-<?php echo $counter; ?>">
+                <div class="timeline-details hide" id="timeline-details-<?php echo $counter; ?>">
                     <?php echo $details ?>
                 </div>
             <?php endif; ?>
