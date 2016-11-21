@@ -34,10 +34,11 @@ class CompanyChangeScoreActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'precision'   => 0,
+                'data'        => (isset($options['data']['score'])) ? $options['data']['score'] : 0,
                 'constraints' => [
                     new NotEqualTo(
                         [
-                            'value'   => '0',
+                            'value'   => 0,
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
