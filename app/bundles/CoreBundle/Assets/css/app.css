@@ -4304,11 +4304,21 @@ lesshat-selector { -lh-property: 0 ;
   right: 300px;
   height: 100%;
 }
+.code-mode .builder-panel {
+  width: 50%;
+}
+.code-mode .builder-content {
+  width: 50%;
+}
 .builder-panel .panel a.btn {
   white-space: normal;
 }
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
+}
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
 }
 @media (max-width: 767px) {
   .builder .builder-panel {

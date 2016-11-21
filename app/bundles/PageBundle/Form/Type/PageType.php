@@ -8,7 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -95,7 +94,7 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
-                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens builder-html',
+                    'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
                 ],
