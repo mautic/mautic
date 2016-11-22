@@ -219,10 +219,10 @@ class ChartQuery extends AbstractChart
             unset($filters['groupBy']);
         }
 
-        $query->select($this->getLocalDateExpression($column, $tablePrefix).' AS local_date, COUNT(*) AS `count`')
-            ->groupBy('local_date'.$groupBy);
+        $query->select($this->getLocalDateExpression($column, $tablePrefix).' AS `date`, COUNT(*) AS `count`')
+            ->groupBy('`date`'.$groupBy);
 
-        $query->orderBy('local_date', 'ASC')->setMaxResults($limit);
+        $query->orderBy('`date`', 'ASC')->setMaxResults($limit);
     }
 
     public function getLocalDateExpression($column, $tablePrefix = 't')
