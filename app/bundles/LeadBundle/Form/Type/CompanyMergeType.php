@@ -42,7 +42,6 @@ class CompanyMergeType extends AbstractType
                 ],
             ]
         );
-
         $builder->add(
             'buttons',
             'form_buttons',
