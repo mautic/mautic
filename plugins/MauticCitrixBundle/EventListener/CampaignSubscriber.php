@@ -131,10 +131,10 @@ class CampaignSubscriber extends CommonSubscriber
                 }
             }
             if (in_array($criteria, ['webinar_register', 'training_register'], true)) {
-                self::registerProduct($product, $event->getLead(), $products);
+                $this->registerProduct($product, $event->getLead(), $products);
             } else {
                 if (in_array($criteria, ['assist_screensharing', 'training_start', 'meeting_start'], true)) {
-                    self::startProduct($product, $event->getLead(), $products, $emailId, $actionId);
+                    $this->startProduct($product, $event->getLead(), $products, $emailId, $actionId);
                 }
             }
         } catch (\Exception $ex) {

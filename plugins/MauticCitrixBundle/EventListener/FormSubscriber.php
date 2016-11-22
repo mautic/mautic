@@ -168,7 +168,7 @@ class FormSubscriber extends CommonSubscriber
                             if ($actionAction === $startType) {
                                 if (array_key_exists('template', $action->getProperties())) {
                                     $emailId = $action->getProperties()['template'];
-                                    self::startProduct(
+                                    $this->startProduct(
                                         $product,
                                         $currentLead,
                                         $productsToRegister,
@@ -181,7 +181,7 @@ class FormSubscriber extends CommonSubscriber
                             }
                         }
                     } else {
-                        self::registerProduct($product, $currentLead, $productsToRegister);
+                        $this->registerProduct($product, $currentLead, $productsToRegister);
                     }
                 } else {
                     throw new BadRequestHttpException('Lead not found!');
