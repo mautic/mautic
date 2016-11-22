@@ -1,21 +1,37 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Werner
- * Date: 10/26/2016
- * Time: 12:44 PM
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticCitrixBundle\Helper;
+namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
-use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 trait CitrixStartTrait
 {
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * @param EmailModel $emailModel
+     */
+    public function setEmailModel(EmailModel $emailModel)
+    {
+        $this->emailModel = $emailModel;
+    }
 
     /**
      * @param string $product
@@ -31,7 +47,7 @@ trait CitrixStartTrait
      * @throws \InvalidArgumentException
      * @throws \Doctrine\ORM\ORMException
      */
-    public static function startProduct($product, $lead, array $productsToStart, $emailId = null, $actionId = null)
+    public function startProduct($product, $lead, array $productsToStart, $emailId = null, $actionId = null)
     {
         $leadFields = $lead->getProfileFields();
         list($email, $firstname, $lastname) = [
@@ -55,14 +71,8 @@ trait CitrixStartTrait
                 if ('' !== $hostUrl) {
                     // send email using template from form action properties
                     // and replace the tokens in the body with the hostUrl
-                    $container = CitrixHelper::getContainer();
-                    $translator = $container->get('translator');
-                    /** @var ModelFactory $factory */
-                    $factory = $container->get('mautic.model.factory');
 
-                    /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                    $model = $factory->getModel('email');
-                    $emailEntity = $model->getEntity($emailId);
+                    $emailEntity = $this->emailModel->getEntity($emailId);
 
                     //make sure the email still exists and is published
                     if (null !== $emailEntity && $emailEntity->isPublished()) {
@@ -73,10 +83,10 @@ trait CitrixStartTrait
                                 'product' => $product,
                                 'productLink' => $hostUrl,
                                 'productText' =>
-                                    sprintf($translator->trans('plugin.citrix.start.producttext'), ucfirst($product)),
+                                    sprintf($this->translator->trans('plugin.citrix.start.producttext'), ucfirst($product)),
                             ];
 
-                            $button = $container->get('templating')->render(
+                            $button = $this->templating->render(
                                 'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                                 $params
                             );
@@ -90,7 +100,7 @@ trait CitrixStartTrait
                         $emailEntity->setCustomHtml($content);
                         $leadFields['id'] = $lead->getId();
                         $options = ['source' => ['trigger', $actionId]];
-                        $model->sendEmail($emailEntity, $leadFields, $options);
+                        $this->emailModel->sendEmail($emailEntity, $leadFields, $options);
                     } else {
                         throw new BadRequestHttpException('Unable to load emal template!');
                     }
@@ -99,10 +109,8 @@ trait CitrixStartTrait
                     $eventName = CitrixHelper::getCleanString(
                             $productToStart['productTitle']
                         ).'_#'.$productToStart['productId'];
-                    /** @var CitrixModel $citrixModel */
-                    $citrixModel = $factory->getModel('citrix.citrix');
 
-                    $citrixModel->addEvent(
+                    $this->citrixModel->addEvent(
                         $product,
                         $email,
                         $eventName,

@@ -27,9 +27,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -42,15 +40,15 @@ class ListModel extends FormModel
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
+    /**
+     * ListModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->container            = $container;
     }
 
     /**
@@ -73,9 +71,7 @@ class ListModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->container->get('event_dispatcher');
-        $repo->setDispatcher($dispatcher);
+        $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
 
         return $repo;

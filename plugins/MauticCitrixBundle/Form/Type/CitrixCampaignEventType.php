@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,61 +12,79 @@
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
 use Mautic\CoreBundle\Translation\Translator;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
-use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CitrixCampaignEventType
+ * Class CitrixCampaignEventType.
  */
 class CitrixCampaignEventType extends AbstractType
 {
+    /**
+     * @var CitrixModel
+     */
+    protected $model;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * CitrixCampaignEventType constructor.
+     *
+     * @param CitrixModel         $model
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(CitrixModel $model, TranslatorInterface $translator)
+    {
+        $this->model      = $model;
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \InvalidArgumentException
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!(array_key_exists('attr', $options) && array_key_exists('data-product', $options['attr'])) ||
-            !CitrixProducts::isValidValue($options['attr']['data-product']) ||
-            !CitrixHelper::isAuthorized('Goto'.$options['attr']['data-product'])
+        if (!(array_key_exists('attr', $options) && array_key_exists('data-product', $options['attr']))
+            || !CitrixProducts::isValidValue($options['attr']['data-product'])
+            || !CitrixHelper::isAuthorized('Goto'.$options['attr']['data-product'])
         ) {
             return;
         }
 
-        $product = $options['attr']['data-product'];
-
-        /** @var Translator $translator */
-        $translator = CitrixHelper::getContainer()->get('translator');
-        /** @var CitrixModel $citrixModel */
-        $citrixModel = CitrixHelper::getContainer()->get('mautic.model.factory')->getModel('citrix');
-        $eventNamesDesc = $citrixModel->getDistinctEventNamesDesc($options['attr']['data-product']);
+        $product        = $options['attr']['data-product'];
+        $eventNamesDesc = $this->model->getDistinctEventNamesDesc($options['attr']['data-product']);
 
         $choices = [
-            'attendedToAtLeast' => $translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
+            'attendedToAtLeast' => $this->translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
         ];
 
         if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING === $product) {
             $choices['registeredToAtLeast'] =
-                 $translator->trans('plugin.citrix.criteria.'.$product.'.registered');
+                $this->translator->trans('plugin.citrix.criteria.'.$product.'.registered');
         }
 
         $builder->add(
             'event-criteria-'.$product,
             'choice',
             [
-                'label' => $translator->trans('plugin.citrix.decision.criteria'),
+                'label'   => $this->translator->trans('plugin.citrix.decision.criteria'),
                 'choices' => $choices,
             ]
         );
 
         $choices = array_replace(
-            ['ANY' => $translator->trans('plugin.citrix.event.'.$product.'.any')],
+            ['ANY' => $this->translator->trans('plugin.citrix.event.'.$product.'.any')],
             $eventNamesDesc
         );
 
@@ -73,8 +92,8 @@ class CitrixCampaignEventType extends AbstractType
             $product.'-list',
             'choice',
             [
-                'label' => $translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                'choices' => $choices,
+                'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                'choices'  => $choices,
                 'multiple' => true,
             ]
         );

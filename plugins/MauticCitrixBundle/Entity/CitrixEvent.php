@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,13 +13,10 @@ namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\MauticCitrixBundle\Helper\BasicEnum;
 
 /**
- *
  * @ORM\Table(name="plugin_citrix_events")
  * @ORM\Entity
- *
  */
 class CitrixEvent
 {
@@ -61,11 +59,11 @@ class CitrixEvent
 
     public function __construct()
     {
-        $this->product = 'undefined';
-        $this->email = 'undefined';
+        $this->product   = 'undefined';
+        $this->email     = 'undefined';
         $this->eventName = 'undefined';
         $this->eventDesc = 'undefined';
-        $this->eventDate = new \Datetime;
+        $this->eventDate = new \Datetime();
         $this->eventType = 'undefined';
     }
 
@@ -104,7 +102,7 @@ class CitrixEvent
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {

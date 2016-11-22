@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -18,12 +19,12 @@
 	    		<?php echo $view->escape($event['eventLabel']); ?>
 			</h3>
             <p class="mb-0">
-				<?php 
-				echo $view->escape($view['translator']->trans('mautic.core.timeline.event.time', array(
-					'%date%' => $view['date']->toFullConcat($event['timestamp']), 
-					'%event%' => $event['eventLabel']
-				))); 
-				?>
+				<?php
+                echo $view->escape($view['translator']->trans('mautic.core.timeline.event.time', [
+                    '%date%'  => $view['date']->toFullConcat($event['timestamp']),
+                    '%event%' => $event['eventLabel'],
+                ]));
+                ?>
 			</p>
 	    </div>
 		<div class="panel-footer">

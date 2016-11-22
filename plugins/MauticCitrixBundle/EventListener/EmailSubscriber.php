@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -20,26 +21,26 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 
 /**
- * Class EmailSubscriber
+ * Class EmailSubscriber.
  */
 class EmailSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
+        return [
 //            CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
 //            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('decodeTokensDisplay', 0),
-        );
+            EmailEvents::EMAIL_ON_DISPLAY => ['decodeTokensDisplay', 0],
+        ];
     }
 
     /**
      * @param TokenGenerateEvent $event
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -50,6 +51,7 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * @param EmailBuilderEvent $event
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -57,9 +59,9 @@ class EmailSubscriber extends CommonSubscriber
     {
         // register tokens
         $tokens = [
-            '{meeting_button}' => $this->translator->trans('plugin.citrix.token.meeting_button'),
+            '{meeting_button}'  => $this->translator->trans('plugin.citrix.token.meeting_button'),
             '{training_button}' => $this->translator->trans('plugin.citrix.token.training_button'),
-            '{assist_button}' => $this->translator->trans('plugin.citrix.token.assist_button'),
+            '{assist_button}'   => $this->translator->trans('plugin.citrix.token.assist_button'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -67,13 +69,13 @@ class EmailSubscriber extends CommonSubscriber
                 $event->filterTokens($tokens)
             );
         }
-
     }
 
     /**
-     * Search and replace tokens with content
+     * Search and replace tokens with content.
      *
      * @param EmailSendEvent $event
+     *
      * @throws \RuntimeException
      */
     public function decodeTokensDisplay(EmailSendEvent $event)
@@ -82,9 +84,10 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Search and replace tokens with content
+     * Search and replace tokens with content.
      *
      * @param EmailSendEvent $event
+     *
      * @throws \RuntimeException
      */
     public function decodeTokensSend(EmailSendEvent $event)
@@ -93,10 +96,11 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Search and replace tokens with content
+     * Search and replace tokens with content.
      *
      * @param EmailSendEvent $event
-     * @param bool $triggerEvent
+     * @param bool           $triggerEvent
+     *
      * @throws \RuntimeException
      */
     public function decodeTokens(EmailSendEvent $event, $triggerEvent = false)
@@ -125,7 +129,7 @@ class EmailSubscriber extends CommonSubscriber
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
                 }
-                
+
                 $button = $this->templating->render(
                     'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                     $params

@@ -1,25 +1,27 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Werner
- * Date: 10/26/2016
- * Time: 12:44 PM
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticCitrixBundle\Helper;
+namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
-use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait CitrixRegistrationTrait
 {
-
     /**
      * @param string $product
-     * @param Lead $currentLead
-     * @param array $productsToRegister
+     * @param Lead   $currentLead
+     * @param array  $productsToRegister
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -27,7 +29,7 @@ trait CitrixRegistrationTrait
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
      */
-    public static function registerProduct($product, $currentLead, array $productsToRegister)
+    public function registerProduct($product, $currentLead, array $productsToRegister)
     {
         $leadFields = $currentLead->getProfileFields();
         list($email, $firstname, $lastname) = [
@@ -51,12 +53,8 @@ trait CitrixRegistrationTrait
                     $eventName = CitrixHelper::getCleanString(
                             $productToRegister['productTitle']
                         ).'_#'.$productToRegister['productId'];
-                    /** @var CitrixModel $citrixModel */
-                    $citrixModel = CitrixHelper::getContainer()
-                        ->get('mautic.model.factory')
-                        ->getModel('citrix.citrix');
 
-                    $citrixModel->addEvent(
+                    $this->citrixModel->addEvent(
                         $product,
                         $email,
                         $eventName,
@@ -71,5 +69,4 @@ trait CitrixRegistrationTrait
             throw new BadRequestHttpException('Mandatory lead fields not found!');
         }
     }
-
 }

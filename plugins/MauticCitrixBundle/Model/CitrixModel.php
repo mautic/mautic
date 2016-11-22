@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,9 +11,10 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Model;
 
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Model\FormModel;
-use Doctrine\DBAL\Schema\Table;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
@@ -23,17 +25,36 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class CitrixModel
+ * Class CitrixModel.
  */
 class CitrixModel extends FormModel
 {
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
 
-    private $container;
+    /**
+     * @var EventModel
+     */
+    protected $eventModel;
 
-    public function __construct()
+    /**
+     * CitrixModel constructor.
+     */
+    public function __construct(LeadModel $leadModel, EventModel $eventModel)
     {
-        $this->container = CitrixHelper::getContainer();
-        $this->setEntityManager($this->container->get('doctrine')->getManager());
+        $this->leadModel  = $leadModel;
+        $this->eventModel = $eventModel;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        parent::setEntityManager($em);
+
         $this->_createTableIfNotExists();
     }
 
@@ -48,13 +69,13 @@ class CitrixModel extends FormModel
     }
 
     /**
-     *
-     * @param string $product
-     * @param string $email
-     * @param string $eventName
-     * @param string $eventDesc
-     * @param string $eventType
+     * @param string    $product
+     * @param string    $email
+     * @param string    $eventName
+     * @param string    $eventDesc
+     * @param string    $eventType
      * @param \DateTime $eventDate
+     *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
@@ -88,6 +109,7 @@ class CitrixModel extends FormModel
     /**
      * @param string $product
      * @param string $email
+     *
      * @return array
      */
     public function getEventsByLeadEmail($product, $email)
@@ -103,6 +125,7 @@ class CitrixModel extends FormModel
      * @param string $product
      * @param string $eventName
      * @param string $eventType
+     *
      * @return array
      */
     public function getEmailsByEvent($product, $eventName, $eventType)
@@ -111,11 +134,11 @@ class CitrixModel extends FormModel
             return []; // is not a valid citrix product
         }
         $citrixEvents = $this->getRepository()->findBy(
-            array(
-                'product' => $product,
+            [
+                'product'   => $product,
                 'eventName' => $eventName,
                 'eventType' => $eventType,
-            )
+            ]
         );
 
         $emails = [];
@@ -133,6 +156,7 @@ class CitrixModel extends FormModel
 
     /**
      * @param string $product
+     *
      * @return array
      */
     public function getDistinctEventNames($product)
@@ -157,6 +181,7 @@ class CitrixModel extends FormModel
 
     /**
      * @param string $product
+     *
      * @return array
      */
     public function getDistinctEventNamesDesc($product)
@@ -168,12 +193,13 @@ class CitrixModel extends FormModel
             "SELECT DISTINCT c.eventName, c.eventDesc FROM MauticCitrixBundle:CitrixEvent c WHERE c.product='%s'",
             $product
         );
-        $query = $this->em->createQuery($dql);
-        $items = $query->getResult();
+        $query  = $this->em->createQuery($dql);
+        $items  = $query->getResult();
         $result = [];
         foreach ($items as $item) {
-$result[$item['eventName']]=$item['eventDesc'];
+            $result[$item['eventName']] = $item['eventDesc'];
         }
+
         return $result;
     }
 
@@ -181,7 +207,8 @@ $result[$item['eventName']]=$item['eventDesc'];
      * @param string $product
      * @param string $email
      * @param string $eventType
-     * @param array $eventNames
+     * @param array  $eventNames
+     *
      * @return int
      */
     public function countEventsBy($product, $email, $eventType, array $eventNames = [])
@@ -213,18 +240,20 @@ $result[$item['eventName']]=$item['eventDesc'];
 
         $query = $this->em->createQuery($dql);
 
-        return (int)$query->getResult()[0]['cant'];
+        return (int) $query->getResult()[0]['cant'];
     }
 
     /**
-     * @param string $product
-     * @param string $eventName
-     * @param string $eventDesc
-     * @param string $eventType
-     * @param array $emailsToAdd
-     * @param array $emailsToRemove
+     * @param string          $product
+     * @param string          $eventName
+     * @param string          $eventDesc
+     * @param string          $eventType
+     * @param array           $emailsToAdd
+     * @param array           $emailsToRemove
      * @param OutputInterface $output
+     *
      * @return int
+     *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
@@ -247,7 +276,7 @@ $result[$item['eventName']]=$item['eventDesc'];
         // Add events
         if (0 !== count($emailsToAdd)) {
             foreach ($emailsToAdd as $email) {
-                $citrixEvent = new CitrixEvent;
+                $citrixEvent = new CitrixEvent();
                 $citrixEvent->setProduct($product);
                 $citrixEvent->setEmail($email);
                 $citrixEvent->setEventName($eventName);
@@ -263,19 +292,19 @@ $result[$item['eventName']]=$item['eventDesc'];
                             ) > 40) ? '...' : '.')
                     );
                 }
-                $count++;
+                ++$count;
             }
         }
 
         // Delete events
         if (0 !== count($emailsToRemove)) {
             $citrixEvents = $this->getRepository()->findBy(
-                array(
+                [
                     'eventName' => $eventName,
                     'eventType' => $eventType,
-                    'email' => $emailsToRemove,
-                    'product' => $product,
-                )
+                    'email'     => $emailsToRemove,
+                    'product'   => $product,
+                ]
             );
             /** @var CitrixEvent $citrixEvent */
             foreach ($citrixEvents as $citrixEvent) {
@@ -289,7 +318,7 @@ $result[$item['eventName']]=$item['eventDesc'];
                             ) > 40) ? '...' : '.')
                     );
                 }
-                $count++;
+                ++$count;
             }
         }
 
@@ -299,7 +328,6 @@ $result[$item['eventName']]=$item['eventDesc'];
 
         if (0 !== count($emailsToAdd)) {
             foreach ($emailsToAdd as $email) {
-
                 if ($this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_EVENT_UPDATE)) {
                     $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventDesc, $eventType, $email);
                     $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_EVENT_UPDATE, $citrixEvent);
@@ -314,16 +342,15 @@ $result[$item['eventName']]=$item['eventDesc'];
     }
 
     /**
-     *
      * @throws \Doctrine\DBAL\DBALException
      */
     private function _createTableIfNotExists()
     {
         $tableName = 'plugin_citrix_events';
-        $sm = $this->em->getConnection()->getSchemaManager();
+        $sm        = $this->em->getConnection()->getSchemaManager();
         if (!$sm->tablesExist([$tableName])) {
             $table = new Table($tableName);
-            $col = $table->addColumn('id', 'integer');
+            $col   = $table->addColumn('id', 'integer');
             $col->setAutoincrement(true);
             $table->addColumn('product', 'string', ['length' => 20]);
             $table->addColumn('email', 'string', ['length' => 255]);
@@ -339,13 +366,13 @@ $result[$item['eventName']]=$item['eventDesc'];
             $table->addIndex(['product', 'email', 'event_type', 'event_name'], 'citrix_product_name');
             $table->addIndex(['event_date'], 'citrix_event_date');
             $sm->createTable($table);
-
         }
     }
 
     /**
      * @param string $product
      * @param string $email
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
@@ -354,16 +381,13 @@ $result[$item['eventName']]=$item['eventDesc'];
         if (!CitrixProducts::isValidValue($product)) {
             return; // is not a valid citrix product
         }
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->container->get('mautic.model.factory')->getModel('lead');
-        $lead = $leadModel->getRepository()->getLeadByEmail($email);
+        /** @var LeadModel $this->leadModel */
+        $lead = $this->leadModel->getRepository()->getLeadByEmail($email);
         if (array_key_exists('id', $lead)) {
-            $leadId = (int)$lead['id'];
-            $entity = $leadModel->getEntity($leadId);
-            $leadModel->setCurrentLead($entity);
-            /** @var EventModel $eventModel */
-            $eventModel = $this->container->get('mautic.model.factory')->getModel('campaign.event');
-            $eventModel->triggerEvent('citrix.event.'.$product);
+            $leadId = (int) $lead['id'];
+            $entity = $this->leadModel->getEntity($leadId);
+            $this->leadModel->setCurrentLead($entity);
+            $this->eventModel->triggerEvent('citrix.event.'.$product);
         }
     }
 }

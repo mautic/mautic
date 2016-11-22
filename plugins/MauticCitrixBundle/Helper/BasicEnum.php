@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,27 +13,32 @@ namespace MauticPlugin\MauticCitrixBundle\Helper;
 
 use ReflectionClass;
 
-abstract class BasicEnum {
+abstract class BasicEnum
+{
     private static $constCacheArray;
 
-    private static function getConstants() {
-        if (self::$constCacheArray === NULL) {
+    private static function getConstants()
+    {
+        if (self::$constCacheArray === null) {
             self::$constCacheArray = [];
         }
         $calledClass = get_called_class();
         if (!array_key_exists($calledClass, self::$constCacheArray)) {
-            $reflect = new ReflectionClass($calledClass);
+            $reflect                             = new ReflectionClass($calledClass);
             self::$constCacheArray[$calledClass] = $reflect->getConstants();
         }
+
         return self::$constCacheArray[$calledClass];
     }
 
     /**
      * @param $name
      * @param bool $strict
+     *
      * @return bool
      */
-    public static function isValidName($name, $strict = false) {
+    public static function isValidName($name, $strict = false)
+    {
         $constants = self::getConstants();
 
         if ($strict) {
@@ -40,30 +46,36 @@ abstract class BasicEnum {
         }
 
         $keys = array_map('strtolower', array_keys($constants));
+
         return in_array(strtolower($name), $keys, true);
     }
 
     /**
      * @param $value
      * @param bool $strict
+     *
      * @return bool
      */
-    public static function isValidValue($value, $strict = true) {
+    public static function isValidValue($value, $strict = true)
+    {
         $values = array_values(self::getConstants());
+
         return in_array($value, $values, $strict);
     }
 
     /**
      * @return array
      */
-    public static function toArray() {
+    public static function toArray()
+    {
         return array_values(self::getConstants());
     }
 
     /**
      * @return array
      */
-    public static function toArrayOfNames() {
+    public static function toArrayOfNames()
+    {
         return array_keys(self::getConstants());
     }
 }

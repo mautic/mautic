@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -38,7 +39,6 @@ class CitrixEventUpdateEvent extends CommonEvent
      */
     private $eventDesc;
 
-
     /**
      * CitrixEventUpdateEvent constructor.
      *
@@ -50,10 +50,10 @@ class CitrixEventUpdateEvent extends CommonEvent
      */
     public function __construct($product, $eventName, $eventDesc, $eventType, $email)
     {
-        $this->product = $product;
+        $this->product   = $product;
         $this->eventName = $eventName;
         $this->eventType = $eventType;
-        $this->email = $email;
+        $this->email     = $email;
         $this->eventDesc = $eventDesc;
     }
 
@@ -96,5 +96,4 @@ class CitrixEventUpdateEvent extends CommonEvent
     {
         return $this->eventDesc;
     }
-
 }

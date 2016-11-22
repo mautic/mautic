@@ -1,7 +1,8 @@
 <?php
 
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -25,7 +26,7 @@ class GotomeetingIntegration extends CitrixAbstractIntegration
     {
         return 'Gotomeeting';
     }
-    
+
     /**
      * @return string
      */
@@ -33,5 +34,4 @@ class GotomeetingIntegration extends CitrixAbstractIntegration
     {
         return 'GoToMeeting';
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -52,7 +53,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         return 'oauth2';
     }
-    
+
     /**
      * {@inheritdoc}
      *
@@ -61,7 +62,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'app_name' => 'mautic.citrix.form.appname',
+            'app_name'  => 'mautic.citrix.form.appname',
             'client_id' => 'mautic.citrix.form.consumerkey',
         ];
     }
@@ -116,7 +117,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAccessTokenUrl()
     {
-        return $this->getApiUrl() . '/oauth/access_token';
+        return $this->getApiUrl().'/oauth/access_token';
     }
 
     /**
@@ -126,9 +127,9 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAuthenticationUrl()
     {
-        return $this->getApiUrl() . '/oauth/authorize';
+        return $this->getApiUrl().'/oauth/authorize';
     }
-    
+
     /**
      * {@inheritdoc}
      *
@@ -137,6 +138,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function isAuthorized()
     {
         $keys = $this->getKeys();
+
         return isset($keys[$this->getAuthTokenKey()]);
     }
 
@@ -146,6 +148,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getApiKey()
     {
         $keys = $this->getKeys();
+
         return $keys[$this->getAuthTokenKey()];
     }
 
@@ -155,7 +158,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getOrganizerKey()
     {
         $keys = $this->getKeys();
+
         return $keys['organizer_key'];
     }
-
 }

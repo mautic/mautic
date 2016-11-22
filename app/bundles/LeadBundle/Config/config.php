@@ -478,7 +478,6 @@ return [
                 'class'     => 'Mautic\LeadBundle\Model\ListModel',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'service_container',
                 ],
             ],
             'mautic.lead.model.note' => [

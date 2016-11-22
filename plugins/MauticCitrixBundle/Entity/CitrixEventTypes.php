@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -15,7 +16,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\BasicEnum;
 abstract class CitrixEventTypes extends BasicEnum
 {
     // Used for querying events
-    const STARTED = 'started';
+    const STARTED    = 'started';
     const REGISTERED = 'registered';
-    const ATTENDED = 'attended';
+    const ATTENDED   = 'attended';
 }

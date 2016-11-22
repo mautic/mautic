@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,44 +11,56 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
-use Mautic\CoreBundle\Translation\Translator;
-use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CitrixCampaignActionType
+ * Class CitrixCampaignActionType.
  */
 class CitrixCampaignActionType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * CitrixCampaignActionType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \InvalidArgumentException
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!(array_key_exists('attr', $options) && array_key_exists('data-product', $options['attr'])) ||
-            !CitrixProducts::isValidValue($options['attr']['data-product']) ||
-            !CitrixHelper::isAuthorized('Goto'.$options['attr']['data-product'])
+        if (!(array_key_exists('attr', $options) && array_key_exists('data-product', $options['attr']))
+            || !CitrixProducts::isValidValue($options['attr']['data-product'])
+            || !CitrixHelper::isAuthorized('Goto'.$options['attr']['data-product'])
         ) {
             return;
         }
 
         $product = $options['attr']['data-product'];
 
-        /** @var Translator $translator */
-        $translator = CitrixHelper::getContainer()->get('translator');
-
         $choices = [
-            'webinar_register' => $translator->trans('plugin.citrix.action.register.webinar'),
-            'meeting_start' => $translator->trans('plugin.citrix.action.start.meeting'),
-            'training_register' => $translator->trans('plugin.citrix.action.register.training'),
-            'training_start' => $translator->trans('plugin.citrix.action.start.training'),
-            'assist_screensharing' => $translator->trans('plugin.citrix.action.screensharing.assist'),
+            'webinar_register'     => $this->translator->trans('plugin.citrix.action.register.webinar'),
+            'meeting_start'        => $this->translator->trans('plugin.citrix.action.start.meeting'),
+            'training_register'    => $this->translator->trans('plugin.citrix.action.register.training'),
+            'training_start'       => $this->translator->trans('plugin.citrix.action.start.training'),
+            'assist_screensharing' => $this->translator->trans('plugin.citrix.action.screensharing.assist'),
         ];
 
         $newChoices = [];
@@ -61,7 +74,7 @@ class CitrixCampaignActionType extends AbstractType
             'event-criteria-'.$product,
             'choice',
             [
-                'label' => $translator->trans('plugin.citrix.action.criteria'),
+                'label'   => $this->translator->trans('plugin.citrix.action.criteria'),
                 'choices' => $newChoices,
             ]
         );
@@ -71,23 +84,22 @@ class CitrixCampaignActionType extends AbstractType
                 $product.'-list',
                 'choice',
                 [
-                    'label' => $translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                    'choices' => CitrixHelper::getCitrixChoices($product),
+                    'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                    'choices'  => CitrixHelper::getCitrixChoices($product),
                     'multiple' => true,
                 ]
             );
         }
 
-        if (array_key_exists('meeting_start', $newChoices) ||
-            array_key_exists('training_start', $newChoices) ||
-            array_key_exists('assist_screensharing', $newChoices)
+        if (array_key_exists('meeting_start', $newChoices)
+            || array_key_exists('training_start', $newChoices)
+            || array_key_exists('assist_screensharing', $newChoices)
         ) {
-
             $defaultOptions = [
-                'label' => 'plugin.citrix.emailtemplate',
+                'label'      => 'plugin.citrix.emailtemplate',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.emailtemplate_descr',
                 ],
                 'required' => true,

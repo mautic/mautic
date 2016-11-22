@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -18,10 +19,10 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
  */
 class MauticCitrixBundle extends PluginBundleBase
 {
-
     public function boot()
     {
         parent::boot();
-        CitrixHelper::init($this->container);
+
+        CitrixHelper::init($this->container->get('mautic.helper.integration'), $this->container->get('monolog.logger.mautic'));
     }
 }

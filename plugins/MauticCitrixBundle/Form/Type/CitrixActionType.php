@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,6 +11,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
+use Mautic\FormBundle\Model\FieldModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
@@ -21,9 +23,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CitrixActionType extends AbstractType
 {
+    /**
+     * @var FieldModel
+     */
+    protected $model;
+
+    /**
+     * CitrixActionType constructor.
+     *
+     * @param FieldModel $fieldModel
+     */
+    public function __construct(FieldModel $fieldModel)
+    {
+        $this->model = $fieldModel;
+    }
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
@@ -39,16 +56,12 @@ class CitrixActionType extends AbstractType
             return;
         }
         $product = $options['attr']['data-product'];
-        
-       // $builder->addEventSubscriber(new PreSubmitSubscriber());
 
-        $modelFactory = CitrixHelper::getContainer()->get('mautic.model.factory');
-        /** @var \Mautic\FormBundle\Model\FieldModel $model */
-        $model = $modelFactory->getModel('form.field');
-        $fields = $model->getSessionFields($options['attr']['data-formid']);
+        $fields  = $this->model->getSessionFields($options['attr']['data-formid']);
         $choices = [
             '' => '',
         ];
+
         foreach ($fields as $f) {
             if (in_array(
                 $f['type'],
@@ -72,7 +85,6 @@ class CitrixActionType extends AbstractType
             ('register' === $options['attr']['data-product-action'] ||
                 'start' === $options['attr']['data-product-action'])
         ) {
-
             $products = [
                 'form' => 'User selection from form',
             ];
@@ -81,23 +93,23 @@ class CitrixActionType extends AbstractType
             $builder->add(
                 'product',
                 'choice',
-                array(
-                    'choices' => $products,
-                    'expanded' => false,
-                    'label_attr' => array('class' => 'control-label'),
-                    'multiple' => false,
-                    'label' => 'plugin.citrix.'.$product.'.listfield',
-                    'attr' => array(
-                        'class' => 'form-control',
+                [
+                    'choices'    => $products,
+                    'expanded'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => false,
+                    'label'      => 'plugin.citrix.'.$product.'.listfield',
+                    'attr'       => [
+                        'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.selectproduct.tooltip',
-                    ),
-                    'required' => true,
+                    ],
+                    'required'    => true,
                     'constraints' => [
                         new NotBlank(
                             ['message' => 'mautic.core.value.required']
                         ),
                     ],
-                )
+                ]
             );
         }
 
@@ -105,85 +117,83 @@ class CitrixActionType extends AbstractType
             ('register' === $options['attr']['data-product-action'] ||
                 'screensharing' === $options['attr']['data-product-action'])
         ) {
-
             $builder->add(
                 'firstname',
                 'choice',
-                array(
-                    'choices' => $choices,
-                    'expanded' => false,
-                    'label_attr' => array('class' => 'control-label'),
-                    'multiple' => false,
-                    'label' => 'plugin.citrix.first_name',
-                    'attr' => array(
-                        'class' => 'form-control',
+                [
+                    'choices'    => $choices,
+                    'expanded'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => false,
+                    'label'      => 'plugin.citrix.first_name',
+                    'attr'       => [
+                        'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.first_name.tooltip',
-                    ),
-                    'required' => true,
+                    ],
+                    'required'    => true,
                     'constraints' => [
                         new NotBlank(
                             ['message' => 'mautic.core.value.required']
                         ),
                     ],
-                )
+                ]
             );
 
             $builder->add(
                 'lastname',
                 'choice',
-                array(
-                    'choices' => $choices,
-                    'expanded' => false,
-                    'label_attr' => array('class' => 'control-label'),
-                    'multiple' => false,
-                    'label' => 'plugin.citrix.last_name',
-                    'attr' => array(
-                        'class' => 'form-control',
+                [
+                    'choices'    => $choices,
+                    'expanded'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => false,
+                    'label'      => 'plugin.citrix.last_name',
+                    'attr'       => [
+                        'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.last_name.tooltip',
-                    ),
-                    'required' => true,
+                    ],
+                    'required'    => true,
                     'constraints' => [
                         new NotBlank(
                             ['message' => 'mautic.core.value.required']
                         ),
                     ],
-                )
+                ]
             );
         }
 
         $builder->add(
             'email',
             'choice',
-            array(
-                'choices' => $choices,
-                'expanded' => false,
-                'label_attr' => array('class' => 'control-label'),
-                'multiple' => false,
-                'label' => 'plugin.citrix.selectidentifier',
-                'attr' => array(
-                    'class' => 'form-control',
+            [
+                'choices'    => $choices,
+                'expanded'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => false,
+                'label'      => 'plugin.citrix.selectidentifier',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.selectidentifier.tooltip',
-                ),
-                'required' => true,
+                ],
+                'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.core.value.required']
                     ),
                 ],
-            )
+            ]
         );
 
         if (array_key_exists('data-product-action', $options['attr']) &&
-            ( 'start' === $options['attr']['data-product-action'] ||
-             'screensharing' === $options['attr']['data-product-action'] )
+            ('start' === $options['attr']['data-product-action'] ||
+             'screensharing' === $options['attr']['data-product-action'])
 
         ) {
-
             $defaultOptions = [
-                'label' => 'plugin.citrix.emailtemplate',
+                'label'      => 'plugin.citrix.emailtemplate',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.emailtemplate_descr',
                 ],
                 'required' => true,

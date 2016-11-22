@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,9 +11,10 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
-abstract class CitrixProducts extends BasicEnum{
-    const GOTOWEBINAR      = 'webinar';
-    const GOTOMEETING      = 'meeting';
-    const GOTOTRAINING     = 'training';
-    const GOTOASSIST       = 'assist';
+abstract class CitrixProducts extends BasicEnum
+{
+    const GOTOWEBINAR  = 'webinar';
+    const GOTOMEETING  = 'meeting';
+    const GOTOTRAINING = 'training';
+    const GOTOASSIST   = 'assist';
 }

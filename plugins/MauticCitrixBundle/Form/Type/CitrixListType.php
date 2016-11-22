@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -19,7 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CitrixListType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -29,10 +29,10 @@ class CitrixListType extends AbstractType
             'empty_value',
             'text',
             [
-                'label' => 'mautic.form.field.form.emptyvalue',
+                'label'      => 'mautic.form.field.form.emptyvalue',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
-                'required' => false,
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -46,16 +46,16 @@ class CitrixListType extends AbstractType
             'multiple',
             'yesno_button_group',
             [
-                'label' => 'mautic.form.field.form.multiple',
-                'data' => $default,
+                'label'    => 'mautic.form.field.form.multiple',
+                'data'     => $default,
                 'required' => true,
             ]
         );
-
     }
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver)

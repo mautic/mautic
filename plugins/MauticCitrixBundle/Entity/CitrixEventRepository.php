@@ -1,9 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Werner
- * Date: 10/23/2016
- * Time: 5:45 PM
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticCitrixBundle\Entity;
@@ -17,10 +20,12 @@ class CitrixEventRepository extends CommonRepository
     /**
      * Fetch the base event data from the database.
      *
-     * @param string $product
-     * @param string $eventType
+     * @param string    $product
+     * @param string    $eventType
      * @param \DateTime $fromDate
+     *
      * @return mixed
+     *
      * @throws \InvalidArgumentException
      */
     public function getEvents($product, $eventType, \DateTime $fromDate = null)
@@ -57,7 +62,7 @@ class CitrixEventRepository extends CommonRepository
         return $this->findBy(
             [
                 'product' => $product,
-                'email' => $email,
+                'email'   => $email,
             ]
         );
     }
@@ -85,7 +90,7 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * @param QueryBuilder $q
-     * @param mixed $filter
+     * @param mixed        $filter
      *
      * @return array
      */
@@ -96,7 +101,7 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * @param QueryBuilder $q
-     * @param mixed $filter
+     * @param mixed        $filter
      *
      * @return array
      */

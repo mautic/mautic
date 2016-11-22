@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -18,7 +19,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class TokenGenerateEvent extends CommonEvent
 {
     /**
-     *
      * @var array
      */
     private $params = [];
@@ -45,7 +45,6 @@ class TokenGenerateEvent extends CommonEvent
 
     /**
      * @param array $params
-     *
      */
     protected function setParams($params)
     {
@@ -57,7 +56,7 @@ class TokenGenerateEvent extends CommonEvent
      */
     public function getProduct()
     {
-        return array_key_exists('product', $this->params)? $this->params['product'] : '';
+        return array_key_exists('product', $this->params) ? $this->params['product'] : '';
     }
 
     /**
@@ -73,7 +72,7 @@ class TokenGenerateEvent extends CommonEvent
      */
     public function getProductLink()
     {
-        return array_key_exists('productLink', $this->params)? $this->params['productLink'] : '';
+        return array_key_exists('productLink', $this->params) ? $this->params['productLink'] : '';
     }
 
     /**
@@ -89,7 +88,7 @@ class TokenGenerateEvent extends CommonEvent
      */
     public function getProductText()
     {
-        return array_key_exists('productText', $this->params)? $this->params['productText'] : '';
+        return array_key_exists('productText', $this->params) ? $this->params['productText'] : '';
     }
 
     /**
