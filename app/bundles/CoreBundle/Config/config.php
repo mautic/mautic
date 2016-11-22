@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -715,6 +716,7 @@ return [
         'cache_path'                => '%kernel.root_dir%/cache',
         'log_path'                  => '%kernel.root_dir%/logs',
         'image_path'                => 'media/images',
+        'tmp_path'                  => '%kernel.root_dir%/cache',
         'theme'                     => 'Mauve',
         'db_driver'                 => 'pdo_mysql',
         'db_host'                   => '127.0.0.1',

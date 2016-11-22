@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -40,6 +41,10 @@ echo $view['form']->start($form);
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
+                <hr/>
+                <div>
+                    <?php echo $view['form']->row($form['score']); ?>
+                </div>
                 <hr/>
                 <div>
                     <?php echo $view['form']->row($form['owner']); ?>

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -233,6 +234,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [
@@ -419,6 +421,10 @@ return [
                     'database_connection',
                 ],
                 'alias' => 'company_list',
+            ],
+            'mautic.form.type.company_change_score' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                'alias' => 'scorecontactscompanies_action',
             ],
         ],
         'other' => [

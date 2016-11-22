@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -1294,9 +1295,8 @@ abstract class AbstractIntegration
             }
         }
 
-        $leadFields      = $config['leadFields'];
-        $availableFields = $this->getAvailableLeadFields($config);
-        $matched         = [];
+        $leadFields = $config['leadFields'];
+        $matched    = [];
 
         foreach ($gleanedData as $key => $field) {
             if (isset($leadFields[$key]) && isset($gleanedData[$key])) {

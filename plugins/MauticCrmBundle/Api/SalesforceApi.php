@@ -208,13 +208,18 @@ class SalesforceApi extends CrmApi
         }
         $settings['feature_settings']['objects'][] = $object;
 
-        $fields       = $this->integration->getAvailableLeadFields($settings);
-        $fields       = $this->integration->ammendToSfFields($fields);
-        $fields['id'] = ['id' => []];
-        $result       = [];
+        $fields = $this->integration->getAvailableLeadFields($settings);
+        $fields = $this->integration->ammendToSfFields($fields);
+        $result = [];
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields        = implode(', ', array_keys($fields));
+            $fields = implode(', ', array_keys($fields));
+
+            $config = $this->integration->mergeConfigToFeatureSettings([]);
+            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+                $fields = 'Owner.Name, Owner.Email, '.$fields;
+            }
+
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {

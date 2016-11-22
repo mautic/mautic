@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -207,14 +208,14 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                     <div class="row">
                                         <?php foreach ($groupFields as $alias => $field): ?>
                                             <?php
-                                            if ($alias == 'company'):?><?php
-                                                unset($form[$alias]);
+                                            if ($isCompany = ('company' === $alias) || !isset($form[$alias]) || $form[$alias]->isRendered()):
+                                                // Company rendered so that it doesn't show up at the bottom of the form
+                                                if ($isCompany):
+                                                    $form[$alias]->setRendered();
+                                                endif;
                                                 continue;
-                                                ?>
-                                                <?php endif; ?>
-                                            <?php if ($form[$alias]->isRendered()) {
-                                                    continue;
-                                                } ?>
+                                            endif;
+                                            ?>
                                             <div class="col-sm-8">
                                                 <?php echo $view['form']->row($form[$alias]); ?>
                                             </div>

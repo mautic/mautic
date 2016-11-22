@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -344,7 +345,7 @@ final class LeadEvents
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
 
     /**
-     * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated
+     * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent instance.
@@ -354,7 +355,7 @@ final class LeadEvents
     const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
 
     /**
-     * The mautic.list_filters_operators_on_generate event is dispatched when the operators for list filters are generated
+     * The mautic.list_filters_operators_on_generate event is dispatched when the operators for list filters are generated.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent instance.
@@ -364,7 +365,7 @@ final class LeadEvents
     const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
 
     /**
-     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated
+     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.

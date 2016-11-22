@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -70,6 +71,18 @@ class CompanyType extends AbstractType
                 ]
             )
                 ->addModelTransformer($transformer)
+        );
+
+        $builder->add('score',
+            'number',
+            [
+                'label'      => 'mautic.company.score',
+                'attr'       => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'control-label'],
+                'precision'  => 0,
+                'required'   => false,
+            ]
+
         );
 
         if (!empty($options['update_select'])) {

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -41,7 +42,7 @@ class LeadListRepository extends CommonRepository
      */
     protected $listFiltersInnerJoinCompany = false;
 
-    /** @var  EventDispatcher */
+    /** @var EventDispatcher */
     private $_dispatcher;
 
     /**
@@ -581,7 +582,7 @@ class LeadListRepository extends CommonRepository
         if (null === $companyTable) {
             $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'companies');
         }
-        $options   = $this->getFilterExpressionFunctions();
+        $options = $this->getFilterExpressionFunctions();
 
         // Add custom filters operators
         /** @var EventDispatcher $dispatcher */
@@ -596,7 +597,6 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($filters as $k => $details) {
-
             if (isset($details['object']) && $details['object'] != $object) {
                 continue;
             }
@@ -1151,7 +1151,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /** @var EventDispatcher $dispatcher */
-    public function setDispatcher($dispatcher){
+    public function setDispatcher($dispatcher)
+    {
         $this->_dispatcher = $dispatcher;
     }
 

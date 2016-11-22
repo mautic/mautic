@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -44,6 +45,11 @@ class CompanyLead
     private $manuallyAdded = false;
 
     /**
+     * @var bool
+     */
+    private $primary = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -69,6 +75,10 @@ class CompanyLead
 
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
+            ->build();
+
+        $builder->createField('primary', 'boolean')
+            ->columnName('is_primary')
             ->build();
     }
 
@@ -174,5 +184,21 @@ class CompanyLead
     public function wasManuallyAdded()
     {
         return $this->manuallyAdded;
+    }
+
+    /**
+     * @param bool $primary
+     */
+    public function setPrimary($primary)
+    {
+        $this->primary = $primary;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPrimary()
+    {
+        return $this->primary;
     }
 }

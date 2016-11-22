@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -49,7 +50,7 @@ class ListModel extends FormModel
     public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->container = $container;
+        $this->container            = $container;
     }
 
     /**
@@ -63,6 +64,7 @@ class ListModel extends FormModel
      * {@inheritdoc}
      *
      * @return \Mautic\LeadBundle\Entity\LeadListRepository
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */

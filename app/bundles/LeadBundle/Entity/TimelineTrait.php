@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -101,7 +102,7 @@ trait TimelineTrait
             foreach ($results as &$result) {
                 foreach ($serializedColumns as $col) {
                     if (isset($result[$col])) {
-                        if ((null === $result[$col])){
+                        if ((null === $result[$col])) {
                             $result[$col] = [];
                         } else {
                             $fixed_data = preg_replace_callback(

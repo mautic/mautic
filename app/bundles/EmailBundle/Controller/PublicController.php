@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -82,7 +83,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -316,7 +317,7 @@ class PublicController extends CommonFormController
             return new Response('success');
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
