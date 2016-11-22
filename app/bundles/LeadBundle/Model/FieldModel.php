@@ -769,8 +769,9 @@ class FieldModel extends FormModel
      */
     public function getUniqueIdentiferFields($filters = [])
     {
-        $filters['isPublished']       = true;
-        $filters['isUniqueIdentifer'] = true;
+        $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
+        $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
+        $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
 
         $fields = $this->getFieldList(false, true, $filters);
 
@@ -782,9 +783,9 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getUniqueIdentifierFields()
+    public function getUniqueIdentifierFields($filters = [])
     {
-        return $this->getUniqueIdentiferFields();
+        return $this->getUniqueIdentiferFields($filters);
     }
 
     /**

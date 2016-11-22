@@ -788,13 +788,15 @@ var Mautic = {
                 editableAtwhoQueryAttrs: {"data-fr-verified": true},
                 data: mQuery.map(tokens, function(value, i) {
                     return {'id':i, 'name':value};
-                })
+                }),
+                acceptSpaceBar: true
             });
 
             if (froala) {
                 froala.events.on('keydown', function (e) {
                     if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB ||
-                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) &&
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER ||
+                        e.which == mQuery.FroalaEditor.KEYCODE.SPACE) &&
                         froala.$el.atwho('isSelecting')) {
                         return false;
                     }
@@ -1464,6 +1466,7 @@ var Mautic = {
                         window["Mautic"][callback].apply('window', []);
                     }
                 }
+                Mautic.generatePageTitle( route );
                 delete Mautic.loadContentXhr[target];
             }
         });
@@ -1471,6 +1474,34 @@ var Mautic = {
         //prevent firing of href link
         //mQuery(link).attr("href", "javascript: void(0)");
         return false;
+    },
+
+    /**
+    * Generates the title of the current page
+    *
+    * @param route
+    */
+    generatePageTitle: function(route){
+
+        if( -1 !== route.indexOf('view') ){
+            //loading view of module title
+            var currentModule = route.split('/')[3];
+
+            //check if we find spans
+            var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+            var currentModuleItem = '';
+
+            if( 1 < titleWithHTML.length ){
+                currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
+            } else {
+                currentModuleItem = mQuery('.page-header h3').text();
+            }
+
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );    
+        } else {
+            //loading basic title
+            mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
+        }
     },
 
     /**
@@ -1743,6 +1774,9 @@ var Mautic = {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
+
+                //update Title
+                Mautic.generatePageTitle( response.route );
             }
 
             if (response.target == '#app-content') {

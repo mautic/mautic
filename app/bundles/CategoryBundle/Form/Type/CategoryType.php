@@ -11,7 +11,6 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
@@ -37,7 +36,10 @@ class CategoryType extends AbstractType
     private $session;
 
     /**
-     * @param MauticFactory $factory
+     * CategoryType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param Session             $session
      */
     public function __construct(TranslatorInterface $translator, Session $session)
     {
