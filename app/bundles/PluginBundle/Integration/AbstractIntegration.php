@@ -755,7 +755,7 @@ abstract class AbstractIntegration
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
-                                $useClientSecretKey => $this->keys[$clientSecretKey],
+                                $useClientSecretKey => isset($this->keys[$clientSecretKey]) ? $this->keys[$clientSecretKey] : '',
                                 'grant_type'        => $grantType,
                             ]
                         );
