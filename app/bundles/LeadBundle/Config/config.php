@@ -234,6 +234,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [

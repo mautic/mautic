@@ -105,8 +105,6 @@ class PropertiesType extends AbstractType
             [
                 'choices' => [
                     'immediately'   => 'mautic.focus.form.when.immediately',
-                    '5seconds'      => 'mautic.focus.form.when.5seconds',
-                    'minute'        => 'mautic.focus.form.when.minute',
                     'scroll_slight' => 'mautic.focus.form.when.scroll_slight',
                     'scroll_middle' => 'mautic.focus.form.when.scroll_middle',
                     'scroll_bottom' => 'mautic.focus.form.when.scroll_bottom',
@@ -119,6 +117,20 @@ class PropertiesType extends AbstractType
                 'multiple'    => false,
                 'required'    => false,
                 'empty_value' => false,
+            ]
+        );
+
+        $builder->add(
+            'timeout',
+            'text',
+            [
+                'label'      => 'mautic.focus.form.timeout',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'          => 'form-control',
+                    'postaddon_text' => 'sec',
+                ],
+                'required' => false,
             ]
         );
 

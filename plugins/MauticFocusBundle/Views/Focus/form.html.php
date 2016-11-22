@@ -176,6 +176,7 @@ echo $view['form']->start($form);
                     <div class="hide" id="focusTypeProperties">
                         <?php echo $view['form']->row($form['properties']['animate']); ?>
                         <?php echo $view['form']->row($form['properties']['when']); ?>
+                        <?php echo $view['form']->row($form['properties']['timeout']); ?>
                         <?php echo $view['form']->row($form['properties']['link_activation']); ?>
                         <?php echo $view['form']->row($form['properties']['frequency']); ?>
                         <div class="hidden-focus-type-notice">

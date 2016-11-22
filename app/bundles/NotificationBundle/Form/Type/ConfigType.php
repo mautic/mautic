@@ -78,6 +78,32 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+        $builder->add(
+            'gcm_sender_id',
+            'text',
+            [
+                'label' => 'mautic.notification.config.form.notification.gcm_sender_id',
+                'data'  => $options['data']['gcm_sender_id'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.gcm_sender_id.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'welcomenotification_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.welcome.enabled',
+                'data'  => (bool) $options['data']['welcomenotification_enabled'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.welcome.tooltip',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
     }
 
     /**

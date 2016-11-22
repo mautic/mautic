@@ -54,18 +54,28 @@ return [
         'forms' => [
             'mautic.form.type.category' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'category',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'mautic.category.model.category',
+                    'router',
+                ],
+                'alias' => 'category',
             ],
             'mautic.form.type.category_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'category_form',
+                'arguments' => [
+                    'translator',
+                    'session',
+                ],
+                'alias' => 'category_form',
             ],
             'mautic.form.type.category_bundles_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'category_bundles_form',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+                'alias' => 'category_bundles_form',
             ],
         ],
         'models' => [
