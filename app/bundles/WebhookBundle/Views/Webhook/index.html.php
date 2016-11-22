@@ -12,24 +12,29 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'mauticWebhook');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.webhook.webhooks'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'templateButtons' => [
-        'new' => $permissions['webhook:webhooks:create'],
-    ],
-    'routeBase' => 'webhook',
-]));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'templateButtons' => [
+                'new' => $permissions['webhook:webhooks:create'],
+            ],
+            'routeBase' => 'webhook',
+        ]
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'searchHelp'      => 'mautic.page.help.searchcommands',
-        'action'          => $currentRoute,
-        'routeBase'       => 'webhook',
-        'templateButtons' => [
-            'delete' => $permissions['webhook:webhooks:deleteown'] || $permissions['webhook:webhooks:deleteother'],
-        ],
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.page.help.searchcommands',
+            'action'      => $currentRoute,
+        ]
+    ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>

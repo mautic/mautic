@@ -43,9 +43,8 @@
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
     <?php
-    echo $view['buttons']->reset(\Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_NAVBAR)
-        ->fetchCustomButtons($app->getRequest())
-        ->renderCustomButtons();
+    echo $view['buttons']->reset($app->getRequest(), \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_NAVBAR)
+        ->renderButtons();
     ?>
     </div>
 
