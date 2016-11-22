@@ -100,7 +100,7 @@ class FullContactController extends FormController
                 $fullcontact = new FullContact_Person($keys['apikey']);
                 try {
 
-                    $webhookId = sprintf('fullcontact%s#%s#%d', (null === $this->request->request->get('notify'))?'':'_notify', $objectId, $this->user->getId());
+                    $webhookId = sprintf('fullcontact%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
 
                     $cache = $lead->getSocialCache()?:[];
                     $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
@@ -273,7 +273,7 @@ class FullContactController extends FormController
                 try {
                     foreach ($lookupEmails as $id => $lookupEmail) {
                         $lead = $model->getEntity($id);
-                        $webhookId = sprintf('fullcontact%s#%s#%d', (null === $this->request->request->get('notify'))?'':'_notify', $id, $this->user->getId());
+                        $webhookId = sprintf('fullcontact%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
                         $cache = $lead->getSocialCache()?:[];
                         $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
@@ -396,7 +396,7 @@ class FullContactController extends FormController
                 $keys = $myIntegration->getDecryptedApiKeys();
                 $fullcontact = new FullContact_Company($keys['apikey']);
                 try {
-                    $webhookId = sprintf('fullcontactcomp%s#%s#%d', (null === $this->request->request->get('notify'))?'':'_notify', $objectId, $this->user->getId());
+                    $webhookId = sprintf('fullcontactcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
                     $website = $company->getFieldValue('companywebsite', 'core');
                     $parse = parse_url($website);
                     $cache = $company->getSocialCache()?:[];
@@ -569,7 +569,7 @@ class FullContactController extends FormController
                 try {
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
                         $company = $model->getEntity($id);
-                        $webhookId = sprintf('fullcontactcomp%s#%s#%d', (null === $this->request->request->get('notify'))?'':'_notify', $id, $this->user->getId());
+                        $webhookId = sprintf('fullcontactcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
                         $cache = $company->getSocialCache()?:[];
                         $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
