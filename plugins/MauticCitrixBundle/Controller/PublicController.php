@@ -21,12 +21,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PublicController extends CommonController
 {
-
     /**
      * This proxy is used for the GoToTraining API requests in order to bypass the CORS restrictions in AJAX.
      *
      * @param Request $request
+     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @throws \InvalidArgumentException
      */
@@ -40,16 +41,16 @@ class PublicController extends CommonController
             $integrationHelper = $this->get('mautic.helper.integration');
             $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
 
-            if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()){
+            if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
                 return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
             }
 
             $ch = curl_init($url);
             if (strtolower($request->server->get('REQUEST_METHOD', '')) === 'post') {
-                $headers = array(
+                $headers = [
                     'Content-type: application/json',
-                    'Accept: application/json'
-                );
+                    'Accept: application/json',
+                ];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->request->all()));
@@ -59,16 +60,16 @@ class PublicController extends CommonController
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERAGENT, $request->server->get('HTTP_USER_AGENT', ''));
             list($header, $contents) = preg_split('/([\r\n][\r\n])\\1/', curl_exec($ch), 2);
-            $status = curl_getinfo($ch);
+            $status                  = curl_getinfo($ch);
             curl_close($ch);
         }
 
         // Set the JSON data object contents, decoding it from JSON if possible.
         $decoded_json = json_decode($contents);
-        $data = $decoded_json ?: $contents;
+        $data         = $decoded_json ?: $contents;
 
         // Generate JSON/JSONP string
-        $json = json_encode($data);
+        $json     = json_encode($data);
         $response = new Response($json, $status['http_code']);
 
         // Generate appropriate content-type header.
@@ -76,8 +77,8 @@ class PublicController extends CommonController
         $response->headers->set('Content-type', 'application/'.($is_xhr ? 'json' : 'x-javascript'));
 
         // Allow CORS requests only from dev machines
-        $allowedIps = $this->coreParametersHelper->getParameter('dev_hosts')?:[];
-        if (in_array($request->getClientIp(), $allowedIps, true))  {
+        $allowedIps = $this->coreParametersHelper->getParameter('dev_hosts') ?: [];
+        if (in_array($request->getClientIp(), $allowedIps, true)) {
             $response->headers->set('Access-Control-Allow-Origin', '*');
         }
 
@@ -87,10 +88,12 @@ class PublicController extends CommonController
     /**
      * This action will receive a POST when the session status changes.
      * A POST will also be made when a customer joins the session and when the session ends
-     * (whether or not a customer joined)
+     * (whether or not a customer joined).
      *
      * @param Request $request
+     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
@@ -101,7 +104,7 @@ class PublicController extends CommonController
         $integrationHelper = $this->get('mautic.helper.integration');
         $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
 
-        if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()){
+        if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
         }
 
@@ -110,13 +113,13 @@ class PublicController extends CommonController
         try {
             /** @var CitrixModel $citrixModel */
             $citrixModel = $this->get('mautic.model.factory')->getModel('citrix.citrix');
-            $productId = $post['sessionId'];
-            $eventDesc = sprintf('%s (%s)', $productId, $post['status']);
-            $eventName = CitrixHelper::getCleanString(
+            $productId   = $post['sessionId'];
+            $eventDesc   = sprintf('%s (%s)', $productId, $post['status']);
+            $eventName   = CitrixHelper::getCleanString(
                     $eventDesc
                 ).'_#'.$productId;
-            $product = 'assist';
-            $registrants = CitrixHelper::getRegistrants($product, $productId);
+            $product          = 'assist';
+            $registrants      = CitrixHelper::getRegistrants($product, $productId);
             $knownRegistrants = $citrixModel->getEmailsByEvent(
                 $product,
                 $eventName,
@@ -132,7 +135,7 @@ class PublicController extends CommonController
                 array_diff($knownRegistrants, $registrants)
             );
 
-            $attendees = CitrixHelper::getAttendees($product, $productId);
+            $attendees      = CitrixHelper::getAttendees($product, $productId);
             $knownAttendees = $citrixModel->getEmailsByEvent(
                 $product,
                 $eventName,
@@ -147,13 +150,10 @@ class PublicController extends CommonController
                 array_diff($attendees, $knownAttendees),
                 array_diff($knownAttendees, $attendees)
             );
-
         } catch (\Exception $ex) {
             throw new BadRequestHttpException($ex->getMessage());
         }
-        
+
         return new Response('OK');
     } // sessionChangedAction
-
 } // class
-

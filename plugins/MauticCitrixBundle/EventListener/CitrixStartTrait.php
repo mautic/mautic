@@ -14,9 +14,7 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 trait CitrixStartTrait
 {
@@ -35,10 +33,11 @@ trait CitrixStartTrait
 
     /**
      * @param string $product
-     * @param Lead $lead
-     * @param array $productsToStart
+     * @param Lead   $lead
+     * @param array  $productsToStart
      * @param  $emailId
      * @param  $actionId
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -49,7 +48,7 @@ trait CitrixStartTrait
      */
     public function startProduct($product, $lead, array $productsToStart, $emailId = null, $actionId = null)
     {
-        $leadFields = $lead->getProfileFields();
+        $leadFields                         = $lead->getProfileFields();
         list($email, $firstname, $lastname) = [
             array_key_exists('email', $leadFields) ? $leadFields['email'] : '',
             array_key_exists('firstname', $leadFields) ? $leadFields['firstname'] : '',
@@ -80,10 +79,9 @@ trait CitrixStartTrait
                         // replace tokens
                         if (CitrixHelper::isAuthorized('Goto'.$product)) {
                             $params = [
-                                'product' => $product,
+                                'product'     => $product,
                                 'productLink' => $hostUrl,
-                                'productText' =>
-                                    sprintf($this->translator->trans('plugin.citrix.start.producttext'), ucfirst($product)),
+                                'productText' => sprintf($this->translator->trans('plugin.citrix.start.producttext'), ucfirst($product)),
                             ];
 
                             $button = $this->templating->render(
@@ -99,7 +97,7 @@ trait CitrixStartTrait
                         // set up email data
                         $emailEntity->setCustomHtml($content);
                         $leadFields['id'] = $lead->getId();
-                        $options = ['source' => ['trigger', $actionId]];
+                        $options          = ['source' => ['trigger', $actionId]];
                         $this->emailModel->sendEmail($emailEntity, $leadFields, $options);
                     } else {
                         throw new BadRequestHttpException('Unable to load emal template!');
@@ -125,5 +123,4 @@ trait CitrixStartTrait
             throw new BadRequestHttpException('Mandatory lead fields not found!');
         }
     }
-
 }

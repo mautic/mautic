@@ -17,16 +17,18 @@ class CitrixApi
 
     /**
      * @param string $operation
-     * @param array $settings
+     * @param array  $settings
      * @param string $route
+     *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     protected function _request($operation, array $settings, $route = 'rest')
     {
         $requestSettings = [
-            'encode_parameters' => 'json',
-            'return_raw' => 'true', // needed to get the HTTP status code in the response
+            'encode_parameters'   => 'json',
+            'return_raw'          => 'true', // needed to get the HTTP status code in the response
             'override_auth_token' => 'oauth_token='.$this->integration->getApiKey(),
         ];
 
@@ -48,7 +50,7 @@ class CitrixApi
             $settings['method'],
             $requestSettings
         );
-        $status = $request->code;
+        $status  = $request->code;
         $message = '';
 
         switch ($status) {
