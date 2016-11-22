@@ -45,7 +45,7 @@ class FormSubscriber extends CommonSubscriber
     {
         return [
             FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
-            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
+            'remove_from_do_not_contact' => ['removeFromDoNotContact', 0],
         ];
     }
 
@@ -106,7 +106,7 @@ class FormSubscriber extends CommonSubscriber
             'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
             'formType' => 'lead_action_removedonotcontact',
             'formTheme' => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
-            'eventName' => FormEvents::FORM_ON_SUBMIT,
+            'eventName' => 'remove_from_do_not_contact',
             'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.RemoveDoNotContact', $action);
@@ -118,7 +118,7 @@ class FormSubscriber extends CommonSubscriber
      *
      * @param SubmissionEvent $event
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function removeFromDoNotContact(SubmissionEvent $event)
     {
         $form = $event->getResults();
         if(isset($form['email']) && !empty($form['email'])){
