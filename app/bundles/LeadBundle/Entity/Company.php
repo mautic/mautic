@@ -39,11 +39,36 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $owner;
 
+    /**
+     * @var array
+     */
+    private $socialCache = [];
+
     public function __clone()
     {
         $this->id = null;
 
         parent::__clone();
+    }
+
+    /**
+     * Get social cache.
+     *
+     * @return mixed
+     */
+    public function getSocialCache()
+    {
+        return $this->socialCache;
+    }
+
+    /**
+     * Set social cache.
+     *
+     * @param $cache
+     */
+    public function setSocialCache($cache)
+    {
+        $this->socialCache = $cache;
     }
 
     /**
@@ -58,6 +83,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
             ->generatedValue()
+            ->build();
+
+        $builder->createField('socialCache', 'array')
+            ->columnName('social_cache')
+            ->nullable()
             ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
