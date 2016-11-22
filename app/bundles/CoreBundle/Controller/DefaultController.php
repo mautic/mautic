@@ -39,7 +39,7 @@ class DefaultController extends CommonController
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
-                $this->notFound();
+                return $this->notFound();
             }
 
             $slug = $pageModel->generateSlug($page);
