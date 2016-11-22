@@ -50,4 +50,24 @@ class CompanyLeadRepository extends CommonRepository
 
         return $result;
     }
+
+    /**
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getLatestCompanyForLead($leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
+        $q->orderBy('cl.date_added', 'DESC');
+        $result = $q->execute()->fetchAll();
+
+        return !empty($result) ? $result[0] : [];
+    }
 }

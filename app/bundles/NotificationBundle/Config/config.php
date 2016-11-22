@@ -157,9 +157,11 @@ return [
     //    'notification' => null
     //],
     'parameters' => [
-        'notification_enabled'       => false,
-        'notification_app_id'        => null,
-        'notification_rest_api_key'  => null,
-        'notification_safari_web_id' => null,
+        'notification_enabled'        => false,
+        'notification_app_id'         => null,
+        'notification_rest_api_key'   => null,
+        'notification_safari_web_id'  => null,
+        'gcm_sender_id'               => '482941778795',
+        'welcomenotification_enabled' => true,
     ],
 ];

@@ -126,7 +126,7 @@ class IpLookupHelper
             $ip = '127.0.0.1';
         }
 
-        if (empty($ipAddress[$ip])) {
+        if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = ($ipAddress === null);

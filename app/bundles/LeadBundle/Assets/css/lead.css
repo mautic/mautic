@@ -237,3 +237,6 @@ ul.tag-cloud li {
     width: 100px;
     float:left;
 }
+.panel-companies .primary {
+    color: #fdb933;
+}

@@ -166,6 +166,8 @@ class ClientModel extends FormModel
 
     /**
      * @param $entity
+     *
+     * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
     {
