@@ -41,42 +41,74 @@ class IdentifyCompanyHelper
      */
     public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
     {
-        $companyName = $companyDomain = null;
-        $leadAdded   = false;
+        $companyName   = $companyDomain   = null;
+        $leadAdded     = false;
+        $companyEntity = null;
 
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['email'])) {
             $companyName = $companyDomain = self::domainExists($parameters['email']);
         } elseif (isset($parameters['companyname'])) {
-            $companyName = filter_var($parameters['companyname'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $companyName = filter_var($parameters['companyname']);
         }
 
         if ($companyName) {
-            $companyRepo = $companyModel->getRepository();
+            $filter['force'] = [
+                'column' => 'companyname',
+                'expr'   => 'eq',
+                'value'  => $companyName,
+            ];
 
-            $city    = isset($parameters['city']) ? $parameters['city'] : null;
-            $country = isset($parameters['country']) ? $parameters['country'] : null;
-            $state   = isset($parameters['state']) ? $parameters['state'] : null;
+            if (isset($parameters['city'])) {
+                $filter['force'][] = [
+                    'column' => 'companycity',
+                    'expr'   => 'eq',
+                    'value'  => $parameters['city'],
+                ];
+            }
+            if (isset($parameters['country'])) {
+                $filter['force'][] = [
+                    'column' => 'companycountry',
+                    'expr'   => 'eq',
+                    'value'  => $parameters['country'],
+                ];
+            }
+            if (isset($parameters['companystate'])) {
+                $filter['force'][] = [
+                    'column' => 'companystate',
+                    'expr'   => 'eq',
+                    'value'  => $parameters['state'],
+                ];
+            }
 
-            $companyEntity = $companyRepo->identifyCompany($companyName, $city, $country, $state);
+            $companyEntities = $companyModel->getEntities([
+                'limit'          => 1,
+                'filter'         => ['force' => [$filter['force']]],
+                'withTotalCount' => false,
+            ]);
+            $company = [
+                'companyname'    => $companyName,
+                'companywebsite' => $companyDomain,
+                'companycity'    => isset($parameters['city']) ? $parameters['city'] : '',
+                'companystate'   => isset($parameters['state']) ? $parameters['state'] : '',
+                'companycountry' => isset($parameters['country']) ? $parameters['country'] : '',
+            ];
 
-            if (!empty($company)) {
-                if ($lead) {
+            if (!empty($companyEntities)) {
+                foreach ($companyEntities as $entity) {
+                    $companyEntity   = $entity;
                     $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                    if (empty($companyLeadRepo->getCompaniesByLeadId($lead->getId(), $company['id']))) {
-                        $leadAdded = true;
+                    if ($lead) {
+                        $companyLead = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $entity->getId());
+                        if (empty($companyLead)) {
+                            $leadAdded = true;
+                        }
                     }
+                    $company['id'] = $entity->getId();
                 }
             } else {
                 //create new company
-                $company = [
-                    'companyname'    => $companyName,
-                    'companywebsite' => $companyDomain,
-                    'companycity'    => $city,
-                    'companystate'   => $state,
-                    'companycountry' => $country,
-                ];
                 $companyEntity = $companyModel->getEntity();
                 $companyModel->setFieldValues($companyEntity, $company, true);
                 $companyModel->saveEntity($companyEntity);
@@ -89,7 +121,7 @@ class IdentifyCompanyHelper
             return [$company, $leadAdded, $companyEntity];
         }
 
-        return [null, false];
+        return [null, false, null];
     }
 
     /**

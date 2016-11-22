@@ -275,7 +275,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q = $this->_em->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
             return [];
         }
