@@ -74,15 +74,6 @@ final class FormEvents
     const FORM_ON_SUBMIT = 'mautic.form_on_submit';
 
     /**
-     * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
-     *
-     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
-     *
-     * @var string
-     */
-    const REMOVE_DO_NO_CONTACT = 'mautic.remove_do_no_contact';
-
-    /**
      * The mautic.form.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a

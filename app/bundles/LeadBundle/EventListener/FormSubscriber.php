@@ -16,6 +16,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\LeadEvents;
 
 
 /**
@@ -45,7 +46,7 @@ class FormSubscriber extends CommonSubscriber
     {
         return [
             FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
-            FormEvents::REMOVE_DO_NO_CONTACT => ['removeFromDoNotContact', 0],
+            LeadEvents::REMOVE_DO_NO_CONTACT => ['removeFromDoNotContact', 0],
         ];
     }
 
@@ -106,7 +107,7 @@ class FormSubscriber extends CommonSubscriber
             'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
             'formType' => 'lead_action_removedonotcontact',
             'formTheme' => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
-            'eventName' => FormEvents::REMOVE_DO_NO_CONTACT,
+            'eventName' => LeadEvents::REMOVE_DO_NO_CONTACT,
             'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.RemoveDoNotContact', $action);
