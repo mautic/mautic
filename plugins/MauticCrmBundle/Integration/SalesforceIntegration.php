@@ -845,9 +845,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $company = $existingCompany[2];
         }
         $companyModel->setFieldValues($company, $matchedFields, false, false);
-
-            // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
-            $companyModel->saveEntity($company, false);
+        $companyModel->saveEntity($company, false);
 
         return $company;
     }
