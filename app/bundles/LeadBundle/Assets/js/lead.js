@@ -519,7 +519,7 @@ Mautic.leadfieldOnLoad = function (container) {
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     var defaultValueField = mQuery('input#leadfield_defaultValue');
 
-    if (selectedVal == 'lookup' || selectedVal == 'multiselect') {
+    if (selectedVal == 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
