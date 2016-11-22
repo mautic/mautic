@@ -39,6 +39,22 @@ class Version20161122172519 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('CREATE TABLE {$this->prefix}plugin_citrix_events (id INT AUTO_INCREMENT NOT NULL, product VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, event_name VARCHAR(255) NOT NULL, event_desc VARCHAR(255) NOT NULL, event_type VARCHAR(50) NOT NULL, event_date DATETIME NOT NULL COMMENT \'(DC2Type:datetime)\', INDEX {$this->prefix}citrix_event_email (product, email), INDEX {$this->prefix}citrix_event_name (product, event_name, event_type), INDEX {$this->prefix}citrix_event_type (product, event_type, event_date), INDEX {$this->prefix}citrix_event_product (product, email, event_type), INDEX {$this->prefix}citrix_event_product_name (product, email, event_type, event_name), INDEX {$this->prefix}citrix_event_date (event_date), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;');
+        $this->addSql("CREATE TABLE {$this->prefix}plugin_citrix_events 
+          (
+            id INT AUTO_INCREMENT NOT NULL, 
+            product VARCHAR(255) NOT NULL, 
+            email VARCHAR(255) NOT NULL, 
+            event_name VARCHAR(255) NOT NULL, 
+            event_desc VARCHAR(255) NOT NULL, 
+            event_type VARCHAR(50) NOT NULL, 
+            event_date DATETIME NOT NULL COMMENT '(DC2Type:datetime)', 
+            INDEX {$this->prefix}citrix_event_email (product, email),
+            INDEX {$this->prefix}citrix_event_name (product, event_name, event_type), 
+            INDEX {$this->prefix}citrix_event_type (product, event_type, event_date), 
+            INDEX {$this->prefix}citrix_event_product (product, email, event_type), 
+            INDEX {$this->prefix}citrix_event_product_name (product, email, event_type, event_name), 
+            INDEX {$this->prefix}citrix_event_date (event_date), 
+            PRIMARY KEY(id)
+          ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
     }
 }

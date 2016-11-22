@@ -41,6 +41,9 @@ class LeadListRepository extends CommonRepository
      */
     protected $listFiltersInnerJoinCompany = false;
 
+    /** @var  EventDispatcher */
+    private $_dispatcher;
+
     /**
      * {@inheritdoc}
      *
@@ -1118,11 +1121,9 @@ class LeadListRepository extends CommonRepository
                 $parameters[$parameter] = $details['filter'];
             }
 
-            /** @var EventDispatcher $dispatcher */
-            $dispatcher = CitrixHelper::getContainer()->get('event_dispatcher');
-            if ($dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+            if ($this->_dispatcher && $this->_dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
                 $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->_em);
-                $dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+                $this->_dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
                 if ($event->isFilteringDone()) {
                     $groupExpr = $q->expr()->andX($event->getSubQuery());
                 }
@@ -1147,6 +1148,11 @@ class LeadListRepository extends CommonRepository
         }
 
         return $expr;
+    }
+
+    /** @var EventDispatcher $dispatcher */
+    public function setDispatcher($dispatcher){
+        $this->_dispatcher = $dispatcher;
     }
 
     /**
