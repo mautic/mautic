@@ -1495,7 +1495,7 @@ var Mautic = {
                 currentModuleItem = mQuery('.page-header h3').text();
             }
 
-            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );    
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
         } else {
             //loading basic title
             mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
@@ -3900,9 +3900,13 @@ var Mautic = {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
         Mautic.showChangeThemeWarning = true;
+        Mautic.builderTheme = themeField.val();
 
         if (isNew) {
             Mautic.showChangeThemeWarning = false;
+
+            // Populate default content
+            Mautic.setThemeHtml(Mautic.builderTheme);
         }
 
         if (customHtml.length) {
@@ -3911,18 +3915,21 @@ var Mautic = {
                 var currentLink = mQuery(this);
                 var theme = currentLink.attr('data-theme');
                 var isCodeMode = (theme === 'mautic_code_mode');
+                Mautic.builderTheme = theme;
 
-                if (Mautic.showChangeThemeWarning && customHtml.val().length && !isCodeMode) {
-                    if (confirm('You will lose the current content if you switch the theme.')) {
-                        customHtml.val('');
-                        Mautic.showChangeThemeWarning = false;
+                if (Mautic.showChangeThemeWarning && customHtml.val().length) {
+                    if (!isCodeMode) {
+                        if (confirm(Mautic.translate('mautic.core.builder.theme_change_warning'))) {
+                            customHtml.val('');
+                            Mautic.showChangeThemeWarning = false;
+                        } else {
+                            return;
+                        }
                     } else {
-                        return;
-                    }
-                } else if (customHtml.val().length && isCodeMode) {
-                    if (confirm('By switching to the Code Mode you will be able to edit the content only in HTML code. No way back.')) {
-                    } else {
-                        return;
+                        if (confirm(Mautic.translate('mautic.core.builder.code_mode_warning'))) {
+                        } else {
+                            return;
+                        }
                     }
                 }
 

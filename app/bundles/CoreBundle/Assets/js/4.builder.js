@@ -24,14 +24,40 @@ Mautic.launchBuilder = function (formName, actionName) {
         height: "100%"
     };
 
+
     // Load the theme from the custom HTML textarea
     var themeHtml = mQuery('textarea.builder-html').val();
 
     if (Mautic.codeMode) {
+        var rawTokens = mQuery.map(Mautic.builderTokens, function (element, index) {
+            return index
+        }).sort();
         Mautic.builderCodeMirror = CodeMirror(document.getElementById('customHtmlContainer'), {
             value: themeHtml,
             lineNumbers: true,
-            mode: 'htmlmixed'
+            mode: 'htmlmixed',
+            extraKeys: {"Ctrl-Space": "autocomplete"},
+            hintOptions: {
+                hint: function (editor) {
+                    var cursor = editor.getCursor();
+                    var currentLine = editor.getLine(cursor.line);
+                    var start = cursor.ch;
+                    var end = start;
+                    while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
+                    while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
+                    var curWord = start != end && currentLine.slice(start, end);
+                    var regex = new RegExp('^' + curWord, 'i');
+                    var result = {
+                        list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function(idx) {
+                            return (rawTokens[idx].indexOf(curWord) !== -1);
+                        })),
+                        from: CodeMirror.Pos(cursor.line, start),
+                        to: CodeMirror.Pos(cursor.line, end)
+                    };
+
+                    return result;
+                }
+            }
         });
 
         Mautic.keepPreviewAlive('builder-template-content');
@@ -74,7 +100,7 @@ Mautic.keepPreviewAlive = function(iframeId) {
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, Mautic.builderCodeMirror.getValue());
             codeChanged = false;
         }
-    }, 10000);
+    }, 2000);
 };
 
 Mautic.killLivePreview = function() {
@@ -138,32 +164,36 @@ Mautic.closeBuilder = function(model) {
     mQuery('#builder-overlay').removeClass('hide');
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    if (Mautic.codeMode) {
-        customHtml = Mautic.builderCodeMirror.getValue();
-        Mautic.killLivePreview();
-        Mautic.destroyCodeMirror();
-        delete Mautic.codeMode;
-    } else {
-        // Trigger slot:destroy event
-        document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+    try {
+        if (Mautic.codeMode) {
+            customHtml = Mautic.builderCodeMirror.getValue();
+            Mautic.killLivePreview();
+            Mautic.destroyCodeMirror();
+            delete Mautic.codeMode;
+        } else {
+            // Trigger slot:destroy event
+            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
 
-        var themeHtml = mQuery('iframe#builder-template-content').contents();
+            var themeHtml = mQuery('iframe#builder-template-content').contents();
 
-        // Remove Mautic's assets
-        themeHtml.find('[data-source="mautic"]').remove();
-        themeHtml.find('.atwho-container').remove();
+            // Remove Mautic's assets
+            themeHtml.find('[data-source="mautic"]').remove();
+            themeHtml.find('.atwho-container').remove();
 
-        // Remove the slot focus highlight
-        themeHtml.find('[data-slot-focus], [data-slot-handle], [data-section-focus]').remove();
+            // Remove the slot focus highlight
+            themeHtml.find('[data-slot-focus], [data-slot-handle], [data-section-focus]').remove();
 
-        // Clear the customize forms
-        mQuery('#slot-form-container, #section-form-container').html('');
+            // Clear the customize forms
+            mQuery('#slot-form-container, #section-form-container').html('');
 
-        customHtml = themeHtml.find('html').get(0).outerHTML
+            customHtml = themeHtml.find('html').get(0).outerHTML
+        }
+
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(customHtml);
+    } catch (error) {
+        // prevent from being able to close builder
     }
-
-    // Store the HTML content to the HTML textarea
-    mQuery('.builder-html').val(customHtml);
 
     // Kill the overlay
     mQuery('#builder-overlay').remove();
