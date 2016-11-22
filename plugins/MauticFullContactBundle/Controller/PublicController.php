@@ -28,7 +28,7 @@ class PublicController extends FormController
      * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
      * @param User|null $user      User object; defaults to current user
      */
-    public function addNotification($message, $header, $iconClass, User $user)
+    public function addNewNotification($message, $header, $iconClass, User $user)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
@@ -38,6 +38,7 @@ class PublicController extends FormController
     /**
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function callbackAction()
     {
@@ -45,21 +46,25 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
+        $data = $this->request->request->get('result', [], true);
+        $oid = $this->request->request->get('webhookId', [], true);
+        list($w, $id, $uid) = explode('#', $oid, 3);
+
+        if (0 === strpos($w, 'fullcontactcomp')) {
+            return $this->compcallbackAction();
+        }
+
+        $notify = FALSE !== strpos($w, '_notify');
+        /** @var array $result */
+        $result = json_decode($data, true);
+
         try {
-
-            $data = $this->request->request->get('result', [], true);
-            $oid = $this->request->request->get('webhookId', [], true);
-            list($w, $id, $uid) = explode('#', $oid, 3);
-
-            if ('fullcontactcomp' === $w) {
-                return $this->compcallbackAction();
-            }
-
-            $result = json_decode($data, true);
 
             $org = null;
             if (array_key_exists('organizations', $result)) {
-                foreach ($result['organizations'] as $organization) {
+                /** @var array $organizations */
+                $organizations = $result['organizations'];
+                foreach ($organizations as $organization) {
                     if ($organization['isPrimary']) {
                         $org = $organization;
                         break;
@@ -82,6 +87,7 @@ class PublicController extends FormController
             }
 
             $social = [];
+            /** @var array $socialProfiles */
             $socialProfiles = [];
             if (array_key_exists('socialProfiles', $result)) {
                 $socialProfiles = $result['socialProfiles'];
@@ -89,7 +95,7 @@ class PublicController extends FormController
             foreach (['facebook', 'foursquare', 'googleplus', 'instagram', 'linkedin', 'twitter'] as $p) {
                 foreach ($socialProfiles as $socialProfile) {
                     if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p) {
-                        $social[$p] = (array_key_exists('url', $socialProfile)) ? $socialProfile['url'] : '';
+                        $social[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';
                         break;
                     }
                 }
@@ -145,28 +151,39 @@ class PublicController extends FormController
             $model->setFieldValues($lead, $data);
             $model->saveEntity($lead);
 
-            /** @var UserModel $userModel */
-            $userModel = $this->getModel('user');
-            $user = $userModel->getEntity($uid);
-
-            $this->addNotification(
-                sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
-                'FullContact Plugin',
-                'fa-search',
-                $user
-            );
-
-        } catch (\Exception $ex) {
-            try {
+            if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
                 $user = $userModel->getEntity($uid);
-                $this->addNotification(
-                    sprintf('Unable to save the contact information for %s: %s', $lead->getEmail(), $ex->getMessage()),
-                    'FullContact Plugin',
-                    'fa-exclamation',
-                    $user
-                );
+                if ($user) {
+                    $this->addNewNotification(
+                        sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
+                        'FullContact Plugin',
+                        'fa-search',
+                        $user
+                    );
+                }
+            }
+
+        } catch (\Exception $ex) {
+            try {
+                if ($notify && isset($lead, $uid) && (!isset($lead->imported) || !$lead->imported)) {
+                    /** @var UserModel $userModel */
+                    $userModel = $this->getModel('user');
+                    $user = $userModel->getEntity($uid);
+                    if ($user) {
+                        $this->addNewNotification(
+                            sprintf(
+                                'Unable to save the contact information for %s: %s',
+                                $lead->getEmail(),
+                                $ex->getMessage()
+                            ),
+                            'FullContact Plugin',
+                            'fa-exclamation',
+                            $user
+                        );
+                    }
+                }
             } catch(\Exception $ex2){
                 $this->get('monolog.mautic.logger')->log('error', 'FullContact: ' . $ex2->getMessage());
             }
@@ -180,6 +197,7 @@ class PublicController extends FormController
      * This is only called internally
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     private function compcallbackAction()
     {
@@ -187,12 +205,12 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
+        $result = $this->request->request->get('result', [], true);
+        $oid = $this->request->request->get('webhookId', [], true);
+        list($w, $id, $uid) = explode('#', $oid, 3);
+        $notify = FALSE !== strpos($w, '_notify');
+
         try {
-
-            $result = $this->request->request->get('result', [], true);
-            $oid = $this->request->request->get('webhookId', [], true);
-            list($w, $id, $uid) = explode('#', $oid, 3);
-
             $org = [];
             $loc = [];
             $phone = [];
@@ -255,32 +273,38 @@ class PublicController extends FormController
             $model->setFieldValues($company, $data);
             $model->saveEntity($company);
 
-            /** @var UserModel $userModel */
-            $userModel = $this->getModel('user');
-            $user = $userModel->getEntity($uid);
-
-            $this->addNotification(
-                sprintf('The company information for %s has been retrieved', $company->getName()),
-                'FullContact Plugin',
-                'fa-search',
-                $user
-            );
-
-        } catch (\Exception $ex) {
-            try {
+            if ($notify) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
                 $user = $userModel->getEntity($uid);
-                $this->addNotification(
-                    sprintf(
-                        'Unable to save the company information for %s: %s',
-                        $company->getName(),
-                        $ex->getMessage()
-                    ),
-                    'FullContact Plugin',
-                    'fa-exclamation',
-                    $user
-                );
+                if ($user) {
+                    $this->addNewNotification(
+                        sprintf('The company information for %s has been retrieved', $company->getName()),
+                        'FullContact Plugin',
+                        'fa-search',
+                        $user
+                    );
+                }
+            }
+        } catch (\Exception $ex) {
+            try {
+                if ($notify && isset($uid, $company)) {
+                    /** @var UserModel $userModel */
+                    $userModel = $this->getModel('user');
+                    $user = $userModel->getEntity($uid);
+                    if ($user) {
+                        $this->addNewNotification(
+                            sprintf(
+                                'Unable to save the company information for %s: %s',
+                                $company->getName(),
+                                $ex->getMessage()
+                            ),
+                            'FullContact Plugin',
+                            'fa-exclamation',
+                            $user
+                        );
+                    }
+                }
             } catch(\Exception $ex2) {
                 $this->get('monolog.mautic.logger')->log('error', 'FullContact: ' . $ex2->getMessage());
             }

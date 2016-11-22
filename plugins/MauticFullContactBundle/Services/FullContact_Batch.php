@@ -26,7 +26,6 @@ namespace MauticPlugin\MauticFullContactBundle\Services;
 class FullContact_Batch extends FullContact_Base
 {
     protected $_resourceUri = '/batch.json';
-//    protected $_baseUri = 'https://requestbin.fullcontact.com/17kl0v91/';
 
     /**
      * @param array $requests

@@ -31,7 +31,6 @@ class FullContact_Person extends FullContact_Base
      */
     protected $_supportedMethods = ['email', 'phone', 'twitter'];
     protected $_resourceUri = '/person.json';
-//    protected $_baseUri = 'https://requestbin.fullcontact.com/17kl0v91/';
 
     public function lookupByEmail($search)
     {

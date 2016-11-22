@@ -68,8 +68,8 @@ class LeadSubscriber extends CommonSubscriber
             try {
                 /** @var User $user */
                 $user = $this->container->get('security.token_storage')->getToken()->getUser();
-                $webhookId = 'fullcontact#'.$lead->getId().'#'.$user->getId();
-                $cache = $lead->getSocialCache();
+                $webhookId = 'fullcontact_notify#'.$lead->getId().'#'.$user->getId();
+                $cache = $lead->getSocialCache()?:[];
                 $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                 if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */
@@ -116,9 +116,9 @@ class LeadSubscriber extends CommonSubscriber
             try {
                 /** @var User $user */
                 $user = $this->container->get('security.token_storage')->getToken()->getUser();
-                $webhookId = 'fullcontactcomp#'.$company->getId().'#'.$user->getId();
+                $webhookId = 'fullcontactcomp_notify#'.$company->getId().'#'.$user->getId();
                 $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
-                $cache = $company->getSocialCache();
+                $cache = $company->getSocialCache()?:[];
                 $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                 if (!array_key_exists($cacheId, $cache)) {
                     /** @var Router $router */

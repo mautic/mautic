@@ -77,7 +77,7 @@ class FullContactIntegration extends AbstractIntegration
                     'required' => false,
                     'attr' => array(
                         'class' => 'form-control',
-                        'rows' => '10',
+                        'rows' => '6',
                         'readonly' => 'readonly',
                     ),
                 )
