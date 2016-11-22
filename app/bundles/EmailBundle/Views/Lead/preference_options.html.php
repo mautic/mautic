@@ -13,7 +13,9 @@ $leadName      = $lead->getPrimaryIdentifier();
 $channelNumber = 0;
 ?>
 <?php echo $view['form']->start($form); ?>
-<table class="pure-table"  id="contact-timeline">
+<div class="row">
+    <div class="col-md-6" >
+<table class="table-condensed"  id="contact-timeline" style="margin: 0 auto">
     <thead>
     <tr>
         <th colspan="2">
@@ -33,15 +35,16 @@ $channelNumber = 0;
     <tr>
         <td style="vertical-align: top" colspan="2">
         <div>
-                    <?php echo $view['form']->widget($form['doNotContactChannels'][$channelNumber]); ++$channelNumber; ?>
-                <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>" class=" col-md-12">
+
+            <?php echo $view['form']->widget($form['doNotContactChannels'][$channelNumber]); ++$channelNumber; ?>
+            <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>">
                     <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?>
                 </label>
                 </div>
         </td>
     </tr><tr>
         <td class="col-md-11" colspan="2">
-                <div id="frequency_<?php echo $channel->value; ?>" class="col-md-12">
+                <div id="frequency_<?php echo $channel->value; ?>">
                     <?php if ($showContactFrequency):?>
                     <div class="col-md-6">
                         <div class="pull-left">
@@ -139,4 +142,6 @@ endif; ?>
     <tr><td colspan="2"><?php echo $view['form']->row($form['buttons']); ?></td></tr>
     </tbody>
 </table>
+    </div>
+</div>
 <?php echo $view['form']->end($form); ?>
