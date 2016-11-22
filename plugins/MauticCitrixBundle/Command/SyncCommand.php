@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command : Synchronizes registrant information from Citrix products
  *
- * php app/console citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
+ * php app/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
  *
  */
 class SyncCommand extends ContainerAwareCommand
@@ -51,7 +51,7 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('citrix:sync')
+        $this->setName('mautic:citrix:sync')
             ->setDescription('Synchronizes registrant information from Citrix products')
             ->addOption(
                 'product',
