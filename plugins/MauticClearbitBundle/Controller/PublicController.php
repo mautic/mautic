@@ -13,10 +13,27 @@ namespace MauticPlugin\MauticClearbitBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+
+    /**
+     * Write a notification.
+     *
+     * @param string    $message   Message of the notification
+     * @param string    $header    Header for message
+     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param User|null $user      User object; defaults to current user
+     */
+    public function addNewNotification($message, $header, $iconClass, User $user)
+    {
+        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
+        $notificationModel = $this->getModel('core.notification');
+        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+    }
 
     /**
      *
@@ -34,14 +51,15 @@ class PublicController extends FormController
 
         /** @var array $result */
         $result = $this->request->request->get('body', [], true);
-        $id = $this->request->request->get('id', [], true);
+        $oid = $this->request->request->get('id', [], true);
+        list($w, $id, $uid) = explode('#', $oid, 3);
+        $notify = FALSE !== strpos($w, '_notify');
 
         $logger = $this->get('monolog.logger.mautic');
 
         try {
 
             if ('person' === $this->request->request->get('type', [], true)) {
-                $id = substr($id, strlen('clearbit#'));
                 /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                 $model = $this->getModel('lead');
                 /** @var Lead $lead */
@@ -52,6 +70,8 @@ class PublicController extends FormController
                 if (array_key_exists('geo', $result)) {
                     $loc = $result['geo'];
                 }
+
+                $data = [];
 
                 foreach ([
                              'facebook' => 'http://www.facebook.com/',
@@ -115,12 +135,25 @@ class PublicController extends FormController
                 $model->setFieldValues($lead, $data);
                 $model->saveEntity($lead);
 
+                if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+                    /** @var UserModel $userModel */
+                    $userModel = $this->getModel('user');
+                    $user = $userModel->getEntity($uid);
+                    if ($user) {
+                        $this->addNewNotification(
+                            sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
+                            'Clearbit Plugin',
+                            'fa-search',
+                            $user
+                        );
+                    }
+                }
+
             } else {
 
                 /******************  COMPANY STUFF  *********************/
 
                 if ('company' === $this->request->request->get('type', [], true)) {
-                    $id = substr($id, strlen('clearbitcomp#'));
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
                     $model = $this->getModel('lead.company');
                     /** @var Company $company */
@@ -181,11 +214,45 @@ class PublicController extends FormController
 
                     $model->setFieldValues($company, $data);
                     $model->saveEntity($company);
+
+                    if ($notify) {
+                        /** @var UserModel $userModel */
+                        $userModel = $this->getModel('user');
+                        $user = $userModel->getEntity($uid);
+                        if ($user) {
+                            $this->addNewNotification(
+                                sprintf('The company information for %s has been retrieved', $company->getName()),
+                                'Clearbit Plugin',
+                                'fa-search',
+                                $user
+                            );
+                        }
+                    }
                 }
             }
 
         } catch (\Exception $ex) {
             $logger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
+            try {
+                if ($notify && $uid) {
+                    /** @var UserModel $userModel */
+                    $userModel = $this->getModel('user');
+                    $user = $userModel->getEntity($uid);
+                    if ($user) {
+                        $this->addNewNotification(
+                            sprintf(
+                                'Unable to save the information: %s',
+                                $ex->getMessage()
+                            ),
+                            'Clearbit Plugin',
+                            'fa-exclamation',
+                            $user
+                        );
+                    }
+                }
+            } catch(\Exception $ex2) {
+                $this->get('monolog.mautic.logger')->log('error', 'Clearbit: ' . $ex2->getMessage());
+            }
         }
 
         return new Response('OK');

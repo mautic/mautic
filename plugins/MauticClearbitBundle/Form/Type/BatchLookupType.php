@@ -37,6 +37,20 @@ class BatchLookupType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'notify',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.plugin.fullcontact.notify',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                ],
+                'data'     => true,
+                'required' => false,
+            ]
+        );
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }

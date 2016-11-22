@@ -65,7 +65,9 @@ class LeadSubscriber extends CommonSubscriber
 
             $clearbit = new Clearbit_Person($keys['apikey']);
             try {
-                $webhookId = 'clearbit#'.$lead->getId();
+                /** @var User $user */
+                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $webhookId = 'clearbit_notify#'.$lead->getId().'#'.$user->getId();
                 $cache = $lead->getSocialCache();
                 $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                 if (!array_key_exists($cacheId, $cache)) {
@@ -103,7 +105,9 @@ class LeadSubscriber extends CommonSubscriber
 
             $clearbit = new Clearbit_Company($keys['apikey']);
             try {
-                $webhookId = 'clearbitcomp#'.$company->getId();
+                /** @var User $user */
+                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $webhookId = 'clearbitcomp_notify#'.$company->getId().'#'.$user->getId();
                 $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
 
                 $cache = $company->getSocialCache();

@@ -17,23 +17,26 @@ use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ClearbitController extends FormController
 {
+
     /**
      * @param string $objectId
      *
      * @return JsonResponse
+     * @throws \InvalidArgumentException
      */
     public function lookupPersonAction($objectId = '')
     {
         if ('POST' === $this->request->getMethod()) {
-            $data     = $this->request->request->get('clearbit_lookup', [], true);
+            $data = $this->request->request->get('clearbit_lookup', [], true);
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         if (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:editown',
@@ -50,12 +53,13 @@ class ClearbitController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         }
 
         if ('GET' === $this->request->getMethod()) {
+
             $route = $this->generateUrl(
                 'mautic_plugin_clearbit_action',
                 [
@@ -79,9 +83,9 @@ class ClearbitController extends FormController
                     ],
                     'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'lead',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -91,16 +95,16 @@ class ClearbitController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Person($keys['apikey']);
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $clearbit = new Clearbit_Person($keys['apikey']);
                 try {
-                    $webhookId = 'clearbit#'.$objectId;
+                    $webhookId = sprintf('clearbit%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
 
-                    $cache   = $lead->getSocialCache();
+                    $cache = $lead->getSocialCache();
                     $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                     if (!array_key_exists($cacheId, $cache)) {
                         $clearbit->setWebhookId($webhookId);
-                        $res             = $clearbit->lookupByEmail($lead->getEmail());
+                        $res = $clearbit->lookupByEmail($lead->getEmail());
                         $cache[$cacheId] = serialize($res);
                         $lead->setSocialCache($cache);
                         $model->saveEntity($lead);
@@ -109,7 +113,7 @@ class ClearbitController extends FormController
                         'mautic.lead.batch_leads_affected',
                         [
                             'pluralCount' => 1,
-                            '%count%'     => 1,
+                            '%count%' => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -123,19 +127,22 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
+
             }
         }
+        return new Response('Bad Request', 400);
     }
 
     /**
+     *
      * @return JsonResponse
+     * @throws \InvalidArgumentException
      */
     public function batchLookupPersonAction()
     {
-        $logger = $this->get('monolog.logger.mautic');
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         if ('GET' === $this->request->getMethod()) {
@@ -159,8 +166,8 @@ class ClearbitController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -178,7 +185,7 @@ class ClearbitController extends FormController
                     'lead:leads:editown',
                     'lead:leads:editother',
                     $lead->getPermissionUser()
-                ) && $lead->getEmail()
+                )
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();
                 }
@@ -197,7 +204,7 @@ class ClearbitController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -211,12 +218,13 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
             }
         }
         if ('GET' === $this->request->getMethod()) {
+
             $route = $this->generateUrl(
                 'mautic_plugin_clearbit_action',
                 [
@@ -238,9 +246,9 @@ class ClearbitController extends FormController
                     ],
                     'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -250,17 +258,17 @@ class ClearbitController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Person($keys['apikey']);
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $clearbit = new Clearbit_Person($keys['apikey']);
                 try {
                     foreach ($lookupEmails as $id => $lookupEmail) {
-                        $lead      = $model->getEntity($id);
-                        $webhookId = 'clearbit#'.$id;
-                        $cache     = $lead->getSocialCache();
-                        $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $lead = $model->getEntity($id);
+                        $webhookId = sprintf('clearbit%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
+                        $cache = $lead->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
-                            $res             = $clearbit->lookupByEmail($lookupEmail);
+                            $res = $clearbit->lookupByEmail($lookupEmail);
                             $cache[$cacheId] = serialize($res);
                             $lead->setSocialCache($cache);
                             $model->saveEntity($lead);
@@ -271,7 +279,7 @@ class ClearbitController extends FormController
                         'mautic.lead.batch_leads_affected',
                         [
                             'pluralCount' => $count,
-                            '%count%'     => $count,
+                            '%count%' => $count,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -285,11 +293,13 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
+
             }
         }
+        return new Response('Bad Request', 400);
     }
 
     /***************** COMPANY ***********************/
@@ -298,11 +308,12 @@ class ClearbitController extends FormController
      * @param string $objectId
      *
      * @return JsonResponse
+     * @throws \InvalidArgumentException
      */
     public function lookupCompanyAction($objectId = '')
     {
         if ('POST' === $this->request->getMethod()) {
-            $data     = $this->request->request->get('clearbit_lookup', [], true);
+            $data = $this->request->request->get('clearbit_lookup', [], true);
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -311,6 +322,7 @@ class ClearbitController extends FormController
         $company = $model->getEntity($objectId);
 
         if ('GET' === $this->request->getMethod()) {
+
             $route = $this->generateUrl(
                 'mautic_plugin_clearbit_action',
                 [
@@ -318,7 +330,7 @@ class ClearbitController extends FormController
                 ]
             );
 
-            $website = $company->getFieldValue('companywebsite');
+            $website = $company->getFieldValue('companywebsite', 'core');
 
             if (!$website) {
                 $this->addFlash(
@@ -330,7 +342,7 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
             }
@@ -352,9 +364,9 @@ class ClearbitController extends FormController
                     ],
                     'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_company_index',
+                        'activeLink' => '#mautic_company_index',
                         'mauticContent' => 'company',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -364,17 +376,18 @@ class ClearbitController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Company($keys['apikey']);
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $clearbit = new Clearbit_Company($keys['apikey']);
                 try {
-                    $webhookId = 'clearbitcomp#'.$objectId;
-                    $website   = $company->getFieldValue('companywebsite');
-                    $parse     = parse_url($website);
-                    $cache     = $company->getSocialCache();
-                    $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+
+                    $webhookId = sprintf('clearbitcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $objectId, $this->user->getId());
+                    $website = $company->getFieldValue('companywebsite', 'core');
+                    $parse = parse_url($website);
+                    $cache = $company->getSocialCache();
+                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                     if (!array_key_exists($cacheId, $cache)) {
                         $clearbit->setWebhookId($webhookId);
-                        $res             = $clearbit->lookupByDomain($parse['host']);
+                        $res = $clearbit->lookupByDomain($parse['host']);
                         $cache[$cacheId] = serialize($res);
                         $company->setSocialCache($cache);
                         $model->saveEntity($company);
@@ -383,7 +396,7 @@ class ClearbitController extends FormController
                         'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => 1,
-                            '%count%'     => 1,
+                            '%count%' => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -397,19 +410,22 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
+
             }
         }
+        return new Response('Bad Request', 400);
     }
 
     /**
+     *
      * @return JsonResponse
+     * @throws \InvalidArgumentException
      */
     public function batchLookupCompanyAction()
     {
-        $logger = $this->get('monolog.logger.mautic');
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
         if ('GET' === $this->request->getMethod()) {
@@ -433,8 +449,8 @@ class ClearbitController extends FormController
                             'force' => [
                                 [
                                     'column' => 'comp.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -448,12 +464,9 @@ class ClearbitController extends FormController
         if ($count = count($entities)) {
             /** @var Company $company */
             foreach ($entities as $company) {
-                if ($company->getFieldValue('companywebsite')) {
-                    $website = $company->getFieldValue('companywebsite');
-                    $parse   = parse_url($website);
-                    if (!isset($parse['host'])) {
-                        continue;
-                    }
+                if ($company->getFieldValue('companywebsite', 'core')) {
+                    $website = $company->getFieldValue('companywebsite', 'core');
+                    $parse = parse_url($website);
                     $lookupWebsites[$company->getId()] = $parse['host'];
                 }
             }
@@ -471,7 +484,7 @@ class ClearbitController extends FormController
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -485,12 +498,13 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
             }
         }
         if ('GET' === $this->request->getMethod()) {
+
             $route = $this->generateUrl(
                 'mautic_plugin_clearbit_action',
                 [
@@ -512,9 +526,9 @@ class ClearbitController extends FormController
                     ],
                     'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_company_index',
+                        'activeLink' => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -524,17 +538,17 @@ class ClearbitController extends FormController
                 $integrationHelper = $this->get('mautic.helper.integration');
                 /** @var ClearbitIntegration $myIntegration */
                 $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Company($keys['apikey']);
+                $keys = $myIntegration->getDecryptedApiKeys();
+                $clearbit = new Clearbit_Company($keys['apikey']);
                 try {
                     foreach ($lookupWebsites as $id => $lookupWebsite) {
-                        $company   = $model->getEntity($id);
-                        $webhookId = 'clearbitcomp#'.$id;
-                        $cache     = $company->getSocialCache();
-                        $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $company = $model->getEntity($id);
+                        $webhookId = sprintf('clearbitcomp%s#%s#%d', (array_key_exists('notify', $data) && $data['notify'])?'_notify':'', $id, $this->user->getId());
+                        $cache = $company->getSocialCache();
+                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                         if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
-                            $res             = $clearbit->lookupByDomain($lookupWebsite);
+                            $res = $clearbit->lookupByDomain($lookupWebsite);
                             $cache[$cacheId] = serialize($res);
                             $company->setSocialCache($cache);
                             $model->saveEntity($company);
@@ -545,7 +559,7 @@ class ClearbitController extends FormController
                         'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => $count,
-                            '%count%'     => $count,
+                            '%count%' => $count,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -559,10 +573,12 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'flashes' => $this->getFlashContent(),
                     ]
                 );
+
             }
         }
+        return new Response('Bad Request', 400);
     }
 }
