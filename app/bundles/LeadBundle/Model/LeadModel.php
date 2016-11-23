@@ -2173,15 +2173,15 @@ class LeadModel extends FormModel
      */
     public function setPrimaryCompany($companyId, $leadId)
     {
-        $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($leadId);
-
         $companyArray      = [];
         $oldPrimaryCompany = $newPrimaryCompany = false;
 
         $lead = $this->getEntity($leadId);
 
-        foreach ($companies as $company) {
-            $company     = $this->companyModel->getEntity($company['company_id']);
+        $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
+
+        foreach ($companyLeads as $companyLead) {
+            $company     = $companyLead->getCompany();
             $companyLead = $this->companyModel->getCompanyLeadRepository()->findOneBy(
                 [
                     'lead'    => $lead,
@@ -2217,5 +2217,35 @@ class LeadModel extends FormModel
         }
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
+    }
+
+    /**
+     * @param Lead $lead
+     * @param $score
+     *
+     * @return bool
+     */
+    public function scoreContactsCompany(Lead $lead, $score)
+    {
+        $success          = false;
+        $entities         = [];
+        $contactCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+
+        if (!empty($contactCompanies)) {
+            foreach ($contactCompanies as $contactCompany) {
+                $company  = $this->companyModel->getEntity($contactCompany['company_id']);
+                $oldScore = $company->getScore();
+                $newScore = $score + $oldScore;
+                $company->setScore($newScore);
+                $entities[] = $company;
+                $success    = true;
+            }
+        }
+
+        if (!empty($entities)) {
+            $this->companyModel->getRepository()->saveEntities($entities);
+        }
+
+        return $success;
     }
 }

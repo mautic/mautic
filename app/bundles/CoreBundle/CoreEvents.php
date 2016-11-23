@@ -141,4 +141,13 @@ final class CoreEvents
      * @var string
      */
     const PROCESS_MESSAGE_QUEUE_BATCH = 'mautic.process_message_queue_batch';
+
+    /**
+     * The mautic.view_inject_custom_buttons event is dispatched to inject custom buttons into Mautic's UI by plugins/other bundles.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomButtonEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_BUTTONS = 'mautic.view_inject_custom_buttons';
 }

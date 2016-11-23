@@ -304,8 +304,12 @@ return [
             ],
             'mautic.helper.template.button' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'buttons',
+                'arguments' => [
+                    'templating',
+                    'translator',
+                    'event_dispatcher',
+                ],
+                'alias' => 'buttons',
             ],
             'mautic.helper.template.formatter' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
@@ -716,6 +720,7 @@ return [
         'cache_path'                => '%kernel.root_dir%/cache',
         'log_path'                  => '%kernel.root_dir%/logs',
         'image_path'                => 'media/images',
+        'tmp_path'                  => '%kernel.root_dir%/cache',
         'theme'                     => 'Mauve',
         'db_driver'                 => 'pdo_mysql',
         'db_host'                   => '127.0.0.1',

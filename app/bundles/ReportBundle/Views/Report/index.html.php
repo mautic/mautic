@@ -31,14 +31,9 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.report.report.help.searchcommands',
-            'action'          => $currentRoute,
-            'langVar'         => 'report.report',
-            'routeBase'       => 'report',
-            'templateButtons' => [
-                'delete' => $permissions['report:reports:deleteown'] || $permissions['report:reports:deleteother'],
-            ],
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.report.report.help.searchcommands',
+            'action'      => $currentRoute,
         ]
     ); ?>
     <div class="page-list">
