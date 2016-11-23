@@ -26,7 +26,7 @@ $leadName = $lead->getPrimaryIdentifier();
             <tr >
                 <th>
                     <input type="checkbox" id="lead_contact_frequency_rules_doNotContactChannels_0" name="check_all"
-                           onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,this.value);" value="all">
+                           onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,'all');" value="all">
                 </th>
                 <th>
                     <?php echo $view['translator']->trans('mautic.lead.preference.channels'); ?>
@@ -69,7 +69,7 @@ $leadName = $lead->getPrimaryIdentifier();
                     </td>
                 <td class="col-md-1" style="vertical-align: top;" align="center">
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
-                               name="lead_contact_frequency_rules[preferred_channel]" class="contact checkbox"
+                               name="lead_contact_frequency_rules[preferred_channel]" class="contact"
                                value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
                     echo $checked;
                 } ?> <?php echo $disabled; ?>>
@@ -79,7 +79,7 @@ $leadName = $lead->getPrimaryIdentifier();
                 <tr style="border-top:none"><th style="border-top:none"></th>
                     <td  style="border-top:none"></td>
                     <td colspan="2" style="border-top:none">
-                        <div id="frequency_<?php echo $channel->value; ?>" class="<?php echo $hidden; ?>" >
+                        <div id="frequency_<?php echo $channel->value; ?>" <?php if (!empty($hidden)) :?>class="<?php echo $hidden; ?>"<?php endif; ?> >
                             <div>
                                 <label class="text-muted fw-n"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
                             </div>
@@ -89,9 +89,7 @@ $leadName = $lead->getPrimaryIdentifier();
                                     <?php echo $view['form']->label($form['contact_pause_end_date_'.$channel->value]); ?>
                                 </div>
                                     <?php echo $view['form']->widget($form['contact_pause_end_date_'.$channel->value]); ?>
-
                             </div>
-
                         </div>
                         <div class="clearfix"></div>
                     </td>

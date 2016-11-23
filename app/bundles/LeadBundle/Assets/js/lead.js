@@ -677,7 +677,8 @@ Mautic.togglePreferredChannel = function(leadId, channel) {
 Mautic.setPreferredChannel = function(leadId, channel) {
     var action = mQuery('#' + channel)[0].checked ? 'add' : 'remove';
     var query = "action=lead:togglePreferredLeadChannel&leadId=" + leadId + "&channel=" + channel + "&channelAction=" + action;
-
+    mQuery( '#frequency_' + channel ).slideToggle();
+    mQuery( '#frequency_' + channel ).removeClass('hide');
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
@@ -697,8 +698,7 @@ Mautic.setPreferredChannel = function(leadId, channel) {
             }
         }
         });
-    mQuery( '#frequency_' + channel ).slideToggle();
-    mQuery( '#frequency_' + channel ).removeClass('hide');
+
 };
 
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
