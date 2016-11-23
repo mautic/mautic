@@ -198,6 +198,7 @@ class FileApiController extends CommonApiController
     {
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()
+            .':'.$this->request->getPort()
             .$this->request->getBasePath().'/'
             .$this->factory->getParameter('image_path');
     }
