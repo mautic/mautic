@@ -21,16 +21,20 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class FileApiController extends CommonApiController
 {
+    /**
+     * Holds array of allowed file extensions.
+     *
+     * @var array
+     */
+    protected $allowedExtensions = [];
+
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->entityNameOne   = 'file';
-        $this->entityNameMulti = 'files';
+        $this->entityNameOne     = 'file';
+        $this->entityNameMulti   = 'files';
+        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
     }
-
-    protected $forbiddenExtensions = [
-        'php',
-    ];
 
     /**
      * Uploads a file.
@@ -48,7 +52,7 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($this->request->files) {
             foreach ($this->request->files as $file) {
-                if (!in_array($file->guessExtension(), $this->forbiddenExtensions)) {
+                if (in_array($file->guessExtension(), $this->allowedExtensions)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $moved    = $file->move($path, $fileName);
 
@@ -58,7 +62,7 @@ class FileApiController extends CommonApiController
 
                     $response[$this->entityNameOne]['name'] = $fileName;
                 } else {
-                    return $this->returnError('The uploaded file cannot have these exetnsions: '.implode(',', $this->forbiddenExtensions).'.', Response::HTTP_NOT_ACCEPTABLE);
+                    return $this->returnError('The uploaded file can have only these extensions: '.implode(',', $this->allowedExtensions).'.', Response::HTTP_NOT_ACCEPTABLE);
                 }
             }
         } else {
