@@ -47,6 +47,11 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Mautic\FeedBundle\Entity\Feed;
+use Mautic\FeedBundle\Entity\Snapshot;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
+use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\FeedBundle\Entity\FeedRepository;
 
 /**
  * Class EmailModel
@@ -856,7 +861,17 @@ class EmailModel extends FormModel
     public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
-        $total      = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
+        $snapshotId = is_null($email->getFeed()) ? null : $email->getFeed()->getSnapshots()->last()->getId();
+
+        if ($email->getEmailType() == 'feed') {
+            $feedRepository = $this->em->getRepository('MauticFeedBundle:Feed');
+            $latestSnapshot = $feedRepository->latestSnapshot($this->factory, $email->getFeed());
+            $snapshotsId = $latestSnapshot->getId();
+        } else {
+            $snapshotsId = null;
+        }
+
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $snapshotsId, $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
@@ -956,6 +971,12 @@ class EmailModel extends FormModel
             $progress->finish();
         }
 
+        // if email have feed, expire snapshot
+        if ($email->getEmailType()=='feed'){
+            /** @var FeedHelper $feedHelper */
+            $feedHelper = $this->factory->getHelper('feed');
+            $feedHelper->expireFeedSnapshot($this->factory, $email);
+        }
         return [$sentCount, $failedCount, $failed];
     }
 
@@ -1154,6 +1175,7 @@ class EmailModel extends FormModel
         $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
+
         if (!$email->getId()) {
             return false;
         }
@@ -1163,6 +1185,8 @@ class EmailModel extends FormModel
             $singleEmail = true;
             $leads       = [$leads['id'] => $leads];
         }
+
+
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
@@ -1180,6 +1204,16 @@ class EmailModel extends FormModel
         $sendTo  = $leads;
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
+
+        if ($allowResends === false && $email->getEmailType() !== 'feed') {
+            static $sent = array();
+            if (!isset($sent[$email->getId()])) {
+                $sent[$email->getId()] = $statRepo->getSentStats($email->getId());
+            }
+            $sendTo = array_diff_key($leads, $sent[$email->getId()]);
+        } else {
+            $sendTo = $leads;
+        }
 
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
@@ -1349,6 +1383,29 @@ class EmailModel extends FormModel
 
                 $mailer->setSource($source);
                 $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
+                $mailer->setLead($lead);
+
+                /** @var Feed $feed */
+                if ($email->getEmailType() === 'feed') {
+                    /** @var FeedHelper $feedHelper */
+                    $feedHelper = $this->factory->getHelper('feed');
+                    /** @var FeedRepository $feedRepository */
+                    $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
+                    /** @var Snapshot $snapshot */
+                    try{
+                    $snapshot = $feedRepository->latestSnapshot($this->factory,$email->getFeed());
+                    $xmlString = $snapshot->getXmlString();
+                    $feedContent = $feedHelper->getFeedContentFromString($xmlString,$email->getFeed()->getItemCount());
+                    $feedFields = $feedHelper->getFeedFields($feedContent);
+
+                    $mailer->setFeed($feedFields);
+                    }catch(\Exception $e){
+                        $errors[$lead['id']] = $lead['email'];
+                    }
+                    echo 'attribution du feed';
+                }
+
+                $mailer->setIdHash($idHash);
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);
@@ -1457,6 +1514,11 @@ class EmailModel extends FormModel
 
         unset($saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
+        if ($email->getEmailType() === 'feed'){
+            //set used feedSnapShot expired
+            /** @var Snapshot $snapshot */
+            $snapshot->setDateExpired(new \DateTime());
+        }
         return $singleEmail ? (empty($errors)) : $errors;
     }
 

@@ -92,10 +92,14 @@ class BuilderSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokenSectionsRequested()) {
-            //add email tokens
+            // add email tokens
             $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
             $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
+
+            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:feedToken.html.php');
+            $event->addTokenSection('email.emailfeedtokens', 'mautic.email.builder.feed', $content);
         }
+
 
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
@@ -248,10 +252,13 @@ class BuilderSubscriber extends CommonSubscriber
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
+
         /**
          * @var string
          * @var Trackable $trackable
          */
+
+
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
@@ -261,6 +268,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             $event->addToken($token, $url);
         }
+
     }
 
     /**

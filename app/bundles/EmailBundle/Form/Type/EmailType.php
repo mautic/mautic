@@ -26,6 +26,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\FeedBundle\Form\Type\FeedType;
+use Mautic\CoreBundle\Entity\Periodicity;
+use Mautic\CoreBundle\Form\Type\PeriodicityType;
 
 /**
  * Class EmailType.
@@ -259,6 +262,24 @@ class EmailType extends AbstractType
                 ]
             )
                 ->addModelTransformer($transformer)
+        );
+
+        //For feed
+        $builder->add(
+            'feed',
+            new FeedType(),
+            array(
+                'label'    => false,
+                'required' => true
+            )
+        );
+
+        $builder->add(
+            'periodicity',
+            new PeriodicityType(),
+            array(
+                'label' => false,
+            )
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');

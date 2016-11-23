@@ -17,6 +17,9 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Entity\Periodicity;
+use Mautic\FeedBundle\Entity\Feed;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 
 class EmailController extends FormController
 {
@@ -415,7 +418,6 @@ class EmailController extends FormController
                     'statsDevices' => $statsDevices,
                     'showAllStats' => $includeVariants,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
                     'variants'     => [
                         'parent'     => $parent,
@@ -500,6 +502,8 @@ class EmailController extends FormController
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
+        $form['periodicity']['triggerMode']->setData('timeInterval');
+
         ///Check for a submitted form and process it
         if ($method == 'POST') {
             $valid = false;
@@ -512,8 +516,29 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
+                    // If this is a feed email
+                    if ($entity->getEmailType() == 'feed') {
+                        // Link the email to the feed
+                        $entity->getFeed()->setEmail($entity);
+                        $this->factory->getEntityManager()->persist($entity->getFeed());
+                    } else {
+                        // Otherwise, make sure the link is null
+                        $entity->setFeed(null);
+                    }
+
                     //form is valid so process the data
                     $model->saveEntity($entity);
+
+                    if ($entity->getEmailType() === 'feed') {
+                        $periodicity = $form['periodicity']->getData();
+                        $periodicity->setTargetId($entity->getId());
+                        $periodicity->setType(Periodicity::getTypeEmail());
+                        $this->factory->getEntityManager()->persist($periodicity);
+                        $this->factory->getEntityManager()->flush();
+                    }
+
+                    //clear the session
+                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -687,6 +712,10 @@ class EmailController extends FormController
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
+        if ($entity->getEmailType() === 'feed') {
+            $form['periodicity']->setData($model->getRepository()->getPeriodicity($entity));
+        }
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
             $valid = false;
@@ -697,8 +726,26 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
+                    if ($entity->getEmailType() === 'feed') {
+                        //We persist the feed entity
+                        $this->factory->getEntityManager()->persist($entity->getFeed());
+                        $this->factory->getEntityManager()->flush();
+                    }
+
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    //Save the Periodicity too (if exist)
+                    if ($entity->getEmailType() === 'feed') {
+                        $periodicity = $form['periodicity']->getData();
+                        $periodicity->setTargetId($entity->getId());
+                        $periodicity->setType(Periodicity::getTypeEmail());
+                        $this->factory->getEntityManager()->persist($periodicity);
+                        $this->factory->getEntityManager()->flush();
+                    }
+
+                    //clear the session
+                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -894,6 +941,8 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
+            $periodicity = $model->getRepository()->getPeriodicity($entity);
+            $this->factory->getEntityManager()->remove($periodicity);
             $model->deleteEntity($entity);
 
             $flashes[] = [

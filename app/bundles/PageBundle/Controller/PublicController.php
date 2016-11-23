@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CoreBundle\Token\DeprecatedTokenHelper;
 
 /**
  * Class PublicController.
@@ -368,6 +369,8 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
+        /** @var DeprecatedTokenHelper $tokenHelper */
+        $tokenHelper   = $this->get('mautic.helper.token');
 
         if (empty($redirect) || !$redirect->isPublished(false)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
@@ -396,8 +399,11 @@ class PublicController extends CommonFormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getCurrentLead();
-        $leadArray = $lead->getProfileFields();
-        $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+
+        $fields    = $lead->getFields();
+        $leadArray = $leadModel->flattenFields($fields);
+
+        $url       = $tokenHelper->findTokens(\Mautic\FeedBundle\EventListener\EmailSubscriber::$feedFieldPrefix, $url, $leadArray, true);
 
         return $this->redirect($url);
     }

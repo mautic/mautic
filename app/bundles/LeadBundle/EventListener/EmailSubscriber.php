@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Token\DeprecatedTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -23,6 +24,14 @@ use Mautic\LeadBundle\Helper\TokenHelper;
  */
 class EmailSubscriber extends CommonSubscriber
 {
+
+    /**
+     * @var DeprecatedTokenHelper
+     */
+    protected $tokenHelper;
+
+    private static $leadFieldPrefix = 'leadfield';
+
     /**
      * @deprecated - to be removed in 3.0
      *
@@ -108,10 +117,21 @@ class EmailSubscriber extends CommonSubscriber
         $content .= $event->getPlainText();
         $lead = $event->getLead();
 
-        $tokenList = TokenHelper::findLeadTokens($content, $lead);
+        // $tokenList = TokenHelper::findLeadTokens($content, $lead);
+        $tokenList = $this->tokenHelper->findTokens(self::$leadFieldPrefix, $content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);
         }
     }
+
+    /**
+     * @param DeprecatedTokenHelper $tokenHelper
+     */
+    public function setTokenHelper(DeprecatedTokenHelper $tokenHelper)
+    {
+        $this->tokenHelper = $tokenHelper;
+        return $this;
+    }
+
 }

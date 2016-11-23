@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\FeedBundle\Entity\Feed;
 
 /**
  * Class EmailSendEvent.
@@ -50,6 +51,11 @@ class EmailSendEvent extends CommonEvent
      * @var Lead
      */
     private $lead;
+
+    /**
+     * @var Feed
+     */
+    private $feed;
 
     /**
      * @var array
@@ -101,6 +107,10 @@ class EmailSendEvent extends CommonEvent
 
         if (isset($args['lead'])) {
             $this->lead = $args['lead'];
+        }
+
+        if (isset($args['feed'])) {
+            $this->feed = $args['feed'];
         }
 
         if (isset($args['source'])) {
@@ -166,7 +176,6 @@ class EmailSendEvent extends CommonEvent
         } else {
             $content = $this->content;
         }
-
         return ($replaceTokens) ? str_replace(array_keys($this->getTokens()), $this->getTokens(), $content) : $content;
     }
 
@@ -252,6 +261,14 @@ class EmailSendEvent extends CommonEvent
     public function getLead()
     {
         return ($this->helper !== null) ? $this->helper->getLead() : $this->lead;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFeed()
+    {
+        return ($this->helper !== null) ? $this->helper->getFeed() : $this->feed;
     }
 
     /**

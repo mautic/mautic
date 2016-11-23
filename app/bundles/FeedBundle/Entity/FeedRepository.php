@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+namespace Mautic\FeedBundle\Entity;
+
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+
+/**
+ * Class FeedRepository
+ *
+ * @package Mautic\FeedBundle\Entity
+ */
+class FeedRepository extends CommonRepository
+{
+
+    /**
+     *
+     * @param MauticFactory $factory
+     * @param Feed $feed
+     * @param
+     *            null | \DateTime $maxDate max date of validity expected
+     *
+     * @return Snapshot
+     */
+    public function latestSnapshot(MauticFactory $factory, Feed $feed, $preview = false)
+    {
+        $snapshots = $feed->getSnapshots();
+        for ($i = count($snapshots)-1; $i >= 0; $i --) {
+            /** @var \Mautic\FeedBundle\Entity\Snapshot $snapshot */
+            $snapshot = $snapshots->get($i);
+            if (!$snapshot->isExpired()) {
+                return $snapshot;
+            }
+        }
+
+        // there is no valid feed... need to parse a new one
+
+        /** @var FeedHelper $feedHelper */
+        $feedHelper = $factory->getHelper('feed');
+
+        $xmlString = $feedHelper->getStringFromFeed($feed->getFeedUrl());
+
+        $ns = new Snapshot();
+        $ns->setDate(new \DateTime());
+        $ns->setXmlString($xmlString);
+        $ns->setFeed($feed);
+        $feed->addSnapshot($ns);
+
+        if ($preview===false && !is_null($xmlString)) {
+            $this->_em->persist($feed);
+            $this->_em->flush();
+        }
+        return $ns;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'f';
+    }
+}

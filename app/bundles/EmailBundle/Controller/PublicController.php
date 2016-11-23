@@ -21,6 +21,10 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\FeedBundle\Entity\Snapshot;
+use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\FeedBundle\Entity\FeedRepository;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 
 class PublicController extends CommonFormController
 {
@@ -337,6 +341,28 @@ class PublicController extends CommonFormController
             return $this->notFound();
         }
 
+        /** @var FeedRepository $feedRepository */
+        $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
+
+        /** @var FeedHelper $feedHelper  */
+        $feedHelper = $this->get('mautic.helper.feed');
+
+        $feedFields = null;
+
+        if ($emailEntity->getEmailType() == 'feed') {
+            try {
+                //TODO A refactoriser pour
+                $feed = $emailEntity->getFeed();
+                /** @var Snapshot $snapshot */
+                $snapshot = $feedRepository->latestSnapshot($this->factory, $feed, true);
+                $xmlString = $snapshot->getXmlString();
+                $feedContent = $feedHelper->getFeedContentFromString($xmlString, $emailEntity->getFeed()->getItemCount());
+                $feedFields = $feedHelper->getFeedFields($feedContent);
+            } catch (FeedNotFoundException $e) {
+                return new Response($e->getMessage());
+            }
+        }
+
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
             || (!$this->get('mautic.security')->isAnonymous()
@@ -389,16 +415,16 @@ class PublicController extends CommonFormController
         $tokens = ['{tracking_pixel}' => ''];
 
         // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
+        /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+        $leadFieldModel = $this->factory->getModel('lead.field');
+        $leadFields     = $leadFieldModel->getFieldList(false, false);
         array_walk(
-            $fields,
+            $leadFields,
             function (&$field) {
                 $field = "[$field]";
             }
         );
-        $fields['id'] = 0;
+        $leadFields['id'] = 0;
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
@@ -409,7 +435,8 @@ class PublicController extends CommonFormController
                 'idHash'       => $idHash,
                 'tokens'       => $tokens,
                 'internalSend' => true,
-                'lead'         => $fields,
+                'lead'         => $leadFields,
+                'feed'         => $feedFields
             ]
         );
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);

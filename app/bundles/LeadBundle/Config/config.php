@@ -213,6 +213,10 @@ return [
             ],
             'mautic.lead.emailbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
+                'methodCalls' => [
+                    'setTokenHelper' => ['mautic.helper.token'],
+                ],
+
             ],
             'mautic.lead.formbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\FormSubscriber',

@@ -180,7 +180,7 @@ class EmailRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
+    public function getEmailPendingLeads($emailId, $snapshotId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -200,6 +200,12 @@ class EmailRepository extends CommonRepository
             $statQb->expr()->eq('stat.lead_id', 'l.id')
         );
 
+
+        if (!is_null($snapshotId)){
+            $statExpr = $statQb->expr()->andX(
+            $statQb->expr()->eq('stat.snapshot_id', (int) $snapshotId)
+            );
+        }
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
                 $variantIds[] = (int) $emailId;
@@ -546,5 +552,18 @@ class EmailRepository extends CommonRepository
         $qb->where($expr);
 
         return $qb->getQuery()->iterate();
+    }
+
+    public function getPeriodicity(Email $email) {
+        $q = $this->createQueryBuilder('e');
+
+        $q->select('p')
+          ->from('Mautic\CoreBundle\Entity\Periodicity', 'p')
+          ->where($q->expr()->andX(
+              $q->expr()->eq('p.type', ':type'),
+              $q->expr()->eq('p.targetId', $email->getId())
+          ))
+          ->setParameter('type', 'email:generate');
+        return $q->getQuery()->getSingleResult();
     }
 }

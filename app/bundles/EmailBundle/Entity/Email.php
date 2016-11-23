@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\CoreBundle\Entity\Periodicity;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -31,6 +32,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\FeedBundle\Entity\Feed;
 
 /**
  * Class Email.
@@ -172,6 +174,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var
      */
     private $sessionId;
+
+    /**
+     * @var Feed
+     */
+    private $feed;
+
+    /**
+     * @var Periodicity
+     */
+    private $periodicity;
 
     public function __clone()
     {
@@ -320,6 +332,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createOneToOne('feed', 'Mautic\FeedBundle\Entity\Feed')
+            ->mappedBy('email')
+            ->build();
     }
 
     /**
@@ -368,7 +384,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
-                if ($type == 'list' && null == $translationParent) {
+                $listViolations                = null;
+                $feedUrlViolations             = null;
+                $feedItemCountViolations       = null;
+                $triggerDateViolations         = null;
+                $triggerIntervalViolations     = null;
+                $triggerIntervalUnitViolations = null;
+                $weekDaysViolations            = null;
+
+                if ($type == 'list' || $type === 'feed' && null == $translationParent) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
@@ -387,6 +411,98 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                                 ->atPath('lists')
                                 ->addViolation();
                         }
+                    }
+                }
+
+                if ($type === 'feed') {
+                    $feedUrlViolations = $validator->validate(
+                        $email->getFeed()->getFeedUrl(),
+                        array(
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.feed.feed_url.required'
+                                )
+                            )
+                        )
+                    );
+
+                    $feedItemCountViolations = $validator->validate(
+                        $email->getFeed()->getItemCount(),
+                        array(
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.feed.item_count.required'
+                                )
+                            )
+                        )
+                    );
+
+                    $triggerDateViolations = $validator->validate(
+                        $email->getPeriodicity()->getTriggerDate(),
+                        array(
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.periodicity.trigger_date.required'
+                                )
+                            )
+                        )
+                    );
+
+                    if ($email->getPeriodicity()->getTriggerMode() === 'timeInterval') {
+                        $triggerIntervalViolations = $validator->validate(
+                            $email->getPeriodicity()->getTriggerInterval(),
+                            array(
+                                new NotBlank(
+                                    array(
+                                        'message' => 'mautic.periodicity.trigger_interval.required'
+                                    )
+                                )
+                            )
+                        );
+
+                        $triggerIntervalUnitViolations = $validator->validate(
+                            $email->getPeriodicity()->getTriggerIntervalUnit(),
+                            array(
+                                new NotBlank(
+                                    array(
+                                        'message' => 'mautic.periodicity.trigger_interval_unit.required'
+                                    )
+                                )
+                            )
+                        );
+                    } else if ($email->getPeriodicity()->getTriggerMode() === 'weekDays') {
+                        $weekDaysViolations = $validator->validate(
+                            $email->getPeriodicity()->getWeekDays(),
+                            array(
+                                new NotBlank(
+                                    array(
+                                        'message' => 'mautic.periodicity.week_days.required'
+                                    )
+                                )
+                            )
+                        );
+                    } else {
+                        throw new RuntimeException('Unknown periodicity trigger mode');
+                    }
+
+                }
+
+                $violationPaths = array(
+                    array($listViolations,          'lists'),
+                    array($feedUrlViolations,       'feed.feed_url'),
+                    array($feedItemCountViolations, 'feed.item_count'),
+                    array($triggerDateViolations,   'periodicity.triggerDate'),
+                    array($triggerIntervalViolations, 'periodicity.triggerInterval'),
+                    array($triggerIntervalUnitViolations, 'periodicity.triggerIntervalUnit'),
+                    array($weekDaysViolations, 'periodicity.weekDays')
+                );
+
+                foreach ($violationPaths as list($violations, $path)) {
+                    if (count($violations) > 0) {
+                        $message = (string) $violations;
+                        $context->buildViolation($message)
+                                ->atPath($path)
+                                ->addViolation();
                     }
                 }
 
@@ -1048,4 +1164,38 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             }
         }
     }
+
+    /**
+     * @return Feed
+     */
+    public function getFeed()
+    {
+        return $this->feed;
+    }
+
+    /**
+     * @param Feed $feed
+     */
+    public function setFeed(Feed $feed = NULL)
+    {
+        $this->feed = $feed;
+        return $this;
+    }
+
+    /**
+     * @return null|Periodicity
+     */
+    public function getPeriodicity() {
+        return $this->periodicity;
+    }
+
+    /**
+     * @param Periodicity $periodicity
+     * @return Email
+     */
+    public function setPeriodicity(Periodicity $periodicity) {
+        $this->periodicity = $periodicity;
+        return $this;
+    }
+
 }

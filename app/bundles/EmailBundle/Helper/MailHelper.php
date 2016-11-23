@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\FeedBundle\Entity\FeedRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -83,6 +84,11 @@ class MailHelper
      * @var null
      */
     protected $lead = null;
+
+    /**
+     * @var null
+     */
+    protected $feed = null;
 
     /**
      * @var bool
@@ -451,6 +457,7 @@ class MailHelper
     public function queue($dispatchSendEvent = false, $immediateSendMessageHandling = 'RESET_TO')
     {
         if ($this->tokenizationEnabled) {
+
 
             // Dispatch event to get custom tokens from listeners
             if ($dispatchSendEvent) {
@@ -1207,7 +1214,23 @@ class MailHelper
     }
 
     /**
-     * Check if this is not being send directly to the lead.
+     * @return null
+     */
+    public function getFeed()
+    {
+        return $this->feed;
+    }
+
+    /**
+     * @param null $feed
+     */
+    public function setFeed($feedFields)
+    {
+        $this->feed = $feedFields;
+    }
+
+    /**
+     * Check if this is not being send directly to the lead
      *
      * @return bool
      */
@@ -1651,6 +1674,19 @@ class MailHelper
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($this->email);
+
+        //check if current email use feed
+        if (!is_null($this->getEmail()) && $this->getEmail()->getEmailType() === 'feed') {
+
+            $feed = $this->getEmail()->getFeed();
+
+            /** @var FeedRepository $feedRepository */
+            $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
+            $currentFeedSnapshot = $feedRepository->latestSnapshot($this->factory, $feed);
+            if (!is_null($currentFeedSnapshot)){
+                $stat->setSnapshot($currentFeedSnapshot);
+            }
+        }
 
         // Note if a lead
         if (null !== $this->lead) {

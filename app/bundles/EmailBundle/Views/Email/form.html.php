@@ -33,6 +33,7 @@ $header = $isExisting ?
 $view['slots']->set('headerTitle', $header.$subheader);
 
 $emailType = $form['emailType']->vars['data'];
+$triggerMode = $form['periodicity']['triggerMode']->vars['data'];
 
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
@@ -181,7 +182,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
             <?php else: ?>
-            <div id="leadList"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+            <div id="leadList"<?php echo ($emailType === 'list' || $emailType === 'feed') ? '' : ' class="hide"'; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
             <?php echo $view['form']->row($form['category']); ?>
@@ -195,12 +196,28 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <?php endif; ?>
 
             <?php if (!$isVariant): ?>
+            <div id="publishStatus"<?php echo ($emailType === 'template' || $emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+
+            <!-- For feed -->
+            <div id="feedInputs"<?php echo ($emailType === 'feed') ? '' : ' class="hide"'; ?>>
+                <hr/>
+                <?php echo $view['form']->row($form['feed']); ?>
+                <?php echo $view['form']->row($form['periodicity']['triggerDate']) ?>
+                <?php echo $view['form']->row($form['periodicity']['triggerMode']) ?>
+                <div id="timeInterval" class="row<?php echo ($triggerMode === 'timeInterval') ? '' : ' hide' ?>">
+                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['periodicity']['triggerInterval']); ?></span>
+                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['periodicity']['triggerIntervalUnit']); ?></span>
+                </div>
+                <div id="weekDays" class="<?php echo ($triggerMode === 'weekDays') ? '' : ' hide' ?>">
+                    <?php echo $view['form']->row($form['periodicity']['weekDays']); ?>
+                </div>
+            </div>
         </div>
         <div class="hide">
             <?php echo $view['form']->rest($form); ?>
@@ -253,21 +270,37 @@ $type = $email->getEmailType();
 if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         [
-            'item'       => $email,
-            'mauticLang' => [
-                'newListEmail'     => 'mautic.email.type.list.header',
-                'newTemplateEmail' => 'mautic.email.type.template.header',
+            'item'               => $email,
+            'mauticLang'         => [
+                'newListEmail'      => 'mautic.email.type.list.header',
+                'newTemplateEmail'  => 'mautic.email.type.template.header',
+                'newRssEmail'       => 'mautic.email.type.feed.header'
             ],
-            'typePrefix'         => 'email',
-            'cancelUrl'          => 'mautic_email_index',
-            'header'             => 'mautic.email.type.header',
-            'typeOneHeader'      => 'mautic.email.type.template.header',
-            'typeOneIconClass'   => 'fa-cube',
-            'typeOneDescription' => 'mautic.email.type.template.description',
-            'typeOneOnClick'     => "Mautic.selectEmailType('template');",
-            'typeTwoHeader'      => 'mautic.email.type.list.header',
-            'typeTwoIconClass'   => 'fa-pie-chart',
-            'typeTwoDescription' => 'mautic.email.type.list.description',
-            'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
+            'typePrefix'           => 'email',
+            'cancelUrl'            => 'mautic_email_index',
+            'header'               => 'mautic.email.type.header',
+            'types'                => [
+                [
+                    'header'       => 'mautic.email.type.template.header',
+                    'iconClass'    => 'fa-cube',
+                    'description'  => 'mautic.email.type.template.description',
+                    'onClick'      => "Mautic.selectEmailType('template');",
+                    'color'        => 'success'
+                ],
+                [
+                    'header'       => 'mautic.email.type.list.header',
+                    'iconClass'    => 'fa-pie-chart',
+                    'description'  => 'mautic.email.type.list.description',
+                    'onClick'      => "Mautic.selectEmailType('list');",
+                    'color'        => 'primary'
+                ],
+                [
+                    'header'       => 'mautic.email.type.feed.header',
+                    'iconClass'    => 'fa-rss-square',
+                    'description'  => 'mautic.email.type.feed.description',
+                    'onClick'      => "Mautic.selectEmailType('feed');",
+                    'color'        => 'warning'
+                ]
+            ]
         ]);
 endif;

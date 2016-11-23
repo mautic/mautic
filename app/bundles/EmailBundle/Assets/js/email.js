@@ -158,16 +158,25 @@ Mautic.autoGeneratePlaintext = function() {
 };
 
 Mautic.selectEmailType = function(emailType) {
-    if (emailType == 'list') {
+    if (emailType === 'list') {
         mQuery('#leadList').removeClass('hide');
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
-    } else {
+        mQuery('#feedInputs').addClass('hide');
+    } else if (emailType === 'template') {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
+        mQuery('#publishStatus').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+        mQuery('#feedInputs').addClass('hide');
+    } else if (emailType === 'feed') {
+        mQuery('#segmentTranslationParent').removeClass('hide');
+        mQuery('#templateTranslationParent').addClass('hide');
+        mQuery('#leadList').removeClass('hide');
+        mQuery('.page-header h3').text(mauticLang.newRssEmail);
+        mQuery('#feedInputs').removeClass('hide');
     }
 
     mQuery('#emailform_emailType').val(emailType);
@@ -668,3 +677,16 @@ Mautic.convertDynamicContentFilterInput = function(el) {
         Mautic.activateChosenSelect(filterEl);
     }
 };
+
+Mautic.feedToggleTriggerMode = function() {
+    var timeIntervalChecked = mQuery('#emailform_periodicity_triggerMode_0').prop('checked');
+    var weekDaysChecked     = mQuery('#emailform_periodicity_triggerMode_1').prop('checked');
+
+    if (timeIntervalChecked) {
+        mQuery('#timeInterval').removeClass('hide');
+        mQuery('#weekDays').addClass('hide');
+    } else if (weekDaysChecked) {
+        mQuery('#timeInterval').addClass('hide');
+        mQuery('#weekDays').removeClass('hide');
+    }
+}
