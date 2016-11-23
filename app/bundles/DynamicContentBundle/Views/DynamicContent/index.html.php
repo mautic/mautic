@@ -28,15 +28,14 @@ $view['slots']->set(
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'searchHelp'      => 'mautic.page.help.searchcommands',
-        'action'          => $currentRoute,
-        'routeBase'       => 'dynamicContent',
-        'templateButtons' => [
-            'delete' => $permissions['dynamicContent:dynamicContents:deleteown'] || $permissions['dynamicContent:dynamicContents:deleteother'],
-        ],
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.page.help.searchcommands',
+            'action'      => $currentRoute,
+        ]
+    ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>
