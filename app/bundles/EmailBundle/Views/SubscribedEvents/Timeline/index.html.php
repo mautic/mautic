@@ -56,19 +56,22 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
     <h6 class="mt-lg mb-sm"><strong><?php echo $view['translator']->trans('mautic.email.timeline.open_details'); ?></strong></h6>
     <?php
     $counter = 1;
-        foreach ($item['openDetails'] as $detail):
-            if (empty($showMore) && $counter > 5):
-                $showMore = true;
+        if (is_array($item['openDetails'])) {
+            foreach ($item['openDetails'] as $detail):
+                if (empty($showMore) && $counter > 5):
+                    $showMore = true;
 
-                echo '<div style="display:none">';
-            endif;
-            ?>
-            <?php if ($counter > 1): ?><hr/><?php endif; ?>
-            <strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br/><?php echo $detail['useragent']; ?>
-            <?php ++$counter; ?>
-        <?php endforeach; ?>
-        <?php
-
+                    echo '<div style="display:none">';
+                endif;
+                ?>
+                <?php if ($counter > 1): ?>
+                <hr/><?php endif; ?>
+                <strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong>
+                <br/><?php echo $detail['useragent']; ?>
+                <?php ++$counter; ?>
+            <?php endforeach; ?>
+            <?php
+        }
         if (!empty($showMore)):
             echo '</div>';
             echo '<a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">';

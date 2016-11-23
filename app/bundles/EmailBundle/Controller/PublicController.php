@@ -440,6 +440,8 @@ class PublicController extends CommonFormController
             $slotsHelper->set($slot, $value);
         }
     }
+<<<<<<< HEAD
+=======
 
     /**
      * @param $integration
@@ -606,4 +608,5 @@ class PublicController extends CommonFormController
         // return entity
         return $repo->getLeadByEmail($email);
     }
+>>>>>>> refs/remotes/mautic/staging
 }

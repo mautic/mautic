@@ -42,6 +42,9 @@ return [
             ],
         ],
         'public' => [
+<<<<<<< HEAD
+            'mautic_email_tracker'             => [
+=======
             'mautic_plugin_tracker' => [
                 'path'         => '/plugin/{integration}/tracking.gif',
                 'controller'   => 'MauticEmailBundle:Public:pluginTrackingGif',
@@ -50,6 +53,7 @@ return [
                 ],
             ],
             'mautic_email_tracker' => [
+>>>>>>> refs/remotes/mautic/staging
                 'path'       => '/email/{idHash}.gif',
                 'controller' => 'MauticEmailBundle:Public:trackingImage',
             ],

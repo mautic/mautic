@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class OutlookIntegration extends AbstractIntegration
@@ -40,8 +39,14 @@ class OutlookIntegration extends AbstractIntegration
      */
     public function getRequiredKeyFields()
     {
+<<<<<<< HEAD:plugins/MauticOutlookBundle/Integration/OutlookIntegration.php
+        return array(
+            'secret'     => 'mautic.integration.outlook.secret',
+        );
+=======
         return [
-            'secret' => 'mautic.integration.outlook.secret',
+            'secret' => 'mautic.integration.gmail.secret',
         ];
+>>>>>>> refs/remotes/mautic/staging:plugins/MauticGmailBundle/Integration/GmailIntegration.php
     }
 }

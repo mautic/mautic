@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 trait LeadDetailsTrait
 {
     /**
+     * Get a list of places for the lead based on IP location
      * @param array      $leads
      * @param array|null $filters
      * @param array|null $orderBy
@@ -116,6 +117,7 @@ trait LeadDetailsTrait
 
     /**
      * Get a list of places for the lead based on IP location.
+>>>>>>> refs/remotes/mautic/staging
      *
      * @param Lead $lead
      *
@@ -172,6 +174,7 @@ trait LeadDetailsTrait
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
+        /** @var array $engagements */
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
@@ -182,14 +185,14 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead       $lead
+     * @param Lead $lead
      * @param array|null $filters
      * @param array|null $orderBy
-     * @param int        $page
-     *
+     * @param int $page
+     * @param int $limit
      * @return array
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1)
+    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
         $session = $this->get('session');
 
@@ -218,7 +221,16 @@ trait LeadDetailsTrait
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        return $model->getEngagements($lead, $filters, $orderBy, $page);
+        $engagements = $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
+
+        // inject lead into events
+        foreach ($engagements['events'] as &$event) {
+            $event['leadId']    = $lead->getId();
+            $event['leadEmail'] = $lead->getEmail();
+            $event['leadName']  = $lead->getName() ? $lead->getName() : $lead->getEmail();
+        }
+
+        return $engagements;
     }
 
     /**
