@@ -60,39 +60,24 @@ class IdentifyCompanyHelper
                 'value'  => $companyName,
             ];
 
-            if (isset($parameters['city'])) {
-                $filter['force'][] = [
-                    'column' => 'companycity',
-                    'expr'   => 'eq',
-                    'value'  => $parameters['city'],
-                ];
-            }
-            if (isset($parameters['country'])) {
-                $filter['force'][] = [
-                    'column' => 'companycountry',
-                    'expr'   => 'eq',
-                    'value'  => $parameters['country'],
-                ];
-            }
-            if (isset($parameters['companystate'])) {
-                $filter['force'][] = [
-                    'column' => 'companystate',
-                    'expr'   => 'eq',
-                    'value'  => $parameters['state'],
-                ];
-            }
+            self::setCompanyFilter('city', $parameters, $filter);
+            self::setCompanyFilter('state', $parameters, $filter);
+            self::setCompanyFilter('country', $parameters, $filter);
 
-            $companyEntities = $companyModel->getEntities([
-                'limit'          => 1,
-                'filter'         => ['force' => [$filter['force']]],
-                'withTotalCount' => false,
-            ]);
+            $companyEntities = $companyModel->getEntities(
+                [
+                    'limit'          => 1,
+                    'filter'         => ['force' => [$filter['force']]],
+                    'withTotalCount' => false,
+                ]
+            );
+
             $company = [
                 'companyname'    => $companyName,
                 'companywebsite' => $companyDomain,
-                'companycity'    => isset($parameters['city']) ? $parameters['city'] : '',
-                'companystate'   => isset($parameters['state']) ? $parameters['state'] : '',
-                'companycountry' => isset($parameters['country']) ? $parameters['country'] : '',
+                'companycity'    => $parameters['companycity'],
+                'companystate'   => $parameters['companystate'],
+                'companycountry' => $parameters['companycountry'],
             ];
 
             if (!empty($companyEntities)) {
@@ -129,12 +114,34 @@ class IdentifyCompanyHelper
      *
      * @return mixed
      */
-    private function domainExists($email)
+    private static function domainExists($email)
     {
         list($user, $domain) = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
         if ($arr[0]['host'] == $domain && !empty($arr[0]['target'])) {
             return $arr[0]['target'];
+        }
+    }
+
+    /**
+     * @param $field
+     * @param $parameters
+     * @param $filter
+     */
+    private static function setCompanyFilter($field, &$parameters, &$filter)
+    {
+        if (isset($parameters[$field]) || isset($parameters['company'.$field])) {
+            if (!isset($parameters['company'.$field])) {
+                $parameters['company'.$field] = $parameters[$field];
+            }
+
+            $filter['force'][] = [
+                'column' => 'company'.$field,
+                'expr'   => 'eq',
+                'value'  => $parameters['company'.$field],
+            ];
+        } else {
+            $parameters['company'.$field] = '';
         }
     }
 }
