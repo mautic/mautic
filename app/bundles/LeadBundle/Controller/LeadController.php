@@ -1007,7 +1007,6 @@ class LeadController extends FormController
                     $viewParameters = [
                         'objectId'     => $lead->getId(),
                         'objectAction' => 'view',
-                        'lead'         => $lead,
                     ];
 
                     return $this->postActionRedirect(
