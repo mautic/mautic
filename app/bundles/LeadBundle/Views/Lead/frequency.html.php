@@ -21,7 +21,7 @@ $leadName = $lead->getPrimaryIdentifier();
 
 <div class="tab-content">
     <div id="channels" class="tab-pane fade in active">
-        <table class="table" width="100%" id="contact-timeline">
+        <table class="table" width="100%">
             <thead >
             <tr >
                 <th>
@@ -105,7 +105,7 @@ $leadName = $lead->getPrimaryIdentifier();
         unset($form['preferred_channel']);
         unset($form['doNotContactChannels']); ?>
 
-        <table class="table" width="100%" id="contact-timeline">
+        <table class="table" width="100%">
             <thead >
             <tr >
                 <th>
@@ -117,7 +117,7 @@ $leadName = $lead->getPrimaryIdentifier();
 
     </div>
     <div id="segments" class="tab-pane fade">
-        <table class="table" width="100%" id="contact-timeline">
+        <table class="table" width="100%">
             <thead >
             <tr >
                 <th>

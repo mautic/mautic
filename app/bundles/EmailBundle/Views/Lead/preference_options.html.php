@@ -15,7 +15,7 @@ $channelNumber = 0;
 <?php echo $view['form']->start($form); ?>
 <div class="row">
     <div class="col-md-6" >
-<table class="table-condensed"  id="contact-timeline" style="margin: 0 auto">
+<table class="table-condensed" style="margin: 0 auto">
     <thead>
     <tr>
         <th colspan="2">
