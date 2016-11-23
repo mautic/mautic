@@ -43,7 +43,7 @@ class LeadCategoryType extends AbstractType
 
                 $choices = [];
                 foreach ($categories as $cat) {
-                    $choices[$cat['id']] = $cat['alias'];
+                    $choices[$cat['id']] = $cat['title'];
                 }
 
                 return $choices;
