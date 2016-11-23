@@ -45,7 +45,8 @@ $channelNumber = 0;
     </tr><tr>
         <td class="col-md-11" colspan="2">
                 <div id="frequency_<?php echo $channel->value; ?>">
-                    <?php if ($showContactFrequency):?>
+                    <?php
+                    if ($showContactFrequency):?>
                     <div class="col-md-6">
                         <div class="pull-left">
                             <?php echo $view['form']->label($form['frequency_number_'.$channel->value]); ?>
@@ -139,7 +140,7 @@ else:
     unset($form['global_categories']);
 endif; ?>
     </tr>
-    <tr><td colspan="2"><?php echo $view['form']->row($form['buttons']); ?></td></tr>
+    <tr><td colspan="2"><?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']) ?></td></tr>
     </tbody>
 </table>
     </div>

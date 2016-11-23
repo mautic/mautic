@@ -1348,15 +1348,18 @@ class LeadModel extends FormModel
                 $frequencyRule->setChannel($ch);
                 $frequencyRule->setLead($lead);
                 $frequencyRule->setDateAdded(new \DateTime());
+
                 if (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) {
                     $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
                     $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+                } else {
+                    $frequencyRule->setFrequencyNumber(null);
+                    $frequencyRule->setFrequencyTime(null);
                 }
 
-                if (!empty($data['contact_pause_start_date_'.$ch]) and !empty($data['contact_pause_end_date_'.$ch])) {
-                    $frequencyRule->setPauseFromDate($data['contact_pause_start_date_'.$ch]);
-                    $frequencyRule->setPauseToDate($data['contact_pause_end_date_'.$ch]);
-                }
+                $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
+                $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+
                 $frequencyRule->setLead($lead);
                 if ($data['preferred_channel'] == $ch) {
                     $frequencyRule->setPreferredChannel(true);
@@ -1445,9 +1448,7 @@ class LeadModel extends FormModel
         } elseif ($categories instanceof Category) {
             $deleteCats[] = $categories;
         }
-        foreach ($deleteCats as $cats) {
-            $this->logger->error(print_r($cats->getId(), true));
-        }
+
         if (!empty($deleteCats)) {
             $this->getLeadCategoryRepository()->deleteEntities($deleteCats);
         }
