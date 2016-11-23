@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
@@ -13,13 +14,12 @@ namespace MauticPlugin\MauticFullContactBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\UserBundle\Entity\User;
 
 class PublicController extends FormController
 {
-
     /**
      * Write a notification.
      *
@@ -36,8 +36,8 @@ class PublicController extends FormController
     }
 
     /**
-     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function callbackAction()
@@ -46,20 +46,19 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $data = $this->request->request->get('result', [], true);
-        $oid = $this->request->request->get('webhookId', [], true);
+        $data               = $this->request->request->get('result', [], true);
+        $oid                = $this->request->request->get('webhookId', [], true);
         list($w, $id, $uid) = explode('#', $oid, 3);
 
         if (0 === strpos($w, 'fullcontactcomp')) {
             return $this->compcallbackAction();
         }
 
-        $notify = FALSE !== strpos($w, '_notify');
+        $notify = false !== strpos($w, '_notify');
         /** @var array $result */
         $result = json_decode($data, true);
 
         try {
-
             $org = null;
             if (array_key_exists('organizations', $result)) {
                 /** @var array $organizations */
@@ -125,9 +124,9 @@ class PublicController extends FormController
             $data = array_merge(
                 $data,
                 [
-                    'company' => (null !== $org) ? $org['name'] : '',
+                    'company'  => (null !== $org) ? $org['name'] : '',
                     'position' => (null !== $org) ? $org['title'] : '',
-                    'city' => (null !== $loc && array_key_exists('city', $loc) && array_key_exists(
+                    'city'     => (null !== $loc && array_key_exists('city', $loc) && array_key_exists(
                             'name',
                             $loc['city']
                         )) ? $loc['city']['name'] : '',
@@ -154,7 +153,7 @@ class PublicController extends FormController
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
-                $user = $userModel->getEntity($uid);
+                $user      = $userModel->getEntity($uid);
                 if ($user) {
                     $this->addNewNotification(
                         sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
@@ -164,13 +163,12 @@ class PublicController extends FormController
                     );
                 }
             }
-
         } catch (\Exception $ex) {
             try {
                 if ($notify && isset($lead, $uid) && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user = $userModel->getEntity($uid);
+                    $user      = $userModel->getEntity($uid);
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
@@ -184,19 +182,19 @@ class PublicController extends FormController
                         );
                     }
                 }
-            } catch(\Exception $ex2){
-                $this->get('monolog.mautic.logger')->log('error', 'FullContact: ' . $ex2->getMessage());
+            } catch (\Exception $ex2) {
+                $this->get('monolog.mautic.logger')->log('error', 'FullContact: '.$ex2->getMessage());
             }
-
         }
 
         return new Response('OK');
     }
 
     /**
-     * This is only called internally
+     * This is only called internally.
      *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     private function compcallbackAction()
@@ -205,16 +203,16 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $result = $this->request->request->get('result', [], true);
-        $oid = $this->request->request->get('webhookId', [], true);
+        $result             = $this->request->request->get('result', [], true);
+        $oid                = $this->request->request->get('webhookId', [], true);
         list($w, $id, $uid) = explode('#', $oid, 3);
-        $notify = FALSE !== strpos($w, '_notify');
+        $notify             = false !== strpos($w, '_notify');
 
         try {
-            $org = [];
-            $loc = [];
+            $org   = [];
+            $loc   = [];
             $phone = [];
-            $fax = [];
+            $fax   = [];
             $email = [];
             if (array_key_exists('organization', $result)) {
                 $org = $result['organization'];
@@ -250,15 +248,15 @@ class PublicController extends FormController
             }
 
             $data = [
-                'companyaddress1' => array_key_exists('addressLine1', $loc) ? $loc['addressLine1'] : '',
-                'companyaddress2' => array_key_exists('addressLine2', $loc) ? $loc['addressLine2'] : '',
-                'companyemail' => array_key_exists('value', $email) ? $email['value'] : '',
-                'companyphone' => array_key_exists('number', $phone) ? $phone['number'] : '',
-                'companycity' => array_key_exists('locality', $loc) ? $loc['locality'] : '',
-                'companyzipcode' => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
-                'companystate' => array_key_exists('region', $loc) ? $loc['region']['name'] : '',
-                'companycountry' => array_key_exists('country', $loc) ? $loc['country']['name'] : '',
-                'companydescription' => array_key_exists('name', $org) ? $org['name'] : '',
+                'companyaddress1'            => array_key_exists('addressLine1', $loc) ? $loc['addressLine1'] : '',
+                'companyaddress2'            => array_key_exists('addressLine2', $loc) ? $loc['addressLine2'] : '',
+                'companyemail'               => array_key_exists('value', $email) ? $email['value'] : '',
+                'companyphone'               => array_key_exists('number', $phone) ? $phone['number'] : '',
+                'companycity'                => array_key_exists('locality', $loc) ? $loc['locality'] : '',
+                'companyzipcode'             => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
+                'companystate'               => array_key_exists('region', $loc) ? $loc['region']['name'] : '',
+                'companycountry'             => array_key_exists('country', $loc) ? $loc['country']['name'] : '',
+                'companydescription'         => array_key_exists('name', $org) ? $org['name'] : '',
                 'companynumber_of_employees' => array_key_exists(
                     'approxEmployees',
                     $org
@@ -276,7 +274,7 @@ class PublicController extends FormController
             if ($notify) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
-                $user = $userModel->getEntity($uid);
+                $user      = $userModel->getEntity($uid);
                 if ($user) {
                     $this->addNewNotification(
                         sprintf('The company information for %s has been retrieved', $company->getName()),
@@ -291,7 +289,7 @@ class PublicController extends FormController
                 if ($notify && isset($uid, $company)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user = $userModel->getEntity($uid);
+                    $user      = $userModel->getEntity($uid);
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
@@ -305,8 +303,8 @@ class PublicController extends FormController
                         );
                     }
                 }
-            } catch(\Exception $ex2) {
-                $this->get('monolog.mautic.logger')->log('error', 'FullContact: ' . $ex2->getMessage());
+            } catch (\Exception $ex2) {
+                $this->get('monolog.mautic.logger')->log('error', 'FullContact: '.$ex2->getMessage());
             }
         }
 

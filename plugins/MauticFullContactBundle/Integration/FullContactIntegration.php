@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -16,7 +17,6 @@ use Symfony\Component\Form\FormBuilder;
 
 class FullContactIntegration extends AbstractIntegration
 {
-    
     public function getName()
     {
         return 'FullContact';
@@ -48,39 +48,38 @@ class FullContactIntegration extends AbstractIntegration
 
     /**
      * @param FormBuilder|Form $builder
-     * @param array $data
-     * @param string $formArea
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea === 'keys') {
-            
             $builder->add(
                 'test_api',
                 'button',
-                array(
+                [
                     'label' => 'mautic.plugin.fullcontact.test_api',
-                    'attr' => array(
-                        'class' => 'btn btn-primary',
-                        'style' => 'margin-bottom: 10px',
+                    'attr'  => [
+                        'class'   => 'btn btn-primary',
+                        'style'   => 'margin-bottom: 10px',
                         'onclick' => 'Mautic.testFullContactApi(this)',
-                    ),
-                )
+                    ],
+                ]
             );
 
             $builder->add(
                 'stats',
                 'textarea',
-                array(
-                    'label_attr' => array('class' => 'control-label'),
-                    'label' => 'mautic.plugin.fullcontact.stats',
-                    'required' => false,
-                    'attr' => array(
-                        'class' => 'form-control',
-                        'rows' => '6',
+                [
+                    'label_attr' => ['class' => 'control-label'],
+                    'label'      => 'mautic.plugin.fullcontact.stats',
+                    'required'   => false,
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'rows'     => '6',
                         'readonly' => 'readonly',
-                    ),
-                )
+                    ],
+                ]
             );
 
             $builder->add(
@@ -94,7 +93,6 @@ class FullContactIntegration extends AbstractIntegration
                     ],
                 ]
             );
-
         }
     }
 

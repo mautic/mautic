@@ -1,28 +1,29 @@
 <?php
-/**
+
+/*
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 return [
-    'name' => 'FullContact',
+    'name'        => 'FullContact',
     'description' => 'Enables integration with FullContact for contact and company lookup',
-    'version' => '1.0',
-    'author' => 'Werner Garcia',
+    'version'     => '1.0',
+    'author'      => 'Werner Garcia',
 
     'routes' => [
         'public' => [
-            'mautic_plugin_fullcontact_index'=>[
-                'path' => '/fullcontact/callback',
+            'mautic_plugin_fullcontact_index' => [
+                'path'       => '/fullcontact/callback',
                 'controller' => 'MauticFullContactBundle:Public:callback',
             ],
         ],
         'main' => [
             'mautic_plugin_fullcontact_action' => [
-                'path' => '/fullcontact/{objectAction}/{objectId}',
+                'path'       => '/fullcontact/{objectAction}/{objectId}',
                 'controller' => 'MauticFullContactBundle:FullContact:execute',
             ],
         ],
@@ -31,15 +32,18 @@ return [
     'services' => [
         'events' => [
             'mautic.plugin.fullcontact.button.subscriber' => [
-                'class' => 'MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber',
+                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber',
                 'arguments' => [
-                    'service_container'
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.plugin.fullcontact.lead.subscriber' => [
-                'class' => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',
+                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                  'service_container'
+                    'mautic.helper.integration',
+                    'mautic.helper.user',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
                 ],
             ],
         ],
