@@ -640,7 +640,7 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        if ('companies' !== $f->getName()) {
+                        if (('companies' !== $f->getName()) && ('company' !== $f->getName())) {
                             $data[$f->getName()] = $f->getData();
                         }
                     }
@@ -1344,10 +1344,10 @@ class LeadController extends FormController
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
         $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
-        $cacheDir  = $this->get('mautic.helper.paths')->getSystemPath('cache', true);
+        $tmpDir    = $this->get('mautic.helper.paths')->getSystemPath('tmp');
         $username  = $this->get('mautic.helper.user')->getUser()->getUsername();
         $fileName  = $username.'_leadimport.csv';
-        $fullPath  = $cacheDir.'/'.$fileName;
+        $fullPath  = $tmpDir.'/'.$fileName;
         $complete  = false;
         if (!file_exists($fullPath)) {
             // Force step one if the file doesn't exist
@@ -1532,7 +1532,7 @@ class LeadController extends FormController
                                 $errorMessage    = null;
                                 $errorParameters = [];
                                 try {
-                                    $fileData->move($cacheDir, $fileName);
+                                    $fileData->move($tmpDir, $fileName);
 
                                     $file = new \SplFileObject($fullPath);
 

@@ -430,6 +430,10 @@ return [
                 'arguments' => 'mautic.category.model.category',
                 'alias'     => 'leadcategory_choices',
             ],
+            'mautic.form.type.company_change_score' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                'alias' => 'scorecontactscompanies_action',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [

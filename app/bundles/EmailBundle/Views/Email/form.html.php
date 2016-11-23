@@ -146,7 +146,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                                 <div class="row">
                                 <?php
                                 $tabHtml = '<div class="col-xs-3 dynamicContentFilterContainer">';
-                                $tabHtml .= '<ul class="nav nav-tabs pr-md pl-md tabs-left" id="dynamicContentTabs">';
+                                $tabHtml .= '<ul class="nav nav-tabs tabs-left" id="dynamicContentTabs">';
                                 $tabHtml .= '<li><a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li>';
                                 $tabContentHtml = '<div class="tab-content pa-md col-xs-9" id="dynamicContentContainer">';
 
