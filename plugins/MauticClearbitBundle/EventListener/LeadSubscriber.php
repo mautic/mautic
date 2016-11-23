@@ -11,119 +11,134 @@
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LeadSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
 
     /**
-     * @var ContainerInterface
+     * @var UserHelper
      */
-    private $container;
+    protected $userHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
 
     /**
      * LeadSubscriber constructor.
-     * @param ContainerInterface $container
+     *
+     * @param IntegrationHelper $integrationHelper
+     * @param UserHelper        $userHelper
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(IntegrationHelper $integrationHelper, UserHelper $userHelper, LeadModel $leadModel, CompanyModel $companyModel)
+    {
         parent::__construct();
-        $this->container = $container;
+
+        $this->integrationHelper = $integrationHelper;
+        $this->userHelper        = $userHelper;
+        $this->leadModel         = $leadModel;
+        $this->companyModel      = $companyModel;
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::LEAD_POST_SAVE => ['leadPostSave', 0],
+            LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],
             LeadEvents::COMPANY_POST_SAVE => ['companyPostSave', 0],
         ];
     }
 
-    public function leadPostSave(LeadEvent $event) {
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+    public function leadPostSave(LeadEvent $event)
+    {
         /** @var ClearbitIntegration $myIntegration */
-        $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
+        $myIntegration = $this->integrationHelper->getIntegrationObject('Clearbit');
 
         if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
         $lead = $event->getLead();
-        $logger = $this->container->get('monolog.logger.mautic');
 
         // get api_key from plugin settings
         $keys = $myIntegration->getDecryptedApiKeys();
 
         if ($myIntegration->shouldAutoUpdate()) {
-
             $clearbit = new Clearbit_Person($keys['apikey']);
             try {
                 /** @var User $user */
-                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $user      = $this->userHelper->getUser();
                 $webhookId = 'clearbit_notify#'.$lead->getId().'#'.$user->getId();
-                $cache = $lead->getSocialCache();
-                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                $cache     = $lead->getSocialCache();
+                $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                 if (!array_key_exists($cacheId, $cache)) {
-                    /** @var Router $router */
+                    /* @var Router $router */
                     $clearbit->setWebhookId($webhookId);
-                    $res = $clearbit->lookupByEmail($lead->getEmail());
+                    $res             = $clearbit->lookupByEmail($lead->getEmail());
                     $cache[$cacheId] = serialize($res);
                     $lead->setSocialCache($cache);
-                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-                    $model =  $this->container->get('mautic.factory')->getModel('lead');
-                    $model->saveEntity($lead);
+                    $this->leadModel->saveEntity($lead);
                 }
             } catch (\Exception $ex) {
-                $logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
+                $this->logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
             }
         }
     }
 
-    public function companyPostSave(CompanyEvent $event) {
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+    public function companyPostSave(CompanyEvent $event)
+    {
         /** @var ClearbitIntegration $myIntegration */
-        $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
+        $myIntegration = $this->integrationHelper->getIntegrationObject('Clearbit');
 
         if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
         $company = $event->getCompany();
-        $logger = $this->container->get('monolog.logger.mautic');
 
         // get api_key from plugin settings
         $keys = $myIntegration->getDecryptedApiKeys();
 
         if ($myIntegration->shouldAutoUpdate()) {
-
             $clearbit = new Clearbit_Company($keys['apikey']);
             try {
                 /** @var User $user */
-                $user = $this->container->get('security.token_storage')->getToken()->getUser();
+                $user      = $this->userHelper->getUser();
                 $webhookId = 'clearbitcomp_notify#'.$company->getId().'#'.$user->getId();
-                $parse = parse_url($company->getFieldValue('companywebsite', 'core'));
+                $parse     = parse_url($company->getFieldValue('companywebsite', 'core'));
 
-                $cache = $company->getSocialCache();
+                $cache   = $company->getSocialCache();
                 $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
                 if (!array_key_exists($cacheId, $cache)) {
-                    /** @var Router $router */
+                    /* @var Router $router */
                     $clearbit->setWebhookId($webhookId);
-                    $res = $clearbit->lookupByDomain($parse['host']);
+                    $res             = $clearbit->lookupByDomain($parse['host']);
                     $cache[$cacheId] = serialize($res);
                     $company->setSocialCache($cache);
-                    /** @var CompanyModel $model */
-                    $model =  $this->container->get('mautic.factory')->getModel('lead.company');
-                    $model->saveEntity($company);
+                    $this->companyModel->saveEntity($company);
                 }
             } catch (\Exception $ex) {
-                $logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
+                $this->logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
             }
         }
     }

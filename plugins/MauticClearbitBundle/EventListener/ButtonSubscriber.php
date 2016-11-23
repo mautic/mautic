@@ -15,25 +15,26 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ButtonSubscriber extends CommonSubscriber
 {
     /**
-     * @var ContainerInterface
+     * @var IntegrationHelper
      */
-    private $container;
+    private $helper;
 
     /**
-     * LeadSubscriber constructor.
+     * ButtonSubscriber constructor.
      *
-     * @param ContainerInterface $container
+     * @param IntegrationHelper $helper
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(IntegrationHelper $helper)
     {
         parent::__construct();
-        $this->container = $container;
+
+        $this->helper = $helper;
     }
 
     public static function getSubscribedEvents()
@@ -48,9 +49,8 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        $integrationHelper = $this->container->get('mautic.helper.integration');
         /** @var ClearbitIntegration $myIntegration */
-        $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
+        $myIntegration = $this->helper->getIntegrationObject('Clearbit');
 
         if (false === $myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return;

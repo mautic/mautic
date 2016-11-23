@@ -41,10 +41,10 @@ class BatchLookupType extends AbstractType
             'notify',
             'yesno_button_group',
             [
-                'label'      => 'mautic.plugin.fullcontact.notify',
+                'label'      => 'mautic.plugin.clearbit.notify',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'data'     => true,
                 'required' => false,

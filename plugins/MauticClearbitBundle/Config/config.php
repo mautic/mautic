@@ -1,28 +1,29 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 return [
-    'name' => 'Clearbit',
+    'name'        => 'Clearbit',
     'description' => 'Enables integration with Clearbit for contact and company lookup',
-    'version' => '1.0',
-    'author' => 'Werner Garcia',
+    'version'     => '1.0',
+    'author'      => 'Werner Garcia',
 
     'routes' => [
         'public' => [
-            'mautic_plugin_clearbit_index'=>[
-                'path' => '/clearbit/callback',
+            'mautic_plugin_clearbit_index' => [
+                'path'       => '/clearbit/callback',
                 'controller' => 'MauticClearbitBundle:Public:callback',
             ],
         ],
         'main' => [
             'mautic_plugin_clearbit_action' => [
-                'path' => '/clearbit/{objectAction}/{objectId}',
+                'path'       => '/clearbit/{objectAction}/{objectId}',
                 'controller' => 'MauticClearbitBundle:Clearbit:execute',
             ],
         ],
@@ -31,15 +32,18 @@ return [
     'services' => [
         'events' => [
             'mautic.plugin.clearbit.button.subscriber' => [
-                'class' => 'MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber',
+                'class'     => 'MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber',
                 'arguments' => [
-                    'service_container'
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.plugin.clearbit.lead.subscriber' => [
-                'class' => 'MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber',
+                'class'     => 'MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                  'service_container'
+                    'mautic.helper.integration',
+                    'mautic.helper.user',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
                 ],
             ],
         ],
