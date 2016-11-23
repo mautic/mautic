@@ -41,7 +41,7 @@ $leadName = $lead->getPrimaryIdentifier();
             <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
                 <?php
                 $contactMe     = isset($leadChannels[$channel->value]);
-                $isContactable = $contactMe ? 'channel-enabled' : 'channel-disabled';
+                $isContactable = $contactMe ? '' : 'text-muted';
                 $hidden        = $contactMe ? '' : 'hide';
                 $checked       = $contactMe ? 'checked' : '';
                 $disabled      = isset($leadChannels[$channel->value]) ? '' : 'disabled';

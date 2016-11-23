@@ -209,31 +209,25 @@ ul.tag-cloud li {
 .contact{
     display: inline !important;
 }
-.channel-disabled{
-    color:lightgrey;
-}
-.channel-enabled{
-    color:#47535f;
-}
 .frequency-table, .frequency-table td{
     border-bottom: none!important;
     border-top: none!important;
 }
 
-.frequency-values{
+.frequency-values {
     padding-left: 10px;
     padding-top: 27px;
     padding-bottom: 15px;
 }
-.frequency-select{
+.frequency-select {
     width:120px!important;
     float: right;
     padding-right: 5px;
 }
-.frequency-label{
-     padding: 8px;
+.frequency-label {
+    padding: 8px;
  }
-.frequency-date{
+.frequency-date {
     width: 160px;
     float:left;
 }

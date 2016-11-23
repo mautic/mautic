@@ -274,27 +274,27 @@ return [
             ],
             'mautic.form.type.leadlist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadlist',
             ],
             'mautic.form.type.leadlist_choices' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadlist_choices',
             ],
             'mautic.form.type.leadlist_filter' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
                 'alias'     => 'leadlist_filter',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadfield',
             ],
             'mautic.form.type.lead.submitaction.pointschange' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_submitaction_pointschange',
             ],
             'mautic.form.type.lead.submitaction.addutmtags' => [
@@ -304,7 +304,7 @@ return [
             ],
             'mautic.form.type.lead.submitaction.changelist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadlist_action_type',
             ],
             'mautic.form.type.leadpoints_trigger' => [
@@ -325,12 +325,12 @@ return [
             ],
             'mautic.form.type.updatelead_action' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\UpdateLeadActionType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'updatelead_action',
             ],
             'mautic.form.type.leadnote' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\NoteType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadnote',
             ],
             'mautic.form.type.lead_import' => [
@@ -339,28 +339,28 @@ return [
             ],
             'mautic.form.type.lead_field_import' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_field_import',
             ],
             'mautic.form.type.lead_quickemail' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_quickemail',
             ],
             'mautic.form.type.lead_tags' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
                 'alias'     => 'lead_tags',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
             ],
             'mautic.form.type.lead_tag' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\TagType',
                 'alias'     => 'lead_tag',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
             ],
             'mautic.form.type.modify_lead_tags' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
             ],
             'mautic.form.type.lead_batch' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\BatchType',
@@ -380,19 +380,17 @@ return [
             ],
             'mautic.form.type.lead_contact_frequency_rules' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ContactFrequencyType',
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
-                'alias' => 'lead_contact_frequency_rules',
+                'arguments' => ['mautic.lead.model.lead'],
+                'alias'     => 'lead_contact_frequency_rules',
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'campaignevent_lead_field_value',
             ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'leadfields_choices',
             ],
             'mautic.form.type.lead_dashboard_leads_in_time_widget' => [
@@ -401,7 +399,7 @@ return [
             ],
             'mautic.form.type.lead_dashboard_leads_lifetime_widget' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_dashboard_leads_lifetime_widget',
             ],
             'mautic.company.type.form' => [
@@ -411,7 +409,7 @@ return [
             ],
             'mautic.company.campaign.action.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
-                'arguments' => 'router',
+                'arguments' => ['router'],
                 'alias'     => 'addtocompany_action',
             ],
             'mautic.company.list.type.form' => [
@@ -427,7 +425,7 @@ return [
             ],
             'mautic.form.type.lead_categories' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadCategoryType',
-                'arguments' => 'mautic.category.model.category',
+                'arguments' => ['mautic.category.model.category'],
                 'alias'     => 'leadcategory_choices',
             ],
             'mautic.form.type.company_change_score' => [
@@ -439,17 +437,17 @@ return [
             'mautic.lead.doctrine.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
                 'tag'       => 'doctrine.event_subscriber',
-                'arguments' => 'monolog.logger.mautic',
+                'arguments' => ['monolog.logger.mautic'],
             ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access',
             ],
             'mautic.lead.constraint.alias' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
@@ -457,7 +455,7 @@ return [
         'helpers' => [
             'mautic.helper.template.avatar' => [
                 'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_avatar',
             ],
         ],

@@ -686,12 +686,12 @@ Mautic.setPreferredChannel = function(leadId, channel) {
         dataType: "json",
         success: function (response) {
             if (mQuery('#' + channel)[0].checked) {
-                mQuery('#is-contactable-' + channel).removeClass('channel-disabled').addClass('channel-enabled');
+                mQuery('#is-contactable-' + channel).removeClass('text-muted');
                 mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
                 mQuery('#preferred_' + channel).prop("disabled" , false);
                 mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
             } else {
-                mQuery('#is-contactable-' + channel).removeClass('channel-enabled').addClass('channel-disabled');
+                mQuery('#is-contactable-' + channel).addClass('text-muted');
                 mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
                 mQuery('#preferred_' + channel).prop("disabled" , true);
                 mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
