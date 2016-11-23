@@ -60,35 +60,36 @@ class ListApiController extends CommonApiController
     public function addLeadAction($id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
 
-            // Does the lead exist and the user has permission to edit
-            if ($lead == null) {
-                return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                return $this->accessDenied();
-            }
-
-            // Does the user have access to the list
-            $lists = $this->model->getUserLists();
-            if (!isset($lists[$id])) {
-                return $this->accessDenied();
-            }
-
-            $leadModel->addToLists($leadId, $entity);
-
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
-
-            return $this->handleView($view);
+        if (null === $entity) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        $leadModel = $this->getModel('lead');
+        $contact   = $leadModel->getEntity($leadId);
+
+        // Does the contact exist and the user has permission to edit
+        if ($contact == null) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        // Does the user have access to the list
+        $lists = $this->model->getUserLists();
+        if (!isset($lists[$id])) {
+            return $this->accessDenied();
+        }
+
+        $leadModel->addToLists($leadId, $entity);
+
+        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     /**
-     * Removes given lead from a list.
+     * Removes given contact from a list.
      *
      * @param int $id     List ID
      * @param int $leadId Lead ID
@@ -100,31 +101,32 @@ class ListApiController extends CommonApiController
     public function removeLeadAction($id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
 
-            // Does the lead exist and the user has permission to edit
-            if ($lead == null) {
-                return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                return $this->accessDenied();
-            }
-
-            // Does the user have access to the list
-            $lists = $this->model->getUserLists();
-            if (!isset($lists[$id])) {
-                return $this->accessDenied();
-            }
-
-            $leadModel->removeFromLists($leadId, $entity);
-
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
-
-            return $this->handleView($view);
+        if (null === $entity) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        $leadModel = $this->getModel('lead');
+        $contact   = $leadModel->getEntity($leadId);
+
+        // Does the lead exist and the user has permission to edit
+        if ($contact == null) {
+            return $this->notFound();
+        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        // Does the user have access to the list
+        $lists = $this->model->getUserLists();
+        if (!isset($lists[$id])) {
+            return $this->accessDenied();
+        }
+
+        $leadModel->removeFromLists($leadId, $entity);
+
+        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     /**
