@@ -111,14 +111,13 @@ class ContactFrequencyType extends AbstractType
 
                     $form->add(
                             'contact_pause_start_date_'.$channel,
-                            'datetime',
+                            'date',
                             [
                                 'widget'     => 'single_text',
                                 'label'      => 'mautic.lead.frequency.contact.start.date',
                                 'label_attr' => ['class' => 'text-muted fw-n'],
                                 'attr'       => [
-                                    'data-toggle' => 'date',
-                                    'class'       => 'frequency-date form-control',
+                                    'class' => 'frequency-date form-control',
                                 ],
                                 'format'   => 'yyyy-MM-dd',
                                 'required' => false,
@@ -127,14 +126,13 @@ class ContactFrequencyType extends AbstractType
                     );
                     $form->add(
                         'contact_pause_end_date_'.$channel,
-                        'datetime',
+                        'date',
                         [
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
                             'label_attr' => ['class' => 'frequency-label text-muted fw-n'],
                             'attr'       => [
-                                'data-toggle' => 'date',
-                                'class'       => 'frequency-date form-control',
+                                'class' => 'frequency-date form-control',
                             ],
                             'format'   => 'yyyy-MM-dd',
                             'required' => false,
