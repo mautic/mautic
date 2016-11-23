@@ -200,6 +200,6 @@ class FileApiController extends CommonApiController
             .$this->request->getHttpHost()
             .':'.$this->request->getPort()
             .$this->request->getBasePath().'/'
-            .$this->factory->getParameter('image_path');
+            .$this->get('mautic.helper.core_parameters')->getParameter('image_path');
     }
 }
