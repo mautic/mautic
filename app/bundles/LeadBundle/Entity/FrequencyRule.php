@@ -97,10 +97,12 @@ class FrequencyRule
 
         $builder->createField('pauseFromDate', 'datetime')
             ->columnName('pause_from_date')
+            ->nullable()
             ->build();
 
         $builder->createField('pauseToDate', 'datetime')
             ->columnName('pause_to_date')
+            ->nullable()
             ->build();
     }
 

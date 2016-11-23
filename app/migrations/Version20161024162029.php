@@ -38,8 +38,8 @@ class Version20161024162029 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}lead_frequencyrules ADD preferred_channel TINYINT(1) NOT NULL DEFAULT 0;");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_frequencyrules ADD pause_from_date datetime DEFAULT NULL;");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_frequencyrules ADD pause_to_date datetime DEFAULT NULL;");
+        $this->addSql("ALTER TABLE {$this->prefix}lead_frequencyrules ADD pause_from_date datetime DEFAULT NULL COMMENT '(DC2Type:datetime)';");
+        $this->addSql("ALTER TABLE {$this->prefix}lead_frequencyrules ADD pause_to_date datetime DEFAULT NULL COMMENT '(DC2Type:datetime)';");
 
         $leadIdx     = $this->generatePropertyName('lead_categories', 'idx', ['lead_id']);
         $leadFk      = $this->generatePropertyName('lead_categories', 'fk', ['lead_id']);
