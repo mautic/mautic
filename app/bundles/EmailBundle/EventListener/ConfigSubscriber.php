@@ -48,6 +48,9 @@ class ConfigSubscriber extends CommonSubscriber
         ];
     }
 
+    /**
+     * @param ConfigBuilderEvent $event
+     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm([
@@ -58,6 +61,9 @@ class ConfigSubscriber extends CommonSubscriber
         ]);
     }
 
+    /**
+     * @param ConfigEvent $event
+     */
     public function onConfigBeforeSave(ConfigEvent $event)
     {
         $event->unsetIfEmpty(
@@ -97,19 +103,10 @@ class ConfigSubscriber extends CommonSubscriber
             'webview_text',
             'unsubscribe_message',
             'resubscribe_message',
+            'default_signature_text',
         ];
         foreach ($decode as $key) {
-            if (strpos($data[$key], '%') !== false) {
-                $data[$key] = urldecode($data[$key]);
-
-                if (preg_match_all('/([^%]|^)(%{1}[^%]\S+[^%]%{1})([^%]|$)/i', $data[$key], $matches)) {
-                    // Encode any left over to prevent Symfony from crashing
-                    foreach ($matches[0] as $matchKey => $match) {
-                        $replaceWith = $matches[1][$matchKey].'%'.$matches[2][$matchKey].'%'.$matches[3][$matchKey];
-                        $data[$key]  = str_replace($match, $replaceWith, $data[$key]);
-                    }
-                }
-            }
+            $data[$key] = $event->escapeString($data[$key]);
         }
 
         $event->setConfig($data, 'emailconfig');
