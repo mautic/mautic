@@ -62,6 +62,15 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'company',
+                        'text'       => 'mautic.company.score',
+                        'class'      => 'visible-md visible-lg col-company-score',
+                        'orderBy'    => 'comp.score',
+                    ]
+                );
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'company',
                         'text'       => 'mautic.lead.list.thead.leadcount',
                         'class'      => 'visible-md visible-lg col-leadlist-leadcount',
                     ]
@@ -120,9 +129,12 @@ if ($tmpl == 'index') {
                     </td>
 
                     <td class="visible-md visible-lg">
-                        <?php if (isset($fields['core']['companywebsite'])) : ?>
-                            <?php echo $fields['core']['companywebsite']['value']; ?>
+                        <?php if (isset($fields['core']['companywebsite'])) :?>
+                        <?php echo $fields['core']['companywebsite']['value']; ?>
                         <?php endif; ?>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        <?php echo $item->getScore(); ?>
                     </td>
                     <td class="visible-md visible-lg">
                         <a class="label label-primary" href="<?php echo $view['router']->path(
