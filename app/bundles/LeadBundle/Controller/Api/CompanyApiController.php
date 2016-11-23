@@ -152,13 +152,6 @@ class CompanyApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        // Does the user have access to the company
-        $comanies = $this->model->getUserCompanies();
-
-        if (!isset($comanies[$companyId])) {
-            return $this->accessDenied();
-        }
-
         $this->model->addLeadToCompany($company, $contact);
 
         return $this->handleView($view);
@@ -190,13 +183,6 @@ class CompanyApiController extends CommonApiController
         if ($contact === null) {
             return $this->notFound();
         } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-            return $this->accessDenied();
-        }
-
-        // Does the user have access to the company
-        $comanies = $this->model->getUserCompanies();
-
-        if (!isset($comanies[$companyId])) {
             return $this->accessDenied();
         }
 
