@@ -25,7 +25,6 @@ class ContactFrequencyType extends AbstractType
 {
     private $leadModel;
 
-    private $em;
     /**
      * @param LeadModel $leadModel
      */

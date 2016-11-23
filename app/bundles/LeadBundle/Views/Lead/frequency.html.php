@@ -29,7 +29,7 @@ $leadName = $lead->getPrimaryIdentifier();
                            onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,'all');" value="all">
                 </th>
                 <th>
-                    <?php echo $view['translator']->trans('mautic.lead.preference.channels'); ?>
+                    <?php echo $view['translator']->trans('mautic.lead.contact.channels'); ?>
                 </th>
                 <th><?php echo $view['translator']->trans('mautic.lead.preferred.frequency'); ?></th>
                 <th><?php echo $view['translator']->trans('mautic.lead.preferred.channels'); ?></th>
@@ -55,7 +55,9 @@ $leadName = $lead->getPrimaryIdentifier();
                     </th>
                     <td class="col-md-1" style="vertical-align: top">
                         <div id="is-contactable-<?php echo $channel->value ?>" class="<?php echo $isContactable; ?> fw-sb">
-                            <?php echo $channel->value; ?>
+                            <?php echo $view['translator']->hasId('mautic.channel.'.$channel->value) ? $view['translator']->trans(
+                            'mautic.channel.'.$channel->value
+                            ) : ucfirst($channel->value); ?>
                         </div>
                     </td>
                     <td class="col-md-9" style="vertical-align: top">
@@ -71,8 +73,8 @@ $leadName = $lead->getPrimaryIdentifier();
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[preferred_channel]" class="contact"
                                value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
-                    echo $checked;
-                } ?> <?php echo $disabled; ?>>
+                                echo $checked;
+                            } ?> <?php echo $disabled; ?>>
 
                 </td>
                 </tr>
