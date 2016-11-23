@@ -547,8 +547,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
-
+                $results = $this->em->getRepository('MauticLeadBundle:Company')->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
                 break;
         }
 
@@ -600,5 +599,63 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         } else {
             return null;
         }
+    }
+
+    /**
+     * Company Merge function, will merge $mainCompany with $secCompany -  empty records from main company will be
+     * filled with secondary then secondary will be deleted.
+     *
+     * @param $mainCompany
+     * @param $secCompany
+     *
+     * @return mixed
+     */
+    public function companyMerge($mainCompany, $secCompany)
+    {
+        $this->logger->debug('COMPANY: Merging companies');
+
+        $mainCompanyId = $mainCompany->getId();
+        $secCompanyId  = $secCompany->getId();
+
+        //if they are the same lead, then just return one
+        if ($mainCompanyId === $secCompanyId) {
+            return $mainCompany;
+        }
+        //merge fields
+        $mergeSecFields    = $secCompany->getFields();
+        $mainCompanyFields = $mainCompany->getFields();
+        foreach ($mergeSecFields as $group => $groupFields) {
+            foreach ($groupFields as $alias => $details) {
+                //fill in empty main company fields with secondary company fields
+                if (empty($mainCompanyFields[$group][$alias]['value']) && !empty($details['value'])) {
+                    $mainCompany->addUpdatedField($alias, $details['value']);
+                    $this->logger->debug('Company: Updated '.$alias.' = '.$details['value']);
+                }
+            }
+        }
+
+        //merge owner
+        $mainCompanyOwner = $mainCompany->getOwner();
+        $secCompanyOwner  = $secCompany->getOwner();
+
+        if ($mainCompanyOwner === null && $secCompanyOwner !== null) {
+            $mainCompany->setOwner($secCompanyOwner);
+        }
+
+        //move all leads from secondary company to main company
+        $companyLeadRepo = $this->getCompanyLeadRepository();
+        $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
+
+        foreach ($secCompanyLeads as $lead) {
+            $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);
+        }
+        //save the updated company
+        $this->saveEntity($mainCompany, false);
+
+        //delete the old company
+        $this->deleteEntity($secCompany);
+
+        //return the merged company
+        return $mainCompany;
     }
 }
