@@ -120,7 +120,6 @@ class PropertiesType extends AbstractType
             ]
         );
 
-
         $builder->add(
             'timeout',
             'text',
@@ -128,7 +127,7 @@ class PropertiesType extends AbstractType
                 'label'      => 'mautic.focus.form.timeout',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'          => 'form-control',
                     'postaddon_text' => 'sec',
                 ],
                 'required' => false,

@@ -9,9 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//Set vars commonly used
-if (!isset($buttonCount)) {
-    $buttonCount = 0;
+if (isset($customButtons)) {
+    $view['buttons']->addButtons($customButtons);
 }
 
 //Function used to get identifier string for entity
@@ -37,15 +36,7 @@ if (!isset($editMode)) {
 }
 
 if (!isset($editAttr)) {
-    $editAttr = '';
-} elseif (is_array($editAttr)) {
-    $string = '';
-    foreach ($editAttr as $attr => $val) {
-        $string .= " $attr=\"$val\"";
-    }
-    $editAttr = $string;
-} else {
-    $editAttr = " $editAttr";
+    $editAttr = [];
 }
 
 //Template/common buttons
@@ -68,12 +59,6 @@ if (!isset($indexRoute)) {
     $indexRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_index' : '';
 }
 
-//Set a default button type (group or dropdown)
-if (!isset($groupType)) {
-    $groupType = 'group';
-}
-$view['buttons']->setGroupType($groupType);
-
 //Extra HTML to be inserted after the buttons
 if (!isset($extraHtml)) {
     $extraHtml = '';
@@ -89,16 +74,19 @@ $view['buttons']->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
 $menuLink = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
 $view['buttons']->setMenuLink($menuLink);
 
+//Set a default button type (group or dropdown)
+if (isset($groupType)) {
+    $view['buttons']->setGroupType($groupType);
+}
+
+// @deprecated 2.3; to be removed in 3.0; use $view['button']->addButton/addButtons instead
 //Build pre template custom buttons
 if (!isset($preCustomButtons)) {
     $preCustomButtons = [];
 }
-
-//Build post template custom buttons
-if (isset($customButtons)) {
-    $postCustomButtons = $customButtons;
-} elseif (!isset($postCustomButtons)) {
+if (!isset($postCustomButtons)) {
     $postCustomButtons = [];
 }
 
 $view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
+$buttonCount = $view['buttons']->getButtonCount();

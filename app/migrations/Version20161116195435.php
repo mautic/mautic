@@ -1,17 +1,18 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -38,6 +39,5 @@ class Version20161116195435 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}companies ADD social_cache LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
-
     }
 }

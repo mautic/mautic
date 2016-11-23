@@ -304,8 +304,12 @@ return [
             ],
             'mautic.helper.template.button' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'buttons',
+                'arguments' => [
+                    'templating',
+                    'translator',
+                    'event_dispatcher',
+                ],
+                'alias' => 'buttons',
             ],
             'mautic.helper.template.formatter' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
