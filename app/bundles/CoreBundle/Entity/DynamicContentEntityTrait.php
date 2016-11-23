@@ -82,4 +82,12 @@ trait DynamicContentEntityTrait
 
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getDefaultDynamicContent()
+    {
+        return $this->defaultDynamicContent;
+    }
 }
