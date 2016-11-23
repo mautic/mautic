@@ -10,12 +10,10 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class ElasticEmailTransport.
@@ -47,7 +45,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
     /**
      * Handle bounces & complaints from ElasticEmail.
      *
-     * @param Request $request
+     * @param Request       $request
      * @param MauticFactory $factory
      *
      * @return mixed
@@ -55,23 +53,23 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
         $translator = $factory->getTranslator();
-        $logger = $factory->getLogger();
+        $logger     = $factory->getLogger();
         $logger->debug('Receiving webhook from ElasticEmail');
 
-
-        $rows = array();
-        $email = rawurldecode($request->get('to'));
-        $status = rawurldecode($request->get('status'));
+        $rows     = [];
+        $email    = rawurldecode($request->get('to'));
+        $status   = rawurldecode($request->get('status'));
         $category = rawurldecode($request->get('category'));
         // https://elasticemail.com/support/delivery/http-web-notification
-        if (in_array($status, array('AbuseReport', 'Unsubscribed' ))) {
+        if (in_array($status, ['AbuseReport', 'Unsubscribed'])) {
             $rows[DoNotContact::UNSUBSCRIBED]['emails'][$email] = $status;
-        } elseif (in_array($category, array('NotDelivered','NoMailbox', 'AccountProblem', 'DNSProblem', 'Unknown', 'Spam'))) {
+        } elseif (in_array($category, ['NotDelivered', 'NoMailbox', 'AccountProblem', 'DNSProblem', 'Unknown', 'Spam'])) {
             // just hard bounces https://elasticemail.com/support/user-interface/activity/bounced-category-filters
             $rows[DoNotContact::BOUNCED]['emails'][$email] = $category;
         } elseif ($status == 'Error') {
             $rows[DoNotContact::BOUNCED]['emails'][$email] = $translator->trans('mautic.email.complaint.reason.unkown');
         }
+
         return $rows;
     }
 }

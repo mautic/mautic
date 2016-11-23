@@ -95,17 +95,17 @@ class TokenSubscriber extends CommonSubscriber
             $emailSendEvent = new EmailSendEvent(
                 null,
                 [
-                    'content'      => $filterContent,
-                    'email'        => null,
-                    'idHash'       => null,
-                    'tokens'       => $tokens,
-                    'lead'         => $lead
+                    'content' => $filterContent,
+                    'email'   => null,
+                    'idHash'  => null,
+                    'tokens'  => $tokens,
+                    'lead'    => $lead,
                 ]
             );
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
             $untokenizedContent = $emailSendEvent->getContent(true);
 
-            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent );
+            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
     }
 
