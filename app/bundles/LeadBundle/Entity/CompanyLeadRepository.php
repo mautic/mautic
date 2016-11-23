@@ -84,4 +84,40 @@ class CompanyLeadRepository extends CommonRepository
 
         return !empty($result) ? $result[0] : [];
     }
+
+    /**
+     * @param $leadId
+     * @param $companyId
+     */
+    public function getCompanyLeadEntity($leadId, $companyId)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->where(
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.lead_id', ':leadId'),
+                    $qb->expr()->eq('cl.company_id', ':companyId')
+            )->setParameter('leadId', $leadId)
+            ->setParameter('companyId', $companyId);
+
+        $companies = $qb->execute()->fetchAll();
+
+        return $companies;
+    }
+
+    public function getEntitiesByLead(Lead $lead)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('cl')
+            ->from('MauticLeadBundle:CompanyLead', 'cl')
+            ->where(
+                $qb->expr()->eq('cl.manuallyRemoved', 0),
+                $qb->expr()->eq('cl.lead', ':lead')
+            )->setParameter('lead', $lead);
+
+        $companies = $qb->getQuery()->execute();
+
+        return $companies;
+    }
 }

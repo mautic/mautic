@@ -426,6 +426,10 @@ return [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyMergeType',
                 'alias' => 'company_merge',
             ],
+            'mautic.form.type.company_change_score' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                'alias' => 'scorecontactscompanies_action',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [

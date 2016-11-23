@@ -54,6 +54,10 @@ echo $view['form']->start($form);
                 </ul>
                 <hr/>
                 <div>
+                    <?php echo $view['form']->row($form['score']); ?>
+                </div>
+                <hr/>
+                <div>
                     <?php echo $view['form']->row($form['owner']); ?>
                 </div>
             </div>
