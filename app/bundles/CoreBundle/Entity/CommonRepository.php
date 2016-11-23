@@ -444,6 +444,7 @@ class CommonRepository extends EntityRepository
      */
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
+        $type         = 'and';
         $parseFilters = [];
         if (isset($filters->root)) {
             // Function is determined by the second clause type

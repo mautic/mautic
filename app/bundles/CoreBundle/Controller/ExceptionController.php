@@ -41,7 +41,12 @@ class ExceptionController extends CommonController
             }
 
             // Special handling for oauth and api urls
-            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) || strpos($request->getUri(), '/api') !== false) {
+            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false)
+                || strpos(
+                    $request->getUri(),
+                    '/api'
+                ) !== false
+            ) {
                 $dataArray = [
                     'error' => [
                         'message' => $exception->getMessage(),
@@ -99,6 +104,7 @@ class ExceptionController extends CommonController
                         ],
                         'route' => $urlParts['path'],
                     ],
+                    'responseCode' => $code,
                 ]
             );
         }

@@ -19,16 +19,25 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class SortableListTransformer implements DataTransformerInterface
 {
+    /**
+     * @var bool
+     */
     private $removeEmpty = true;
+
+    /**
+     * @var bool
+     */
+    private $withLabels = true;
 
     /**
      * SortableListTransformer constructor.
      *
      * @param bool $removeEmpty
      */
-    public function __construct($removeEmpty = true)
+    public function __construct($removeEmpty = true, $withLabels = true)
     {
         $this->removeEmpty = $removeEmpty;
+        $this->withLabels  = $withLabels;
     }
 
     /**
@@ -38,15 +47,7 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function transform($array)
     {
-        if ($array === null || !isset($array['list'])) {
-            return ['list' => []];
-        }
-
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list'], $this->removeEmpty);
-
-        $array['list'] = AbstractFormFieldHelper::formatList(AbstractFormFieldHelper::FORMAT_ARRAY, $array['list']);
-
-        return $array;
+        return $this->formatList($array);
     }
 
     /**
@@ -56,11 +57,28 @@ class SortableListTransformer implements DataTransformerInterface
      */
     public function reverseTransform($array)
     {
+        return $this->formatList($array);
+    }
+
+    /**
+     * @param $array
+     *
+     * @return mixed
+     */
+    private function formatList($array)
+    {
         if ($array === null || !isset($array['list'])) {
             return ['list' => []];
         }
 
         $array['list'] = AbstractFormFieldHelper::parseList($array['list'], $this->removeEmpty);
+
+        if (!$this->withLabels) {
+            $array['list'] = array_keys($array['list']);
+        }
+
+        $format        = ($this->withLabels) ? AbstractFormFieldHelper::FORMAT_ARRAY : AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY;
+        $array['list'] = AbstractFormFieldHelper::formatList($format, $array['list']);
 
         return $array;
     }
