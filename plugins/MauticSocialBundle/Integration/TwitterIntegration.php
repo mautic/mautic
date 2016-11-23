@@ -178,8 +178,13 @@ class TwitterIntegration extends SocialIntegration
             $image                = str_replace(['_normal', '_bigger', '_mini'], '', $image);
             $info['profileImage'] = $image;
 
-            $socialCache['profile'] = $info;
+            $socialCache['profile']     = $info;
+            $socialCache['lastRefresh'] = new \DateTime();
+
+            $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
         }
+
+        return $data;
     }
 
     /**
