@@ -58,6 +58,8 @@ class PublicController extends FormController
         /** @var array $result */
         $result = json_decode($data, true);
 
+        $logger = $this->get('monolog.logger.mautic');
+
         try {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
@@ -65,24 +67,24 @@ class PublicController extends FormController
             $lead = $model->getEntity($id);
             $currFields = $lead->getFields(true);
 
-            $org = null;
+            $org = [];
             if (array_key_exists('organizations', $result)) {
                 /** @var array $organizations */
                 $organizations = $result['organizations'];
                 foreach ($organizations as $organization) {
-                    if ($organization['isPrimary']) {
+                    if (array_key_exists('isPrimary', $organization) && !empty($organization['isPrimary'])) {
                         $org = $organization;
                         break;
                     }
                 }
 
-                if (null === $org && 0 !== count($result['organizations'])) {
+                if (0 === count($org) && 0 !== count($result['organizations'])) {
                     // primary not found, use the first one if exists
                     $org = $result['organizations'][0];
                 }
             }
 
-            $loc = null;
+            $loc = [];
             if (array_key_exists('demographics', $result) && array_key_exists(
                     'locationDeduced',
                     $result['demographics']
@@ -99,7 +101,7 @@ class PublicController extends FormController
             }
             foreach (['facebook', 'foursquare', 'googleplus', 'instagram', 'linkedin', 'twitter'] as $p) {
                 foreach ($socialProfiles as $socialProfile) {
-                    if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p && empty($currFields[$p])) {
+                    if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p && empty($currFields[$p]['value'])) {
                         $data[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';
                         break;
                     }
@@ -111,60 +113,62 @@ class PublicController extends FormController
                 if (array_key_exists(
                         'familyName',
                         $result['contactInfo']
-                    ) && empty($currFields['lastname'])) {
+                    ) && empty($currFields['lastname']['value'])) {
                     $data['lastname'] = $result['contactInfo']['familyName'];
                 }
 
                 if (array_key_exists(
                         'givenName',
                         $result['contactInfo']
-                    ) && empty($currFields['firstname'])) {
+                    ) && empty($currFields['firstname']['value'])) {
                     $data['firstname'] = $result['contactInfo']['givenName'];
                 }
 
                 if ((array_key_exists('websites', $result['contactInfo']) && count(
                             $result['contactInfo']['websites']
-                        )) && empty($currFields['website'])) {
+                        )) && empty($currFields['website']['value'])) {
                     $data['website'] = $result['contactInfo']['websites'][0]['url'];
                 }
 
                 if ((array_key_exists('chats', $result['contactInfo']) && array_key_exists(
                             'skype',
                             $result['contactInfo']['chats']
-                        )) && empty($currFields['skype'])) {
+                        )) && empty($currFields['skype']['value'])) {
                     $data['skype'] = $result['contactInfo']['chats']['skype']['handle'];
                 }
 
             }
 
-            if ((null !== $org && array_key_exists('name', $org)) && empty($currFields['company'])) {
+            if (array_key_exists('name', $org) && empty($currFields['company']['value'])) {
                 $data['company'] = $org['name'];
             }
 
-            if ((null !== $org && array_key_exists('title', $org)) && empty($currFields['position'])) {
+            if (array_key_exists('title', $org) && empty($currFields['position']['value'])) {
                 $data['position'] = $org['title'];
             }
 
-            if ((null !== $loc && array_key_exists('city', $loc) && array_key_exists(
+            if ((array_key_exists('city', $loc) && array_key_exists(
                         'name',
                         $loc['city']
-                    )) && empty($currFields['city'])) {
+                    )) && empty($currFields['city']['value'])) {
                 $data['city'] = $loc['city']['name'];
             }
 
-            if ((null !== $loc && array_key_exists('state', $loc) && array_key_exists(
+            if ((array_key_exists('state', $loc) && array_key_exists(
                         'name',
                         $loc['state']
-                    )) && empty($currFields['state'])) {
+                    )) && empty($currFields['state']['value'])) {
                 $data['state'] = $loc['state']['name'];
             }
 
-            if ((null !== $loc && array_key_exists('country', $loc) && array_key_exists(
+            if ((array_key_exists('country', $loc) && array_key_exists(
                         'name',
                         $loc['country']
-                    )) && empty($currFields['country'])) {
+                    )) && empty($currFields['country']['value'])) {
                 $data['country'] = $loc['country']['name'];
             }
+
+            $logger->log('debug', 'SET FIELDS: ' . print_r($data, true));
 
             $model->setFieldValues($lead, $data);
             $model->getRepository()->saveEntity($lead);
@@ -226,6 +230,7 @@ class PublicController extends FormController
         $oid                = $this->request->request->get('webhookId', [], true);
         list($w, $id, $uid) = explode('#', $oid, 3);
         $notify             = false !== strpos($w, '_notify');
+        $logger = $this->get('monolog.logger.mautic');
 
         try {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -233,7 +238,7 @@ class PublicController extends FormController
             /** @var Company $company */
             $company = $model->getEntity($id);
             $currFields = $company->getFields(true);
-            
+
             $org   = [];
             $loc   = [];
             $phone = [];
@@ -274,52 +279,54 @@ class PublicController extends FormController
 
             $data = [];
 
-            if (array_key_exists('addressLine1', $loc) && empty($currFields['companyaddress1'])) {
+            if (array_key_exists('addressLine1', $loc) && empty($currFields['companyaddress1']['value'])) {
                 $data['companyaddress1'] = $loc['addressLine1'];
             }
 
-            if (array_key_exists('addressLine2', $loc) && empty($currFields['companyaddress2'])) {
+            if (array_key_exists('addressLine2', $loc) && empty($currFields['companyaddress2']['value'])) {
                 $data['companyaddress2'] = $loc['addressLine2'];
             }
 
-            if (array_key_exists('value', $email) && empty($currFields['companyemail'])) {
+            if (array_key_exists('value', $email) && empty($currFields['companyemail']['value'])) {
                 $data['companyemail'] = $email['value'];
             }
 
-            if (array_key_exists('number', $phone) && empty($currFields['companyphone'])) {
+            if (array_key_exists('number', $phone) && empty($currFields['companyphone']['value'])) {
                 $data['companyphone'] = $phone['number'];
             }
 
-            if (array_key_exists('locality', $loc) && empty($currFields['companycity'])) {
+            if (array_key_exists('locality', $loc) && empty($currFields['companycity']['value'])) {
                 $data['companycity'] = $loc['locality'];
             }
 
-            if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode'])) {
+            if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode']['value'])) {
                 $data['companyzipcode'] = $loc['postalCode'];
             }
 
-            if (array_key_exists('region', $loc) && empty($currFields['companystate'])) {
+            if (array_key_exists('region', $loc) && empty($currFields['companystate']['value'])) {
                 $data['companystate'] = $loc['region']['name'];
             }
 
-            if (array_key_exists('country', $loc) && empty($currFields['companycountry'])) {
+            if (array_key_exists('country', $loc) && empty($currFields['companycountry']['value'])) {
                 $data['companycountry'] = $loc['country']['name'];
             }
 
-            if (array_key_exists('name', $org) && empty($currFields['companydescription'])) {
+            if (array_key_exists('name', $org) && empty($currFields['companydescription']['value'])) {
                 $data['companydescription'] = $org['name'];
             }
 
             if (array_key_exists(
                     'approxEmployees',
                     $org
-                ) && empty($currFields['companynumber_of_employees'])) {
+                ) && empty($currFields['companynumber_of_employees']['value'])) {
                 $data['companynumber_of_employees'] = $org['approxEmployees'];
             }
 
-            if (array_key_exists('number', $fax) && empty($currFields['companyfax'])) {
+            if (array_key_exists('number', $fax) && empty($currFields['companyfax']['value'])) {
                 $data['companyfax'] = $fax['number'];
             }
+
+            $logger->log('debug', 'SET FIELDS: ' . print_r($data, true));
 
             $model->setFieldValues($company, $data);
             $model->getRepository()->saveEntity($company);
