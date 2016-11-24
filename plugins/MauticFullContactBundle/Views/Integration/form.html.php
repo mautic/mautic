@@ -53,10 +53,9 @@ echo $view['assets']->includeScript('plugins/MauticFullContactBundle/Assets/js/f
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <div class="well well-sm" style="margin-bottom:0 !important;">
-            <p>
-                The plugin will use the following as the Webhook URL for FullContact:</p>
+            <p><?php echo $view['translator']->trans('mautic.plugin.fullcontact.webhook'); ?></p>
             <div class="alert alert-warning">
-                <strong>Warning!</strong> This must be a public accessible URL for the Webhook to work.
+                <?php echo $view['translator']->trans('mautic.plugin.fullcontact.public_info'); ?>
             </div>
             <input type="text" readonly="readonly" value="<?php echo $this->container->get('router')->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL)?>" class="form-control">
         </div>

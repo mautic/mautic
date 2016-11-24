@@ -107,7 +107,7 @@ class FullContactController extends FormController
                     );
 
                     $cache   = $lead->getSocialCache() ?: [];
-                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                     if (!array_key_exists($cacheId, $cache)) {
                         $fullcontact->setWebhookUrl(
                             $this->generateUrl(
@@ -284,7 +284,7 @@ class FullContactController extends FormController
                             $this->user->getId()
                         );
                         $cache   = $lead->getSocialCache() ?: [];
-                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                         if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
                                 $this->generateUrl(
@@ -414,7 +414,7 @@ class FullContactController extends FormController
                     $website = $company->getFieldValue('companywebsite');
                     $parse   = parse_url($website);
                     $cache   = $company->getSocialCache() ?: [];
-                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                     if (!array_key_exists($cacheId, $cache) && isset($parse['host'])) {
                         $webhookUrl = $this->generateUrl(
                             'mautic_plugin_fullcontact_index',
@@ -594,7 +594,7 @@ class FullContactController extends FormController
                             $this->user->getId()
                         );
                         $cache   = $company->getSocialCache() ?: [];
-                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                         if (!array_key_exists($cacheId, $cache)) {
                             $fullcontact->setWebhookUrl(
                                 $this->generateUrl(

@@ -59,6 +59,12 @@ class PublicController extends FormController
         $result = json_decode($data, true);
 
         try {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            /** @var Lead $lead */
+            $lead = $model->getEntity($id);
+            $currFields = $lead->getFields(true);
+
             $org = null;
             if (array_key_exists('organizations', $result)) {
                 /** @var array $organizations */
@@ -143,12 +149,8 @@ class PublicController extends FormController
 
             $data = array_merge($data, $social);
 
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
-            /** @var Lead $lead */
-            $lead = $model->getEntity($id);
             $model->setFieldValues($lead, $data);
-            $model->saveEntity($lead);
+            $model->getRepository()->saveEntity($lead);
 
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
@@ -156,7 +158,7 @@ class PublicController extends FormController
                 $user      = $userModel->getEntity($uid);
                 if ($user) {
                     $this->addNewNotification(
-                        sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
+                        sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $lead->getEmail()),
                         'FullContact Plugin',
                         'fa-search',
                         $user
@@ -172,7 +174,7 @@ class PublicController extends FormController
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
-                                'Unable to save the contact information for %s: %s',
+                                $this->translator->trans('mautic.plugin.fullcontact.unable'),
                                 $lead->getEmail(),
                                 $ex->getMessage()
                             ),
@@ -209,6 +211,12 @@ class PublicController extends FormController
         $notify             = false !== strpos($w, '_notify');
 
         try {
+            /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+            $model = $this->getModel('lead.company');
+            /** @var Company $company */
+            $company = $model->getEntity($id);
+            $currFields = $company->getFields(true);
+            
             $org   = [];
             $loc   = [];
             $phone = [];
@@ -264,12 +272,8 @@ class PublicController extends FormController
                 'companyfax' => array_key_exists('number', $fax) ? $fax['number'] : '',
             ];
 
-            /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-            $model = $this->getModel('lead.company');
-            /** @var Company $company */
-            $company = $model->getEntity($id);
             $model->setFieldValues($company, $data);
-            $model->saveEntity($company);
+            $model->getRepository()->saveEntity($company);
 
             if ($notify) {
                 /** @var UserModel $userModel */
@@ -277,7 +281,7 @@ class PublicController extends FormController
                 $user      = $userModel->getEntity($uid);
                 if ($user) {
                     $this->addNewNotification(
-                        sprintf('The company information for %s has been retrieved', $company->getName()),
+                        sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
                         'FullContact Plugin',
                         'fa-search',
                         $user
@@ -293,7 +297,7 @@ class PublicController extends FormController
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
-                                'Unable to save the company information for %s: %s',
+                                $this->translator->trans('mautic.plugin.fullcontact.unable'),
                                 $company->getName(),
                                 $ex->getMessage()
                             ),

@@ -94,7 +94,7 @@ class LeadSubscriber extends CommonSubscriber
                 $user      = $this->userHelper->getUser();
                 $webhookId = 'fullcontact_notify#'.$lead->getId().'#'.$user->getId();
                 $cache     = $lead->getSocialCache() ?: [];
-                $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                $cacheId   = sprintf('%s%s', $webhookId, date('YmdH'));
                 if (!array_key_exists($cacheId, $cache)) {
                     $fullcontact->setWebhookUrl(
                         $this->router->generate(
@@ -107,7 +107,7 @@ class LeadSubscriber extends CommonSubscriber
                     $res             = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
                     $cache[$cacheId] = serialize($res);
                     $lead->setSocialCache($cache);
-                    $this->leadModel->saveEntity($lead);
+                    $this->leadModel->getRepository()->saveEntity($lead);
                 }
             } catch (\Exception $ex) {
                 $this->logger->log('error', 'Error while using FullContact: '.$ex->getMessage());
@@ -137,7 +137,7 @@ class LeadSubscriber extends CommonSubscriber
                 $webhookId = 'fullcontactcomp_notify#'.$company->getId().'#'.$user->getId();
                 $parse     = parse_url($company->getFieldValue('companywebsite', 'core'));
                 $cache     = $company->getSocialCache() ?: [];
-                $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                $cacheId   = sprintf('%s%s', $webhookId, date('YmdH'));
                 if (!array_key_exists($cacheId, $cache)) {
                     $fullcontact->setWebhookUrl(
                         $this->router->generate(
@@ -150,7 +150,7 @@ class LeadSubscriber extends CommonSubscriber
                     $res             = $fullcontact->lookupByDomain($parse['host']);
                     $cache[$cacheId] = serialize($res);
                     $company->setSocialCache($cache);
-                    $this->companyModel->saveEntity($company);
+                    $this->companyModel->getRepository()->saveEntity($company);
                 }
             } catch (\Exception $ex) {
                 $this->logger->log('error', 'Error while using FullContact: '.$ex->getMessage());
