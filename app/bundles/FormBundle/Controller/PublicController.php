@@ -332,7 +332,7 @@ class PublicController extends CommonFormController
         $template          = null;
 
         if ($form === null || !$form->isPublished()) {
-            $this->notFound();
+            return $this->notFound();
         } else {
             $html = $model->getContent($form);
 

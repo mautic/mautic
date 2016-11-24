@@ -123,6 +123,10 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
+
+    if (mQuery(container + ' .panel-companies').length) {
+        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+    }
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -515,7 +519,7 @@ Mautic.leadfieldOnLoad = function (container) {
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     var defaultValueField = mQuery('input#leadfield_defaultValue');
 
-    if (selectedVal == 'lookup' || selectedVal == 'multiselect') {
+    if (selectedVal == 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
@@ -1113,3 +1117,17 @@ Mautic.updateFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+Mautic.setAsPrimaryCompany = function (companyId,leadId){
+    Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
+        if (response.success) {
+            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+            } else {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+                mQuery('#company-' + response.newPrimary).addClass('primary');
+            }
+
+        }
+    });
+}

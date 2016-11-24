@@ -12,10 +12,14 @@ $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
 $useUnloadEvent = ($props['when'] == 'leave');
-$useTimeout     = (!$useUnloadEvent && !$useScrollEvent && $props['when'] != 'immediately');
-
+$useTimeout     = (int) $props['timeout'];
+if ($props['when'] == '5seconds') {
+    $useTimeout = 5;
+} elseif ($props['when'] == 'minute') {
+    $useTimeout = 60;
+}
 if ($useTimeout) {
-    $timeout = ($props['when'] == '5seconds') ? 5000 : 60000;
+    $timeout = $useTimeout * 1000;
 }
 
 $debug          = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
@@ -197,21 +201,37 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('scroll event registered');
 
-                window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                    <?php if ($useTimeout): ?>
+                    if (Focus.debug)
+                        console.log('timeout event registered');
 
-                <?php elseif ($useTimeout): ?>
-                if (Focus.debug)
-                    console.log('timeout event registered');
+                    setTimeout(function () {
+                        window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                    }, <?php echo $timeout; ?>);
 
-                setTimeout(function () {
-                    Focus.engageVisitor();
-                }, <?php echo $timeout; ?>);
+                    <?php else: ?>
+
+                     window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+
+                   <?php endif; ?>
+
                 <?php elseif ($useUnloadEvent): ?>
                 if (Focus.debug)
                     console.log('show when visitor leaves');
 
-                // Use mouseleave event on <html> or else the div will not show
-                document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                    <?php if ($useTimeout): ?>
+                    if (Focus.debug)
+                        console.log('timeout event registered');
+
+                    setTimeout(function () {
+                        document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                    }, <?php echo $timeout; ?>);
+
+                    <?php else: ?>
+
+                    document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+
+                    <?php endif; ?>
 
                 // Add a listener to every link
                 <?php if ($linkActivation): ?>
@@ -236,8 +256,22 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('show immediately');
 
-                // Give a slight delay to allow browser to process style injection into header
-                Focus.engageVisitor();
+                    <?php if ($useTimeout): ?>
+                    if (Focus.debug)
+                        console.log('timeout event registered');
+
+                    setTimeout(function () {
+                        // Give a slight delay to allow browser to process style injection into header
+                        Focus.engageVisitor();
+                    }, <?php echo $timeout; ?>);
+
+                    <?php else: ?>
+
+                    // Give a slight delay to allow browser to process style injection into header
+                    Focus.engageVisitor();
+
+                    <?php endif; ?>
+
                 <?php endif; ?>
             },
 
