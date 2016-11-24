@@ -168,7 +168,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 return false;
             }
         } elseif ($this->lockExpiration) {
-            // Attemp to update the modified time just in case there is no lock but the file still exists
+            // Attempt to update the modified time just in case there is no lock but the file still exists
             @touch($this->lockFile);
         }
 
