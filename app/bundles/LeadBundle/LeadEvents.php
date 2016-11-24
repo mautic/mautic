@@ -352,5 +352,5 @@ final class LeadEvents
      *
      * @var string
      */
-    const REMOVE_DO_NO_CONTACT = 'mautic.remove_do_no_contact';
+    const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
 }
