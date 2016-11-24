@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -10,7 +10,7 @@
  */
 ?>
 
-<div class="row" id="leadFieldsContainer">
+<div class="row" id="companyFieldsContainer">
     <?php if (!empty($specialInstructions)): ?>
         <div class="alert alert-<?php echo $alertType; ?>">
             <?php echo $view['translator']->trans($specialInstructions); ?>
@@ -20,20 +20,16 @@
         <?php echo $view['form']->errors($form); ?>
         <?php $rowCount = 1; ?>
         <?php foreach ($form->children as $child): ?>
-        <?php if ($rowCount++ % 2 == 1): ?>
-        <div class="row">
-        <?php endif; ?>
+            <?php if ($rowCount++ % 2 == 1): ?>
+                <div class="row">
+            <?php endif; ?>
             <div class="col-sm-6">
                 <?php echo $view['form']->row($child); ?>
             </div>
-        <?php if ($rowCount++ % 2 == 1): ?>
-        </div>
-        <?php endif; ?>
-        <?php ++$rowCount; ?>
+            <?php if ($rowCount++ % 2 == 1): ?>
+                </div>
+            <?php endif; ?>
+            <?php ++$rowCount; ?>
         <?php endforeach; ?>
-        <?php
-        if ($rowCount % 2 == 0):?>
-    </div>
-        <?php endif; ?>
     </div>
 </div>

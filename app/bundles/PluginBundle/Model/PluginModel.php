@@ -59,4 +59,12 @@ class PluginModel extends FormModel
     {
         return $this->leadFieldModel->getFieldList();
     }
+
+    /**
+     * Get Company fields.
+     */
+    public function getCompanyFields()
+    {
+        return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+    }
 }
