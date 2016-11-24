@@ -176,7 +176,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     }
 
                     $list    = $options['fields'][$fieldObject][$fieldName]['properties']['list'];
-                    $choices = FormFieldHelper::parseListStringIntoArray($list);
+                    $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys
