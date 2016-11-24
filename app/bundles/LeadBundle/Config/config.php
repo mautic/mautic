@@ -237,6 +237,7 @@ return [
                     'mautic.stage.model.stage',
                     'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [
@@ -410,7 +411,7 @@ return [
             ],
             'mautic.company.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security'],
+                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security', 'router', 'translator'],
                 'alias'     => 'company',
             ],
             'mautic.company.campaign.action.type.form' => [
@@ -428,6 +429,14 @@ return [
                     'database_connection',
                 ],
                 'alias' => 'company_list',
+            ],
+            'mautic.company.merge.type.form' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyMergeType',
+                'alias' => 'company_merge',
+            ],
+            'mautic.form.type.company_change_score' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                'alias' => 'scorecontactscompanies_action',
             ],
         ],
         'other' => [

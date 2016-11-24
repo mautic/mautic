@@ -187,7 +187,6 @@ class LeadController extends FormController
                     'noContactList'    => $emailRepo->getDoNotEmailList(),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
-                    'showCheckbox'     => true,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [
@@ -640,7 +639,7 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        if ('companies' !== $f->getName()) {
+                        if (('companies' !== $f->getName()) && ('company' !== $f->getName())) {
                             $data[$f->getName()] = $f->getData();
                         }
                     }
@@ -1316,10 +1315,10 @@ class LeadController extends FormController
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
         $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
-        $cacheDir  = $this->get('mautic.helper.paths')->getSystemPath('cache', true);
+        $tmpDir    = $this->get('mautic.helper.paths')->getSystemPath('tmp');
         $username  = $this->get('mautic.helper.user')->getUser()->getUsername();
         $fileName  = $username.'_leadimport.csv';
-        $fullPath  = $cacheDir.'/'.$fileName;
+        $fullPath  = $tmpDir.'/'.$fileName;
         $complete  = false;
         if (!file_exists($fullPath)) {
             // Force step one if the file doesn't exist
@@ -1504,7 +1503,7 @@ class LeadController extends FormController
                                 $errorMessage    = null;
                                 $errorParameters = [];
                                 try {
-                                    $fileData->move($cacheDir, $fileName);
+                                    $fileData->move($tmpDir, $fileName);
 
                                     $file = new \SplFileObject($fullPath);
 
@@ -2264,106 +2263,6 @@ class LeadController extends FormController
                     'viewParameters' => [
                         'form' => $this->createForm(
                             'lead_batch_stage',
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
-        }
-    }
-
-    /**
-     * Bulk edit lead's companies.
-     *
-     * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function batchCompaniesAction($objectId = 0)
-    {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel = $this->getModel('lead.company');
-        if ($this->request->getMethod() == 'POST') {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model    = $this->getModel('lead');
-            $data     = $this->request->request->get('lead_batch', [], true);
-            $ids      = json_decode($data['ids'], true);
-            $entities = [];
-            if (is_array($ids)) {
-                $entities = $model->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
-                                ],
-                            ],
-                        ],
-                        'ignore_paginator' => true,
-                    ]
-                );
-            }
-
-            $count = 0;
-            foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
-                    ++$count;
-                    if (!empty($data['add'])) {
-                        $companyModel->addLeadToCompany($data['add'], $lead);
-                    }
-                    if (!empty($data['remove'])) {
-                        $companyModel->removeLeadFromCompany($data['remove'], $lead);
-                    }
-                }
-            }
-            // Save entities
-            $model->saveEntities($entities);
-            $this->addFlash(
-                'mautic.lead.batch_leads_affected',
-                [
-                    'pluralCount' => $count,
-                    '%count%'     => $count,
-                ]
-            );
-
-            return new JsonResponse(
-                [
-                    'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
-                ]
-            );
-        } else {
-            // Get a list of lists
-            $companies = $companyModel->getUserCompanies();
-            $items     = [];
-            foreach ($companies as $company) {
-                $items[$company['id']] = $company['companyname'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchCompanies',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            'lead_batch',
                             [],
                             [
                                 'items'  => $items,

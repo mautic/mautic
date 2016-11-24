@@ -229,19 +229,27 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (is_callable([$mailer, 'setApiKey'])) {
-                    if (empty($settings['api_key'])) {
-                        $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                try {
+                    if (is_callable([$mailer, 'setApiKey'])) {
+                        if (empty($settings['api_key'])) {
+                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                        }
+                        $mailer->setApiKey($settings['api_key']);
                     }
-                    $mailer->setApiKey($settings['api_key']);
+                } catch (\Exception $exception) {
+                    // Transport had magic method defined and threw an exception
                 }
 
-                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
-                    if (empty($settings['password'])) {
-                        $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
+                try {
+                    if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
+                        if (empty($settings['password'])) {
+                            $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
+                        }
+                        $mailer->setUsername($settings['user']);
+                        $mailer->setPassword($settings['password']);
                     }
-                    $mailer->setUsername($settings['user']);
-                    $mailer->setPassword($settings['password']);
+                } catch (\Exception $exception) {
+                    // Transport had magic method defined and threw an exception
                 }
 
                 $logger = new \Swift_Plugins_Loggers_ArrayLogger();

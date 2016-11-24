@@ -22,8 +22,12 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall' => 'true',
-                        'target'   => '#stageTable',
+                        'checkall'        => 'true',
+                        'target'          => '#stageTable',
+                        'routeBase'       => 'stage',
+                        'templateButtons' => [
+                            'delete' => $permissions['stage:stages:delete'],
+                        ],
                     ]
                 );
 

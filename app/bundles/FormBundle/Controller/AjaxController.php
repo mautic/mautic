@@ -26,7 +26,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderFieldsAction(Request $request, $name = 'fields')
+    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));

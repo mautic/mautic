@@ -61,7 +61,7 @@ echo $view['form']->start($form);
             <div class="website-preview">
                 <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
                     <div class="row">
-                        <div class="col-xs-3 text-center">
+                        <div class="mautibot-image col-xs-3 text-center">
                             <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="<?php echo $view['mautibot']->getImage(
                                 'wave'
                             ); ?>"/>
@@ -176,6 +176,7 @@ echo $view['form']->start($form);
                     <div class="hide" id="focusTypeProperties">
                         <?php echo $view['form']->row($form['properties']['animate']); ?>
                         <?php echo $view['form']->row($form['properties']['when']); ?>
+                        <?php echo $view['form']->row($form['properties']['timeout']); ?>
                         <?php echo $view['form']->row($form['properties']['link_activation']); ?>
                         <?php echo $view['form']->row($form['properties']['frequency']); ?>
                         <div class="hidden-focus-type-notice">
