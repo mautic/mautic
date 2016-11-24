@@ -588,6 +588,11 @@ class LeadListRepository extends CommonRepository
                 $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
             }
 
+            if (!$column) {
+                // Column no longer exists so continue
+                continue;
+            }
+
             //DBAL does not have a not() function so we have to use the opposite
             $func = (!$not)
                 ? $options[$details['operator']]['expr']
@@ -599,32 +604,30 @@ class LeadListRepository extends CommonRepository
                 $field = "comp.{$details['field']}";
             }
             // Format the field based on platform specific functions that DBAL doesn't support natively
-            if ($column) {
-                $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
-                $columnType = $column->getType();
+            $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
+            $columnType = $column->getType();
 
-                switch ($details['type']) {
-                    case 'datetime':
-                        if (!$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toDateTime($field);
-                        }
-                        break;
-                    case 'date':
-                        if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toDate($field);
-                        }
-                        break;
-                    case 'time':
-                        if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toTime($field);
-                        }
-                        break;
-                    case 'number':
-                        if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
-                            $field = $formatter->toNumeric($field);
-                        }
-                        break;
-                }
+            switch ($details['type']) {
+                case 'datetime':
+                    if (!$columnType instanceof UTCDateTimeType) {
+                        $field = $formatter->toDateTime($field);
+                    }
+                    break;
+                case 'date':
+                    if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
+                        $field = $formatter->toDate($field);
+                    }
+                    break;
+                case 'time':
+                    if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
+                        $field = $formatter->toTime($field);
+                    }
+                    break;
+                case 'number':
+                    if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
+                        $field = $formatter->toNumeric($field);
+                    }
+                    break;
             }
 
             //the next one will determine the group
