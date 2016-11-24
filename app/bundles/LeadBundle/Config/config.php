@@ -216,6 +216,9 @@ return [
             ],
             'mautic.lead.formbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\FormSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
@@ -301,6 +304,11 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_action_addutmtags',
+            ],
+            'mautic.form.type.lead.submitaction.removedonotcontact' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_removedonotcontact',
             ],
             'mautic.form.type.lead.submitaction.changelist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
