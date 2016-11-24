@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
+use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait CitrixStartTrait
