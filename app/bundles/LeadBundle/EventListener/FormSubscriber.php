@@ -32,11 +32,11 @@ class FormSubscriber extends CommonSubscriber
     /**
      * FormSubscriber constructor.
      *
-     * @param EmailModel        $emailModel
+     * @param EmailModel $emailModel
      */
     public function __construct(EmailModel $emailModel)
     {
-        $this->emailModel         = $emailModel;
+        $this->emailModel = $emailModel;
     }
 
     /**
@@ -100,6 +100,7 @@ class FormSubscriber extends CommonSubscriber
         ];
         $event->addSubmitAction('lead.addutmtags', $action);
 
+
         // add Do Not Contact
         $action = [
             'group' => 'mautic.lead.lead.submitaction',
@@ -111,8 +112,17 @@ class FormSubscriber extends CommonSubscriber
             'allowCampaignForm' => true,
         ];
         $event->addSubmitAction('lead.removeronotcontact', $action);
-    }
 
+        // score contact's companies
+        $action = [
+            'group' => 'mautic.lead.lead.submitaction',
+            'label' => 'mautic.lead.lead.events.changecompanyscore',
+            'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
+            'formType' => 'scorecontactscompanies_action',
+            'callback' => '\Mautic\LeadBundle\Helper\FormEventHelper::scoreContactsCompanies',
+        ];
+        $event->addSubmitAction('lead.scorecontactscompanies', $action);
+    }
 
     /**
      * Trigger event for when a form is submitted.
@@ -122,7 +132,7 @@ class FormSubscriber extends CommonSubscriber
     public function removeFromDoNotContact(SubmissionEvent $event)
     {
         $form = $event->getResults();
-        if(isset($form['email']) && !empty($form['email'])){
+        if (isset($form['email']) && !empty($form['email'])) {
             $this->emailModel->removeDoNotContact($form['email']);
         }
     }
