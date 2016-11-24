@@ -158,6 +158,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             // Check timestamp if $force is not requested
             if ($this->lockExpiration) {
                 $fileAge = time() - filemtime($this->lockFile);
+
                 if ($fileAge <= $this->lockExpiration) {
                     $this->output->writeln('<info>Lock expires in '.($this->lockExpiration - $fileAge).' seconds.</info>');
 
@@ -167,7 +168,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 // Lock is still in effect
                 return false;
             }
-        } elseif ($this->lockExpiration) {
+        }
+
+        if ($this->lockExpiration) {
             // Attempt to update the modified time just in case there is no lock but the file still exists
             @touch($this->lockFile);
         }
