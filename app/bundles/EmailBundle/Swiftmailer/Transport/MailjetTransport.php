@@ -62,8 +62,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
         $postData = json_decode($request->getContent(), true);
-        $this->factory->getLogger()->debug('error', serialize($postData)); //used to debug mailjet webhook
-        $rows = [
+        $rows     = [
             DoNotContact::BOUNCED => [
                 'hashIds' => [],
                 'emails'  => [],
