@@ -90,7 +90,7 @@ class LeadSubscriber extends CommonSubscriber
                 $user      = $this->userHelper->getUser();
                 $webhookId = 'clearbit_notify#'.$lead->getId().'#'.$user->getId();
                 $cache     = $lead->getSocialCache();
-                $cacheId   = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                $cacheId   = sprintf('%s%s', $webhookId, date('YmdH'));
                 if (!array_key_exists($cacheId, $cache)) {
                     /* @var Router $router */
                     $clearbit->setWebhookId($webhookId);
@@ -128,7 +128,7 @@ class LeadSubscriber extends CommonSubscriber
                 $parse     = parse_url($company->getFieldValue('companywebsite', 'core'));
 
                 $cache   = $company->getSocialCache();
-                $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                 if (!array_key_exists($cacheId, $cache)) {
                     /* @var Router $router */
                     $clearbit->setWebhookId($webhookId);

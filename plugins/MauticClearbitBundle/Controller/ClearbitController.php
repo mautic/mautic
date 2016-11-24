@@ -105,7 +105,7 @@ class ClearbitController extends FormController
                     );
 
                     $cache   = $lead->getSocialCache();
-                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                     if (!array_key_exists($cacheId, $cache)) {
                         $clearbit->setWebhookId($webhookId);
                         $res             = $clearbit->lookupByEmail($lead->getEmail());
@@ -274,7 +274,7 @@ class ClearbitController extends FormController
                             $this->user->getId()
                         );
                         $cache   = $lead->getSocialCache();
-                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                         if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
                             $res             = $clearbit->lookupByEmail($lookupEmail);
@@ -397,7 +397,7 @@ class ClearbitController extends FormController
                     $website = $company->getFieldValue('companywebsite');
                     $parse   = parse_url($website);
                     $cache   = $company->getSocialCache();
-                    $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                     if (!array_key_exists($cacheId, $cache) && isset($parse['host'])) {
                         $clearbit->setWebhookId($webhookId);
                         $res             = $clearbit->lookupByDomain($parse['host']);
@@ -565,7 +565,7 @@ class ClearbitController extends FormController
                             $this->user->getId()
                         );
                         $cache   = $company->getSocialCache();
-                        $cacheId = sprintf('%s%s', $webhookId, date(DATE_ATOM));
+                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
                         if (!array_key_exists($cacheId, $cache)) {
                             $clearbit->setWebhookId($webhookId);
                             $res             = $clearbit->lookupByDomain($lookupWebsite);
