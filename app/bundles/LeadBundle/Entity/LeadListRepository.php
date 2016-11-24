@@ -588,11 +588,6 @@ class LeadListRepository extends CommonRepository
                 $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
             }
 
-            if (!$column) {
-                // Column no longer exists so continue
-                continue;
-            }
-
             //DBAL does not have a not() function so we have to use the opposite
             $func = (!$not)
                 ? $options[$details['operator']]['expr']
@@ -607,27 +602,29 @@ class LeadListRepository extends CommonRepository
             $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
             $columnType = $column->getType();
 
-            switch ($details['type']) {
-                case 'datetime':
-                    if (!$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toDateTime($field);
-                    }
-                    break;
-                case 'date':
-                    if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toDate($field);
-                    }
-                    break;
-                case 'time':
-                    if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
-                        $field = $formatter->toTime($field);
-                    }
-                    break;
-                case 'number':
-                    if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
-                        $field = $formatter->toNumeric($field);
-                    }
-                    break;
+            if ($column) {
+                switch ($details['type']) {
+                    case 'datetime':
+                        if (!$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toDateTime($field);
+                        }
+                        break;
+                    case 'date':
+                        if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toDate($field);
+                        }
+                        break;
+                    case 'time':
+                        if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
+                            $field = $formatter->toTime($field);
+                        }
+                        break;
+                    case 'number':
+                        if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
+                            $field = $formatter->toNumeric($field);
+                        }
+                        break;
+                }
             }
 
             //the next one will determine the group
@@ -1002,6 +999,11 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 default:
+                    if (!$column) {
+                        // Column no longer exists so continue
+                        continue;
+                    }
+
                     if ($isCompany) {
                         // Must tell getLeadsByList how to best handle the relationship with the companies table
                         if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
