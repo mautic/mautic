@@ -67,8 +67,7 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'comp.score',
                     ]
                 );
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'company',
                         'text'       => 'mautic.lead.list.thead.leadcount',
