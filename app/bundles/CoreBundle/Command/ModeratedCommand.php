@@ -154,24 +154,21 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         // Accessing PID commands is not available so use a simple lock file mechanism
         $lockHandler = $this->lockHandler = new LockHandler($this->moderationKey, $this->runDirectory);
 
-        if (!$lockHandler->lock()) {
+        if (!$force && !$lockHandler->lock()) {
             // Check timestamp if $force is not requested
-            if (!$force) {
-                if ($this->lockExpiration) {
-                    $fileAge = time() - filemtime($this->lockFile);
-                    if ($fileAge <= $this->lockExpiration) {
-                        $this->output->writeln('<info>Lock expires in '.($this->lockExpiration - $fileAge).' seconds.</info>');
+            if ($this->lockExpiration) {
+                $fileAge = time() - filemtime($this->lockFile);
+                if ($fileAge <= $this->lockExpiration) {
+                    $this->output->writeln('<info>Lock expires in '.($this->lockExpiration - $fileAge).' seconds.</info>');
 
-                        return false;
-                    }
-                } else {
-                    // Lock is still in effect
                     return false;
                 }
+            } else {
+                // Lock is still in effect
+                return false;
             }
-
-            // Force enabled or lock expired
-            $lockHandler->release();
+        } elseif ($this->lockExpiration) {
+            // Attemp to update the modified time just in case there is no lock but the file still exists
             @touch($this->lockFile);
         }
 
