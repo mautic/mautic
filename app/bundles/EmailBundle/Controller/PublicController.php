@@ -145,6 +145,7 @@ class PublicController extends CommonFormController
                 ],
                 $message
             );
+                $message = '<h2>'.$message.'</h2>';
             }
             if ($email !== null) {
                 $template = $email->getTemplate();
@@ -281,7 +282,7 @@ class PublicController extends CommonFormController
                                 'showContactSegments'          => $showContactSegments,
                             ]
                         );
-                        $formContent = $html;
+                        $message = $html;
                     }
                 }
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
@@ -289,7 +290,7 @@ class PublicController extends CommonFormController
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
-                    $formContent .= '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
         } else {

@@ -123,7 +123,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
     {
         if (is_array($lead)) {
             $q = $this->_em->createQueryBuilder()
@@ -146,7 +146,10 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
-
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
 
             $return = [];
@@ -176,6 +179,11 @@ class LeadListRepository extends CommonRepository
                 )
             )
                 ->setParameter('false', false, 'boolean');
+
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
@@ -913,6 +921,7 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
+                case 'globalcategory':
                 case 'lead_email_received':
 
                     // Special handling of lead lists and tags
@@ -949,6 +958,10 @@ class LeadListRepository extends CommonRepository
                         case 'tags':
                             $table  = 'lead_tags_xref';
                             $column = 'tag_id';
+                            break;
+                        case 'globalcategory':
+                            $table  = 'lead_categories';
+                            $column = 'category_id';
                             break;
                         case 'lead_email_received':
                             $table  = 'email_stats';

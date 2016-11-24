@@ -274,7 +274,7 @@ return [
             ],
             'mautic.form.type.leadlist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['translator', 'mautic.lead.model.list', 'mautic.email.model.email', 'mautic.security', 'mautic.lead.model.lead', 'mautic.stage.model.stage', 'mautic.category.model.category'],
                 'alias'     => 'leadlist',
             ],
             'mautic.form.type.leadlist_choices' => [

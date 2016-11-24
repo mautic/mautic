@@ -145,7 +145,7 @@ class ContactFrequencyType extends AbstractType
                     );
                 }
 
-                $leadLists = $this->leadModel->getLists($lead);
+                $leadLists = $this->leadModel->getLists($lead, false, false, $data['public_view']);
 
                 $lists = [];
                 foreach ($leadLists as $leadList) {
