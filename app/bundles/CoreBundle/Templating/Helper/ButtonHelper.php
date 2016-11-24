@@ -437,7 +437,7 @@ class ButtonHelper extends Helper
      */
     protected function validatePriority(&$button)
     {
-        if (!empty($button['primary']) && self::TYPE_BUTTON_DROPDOWN == $this->groupType) {
+        if (!empty($button['primary'])) {
             if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
                 $button['priority'] = 201;
             }
