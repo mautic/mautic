@@ -645,4 +645,156 @@ class CompanyController extends FormController
             )
         );
     }
+
+    /**
+     * Company Merge function.
+     *
+     * @param   $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function mergeAction($objectId)
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editother',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model            = $this->getModel('lead.company');
+        $secondaryCompany = $model->getEntity($objectId);
+        $page             = $this->get('session')->get('mautic.lead.page', 1);
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        if ($secondaryCompany === null) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.lead.company.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $secondaryCompany->getId()]);
+
+        $form = $this->get('form.factory')->create(
+            'company_merge',
+            [],
+            [
+                'action'      => $action,
+                'main_entity' => $secondaryCompany->getId(),
+            ]
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $valid = true;
+            if (!$this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data           = $form->getData();
+                    $primaryMergeId = $data['company_to_merge'];
+                    $primaryCompany = $model->getEntity($primaryMergeId);
+
+                    if ($primaryCompany === null) {
+                        return $this->postActionRedirect(
+                            array_merge(
+                                $postActionVars,
+                                [
+                                    'flashes' => [
+                                        [
+                                            'type'    => 'error',
+                                            'msg'     => 'mautic.lead.company.error.notfound',
+                                            'msgVars' => ['%id%' => $primaryCompany->getId()],
+                                        ],
+                                    ],
+                                ]
+                            )
+                        );
+                    } elseif (!$permissions['lead:leads:editother']) {
+                        return $this->accessDenied();
+                    } elseif ($model->isLocked($secondaryCompany)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
+                    } elseif ($model->isLocked($primaryCompany)) {
+                        //deny access if the entity is locked
+                        return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
+                    }
+
+                    //Both leads are good so now we merge them
+                    $mainCompany = $model->companyMerge($primaryCompany, $secondaryCompany, false);
+                }
+
+                if ($valid) {
+                    $viewParameters = [
+                        'objectId'     => $primaryCompany->getId(),
+                        'objectAction' => 'edit',
+                    ];
+                }
+            } else {
+                $viewParameters = [
+                    'objectId'     => $secondaryCompany->getId(),
+                    'objectAction' => 'edit',
+                ];
+            }
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticLeadBundle:Company:edit',
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                    ],
+                ]
+            );
+        }
+
+        $tmpl = $this->request->get('tmpl', 'index');
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'tmpl'         => $tmpl,
+                    'action'       => $action,
+                    'form'         => $form->createView(),
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_company_action',
+                        [
+                            'objectAction' => 'merge',
+                            'objectId'     => $secondaryCompany->getId(),
+                        ]
+                    ),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.php',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.company-merge-options' : null,
+                ],
+            ]
+        );
+    }
 }

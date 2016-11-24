@@ -122,6 +122,17 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
+            'properties_lookup_template',
+            'sortablelist',
+            [
+                'mapped'          => false,
+                'label'           => 'mautic.lead.field.form.properties.select',
+                'option_required' => false,
+                'with_labels'     => false,
+            ]
+        );
+
+        $builder->add(
             'default_template',
             'text',
             [
@@ -190,7 +201,7 @@ class FieldType extends AbstractType
                             'required'    => false,
                             'label'       => 'mautic.lead.field.form.properties.select',
                             'data'        => $properties,
-                            'with_labels' => true,
+                            'with_labels' => ('lookup' !== $type),
                         ]
                     );
                     break;

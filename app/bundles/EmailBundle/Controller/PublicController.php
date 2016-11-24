@@ -83,7 +83,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -317,7 +317,7 @@ class PublicController extends CommonFormController
             return new Response('success');
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**

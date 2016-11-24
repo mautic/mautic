@@ -45,6 +45,8 @@ class FieldController extends CommonFormController
             ];
         }
 
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
             !$this->request->isXmlHttpRequest() ||
@@ -249,7 +251,10 @@ class FieldController extends CommonFormController
                 }
             }
 
-            $viewParams = ['type' => $fieldType];
+            $viewParams       = ['type' => $fieldType];
+            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {

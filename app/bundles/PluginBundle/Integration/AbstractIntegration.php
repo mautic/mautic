@@ -1279,29 +1279,46 @@ abstract class AbstractIntegration
      *
      * @param       $data
      * @param array $config
+     * @param null  $object
      *
      * @return array
      */
-    public function populateMauticLeadData($data, $config = [])
+    public function populateMauticLeadData($data, $config = [], $object = null)
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
 
-        if (!isset($config['leadFields'])) {
-            $config = $this->mergeConfigToFeatureSettings($config);
-
-            if (empty($config['leadFields'])) {
-                return [];
-            }
+        if ($object == null) {
+            $object = 'lead';
         }
 
-        $leadFields      = $config['leadFields'];
-        $availableFields = $this->getAvailableLeadFields($config);
-        $matched         = [];
+        if ($object == 'company') {
+            if (!isset($config['companyFields'])) {
+                $config = $this->mergeConfigToFeatureSettings($config);
+
+                if (empty($config['companyFields'])) {
+                    return [];
+                }
+            }
+
+            $fields = $config['companyFields'];
+        }
+        if ($object == 'lead') {
+            if (!isset($config['leadFields'])) {
+                $config = $this->mergeConfigToFeatureSettings($config);
+
+                if (empty($config['leadFields'])) {
+                    return [];
+                }
+            }
+            $fields = $config['leadFields'];
+        }
+
+        $matched = [];
 
         foreach ($gleanedData as $key => $field) {
-            if (isset($leadFields[$key]) && isset($gleanedData[$key])) {
-                $matched[$leadFields[$key]] = $gleanedData[$key];
+            if (isset($fields[$key]) && isset($gleanedData[$key])) {
+                $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
 
@@ -1647,6 +1664,24 @@ abstract class AbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
+        if (isset($settings['feature_settings']['objects']['company'])) {
+            unset($settings['feature_settings']['objects']['company']);
+        }
+
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects']['company'] = 'company';
+
         return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
     }
 
