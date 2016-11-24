@@ -19,14 +19,17 @@ if (!$hasFields = (isset($form['featureSettings']) && count($form['featureSettin
     // Unset if set to prevent features tab from showing when there's no feature to show
     unset($form['featureSettings']['leadFields']);
 }
-if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count($form['featureSettings']) > 1) || (!$hasFields && count($form['featureSettings']))))) {
+if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count(
+                $form['featureSettings']
+            ) > 1) || (!$hasFields && count($form['featureSettings']))))
+) {
     if (isset($form['featureSettings'])) {
         $form['featureSettings']->setRendered();
     }
 }
 
-$fieldHtml     = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldHtml = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$fieldLabel = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
 $fieldTabClass = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 
@@ -38,7 +41,10 @@ unset($form['featureSettings']['leadFields']);
     </div>
 <?php endif; ?>
 <ul class="nav nav-tabs pr-md pl-md">
-    <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
+    <li class="active" id="details-tab"><a href="#details-container" role="tab"
+                                           data-toggle="tab"><?php echo $view['translator']->trans(
+                'mautic.plugin.integration.tab.details'
+            ); ?></a></li>
 
 </ul>
 
@@ -50,11 +56,17 @@ unset($form['featureSettings']['leadFields']);
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <div class="well well-sm" style="margin-bottom:0 !important;">
             <p>
-            For the plugin to work, you must use the following as the Webhook URL in your account settings on the <a href="https://dashboard.clearbit.com/account" target="_blank">Clearbit dashboard</a>:</p>
+                <?php echo $view['translator']->trans('mautic.plugin.clearbit.webhook_info'); ?>
+            </p>
             <div class="alert alert-warning">
-                <strong>Warning!</strong> This must be a public accessible URL for the Webhook to work.
+                <?php echo $view['translator']->trans('mautic.plugin.clearbit.public_info'); ?>
             </div>
-            <input type="text" readonly="" onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $this->container->get('router')->generate('mautic_plugin_clearbit_index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)?>" class="form-control">
+            <input type="text" readonly="" onclick="this.setSelectionRange(0, this.value.length);"
+                   value="<?php echo $this->container->get('router')->generate(
+                       'mautic_plugin_clearbit_index',
+                       [],
+                       \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+                   ) ?>" class="form-control">
         </div>
     </div>
 </div>

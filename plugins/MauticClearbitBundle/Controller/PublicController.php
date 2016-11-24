@@ -130,10 +130,8 @@ class PublicController extends FormController
                     $data['country'] = $loc['country'];
                 }
 
-                // TODO: create a cache column for companies
-
                 $model->setFieldValues($lead, $data);
-                $model->saveEntity($lead);
+                $model->getRepository()->saveEntity($lead);
 
                 if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
@@ -141,7 +139,7 @@ class PublicController extends FormController
                     $user = $userModel->getEntity($uid);
                     if ($user) {
                         $this->addNewNotification(
-                            sprintf('The contact information for %s has been retrieved', $lead->getEmail()),
+                            sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
                             'Clearbit Plugin',
                             'fa-search',
                             $user
@@ -213,7 +211,7 @@ class PublicController extends FormController
                     }
 
                     $model->setFieldValues($company, $data);
-                    $model->saveEntity($company);
+                    $model->getRepository()->saveEntity($company);
 
                     if ($notify) {
                         /** @var UserModel $userModel */
@@ -221,7 +219,7 @@ class PublicController extends FormController
                         $user = $userModel->getEntity($uid);
                         if ($user) {
                             $this->addNewNotification(
-                                sprintf('The company information for %s has been retrieved', $company->getName()),
+                                sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
                                 'Clearbit Plugin',
                                 'fa-search',
                                 $user
@@ -241,7 +239,7 @@ class PublicController extends FormController
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
-                                'Unable to save the information: %s',
+                                $this->translator->trans('mautic.plugin.clearbit.unable'),
                                 $ex->getMessage()
                             ),
                             'Clearbit Plugin',

@@ -10,7 +10,7 @@
  */
 $attr = $form->vars['attr'];
 ?>
-    <div class="alert alert-info">Click submit to lookup the information for the selected item(s).</div>
+    <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.plugin.clearbit.submit_items'); ?></div>
     <div style="margin-top: 10px">
         <ul class="list-group" style="max-height: 400px;overflow-y: auto">
             <?php

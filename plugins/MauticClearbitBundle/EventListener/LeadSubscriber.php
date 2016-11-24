@@ -97,7 +97,7 @@ class LeadSubscriber extends CommonSubscriber
                     $res             = $clearbit->lookupByEmail($lead->getEmail());
                     $cache[$cacheId] = serialize($res);
                     $lead->setSocialCache($cache);
-                    $this->leadModel->saveEntity($lead);
+                    $this->leadModel->getRepository()->saveEntity($lead);
                 }
             } catch (\Exception $ex) {
                 $this->logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
@@ -135,7 +135,7 @@ class LeadSubscriber extends CommonSubscriber
                     $res             = $clearbit->lookupByDomain($parse['host']);
                     $cache[$cacheId] = serialize($res);
                     $company->setSocialCache($cache);
-                    $this->companyModel->saveEntity($company);
+                    $this->companyModel->getRepository()->saveEntity($company);
                 }
             } catch (\Exception $ex) {
                 $this->logger->log('error', 'Error while using Clearbit: '.$ex->getMessage());
