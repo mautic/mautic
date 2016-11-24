@@ -50,8 +50,8 @@ class PublicController extends FormController
         }
 
         /** @var array $result */
-        $result = $this->request->request->get('body', [], true);
-        $oid = $this->request->request->get('id', [], true);
+        $result = $this->request->request->get('body', []);
+        $oid = $this->request->request->get('id');
         list($w, $id, $uid) = explode('#', $oid, 3);
         $notify = FALSE !== strpos($w, '_notify');
 
@@ -59,12 +59,13 @@ class PublicController extends FormController
 
         try {
 
-            if ('person' === $this->request->request->get('type', [], true)) {
+            if ('person' === $this->request->request->get('type')) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                 $model = $this->getModel('lead');
                 /** @var Lead $lead */
                 $lead = $model->getEntity($id);
                 $currFields = $lead->getFields(true);
+                $logger->log('debug','CURRFIELDS: ' . var_export($currFields, true));
 
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
@@ -80,7 +81,7 @@ class PublicController extends FormController
                              'twitter' => 'http://www.twitter.com/',
                          ] as $p => $u) {
                     foreach ($result as $type => $socialProfile) {
-                        if ($type === $p && empty($currFields[$p])) {
+                        if ($type === $p && empty($currFields[$p]['value'])) {
                             $data[$p] = (array_key_exists('handle', $socialProfile) && $socialProfile['handle']) ? $u.$socialProfile['handle'] : '';
                             break;
                         }
@@ -90,45 +91,47 @@ class PublicController extends FormController
                 if (array_key_exists('name', $result) && array_key_exists(
                         'familyName',
                         $result['name']
-                    ) && empty($currFields['lastname'])) {
+                    ) && empty($currFields['lastname']['value'])) {
                     $data['lastname'] = $result['name']['familyName'];
                 }
 
                 if (array_key_exists('name', $result) && array_key_exists(
                         'givenName',
                         $result['name']
-                    ) && empty($currFields['firstname'])) {
+                    ) && empty($currFields['firstname']['value'])) {
                     $data['firstname'] = $result['name']['givenName'];
                 }
 
-                if (array_key_exists('site', $result) && empty($currFields['website'])) {
+                if (array_key_exists('site', $result) && empty($currFields['website']['value'])) {
                     $data['website'] = $result['site'];
                 }
 
                 if (array_key_exists('employment', $result) && array_key_exists(
                         'name',
                         $result['employment']
-                    ) && empty($currFields['company'])) {
+                    ) && empty($currFields['company']['value'])) {
                     $data['company'] = $result['employment']['name'];
                 }
 
                 if (array_key_exists('employment', $result) && array_key_exists(
                         'title',
                         $result['employment']
-                    ) && empty($currFields['position'])) {
+                    ) && empty($currFields['position']['value'])) {
                     $data['position'] = $result['employment']['title'];
                 }
 
-                if (array_key_exists('city', $loc) && empty($currFields['city'])) {
+                if (array_key_exists('city', $loc) && empty($currFields['city']['value'])) {
                     $data['city'] = $loc['city'];
                 }
-                if (array_key_exists('state', $loc) && empty($currFields['state'])) {
+                if (array_key_exists('state', $loc) && empty($currFields['state']['value'])) {
                     $data['state'] = $loc['state'];
                 }
 
-                if (array_key_exists('country', $loc) && empty($currFields['country'])) {
+                if (array_key_exists('country', $loc) && empty($currFields['country']['value'])) {
                     $data['country'] = $loc['country'];
                 }
+
+                $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                 $model->setFieldValues($lead, $data);
                 $model->getRepository()->saveEntity($lead);
@@ -168,47 +171,49 @@ class PublicController extends FormController
                     if (array_key_exists('streetNumber', $loc) && array_key_exists(
                             'streetName',
                             $loc
-                        ) && empty($currFields['companyaddress1'])) {
+                        ) && empty($currFields['companyaddress1']['value'])) {
                         $data['companyaddress1'] = $loc['streetNumber'].' '.$loc['streetName'];
                     }
 
-                    if (array_key_exists('city', $loc) && empty($currFields['companycity'])) {
+                    if (array_key_exists('city', $loc) && empty($currFields['companycity']['value'])) {
                         $data['companycity'] = $loc['city'];
                     }
 
                     if (array_key_exists('metrics', $result) && array_key_exists(
                             'employees',
                             $result['metrics']
-                        ) && empty($currFields['companynumber_of_employees'])) {
+                        ) && empty($currFields['companynumber_of_employees']['value'])) {
                         $data['companynumber_of_employees'] = $result['metrics']['employees'];
                     }
 
-                    if (array_key_exists('description', $result) && empty($currFields['companydescription'])) {
+                    if (array_key_exists('description', $result) && empty($currFields['companydescription']['value'])) {
                         $data['companydescription'] = $result['description'];
                     }
 
-                    if (array_key_exists('phone', $result) && empty($currFields['companyphone'])) {
+                    if (array_key_exists('phone', $result) && empty($currFields['companyphone']['value'])) {
                         $data['companyphone'] = $result['phone'];
                     }
 
                     if (array_key_exists('site', $result) && array_key_exists(
                             'emailAddresses',
                             $result['site']
-                        ) && count($result['site']['emailAddresses']) && empty($currFields['companyemail'])) {
+                        ) && count($result['site']['emailAddresses']) && empty($currFields['companyemail']['value'])) {
                         $data['companyemail'] = $result['site']['emailAddresses'][0];
                     }
 
-                    if (array_key_exists('country', $loc) && empty($currFields['companycountry'])) {
+                    if (array_key_exists('country', $loc) && empty($currFields['companycountry']['value'])) {
                         $data['companycountry'] = $loc['country'];
                     }
 
-                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode'])) {
+                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode']['value'])) {
                         $loc['postalCode'];
                     }
 
-                    if (array_key_exists('state', $loc) && empty($currFields['companystate'])) {
+                    if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {
                         $data['companystate'] = $loc['state'];
                     }
+
+                    $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                     $model->setFieldValues($company, $data);
                     $model->getRepository()->saveEntity($company);
@@ -249,7 +254,7 @@ class PublicController extends FormController
                     }
                 }
             } catch(\Exception $ex2) {
-                $this->get('monolog.mautic.logger')->log('error', 'Clearbit: ' . $ex2->getMessage());
+                $this->get('monolog.logger.mautic')->log('error', 'Clearbit: ' . $ex2->getMessage());
             }
         }
 
