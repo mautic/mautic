@@ -202,7 +202,10 @@ class CommonController extends Controller implements MauticController
         $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : [];
         $template   = $args['contentTemplate'];
 
-        return $this->render($template, $parameters);
+        $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+        $response = new Response('', $code);
+
+        return $this->render($template, $parameters, $response);
     }
 
     /**
@@ -297,6 +300,7 @@ class CommonController extends Controller implements MauticController
         $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : [];
         $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
+        $code            = array_key_exists('responseCode', $args) ? $args['responseCode'] : 200;
 
         //set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
@@ -320,10 +324,7 @@ class CommonController extends Controller implements MauticController
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json
         if ($this->request->get('ignoreAjax', false)) {
-            $response = new Response();
-            $response->setContent($newContent);
-
-            return $response;
+            return new Response($newContent, $code);
         }
 
         //render flashes
@@ -377,8 +378,6 @@ class CommonController extends Controller implements MauticController
                 ['newContent' => $newContent]
             );
         }
-
-        $code = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
 
         if ($newContent instanceof Response) {
             $response = $newContent;
@@ -463,11 +462,13 @@ class CommonController extends Controller implements MauticController
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
-        throw new NotFoundHttpException(
-            $this->translator->trans($msg,
-                [
-                    '%url%' => $this->request->getRequestUri(),
-                ]
+        return $this->renderException(
+            new NotFoundHttpException(
+                $this->translator->trans($msg,
+                    [
+                        '%url%' => $this->request->getRequestUri(),
+                    ]
+                )
             )
         );
     }

@@ -8,15 +8,19 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 if (isset($template)) {
     switch ($template) {
         case 'batchdelete':
             $confirmText = (!isset($confirmText)) ? $view['translator']->trans('mautic.core.form.delete')
                 : $confirmText;
-            $iconClass       = (!isset($iconClass)) ? 'fa fa-fw fa-trash-o' : $iconClass;
-            $btnText         = (!isset($btnText)) ? false : $btnText;
-            $btnClass        = (!isset($btnClass)) ? 'btn btn-sm btn-danger' : $btnClass;
+            $iconClass       = (!isset($iconClass)) ? 'fa fa-trash-o text-danger' : $iconClass;
+            $btnText         = (!isset($btnText)) ? $view['translator']->trans('mautic.core.form.delete_selected') : $btnText;
+            $btnClass        = (!isset($btnClass)) ? '' : $btnClass;
             $confirmCallback = (!isset($confirmCallback)) ? 'executeBatchAction' : $confirmCallback;
+            $wrapOpeningTag  = (!isset($wrapOpeningTag)) ? '<li>' : $wrapOpeningTag;
+            $wrapClosingTag  = (!isset($wrapClosingTag)) ? '</li>' : $wrapClosingTag;
+            $precheck        = (!isset($precheck)) ? 'batchActionPrecheck' : $precheck;
             break;
         case 'delete':
             $confirmText = (!isset($confirmText)) ? $view['translator']->trans('mautic.core.form.delete')
@@ -32,8 +36,12 @@ if (!isset($btnClass)) {
     $btnClass = 'btn btn-default';
 }
 
-if (!isset($btnTextClass)) {
-    $btnTextClass = '';
+if (!isset($btnTextAttr)) {
+    $btnTextAttr = '';
+}
+
+if (isset($btnTextClass)) {
+    $btnTextAttr .= ' class="'.$btnTextClass.'"';
 }
 
 if (!isset($confirmAction)) {
@@ -69,9 +77,10 @@ if (isset($target)) {
     $attr[] = "data-target=\"$target\"";
 }
 
-if (!isset($openTag)) {
+if (!isset($tag)) {
     $tag = 'a';
 }
+
 $buttonType = ($tag == 'button') ? ' type="button"' : '';
 
 if (!isset($wrapOpeningTag)) {
@@ -91,10 +100,16 @@ if (!isset($precheck)) {
 }
 
 ?>
-<?php echo $wrapOpeningTag; ?><<?php echo $tag; ?><?php echo $buttonType; ?> class="<?php echo $btnClass; ?>" href="<?php echo $confirmAction; ?>" data-toggle="confirmation" data-precheck="<?php echo $precheck; ?>" data-message="<?php echo $view->escape(
-    $message
-); ?>" data-confirm-text="<?php echo $view->escape($confirmText); ?>" <?php echo implode(' ', $attr); ?>>
-<span<?php echo $tooltipAttr; ?>><?php if (isset($iconClass)): ?><i
-        class="<?php echo $iconClass; ?>"></i> <?php endif; ?><?php if (isset($btnText)): ?><span
-        class="<?php echo $btnTextClass; ?>"><?php echo $btnText; ?></span><?php endif; ?></span>
+<?php echo $wrapOpeningTag; ?>
+<<?php echo $tag; ?><?php echo $buttonType; ?>
+    class="<?php echo $btnClass; ?>"
+    href="<?php echo $confirmAction; ?>"
+    data-toggle="confirmation"
+    data-precheck="<?php echo $precheck; ?>"
+    data-message="<?php echo $view->escape($message); ?>"
+    data-confirm-text="<?php echo $view->escape($confirmText); ?>" <?php echo implode(' ', $attr); ?>>
+<span<?php echo $tooltipAttr; ?>>
+    <?php if (isset($iconClass)): ?><i class="<?php echo $iconClass; ?>"></i>
+    <?php endif; ?><?php if (isset($btnText)): ?><span<?php echo $btnTextAttr; ?>><?php echo $btnText; ?></span><?php endif; ?>
+</span>
 </<?php echo $tag; ?>><?php echo $wrapClosingTag; ?>

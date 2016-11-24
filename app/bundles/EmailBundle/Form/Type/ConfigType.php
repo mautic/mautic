@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -210,16 +209,17 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'mautic.transport.amazon'    => 'mautic.email.config.mailer_transport.amazon',
-                    'gmail'                      => 'mautic.email.config.mailer_transport.gmail',
-                    'mautic.transport.mandrill'  => 'mautic.email.config.mailer_transport.mandrill',
-                    'mautic.transport.mailjet'   => 'mautic.email.config.mailer_transport.mailjet',
-                    'smtp'                       => 'mautic.email.config.mailer_transport.smtp',
-                    'mail'                       => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.postmark'  => 'mautic.email.config.mailer_transport.postmark',
-                    'mautic.transport.sendgrid'  => 'mautic.email.config.mailer_transport.sendgrid',
-                    'sendmail'                   => 'mautic.email.config.mailer_transport.sendmail',
-                    'mautic.transport.sparkpost' => 'mautic.email.config.mailer_transport.sparkpost',
+                    'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
+                    'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
+                    'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
+                    'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
+                    'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
+                    'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
+                    'mail'                          => 'mautic.email.config.mailer_transport.mail',
+                    'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
+                    'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+                    'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
+                    'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
                 ],
                 'label'    => 'mautic.email.config.mailer.transport',
                 'required' => false,
@@ -346,6 +346,7 @@ class ConfigType extends AbstractType
                 "mautic.transport.mandrill",
                 "mautic.transport.mailjet",
                 "mautic.transport.sendgrid",
+                "mautic.transport.elasticemail",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
                 "gmail"
@@ -358,6 +359,7 @@ class ConfigType extends AbstractType
                 "login",
                 "cram-md5"
             ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.elasticemail",
                 "mautic.transport.sendgrid",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
@@ -602,7 +604,9 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-        $builder->add('email_frequency_number', 'number',
+        $builder->add(
+            'email_frequency_number',
+            'number',
             [
                 'precision'  => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
@@ -611,8 +615,11 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
-            ]);
-        $builder->add('email_frequency_time', 'choice',
+            ]
+        );
+        $builder->add(
+            'email_frequency_time',
+            'choice',
             [
                 'choices' => [
                     'DAY'   => 'day',
@@ -626,7 +633,8 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
-            ]);
+            ]
+        );
     }
 
     /**
