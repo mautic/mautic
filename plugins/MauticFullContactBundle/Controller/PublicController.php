@@ -91,7 +91,7 @@ class PublicController extends FormController
                 $loc = $result['demographics']['locationDeduced'];
             }
 
-            $social = [];
+            $data = [];
             /** @var array $socialProfiles */
             $socialProfiles = [];
             if (array_key_exists('socialProfiles', $result)) {
@@ -99,55 +99,72 @@ class PublicController extends FormController
             }
             foreach (['facebook', 'foursquare', 'googleplus', 'instagram', 'linkedin', 'twitter'] as $p) {
                 foreach ($socialProfiles as $socialProfile) {
-                    if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p) {
-                        $social[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';
+                    if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p && empty($currFields[$p])) {
+                        $data[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';
                         break;
                     }
                 }
             }
 
-            $data = [];
-
             if (array_key_exists('contactInfo', $result)) {
-                $data = [
-                    'lastname' => array_key_exists(
+
+                if (array_key_exists(
                         'familyName',
                         $result['contactInfo']
-                    ) ? $result['contactInfo']['familyName'] : '',
-                    'firstname' => array_key_exists(
+                    ) && empty($currFields['lastname'])) {
+                    $data['lastname'] = $result['contactInfo']['familyName'];
+                }
+
+                if (array_key_exists(
                         'givenName',
                         $result['contactInfo']
-                    ) ? $result['contactInfo']['givenName'] : '',
-                    'website' => (array_key_exists('websites', $result['contactInfo']) && count(
+                    ) && empty($currFields['firstname'])) {
+                    $data['firstname'] = $result['contactInfo']['givenName'];
+                }
+
+                if ((array_key_exists('websites', $result['contactInfo']) && count(
                             $result['contactInfo']['websites']
-                        )) ? $result['contactInfo']['websites'][0]['url'] : '',
-                    'skype' => (array_key_exists('chats', $result['contactInfo']) && array_key_exists(
+                        )) && empty($currFields['website'])) {
+                    $data['website'] = $result['contactInfo']['websites'][0]['url'];
+                }
+
+                if ((array_key_exists('chats', $result['contactInfo']) && array_key_exists(
                             'skype',
                             $result['contactInfo']['chats']
-                        )) ? $result['contactInfo']['chats']['skype']['handle'] : '',
-                ];
-            }
-            $data = array_merge(
-                $data,
-                [
-                    'company'  => (null !== $org) ? $org['name'] : '',
-                    'position' => (null !== $org) ? $org['title'] : '',
-                    'city'     => (null !== $loc && array_key_exists('city', $loc) && array_key_exists(
-                            'name',
-                            $loc['city']
-                        )) ? $loc['city']['name'] : '',
-                    'state' => (null !== $loc && array_key_exists('state', $loc) && array_key_exists(
-                            'name',
-                            $loc['state']
-                        )) ? $loc['state']['name'] : '',
-                    'country' => (null !== $loc && array_key_exists('country', $loc) && array_key_exists(
-                            'name',
-                            $loc['country']
-                        )) ? $loc['country']['name'] : '',
-                ]
-            );
+                        )) && empty($currFields['skype'])) {
+                    $data['skype'] = $result['contactInfo']['chats']['skype']['handle'];
+                }
 
-            $data = array_merge($data, $social);
+            }
+
+            if ((null !== $org && array_key_exists('name', $org)) && empty($currFields['company'])) {
+                $data['company'] = $org['name'];
+            }
+
+            if ((null !== $org && array_key_exists('title', $org)) && empty($currFields['position'])) {
+                $data['position'] = $org['title'];
+            }
+
+            if ((null !== $loc && array_key_exists('city', $loc) && array_key_exists(
+                        'name',
+                        $loc['city']
+                    )) && empty($currFields['city'])) {
+                $data['city'] = $loc['city']['name'];
+            }
+
+            if ((null !== $loc && array_key_exists('state', $loc) && array_key_exists(
+                        'name',
+                        $loc['state']
+                    )) && empty($currFields['state'])) {
+                $data['state'] = $loc['state']['name'];
+            }
+
+            if ((null !== $loc && array_key_exists('country', $loc) && array_key_exists(
+                        'name',
+                        $loc['country']
+                    )) && empty($currFields['country'])) {
+                $data['country'] = $loc['country']['name'];
+            }
 
             $model->setFieldValues($lead, $data);
             $model->getRepository()->saveEntity($lead);
@@ -255,22 +272,54 @@ class PublicController extends FormController
                 }
             }
 
-            $data = [
-                'companyaddress1'            => array_key_exists('addressLine1', $loc) ? $loc['addressLine1'] : '',
-                'companyaddress2'            => array_key_exists('addressLine2', $loc) ? $loc['addressLine2'] : '',
-                'companyemail'               => array_key_exists('value', $email) ? $email['value'] : '',
-                'companyphone'               => array_key_exists('number', $phone) ? $phone['number'] : '',
-                'companycity'                => array_key_exists('locality', $loc) ? $loc['locality'] : '',
-                'companyzipcode'             => array_key_exists('postalCode', $loc) ? $loc['postalCode'] : '',
-                'companystate'               => array_key_exists('region', $loc) ? $loc['region']['name'] : '',
-                'companycountry'             => array_key_exists('country', $loc) ? $loc['country']['name'] : '',
-                'companydescription'         => array_key_exists('name', $org) ? $org['name'] : '',
-                'companynumber_of_employees' => array_key_exists(
+            $data = [];
+
+            if (array_key_exists('addressLine1', $loc) && empty($currFields['companyaddress1'])) {
+                $data['companyaddress1'] = $loc['addressLine1'];
+            }
+
+            if (array_key_exists('addressLine2', $loc) && empty($currFields['companyaddress2'])) {
+                $data['companyaddress2'] = $loc['addressLine2'];
+            }
+
+            if (array_key_exists('value', $email) && empty($currFields['companyemail'])) {
+                $data['companyemail'] = $email['value'];
+            }
+
+            if (array_key_exists('number', $phone) && empty($currFields['companyphone'])) {
+                $data['companyphone'] = $phone['number'];
+            }
+
+            if (array_key_exists('locality', $loc) && empty($currFields['companycity'])) {
+                $data['companycity'] = $loc['locality'];
+            }
+
+            if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode'])) {
+                $data['companyzipcode'] = $loc['postalCode'];
+            }
+
+            if (array_key_exists('region', $loc) && empty($currFields['companystate'])) {
+                $data['companystate'] = $loc['region']['name'];
+            }
+
+            if (array_key_exists('country', $loc) && empty($currFields['companycountry'])) {
+                $data['companycountry'] = $loc['country']['name'];
+            }
+
+            if (array_key_exists('name', $org) && empty($currFields['companydescription'])) {
+                $data['companydescription'] = $org['name'];
+            }
+
+            if (array_key_exists(
                     'approxEmployees',
                     $org
-                ) ? $org['approxEmployees'] : '',
-                'companyfax' => array_key_exists('number', $fax) ? $fax['number'] : '',
-            ];
+                ) && empty($currFields['companynumber_of_employees'])) {
+                $data['companynumber_of_employees'] = $org['approxEmployees'];
+            }
+
+            if (array_key_exists('number', $fax) && empty($currFields['companyfax'])) {
+                $data['companyfax'] = $fax['number'];
+            }
 
             $model->setFieldValues($company, $data);
             $model->getRepository()->saveEntity($company);
