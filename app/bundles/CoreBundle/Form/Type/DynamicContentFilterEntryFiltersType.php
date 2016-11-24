@@ -208,7 +208,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 
             if (in_array($data['operator'], ['empty', '!empty'])) {
                 $attr['disabled'] = 'disabled';
-            } else {
+            } elseif (null !== $data['filter']) {
                 $customOptions['constraints'] = [
                     new NotBlank(
                         [
