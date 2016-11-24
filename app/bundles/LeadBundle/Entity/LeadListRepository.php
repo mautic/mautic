@@ -927,7 +927,6 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
-                    echo $subqb->getSQL();
                     break;
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
