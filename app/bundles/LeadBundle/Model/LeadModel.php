@@ -1549,13 +1549,27 @@ class LeadModel extends FormModel
                             break;
                         // Ensure date/time entries match what symfony expects
                         case 'datetime':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
-                            break;
                         case 'date':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
-                            break;
                         case 'time':
-                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
+                            // Prevent zero based date placeholders
+                            $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
+
+                            if (!$dateTest) {
+                                // Date placeholder was used so just ignore it to allow import of the field
+                                unset($fieldData[$leadField['alias']]);
+                            } else {
+                                switch ($leadField['type']) {
+                                    case 'datetime':
+                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
+                                        break;
+                                    case 'date':
+                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
+                                        break;
+                                    case 'time':
+                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
+                                        break;
+                                }
+                            }
                             break;
                     }
                 } catch (\Exception $exception) {
