@@ -343,4 +343,14 @@ final class LeadEvents
      * @var string
      */
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+
+    /**
+     * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
+     *
+     * @var string
+     */
+    const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
 }
