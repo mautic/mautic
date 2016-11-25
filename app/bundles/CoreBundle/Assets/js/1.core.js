@@ -3948,10 +3948,12 @@ var Mautic = {
                 if (isCodeMode) {
                     mQuery('.builder').addClass('code-mode');
                     mQuery('.builder .code-editor').removeClass('hide');
+                    mQuery('.builder .code-mode-toolbar').removeClass('hide');
                     mQuery('.builder .builder-toolbar').addClass('hide');
                 } else {
                     mQuery('.builder').removeClass('code-mode');
                     mQuery('.builder .code-editor').addClass('hide');
+                    mQuery('.builder .code-mode-toolbar').addClass('hide');
                     mQuery('.builder .builder-toolbar').removeClass('hide');
 
                     // Load the theme HTML to the source textarea

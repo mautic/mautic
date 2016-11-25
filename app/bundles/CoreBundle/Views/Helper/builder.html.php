@@ -21,14 +21,16 @@
             <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('<?php echo $type; ?>');">
                 <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
             </button>
-            <button class="btn btn-default btn-nospin <?php echo $isCodeMode ? '' : 'hide'; ?>" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.media.manager.desc'); ?>">
-                <i class="fa fa-photo"></i>
-                <?php echo $view['translator']->trans('mautic.core.media.manager'); ?>
-            </button>
-            <button class="btn btn-default btn-nospin <?php echo $isCodeMode ? '' : 'hide'; ?>" onclick="Mautic.formatCode()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.format.code.desc'); ?>">
-                <i class="fa fa-indent"></i>
-                <?php echo $view['translator']->trans('mautic.core.format.code'); ?>
-            </button>
+            <div class="code-mode-toolbar <?php echo $isCodeMode ? '' : 'hide'; ?>">
+                <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.media.manager.desc'); ?>">
+                    <i class="fa fa-photo"></i>
+                    <?php echo $view['translator']->trans('mautic.core.media.manager'); ?>
+                </button>
+                <button class="btn btn-default btn-nospin" onclick="Mautic.formatCode()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.format.code.desc'); ?>">
+                    <i class="fa fa-indent"></i>
+                    <?php echo $view['translator']->trans('mautic.core.format.code'); ?>
+                </button>
+            </div>
         </div>
         <div class="code-editor <?php echo $isCodeMode ? '' : 'hide'; ?>">
             <div id="customHtmlContainer"></div>
