@@ -803,6 +803,14 @@ var Mautic = {
         });
     },
 
+    getBuilderTokensMethod: function() {
+        var method = 'page:getBuilderTokens';
+        if (parent.mQuery('.builder').hasClass('email-builder')) {
+            method = 'email:getBuilderTokens';
+        }
+        return method;
+    },
+
     /**
      * Download the tokens
      *

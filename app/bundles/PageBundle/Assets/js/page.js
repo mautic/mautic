@@ -19,6 +19,8 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
+    // Preload tokens for code mode builder
+    Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
     Mautic.intiSelectTheme(mQuery('#page_template'));
 };
 

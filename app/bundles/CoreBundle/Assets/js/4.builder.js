@@ -669,14 +669,6 @@ Mautic.initSlotListeners = function() {
         });
     }
 
-    Mautic.getBuilderTokensMethod = function() {
-        var method = 'page:getBuilderTokens';
-        if (parent.mQuery('.builder').hasClass('email-builder')) {
-            method = 'email:getBuilderTokens';
-        }
-        return method;
-    }
-
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
