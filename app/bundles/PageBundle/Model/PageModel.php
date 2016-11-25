@@ -613,10 +613,23 @@ class PageModel extends FormModel
             $device->setDeviceOs($dd->getOs());
             $device->setDateOpen($hit->getDateHit());
             $device->setLead($lead);
-
-            $this->em->persist($device);
         } else {
             $device = $deviceRepo->getEntity($device['id']);
+        }
+
+        // Append the fingerprint string to this device
+        if (!empty($query['fingerprint']) && $query['fingerprint'] != $device->getDeviceFingerprint()) {
+            // The device fingerprint has changed, or it was not set previously.
+            $device->setDeviceFingerprint($query['fingerprint']);
+            // The device is already in DB
+            if ($this->em->contains($device)) {
+                $this->em->persist($device);
+                $this->em->flush();
+            }
+        }
+        // This is a new device
+        if (!$this->em->contains($device)) {
+            $this->em->persist($device);
         }
 
         $hit->setDeviceStat($device);
