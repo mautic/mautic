@@ -32,6 +32,7 @@
         </div>
         <div class="code-editor <?php echo $isCodeMode ? '' : 'hide'; ?>">
             <div id="customHtmlContainer"></div>
+            <i class="text-muted"><?php echo $view['translator']->trans('mautic.core.code.mode.token.dropdown.hint'); ?></i>
         </div>
         <div class="builder-toolbar <?php echo $isCodeMode ? 'hide' : ''; ?>">
             <div class="panel panel-default">
