@@ -84,6 +84,13 @@ Mautic.launchBuilder = function (formName, actionName) {
 };
 
 /**
+ * Frmats code style in the CodeMirror editor
+ */
+Mautic.formatCode = function() {
+    Mautic.builderCodeMirror.autoFormatRange({line: 0, ch: 0}, {line: Mautic.builderCodeMirror.lineCount()});
+}
+
+/**
  * Creates an iframe and keeps its content live from CodeMirror changes
  *
  * @param iframeId

@@ -23,6 +23,9 @@
             </button>
         </div>
         <div class="code-editor <?php echo $isCodeMode ? '' : 'hide'; ?>">
+            <button class="btn btn-default" onclick="Mautic.formatCode()"  data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.format.code.desc'); ?>">
+                <?php echo $view['translator']->trans('mautic.core.format.code'); ?>
+            </button>
             <div id="customHtmlContainer"></div>
         </div>
         <div class="builder-toolbar <?php echo $isCodeMode ? 'hide' : ''; ?>">
