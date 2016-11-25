@@ -91,6 +91,47 @@ Mautic.formatCode = function() {
 }
 
 /**
+ * Opens Filemanager window
+ */
+Mautic.openMediaManager = function() {
+    Mautic.openServerBrowser(
+        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        screen.width * 0.7,
+        screen.height * 0.7
+    );
+}
+
+/**
+ * Receives a file URL from Filemanager when selected
+ */
+Mautic.setFileUrl = function(url, width, height, alt) {
+    Mautic.insertTextAtCMCursor(url);
+}
+
+/**
+ * Inserts the text to the cursor position or replace selected range
+ */
+Mautic.insertTextAtCMCursor = function(text) {
+    var doc = Mautic.builderCodeMirror.getDoc();
+    var cursor = doc.getCursor();
+    doc.replaceRange(text, cursor);
+}
+
+/**
+ * Opens new window on the URL
+ */
+Mautic.openServerBrowser = function(url, width, height) {
+    var iLeft = (screen.width - width) / 2 ;
+    var iTop = (screen.height - height) / 2 ;
+    var sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
+    sOptions += ",width=" + width ;
+    sOptions += ",height=" + height ;
+    sOptions += ",left=" + iLeft ;
+    sOptions += ",top=" + iTop ;
+    var oWindow = window.open( url, "BrowseWindow", sOptions ) ;
+}
+
+/**
  * Creates an iframe and keeps its content live from CodeMirror changes
  *
  * @param iframeId
