@@ -54,6 +54,9 @@ class PublicController extends FormController
         list($w, $id, $uid) = explode('#', $oid, 3);
         $notify             = false !== strpos($w, '_notify');
 
+        // Prevent listener from redispatching another call
+        defined('CLEARBIT_OID') || define('CLEARBIT_OID', $oid);
+
         $logger = $this->get('monolog.logger.mautic');
 
         try {
