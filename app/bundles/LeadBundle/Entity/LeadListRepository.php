@@ -598,11 +598,13 @@ class LeadListRepository extends CommonRepository
             } elseif ($object == 'company') {
                 $field = "comp.{$details['field']}";
             }
-            // Format the field based on platform specific functions that DBAL doesn't support natively
-            $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
-            $columnType = $column->getType();
 
+            $columnType = false;
             if ($column) {
+                // Format the field based on platform specific functions that DBAL doesn't support natively
+                $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
+                $columnType = $column->getType();
+
                 switch ($details['type']) {
                     case 'datetime':
                         if (!$columnType instanceof UTCDateTimeType) {
