@@ -111,7 +111,7 @@ class ClearbitController extends FormController
                         $res             = $clearbit->lookupByEmail($lead->getEmail());
                         $cache[$cacheId] = serialize($res);
                         $lead->setSocialCache($cache);
-                        $model->saveEntity($lead);
+                        $model->getRepository()->saveEntity($lead);
                     }
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
@@ -280,7 +280,7 @@ class ClearbitController extends FormController
                             $res             = $clearbit->lookupByEmail($lookupEmail);
                             $cache[$cacheId] = serialize($res);
                             $lead->setSocialCache($cache);
-                            $model->saveEntity($lead);
+                            $model->getRepository()->saveEntity($lead);
                         }
                     }
 
@@ -403,7 +403,7 @@ class ClearbitController extends FormController
                         $res             = $clearbit->lookupByDomain($parse['host']);
                         $cache[$cacheId] = serialize($res);
                         $company->setSocialCache($cache);
-                        $model->saveEntity($company);
+                        $model->getRepository()->saveEntity($company);
                     }
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
@@ -571,7 +571,7 @@ class ClearbitController extends FormController
                             $res             = $clearbit->lookupByDomain($lookupWebsite);
                             $cache[$cacheId] = serialize($res);
                             $company->setSocialCache($cache);
-                            $model->saveEntity($company);
+                            $model->getRepository()->saveEntity($company);
                         }
                     }
 
