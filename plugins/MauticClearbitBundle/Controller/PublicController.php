@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
-
     /**
      * Write a notification.
      *
@@ -36,8 +35,8 @@ class PublicController extends FormController
     }
 
     /**
-     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function callbackAction()
@@ -50,22 +49,21 @@ class PublicController extends FormController
         }
 
         /** @var array $result */
-        $result = $this->request->request->get('body', []);
-        $oid = $this->request->request->get('id');
+        $result             = $this->request->request->get('body', []);
+        $oid                = $this->request->request->get('id');
         list($w, $id, $uid) = explode('#', $oid, 3);
-        $notify = FALSE !== strpos($w, '_notify');
+        $notify             = false !== strpos($w, '_notify');
 
         $logger = $this->get('monolog.logger.mautic');
 
         try {
-
             if ('person' === $this->request->request->get('type')) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                 $model = $this->getModel('lead');
                 /** @var Lead $lead */
-                $lead = $model->getEntity($id);
+                $lead       = $model->getEntity($id);
                 $currFields = $lead->getFields(true);
-                $logger->log('debug','CURRFIELDS: ' . var_export($currFields, true));
+                $logger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
 
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
@@ -134,12 +132,12 @@ class PublicController extends FormController
                 $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                 $model->setFieldValues($lead, $data);
-                $model->getRepository()->saveEntity($lead);
+                $model->saveEntity($lead);
 
                 if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user = $userModel->getEntity($uid);
+                    $user      = $userModel->getEntity($uid);
                     if ($user) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
@@ -149,7 +147,6 @@ class PublicController extends FormController
                         );
                     }
                 }
-
             } else {
 
                 /******************  COMPANY STUFF  *********************/
@@ -158,7 +155,7 @@ class PublicController extends FormController
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
                     $model = $this->getModel('lead.company');
                     /** @var Company $company */
-                    $company = $model->getEntity($id);
+                    $company    = $model->getEntity($id);
                     $currFields = $company->getFields(true);
 
                     $loc = [];
@@ -216,12 +213,12 @@ class PublicController extends FormController
                     $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                     $model->setFieldValues($company, $data);
-                    $model->getRepository()->saveEntity($company);
+                    $model->saveEntity($company);
 
                     if ($notify) {
                         /** @var UserModel $userModel */
                         $userModel = $this->getModel('user');
-                        $user = $userModel->getEntity($uid);
+                        $user      = $userModel->getEntity($uid);
                         if ($user) {
                             $this->addNewNotification(
                                 sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
@@ -233,14 +230,13 @@ class PublicController extends FormController
                     }
                 }
             }
-
         } catch (\Exception $ex) {
             $logger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
                 if ($notify && $uid) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user = $userModel->getEntity($uid);
+                    $user      = $userModel->getEntity($uid);
                     if ($user) {
                         $this->addNewNotification(
                             sprintf(
@@ -253,12 +249,11 @@ class PublicController extends FormController
                         );
                     }
                 }
-            } catch(\Exception $ex2) {
-                $this->get('monolog.logger.mautic')->log('error', 'Clearbit: ' . $ex2->getMessage());
+            } catch (\Exception $ex2) {
+                $this->get('monolog.logger.mautic')->log('error', 'Clearbit: '.$ex2->getMessage());
             }
         }
 
         return new Response('OK');
     }
-
 }
