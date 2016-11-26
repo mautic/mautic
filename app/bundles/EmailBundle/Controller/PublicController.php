@@ -29,28 +29,12 @@ class PublicController extends CommonFormController
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(
-            [
-                'email:emails:viewown',
-                'email:emails:viewother',
-                'email:emails:create',
-                'email:emails:editown',
-                'email:emails:editother',
-                'email:emails:deleteown',
-                'email:emails:deleteother',
-                'email:emails:publishown',
-                'email:emails:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
-
-        if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
-            return $this->accessDenied();
-        }
-
         if (!empty($stat)) {
-            if ($this->get('mautic.security')->isAnonymous()) {
+	        if ($stat->getSource() == 'email.client' && !$this->get('mautic.security')->isGranted('email:emails:viewown') && !$this->get('mautic.security')->isGranted('email:emails:viewother')) {
+		        return $this->accessDenied();
+	        }
+
+	        if ($this->get('mautic.security')->isAnonymous()) {
                 $model->hitEmail($stat, $this->request, true);
             }
 
@@ -548,8 +532,17 @@ class PublicController extends CommonFormController
             // stat doesn't exist, create one
             if ($stat === null) {
                 $lead['email'] = $email; // needed for stat
+	            if ($lead['email'] === null) {
+		            $logger->log('error', $integration.': email not available for stat.');
+	            }
                 $this->addStat($lead, $email, $query, $idHash);
             }
+
+            if ($stat === null) {
+		        $logger->log('error', $integration.': Creating the stat didnt work.');
+	        }
+
+	        $stat->setSource('email.client');
 
             if ($stat || $integration !== 'Outlook') { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $this->request); // add email event
