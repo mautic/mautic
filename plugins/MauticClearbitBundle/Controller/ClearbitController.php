@@ -13,9 +13,6 @@ namespace MauticPlugin\MauticClearbitBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
-use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
-use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -90,29 +87,8 @@ class ClearbitController extends FormController
             );
         } else {
             if ('POST' === $this->request->getMethod()) {
-                // get api_key from plugin settings
-                $integrationHelper = $this->get('mautic.helper.integration');
-                /** @var ClearbitIntegration $myIntegration */
-                $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Person($keys['apikey']);
                 try {
-                    $webhookId = sprintf(
-                        'clearbit%s#%s#%d',
-                        (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
-                        $objectId,
-                        $this->user->getId()
-                    );
-
-                    $cache   = $lead->getSocialCache();
-                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
-                    if (!array_key_exists($cacheId, $cache)) {
-                        $clearbit->setWebhookId($webhookId);
-                        $res             = $clearbit->lookupByEmail($lead->getEmail());
-                        $cache[$cacheId] = serialize($res);
-                        $lead->setSocialCache($cache);
-                        $model->getRepository()->saveEntity($lead);
-                    }
+                    $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, array_key_exists('notify', $data));
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
@@ -258,51 +234,36 @@ class ClearbitController extends FormController
             );
         } else {
             if ('POST' === $this->request->getMethod()) {
-                // get api_key from plugin settings
-                $integrationHelper = $this->get('mautic.helper.integration');
-                /** @var ClearbitIntegration $myIntegration */
-                $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Person($keys['apikey']);
-                try {
-                    foreach ($lookupEmails as $id => $lookupEmail) {
-                        $lead      = $model->getEntity($id);
-                        $webhookId = sprintf(
-                            'clearbit%s#%s#%d',
-                            (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
-                            $id,
-                            $this->user->getId()
-                        );
-                        $cache   = $lead->getSocialCache();
-                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
-                        if (!array_key_exists($cacheId, $cache)) {
-                            $clearbit->setWebhookId($webhookId);
-                            $res             = $clearbit->lookupByEmail($lookupEmail);
-                            $cache[$cacheId] = serialize($res);
-                            $lead->setSocialCache($cache);
-                            $model->getRepository()->saveEntity($lead);
+                $notify = array_key_exists('notify', $data);
+                foreach ($lookupEmails as $id => $lookupEmail) {
+                    if ($lead = $model->getEntity($id)) {
+                        try {
+                            $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, $notify);
+                        } catch (\Exception $ex) {
+                            $this->addFlash(
+                                    $ex->getMessage(),
+                                    [],
+                                    'error'
+                                );
+                            --$count;
                         }
                     }
+                }
 
+                if ($count) {
                     $this->addFlash(
-                        'mautic.lead.batch_leads_affected',
-                        [
-                            'pluralCount' => $count,
-                            '%count%'     => $count,
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlash(
-                        $ex->getMessage(),
-                        [],
-                        'error'
-                    );
+                            'mautic.lead.batch_leads_affected',
+                            [
+                                'pluralCount' => $count,
+                                '%count%'     => $count,
+                            ]
+                        );
                 }
 
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                         'flashes'   => $this->getFlashContent(),
                     ]
                 );
             }
@@ -381,30 +342,8 @@ class ClearbitController extends FormController
             );
         } else {
             if ('POST' === $this->request->getMethod()) {
-                // get api_key from plugin settings
-                $integrationHelper = $this->get('mautic.helper.integration');
-                /** @var ClearbitIntegration $myIntegration */
-                $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Company($keys['apikey']);
                 try {
-                    $webhookId = sprintf(
-                        'clearbitcomp%s#%s#%d',
-                        (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
-                        $objectId,
-                        $this->user->getId()
-                    );
-                    $website = $company->getFieldValue('companywebsite');
-                    $parse   = parse_url($website);
-                    $cache   = $company->getSocialCache();
-                    $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
-                    if (!array_key_exists($cacheId, $cache) && isset($parse['host'])) {
-                        $clearbit->setWebhookId($webhookId);
-                        $res             = $clearbit->lookupByDomain($parse['host']);
-                        $cache[$cacheId] = serialize($res);
-                        $company->setSocialCache($cache);
-                        $model->getRepository()->saveEntity($company);
-                    }
+                    $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, array_key_exists('notify', $data));
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
@@ -549,44 +488,29 @@ class ClearbitController extends FormController
             );
         } else {
             if ('POST' === $this->request->getMethod()) {
-                // get api_key from plugin settings
-                $integrationHelper = $this->get('mautic.helper.integration');
-                /** @var ClearbitIntegration $myIntegration */
-                $myIntegration = $integrationHelper->getIntegrationObject('Clearbit');
-                $keys          = $myIntegration->getDecryptedApiKeys();
-                $clearbit      = new Clearbit_Company($keys['apikey']);
-                try {
-                    foreach ($lookupWebsites as $id => $lookupWebsite) {
-                        $company   = $model->getEntity($id);
-                        $webhookId = sprintf(
-                            'clearbitcomp%s#%s#%d',
-                            (array_key_exists('notify', $data) && $data['notify']) ? '_notify' : '',
-                            $id,
-                            $this->user->getId()
-                        );
-                        $cache   = $company->getSocialCache();
-                        $cacheId = sprintf('%s%s', $webhookId, date('YmdH'));
-                        if (!array_key_exists($cacheId, $cache)) {
-                            $clearbit->setWebhookId($webhookId);
-                            $res             = $clearbit->lookupByDomain($lookupWebsite);
-                            $cache[$cacheId] = serialize($res);
-                            $company->setSocialCache($cache);
-                            $model->getRepository()->saveEntity($company);
+                $notify = array_key_exists('notify', $data);
+                foreach ($lookupWebsites as $id => $lookupWebsite) {
+                    if ($company = $model->getEntity($id)) {
+                        try {
+                            $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, $notify);
+                        } catch (\Exception $ex) {
+                            $this->addFlash(
+                                $ex->getMessage(),
+                                [],
+                                'error'
+                            );
+                            --$count;
                         }
                     }
+                }
 
+                if ($count) {
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
                             'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlash(
-                        $ex->getMessage(),
-                        [],
-                        'error'
                     );
                 }
 

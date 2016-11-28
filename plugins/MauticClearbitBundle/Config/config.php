@@ -40,10 +40,7 @@ return [
             'mautic.plugin.clearbit.lead.subscriber' => [
                 'class'     => 'MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.helper.user',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
+                    'mautic.plugin.clearbit.lookup_helper',
                 ],
             ],
         ],
@@ -55,6 +52,18 @@ return [
             'mautic.form.type.clearbit_batch_lookup' => [
                 'class' => 'MauticPlugin\MauticClearbitBundle\Form\Type\BatchLookupType',
                 'alias' => 'clearbit_batch_lookup',
+            ],
+        ],
+        'others' => [
+            'mautic.plugin.clearbit.lookup_helper' => [
+                'class'     => 'MauticPlugin\MauticClearbitBundle\Helper\LookupHelper',
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.helper.user',
+                    'monolog.logger.mautic',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                ],
             ],
         ],
     ],
