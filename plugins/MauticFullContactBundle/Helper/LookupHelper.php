@@ -235,7 +235,7 @@ class LookupHelper
         /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
-        $cacheId   = sprintf('fullcontact%s#', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');
+        $cacheId   = sprintf('fullcontact%s%s#', $entity instanceof Company ? 'comp' : '', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');
         $webhookId = $cacheId.'#'.$user->getId().'#'.$nonce;
 
         $cache = $entity->getSocialCache();
