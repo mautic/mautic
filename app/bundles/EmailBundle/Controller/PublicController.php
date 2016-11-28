@@ -224,7 +224,7 @@ class PublicController extends CommonFormController
                                     }
                                     if (!empty($deletedChannels = array_diff_key($formData['lead_channels'], $formData['doNotContactChannels']))) {
                                         foreach ($deletedChannels as $deletedChannel) {
-                                            $leadModel->addDncForLead($lead, $deletedChannel, 'user', 3);
+                                            $leadModel->addDncForLead($lead, $deletedChannel, 'user', DoNotContact::UNSUBSCRIBED);
                                         }
                                     }
                                     $leadModel->setFrequencyRules($lead, $formData, $leadsLists);
