@@ -34,6 +34,9 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+            'mautic.sms.channel.subscriber' => [
+                'class' => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [

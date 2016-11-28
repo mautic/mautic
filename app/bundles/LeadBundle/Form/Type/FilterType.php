@@ -149,6 +149,16 @@ class FilterType extends AbstractType
                     $customOptions['choices'] = $options['stage'];
                     $type                     = 'choice';
                     break;
+                case 'globalcategory':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = [];
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = [$data['filter']];
+                    }
+                    $customOptions['choices']  = $options['globalcategory'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                 case 'country':
                 case 'region':
@@ -376,6 +386,7 @@ class FilterType extends AbstractType
                 'tags',
                 'stage',
                 'locales',
+                'globalcategory',
             ]
         );
 

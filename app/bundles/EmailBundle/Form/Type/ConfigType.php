@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -633,6 +634,89 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
+            ]);
+        $builder->add(
+            'show_contact_segments',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.segments',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_segments']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_preferences',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.preference.options',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_preferences']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_frequency',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.frequency',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_frequency']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_pause_dates',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.pause.dates',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_pause_dates']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_categories',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.categories',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_categories']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_preferred_channels',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.preferred.channels',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
+                ],
+                'data'     => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'required' => false,
             ]
         );
     }

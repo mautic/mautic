@@ -422,6 +422,14 @@ class ListModel extends FormModel
                 'object' => 'lead',
 
             ],
+            'globalcategory' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.categories'),
+                'properties' => [
+                    'type' => 'globalcategory',
+                ],
+                'operators' => 'multiselect',
+                'object'    => 'lead',
+            ],
         ];
 
         //get list of custom fields

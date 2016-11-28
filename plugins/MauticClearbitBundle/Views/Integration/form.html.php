@@ -28,8 +28,8 @@ if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && c
     }
 }
 
-$fieldHtml = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$fieldLabel = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldHtml     = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
 $fieldTabClass = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 
