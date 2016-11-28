@@ -401,7 +401,22 @@ class ButtonHelper extends Helper
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
                 if ($ap == $bp) {
-                    return 0;
+                    $aText = $bText = '';
+
+                    // Sort alphabetically
+                    if (isset($a['confirm']) && isset($a['confirm']['btnText'])) {
+                        $aText = $a['confirm']['btnText'];
+                    } elseif (isset($a['btnText'])) {
+                        $aText = $a['btnText'];
+                    }
+
+                    if (isset($b['confirm']) && isset($b['confirm']['btnText'])) {
+                        $bText = $b['confirm']['btnText'];
+                    } elseif (isset($b['btnText'])) {
+                        $bText = $b['btnText'];
+                    }
+
+                    return strcasecmp($aText, $bText);
                 }
 
                 return ($ap > $bp) ? -1 : 1;
