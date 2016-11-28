@@ -813,6 +813,14 @@ var Mautic = {
         });
     },
 
+    getBuilderTokensMethod: function() {
+        var method = 'page:getBuilderTokens';
+        if (parent.mQuery('.builder').hasClass('email-builder')) {
+            method = 'email:getBuilderTokens';
+        }
+        return method;
+    },
+
     /**
      * Download the tokens
      *
@@ -1505,7 +1513,7 @@ var Mautic = {
                 currentModuleItem = mQuery('.page-header h3').text();
             }
 
-            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );    
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
         } else {
             //loading basic title
             mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
@@ -3913,37 +3921,57 @@ var Mautic = {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
         Mautic.showChangeThemeWarning = true;
+        Mautic.builderTheme = themeField.val();
 
         if (isNew) {
             Mautic.showChangeThemeWarning = false;
+
+            // Populate default content
+            Mautic.setThemeHtml(Mautic.builderTheme);
         }
 
         if (customHtml.length) {
-
-            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
-
-            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
-                Mautic.setThemeHtml(themeField.val());
-            }
-
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
+                var theme = currentLink.attr('data-theme');
+                var isCodeMode = (theme === 'mautic_code_mode');
+                Mautic.builderTheme = theme;
 
                 if (Mautic.showChangeThemeWarning && customHtml.val().length) {
-                    if (confirm('You will lose the current content if you switch the theme.')) {
-                        customHtml.val('');
-                        Mautic.showChangeThemeWarning = false;
+                    if (!isCodeMode) {
+                        if (confirm(Mautic.translate('mautic.core.builder.theme_change_warning'))) {
+                            customHtml.val('');
+                            Mautic.showChangeThemeWarning = false;
+                        } else {
+                            return;
+                        }
                     } else {
-                        return;
+                        if (confirm(Mautic.translate('mautic.core.builder.code_mode_warning'))) {
+                        } else {
+                            return;
+                        }
                     }
                 }
 
                 // Set the theme field value
-                themeField.val(currentLink.attr('data-theme'));
+                themeField.val(theme);
 
-                // Load the theme HTML to the source textarea
-                Mautic.setThemeHtml(currentLink.attr('data-theme'));
+                // Code Mode
+                if (isCodeMode) {
+                    mQuery('.builder').addClass('code-mode');
+                    mQuery('.builder .code-editor').removeClass('hide');
+                    mQuery('.builder .code-mode-toolbar').removeClass('hide');
+                    mQuery('.builder .builder-toolbar').addClass('hide');
+                } else {
+                    mQuery('.builder').removeClass('code-mode');
+                    mQuery('.builder .code-editor').addClass('hide');
+                    mQuery('.builder .code-mode-toolbar').addClass('hide');
+                    mQuery('.builder .builder-toolbar').removeClass('hide');
+
+                    // Load the theme HTML to the source textarea
+                    Mautic.setThemeHtml(theme);
+                }
 
                 // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
@@ -3965,8 +3993,21 @@ var Mautic = {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
-            textarea.froalaEditor('html.set', themeHtml);
         });
+    },
+
+    /**
+     * Updates content of an iframe
+     *
+     * @param iframe ID
+     * @param HTML content
+     */
+    updateIframeContent: function(iframeId, content) {
+        var iframe = document.getElementById(iframeId);
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(content);
+        doc.close();
     },
 
     /**
