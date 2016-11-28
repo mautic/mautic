@@ -30,7 +30,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry')
+        $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry, comp.companywebsite')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
         ->where('cl.lead_id = :leadId')

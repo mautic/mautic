@@ -606,8 +606,10 @@ class LeadListRepository extends CommonRepository
             } elseif ($object == 'company') {
                 $field = "comp.{$details['field']}";
             }
-            // Format the field based on platform specific functions that DBAL doesn't support natively
+
+            $columnType = false;
             if ($column) {
+                // Format the field based on platform specific functions that DBAL doesn't support natively
                 $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
                 $columnType = $column->getType();
 
@@ -1012,6 +1014,11 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 default:
+                    if (!$column) {
+                        // Column no longer exists so continue
+                        continue;
+                    }
+
                     if ($isCompany) {
                         // Must tell getLeadsByList how to best handle the relationship with the companies table
                         if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
