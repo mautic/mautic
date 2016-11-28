@@ -952,6 +952,22 @@ class LeadModel extends FormModel
     /**
      * Get or generate the tracking ID for the current session.
      *
+     * @param ParameterBag $cookies
+     *
+     * @return array
+     */
+    public function getTrackingCookieForQueue($cookies)
+    {
+      if(!$cookies->get('mautic_session_id')){
+        $newTrackingId = hash('sha1', uniqid(mt_rand()));
+        $this->cookieHelper->setCookie('mautic_session_id', $newTrackingId);
+      }
+      return array($cookies->get('mautic_session_id'), false);
+    }
+
+    /**
+     * Get or generate the tracking ID for the current session
+     *
      * @param bool|false $forceRegeneration
      *
      * @return array

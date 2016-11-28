@@ -275,6 +275,10 @@ return [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
                 'arguments' => 'mautic.page.model.page',
             ],
+            'rabbitmq_consumer' => [
+              'class' => 'Mautic\PageBundle\Service\Rabbitmq\Consumer',
+              'arguments' => 'mautic.page.model.page'
+            ],
         ],
     ],
 

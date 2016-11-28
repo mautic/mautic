@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Class TrackingPixelHelper.
@@ -23,6 +24,13 @@ class TrackingPixelHelper
     {
         $response = self::getResponse($request);
         $response->send();
+    }
+
+    public static function getResponseWithCookie(Request $request, $value)
+    {
+      $response = self::getResponse($request);
+      $response->headers->setCookie(new Cookie('mautic_session_id', $value, time() + 1800));
+      return $response;
     }
 
     /**
@@ -39,7 +47,7 @@ class TrackingPixelHelper
             apache_setenv('no-gzip', 1);
         }
 
-        ini_set('zlib.output_compression', 0);
+        // ini_set('zlib.output_compression', 0);
 
         $response = new Response();
 

@@ -1,0 +1,34 @@
+# RabbitMQ Configuration
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:        'localhost'
+            port:        5672
+            user:        'guest'
+            password:    'guest'
+            vhost:       '/'
+            lazy:        true
+            connection_timeout: 3
+            read_write_timeout: 3
+
+    producers:
+        task_name:
+          connection:       default
+          exchange_options: {name: 'task_name', type: direct}
+
+        task_email:
+          connection:       default
+          exchange_options: {name: 'task_email', type: direct}
+
+    consumers:
+        task_name:
+          connection:       default
+          exchange_options: {name: 'task_name', type: direct}
+          queue_options:    {name: 'task_name'}
+          callback:         rabbitmq_consumer
+
+        task_email:
+          connection:       default
+          exchange_options: {name: 'task_email', type: direct}
+          queue_options:    {name: 'task_email'}
+          callback:         email_consumer

@@ -173,9 +173,15 @@ class CommonRepository extends EntityRepository
      */
     public function saveEntity($entity, $flush = true)
     {
-        $this->getEntityManager()->persist($entity);
+      if (!$this->_em->isOpen()) {
+        $this->_em = $this->_em->create(
+            $this->_em->getConnection(),
+            $this->_em->getConfiguration()
+        );
+      }
+        $this->_em->persist($entity);
         if ($flush) {
-            $this->getEntityManager()->flush($entity);
+            $this->_em->flush($entity);
         }
     }
 

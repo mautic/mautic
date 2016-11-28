@@ -13,6 +13,8 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
@@ -348,11 +350,14 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        //Create page entry
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
-
+        $trackingId = $this->request->cookies->get('mautic_session_id');
+        if(!$trackingId){
+          $trackingId = hash('sha1', uniqid(mt_rand()));
+          $cookieHelper = $this->factory->getHelper('cookie');
+          $cookieHelper->setCookie('mautic_session_id', $trackingId);
+        }
+        $msg = array('request' => $this->request);
+        $this->get('old_sound_rabbit_mq.task_name_producer')->publish(serialize($msg));
         return TrackingPixelHelper::getResponse($this->request);
     }
 
