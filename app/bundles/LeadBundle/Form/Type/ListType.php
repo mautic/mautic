@@ -11,16 +11,23 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ListType.
@@ -28,25 +35,24 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $fieldChoices    = [];
-    private $timezoneChoices = [];
-    private $countryChoices  = [];
-    private $regionChoices   = [];
-    private $listChoices     = [];
-    private $emailChoices    = [];
-    private $tagChoices      = [];
-    private $stageChoices    = [];
-    private $localeChoices   = [];
+    private $fieldChoices      = [];
+    private $timezoneChoices   = [];
+    private $countryChoices    = [];
+    private $regionChoices     = [];
+    private $listChoices       = [];
+    private $emailChoices      = [];
+    private $tagChoices        = [];
+    private $stageChoices      = [];
+    private $localeChoices     = [];
+    private $categoriesChoices = [];
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel)
     {
-        $this->translator = $factory->getTranslator();
+        $this->translator = $translator;
 
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel          = $factory->getModel('lead.list');
         $this->fieldChoices = $listModel->getChoiceFields();
 
         // Locales
@@ -61,26 +67,27 @@ class ListType extends AbstractType
             $this->listChoices[$list['id']] = $list['name'];
         }
 
-        // Emails
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $factory->getModel('email');
-        $viewOther  = $factory->getSecurity()->isGranted('email:emails:viewother');
-        $emails     = $emailModel->getRepository()->getEmailList('', 0, 0, $viewOther, true);
+        $viewOther = $security->isGranted('email:emails:viewother');
+        $emails    = $emailModel->getRepository()->getEmailList('', 0, 0, $viewOther, true);
         foreach ($emails as $email) {
             $this->emailChoices[$email['language']][$email['id']] = $email['name'];
         }
         ksort($this->emailChoices);
 
-        // Tags
-        $leadModel = $factory->getModel('lead');
-        $tags      = $leadModel->getTagList();
+        $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
         }
 
-        $stages = $factory->getModel('stage')->getRepository()->getSimpleList();
+        $stages = $stageModel->getRepository()->getSimpleList();
         foreach ($stages as $stage) {
             $this->stageChoices[$stage['value']] = $stage['label'];
+        }
+
+        $categories = $categoryModel->getLookupResults('global');
+
+        foreach ($categories as $category) {
+            $this->categoriesChoices[$category['id']] = $category['title'];
         }
     }
 
@@ -147,16 +154,17 @@ class ListType extends AbstractType
                 [
                     'type'    => 'leadlist_filter',
                     'options' => [
-                        'label'     => false,
-                        'timezones' => $this->timezoneChoices,
-                        'countries' => $this->countryChoices,
-                        'regions'   => $this->regionChoices,
-                        'fields'    => $this->fieldChoices,
-                        'lists'     => $this->listChoices,
-                        'emails'    => $this->emailChoices,
-                        'tags'      => $this->tagChoices,
-                        'stage'     => $this->stageChoices,
-                        'locales'   => $this->localeChoices,
+                        'label'          => false,
+                        'timezones'      => $this->timezoneChoices,
+                        'countries'      => $this->countryChoices,
+                        'regions'        => $this->regionChoices,
+                        'fields'         => $this->fieldChoices,
+                        'lists'          => $this->listChoices,
+                        'emails'         => $this->emailChoices,
+                        'tags'           => $this->tagChoices,
+                        'stage'          => $this->stageChoices,
+                        'locales'        => $this->localeChoices,
+                        'globalcategory' => $this->categoriesChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -191,15 +199,16 @@ class ListType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields']    = $this->fieldChoices;
-        $view->vars['countries'] = $this->countryChoices;
-        $view->vars['regions']   = $this->regionChoices;
-        $view->vars['timezones'] = $this->timezoneChoices;
-        $view->vars['lists']     = $this->listChoices;
-        $view->vars['emails']    = $this->emailChoices;
-        $view->vars['tags']      = $this->tagChoices;
-        $view->vars['stage']     = $this->stageChoices;
-        $view->vars['locales']   = $this->localeChoices;
+        $view->vars['fields']         = $this->fieldChoices;
+        $view->vars['countries']      = $this->countryChoices;
+        $view->vars['regions']        = $this->regionChoices;
+        $view->vars['timezones']      = $this->timezoneChoices;
+        $view->vars['lists']          = $this->listChoices;
+        $view->vars['emails']         = $this->emailChoices;
+        $view->vars['tags']           = $this->tagChoices;
+        $view->vars['stage']          = $this->stageChoices;
+        $view->vars['locales']        = $this->localeChoices;
+        $view->vars['globalcategory'] = $this->categoriesChoices;
     }
 
     /**

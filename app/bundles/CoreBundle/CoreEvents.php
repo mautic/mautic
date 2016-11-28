@@ -44,6 +44,15 @@ final class CoreEvents
     const GLOBAL_SEARCH = 'mautic.global_search';
 
     /**
+     * The mautic.list_stats event is thrown to build statistical results from applicable bundles/database tables.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StatsEvent instance.
+     *
+     * @var string
+     */
+    const LIST_STATS = 'mautic.list_stats';
+
+    /**
      * The mautic.build_command_list event is thrown to build global search's autocomplete list.
      *
      * The event listener receives a Mautic\CoreBundle\Event\CommandListEvent instance.
@@ -141,4 +150,13 @@ final class CoreEvents
      * @var string
      */
     const PROCESS_MESSAGE_QUEUE_BATCH = 'mautic.process_message_queue_batch';
+
+    /**
+     * The mautic.view_inject_custom_buttons event is dispatched to inject custom buttons into Mautic's UI by plugins/other bundles.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomButtonEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_BUTTONS = 'mautic.view_inject_custom_buttons';
 }

@@ -30,7 +30,7 @@ class CompanyChangeScoreActionType extends AbstractType
             'score',
             'number',
             [
-                'label'       => 'mautic.company.score',
+                'label'       => 'mautic.lead.lead.events.changecompanyscore',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'precision'   => 0,

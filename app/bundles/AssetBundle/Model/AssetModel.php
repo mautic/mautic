@@ -108,7 +108,6 @@ class AssetModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        //set the author for new asset
         if (!$entity->isNew()) {
             //increase the revision
             $revision = $entity->getRevision();
@@ -330,9 +329,12 @@ class AssetModel extends FormModel
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('asset', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('asset', $entity, $options);
     }
 
     /**

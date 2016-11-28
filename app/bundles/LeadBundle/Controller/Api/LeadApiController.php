@@ -15,7 +15,10 @@ use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -67,13 +70,9 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $entity
-     *
-     * @return mixed|void
+     * @return array
      */
-    protected function createEntityForm($entity)
+    protected function getEntityFormOptions()
     {
         $fields = $this->getModel('lead.field')->getEntities(
             [
@@ -83,12 +82,17 @@ class LeadApiController extends CommonApiController
                         'expr'   => 'eq',
                         'value'  => true,
                     ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'eq',
+                        'value'  => 'lead',
+                    ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]
         );
 
-        return $this->model->createForm($entity, $this->get('form.factory'), null, ['fields' => $fields, 'csrf_protection' => false]);
+        return ['fields' => $fields];
     }
 
     /**
@@ -136,6 +140,7 @@ class LeadApiController extends CommonApiController
                             'column' => 'f.isPublished',
                             'expr'   => 'eq',
                             'value'  => true,
+                            'object' => 'lead',
                         ],
                     ],
                 ],
@@ -290,6 +295,109 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Obtains a list of contact events.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getEventsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
+        }
+
+        $filters = InputHelper::clean($this->request->get('filters', []));
+
+        if (!isset($filters['search'])) {
+            $filters['search'] = '';
+        }
+
+        if (!isset($filters['includeEvents'])) {
+            $filters['includeEvents'] = [];
+        }
+
+        if (!isset($filters['excludeEvents'])) {
+            $filters['excludeEvents'] = [];
+        }
+
+        $order = InputHelper::clean($this->request->get('order', [
+            'timestamp',
+            'DESC',
+        ]));
+        $page        = (int) $this->request->get('page', 1);
+        $engagements = $this->model->getEngagements($entity, $filters, $order, $page);
+        $view        = $this->view($engagements);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds a DNC to the contact.
+     *
+     * @param int    $id
+     * @param string $channel
+     */
+    public function addDncAction($id, $channel)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $channelId = (int) $this->request->request->get('channelId');
+        $reason    = (int) $this->request->request->get('reason');
+        $comments  = InputHelper::clean($this->request->request->get('comments'));
+        $result    = $this->model->addDncForLead($entity, $channel, $comments, $reason);
+        $view      = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Removes a DNC from the contact.
+     *
+     * @param int $id
+     * @param int $channel
+     */
+    public function removeDncAction($id, $channel)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $result = $this->model->removeDncForLead($entity, $channel);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
@@ -322,10 +430,29 @@ class LeadApiController extends CommonApiController
             unset($parameters['companies']);
         }
 
+        // Contact parameters which can be updated apart form contact fields
+        $contactParams = ['points', 'color', 'owner'];
+
+        foreach ($contactParams as $contactParam) {
+            if (isset($parameters[$contactParam])) {
+                $entity->setPoints($parameters[$contactParam]);
+                unset($parameters[$contactParam]);
+            }
+        }
+
         // Check for lastActive date
         if (isset($parameters['lastActive'])) {
             $lastActive = new DateTimeHelper($parameters['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
+        }
+
+        if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
+            foreach ($parameters['doNotContact'] as $dnc) {
+                $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
+                $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
+                $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
+                $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+            }
         }
 
         //set the custom field values
@@ -342,7 +469,7 @@ class LeadApiController extends CommonApiController
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
      * @param $parameters
-     * @param $entity
+     * @param Lead $entity
      * @param $action
      *
      * @return mixed|void
@@ -350,6 +477,23 @@ class LeadApiController extends CommonApiController
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
         unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
+
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+            // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
+            // is not defined in the request
+
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $fields     = $fieldModel->getFieldListWithProperties();
+
+            foreach ($fields as $alias => $field) {
+                // Set the default value if the parameter is not included in the request, there is no value for the given entity, and a default is defined
+                $currentValue = $entity->getFieldValue($alias);
+                if (!isset($parameters[$alias]) && ('' === $currentValue || null == $currentValue) && '' !== $field['defaultValue'] && null !== $field['defaultValue']) {
+                    $parameters[$alias] = $field['defaultValue'];
+                }
+            }
+        }
 
         return $parameters;
     }
@@ -363,9 +507,7 @@ class LeadApiController extends CommonApiController
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
         if ($entity instanceof Lead) {
-            $fields        = $entity->getFields();
-            $all           = $this->model->flattenFields($fields);
-            $fields['all'] = $all;
+            $fields['all'] = $entity->getProfileFields();
             $entity->setFields($fields);
         }
     }

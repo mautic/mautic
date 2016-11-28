@@ -60,7 +60,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $messageId  = $input->getOption('message-id');
         $key        = $channel.$channelId.$messageId;
 
-        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
+        if (!$this->checkRunStatus($input, $output, $key)) {
             return 0;
         }
 

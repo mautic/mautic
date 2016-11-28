@@ -64,7 +64,7 @@ EOT
         $channel   = $input->getOption('channel');
         $channelId = $input->getOption('id');
         $key       = $channel.$channelId;
-        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
+        if (!$this->checkRunStatus($input, $output, $key)) {
             return 0;
         }
 

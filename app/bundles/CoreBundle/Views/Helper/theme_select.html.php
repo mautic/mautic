@@ -8,9 +8,27 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$codeMode   = 'mautic_code_mode';
+$isCodeMode = ($active == $codeMode);
 ?>
 <?php if ($themes) : ?>
 <div class="row">
+    <div class="col-md-3 theme-list">
+        <div class="panel panel-default <?php echo $isCodeMode ? 'theme-selected' : ''; ?>">
+            <div class="panel-body text-center">
+                <h3><?php echo $view['translator']->trans('mautic.core.code.mode'); ?></h3>
+                <div class="panel-body text-center" style="height: 250px">
+                    <i class="fa fa-code fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
+                </div>
+                <a href="#" type="button" data-theme="<?php echo $codeMode; ?>" class="select-theme-link btn btn-default <?php echo $isCodeMode ? 'hide' : '' ?>">
+                    Select
+                </a>
+                <button type="button" class="select-theme-selected btn btn-default <?php echo $isCodeMode ? '' : 'hide' ?>" disabled="disabled">
+                    Selected
+                </button>
+            </div>
+        </div>
+    </div>
     <?php foreach ($themes as $themeKey => $themeInfo) : ?>
         <?php $isSelected = ($active === $themeKey); ?>
         <?php if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) {

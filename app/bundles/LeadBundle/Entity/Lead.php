@@ -338,6 +338,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'stage',
                     'dateIdentified',
                     'preferredProfileImage',
+                    'doNotContact',
                 ]
             )
             ->build();
@@ -729,7 +730,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
         if ($pointsDelta === 0) {
-            // No need to record a null delta
+            // No need to record no change
             return;
         }
 
@@ -1220,7 +1221,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      *
      * @return Stage
      */
-    public function setStage(Stage $stage)
+    public function setStage(Stage $stage = null)
     {
         $this->stage = $stage;
 
@@ -1238,11 +1239,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set stage.
+     * Set frequency rules.
      *
      * @param FrequencyRule $frequencyRules
      *
-     * @return frequencyRules
+     * @return Lead
      */
     public function setFrequencyRules(FrequencyRule $frequencyRules)
     {
@@ -1253,7 +1254,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get stage.
+     * Get frequency rules.
      *
      * @return array
      */
