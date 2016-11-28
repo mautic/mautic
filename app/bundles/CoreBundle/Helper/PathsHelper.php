@@ -36,6 +36,11 @@ class PathsHelper
     /**
      * @var string
      */
+    protected $assetPath;
+
+    /**
+     * @var string
+     */
     protected $dashboardImportDir;
 
     /**

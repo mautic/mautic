@@ -42,12 +42,12 @@ class LeadField extends FormEntity
     /**
      * @var string
      */
-    private $type;
+    private $type = 'text';
 
     /**
      * @var string
      */
-    private $group;
+    private $group = 'core';
 
     /**
      * @var string
@@ -99,7 +99,7 @@ class LeadField extends FormEntity
     /**
      * @var int
      */
-    private $order = 0;
+    private $order = 1;
 
     /**
      * @var string
@@ -109,7 +109,7 @@ class LeadField extends FormEntity
     /**
      * @var array
      */
-    private $properties;
+    private $properties = [];
 
     public function __clone()
     {

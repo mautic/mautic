@@ -27,6 +27,14 @@ return [
                 ],
             ],
         ],
+        'api' => [
+            'mautic_api_categoriesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'categories',
+                'path'            => '/categories',
+                'controller'      => 'MauticCategoryBundle:Api\CategoryApi',
+            ],
+        ],
     ],
 
     'menu' => [
@@ -64,11 +72,11 @@ return [
             ],
             'mautic.form.type.category_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
+                'alias'     => 'category_form',
                 'arguments' => [
                     'translator',
                     'session',
                 ],
-                'alias' => 'category_form',
             ],
             'mautic.form.type.category_bundles_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',

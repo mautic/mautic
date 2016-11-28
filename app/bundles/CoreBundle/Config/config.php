@@ -70,6 +70,29 @@ return [
                 ],
             ],
         ],
+        'api' => [
+            'mautic_core_api_file_list' => [
+                'path'       => '/files/{dir}',
+                'controller' => 'MauticCoreBundle:Api\FileApi:list',
+            ],
+            'mautic_core_api_file_create' => [
+                'path'       => '/files/{dir}/new',
+                'controller' => 'MauticCoreBundle:Api\FileApi:create',
+                'method'     => 'POST',
+            ],
+            'mautic_core_api_file_delete' => [
+                'path'       => '/files/{dir}/{file}/delete',
+                'controller' => 'MauticCoreBundle:Api\FileApi:delete',
+                'method'     => 'DELETE',
+            ],
+           'mautic_core_api_stats' => [
+               'path'       => '/stats/{table}',
+               'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+               'defaults'   => [
+                    'table' => '',
+                ],
+           ],
+        ],
     ],
     'menu' => [
         'main' => [
@@ -147,6 +170,12 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.core.stats.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

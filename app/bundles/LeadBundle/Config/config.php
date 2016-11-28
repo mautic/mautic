@@ -89,33 +89,28 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getcontacts' => [
-                'path'       => '/contacts',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntities',
+            'mautic_api_contactsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'contacts',
+                'path'            => '/contacts',
+                'controller'      => 'MauticLeadBundle:Api\LeadApi',
             ],
-            'mautic_api_newcontact' => [
-                'path'       => '/contacts/new',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:newEntity',
+            'mautic_api_dncaddcontact' => [
+                'path'       => '/contacts/{id}/dnc/add/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addDnc',
+                'method'     => 'POST',
+                'defaults'   => [
+                    'channel' => 'email',
+                ],
+            ],
+            'mautic_api_dncremovecontact' => [
+                'path'       => '/contacts/{id}/dnc/remove/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
             ],
-            'mautic_api_getcontact' => [
-                'path'       => '/contacts/{id}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntity',
-            ],
-            'mautic_api_editputcontact' => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PUT',
-            ],
-            'mautic_api_editpatchcontact' => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PATCH',
-            ],
-            'mautic_api_deletecontact' => [
-                'path'       => '/contacts/{id}/delete',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:deleteEntity',
-                'method'     => 'DELETE',
+            'mautic_api_getcontactevents' => [
+                'path'       => '/contacts/{id}/events',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
             ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
@@ -141,9 +136,11 @@ return [
                 'path'       => '/contacts/list/segments',
                 'controller' => 'MauticLeadBundle:Api\ListApi:getLists',
             ],
-            'mautic_api_getsegments' => [
-                'path'       => '/segments',
-                'controller' => 'MauticLeadBundle:Api\ListApi:getLists',
+            'mautic_api_segmentsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'lists',
+                'path'            => '/segments',
+                'controller'      => 'MauticLeadBundle:Api\ListApi',
             ],
             'mautic_api_segmentaddcontact' => [
                 'path'       => '/segments/{id}/contact/add/{leadId}',
@@ -154,6 +151,37 @@ return [
                 'path'       => '/segments/{id}/contact/remove/{leadId}',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST',
+            ],
+            'mautic_api_companiesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'companies',
+                'path'            => '/companies',
+                'controller'      => 'MauticLeadBundle:Api\CompanyApi',
+            ],
+            'mautic_api_companyaddcontact' => [
+                'path'       => '/companies/{companyId}/contact/add/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:addContact',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companyremovecontact' => [
+                'path'       => '/companies/{companyId}/contact/remove/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
+                'method'     => 'POST',
+            ],
+            'mautic_api_fieldsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'fields',
+                'path'            => '/fields/{object}',
+                'controller'      => 'MauticLeadBundle:Api\FieldApi',
+                'defaults'        => [
+                    'object' => 'contact',
+                ],
+            ],
+            'mautic_api_notesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'notes',
+                'path'            => '/notes',
+                'controller'      => 'MauticLeadBundle:Api\NoteApi',
             ],
         ],
     ],
@@ -266,6 +294,12 @@ return [
                 'class'     => 'Mautic\LeadBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.lead.stats.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
