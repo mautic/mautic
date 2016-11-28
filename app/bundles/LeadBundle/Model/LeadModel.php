@@ -2344,11 +2344,23 @@ class LeadModel extends FormModel
         $event = new ChannelEvent();
 
         $this->dispatcher->dispatch(LeadEvents::ADD_CHANNEL, $event);
-        $channels = $event->getChannels();
+        $allChannels = $event->getChannels();
+
+        $channels = [];
+        foreach ($allChannels as $channel) {
+            $channelName = $this->translator->hasId('mautic.channel.'.$channel) ?
+                $this->translator->trans('mautic.channel.'.$channel) : ucfirst($channel);
+            $channels[$channelName] = $channel;
+        }
 
         return $channels;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return array
+     */
     public function getPreferredChannel(Lead $lead)
     {
         $preferredChannel = $this->getFrequencyRuleRepository()->getPreferredChannel($lead->getId());
@@ -2358,6 +2370,7 @@ class LeadModel extends FormModel
 
         return [];
     }
+
     /**
      * @param $companyId
      * @param $leadId
