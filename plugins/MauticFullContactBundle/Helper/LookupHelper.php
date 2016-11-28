@@ -90,6 +90,10 @@ class LookupHelper
      */
     public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
     {
+        if (!$lead->getEmail()) {
+            return;
+        }
+
         /** @var FullContact_Person $fullcontact */
         if ($fullcontact = $this->getFullContact()) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
@@ -133,11 +137,15 @@ class LookupHelper
      */
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
+        if (!$website = $company->getFieldValue('companywebsite')) {
+            return;
+        }
+
         /** @var FullContact_Company $fullcontact */
         if ($fullcontact = $this->getFullContact(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    $parse                             = parse_url($company->getFieldValue('companywebsite'));
+                    $parse                             = parse_url($website);
                     list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
