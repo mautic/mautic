@@ -352,7 +352,7 @@ class FieldModel extends FormModel
             // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
-            $aliases   = $repo->getAliases($entity->getId());
+            $aliases   = $repo->getAliases($entity->getId(), false, true, $entity->getObject());
             $count     = (int) in_array($testAlias, $aliases);
             $aliasTag  = $count;
 
