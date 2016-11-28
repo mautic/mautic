@@ -47,7 +47,7 @@ class LeadField extends FormEntity
     /**
      * @var string
      */
-    private $group;
+    private $group = 'core';
 
     /**
      * @var string
