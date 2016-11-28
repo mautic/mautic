@@ -109,7 +109,7 @@ class LookupHelper
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),
-                            'nonce'  => $cache['nonce'],
+                            'nonce'  => $cache['fullcontact']['nonce'],
                         ];
                         $lead->setSocialCache($cache);
 
@@ -153,7 +153,7 @@ class LookupHelper
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),
-                            'nonce'  => $cache['nonce'],
+                            'nonce'  => $cache['fullcontact']['nonce'],
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
@@ -235,7 +235,7 @@ class LookupHelper
         /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
-        $cacheId   = sprintf('fullcontact%s#', $notify ? '_notify' : '').$entity->getId().'#'.date('YmdH');
+        $cacheId   = sprintf('fullcontact%s#', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');
         $webhookId = $cacheId.'#'.$user->getId().'#'.$nonce;
 
         $cache = $entity->getSocialCache();
