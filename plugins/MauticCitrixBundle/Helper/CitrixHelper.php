@@ -238,7 +238,7 @@ class CitrixHelper
     {
         $myIntegration = self::getIntegration($integration);
 
-        return $myIntegration && $myIntegration->getIntegrationSettings()->getIsPublished();
+        return $myIntegration && $myIntegration->getIntegrationSettings() && $myIntegration->getIntegrationSettings()->getIsPublished();
     }
 
     /**
