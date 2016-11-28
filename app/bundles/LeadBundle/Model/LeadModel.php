@@ -1340,7 +1340,7 @@ class LeadModel extends FormModel
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
         $entities       = [];
-        $channels       = $this->getContactChannels($lead);
+        $channels       = $this->getDoNotContactChannels($lead);
 
         foreach ($channels as $ch) {
             if (!empty($data['preferred_channel']) or (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) or (!empty($data['contact_pause_start_date_'.$ch]) and !empty($data['contact_pause_end_date_'.$ch]))) {
@@ -2321,13 +2321,14 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getContactChannels(Lead $lead)
+    public function getDoNotContactChannels(Lead $lead)
     {
-        $channels = $this->getAllChannels();
+        $allChannels = $this->getAllChannels();
 
-        foreach ($channels as $channel) {
-            if ($this->isContactable($lead, $channel)) {
-                unset($channels[$channel]);
+        $channels = [];
+        foreach ($allChannels as $channel) {
+            if (!$this->isContactable($lead, $channel)) {
+                $channels[$channel] = $channel;
             }
         }
 

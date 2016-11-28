@@ -961,7 +961,7 @@ class LeadController extends FormController
             $frequencyRules = $model->getFrequencyRule($lead);
 
             $action                = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
-            $channels              = $model->getContactChannels($lead);
+            $channels              = $model->getDoNotContactChannels($lead);
             $allChannels           = $model->getAllChannels();
             $data['channels']      = $allChannels;
             $data['lead_channels'] = $channels;
@@ -995,6 +995,7 @@ class LeadController extends FormController
                     'data'   => $data,
                 ]
             );
+
             if ($this->request->getMethod() == 'POST') {
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
