@@ -80,6 +80,10 @@ class LookupHelper
      */
     public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
     {
+        if (!$lead->getEmail()) {
+            return;
+        }
+
         /* @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
@@ -116,6 +120,10 @@ class LookupHelper
      */
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
+        if (!$website = $company->getFieldValue('companywebsite')) {
+            return;
+        }
+
         /* @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
