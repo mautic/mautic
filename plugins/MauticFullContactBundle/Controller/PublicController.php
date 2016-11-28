@@ -46,9 +46,9 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $data             = $this->request->request->get('result', [], true);
+        $data             = $this->request->request->get('result', '[]');
         $result           = json_decode($data, true);
-        $oid              = $this->request->request->get('webhookId', [], true);
+        $oid              = $this->request->request->get('webhookId', '');
         $validatedRequest = $this->get('mautic.plugin.fullcontact.lookup_helper')->validateRequest($oid);
 
         if (!$validatedRequest) {
