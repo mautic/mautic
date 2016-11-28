@@ -216,6 +216,9 @@ return [
             ],
             'mautic.lead.formbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\FormSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
@@ -301,6 +304,11 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_action_addutmtags',
+            ],
+            'mautic.form.type.lead.submitaction.removedonotcontact' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_removedonotcontact',
             ],
             'mautic.form.type.lead.submitaction.changelist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
@@ -403,7 +411,7 @@ return [
             ],
             'mautic.company.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security'],
+                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security', 'router', 'translator'],
                 'alias'     => 'company',
             ],
             'mautic.company.campaign.action.type.form' => [
@@ -421,6 +429,10 @@ return [
                     'database_connection',
                 ],
                 'alias' => 'company_list',
+            ],
+            'mautic.company.merge.type.form' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CompanyMergeType',
+                'alias' => 'company_merge',
             ],
             'mautic.form.type.company_change_score' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',

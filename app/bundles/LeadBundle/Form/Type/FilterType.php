@@ -229,9 +229,9 @@ class FilterType extends AbstractType
                     }
 
                     $list    = $field['properties']['list'];
-                    $choices = FormFieldHelper::parseList($list);
+                    $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
 
-                    if ($fieldType == 'select') {
+                    if ('select' == $fieldType) {
                         // array_unshift cannot be used because numeric values get lost as keys
                         $choices     = array_reverse($choices, true);
                         $choices[''] = '';
