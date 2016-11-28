@@ -89,7 +89,10 @@ class LookupHelper
                     $clearbit->setWebhookId($webhookId);
                     $res = $clearbit->lookupByEmail($lead->getEmail());
                     // Prevent from filling up the cache
-                    $cache['clearbit'] = [$cacheId => serialize($res)];
+                    $cache['clearbit'] = [
+                        $cacheId => serialize($res),
+                        'nonce'  => $cache['nonce'],
+                    ];
                     $lead->setSocialCache($cache);
 
                     if ($checkAuto) {
@@ -122,7 +125,10 @@ class LookupHelper
                     $clearbit->setWebhookId($webhookId);
                     $res = $clearbit->lookupByDomain($parse['host']);
                     // Prevent from filling up the cache
-                    $cache['clearbit'] = [$cacheId => serialize($res)];
+                    $cache['clearbit'] = [
+                        $cacheId => serialize($res),
+                        'nonce'  => $cache['nonce'],
+                    ];
                     $company->setSocialCache($cache);
                     if ($checkAuto) {
                         $this->companyModel->getRepository()->saveEntity($company);
