@@ -203,7 +203,7 @@ class PublicController extends FormController
                 $userModel = $this->getModel('user');
                 if ($user = $userModel->getEntity($notify)) {
                     $this->addNewNotification(
-                        sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $lead->getEmail()),
+                        sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
                         'FullContact Plugin',
                         'fa-search',
                         $user
