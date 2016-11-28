@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -346,7 +347,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null && $channel !== null) {
                 if ($action === 'remove') {
-                    $leadModel->addDncForLead($lead, $channel, 'user', 3);
+                    $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
                 } elseif ($action === 'add') {
                     $leadModel->removeDncForLead($lead, $channel);
                 }

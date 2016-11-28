@@ -26,7 +26,7 @@ $leadName = $lead->getPrimaryIdentifier();
             <tr >
                 <th>
                     <input type="checkbox" id="lead_contact_frequency_rules_doNotContactChannels_0" name="check_all"
-                           onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,'all');" value="all">
+                           onclick="Mautic.togglePreferredChannel('all');" value="all">
                 </th>
                 <th>
                     <?php echo $view['translator']->trans('mautic.lead.contact.channels'); ?>
@@ -50,7 +50,7 @@ $leadName = $lead->getPrimaryIdentifier();
                     <th style="vertical-align: top" class="col-md-1">
                         <input type="checkbox" id="<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[doNotContactChannels][]" class="control-label"
-                               onclick="Mautic.togglePreferredChannel(<?php echo $leadId; ?>,this.value);"
+                               onclick="Mautic.togglePreferredChannel(this.value);"
                                value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
                     </th>
                     <td class="col-md-1" style="vertical-align: top">

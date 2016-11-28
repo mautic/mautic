@@ -52,7 +52,7 @@ class ContactFrequencyType extends AbstractType
                         'choices_as_values' => true,
                         'expanded'          => true,
                         'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => ['onClick' => 'Mautic.togglePreferredChannel('.$data['leadId'].',this.value);'],
+                        'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
                         'multiple'          => true,
                         'label'             => 'mautic.lead.do.not.contact',
                         'required'          => false,

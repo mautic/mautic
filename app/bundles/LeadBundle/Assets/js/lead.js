@@ -659,46 +659,37 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
-Mautic.togglePreferredChannel = function(leadId, channel) {
+
+Mautic.togglePreferredChannel = function(channel) {
     if (channel == 'all') {
-       var status = mQuery('#lead_contact_frequency_rules_doNotContactChannels_0')[0].checked;  //"select all" change
+        var status = mQuery('#lead_contact_frequency_rules_doNotContactChannels_0')[0].checked;  //"select all" change
+
        // "select all" checked status
-        mQuery('.checkbox').each(function(){ //iterate all listed checkbox items
+        mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
             if (this.checked != status) {
-                this.checked = status; //change ".checkbox" checked status
-                Mautic.setPreferredChannel(leadId, this.value);
+                this.checked = status;
+                Mautic.setPreferredChannel(this.value);
             }
         });
     } else {
-        Mautic.setPreferredChannel(leadId,channel);
+        Mautic.setPreferredChannel(channel);
     }
-
 };
-Mautic.setPreferredChannel = function(leadId, channel) {
-    var action = mQuery('#' + channel)[0].checked ? 'add' : 'remove';
-    var query = "action=lead:togglePreferredLeadChannel&leadId=" + leadId + "&channel=" + channel + "&channelAction=" + action;
+
+Mautic.setPreferredChannel = function(channel) {
     mQuery( '#frequency_' + channel ).slideToggle();
     mQuery( '#frequency_' + channel ).removeClass('hide');
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (mQuery('#' + channel)[0].checked) {
-                mQuery('#is-contactable-' + channel).removeClass('text-muted');
-                mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
-                mQuery('#preferred_' + channel).prop("disabled" , false);
-                mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
-            } else {
-                mQuery('#is-contactable-' + channel).addClass('text-muted');
-                mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
-                mQuery('#preferred_' + channel).prop("disabled" , true);
-                mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
-            }
-        }
-        });
-
+    if (mQuery('#' + channel)[0].checked) {
+        mQuery('#is-contactable-' + channel).removeClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , false);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
+    } else {
+        mQuery('#is-contactable-' + channel).addClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , true);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
+    }
 };
 
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {

@@ -999,8 +999,22 @@ class LeadController extends FormController
             if ($this->request->getMethod() == 'POST') {
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
-                        $formdata = $form->getData();
-                        $model->setFrequencyRules($lead, $formdata, $leadsLists);
+                        $formData = $form->getData();
+                        foreach ($formData['doNotContactChannels'] as $contactChannel) {
+                            if (!isset($formData['lead_channels'][$contactChannel])) {
+                                $contactable = $model->isContactable($lead, $contactChannel);
+                                if ($contactable !== DoNotContact::UNSUBSCRIBED) {
+                                    // Only resubscribe if the contact did not opt out themselves
+                                    $model->removeDncForLead($lead, $contactChannel);
+                                }
+                            }
+                        }
+                        if (!empty($deletedChannels = array_diff_key($formData['lead_channels'], $formData['doNotContactChannels']))) {
+                            foreach ($deletedChannels as $deletedChannel) {
+                                $model->addDncForLead($lead, $deletedChannel, 'user', DoNotContact::MANUAL);
+                            }
+                        }
+                        $model->setFrequencyRules($lead, $formData, $leadsLists);
                     }
                 }
 
