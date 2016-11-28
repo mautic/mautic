@@ -8,7 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -39,7 +38,10 @@ class ThemeListType extends AbstractType
         $factory = $this->factory;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($factory) {
-                return $factory->getInstalledThemes($options['feature']);
+                $themes = $factory->getInstalledThemes($options['feature']);
+                $themes['mautic_code_mode'] = 'Code Mode';
+
+                return $themes;
             },
             'expanded'    => false,
             'multiple'    => false,
