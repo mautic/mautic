@@ -134,7 +134,7 @@ class LookupHelper
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
         /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact()) {
+        if ($fullcontact = $this->getFullContact(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
