@@ -92,7 +92,7 @@ class LookupHelper
                         // Prevent from filling up the cache
                         $cache['clearbit'] = [
                             $cacheId => serialize($res),
-                            'nonce'  => $cache['nonce'],
+                            'nonce'  => $cache['clearbit']['nonce'],
                         ];
                         $lead->setSocialCache($cache);
 
@@ -130,7 +130,7 @@ class LookupHelper
                         // Prevent from filling up the cache
                         $cache['clearbit'] = [
                             $cacheId => serialize($res),
-                            'nonce'  => $cache['nonce'],
+                            'nonce'  => $cache['clearbit']['nonce'],
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
