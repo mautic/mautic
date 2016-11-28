@@ -242,58 +242,56 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $searchCompanyLead = 1, $dateManipulated = null)
     {
         // Primary company name to be peristed to the lead's contact company field
-        $companyName = '';
+        $companyName        = '';
+        $companyLeadAdd     = [];
+        $searchForCompanies = [];
 
         if ($dateManipulated == null) {
             $dateManipulated = new \DateTime();
         }
 
-        if (!$lead instanceof Lead) {
+        if ($lead instanceof Lead) {
+            $leadId = $lead->getId();
+        } else {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
-        } else {
-            $leadId = $lead->getId();
         }
-        if (!is_array($companies)) {
+
+        if ($companies instanceof Company) {
+            $companyLeadAdd[$companies->getId()] = $companies;
+            $companies                           = [$companies->getId()];
+        } elseif (!is_array($companies)) {
             $companies = [$companies];
         }
-        /** @var Company[] $companyLeadAdd */
-        $companyLeadAdd = [];
-        if (!$companies instanceof Company) {
-            //make sure they are ints
-            $searchForCompanies = [];
-            foreach ($companies as $k => &$l) {
-                $l = (int) $l;
 
-                if (!isset($companyLeadAdd[$l])) {
-                    $searchForCompanies[] = $l;
-                }
+        //make sure they are ints
+        foreach ($companies as $k => &$l) {
+            $l = (int) $l;
+
+            if (!isset($companyLeadAdd[$l])) {
+                $searchForCompanies[] = $l;
             }
+        }
 
-            if (!empty($searchForCompanies)) {
-                $companyEntities = $this->getEntities([
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => 'comp.id',
-                                'expr'   => 'in',
-                                'value'  => $searchForCompanies,
-                            ],
+        if (!empty($searchForCompanies)) {
+            $companyEntities = $this->getEntities([
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'comp.id',
+                            'expr'   => 'in',
+                            'value'  => $searchForCompanies,
                         ],
                     ],
-                ]);
+                ],
+            ]);
 
-                foreach ($companyEntities as $company) {
-                    $companyLeadAdd[$company->getId()] = $company;
-                }
+            foreach ($companyEntities as $company) {
+                $companyLeadAdd[$company->getId()] = $company;
             }
-
-            unset($companyEntities, $searchForCompanies);
-        } else {
-            $companyLeadAdd[$companies->getId()] = $companies;
-
-            $companies = [$companies->getId()];
         }
+
+        unset($companyEntities, $searchForCompanies);
 
         $persistCompany = [];
         $dispatchEvents = [];

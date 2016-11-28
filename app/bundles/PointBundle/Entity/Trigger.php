@@ -157,6 +157,7 @@ class Trigger extends FormEntity
                     'points',
                     'color',
                     'events',
+                    'triggerExistingLeads',
                 ]
             )
             ->build();

@@ -206,7 +206,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     break;
             }
 
-            if (in_array($data['operator'], ['empty', '!empty'])) {
+            if ($data['operator'] === null || in_array($data['operator'], ['empty', '!empty'])) {
                 $attr['disabled'] = 'disabled';
             } elseif (null !== $data['filter']) {
                 $customOptions['constraints'] = [
@@ -254,7 +254,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 [
                     'label'          => false,
                     'attr'           => $displayAttr,
-                    'data'           => $data['display'],
+                    'data'           => isset($data['display']) ? $data['display'] : '',
                     'error_bubbling' => false,
                 ]
             );

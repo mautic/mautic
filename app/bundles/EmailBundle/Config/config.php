@@ -21,13 +21,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getemails' => [
-                'path'       => '/emails',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:getEntities',
-            ],
-            'mautic_api_getemail' => [
-                'path'       => '/emails/{id}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:getEntity',
+            'mautic_api_emailstandard' => [
+                'standard_entity' => true,
+                'name'            => 'emails',
+                'path'            => '/emails',
+                'controller'      => 'MauticEmailBundle:Api\EmailApi',
             ],
             'mautic_api_sendemail' => [
                 'path'       => '/emails/{id}/send',
@@ -184,6 +182,12 @@ return [
             ],
             'mautic.email.channel.subscriber' => [
                 'class' => \Mautic\EmailBundle\EventListener\ChannelSubscriber::class,
+            ],
+            'mautic.email.stats.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
         ],
         'forms' => [

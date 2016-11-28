@@ -37,6 +37,12 @@ return [
             'mautic.sms.channel.subscriber' => [
                 'class' => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
             ],
+            'mautic.sms.stats.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -121,6 +127,14 @@ return [
             'mautic_receive_sms' => [
                 'path'       => '/sms/receive',
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
+            ],
+        ],
+        'api' => [
+            'mautic_api_smsesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'smses',
+                'path'            => '/smses',
+                'controller'      => 'MauticSmsBundle:Api\SmsApi',
             ],
         ],
     ],

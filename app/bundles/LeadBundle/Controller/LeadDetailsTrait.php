@@ -66,7 +66,7 @@ trait LeadDetailsTrait
         ];
 
         // get events for each contact
-        foreach ($leads as /* @var LeadModel $lead */ $lead) {
+        foreach ($leads as $lead) {
             //  if (!$lead->getEmail()) continue; // discard contacts without email
 
             /** @var LeadModel $model */
