@@ -88,6 +88,7 @@ $container->loadFromExtension(
                 'bazinga_oauth'      => true,
                 'mautic_plugin_auth' => true,
                 'stateless'          => true,
+                'http_basic'         => '%mautic.api_enable_basic_auth%',
             ],
             'main' => [
                 'pattern'     => '^/s/',

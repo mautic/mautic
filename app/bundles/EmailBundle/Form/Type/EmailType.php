@@ -16,10 +16,9 @@ use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\DynamicContentFilterType;
+use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -32,6 +31,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailType extends AbstractType
 {
+    use DynamicContentTrait;
+
     private $translator;
     private $defaultTheme;
     private $em;
@@ -476,19 +477,7 @@ class EmailType extends AbstractType
             );
         }
 
-        $builder->add(
-            'dynamicContent',
-            CollectionType::class,
-            [
-                'entry_type'   => DynamicContentFilterType::class,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'label'        => false,
-                'options'      => [
-                    'label' => false,
-                ],
-            ]
-        );
+        $this->addDynamicContentField($builder);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

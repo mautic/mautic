@@ -287,6 +287,14 @@ return [
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
+            'mautic.transport.mailjet' => [
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
+                ],
+            ],
             'mautic.transport.sendgrid' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
