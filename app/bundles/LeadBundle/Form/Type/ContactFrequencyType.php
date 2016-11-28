@@ -127,6 +127,7 @@ class ContactFrequencyType extends AbstractType
                                 'attr'       => $attributes,
                                 'format'     => 'yyyy-MM-dd',
                                 'required'   => false,
+                                'disabled'   => in_array($channel, $data['lead_channels']) ? false : true,
                                 'data'       => isset($data['contact_pause_start_date_'.$channel]) ? $data['contact_pause_start_date_'.$channel] : null,
                             ]
                     );
@@ -140,6 +141,7 @@ class ContactFrequencyType extends AbstractType
                             'attr'       => $attributes,
                             'format'     => 'yyyy-MM-dd',
                             'required'   => false,
+                            'disabled'   => in_array($channel, $data['lead_channels']) ? false : true,
                             'data'       => isset($data['contact_pause_end_date_'.$channel]) ? $data['contact_pause_end_date_'.$channel] : null,
                         ]
                     );
