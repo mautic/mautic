@@ -11,7 +11,26 @@
 $leadId        = $lead->getId();
 $leadName      = $lead->getPrimaryIdentifier();
 $channelNumber = 0;
+$js            = <<<'JS'
+function togglePreferredChannel(channel){
+       var status = document.getElementById(channel).checked;
+       if(status)
+           {
+                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = false;
+                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = false;
+            } else {
+                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = true;
+                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = true;
+            }
+        }
+JS;
+
 ?>
+<script><?php echo $js; ?></script>
 <div class="container">
     <div class="row text-left">
         <?php echo $view['form']->start($form); ?>
@@ -27,12 +46,17 @@ $channelNumber = 0;
                             echo $view['translator']->trans('mautic.lead.message.preferences.descr'); ?></small>
                     </div>
                     <table class="table">
-                        <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel): ?>
+                        <?php foreach ($form['doNotContactChannels']->vars['choices'] as $channel):
+                            $contactMe = isset($leadChannels[$channel->value]);
+                            $checked   = $contactMe ? 'checked' : '';
+                            ?>
                         <tr>
                             <td>
                                 <div class="text-left">
-
-                                    <?php echo $view['form']->widget($form['doNotContactChannels'][$channelNumber]); ++$channelNumber; ?>
+                                    <input type="checkbox" id="<?php echo $channel->value ?>"
+                                           name="lead_contact_frequency_rules[doNotContactChannels][]"
+                                           onclick="togglePreferredChannel(this.value);"
+                                           value="<?php echo $channel->value ?>" <?php echo $checked; ?>>
                                     <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>">
                                         <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channel->value]); ?>
                                     </label>
@@ -148,7 +172,9 @@ $channelNumber = 0;
             </div>
         </div>
 
-        <?php echo $view['form']->end($form); ?>
+        <?php
+        unset($form['doNotContactChannels']);
+        echo $view['form']->end($form); ?>
 
     </div>
 </div>
