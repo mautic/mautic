@@ -91,35 +91,37 @@ class LookupHelper
     public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
     {
         /** @var FullContact_Person $fullcontact */
-        if ($fullcontact = $this->getFullContact() && (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate()))) {
-            try {
-                list($cacheId, $webhookId, $cache) = $this->getCache($lead, $notify);
+        if ($fullcontact = $this->getFullContact()) {
+            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+                try {
+                    list($cacheId, $webhookId, $cache) = $this->getCache($lead, $notify);
 
-                if (!array_key_exists($cacheId, $cache['fullcontact'])) {
-                    $fullcontact->setWebhookUrl(
-                        $this->router->generate(
-                            'mautic_plugin_fullcontact_index',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
-                    $res = $fullcontact->lookupByEmail($lead->getEmail());
-                    // Prevent from filling up the cache
-                    $cache['fullcontact'] = [
-                        $cacheId => serialize($res),
-                        'nonce'  => $cache['nonce'],
-                    ];
-                    $lead->setSocialCache($cache);
+                    if (!array_key_exists($cacheId, $cache['fullcontact'])) {
+                        $fullcontact->setWebhookUrl(
+                            $this->router->generate(
+                                'mautic_plugin_fullcontact_index',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                            $webhookId
+                        );
+                        $res = $fullcontact->lookupByEmail($lead->getEmail());
+                        // Prevent from filling up the cache
+                        $cache['fullcontact'] = [
+                            $cacheId => serialize($res),
+                            'nonce'  => $cache['nonce'],
+                        ];
+                        $lead->setSocialCache($cache);
 
-                    if ($checkAuto) {
-                        $this->leadModel->getRepository()->saveEntity($lead);
-                    } else {
-                        $this->leadModel->saveEntity($lead);
+                        if ($checkAuto) {
+                            $this->leadModel->getRepository()->saveEntity($lead);
+                        } else {
+                            $this->leadModel->saveEntity($lead);
+                        }
                     }
+                } catch (\Exception $ex) {
+                    $this->logger->log('error', 'Error while using FullContact to lookup '.$lead->getEmail().': '.$ex->getMessage());
                 }
-            } catch (\Exception $ex) {
-                $this->logger->log('error', 'Error while using FullContact to lookup '.$lead->getEmail().': '.$ex->getMessage());
             }
         }
     }
@@ -132,35 +134,37 @@ class LookupHelper
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
         /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact(false) && (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate()))) {
-            try {
-                $parse                             = parse_url($company->getFieldValue('companywebsite'));
-                list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
+        if ($fullcontact = $this->getFullContact()) {
+            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+                try {
+                    $parse                             = parse_url($company->getFieldValue('companywebsite'));
+                    list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
 
-                if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
-                    $fullcontact->setWebhookUrl(
-                        $this->router->generate(
-                            'mautic_plugin_fullcontact_index',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
-                    $res = $fullcontact->lookupByDomain($parse['host']);
-                    // Prevent from filling up the cache
-                    $cache['fullcontact'] = [
-                        $cacheId => serialize($res),
-                        'nonce'  => $cache['nonce'],
-                    ];
-                    $company->setSocialCache($cache);
-                    if ($checkAuto) {
-                        $this->companyModel->getRepository()->saveEntity($company);
-                    } else {
-                        $this->companyModel->saveEntity($company);
+                    if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
+                        $fullcontact->setWebhookUrl(
+                            $this->router->generate(
+                                'mautic_plugin_fullcontact_index',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                            $webhookId
+                        );
+                        $res = $fullcontact->lookupByDomain($parse['host']);
+                        // Prevent from filling up the cache
+                        $cache['fullcontact'] = [
+                            $cacheId => serialize($res),
+                            'nonce'  => $cache['nonce'],
+                        ];
+                        $company->setSocialCache($cache);
+                        if ($checkAuto) {
+                            $this->companyModel->getRepository()->saveEntity($company);
+                        } else {
+                            $this->companyModel->saveEntity($company);
+                        }
                     }
+                } catch (\Exception $ex) {
+                    $this->logger->log('error', 'Error while using FullContact to lookup '.$parse['host'].': '.$ex->getMessage());
                 }
-            } catch (\Exception $ex) {
-                $this->logger->log('error', 'Error while using FullContact to lookup '.$parse['host'].': '.$ex->getMessage());
             }
         }
     }
