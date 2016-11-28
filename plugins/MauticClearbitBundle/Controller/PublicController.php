@@ -147,6 +147,11 @@ class PublicController extends FormController
 
                 $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
+                // Unset the nonce so that it's not used again
+                $socialCache = $lead->getSocialCache();
+                unset($socialCache['clearbit']['nonce']);
+                $lead->setSocialCache($socialCache);
+
                 $model->setFieldValues($lead, $data);
                 $model->saveEntity($lead);
 
@@ -236,6 +241,11 @@ class PublicController extends FormController
                     }
 
                     $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+
+                    // Unset the nonce so that it's not used again
+                    $socialCache = $company->getSocialCache();
+                    unset($socialCache['clearbit']['nonce']);
+                    $company->setSocialCache($socialCache);
 
                     $model->setFieldValues($company, $data);
                     $model->saveEntity($company);
