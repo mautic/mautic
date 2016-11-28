@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
@@ -21,6 +22,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -273,7 +275,7 @@ class CommonApiController extends FOSRestController implements MauticController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
-        if ($entity === null) {
+        if ($entity === null || !$entity->getId()) {
             if ($method === 'PATCH') {
                 //PATCH requires that an entity exists
                 return $this->notFound();
@@ -348,19 +350,58 @@ class CommonApiController extends FOSRestController implements MauticController
         } else {
             $statusCode = Codes::HTTP_CREATED;
             $action     = 'new';
+
+            // All the properties have to be defined in order for validation to work
+            // Bug reported https://github.com/symfony/symfony/issues/19788
+            $defaultProperties = $this->getEntityDefaultProperties($entity);
+            $parameters        = array_merge($defaultProperties, $parameters);
         }
+
         $form         = $this->createEntityForm($entity);
         $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+
+        // Special handling of some fields
+        foreach ($form as $name => $child) {
+            if (isset($submitParams[$name])) {
+                switch ($child->getConfig()->getType()->getName()) {
+                    case 'yesno_button_group':
+                        // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                        $setter = 'set'.ucfirst($name);
+                        $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
+
+                        try {
+                            $entity->$setter((int) $data);
+
+                            // Manually handled so remove from form processing
+                            unset($form[$name], $submitParams[$name]);
+                        } catch (\InvalidArgumentException $exception) {
+                            // Setter not found
+                        }
+                        break;
+                    case 'choice':
+                        if ($child->getConfig()->getOption('multiple')) {
+                            // Ensure the value is an array
+                            if (!is_array($submitParams[$name])) {
+                                $submitParams[$name] = [$submitParams[$name]];
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
-            $this->preSaveEntity($entity, $form, $parameters, $action);
+            $this->preSaveEntity($entity, $form, $submitParams, $action);
             $this->model->saveEntity($entity);
             $headers = [];
             //return the newly created entities location if applicable
             if (Codes::HTTP_CREATED === $statusCode) {
+                $route = ($this->get('router')->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone') !== null)
+                    ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
-                    'mautic_api_get'.$this->entityNameOne,
+                    $route,
                     ['id' => $entity->getId()],
                     true
                 );
@@ -379,6 +420,44 @@ class CommonApiController extends FOSRestController implements MauticController
         return $this->handleView($view);
     }
 
+    /**
+     * Get the default properties of an entity and parents.
+     *
+     * @param $entity
+     *
+     * @return array
+     */
+    protected function getEntityDefaultProperties($entity)
+    {
+        $class         = get_class($entity);
+        $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
+        $defaultValues = [];
+
+        $classMetdata = new ClassMetadata($class);
+        foreach ($chain as $class) {
+            if (method_exists($class, 'loadMetadata')) {
+                $class::loadMetadata($classMetdata);
+            }
+            $defaultValues += (new \ReflectionClass($class))->getDefaultProperties();
+        }
+
+        // These are the mapped columns
+        $fields = $classMetdata->getFieldNames();
+
+        // Merge values in with $fields
+        $properties = [];
+        foreach ($fields as $field) {
+            $properties[$field] = $defaultValues[$field];
+        }
+
+        return $properties;
+    }
+
+    /**
+     * @param array $formErrors
+     *
+     * @return string
+     */
     public function getFormErrorMessage(array $formErrors)
     {
         $msg = '';
@@ -408,10 +487,14 @@ class CommonApiController extends FOSRestController implements MauticController
         return $msg;
     }
 
+    /**
+     * @param Form $form
+     *
+     * @return array
+     */
     public function getFormErrorMessages(\Symfony\Component\Form\Form $form)
     {
         $errors = [];
-
         foreach ($form->getErrors() as $key => $error) {
             if ($form->isRoot()) {
                 $errors['#'][] = $error->getMessage();
@@ -421,7 +504,8 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         foreach ($form->all() as $child) {
-            if (!$child->isValid()) {
+            $childErrors = $child->getErrors();
+            if (count($childErrors)) {
                 $errors[$child->getName()] = $this->getFormErrorMessages($child);
             }
         }
@@ -454,11 +538,11 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @param $entity
      *
-     * @return mixed
+     * @return Form
      */
     protected function createEntityForm($entity)
     {
-        return $this->model->createForm($entity, $this->get('form.factory'));
+        return $this->model->createForm($entity, $this->get('form.factory'), null, ['csrf_protection' => false, 'allow_extra_fields' => true]);
     }
 
     /**
