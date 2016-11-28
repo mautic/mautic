@@ -81,7 +81,7 @@ class LookupHelper
     public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
     {
         /* @var Clearbit_Person $clearbit */
-        if ($fullcontact = $this->getClearbit()) {
+        if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
                     list($cacheId, $webhookId, $cache) = $this->getCache($lead, $notify);
@@ -117,7 +117,7 @@ class LookupHelper
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
         /* @var Clearbit_Company $clearbit */
-        if ($fullcontact = $this->getClearbit(false)) {
+        if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
