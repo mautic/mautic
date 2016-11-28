@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -12,59 +11,33 @@
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\UserBundle\Entity\User;
-use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
-use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
-use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 
 class LeadSubscriber extends CommonSubscriber
 {
     /**
-     * @var IntegrationHelper
+     * @var LookupHelper
      */
-    protected $integrationHelper;
-
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected $lookupHelper;
 
     /**
      * LeadSubscriber constructor.
      *
-     * @param IntegrationHelper $integrationHelper
-     * @param UserHelper        $userHelper
-     * @param LeadModel         $leadModel
-     * @param CompanyModel      $companyModel
+     * @param LookupHelper $lookupHelper
      */
-    public function __construct(IntegrationHelper $integrationHelper, UserHelper $userHelper, LeadModel $leadModel, CompanyModel $companyModel)
+    public function __construct(LookupHelper $lookupHelper)
     {
         parent::__construct();
 
-        $this->integrationHelper = $integrationHelper;
-        $this->userHelper        = $userHelper;
-        $this->leadModel         = $leadModel;
-        $this->companyModel      = $companyModel;
+        $this->lookupHelper = $lookupHelper;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -73,88 +46,19 @@ class LeadSubscriber extends CommonSubscriber
         ];
     }
 
+    /**
+     * @param LeadEvent $event
+     */
     public function leadPostSave(LeadEvent $event)
     {
-        /** @var FullContactIntegration $myIntegration */
-        $myIntegration = $this->integrationHelper->getIntegrationObject('FullContact');
-
-        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
-            return;
-        }
-
-        $lead = $event->getLead();
-
-        // get api_key from plugin settings
-        $keys = $myIntegration->getDecryptedApiKeys();
-
-        if ($myIntegration->shouldAutoUpdate()) {
-            $fullcontact = new FullContact_Person($keys['apikey']);
-            try {
-                /** @var User $user */
-                $user      = $this->userHelper->getUser();
-                $webhookId = 'fullcontact_notify#'.$lead->getId().'#'.$user->getId();
-                $cache     = $lead->getSocialCache() ?: [];
-                $cacheId   = sprintf('%s%s', $webhookId, date('YmdH'));
-                if (!array_key_exists($cacheId, $cache)) {
-                    $fullcontact->setWebhookUrl(
-                        $this->router->generate(
-                            'mautic_plugin_fullcontact_index',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
-                    $res             = $fullcontact->lookupByEmailMD5(md5($lead->getEmail()));
-                    $cache[$cacheId] = serialize($res);
-                    $lead->setSocialCache($cache);
-                    $this->leadModel->getRepository()->saveEntity($lead);
-                }
-            } catch (\Exception $ex) {
-                $this->logger->log('error', 'Error while using FullContact: '.$ex->getMessage());
-            }
-        }
+        $this->lookupHelper->lookupContact($event->getLead(), true, true);
     }
 
+    /**
+     * @param CompanyEvent $event
+     */
     public function companyPostSave(CompanyEvent $event)
     {
-        /** @var FullContactIntegration $myIntegration */
-        $myIntegration = $this->integrationHelper->getIntegrationObject('FullContact');
-
-        if (!$myIntegration->getIntegrationSettings()->getIsPublished()) {
-            return;
-        }
-
-        $company = $event->getCompany();
-
-        // get api_key from plugin settings
-        $keys = $myIntegration->getDecryptedApiKeys();
-
-        if ($myIntegration->shouldAutoUpdate()) {
-            $fullcontact = new FullContact_Company($keys['apikey']);
-            try {
-                /** @var User $user */
-                $user      = $this->userHelper->getUser();
-                $webhookId = 'fullcontactcomp_notify#'.$company->getId().'#'.$user->getId();
-                $parse     = parse_url($company->getFieldValue('companywebsite', 'core'));
-                $cache     = $company->getSocialCache() ?: [];
-                $cacheId   = sprintf('%s%s', $webhookId, date('YmdH'));
-                if (!array_key_exists($cacheId, $cache)) {
-                    $fullcontact->setWebhookUrl(
-                        $this->router->generate(
-                            'mautic_plugin_fullcontact_index',
-                            [],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $webhookId
-                    );
-                    $res             = $fullcontact->lookupByDomain($parse['host']);
-                    $cache[$cacheId] = serialize($res);
-                    $company->setSocialCache($cache);
-                    $this->companyModel->getRepository()->saveEntity($company);
-                }
-            } catch (\Exception $ex) {
-                $this->logger->log('error', 'Error while using FullContact: '.$ex->getMessage());
-            }
-        }
+        $this->lookupHelper->lookupCompany($event->getCompany(), true, true);
     }
 }

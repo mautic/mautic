@@ -46,25 +46,27 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $data               = $this->request->request->get('result', [], true);
-        $oid                = $this->request->request->get('webhookId', [], true);
-        list($w, $id, $uid) = explode('#', $oid, 3);
+        $data             = $this->request->request->get('result', [], true);
+        $result           = json_decode($data, true);
+        $oid              = $this->request->request->get('webhookId', [], true);
+        $validatedRequest = $this->get('mautic.plugin.fullcontact.lookup_helper')->validateRequest($oid);
 
-        if (0 === strpos($w, 'fullcontactcomp')) {
-            return $this->compcallbackAction();
+        if (!$validatedRequest) {
+            return new Response('ERROR');
         }
 
-        $notify = false !== strpos($w, '_notify');
-        /** @var array $result */
-        $result = json_decode($data, true);
+        if ('company' == $validatedRequest['type']) {
+            return $this->compcallbackAction($result, $validatedRequest);
+        }
 
+        $notify = $validatedRequest['notify'];
         $logger = $this->get('monolog.logger.mautic');
 
         try {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
             /** @var Lead $lead */
-            $lead = $model->getEntity($id);
+            $lead       = $validatedRequest['entity'];
             $currFields = $lead->getFields(true);
 
             $org = [];
@@ -85,7 +87,8 @@ class PublicController extends FormController
             }
 
             $loc = [];
-            if (array_key_exists('demographics', $result) && array_key_exists(
+            if (array_key_exists('demographics', $result)
+                && array_key_exists(
                     'locationDeduced',
                     $result['demographics']
                 )
@@ -109,34 +112,42 @@ class PublicController extends FormController
             }
 
             if (array_key_exists('contactInfo', $result)) {
-
                 if (array_key_exists(
                         'familyName',
                         $result['contactInfo']
-                    ) && empty($currFields['lastname']['value'])) {
+                    )
+                    && empty($currFields['lastname']['value'])
+                ) {
                     $data['lastname'] = $result['contactInfo']['familyName'];
                 }
 
                 if (array_key_exists(
                         'givenName',
                         $result['contactInfo']
-                    ) && empty($currFields['firstname']['value'])) {
+                    )
+                    && empty($currFields['firstname']['value'])
+                ) {
                     $data['firstname'] = $result['contactInfo']['givenName'];
                 }
 
-                if ((array_key_exists('websites', $result['contactInfo']) && count(
+                if ((array_key_exists('websites', $result['contactInfo'])
+                        && count(
                             $result['contactInfo']['websites']
-                        )) && empty($currFields['website']['value'])) {
+                        ))
+                    && empty($currFields['website']['value'])
+                ) {
                     $data['website'] = $result['contactInfo']['websites'][0]['url'];
                 }
 
-                if ((array_key_exists('chats', $result['contactInfo']) && array_key_exists(
+                if ((array_key_exists('chats', $result['contactInfo'])
+                        && array_key_exists(
                             'skype',
                             $result['contactInfo']['chats']
-                        )) && empty($currFields['skype']['value'])) {
+                        ))
+                    && empty($currFields['skype']['value'])
+                ) {
                     $data['skype'] = $result['contactInfo']['chats']['skype']['handle'];
                 }
-
             }
 
             if (array_key_exists('name', $org) && empty($currFields['company']['value'])) {
@@ -147,28 +158,37 @@ class PublicController extends FormController
                 $data['position'] = $org['title'];
             }
 
-            if ((array_key_exists('city', $loc) && array_key_exists(
+            if ((array_key_exists('city', $loc)
+                    && array_key_exists(
                         'name',
                         $loc['city']
-                    )) && empty($currFields['city']['value'])) {
+                    ))
+                && empty($currFields['city']['value'])
+            ) {
                 $data['city'] = $loc['city']['name'];
             }
 
-            if ((array_key_exists('state', $loc) && array_key_exists(
+            if ((array_key_exists('state', $loc)
+                    && array_key_exists(
                         'name',
                         $loc['state']
-                    )) && empty($currFields['state']['value'])) {
+                    ))
+                && empty($currFields['state']['value'])
+            ) {
                 $data['state'] = $loc['state']['name'];
             }
 
-            if ((array_key_exists('country', $loc) && array_key_exists(
+            if ((array_key_exists('country', $loc)
+                    && array_key_exists(
                         'name',
                         $loc['country']
-                    )) && empty($currFields['country']['value'])) {
+                    ))
+                && empty($currFields['country']['value'])
+            ) {
                 $data['country'] = $loc['country']['name'];
             }
 
-            $logger->log('debug', 'SET FIELDS: ' . print_r($data, true));
+            $logger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             $model->setFieldValues($lead, $data);
             $model->getRepository()->saveEntity($lead);
@@ -176,8 +196,7 @@ class PublicController extends FormController
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
-                $user      = $userModel->getEntity($uid);
-                if ($user) {
+                if ($user = $userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $lead->getEmail()),
                         'FullContact Plugin',
@@ -188,11 +207,10 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && isset($lead, $uid) && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && isset($lead) && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user      = $userModel->getEntity($uid);
-                    if ($user) {
+                    if ($user = $userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),
@@ -220,23 +238,16 @@ class PublicController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction()
+    private function compcallbackAction($result, $validatedRequest)
     {
-        if (!$this->request->request->has('result') || !$this->request->request->has('webhookId')) {
-            return new Response('ERROR');
-        }
-
-        $result             = $this->request->request->get('result', [], true);
-        $oid                = $this->request->request->get('webhookId', [], true);
-        list($w, $id, $uid) = explode('#', $oid, 3);
-        $notify             = false !== strpos($w, '_notify');
+        $notify = $validatedRequest['notify'];
         $logger = $this->get('monolog.logger.mautic');
 
         try {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
             $model = $this->getModel('lead.company');
             /** @var Company $company */
-            $company = $model->getEntity($id);
+            $company    = $validatedRequest['entity'];
             $currFields = $company->getFields(true);
 
             $org   = [];
@@ -247,25 +258,29 @@ class PublicController extends FormController
             if (array_key_exists('organization', $result)) {
                 $org = $result['organization'];
                 if (array_key_exists('contactInfo', $result['organization'])) {
-                    if (array_key_exists('addresses', $result['organization']['contactInfo']) && count(
+                    if (array_key_exists('addresses', $result['organization']['contactInfo'])
+                        && count(
                             $result['organization']['contactInfo']['addresses']
                         )
                     ) {
                         $loc = $result['organization']['contactInfo']['addresses'][0];
                     }
-                    if (array_key_exists('emailAddresses', $result['organization']['contactInfo']) && count(
+                    if (array_key_exists('emailAddresses', $result['organization']['contactInfo'])
+                        && count(
                             $result['organization']['contactInfo']['emailAddresses']
                         )
                     ) {
                         $email = $result['organization']['contactInfo']['emailAddresses'][0];
                     }
-                    if (array_key_exists('phoneNumbers', $result['organization']['contactInfo']) && count(
+                    if (array_key_exists('phoneNumbers', $result['organization']['contactInfo'])
+                        && count(
                             $result['organization']['contactInfo']['phoneNumbers']
                         )
                     ) {
                         $phone = $result['organization']['contactInfo']['phoneNumbers'][0];
                         foreach ($result['organization']['contactInfo']['phoneNumbers'] as $phoneNumber) {
-                            if (array_key_exists('label', $phoneNumber) && 0 >= strpos(
+                            if (array_key_exists('label', $phoneNumber)
+                                && 0 >= strpos(
                                     strtolower($phoneNumber['label']),
                                     'fax'
                                 )
@@ -318,7 +333,9 @@ class PublicController extends FormController
             if (array_key_exists(
                     'approxEmployees',
                     $org
-                ) && empty($currFields['companynumber_of_employees']['value'])) {
+                )
+                && empty($currFields['companynumber_of_employees']['value'])
+            ) {
                 $data['companynumber_of_employees'] = $org['approxEmployees'];
             }
 
@@ -326,7 +343,7 @@ class PublicController extends FormController
                 $data['companyfax'] = $fax['number'];
             }
 
-            $logger->log('debug', 'SET FIELDS: ' . print_r($data, true));
+            $logger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             $model->setFieldValues($company, $data);
             $model->getRepository()->saveEntity($company);
@@ -334,8 +351,7 @@ class PublicController extends FormController
             if ($notify) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
-                $user      = $userModel->getEntity($uid);
-                if ($user) {
+                if ($user = $userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
                         'FullContact Plugin',
@@ -346,11 +362,10 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && isset($uid, $company)) {
+                if ($notify && isset($company)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user      = $userModel->getEntity($uid);
-                    if ($user) {
+                    if ($user = $userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),

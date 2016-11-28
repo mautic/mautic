@@ -40,10 +40,7 @@ return [
             'mautic.plugin.fullcontact.lead.subscriber' => [
                 'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.helper.user',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
+                    'mautic.plugin.fullcontact.lookup_helper',
                 ],
             ],
         ],
@@ -55,6 +52,19 @@ return [
             'mautic.form.type.fullcontact_batch_lookup' => [
                 'class' => 'MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType',
                 'alias' => 'fullcontact_batch_lookup',
+            ],
+        ],
+        'others' => [
+            'mautic.plugin.fullcontact.lookup_helper' => [
+                'class'     => 'MauticPlugin\MauticFullContactBundle\Helper\LookupHelper',
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.helper.user',
+                    'monolog.logger.mautic',
+                    'router',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                ],
             ],
         ],
     ],
