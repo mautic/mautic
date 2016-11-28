@@ -157,7 +157,7 @@ class LookupHelper
 
         if ($entity) {
             $socialCache = $entity->getSocialCache();
-            $cacheId     = 'clearbit_notify#'.$id.'#'.$hour;
+            $cacheId     = $w.'#'.$id.'#'.$hour;
 
             if (isset($socialCache['clearbit'][$cacheId]) && !empty($socialCache['clearbit']['nonce']) && !empty($nonce)
                 && $socialCache['clearbit']['nonce'] === $nonce
