@@ -41,22 +41,23 @@ class PublicController extends FormController
      */
     public function callbackAction()
     {
-        if (!$this->request->request->has('body') || !$this->request->request->has('id') ||
-            !$this->request->request->has('type') || !$this->request->request->has('status') ||
-            200 !== $this->request->request->get('status')
+        if (!$this->request->request->has('body') || !$this->request->request->has('id')
+            || !$this->request->request->has('type')
+            || !$this->request->request->has('status')
+            || 200 !== $this->request->request->get('status')
         ) {
             return new Response('ERROR');
         }
 
         /** @var array $result */
-        $result             = $this->request->request->get('body', []);
-        $oid                = $this->request->request->get('id');
-        list($w, $id, $uid) = explode('#', $oid, 3);
-        $notify             = false !== strpos($w, '_notify');
+        $result           = $this->request->request->get('body', []);
+        $oid              = $this->request->request->get('id');
+        $validatedRequest = $this->get('mautic.plugin.clearbit.lookup_helper')->validateRequest($oid, $this->request->request->get('type'));
+        if (!$validatedRequest) {
+            return new Response('ERROR');
+        }
 
-        // Prevent listener from redispatching another call
-        defined('CLEARBIT_OID') || define('CLEARBIT_OID', $oid);
-
+        $notify = $validatedRequest['notify'];
         $logger = $this->get('monolog.logger.mautic');
 
         try {
@@ -64,7 +65,7 @@ class PublicController extends FormController
                 /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                 $model = $this->getModel('lead');
                 /** @var Lead $lead */
-                $lead       = $model->getEntity($id);
+                $lead       = $validatedRequest['entity'];
                 $currFields = $lead->getFields(true);
                 $logger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
 
@@ -89,17 +90,23 @@ class PublicController extends FormController
                     }
                 }
 
-                if (array_key_exists('name', $result) && array_key_exists(
+                if (array_key_exists('name', $result)
+                    && array_key_exists(
                         'familyName',
                         $result['name']
-                    ) && empty($currFields['lastname']['value'])) {
+                    )
+                    && empty($currFields['lastname']['value'])
+                ) {
                     $data['lastname'] = $result['name']['familyName'];
                 }
 
-                if (array_key_exists('name', $result) && array_key_exists(
+                if (array_key_exists('name', $result)
+                    && array_key_exists(
                         'givenName',
                         $result['name']
-                    ) && empty($currFields['firstname']['value'])) {
+                    )
+                    && empty($currFields['firstname']['value'])
+                ) {
                     $data['firstname'] = $result['name']['givenName'];
                 }
 
@@ -107,17 +114,23 @@ class PublicController extends FormController
                     $data['website'] = $result['site'];
                 }
 
-                if (array_key_exists('employment', $result) && array_key_exists(
+                if (array_key_exists('employment', $result)
+                    && array_key_exists(
                         'name',
                         $result['employment']
-                    ) && empty($currFields['company']['value'])) {
+                    )
+                    && empty($currFields['company']['value'])
+                ) {
                     $data['company'] = $result['employment']['name'];
                 }
 
-                if (array_key_exists('employment', $result) && array_key_exists(
+                if (array_key_exists('employment', $result)
+                    && array_key_exists(
                         'title',
                         $result['employment']
-                    ) && empty($currFields['position']['value'])) {
+                    )
+                    && empty($currFields['position']['value'])
+                ) {
                     $data['position'] = $result['employment']['title'];
                 }
 
@@ -140,8 +153,7 @@ class PublicController extends FormController
                 if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user      = $userModel->getEntity($uid);
-                    if ($user) {
+                    if ($user = $userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
                             'Clearbit Plugin',
@@ -158,7 +170,7 @@ class PublicController extends FormController
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
                     $model = $this->getModel('lead.company');
                     /** @var Company $company */
-                    $company    = $model->getEntity($id);
+                    $company    = $validatedRequest['entity'];
                     $currFields = $company->getFields(true);
 
                     $loc = [];
@@ -168,10 +180,13 @@ class PublicController extends FormController
 
                     $data = [];
 
-                    if (array_key_exists('streetNumber', $loc) && array_key_exists(
+                    if (array_key_exists('streetNumber', $loc)
+                        && array_key_exists(
                             'streetName',
                             $loc
-                        ) && empty($currFields['companyaddress1']['value'])) {
+                        )
+                        && empty($currFields['companyaddress1']['value'])
+                    ) {
                         $data['companyaddress1'] = $loc['streetNumber'].' '.$loc['streetName'];
                     }
 
@@ -179,10 +194,13 @@ class PublicController extends FormController
                         $data['companycity'] = $loc['city'];
                     }
 
-                    if (array_key_exists('metrics', $result) && array_key_exists(
+                    if (array_key_exists('metrics', $result)
+                        && array_key_exists(
                             'employees',
                             $result['metrics']
-                        ) && empty($currFields['companynumber_of_employees']['value'])) {
+                        )
+                        && empty($currFields['companynumber_of_employees']['value'])
+                    ) {
                         $data['companynumber_of_employees'] = $result['metrics']['employees'];
                     }
 
@@ -194,10 +212,14 @@ class PublicController extends FormController
                         $data['companyphone'] = $result['phone'];
                     }
 
-                    if (array_key_exists('site', $result) && array_key_exists(
+                    if (array_key_exists('site', $result)
+                        && array_key_exists(
                             'emailAddresses',
                             $result['site']
-                        ) && count($result['site']['emailAddresses']) && empty($currFields['companyemail']['value'])) {
+                        )
+                        && count($result['site']['emailAddresses'])
+                        && empty($currFields['companyemail']['value'])
+                    ) {
                         $data['companyemail'] = $result['site']['emailAddresses'][0];
                     }
 
@@ -221,8 +243,7 @@ class PublicController extends FormController
                     if ($notify) {
                         /** @var UserModel $userModel */
                         $userModel = $this->getModel('user');
-                        $user      = $userModel->getEntity($uid);
-                        if ($user) {
+                        if ($user = $userModel->getEntity($notify)) {
                             $this->addNewNotification(
                                 sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
                                 'Clearbit Plugin',
@@ -236,11 +257,10 @@ class PublicController extends FormController
         } catch (\Exception $ex) {
             $logger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
-                if ($notify && $uid) {
+                if ($notify) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
-                    $user      = $userModel->getEntity($uid);
-                    if ($user) {
+                    if ($user = $userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.clearbit.unable'),
