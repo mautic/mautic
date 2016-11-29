@@ -829,7 +829,8 @@ class EmailController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->getModel('email');
+        $model = $this->getModel('email');
+        /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -847,7 +848,7 @@ class EmailController extends FormController
             $session     = $this->get('session');
             $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
 
-            $session->set($contentName, $entity->getContent());
+            $session->set($contentName, $entity->getCustomHtml());
         }
 
         return $this->newAction($entity);
