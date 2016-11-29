@@ -34,7 +34,8 @@ foreach ($templateButtons as $action => $enabled) {
         case 'clone':
         case 'abtest':
             $actionQuery = [
-                'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent()) ? $item->getVariantParent()->getId() : $item->getId(),
+                'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
+                    ? $item->getVariantParent()->getId() : $item->getId(),
             ];
             $icon = ($action == 'clone') ? 'copy' : 'sitemap';
             $path = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
@@ -74,13 +75,17 @@ foreach ($templateButtons as $action => $enabled) {
     }
 
     if ($path) {
+        $mergeAttr = (!in_array($action, ['edit', 'new'])) ? [] : $editAttr;
         $view['buttons']->addButton(
             [
-                'attr' => [
-                    'class'       => 'btn btn-default',
-                    'href'        => $path,
-                    'data-toggle' => 'ajax',
-                ],
+                'attr' => array_merge(
+                    [
+                        'class'       => 'btn btn-default',
+                        'href'        => $path,
+                        'data-toggle' => 'ajax',
+                    ],
+                    $mergeAttr
+                ),
                 'iconClass' => 'fa fa-'.$icon,
                 'btnText'   => $view['translator']->trans('mautic.core.form.'.$action),
                 'priority'  => $priority,
