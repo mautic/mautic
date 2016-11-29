@@ -4284,7 +4284,7 @@ lesshat-selector { -lh-property: 0 ;
   z-index: 1030;
 }
 .builder-panel {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   right: 0;
