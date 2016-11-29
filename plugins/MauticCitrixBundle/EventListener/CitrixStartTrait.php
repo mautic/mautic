@@ -114,7 +114,8 @@ trait CitrixStartTrait
                         $email,
                         $eventName,
                         $productToStart['productTitle'],
-                        CitrixEventTypes::STARTED
+                        CitrixEventTypes::STARTED,
+                        $lead
                     );
                 } else {
                     throw new BadRequestHttpException('Unable to start!');

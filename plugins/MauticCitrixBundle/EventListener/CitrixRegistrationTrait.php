@@ -60,7 +60,8 @@ trait CitrixRegistrationTrait
                         $email,
                         $eventName,
                         $productToRegister['productTitle'],
-                        CitrixEventTypes::REGISTERED
+                        CitrixEventTypes::REGISTERED,
+                        $currentLead
                     );
                 } else {
                     throw new BadRequestHttpException('Unable to register!');

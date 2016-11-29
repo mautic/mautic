@@ -62,6 +62,7 @@ class CitrixModel extends FormModel
      * @param string    $email
      * @param string    $eventName
      * @param string    $eventDesc
+     * @param Lead      $lead
      * @param string    $eventType
      * @param \DateTime $eventDate
      *
@@ -71,7 +72,7 @@ class CitrixModel extends FormModel
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, \DateTime $eventDate = null)
+    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, $lead, \DateTime $eventDate = null)
     {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             CitrixHelper::log('addEvent: incorrect data');
@@ -84,6 +85,7 @@ class CitrixModel extends FormModel
         $citrixEvent->setEventName($eventName);
         $citrixEvent->setEventDesc($eventDesc);
         $citrixEvent->setEventType($eventType);
+        $citrixEvent->setLead($lead);
 
         if (null !== $eventDate) {
             $citrixEvent->setEventDate($eventDate);
@@ -92,7 +94,7 @@ class CitrixModel extends FormModel
         $this->em->persist($citrixEvent);
         $this->em->flush();
 
-        $this->triggerCampaignEvents($product, $email);
+        $this->triggerCampaignEvents($product, $lead);
     }
 
     /**
