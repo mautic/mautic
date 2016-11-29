@@ -3,7 +3,7 @@
 /**
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License at.
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,20 +17,19 @@
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
 /**
- * This class just tells us what icons we have available
+ * This class just tells us what icons we have available.
  *
- * @package  Services\FullContact
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
 class FullContact_Icon extends FullContact_Base
 {
-    protected $_supportedMethods = array('available');
-    protected $_resourceUri = '/icon/';
+    protected $_supportedMethods = ['available'];
+    protected $_resourceUri      = '/icon/';
 
     public function available()
     {
-        $this->_execute(array('method' => 'available'));
+        $this->_execute(['method' => 'available']);
 
         return $this->response_obj;
     }

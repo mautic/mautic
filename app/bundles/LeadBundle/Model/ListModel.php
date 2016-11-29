@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -40,6 +41,11 @@ class ListModel extends FormModel
      */
     protected $coreParametersHelper;
 
+    /**
+     * ListModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -56,12 +62,16 @@ class ListModel extends FormModel
      * {@inheritdoc}
      *
      * @return \Mautic\LeadBundle\Entity\LeadListRepository
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function getRepository()
     {
         /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
+        $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
 
         return $repo;
@@ -423,6 +433,13 @@ class ListModel extends FormModel
                 'object'    => 'lead',
             ],
         ];
+
+        // Add custom choices
+        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
+            $event = new LeadListFiltersChoicesEvent($choices, $operators, $this->translator);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
+            $choices = $event->getChoices();
+        }
 
         //get list of custom fields
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(

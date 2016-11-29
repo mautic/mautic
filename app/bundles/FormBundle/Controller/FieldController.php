@@ -279,11 +279,7 @@ class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:'.$fieldType.'.html.php';
-            }
+            $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
 
             //prevent undefined errors
             $entity    = new Field();

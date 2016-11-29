@@ -3,7 +3,7 @@
 /**
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License at.
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,14 +22,13 @@ use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NotImpl
 /**
  * This class handles the actually HTTP request to the FullContact endpoint.
  *
- * @package  Services\FullContact
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
 class FullContact_Base
 {
     const REQUEST_LATENCY = 0.2;
-    const USER_AGENT = 'caseysoftware/fullcontact-php-0.9.0';
+    const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
     private $_next_req_time = null;
 
@@ -37,18 +36,18 @@ class FullContact_Base
     protected $_baseUri = 'https://api.fullcontact.com/';
     protected $_version = 'v2';
 
-    protected $_apiKey = null;
-    protected $_webhookUrl = null;
-    protected $_webhookId = null;
-    protected $_webhookJson = false;
+    protected $_apiKey           = null;
+    protected $_webhookUrl       = null;
+    protected $_webhookId        = null;
+    protected $_webhookJson      = false;
     protected $_supportedMethods = [];
 
-    public $response_obj = null;
+    public $response_obj  = null;
     public $response_code = null;
     public $response_json = null;
 
     /**
-     * Slow down calls to the FullContact API if needed
+     * Slow down calls to the FullContact API if needed.
      */
     private function _wait_for_rate_limit()
     {
@@ -60,27 +59,26 @@ class FullContact_Base
     }
 
     /**
-     *
      * @param string $hdr
      */
     private function _update_rate_limit($hdr)
     {
-        $remaining = (float)$hdr['X-Rate-Limit-Remaining'];
-        $reset = (float)$hdr['X-Rate-Limit-Reset'];
-        $spacing = $reset / (1.0 + $remaining);
-        $delay = $spacing - self::REQUEST_LATENCY;
-        $this->_next_req_time = new \DateTime('now + ' . $delay . ' seconds');
+        $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
+        $reset                = (float) $hdr['X-Rate-Limit-Reset'];
+        $spacing              = $reset / (1.0 + $remaining);
+        $delay                = $spacing - self::REQUEST_LATENCY;
+        $this->_next_req_time = new \DateTime('now + '.$delay.' seconds');
     }
 
     /**
      * The base constructor Sets the API key available from here:
-     * http://fullcontact.com/getkey
+     * http://fullcontact.com/getkey.
      *
      * @param string $api_key
      */
     public function __construct($api_key)
     {
-        $this->_apiKey = $api_key;
+        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 
@@ -89,15 +87,17 @@ class FullContact_Base
      * instance. To unset, just use setWebhookUrl(null).
      *
      * @author  David Boskovic <me@david.gs> @dboskovic
-     * @param   string $url
-     * @param   string $id
-     * @param   bool $json
-     * @return  object
+     *
+     * @param string $url
+     * @param string $id
+     * @param bool   $json
+     *
+     * @return object
      */
     public function setWebhookUrl($url, $id = null, $json = false)
     {
-        $this->_webhookUrl = $url;
-        $this->_webhookId = $id;
+        $this->_webhookUrl  = $url;
+        $this->_webhookId   = $id;
         $this->_webhookJson = $json;
 
         return $this;
@@ -105,13 +105,16 @@ class FullContact_Base
 
     /**
      * This is a pretty close copy of my work on the Contactually PHP library
-     *   available here: http://github.com/caseysoftware/contactually-php
+     *   available here: http://github.com/caseysoftware/contactually-php.
      *
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
-     * @param   array $params
-     * @param   array $postData
-     * @return  object
+     *
+     * @param array $params
+     * @param array $postData
+     *
+     * @return object
+     *
      * @throws FullContact_Exception_NoCredit
      * @throws FullContact_Exception_NotImplemented
      */
@@ -120,7 +123,7 @@ class FullContact_Base
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new FullContact_Exception_NotImplemented(
                 __CLASS__.
-                " does not support the [".$params['method']."] method"
+                ' does not support the ['.$params['method'].'] method'
             );
         }
 
@@ -172,13 +175,13 @@ class FullContact_Base
             if ($i === 0) {
                 $headers['http_code'] = $line;
             } else {
-                list ($key, $value) = explode(': ', $line);
-                $headers[$key] = $value;
+                list($key, $value) = explode(': ', $line);
+                $headers[$key]     = $value;
             }
         }
 
         $this->response_code = curl_getinfo($connection, CURLINFO_HTTP_CODE);
-        $this->response_obj = json_decode($this->response_json);
+        $this->response_obj  = json_decode($this->response_json);
 
         if ('403' === $this->response_code) {
             throw new FullContact_Exception_NoCredit($this->response_obj->message);
@@ -187,6 +190,7 @@ class FullContact_Base
                 $this->_update_rate_limit($headers);
             }
         }
+
         return $this->response_obj;
     }
 }

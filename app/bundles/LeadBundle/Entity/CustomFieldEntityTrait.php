@@ -100,6 +100,8 @@ trait CustomFieldEntityTrait
      * @param        $alias
      * @param        $value
      * @param string $oldValue
+     *
+     * @return $this
      */
     public function addUpdatedField($alias, $value, $oldValue = '')
     {
@@ -117,6 +119,8 @@ trait CustomFieldEntityTrait
 
         $this->addChange('fields', [$alias => [$oldValue, $value]]);
         $this->updatedFields[$alias] = $value;
+
+        return $this;
     }
 
     /**

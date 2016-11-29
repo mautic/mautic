@@ -3,7 +3,7 @@
 /**
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License at.
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,7 +19,6 @@ namespace MauticPlugin\MauticFullContactBundle\Services;
 /**
  * This class handles everything related to the Company lookup API.
  *
- * @package  Services\FullContact
  * @author   Adam Curtis <me@alc.im>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
@@ -29,7 +28,7 @@ class FullContact_Batch extends FullContact_Base
 
     /**
      * @param array $requests
-     * @return null
+     *
      * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit
      * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NotImplemented
      */

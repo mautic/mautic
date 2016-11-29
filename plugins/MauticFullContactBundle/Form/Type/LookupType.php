@@ -18,7 +18,7 @@ class LookupType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -36,10 +36,10 @@ class LookupType extends AbstractType
             'buttons',
             'form_buttons',
             [
-                'apply_text' => false,
-                'save_text' => 'mautic.core.form.submit',
+                'apply_text'     => false,
+                'save_text'      => 'mautic.core.form.submit',
                 'cancel_onclick' => 'javascript:void(0);',
-                'cancel_attr' => [
+                'cancel_attr'    => [
                     'data-dismiss' => 'modal',
                 ],
             ]
@@ -52,7 +52,7 @@ class LookupType extends AbstractType
                 'label'      => 'mautic.plugin.fullcontact.notify',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'data'     => true,
                 'required' => false,

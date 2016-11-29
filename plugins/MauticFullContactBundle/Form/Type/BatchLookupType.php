@@ -44,7 +44,7 @@ class BatchLookupType extends AbstractType
                 'label'      => 'mautic.plugin.fullcontact.notify',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'data'     => true,
                 'required' => false,
