@@ -30,6 +30,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
+    use DefaultValueTrait;
+
     /**
      * @var Session
      */
@@ -50,6 +52,17 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
+    }
+
+    /**
+     * @param Company $entity
+     * @param bool    $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        $this->setEntityDefaultValues($entity, 'company');
+
+        parent::saveEntity($entity, $unlock);
     }
 
     /**
