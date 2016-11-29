@@ -40,6 +40,9 @@ class CitrixModel extends FormModel
 
     /**
      * CitrixModel constructor.
+     *
+     * @param LeadModel  $leadModel
+     * @param EventModel $eventModel
      */
     public function __construct(LeadModel $leadModel, EventModel $eventModel)
     {
@@ -338,6 +341,10 @@ class CitrixModel extends FormModel
                 $citrixEvent->setEventDesc($eventDesc);
                 $citrixEvent->setEventType($eventType);
                 $citrixEvent->setLead($leads[$email]);
+
+                if (!empty($info['event_date'])) {
+                    $citrixEvent->setEventDate($info['event_date']);
+                }
 
                 $newEntities[] = $citrixEvent;
 

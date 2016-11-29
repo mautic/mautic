@@ -531,13 +531,14 @@ class CitrixHelper
         $contacts = [];
 
         foreach ($results as $result) {
+            $emailKey = false;
             if (isset($result['attendeeEmail'])) {
                 if (empty($result['attendeeEmail'])) {
                     // ignore
                     continue;
                 }
-
-                $names = explode(' ', $result['attendeeName']);
+                $emailKey = strtolower($result['attendeeEmail']);
+                $names    = explode(' ', $result['attendeeName']);
                 switch (count($names)) {
                     case 1:
                         $firstname = $names[0];
@@ -552,17 +553,36 @@ class CitrixHelper
                         $lastname = implode(' ', $names);
                 }
 
-                $contacts[strtolower($result['attendeeEmail'])] = [
+                $contacts[$emailKey] = [
                     'firstname' => $firstname,
                     'lastname'  => $lastname,
                     'email'     => $result['attendeeEmail'],
                 ];
             } elseif (!empty($result['email'])) {
-                $contacts[strtolower($result['email'])] = [
+                $emailKey            = strtolower($result['email']);
+                $contacts[$emailKey] = [
                     'firstname' => (isset($result['firstName'])) ? $result['firstName'] : '',
                     'lastname'  => (isset($result['lastName'])) ? $result['lastName'] : '',
                     'email'     => $result['email'],
                 ];
+            }
+
+            if ($emailKey) {
+                $eventDate = null;
+                // Extract join/register time
+                if (!empty($result['attendance']['joinTime'])) {
+                    $eventDate = $result['attendance']['joinTime'];
+                } elseif (!empty($result['joinTime'])) {
+                    $eventDate = $result['joinTime'];
+                } elseif (!empty($result['inSessionTimes']['joinTime'])) {
+                    $eventDate = $result['inSessionTimes']['joinTime'];
+                } elseif (!empty($result['registrationDate'])) {
+                    $eventDate = $result['registrationDate'];
+                }
+
+                if ($eventDate) {
+                    $contacts[$emailKey]['event_date'] = new \DateTime($eventDate);
+                }
             }
         }
 
