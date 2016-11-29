@@ -244,8 +244,7 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Helper function to debug REST requests
-     * TODO: Remove onRequest function.
+     * Helper function to debug REST requests.
      *
      * @param PluginIntegrationRequestEvent $event
      */
@@ -281,14 +280,18 @@ class FormSubscriber extends CommonSubscriber
             $list = CitrixHelper::getCitrixChoices($eventType);
             /** @var array $values */
             $values = $event->getValue();
-            if (!(array) $values) {
+
+            if (!is_array($values) && !is_object($values)) {
                 $values = [$values];
             }
-            foreach ($values as $value) {
-                if (!array_key_exists($value, $list)) {
-                    $event->failedValidation(
-                        $value.': '.$this->translator->trans('plugin.citrix.'.$eventType.'.nolongeravailable')
-                    );
+
+            if (is_array($values) || is_object($values)) {
+                foreach ($values as $value) {
+                    if (!array_key_exists($value, $list)) {
+                        $event->failedValidation(
+                            $value.': '.$this->translator->trans('plugin.citrix.'.$eventType.'.nolongeravailable')
+                        );
+                    }
                 }
             }
         }
@@ -368,9 +371,7 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @param Events\FormEvent $event
      *
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \InvalidArgumentException
+     * @throws ValidationException
      */
     public function onFormPreSave(Events\FormEvent $event)
     {
@@ -379,20 +380,31 @@ class FormSubscriber extends CommonSubscriber
 
         // Verify if the form is well configured
         if (0 !== count($fields)) {
-            $errors         = $this->_checkFormValidity($form);
-            $errorSeparator = '~ Citrix';
-            $formName       = $form->getName();
-            $newFormName    = trim(explode($errorSeparator, $formName)[0]);
-            if (0 !== count($errors)) {
-                $newFormName .= ' '.$errorSeparator.' '.$errors[0];
+            $violations = $this->_checkFormValidity($form);
+            if (0 !== count($violations)) {
                 $event->stopPropagation();
-            }
-            if ($newFormName !== $formName) {
-                $form->setName($newFormName);
-                $this->em->persist($form);
-                $this->em->flush();
+                $error     = implode('<br/>', $violations);
+                $exception = (new ValidationException($error))
+                    ->setViolations($violations);
+                throw $exception;
             }
         }
+
+//        if (0 !== count($fields)) {
+//            $errors         = $this->_checkFormValidity($form);
+//            $errorSeparator = '~ Citrix';
+//            $formName       = $form->getName();
+//            $newFormName    = trim(explode($errorSeparator, $formName)[0]);
+//            if (0 !== count($errors)) {
+//                $newFormName .= ' '.$errorSeparator.' '.$errors[0];
+//                $event->stopPropagation();
+//            }
+//            if ($newFormName !== $formName) {
+//              //  $form->setName($newFormName);
+//                $this->em->persist($form);
+//                $this->em->flush();
+//            }
+//        }
     }
 
     /**
