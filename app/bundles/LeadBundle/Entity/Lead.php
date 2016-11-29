@@ -355,14 +355,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $current = ($oldValue) ? $oldValue : $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
+                $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
+                $this->changes['owner'] = [$current, $val->getId()];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
+                $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
@@ -403,14 +400,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             }
         } elseif ($prop == 'stage') {
             if ($current && !$val) {
-                $this->changes['stage'] = [$current->getName().' ('.$current->getId().')', $val];
+                $this->changes['stage'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
-                $this->changes['stage'] = [$current, $val->getName().' ('.$val->getId().')'];
+                $this->changes['stage'] = [$current, $val->getId()];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['stage'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
+                $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];

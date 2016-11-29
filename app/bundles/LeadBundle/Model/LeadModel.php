@@ -121,6 +121,8 @@ class LeadModel extends FormModel
      * @param FieldModel        $leadFieldModel
      * @param ListModel         $leadListModel
      * @param FormFactory       $formFactory
+     * @param CompanyModel      $companyModel
+     * @param CategoryModel     $categoryModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -455,13 +457,13 @@ class LeadModel extends FormModel
         $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
         $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-        if (isset($data['stage']) && $data['stage'] != $currentLeadStage) {
+        if (isset($data['stage']) && $data['stage'] !== $currentLeadStage) {
             $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
             $lead->stageChangeLogEntry(
                 $stage,
                 $stage->getId().':'.$stage->getName(),
                 $this->translator->trans('mautic.stage.event.changed')
-          );
+            );
         }
 
         //save the field values
@@ -778,6 +780,8 @@ class LeadModel extends FormModel
      * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
      *
      * @param array $queryFields
+     *
+     * @return array|Lead|null
      */
     public function getLeadFromRequest(array $queryFields = [])
     {
@@ -788,6 +792,8 @@ class LeadModel extends FormModel
      * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters.
      *
      * @param array $queryFields
+     *
+     * @return array|Lead|null
      */
     public function getContactFromRequest($queryFields = [])
     {
@@ -937,9 +943,10 @@ class LeadModel extends FormModel
     /**
      * Get a list of lists this lead belongs to.
      *
-     * @param Lead       $lead
-     * @param bool|false $forLists
-     * @param bool|false $arrayHydration
+     * @param Lead $lead
+     * @param bool $forLists
+     * @param bool $arrayHydration
+     * @param bool $isPublic
      *
      * @return mixed
      */
@@ -1493,12 +1500,11 @@ class LeadModel extends FormModel
      * @param null $owner
      * @param null $list
      * @param null $tags
-     * @param bool $persist Persist to the database; otherwise return entity
+     * @param bool $persist
      *
-     * @return bool
+     * @return array|bool|null
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Swift_RfcComplianceException
+     * @throws \Exception
      */
     public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
     {
@@ -1816,9 +1822,8 @@ class LeadModel extends FormModel
     /**
      * Update a leads tags.
      *
-     * @param Lead       $lead
-     * @param array      $tags
-     * @param bool|false $removeOrphans
+     * @param Lead   $lead
+     * @param UtmTag $utmTags
      */
     public function setUtmTags(Lead $lead, UtmTag $utmTags)
     {
@@ -1956,45 +1961,45 @@ class LeadModel extends FormModel
     {
         $operatorOptions = [
             '=' => [
-                    'label'       => 'mautic.lead.list.form.operator.equals',
-                    'expr'        => 'eq',
-                    'negate_expr' => 'neq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.equals',
+                'expr'        => 'eq',
+                'negate_expr' => 'neq',
+            ],
             '!=' => [
-                    'label'       => 'mautic.lead.list.form.operator.notequals',
-                    'expr'        => 'neq',
-                    'negate_expr' => 'eq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.notequals',
+                'expr'        => 'neq',
+                'negate_expr' => 'eq',
+            ],
             'gt' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
-                    'expr'        => 'gt',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                'expr'        => 'gt',
+                'negate_expr' => 'lt',
+            ],
             'gte' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'expr'        => 'gte',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                'expr'        => 'gte',
+                'negate_expr' => 'lt',
+            ],
             'lt' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthan',
-                    'expr'        => 'lt',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthan',
+                'expr'        => 'lt',
+                'negate_expr' => 'gt',
+            ],
             'lte' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-                    'expr'        => 'lte',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                'expr'        => 'lte',
+                'negate_expr' => 'gt',
+            ],
             'like' => [
-                    'label'       => 'mautic.lead.list.form.operator.islike',
-                    'expr'        => 'like',
-                    'negate_expr' => 'notLike',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.islike',
+                'expr'        => 'like',
+                'negate_expr' => 'notLike',
+            ],
             '!like' => [
-                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
-                    'expr'        => 'notLike',
-                    'negate_expr' => 'like',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                'expr'        => 'notLike',
+                'negate_expr' => 'like',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
@@ -2135,9 +2140,9 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) as quantity, t.country')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-            ->groupBy('t.country')
-            ->where($q->expr()->isNotNull('t.country'));
+          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+          ->groupBy('t.country')
+          ->where($q->expr()->isNotNull('t.country'));
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2174,12 +2179,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
-            ->where($q->expr()->isNotNull('t.owner_id'))
-            ->orderBy('leads', 'DESC')
-            ->groupBy('t.owner_id, u.first_name, u.last_name')
-            ->setMaxResults($limit);
+          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+          ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+          ->where($q->expr()->isNotNull('t.owner_id'))
+          ->orderBy('leads', 'DESC')
+          ->groupBy('t.owner_id, u.first_name, u.last_name')
+          ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2204,12 +2209,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-            ->where($q->expr()->isNotNull('t.created_by'))
-            ->andWhere($q->expr()->isNotNull('t.created_by_user'))
-            ->orderBy('leads', 'DESC')
-            ->groupBy('t.created_by, t.created_by_user')
-            ->setMaxResults($limit);
+          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+          ->where($q->expr()->isNotNull('t.created_by'))
+          ->andWhere($q->expr()->isNotNull('t.created_by_user'))
+          ->orderBy('leads', 'DESC')
+          ->groupBy('t.created_by, t.created_by_user')
+          ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2239,8 +2244,8 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-            ->setMaxResults($limit);
+          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+          ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2272,9 +2277,13 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead $lead
-     * @param int  $page
-     * @param null $filters
+     * @param Lead       $lead
+     * @param null       $filters
+     * @param array|null $orderBy
+     * @param int        $page
+     * @param int        $limit
+     *
+     * @return array
      */
     public function getEngagements(Lead $lead, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
@@ -2298,12 +2307,13 @@ class LeadModel extends FormModel
     /**
      * Get engagement counts by time unit.
      *
-     * @param Lead           $lead
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
-     * @param string         $unit     Y, m, d, etc
+     * @param Lead            $lead
+     * @param \DateTime|null  $dateFrom
+     * @param \DateTime|null  $dateTo
+     * @param string          $unit
+     * @param ChartQuery|null $chartQuery
      *
-     * @return array|int
+     * @return array
      */
     public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null)
     {
@@ -2397,6 +2407,8 @@ class LeadModel extends FormModel
     /**
      * @param $companyId
      * @param $leadId
+     *
+     * @return array
      */
     public function setPrimaryCompany($companyId, $leadId)
     {
