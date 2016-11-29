@@ -70,14 +70,10 @@ JS;
                                 <?php
                                 if ($showContactFrequency):?>
                                     <div class="col-md-6">
-                                        <div class="pull-left">
-                                            <?php echo $view['form']->label($form['frequency_number_'.$channel->value]); ?>
-                                            <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
-                                        </div>
+                                        <label class="text-muted"><?php echo $view['translator']->trans($form['frequency_number_'.$channel->value]->vars['label']); ?></label>
+                                        <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
                                         <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
-                                        <span class="clearfix">
-                <?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?>
-            </span>
+                                        <?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?>
                                     </div>
                                 <?php else:
                                     unset($form['frequency_time_'.$channel->value]);

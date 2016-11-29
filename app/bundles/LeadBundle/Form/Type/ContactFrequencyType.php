@@ -90,7 +90,7 @@ class ContactFrequencyType extends AbstractType
                             'label_attr' => ['class' => 'text-muted fw-n'],
                             'required'   => true,
                             'attr'       => [
-                                'class' => 'frequency form-control pull-left',
+                                'class' => 'frequency form-control',
                             ],
                             'required' => false,
                             'disabled' => in_array($channel, $data['lead_channels']) ? false : true,
