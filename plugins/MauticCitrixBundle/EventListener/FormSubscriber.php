@@ -320,18 +320,20 @@ class FormSubscriber extends CommonSubscriber
                 $alias = $field->getAlias();
                 /** @var array $productIds */
                 $productIds = $post[$alias];
-                if (!(array) $productIds) {
+                if (!is_array($productIds) && !is_object($productIds)) {
                     $productIds = [$productIds];
                 }
-                foreach ($productIds as $productId) {
-                    $products[] = [
-                        'fieldName'    => $alias,
-                        'productId'    => $productId,
-                        'productTitle' => array_key_exists(
-                            $productId,
-                            $productlist
-                        ) ? $productlist[$productId] : 'untitled',
-                    ];
+                if (is_array($productIds) || is_object($productIds)) {
+                    foreach ($productIds as $productId) {
+                        $products[] = [
+                            'fieldName'    => $alias,
+                            'productId'    => $productId,
+                            'productTitle' => array_key_exists(
+                                $productId,
+                                $productlist
+                            ) ? $productlist[$productId] : 'untitled',
+                        ];
+                    }
                 }
             }
         }
@@ -389,22 +391,6 @@ class FormSubscriber extends CommonSubscriber
                 throw $exception;
             }
         }
-
-//        if (0 !== count($fields)) {
-//            $errors         = $this->_checkFormValidity($form);
-//            $errorSeparator = '~ Citrix';
-//            $formName       = $form->getName();
-//            $newFormName    = trim(explode($errorSeparator, $formName)[0]);
-//            if (0 !== count($errors)) {
-//                $newFormName .= ' '.$errorSeparator.' '.$errors[0];
-//                $event->stopPropagation();
-//            }
-//            if ($newFormName !== $formName) {
-//              //  $form->setName($newFormName);
-//                $this->em->persist($form);
-//                $this->em->flush();
-//            }
-//        }
     }
 
     /**
