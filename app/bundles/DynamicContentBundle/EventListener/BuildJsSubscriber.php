@@ -15,12 +15,29 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\FormBundle\Model\FormModel;
 
 /**
  * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var
+     */
+    protected $formModel;
+
+
+    /**
+     * BuildJsSubscriber constructor.
+     *
+     * @param FormModel $formModel
+     */
+    public function __construct(FormModel $formModel)
+    {
+        $this->formModel = $formModel;
+    }
+
     /**
      * @return array
      */
@@ -43,6 +60,7 @@ class BuildJsSubscriber extends CommonSubscriber
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
+        
 MauticJS.replaceDynamicContent = function () {
     var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
 
@@ -53,30 +71,10 @@ MauticJS.replaceDynamicContent = function () {
 
             MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
                 if (response.length) {
-            if (typeof MauticSDKLoaded == 'undefined') &&  response.search("mauticform_wrapper") > 0) {
-                <script type="text/javascript">
-
-    /** This section is only needed once per page if manually copying **/
-    if (typeof MauticSDKLoaded == 'undefined') {
-        var MauticSDKLoaded = true;
-        var head            = document.getElementsByTagName('head')[0];
-        var script          = document.createElement('script');
-        script.type         = 'text/javascript';
-        script.src          = 'http://localhost/mautic/media/js/mautic-form.js';
-        script.onload       = function() {
-            MauticSDK.onLoad();
-        };
-        head.appendChild(script);
-        var MauticDomain = 'http://localhost';
-        var MauticLang   = {
-            'submittingMessage': "Please wait..."
-        }
-    }
-</script>
-
-            }
-                
                     node.innerHTML = response;
+                    if (typeof MauticSDKLoaded != 'undefined') {
+                        MauticSDK.onLoad();   
+                    }
                 }
             });
         });

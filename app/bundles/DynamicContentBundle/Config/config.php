@@ -56,6 +56,9 @@ return [
             ],
             'mautic.dynamicContent.js.subscriber' => [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.form.model.form',
+                ],
             ],
             'mautic.dynamicContent.subscriber' => [
                 'class'     => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
@@ -64,8 +67,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.form.helper.token',
-                    'mautic.core.model.auditlog',
-                    'mautic.form.model.form',
+                    'mautic.core.model.auditlog'
                 ],
             ],
         ],

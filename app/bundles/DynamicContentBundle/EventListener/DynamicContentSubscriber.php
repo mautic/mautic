@@ -23,7 +23,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\FormBundle\Model\FormModel;
 
 /**
  * Class DynamicContentSubscriber.
@@ -56,11 +55,6 @@ class DynamicContentSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
      * DynamicContentSubscriber constructor.
      *
      * @param TrackableModel   $trackableModel
@@ -74,15 +68,13 @@ class DynamicContentSubscriber extends CommonSubscriber
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
         FormTokenHelper $formTokenHelper,
-        AuditLogModel $auditLogModel,
-        FormModel $formModel
+        AuditLogModel $auditLogModel
     ) {
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
         $this->formTokenHelper = $formTokenHelper;
         $this->auditLogModel    = $auditLogModel;
-        $this->formModel = $formModel;
 
     }
 
