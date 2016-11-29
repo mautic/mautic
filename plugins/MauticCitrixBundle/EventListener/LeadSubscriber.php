@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
@@ -184,7 +183,7 @@ class LeadSubscriber extends CommonSubscriber
                 $eventNames
             );
 
-            if (CitrixProducts::GOTOWEBINAR === $product || CitrixProducts::GOTOTRAINING === $product) {
+            if (in_array($product, [CitrixProducts::GOTOWEBINAR, CitrixProducts::GOTOTRAINING])) {
                 $event->addChoice(
                     'lead',
                     $product.'-registration',
@@ -262,18 +261,10 @@ class LeadSubscriber extends CommonSubscriber
 
             if (in_array($currentFilter, $eventFilters, true)) {
                 $eventNames = $details['filter'];
-
-                $isAnyEvent = in_array("'any'", $eventNames, true);
-
-                $leadEmail = '';
-                if ('' !== $leadId && null !== $leadId) {
-                    /** @var LeadRepository $leadRepository */
-                    $leadRepository = $em->getRepository('MauticLeadBundle:Lead');
-                    /** @var Lead $lead */
-                    $lead      = $leadRepository->getEntity($leadId);
-                    $leadEmail = $lead->getEmail();
-                }
-
+                $isAnyEvent = in_array('any', $eventNames, true);
+                $eventNames = array_map(function ($v) use ($q) {
+                    return $q->expr()->literal($v);
+                }, $eventNames);
                 $subQueriesSQL = [];
 
                 $eventTypes = [CitrixEventTypes::REGISTERED, CitrixEventTypes::ATTENDED];
@@ -285,93 +276,56 @@ class LeadSubscriber extends CommonSubscriber
                     if (!$isAnyEvent) {
                         $query->where(
                             $q->expr()->andX(
-                                $q->expr()->eq($alias.$k.'.product', "'".$product."'"),
-                                $q->expr()->eq($alias.$k.'.email', 'l.email'),
-                                $q->expr()->eq($alias.$k.'.event_type', "'".$eventType."'"),
-                                $q->expr()->in($alias.$k.'.event_name', $eventNames)
+                                $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
+                                $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
+                                $q->expr()->in($alias.$k.'.event_name', $eventNames),
+                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
                             )
                         );
                     } else {
                         $query->where(
                             $q->expr()->andX(
-                                $q->expr()->eq($alias.$k.'.product', "'".$product."'"),
-                                $q->expr()->eq($alias.$k.'.email', 'l.email'),
-                                $q->expr()->eq($alias.$k.'.event_type', "'".$eventType."'")
+                                $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
+                                $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
+                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
                             )
                         );
                     }
 
-                    if ('' !== $leadEmail) {
+                    if ($leadId) {
                         $query->andWhere(
-                            $query->expr()->eq($alias.$k.'.email', $leadEmail)
+                            $query->expr()->eq($alias.$k.'.lead_id', $leadId)
                         );
                     }
 
                     $subQueriesSQL[$eventType] = $query->getSQL();
                 } // foreach $eventType
 
-                $subQuery = '';
+                switch ($currentFilter) {
+                    case $product.'-registration':
+                        $event->setSubQuery(
+                            sprintf('%s (%s)', 'in' == $func ? 'EXISTS' : 'NOT EXISTS', $subQueriesSQL[CitrixEventTypes::REGISTERED])
+                        );
+                        break;
 
-                if ($func === 'in') {
-                    if ($currentFilter === $product.'-registration') {
-                        $subQuery = 'EXISTS ('.$subQueriesSQL[CitrixEventTypes::REGISTERED].')';
-                    } else {
-                        if ($currentFilter === $product.'-attendance') {
-                            $subQuery = 'EXISTS ('.$subQueriesSQL[CitrixEventTypes::ATTENDED].')';
-                        } else {
-                            if ($currentFilter === $product.'-no-attendance') {
-                                $queryNbRegistered = $em->getConnection()->createQueryBuilder()
-                                                        ->select('count(*)')
-                                                        ->from($citrixEventsTable, $alias.'sub1')
-                                                        ->where(
-                                                            $q->expr()->andX(
-                                                                $q->expr()->eq(
-                                                                    $alias.'sub1.event_type',
-                                                                    "'".CitrixEventTypes::REGISTERED."'"
-                                                                ),
-                                                                $q->expr()->in($alias.'sub1.event_name', $eventNames),
-                                                                $q->expr()->eq($alias.'sub1.email', $alias.'.email')
-                                                            )
-                                                        )->getSQL();
+                    case $product.'-attendance':
+                        $event->setSubQuery(
+                            sprintf('%s (%s)', 'in' == $func ? 'EXISTS' : 'NOT EXISTS', $subQueriesSQL[CitrixEventTypes::ATTENDED])
+                        );
+                        break;
 
-                                $queryNbParticipated = $em->getConnection()->createQueryBuilder()
-                                                          ->select('count(*)')
-                                                          ->from($citrixEventsTable, $alias.'sub2')
-                                                          ->where(
-                                                              $q->expr()->andX(
-                                                                  $q->expr()->eq(
-                                                                      $alias.'sub2.event_type',
-                                                                      "'".CitrixEventTypes::ATTENDED."'"
-                                                                  ),
-                                                                  $q->expr()->in($alias.'sub2.event_name', $eventNames),
-                                                                  $q->expr()->eq($alias.'sub2.email', $alias.'.email')
-                                                              )
-                                                          )->getSQL();
+                    case $product.'-no-attendance':
+                        $queries = [sprintf('%s (%s)', 'in' == $func ? 'NOT EXISTS' : 'EXISTS', $subQueriesSQL[CitrixEventTypes::ATTENDED])];
 
-                                $subQuery = '(('.$queryNbRegistered.') > ('.$queryNbParticipated.')) AND '.$alias.'.email = l.email';
-
-                                if ('' !== $leadEmail) {
-                                    $subQuery .= ' AND '.$alias.".email='".$leadEmail."'";
-                                }
-
-                                $subQuery = 'EXISTS ( SELECT null FROM '.$citrixEventsTable.' AS '.$alias.' WHERE ( '.$subQuery.'))';
-                            }
+                        if (in_array($product, [CitrixProducts::GOTOWEBINAR, CitrixProducts::GOTOTRAINING])) {
+                            // These products track registration
+                            $queries[] = sprintf('EXISTS (%s)', $subQueriesSQL[CitrixEventTypes::REGISTERED]);
                         }
-                    }
-                } else {
-                    if ($func === 'notIn') {
-                        if ($currentFilter === $product.'-registration') {
-                            $subQuery = 'NOT EXISTS ('.$subQueriesSQL[CitrixEventTypes::REGISTERED].')';
-                        } else {
-                            if ($currentFilter === $product.'-attendance') {
-                                $subQuery = 'NOT EXISTS ('.$subQueriesSQL[CitrixEventTypes::ATTENDED].')';
-                            }
-                        }
-                    }
+
+                        $event->setSubQuery(implode(' AND ', $queries));
+
+                        break;
                 }
-
-                $event->setSubQuery($subQuery);
-                $event->setFilteringStatus(true);
             }
         } // foreach $product
     }

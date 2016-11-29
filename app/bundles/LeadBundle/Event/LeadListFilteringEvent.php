@@ -1,24 +1,23 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
-use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
- * Class LeadListFilteringEvent
+ * Class LeadListFilteringEvent.
  *
  * Please refer to LeadListRepository.php, inside getListFilterExpr method, for examples
- *
- * @package Mautic\FieldBundle\Event
  */
 class LeadListFilteringEvent extends CommonEvent
 {
@@ -28,7 +27,7 @@ class LeadListFilteringEvent extends CommonEvent
     protected $details;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $leadId;
 
@@ -58,11 +57,11 @@ class LeadListFilteringEvent extends CommonEvent
     protected $func;
 
     /**
-     * @param array $details
-     * @param int $leadId
-     * @param string $alias
-     * @param string $func
-     * @param QueryBuilder $queryBuilder
+     * @param array         $details
+     * @param int           $leadId
+     * @param string        $alias
+     * @param string        $func
+     * @param QueryBuilder  $queryBuilder
      * @param EntityManager $entityManager
      */
     public function __construct(
@@ -73,14 +72,14 @@ class LeadListFilteringEvent extends CommonEvent
         QueryBuilder $queryBuilder,
         EntityManager $entityManager
     ) {
-        $this->details = $details;
-        $this->leadId = $leadId;
-        $this->alias = $alias;
-        $this->func = $func;
-        $this->queryBuilder = $queryBuilder;
-        $this->em = $entityManager;
+        $this->details         = $details;
+        $this->leadId          = $leadId;
+        $this->alias           = $alias;
+        $this->func            = $func;
+        $this->queryBuilder    = $queryBuilder;
+        $this->em              = $entityManager;
         $this->isFilteringDone = false;
-        $this->subQuery = '';
+        $this->subQuery        = '';
     }
 
     /**
@@ -92,7 +91,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getLeadId()
     {
@@ -145,6 +144,8 @@ class LeadListFilteringEvent extends CommonEvent
     public function setSubQuery($query)
     {
         $this->subQuery = $query;
+
+        $this->setFilteringStatus(true);
     }
 
     /**
@@ -162,5 +163,4 @@ class LeadListFilteringEvent extends CommonEvent
     {
         return $this->subQuery;
     }
-
 }

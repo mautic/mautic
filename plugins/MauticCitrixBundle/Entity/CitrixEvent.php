@@ -86,6 +86,8 @@ class CitrixEvent
             ->addIndex(['product', 'event_type', 'event_date'], 'citrix_event_type')
             ->addIndex(['product', 'email', 'event_type'], 'citrix_event_product')
             ->addIndex(['product', 'email', 'event_type', 'event_name'], 'citrix_event_product_name')
+            ->addIndex(['product', 'event_type', 'event_name', 'lead_id'], 'citrix_event_product_name_lead')
+            ->addIndex(['product', 'event_type', 'lead_id'], 'citrix_event_product_type_lead')
             ->addIndex(['event_date'], 'citrix_event_date');
         $builder->addId();
         $builder->addNamedField('product', 'string', 'product');
