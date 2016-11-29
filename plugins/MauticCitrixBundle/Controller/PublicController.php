@@ -12,7 +12,6 @@ namespace MauticPlugin\MauticCitrixBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -118,38 +117,8 @@ class PublicController extends CommonController
             $eventName   = CitrixHelper::getCleanString(
                     $eventDesc
                 ).'_#'.$productId;
-            $product          = 'assist';
-            $registrants      = CitrixHelper::getRegistrants($product, $productId);
-            $knownRegistrants = $citrixModel->getEmailsByEvent(
-                $product,
-                $eventName,
-                CitrixEventTypes::REGISTERED
-            );
-
-            $citrixModel->batchAddAndRemove(
-                $product,
-                $eventName,
-                $eventDesc,
-                CitrixEventTypes::REGISTERED,
-                array_diff($registrants, $knownRegistrants),
-                array_diff($knownRegistrants, $registrants)
-            );
-
-            $attendees      = CitrixHelper::getAttendees($product, $productId);
-            $knownAttendees = $citrixModel->getEmailsByEvent(
-                $product,
-                $eventName,
-                CitrixEventTypes::ATTENDED
-            );
-
-            $citrixModel->batchAddAndRemove(
-                $product,
-                $eventName,
-                $eventDesc,
-                CitrixEventTypes::ATTENDED,
-                array_diff($attendees, $knownAttendees),
-                array_diff($knownAttendees, $attendees)
-            );
+            $product = 'assist';
+            $citrixModel->syncEvent($product, $productId, $eventName, $eventDesc);
         } catch (\Exception $ex) {
             throw new BadRequestHttpException($ex->getMessage());
         }

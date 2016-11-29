@@ -469,19 +469,18 @@ class CitrixHelper
      */
     public static function getRegistrants($product, $productId)
     {
-        if (CitrixProducts::GOTOWEBINAR === $product) {
-            $result = self::getG2wApi()->request($product.'s/'.$productId.'/registrants');
+        $result = [];
+        switch ($product) {
+            case CitrixProducts::GOTOWEBINAR:
+                $result = self::getG2wApi()->request($product.'s/'.$productId.'/registrants');
+                break;
 
-            return array_map(create_function('$o', 'return $o["email"];'), $result);
-        } else {
-            if (CitrixProducts::GOTOTRAINING === $product) {
+            case CitrixProducts::GOTOTRAINING:
                 $result = self::getG2tApi()->request($product.'s/'.$productId.'/registrants');
-
-                return array_map(create_function('$o', 'return $o["email"];'), $result);
-            }
+                break;
         }
 
-        return [];
+        return self::extractContacts($result);
     }
 
     /**
@@ -494,36 +493,81 @@ class CitrixHelper
      */
     public static function getAttendees($product, $productId)
     {
-        if (CitrixProducts::GOTOWEBINAR === $product) {
-            $result = self::getG2wApi()->request($product.'s/'.$productId.'/attendees');
+        $result = [];
+        switch ($product) {
+            case CitrixProducts::GOTOWEBINAR:
+                $result = self::getG2wApi()->request($product.'s/'.$productId.'/attendees');
+                break;
 
-            return array_map(create_function('$o', 'return $o["email"];'), $result);
-        } else {
-            if (CitrixProducts::GOTOMEETING === $product) {
+            case CitrixProducts::GOTOMEETING:
                 $result = self::getG2mApi()->request($product.'s/'.$productId.'/attendees');
+                break;
 
-                return array_map(create_function('$o', 'return $o["email"];'), $result);
-            } else {
-                if (CitrixProducts::GOTOTRAINING === $product) {
-                    $attendees = [];
-                    $result    = self::getG2tApi()->request($product.'s/'.$productId, [], 'GET', 'rest/reports');
-                    $sessions  = array_map(create_function('$o', 'return $o["sessionKey"];'), $result);
-                    foreach ($sessions as $session) {
-                        $result = self::getG2tApi()->request(
-                            'sessions/'.$session.'/attendees',
-                            [],
-                            'GET',
-                            'rest/reports'
-                        );
-                        $arr       = array_map(create_function('$o', 'return $o["email"];'), $result);
-                        $attendees = array_merge($attendees, $arr);
-                    }
-
-                    return $attendees;
+            case CitrixProducts::GOTOTRAINING:
+                $reports  = self::getG2tApi()->request($product.'s/'.$productId, [], 'GET', 'rest/reports');
+                $sessions = array_map(create_function('$o', 'return $o["sessionKey"];'), $reports);
+                foreach ($sessions as $session) {
+                    $result = self::getG2tApi()->request(
+                        'sessions/'.$session.'/attendees',
+                        [],
+                        'GET',
+                        'rest/reports'
+                    );
+                    $arr    = array_map(create_function('$o', 'return $o["email"];'), $result);
+                    $result = array_merge($result, $arr);
                 }
+
+                break;
+        }
+
+        return self::extractContacts($result);
+    }
+
+    /**
+     * @param $results
+     *
+     * @return array
+     */
+    protected static function extractContacts($results)
+    {
+        $contacts = [];
+
+        foreach ($results as $result) {
+            if (isset($result['attendeeEmail'])) {
+                if (empty($result['attendeeEmail'])) {
+                    // ignore
+                    continue;
+                }
+
+                $names = explode(' ', $result['attendeeName']);
+                switch (count($names)) {
+                    case 1:
+                        $firstname = $names[0];
+                        $lastname  = '';
+                        break;
+                    case 2:
+                        list($firstname, $lastname) = $names;
+                        break;
+                    default:
+                        $firstname = $names[0];
+                        unset($names[0]);
+                        $lastname = implode(' ', $names);
+                }
+
+                $contacts[strtolower($result['attendeeEmail'])] = [
+                    'firstname' => $firstname,
+                    'lastname'  => $lastname,
+                    'email'     => $result['attendeeEmail'],
+                ];
+            } elseif (!empty($result['email'])) {
+                $contacts[strtolower($result['email'])] = [
+                    'firstname' => (isset($result['firstName'])) ? $result['firstName'] : '',
+                    'lastname'  => (isset($result['lastName'])) ? $result['lastName'] : '',
+                    'email'     => $result['email'],
+                ];
             }
         }
 
-        return [];
+        return $contacts;
     }
 }

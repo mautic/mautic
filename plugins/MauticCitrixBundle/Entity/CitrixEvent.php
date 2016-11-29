@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @ORM\Table(name="plugin_citrix_events")
@@ -26,6 +27,11 @@ class CitrixEvent
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var Lead
+     */
+    protected $lead;
 
     /**
      * @ORM\Column(name="product", type="string", length=20)
@@ -85,12 +91,13 @@ class CitrixEvent
         $builder->addNamedField('product', 'string', 'product');
         $builder->addNamedField('email', 'string', 'email');
         $builder->addNamedField('eventName', 'string', 'event_name');
-        $builder->addNamedField('eventDesc', 'string', 'event_desc');
+        $builder->addNamedField('eventDesc', 'string', 'event_desc', true);
         $builder->createField('eventType', 'string')
             ->columnName('event_type')
             ->length(50)
             ->build();
         $builder->addNamedField('eventDate', 'datetime', 'event_date');
+        $builder->addLead();
     }
 
     /**
@@ -203,5 +210,25 @@ class CitrixEvent
     public function setEventDesc($eventDesc)
     {
         $this->eventDesc = $eventDesc;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return CitrixEvent
+     */
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
+
+        return $this;
     }
 }

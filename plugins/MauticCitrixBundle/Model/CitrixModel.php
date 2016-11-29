@@ -11,10 +11,9 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Model;
 
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
@@ -46,16 +45,6 @@ class CitrixModel extends FormModel
     {
         $this->leadModel  = $leadModel;
         $this->eventModel = $eventModel;
-    }
-
-    /**
-     * @param EntityManager $em
-     */
-    public function setEntityManager(EntityManager $em)
-    {
-        parent::setEntityManager($em);
-
-        $this->_createTableIfNotExists();
     }
 
     /**
@@ -103,7 +92,7 @@ class CitrixModel extends FormModel
         $this->em->persist($citrixEvent);
         $this->em->flush();
 
-        $this->_triggerCampaignEvents($product, $email);
+        $this->triggerCampaignEvents($product, $email);
     }
 
     /**
@@ -244,11 +233,60 @@ class CitrixModel extends FormModel
     }
 
     /**
+     * @param      $product
+     * @param      $productId
+     * @param      $eventName
+     * @param      $eventDesc
+     * @param int  $count
+     * @param null $output
+     */
+    public function syncEvent($product, $productId, $eventName, $eventDesc, &$count = 0, $output = null)
+    {
+        $registrants      = CitrixHelper::getRegistrants($product, $productId);
+        $knownRegistrants = $this->getEmailsByEvent(
+            $product,
+            $eventName,
+            CitrixEventTypes::REGISTERED
+        );
+
+        list($registrantsToAdd, $registrantsToDelete) = $this->filterEventContacts($registrants, $knownRegistrants);
+        $count += $this->batchAddAndRemove(
+            $product,
+            $eventName,
+            $eventDesc,
+            CitrixEventTypes::REGISTERED,
+            $registrantsToAdd,
+            $registrantsToDelete,
+            $output
+        );
+        unset($registrants, $knownRegistrants, $registrantsToAdd, $registrantsToDelete);
+
+        $attendees      = CitrixHelper::getAttendees($product, $productId);
+        $knownAttendees = $this->getEmailsByEvent(
+            $product,
+            $eventName,
+            CitrixEventTypes::ATTENDED
+        );
+
+        list($attendeesToAdd, $attendeesToDelete) = $this->filterEventContacts($attendees, $knownAttendees);
+        $count += $this->batchAddAndRemove(
+            $product,
+            $eventName,
+            $eventDesc,
+            CitrixEventTypes::ATTENDED,
+            $attendeesToAdd,
+            $attendeesToDelete,
+            $output
+        );
+        unset($attendees, $knownAttendees, $attendeesToAdd, $attendeesToDelete);
+    }
+
+    /**
      * @param string          $product
      * @param string          $eventName
      * @param string          $eventDesc
      * @param string          $eventType
-     * @param array           $emailsToAdd
+     * @param array           $contactsToAdd
      * @param array           $emailsToRemove
      * @param OutputInterface $output
      *
@@ -265,24 +303,41 @@ class CitrixModel extends FormModel
         $eventName,
         $eventDesc,
         $eventType,
-        array $emailsToAdd = [],
+        array $contactsToAdd = [],
         array $emailsToRemove = [],
         OutputInterface $output = null
     ) {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             return 0;
         }
-        $count = 0;
+
+        $count       = 0;
+        $newEntities = [];
+
         // Add events
-        if (0 !== count($emailsToAdd)) {
-            foreach ($emailsToAdd as $email) {
+        if (0 !== count($contactsToAdd)) {
+            $searchEmails = array_keys($contactsToAdd);
+            $leads        = $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true);
+            foreach ($contactsToAdd as $email => $info) {
+                if (!isset($leads[strtolower($email)])) {
+                    $lead = (new Lead())
+                        ->addUpdatedField('email', $info['email'])
+                        ->addUpdatedField('firstname', $info['firstname'])
+                        ->addUpdatedField('lastname', $info['lastname']);
+                    $this->leadModel->saveEntity($lead);
+
+                    $leads[strtolower($email)] = $lead;
+                }
+
                 $citrixEvent = new CitrixEvent();
                 $citrixEvent->setProduct($product);
                 $citrixEvent->setEmail($email);
                 $citrixEvent->setEventName($eventName);
                 $citrixEvent->setEventDesc($eventDesc);
                 $citrixEvent->setEventType($eventType);
-                $this->em->persist($citrixEvent);
+                $citrixEvent->setLead($leads[$email]);
+
+                $newEntities[] = $citrixEvent;
 
                 if (null !== $output) {
                     $output->writeln(
@@ -294,6 +349,8 @@ class CitrixModel extends FormModel
                 }
                 ++$count;
             }
+
+            $this->getRepository()->saveEntities($newEntities);
         }
 
         // Delete events
@@ -306,10 +363,10 @@ class CitrixModel extends FormModel
                     'product'   => $product,
                 ]
             );
+            $this->getRepository()->deleteEntities($citrixEvents);
+
             /** @var CitrixEvent $citrixEvent */
             foreach ($citrixEvents as $citrixEvent) {
-                $this->em->remove($citrixEvent);
-
                 if (null !== $output) {
                     $output->writeln(
                         ' - '.$citrixEvent->getEmail().' '.$eventType.' from '.
@@ -322,72 +379,61 @@ class CitrixModel extends FormModel
             }
         }
 
-        if (0 !== count($emailsToAdd) || 0 !== count($emailsToRemove)) {
-            $this->em->flush();
-        }
-
-        if (0 !== count($emailsToAdd)) {
-            foreach ($emailsToAdd as $email) {
+        if (0 !== count($newEntities)) {
+            /** @var CitrixEvent $entity */
+            foreach ($newEntities as $entity) {
                 if ($this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_EVENT_UPDATE)) {
-                    $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventDesc, $eventType, $email);
+                    $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventDesc, $eventType, $entity->getLead());
                     $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_EVENT_UPDATE, $citrixEvent);
                     unset($citrixEvent);
                 }
 
-                $this->_triggerCampaignEvents($product, $email);
+                $this->triggerCampaignEvents($product, $entity->getLead());
             }
         }
+
+        $this->em->clear(Lead::class);
+        $this->em->clear(CitrixEvent::class);
 
         return $count;
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function _createTableIfNotExists()
-    {
-        $tableName = 'plugin_citrix_events';
-        $sm        = $this->em->getConnection()->getSchemaManager();
-        if (!$sm->tablesExist([$tableName])) {
-            $table = new Table($tableName);
-            $col   = $table->addColumn('id', 'integer');
-            $col->setAutoincrement(true);
-            $table->addColumn('product', 'string', ['length' => 20]);
-            $table->addColumn('email', 'string', ['length' => 255]);
-            $table->addColumn('event_name', 'string', ['length' => 255]);
-            $table->addColumn('event_desc', 'string', ['length' => 255]);
-            $table->addColumn('event_type', 'string', ['length' => 50]);
-            $table->addColumn('event_date', 'datetime');
-            $table->setPrimaryKey(['id']);
-            $table->addIndex(['product', 'email'], 'citrix_event_email');
-            $table->addIndex(['product', 'event_name', 'event_type'], 'citrix_event_name');
-            $table->addIndex(['product', 'event_type', 'event_date'], 'citrix_event_type');
-            $table->addIndex(['product', 'email', 'event_type'], 'citrix_product');
-            $table->addIndex(['product', 'email', 'event_type', 'event_name'], 'citrix_product_name');
-            $table->addIndex(['event_date'], 'citrix_event_date');
-            $sm->createTable($table);
-        }
-    }
-
-    /**
      * @param string $product
-     * @param string $email
+     * @param string $lead
      *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    private function _triggerCampaignEvents($product, $email)
+    private function triggerCampaignEvents($product, $lead)
     {
         if (!CitrixProducts::isValidValue($product)) {
             return; // is not a valid citrix product
         }
-        /** @var LeadModel $this->leadModel */
-        $lead = $this->leadModel->getRepository()->getLeadByEmail($email);
-        if (array_key_exists('id', $lead)) {
-            $leadId = (int) $lead['id'];
-            $entity = $this->leadModel->getEntity($leadId);
-            $this->leadModel->setCurrentLead($entity);
-            $this->eventModel->triggerEvent('citrix.event.'.$product);
-        }
+
+        $this->leadModel->setSystemCurrentLead($lead);
+        $this->eventModel->triggerEvent('citrix.event.'.$product);
+    }
+
+    /**
+     * @param $found
+     * @param $known
+     *
+     * @return array
+     */
+    private function filterEventContacts($found, $known)
+    {
+        // Lowercase the emails to keep things consistent
+        $known  = array_map('strtolower', $known);
+        $delete = array_diff($known, array_map('strtolower', array_keys($found)));
+        $add    = array_filter(
+            $found,
+            function ($key) use ($known) {
+                return !in_array(strtolower($key), $known);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        return [$add, $delete];
     }
 }

@@ -11,11 +11,10 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Command;
 
-use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * php app/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
  */
-class SyncCommand extends ContainerAwareCommand
+class SyncCommand extends ModeratedCommand
 {
     /** @var CitrixModel */
     protected $citrixModel;
@@ -56,10 +55,14 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->citrixModel = $this->getContainer()->get('mautic.citrix.model.citrix');
+        $model   = $this->getContainer()->get('mautic.citrix.model.citrix');
+        $options = $input->getOptions();
+        $product = $options['product'];
 
-        $options        = $input->getOptions();
-        $product        = $options['product'];
+        if (!$this->checkRunStatus($input, $output, $options['product'].$options['id'])) {
+            return 0;
+        }
+
         $activeProducts = [];
         if (null === $product) {
             // all products
@@ -70,11 +73,14 @@ class SyncCommand extends ContainerAwareCommand
             }
 
             if (0 === count($activeProducts)) {
+                $this->completeRun();
+
                 return;
             }
         } else {
             if (!CitrixProducts::isValidValue($product)) {
                 $output->writeln('<error>Invalid product: '.$product.'. Aborted</error>');
+                $this->completeRun();
 
                 return;
             }
@@ -105,47 +111,20 @@ class SyncCommand extends ContainerAwareCommand
                         ).'_#'.$productId;
                     $output->writeln('Synchronizing: ['.$productId.'] '.$eventName);
 
-                    $registrants      = CitrixHelper::getRegistrants($product, $productId);
-                    $knownRegistrants = $this->citrixModel->getEmailsByEvent(
-                        $product,
-                        $eventName,
-                        CitrixEventTypes::REGISTERED
-                    );
-
-                    $count += $this->citrixModel->batchAddAndRemove(
-                        $product,
-                        $eventName,
-                        $eventDesc,
-                        CitrixEventTypes::REGISTERED,
-                        array_diff($registrants, $knownRegistrants),
-                        array_diff($knownRegistrants, $registrants),
-                        $output
-                    );
-
-                    $attendees      = CitrixHelper::getAttendees($product, $productId);
-                    $knownAttendees = $this->citrixModel->getEmailsByEvent(
-                        $product,
-                        $eventName,
-                        CitrixEventTypes::ATTENDED
-                    );
-
-                    $count += $this->citrixModel->batchAddAndRemove(
-                        $product,
-                        $eventName,
-                        $eventDesc,
-                        CitrixEventTypes::ATTENDED,
-                        array_diff($attendees, $knownAttendees),
-                        array_diff($knownAttendees, $attendees),
-                        $output
-                    );
+                    $model->syncEvent($product, $productId, $eventName, $eventDesc, $count, $output);
                 } catch (\Exception $ex) {
                     $output->writeln('<error>Error syncing '.$product.': '.$productId.'.</error>');
                     $output->writeln('<error>'.$ex->getMessage().'</error>');
+                    if ('dev' === MAUTIC_ENV) {
+                        $output->writeln('<info>'.(string) $ex.'</info>');
+                    }
                 }
             }
         }
 
         $output->writeln($count.' contacts synchronized.');
         $output->writeln('<info>Done.</info>');
+
+        $this->completeRun();
     }
 }
