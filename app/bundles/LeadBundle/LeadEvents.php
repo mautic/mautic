@@ -61,7 +61,7 @@ final class LeadEvents
      * The mautic.lead_company_change event is dispatched if a lead's company changes.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadCompanyChange instance.
+     * Mautic\LeadBundle\Event\LeadChangeCompanyEvent instance.
      *
      * @var string
      */
@@ -71,11 +71,21 @@ final class LeadEvents
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadListChange instance.
+     * Mautic\LeadBundle\Event\ListChangeEvent instance.
      *
      * @var string
      */
     const LEAD_LIST_CHANGE = 'mautic.lead_list_change';
+
+    /**
+     * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadCategoryEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_CATEGORY_CHANGE = 'mautic.lead_category_change';
 
     /**
      * The mautic.lead_list_batch_change event is dispatched if a batch of leads are changed from ListModel::rebuildListLeads().

@@ -35,6 +35,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\ChannelEvent;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -1428,6 +1429,10 @@ class LeadModel extends FormModel
                 $newLeadCategory->setDateAdded(new \DateTime());
                 $newLeadCategory->setManuallyAdded($manuallyAdded);
                 $results[$category->getId()] = $newLeadCategory;
+
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($lead, $category));
+                }
             }
         }
         if (!empty($results)) {
@@ -1437,16 +1442,28 @@ class LeadModel extends FormModel
         return $results;
     }
 
+    /**
+     * @param $categories
+     */
     public function removeFromCategories($categories)
     {
         $deleteCats = [];
         if (is_array($categories)) {
             foreach ($categories as $key => $category) {
+                /** @var LeadCategory $category */
                 $category     = $this->getLeadCategoryRepository()->getEntity($key);
                 $deleteCats[] = $category;
+
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
+                }
             }
-        } elseif ($categories instanceof Category) {
+        } elseif ($categories instanceof LeadCategory) {
             $deleteCats[] = $categories;
+
+            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($categories->getLead(), $categories->getCategory(), false));
+            }
         }
 
         if (!empty($deleteCats)) {
@@ -1454,6 +1471,11 @@ class LeadModel extends FormModel
         }
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return array
+     */
     public function getLeadCategories(Lead $lead)
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
