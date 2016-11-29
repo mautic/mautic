@@ -224,16 +224,29 @@ class CustomButtonEvent extends Event
     protected function generateButtonKey($button)
     {
         $buttonKey = '';
-        if (isset($button['btnText'])) {
+        if (!empty($button['btnText'])) {
             $buttonKey .= $button['btnText'];
         } elseif (isset($button['confirm'])) {
-            if (isset($button['confirm']['btnText'])) {
+            if (!empty($button['confirm']['btnText'])) {
                 $buttonKey .= $button['confirm']['btnText'];
             }
 
-            if (isset($button['confirm']['template'])) {
+            if (!empty($button['confirm']['template'])) {
                 $buttonKey .= $button['confirm']['template'];
             }
+
+            if (!empty($button['confirm']['iconClass'])) {
+                $buttonKey .= $button['confirm']['iconClass'];
+            }
+        }
+
+        if (!empty($button['iconClass'])) {
+            $buttonKey .= $button['iconClass'];
+        }
+
+        // Ensure buttons aren't overwritten unintentionally
+        if (empty($buttonKey)) {
+            $buttonKey = uniqid(time());
         }
 
         if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
