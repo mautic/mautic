@@ -115,9 +115,7 @@ class CitrixHelper
     public static function log($msg, $level = 'error')
     {
         try {
-            self::$logger->log($level, '**********************************************************************');
             self::$logger->log($level, $msg);
-            self::$logger->log($level, '**********************************************************************');
         } catch (\Exception $ex) {
             // do nothing
         }
