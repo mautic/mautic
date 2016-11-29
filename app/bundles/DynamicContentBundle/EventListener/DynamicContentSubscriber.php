@@ -147,7 +147,8 @@ class DynamicContentSubscriber extends CommonSubscriber
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
-                $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
+                $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
+                $this->formTokenHelper->findFormTokens($content)
             );
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(

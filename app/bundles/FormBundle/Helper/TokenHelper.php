@@ -21,16 +21,16 @@ class TokenHelper
     /**
      * @var
      */
-    protected $model;
+    protected $formModel;
 
     /**
      * TokenHelper constructor.
      *
      * @param FormModel $model
      */
-    public function __construct(FormModel $model)
+    public function __construct(FormModel $formModel)
     {
-        $this->model = $model;
+        $this->formModel = $formModel;
     }
 
     /**
@@ -61,10 +61,8 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
-                        '<div class="mauticform-error">'.
-                        $this->translator->trans('mautic.form.form.pagetoken.notpublished').
-                        '</div>';
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                        '';
 
                     //pouplate get parameters
                     //priority populate value order by: query string (parameters) -> with lead

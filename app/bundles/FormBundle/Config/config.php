@@ -301,7 +301,9 @@ return [
             ],
             'mautic.form.helper.token' => [
                 'class'     => 'Mautic\FormBundle\Helper\TokenHelper',
-                'arguments' => 'mautic.form.model.form',
+                'arguments' => [
+                    'mautic.form.model.form',
+                ],
             ],
         ],
     ],
