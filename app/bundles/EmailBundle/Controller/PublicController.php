@@ -116,9 +116,11 @@ class PublicController extends CommonFormController
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
         $message    = '';
+        $email      = null;
+        $lead       = null;
+        $template   = null;
 
-        $template = null;
-        if ($stat) {
+        if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -148,7 +150,6 @@ class PublicController extends CommonFormController
         }
 
         if (!empty($stat)) {
-            $email                  = $stat->getEmail();
             $lead                   = $stat->getLead();
             $showContactPreferences = $this->get('mautic.helper.core_parameters')->getParameter(('show_contact_preferences'));
             if (!$showContactPreferences) {
@@ -313,7 +314,6 @@ class PublicController extends CommonFormController
                 }
             }
         } else {
-            $email   = $lead   = false;
             $message = $translator->trans('mautic.email.stat_record.not_found');
         }
 
