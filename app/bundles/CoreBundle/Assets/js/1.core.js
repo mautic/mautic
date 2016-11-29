@@ -3927,7 +3927,9 @@ var Mautic = {
             Mautic.showChangeThemeWarning = false;
 
             // Populate default content
-            Mautic.setThemeHtml(Mautic.builderTheme);
+            if (!customHtml.length || !customHtml.val().length) {
+                Mautic.setThemeHtml(Mautic.builderTheme);
+            }
         }
 
         if (customHtml.length) {
