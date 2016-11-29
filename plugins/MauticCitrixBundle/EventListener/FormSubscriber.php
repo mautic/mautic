@@ -469,7 +469,7 @@ class FormSubscriber extends CommonSubscriber
                             if ($fieldProduct === $actionProduct) {
                                 $hasCitrixListField = true;
                                 if (!$field->getIsRequired()) {
-                                    $errors[] = sprintf(
+                                    $errors[$fieldProduct.'required'] = sprintf(
                                         $errorMessages['field_should_be_required'],
                                         $this->translator->trans('plugin.citrix.'.$fieldProduct.'.listfield')
                                     );
@@ -478,7 +478,7 @@ class FormSubscriber extends CommonSubscriber
                         } // foreach $fields
 
                         if (!$hasCitrixListField) {
-                            $errors[] = sprintf(
+                            $errors[$actionProduct.'listfield'] = sprintf(
                                 $errorMessages['field_not_found'],
                                 $this->translator->trans('plugin.citrix.'.$actionProduct.'.listfield')
                             );
@@ -492,11 +492,11 @@ class FormSubscriber extends CommonSubscriber
                         /** @var Field $field */
                         $field = $fields->get($props[$actionField]);
                         if (null === $field) {
-                            $errors[] = sprintf($errorMessages['lead_field_not_found'], $actionField);
+                            $errors[$actionField.'notfound'] = sprintf($errorMessages['lead_field_not_found'], $actionField);
                             break;
                         } else {
                             if (!$field->getIsRequired()) {
-                                $errors[] = sprintf($errorMessages['field_should_be_required'], $actionField);
+                                $errors[$actionField.'required'] = sprintf($errorMessages['field_should_be_required'], $actionField);
                                 break;
                             }
                         }
@@ -507,10 +507,10 @@ class FormSubscriber extends CommonSubscriber
                     $mandatoryFields = $actionFields[$actionAction];
                     foreach ($mandatoryFields as $mandatoryField) {
                         if (!array_key_exists($mandatoryField, $currentLeadFields)) {
-                            $errors[] = sprintf($errorMessages['lead_field_not_found'], $mandatoryField);
+                            $errors[$mandatoryField.'notfound'] = sprintf($errorMessages['lead_field_not_found'], $mandatoryField);
                         } else {
                             if (!$currentLeadFields[$mandatoryField]) {
-                                $errors[] = sprintf(
+                                $errors[$mandatoryField.'required'] = sprintf(
                                     $errorMessages['field_should_be_required'],
                                     $mandatoryField
                                 );
