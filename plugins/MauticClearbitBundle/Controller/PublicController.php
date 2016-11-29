@@ -53,7 +53,8 @@ class PublicController extends FormController
         $result           = $this->request->request->get('body', []);
         $oid              = $this->request->request->get('id');
         $validatedRequest = $this->get('mautic.plugin.clearbit.lookup_helper')->validateRequest($oid, $this->request->request->get('type'));
-        if (!$validatedRequest) {
+
+        if (!$validatedRequest || !is_array($result)) {
             return new Response('ERROR');
         }
 
