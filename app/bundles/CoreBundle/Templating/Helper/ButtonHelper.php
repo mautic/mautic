@@ -298,6 +298,8 @@ class ButtonHelper extends Helper
         $this->request        = $request;
         $this->item           = $item;
         $this->listMarker     = 3;
+        $this->wrapOpeningTag = null;
+        $this->wrapClosingTag = null;
 
         return $this;
     }
@@ -365,9 +367,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param Request $request
-     * @param null    $item
-     *
      * @return $this
      */
     protected function fetchCustomButtons()
@@ -454,7 +453,7 @@ class ButtonHelper extends Helper
     {
         if (!empty($button['primary'])) {
             if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
-                $button['priority'] = 201;
+                $button['priority'] = 215;
             }
         } elseif (!isset($button['priority'])) {
             $button['priority'] = 0;
@@ -563,9 +562,10 @@ class ButtonHelper extends Helper
         }
 
         if (!empty($removeFrom['btnClass'])) {
-            $removeFrom['attr']['class'] = $removeFrom['btnClass'];
+            $removeFrom['attr']['class'] = &$removeFrom['btnClass'];
         } elseif (!isset($removeFrom['attr']['class'])) {
             $removeFrom['attr']['class'] = '';
+            $removeFrom['btnClass']      = false;
         }
 
         $search = [

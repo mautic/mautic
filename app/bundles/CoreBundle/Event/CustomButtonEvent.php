@@ -11,9 +11,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Router;
 
 class CustomButtonEvent extends Event
 {
@@ -46,18 +46,20 @@ class CustomButtonEvent extends Event
      *
      * @param         $location
      * @param Request $request
-     * @param Router  $router
      * @param array   $buttons
      * @param null    $item
      */
     public function __construct($location, Request $request, array $buttons = [], $item = null)
     {
         $this->location = $location;
-        $this->buttons  = $buttons;
         $this->item     = $item;
 
         // The original request will be stored in the subrequest
         $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
+
+        foreach ($buttons as $button) {
+            $this->buttons[$this->generateButtonKey($button)] = $button;
+        }
     }
 
     /**
@@ -114,11 +116,11 @@ class CustomButtonEvent extends Event
 
         foreach ($buttons as $key => $button) {
             if (!isset($button['priority'])) {
-                $buttons[$key]['priority'] = 0;
+                $button['priority'] = 0;
             }
-        }
 
-        $this->buttons = array_merge($this->buttons, $buttons);
+            $this->buttons[$this->generateButtonKey($button)] = $button;
+        }
 
         return $this;
     }
@@ -142,9 +144,20 @@ class CustomButtonEvent extends Event
             $button['priority'] = 0;
         }
 
-        $this->buttons[] = $button;
+        $this->buttons[$this->generateButtonKey($button)] = $button;
 
         return $this;
+    }
+
+    /**
+     * @param $button
+     */
+    public function removeButton($button)
+    {
+        $buttonKey = $this->generateButtonKey($button);
+        if (isset($this->buttons[$buttonKey])) {
+            unset($this->buttons[$buttonKey]);
+        }
     }
 
     /**
@@ -199,5 +212,41 @@ class CustomButtonEvent extends Event
         }
 
         return true;
+    }
+
+    /**
+     * Generate a button ID that can be overridden by other plugins.
+     *
+     * @param $button
+     *
+     * @return string
+     */
+    protected function generateButtonKey($button)
+    {
+        $buttonKey = '';
+        if (isset($button['btnText'])) {
+            $buttonKey .= $button['btnText'];
+        } elseif (isset($button['confirm'])) {
+            if (isset($button['confirm']['btnText'])) {
+                $buttonKey .= $button['confirm']['btnText'];
+            }
+
+            if (isset($button['confirm']['template'])) {
+                $buttonKey .= $button['confirm']['template'];
+            }
+        }
+
+        if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
+            // Include the request
+            list($currentRoute, $routeParams) = $this->getRoute(true);
+
+            $buttonKey .= $currentRoute;
+
+            foreach ($routeParams as $paramKey => $paramValue) {
+                $buttonKey .= $paramKey.$paramValue;
+            }
+        }
+
+        return $buttonKey;
     }
 }
