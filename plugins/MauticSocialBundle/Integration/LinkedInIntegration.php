@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -105,9 +106,8 @@ class LinkedInIntegration extends SocialIntegration
 
         if (!isset($accessToken['access_token'])) {
             return;
-        } elseif (isset($accessToken['persist_lead'])) {
-            $persistLead = $accessToken['persist_lead'];
-            unset($accessToken['persist_lead']);
+        } elseif (isset($accessToken['access_token'])) {
+            $persistLead = $this->persistNewLead;
         }
 
         $fields        = $this->getFieldNames($this->getAvailableLeadFields());

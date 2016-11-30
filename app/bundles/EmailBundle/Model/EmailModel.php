@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -220,6 +221,9 @@ class EmailModel extends FormModel
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
+        } else {
+            // Ensure that all lists are been removed in case of a clone
+            $entity->setLists([]);
         }
 
         if (!$this->updatingTranslationChildren) {
@@ -872,6 +876,11 @@ class EmailModel extends FormModel
         //get the leads
         if (empty($lists)) {
             $lists = $email->getLists();
+        }
+
+        // Safety check
+        if ('list' !== $email->getEmailType()) {
+            return [0, 0, []];
         }
 
         $options = [

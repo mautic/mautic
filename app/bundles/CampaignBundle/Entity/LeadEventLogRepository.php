@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,32 +11,16 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
-use Mautic\UserBundle\Entity\User;
 
 /**
  * LeadEventLogRepository.
  */
-class LeadEventLogRepository extends EntityRepository
+class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
-
-    /**
-     * @var User
-     */
-    protected $currentUser;
-
-    /**
-     * Set the current user (i.e. from security context) for use within repositories.
-     *
-     * @param User $user
-     */
-    public function setCurrentUser(User $user)
-    {
-        $this->currentUser = $user;
-    }
 
     /**
      * Get a lead's page event log.

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -52,6 +53,7 @@ if ($emailType == 'list') {
         ],
         'iconClass' => 'fa fa-send-o',
         'btnText'   => 'mautic.email.send',
+        'primary'   => true,
     ];
 }
 
@@ -65,6 +67,7 @@ $customButtons[] = [
     ],
     'iconClass' => 'fa fa-send',
     'btnText'   => 'mautic.email.send.example',
+    'primary'   => true,
 ];
 
 // Only show A/B test button if not already a translation of an a/b test
@@ -95,8 +98,8 @@ $view['slots']->set(
                     $email->getCreatedBy()
                 ),
             ],
-            'routeBase'        => 'email',
-            'preCustomButtons' => $customButtons,
+            'routeBase'     => 'email',
+            'customButtons' => $customButtons,
         ]
     )
 );

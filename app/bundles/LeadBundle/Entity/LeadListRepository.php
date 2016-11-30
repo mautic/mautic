@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,10 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * LeadListRepository.
@@ -34,6 +39,11 @@ class LeadListRepository extends CommonRepository
      * @var bool
      */
     protected $listFiltersInnerJoinCompany = false;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * {@inheritdoc}
@@ -122,7 +132,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
     {
         if (is_array($lead)) {
             $q = $this->_em->createQueryBuilder()
@@ -145,7 +155,10 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
-
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
 
             $return = [];
@@ -175,6 +188,11 @@ class LeadListRepository extends CommonRepository
                 )
             )
                 ->setParameter('false', false, 'boolean');
+
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
@@ -572,7 +590,15 @@ class LeadListRepository extends CommonRepository
         if (null === $companyTable) {
             $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'companies');
         }
-        $options   = $this->getFilterExpressionFunctions();
+        $options = $this->getFilterExpressionFunctions();
+
+        // Add custom filters operators
+        if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE)) {
+            $event = new LeadListFiltersOperatorsEvent($options, $this->translator);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
+            $options = $event->getOperators();
+        }
+
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
@@ -597,8 +623,10 @@ class LeadListRepository extends CommonRepository
             } elseif ($object == 'company') {
                 $field = "comp.{$details['field']}";
             }
-            // Format the field based on platform specific functions that DBAL doesn't support natively
+
+            $columnType = false;
             if ($column) {
+                // Format the field based on platform specific functions that DBAL doesn't support natively
                 $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
                 $columnType = $column->getType();
 
@@ -912,6 +940,7 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
+                case 'globalcategory':
                 case 'lead_email_received':
 
                     // Special handling of lead lists and tags
@@ -948,6 +977,10 @@ class LeadListRepository extends CommonRepository
                         case 'tags':
                             $table  = 'lead_tags_xref';
                             $column = 'tag_id';
+                            break;
+                        case 'globalcategory':
+                            $table  = 'lead_categories';
+                            $column = 'category_id';
                             break;
                         case 'lead_email_received':
                             $table  = 'email_stats';
@@ -998,6 +1031,11 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 default:
+                    if (!$column) {
+                        // Column no longer exists so continue
+                        continue;
+                    }
+
                     if ($isCompany) {
                         // Must tell getLeadsByList how to best handle the relationship with the companies table
                         if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
@@ -1100,6 +1138,14 @@ class LeadListRepository extends CommonRepository
 
                 $parameters[$parameter] = $details['filter'];
             }
+
+            if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+                $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->_em);
+                $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+                if ($event->isFilteringDone()) {
+                    $groupExpr = $q->expr()->andX($event->getSubQuery());
+                }
+            }
         }
 
         // Get the last of the filters
@@ -1120,6 +1166,14 @@ class LeadListRepository extends CommonRepository
         }
 
         return $expr;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**

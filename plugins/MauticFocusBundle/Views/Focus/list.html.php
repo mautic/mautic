@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -21,8 +22,12 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall' => 'true',
-                        'target'   => '#focusTable',
+                        'checkall'        => 'true',
+                        'target'          => '#focusTable',
+                        'routeBase'       => 'focus',
+                        'templateButtons' => [
+                            'delete' => $permissions['plugin:focus:items:delete'],
+                        ],
                     ]
                 );
 

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -1847,7 +1848,7 @@ class MailHelper
         $now      = new \DateTime();
         $channels = $frequencyRule['channels'];
 
-        if (!empty($frequencyRule) and in_array('email', $channels, true)) {
+        if (!empty($frequencyRule) && !empty($channels) && in_array('email', $channels, true)) {
             $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
             $frequencyNumber = $frequencyRule['frequency_number'];
         } elseif ($this->factory->getParameter('frequency_number') > 0) {
@@ -1855,8 +1856,10 @@ class MailHelper
             $frequencyNumber = $this->factory->getParameter('frequency_number');
         }
 
-        $now->sub($frequencyTime);
-        $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
+        if (isset($frequencyTime)) {
+            $now->sub($frequencyTime);
+            $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
+        }
 
         if (!empty($sentQuery) and count($sentQuery) < $frequencyNumber) {
             return true;

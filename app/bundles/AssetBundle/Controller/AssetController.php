@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -367,7 +368,7 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'startOnLocal'     => $entity->isLocal(),
                 'uploadEndpoint'   => $uploadEndpoint,
                 'maxSize'          => $maxSize,
                 'maxSizeError'     => $maxSizeError,
@@ -530,7 +531,7 @@ class AssetController extends FormController
                 'activeAsset'      => $entity,
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
-                'startOnLocal'     => $entity->getStorageLocation() == 'local',
+                'startOnLocal'     => $entity->isLocal(),
                 'uploadEndpoint'   => $uploadEndpoint,
                 'maxSize'          => $maxSize,
                 'maxSizeError'     => $maxSizeError,

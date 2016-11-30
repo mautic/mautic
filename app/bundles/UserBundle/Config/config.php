@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -67,13 +68,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getusers' => [
-                'path'       => '/users',
-                'controller' => 'MauticUserBundle:Api\UserApi:getEntities',
-            ],
-            'mautic_api_getuser' => [
-                'path'       => '/users/{id}',
-                'controller' => 'MauticUserBundle:Api\UserApi:getEntity',
+            'mautic_api_usersstandard' => [
+                'standard_entity' => true,
+                'name'            => 'users',
+                'path'            => '/users',
+                'controller'      => 'MauticUserBundle:Api\UserApi',
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
@@ -88,13 +87,11 @@ return [
                 'path'       => '/users/list/roles',
                 'controller' => 'MauticUserBundle:Api\UserApi:getRoles',
             ],
-            'mautic_api_getroles' => [
-                'path'       => '/roles',
-                'controller' => 'MauticUserBundle:Api\RoleApi:getEntities',
-            ],
-            'mautic_api_getrole' => [
-                'path'       => '/roles/{id}',
-                'controller' => 'MauticUserBundle:Api\RoleApi:getEntity',
+            'mautic_api_rolesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'roles',
+                'path'            => '/roles',
+                'controller'      => 'MauticUserBundle:Api\RoleApi',
             ],
         ],
         'public' => [

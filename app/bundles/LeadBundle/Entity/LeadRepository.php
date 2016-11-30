@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,6 +14,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\PointBundle\Model\TriggerModel;
 
@@ -81,49 +83,54 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getLeadsByFieldValue($field, $value, $ignoreId = null)
+    public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
     {
         $col = 'l.'.$field;
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+                  ->select('l.id')
+                  ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         if ($field == 'email') {
             // Prevent emails from being case sensitive
             $col   = "LOWER($col)";
-            $value = strtolower($value);
+            $value = (is_array($value)) ? array_map(
+                function ($v) use ($q) {
+                    return $q->expr()->literal(strtolower(InputHelper::email($v)));
+                },
+                $value
+            ) : strtolower($value);
         }
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->where("$col = :search")
-            ->setParameter('search', $value);
+        if (is_array($value)) {
+            $q->where(
+                $q->expr()->in($col, $value)
+            );
+        } else {
+            $q->where("$col = :search")
+              ->setParameter('search', $value);
+        }
 
         if ($ignoreId) {
             $q->andWhere('l.id != :ignoreId')
                 ->setParameter('ignoreId', $ignoreId);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $this->getEntities(['qb' => $q, 'ignore_paginator' => true]);
 
-        if (count($results)) {
-            $ids = [];
-            foreach ($results as $r) {
-                $ids[] = $r['id'];
-            }
-
-            $q = $this->getEntityManager()->createQueryBuilder()
-                ->select('l')
-                ->from('MauticLeadBundle:Lead', 'l');
-            $q->where(
-                $q->expr()->in('l.id', ':ids')
-            )
-                ->setParameter('ids', $ids)
-                ->orderBy('l.dateAdded', 'DESC');
-            $results = $q->getQuery()->getResult();
-
+        if (count($results) && $indexByColumn) {
             /** @var Lead $lead */
+            $leads = [];
             foreach ($results as $lead) {
-                $lead->setAvailableSocialFields($this->availableSocialFields);
+                $fieldKey = $lead->getFieldValue($field);
+                if ('email' === $field) {
+                    $fieldKey = strtolower($fieldKey);
+                }
+
+                $leads[$fieldKey] = $lead;
             }
+
+            return $leads;
         }
 
         return $results;

@@ -468,6 +468,14 @@ var Mautic = {
             Mautic.startIconSpinOnEvent(event);
         });
 
+        mQuery(container + ' input[class=list-checkbox]').on('change', function () {
+            var disabled = Mautic.batchActionPrecheck(container) ? false : true;
+            var color    = (disabled) ? 'btn-default' : 'btn-info';
+            var button   = container + ' th.col-actions .input-group-btn button';
+            mQuery(button).prop('disabled', disabled);
+            mQuery(button).removeClass('btn-default btn-info').addClass(color);
+        });
+
         //Copy form buttons to the toolbar
         if (mQuery(container + " .bottom-form-buttons").length) {
             if (inModal) {
@@ -788,19 +796,29 @@ var Mautic = {
                 editableAtwhoQueryAttrs: {"data-fr-verified": true},
                 data: mQuery.map(tokens, function(value, i) {
                     return {'id':i, 'name':value};
-                })
+                }),
+                acceptSpaceBar: true
             });
 
             if (froala) {
                 froala.events.on('keydown', function (e) {
                     if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB ||
-                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) &&
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER ||
+                        e.which == mQuery.FroalaEditor.KEYCODE.SPACE) &&
                         froala.$el.atwho('isSelecting')) {
                         return false;
                     }
                 }, true);
             }
         });
+    },
+
+    getBuilderTokensMethod: function() {
+        var method = 'page:getBuilderTokens';
+        if (parent.mQuery('.builder').hasClass('email-builder')) {
+            method = 'email:getBuilderTokens';
+        }
+        return method;
     },
 
     /**
@@ -1464,6 +1482,7 @@ var Mautic = {
                         window["Mautic"][callback].apply('window', []);
                     }
                 }
+                Mautic.generatePageTitle( route );
                 delete Mautic.loadContentXhr[target];
             }
         });
@@ -1471,6 +1490,34 @@ var Mautic = {
         //prevent firing of href link
         //mQuery(link).attr("href", "javascript: void(0)");
         return false;
+    },
+
+    /**
+    * Generates the title of the current page
+    *
+    * @param route
+    */
+    generatePageTitle: function(route){
+
+        if( -1 !== route.indexOf('view') ){
+            //loading view of module title
+            var currentModule = route.split('/')[3];
+
+            //check if we find spans
+            var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+            var currentModuleItem = '';
+
+            if( 1 < titleWithHTML.length ){
+                currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
+            } else {
+                currentModuleItem = mQuery('.page-header h3').text();
+            }
+
+            mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
+        } else {
+            //loading basic title
+            mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
+        }
     },
 
     /**
@@ -1743,6 +1790,9 @@ var Mautic = {
                 //update URL in address bar
                 MauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
+
+                //update Title
+                Mautic.generatePageTitle( response.route );
             }
 
             if (response.target == '#app-content') {
@@ -2461,8 +2511,11 @@ var Mautic = {
      *
      * @returns int
      */
-    batchActionPrecheck: function() {
-        return mQuery('input[class=list-checkbox]:checked').length;
+    batchActionPrecheck: function(container) {
+        if (typeof container == 'undefined') {
+            container = '';
+        }
+        return mQuery(container + ' input[class=list-checkbox]:checked').length;
     },
 
     /**
@@ -3868,37 +3921,59 @@ var Mautic = {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
         Mautic.showChangeThemeWarning = true;
+        Mautic.builderTheme = themeField.val();
 
         if (isNew) {
             Mautic.showChangeThemeWarning = false;
+
+            // Populate default content
+            if (!customHtml.length || !customHtml.val().length) {
+                Mautic.setThemeHtml(Mautic.builderTheme);
+            }
         }
 
         if (customHtml.length) {
-
-            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
-
-            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
-                Mautic.setThemeHtml(themeField.val());
-            }
-
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
+                var theme = currentLink.attr('data-theme');
+                var isCodeMode = (theme === 'mautic_code_mode');
+                Mautic.builderTheme = theme;
 
                 if (Mautic.showChangeThemeWarning && customHtml.val().length) {
-                    if (confirm('You will lose the current content if you switch the theme.')) {
-                        customHtml.val('');
-                        Mautic.showChangeThemeWarning = false;
+                    if (!isCodeMode) {
+                        if (confirm(Mautic.translate('mautic.core.builder.theme_change_warning'))) {
+                            customHtml.val('');
+                            Mautic.showChangeThemeWarning = false;
+                        } else {
+                            return;
+                        }
                     } else {
-                        return;
+                        if (confirm(Mautic.translate('mautic.core.builder.code_mode_warning'))) {
+                        } else {
+                            return;
+                        }
                     }
                 }
 
                 // Set the theme field value
-                themeField.val(currentLink.attr('data-theme'));
+                themeField.val(theme);
 
-                // Load the theme HTML to the source textarea
-                Mautic.setThemeHtml(currentLink.attr('data-theme'));
+                // Code Mode
+                if (isCodeMode) {
+                    mQuery('.builder').addClass('code-mode');
+                    mQuery('.builder .code-editor').removeClass('hide');
+                    mQuery('.builder .code-mode-toolbar').removeClass('hide');
+                    mQuery('.builder .builder-toolbar').addClass('hide');
+                } else {
+                    mQuery('.builder').removeClass('code-mode');
+                    mQuery('.builder .code-editor').addClass('hide');
+                    mQuery('.builder .code-mode-toolbar').addClass('hide');
+                    mQuery('.builder .builder-toolbar').removeClass('hide');
+
+                    // Load the theme HTML to the source textarea
+                    Mautic.setThemeHtml(theme);
+                }
 
                 // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
@@ -3920,8 +3995,21 @@ var Mautic = {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
-            textarea.froalaEditor('html.set', themeHtml);
         });
+    },
+
+    /**
+     * Updates content of an iframe
+     *
+     * @param iframe ID
+     * @param HTML content
+     */
+    updateIframeContent: function(iframeId, content) {
+        var iframe = document.getElementById(iframeId);
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(content);
+        doc.close();
     },
 
     /**

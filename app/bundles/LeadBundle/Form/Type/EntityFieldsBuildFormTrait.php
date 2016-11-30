@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -213,7 +214,7 @@ trait EntityFieldsBuildFormTrait
                         $attr['data-target'] = $alias;
 
                         if (!empty($properties['list'])) {
-                            $attr['data-options'] = $properties['list'];
+                            $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                         }
                     }
                     $builder->add(

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,9 +16,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 trait DynamicContentEntityTrait
 {
     /**
+     * Keep the default content set outside of $dynamicContent so that it can be used if $dynamicContent is emptied.
+     *
      * @var array
      */
-    private $dynamicContent = [
+    private $defaultDynamicContent = [
         [
             'tokenName' => null,
             'content'   => null,
@@ -41,6 +44,11 @@ trait DynamicContentEntityTrait
     ];
 
     /**
+     * @var array
+     */
+    private $dynamicContent = [];
+
+    /**
      * @param ClassMetadataBuilder $builder
      */
     protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder)
@@ -56,14 +64,30 @@ trait DynamicContentEntityTrait
      */
     public function getDynamicContent()
     {
-        return $this->dynamicContent;
+        return (empty($this->dynamicContent)) ? $this->defaultDynamicContent : $this->dynamicContent;
     }
 
     /**
-     * @param array $dynamicContent
+     * @param $dynamicContent
+     *
+     * @return $this
      */
     public function setDynamicContent($dynamicContent)
     {
+        if (empty($dynamicContent)) {
+            $dynamicContent = $this->defaultDynamicContent;
+        }
+
         $this->dynamicContent = $dynamicContent;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultDynamicContent()
+    {
+        return $this->defaultDynamicContent;
     }
 }

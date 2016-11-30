@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -31,6 +32,15 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                ],
+            ],
+            'mautic.sms.channel.subscriber' => [
+                'class' => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
+            ],
+            'mautic.sms.stats.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
@@ -117,6 +127,14 @@ return [
             'mautic_receive_sms' => [
                 'path'       => '/sms/receive',
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
+            ],
+        ],
+        'api' => [
+            'mautic_api_smsesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'smses',
+                'path'            => '/smses',
+                'controller'      => 'MauticSmsBundle:Api\SmsApi',
             ],
         ],
     ],

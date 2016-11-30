@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -331,7 +332,7 @@ class PublicController extends CommonFormController
         $template          = null;
 
         if ($form === null || !$form->isPublished()) {
-            $this->notFound();
+            return $this->notFound();
         } else {
             $html = $model->getContent($form);
 

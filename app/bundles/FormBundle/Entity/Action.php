@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -116,6 +117,17 @@ class Action
                 ]
             )
             ->build();
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+            'groups'  => ['action'],
+        ]));
     }
 
     /**

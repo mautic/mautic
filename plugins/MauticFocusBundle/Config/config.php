@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -68,6 +69,12 @@ return [
                     'router',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.focus.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

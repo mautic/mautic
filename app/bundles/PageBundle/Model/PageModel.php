@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -224,13 +225,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(['Page']);
         }
 
-        if (!isset($options['formName'])) {
-            $options['formName'] = 'page';
+        $formName = 'page';
+
+        if (!empty($options['formName'])) {
+            $formName = $options['formName'];
         }
 
-        $params = (!empty($action)) ? ['action' => $action] : [];
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create($options['formName'], $entity, $params);
+        return $formFactory->create($formName, $entity, $options);
     }
 
     /**

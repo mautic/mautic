@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -29,13 +30,9 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.core.help.searchcommands',
-            'action'          => $currentRoute,
-            'routeBase'       => 'company',
-            'templateButtons' => [
-                'delete' => $permissions['lead:leads:deleteother'],
-            ],
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.core.help.searchcommands',
+            'action'      => $currentRoute,
         ]
     ); ?>
     <div class="page-list">

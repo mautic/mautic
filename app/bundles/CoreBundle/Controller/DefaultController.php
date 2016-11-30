@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -38,7 +39,7 @@ class DefaultController extends CommonController
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
-                $this->notFound();
+                return $this->notFound();
             }
 
             $slug = $pageModel->generateSlug($page);

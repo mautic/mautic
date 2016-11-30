@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -44,6 +45,8 @@ class FieldController extends CommonFormController
             ];
         }
 
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
             !$this->request->isXmlHttpRequest() ||
@@ -248,7 +251,10 @@ class FieldController extends CommonFormController
                 }
             }
 
-            $viewParams = ['type' => $fieldType];
+            $viewParams       = ['type' => $fieldType];
+            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
@@ -273,11 +279,7 @@ class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:'.$fieldType.'.html.php';
-            }
+            $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
 
             //prevent undefined errors
             $entity    = new Field();

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -57,5 +58,13 @@ class PluginModel extends FormModel
     public function getLeadFields()
     {
         return $this->leadFieldModel->getFieldList();
+    }
+
+    /**
+     * Get Company fields.
+     */
+    public function getCompanyFields()
+    {
+        return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 }

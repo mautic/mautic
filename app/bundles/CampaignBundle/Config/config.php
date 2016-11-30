@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,13 +34,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getcampaigns' => [
-                'path'       => '/campaigns',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntities',
-            ],
-            'mautic_api_getcampaign' => [
-                'path'       => '/campaigns/{id}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntity',
+            'mautic_api_campaignsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'campaigns',
+                'path'            => '/campaigns',
+                'controller'      => 'MauticCampaignBundle:Api\CampaignApi',
             ],
             'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',
@@ -106,6 +105,12 @@ return [
             ],
             'mautic.campaignconfigbundle.subscriber' => [
                 'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',
+            ],
+            'mautic.campaign.stats.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
         ],
         'forms' => [

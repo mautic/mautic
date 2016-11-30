@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -156,6 +157,10 @@ class TimelineController extends CommonController
 
         $events = $this->getEngagements($lead, $filters, $order, $page);
 
+        $str = $this->request->server->get('QUERY_STRING');
+        $str = substr($str, strpos($str, '?') + 1);
+        parse_str($str, $query);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -163,6 +168,7 @@ class TimelineController extends CommonController
                     'page'        => $page,
                     'integration' => $integration,
                     'events'      => $events,
+                    'newCount'    => (array_key_exists('count', $query) && $query['count']) ? $query['count'] : 0,
                 ],
                 'passthroughVars' => [
                     'route'         => false,

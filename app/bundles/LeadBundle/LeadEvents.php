@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -60,7 +61,7 @@ final class LeadEvents
      * The mautic.lead_company_change event is dispatched if a lead's company changes.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadCompanyChange instance.
+     * Mautic\LeadBundle\Event\LeadChangeCompanyEvent instance.
      *
      * @var string
      */
@@ -70,11 +71,21 @@ final class LeadEvents
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadListChange instance.
+     * Mautic\LeadBundle\Event\ListChangeEvent instance.
      *
      * @var string
      */
     const LEAD_LIST_CHANGE = 'mautic.lead_list_change';
+
+    /**
+     * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadCategoryEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_CATEGORY_CHANGE = 'mautic.lead_category_change';
 
     /**
      * The mautic.lead_list_batch_change event is dispatched if a batch of leads are changed from ListModel::rebuildListLeads().
@@ -342,4 +353,52 @@ final class LeadEvents
      * @var string
      */
     const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
+
+    /**
+     * The mautic.list_filters_operators_on_generate event is dispatched when the operators for list filters are generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
+
+    /**
+     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+
+    /**
+     * The mautic.add_channel event registers communication channels.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance.
+     *
+     * @var string
+     */
+    const ADD_CHANNEL = 'mautic.add_channel';
+
+    /**
+     * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
+     *
+     * @var string
+     */
+    const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
 }

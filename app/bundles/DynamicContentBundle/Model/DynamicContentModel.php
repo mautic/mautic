@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -85,6 +86,10 @@ class DynamicContentModel extends FormModel
      */
     public function getEntity($id = null)
     {
+        if ($id === null) {
+            return new DynamicContent();
+        }
+
         return parent::getEntity($id);
     }
 

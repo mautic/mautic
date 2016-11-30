@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -94,7 +95,7 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
-                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens builder-html',
+                    'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
                 ],
@@ -221,10 +222,12 @@ class PageType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
-                $formModifier(
-                    $event->getForm(),
-                    $data['variantParent']
-                );
+                if (isset($data['variantParent'])) {
+                    $formModifier(
+                        $event->getForm(),
+                        $data['variantParent']
+                    );
+                }
             }
         );
 
