@@ -42,7 +42,7 @@ class PublicController extends CommonController
             switch ($object) {
                 case 'contacts': $integrationObject->getMauticLead($fieldsValues);
                                   break;
-                case 'company':
+                case 'companies':
 
                     $integrationObject->getMauticCompany($fieldsValues);
                     break;
