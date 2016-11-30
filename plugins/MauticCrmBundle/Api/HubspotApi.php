@@ -13,10 +13,10 @@ class HubspotApi extends CrmApi
         'encode_parameters' => 'json',
     ];
 
-    protected function request($operation, $parameters = [], $method = 'GET')
+    protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
         $hapikey = $this->integration->getHubSpotApiKey();
-        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $this->module, $operation, $hapikey);
+        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
 
         if (isset($request['status']) && $request['status'] == 'error') {
@@ -33,9 +33,13 @@ class HubspotApi extends CrmApi
     /**
      * @return mixed
      */
-    public function getLeadFields()
+    public function getLeadFields($object = 'contacts')
     {
-        return $this->request('v2/properties');
+        if ($object == 'company') {
+            $object = 'companies'; //hubspot company object name
+        }
+
+        return $this->request('v2/properties', [], 'GET', $object);
     }
 
     /**

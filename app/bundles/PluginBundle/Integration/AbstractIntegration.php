@@ -1315,7 +1315,6 @@ abstract class AbstractIntegration
         }
 
         $matched = [];
-
         foreach ($gleanedData as $key => $field) {
             if (isset($fields[$key]) && isset($gleanedData[$key])) {
                 $matched[$fields[$key]] = $gleanedData[$key];

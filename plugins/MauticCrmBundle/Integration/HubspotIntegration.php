@@ -86,26 +86,57 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects']['company'] = 'company';
+
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
      * @return array|mixed
      */
     public function getAvailableLeadFields($settings = [])
     {
         $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
+        $hubspotObjects = [];
+
+        if (isset($settings['feature_settings']['objects'])) {
+            $hubspotObjects = $settings['feature_settings']['objects'];
+        }
+
         try {
             if ($this->isAuthorized()) {
-                $leadFields = $this->getApiHelper()->getLeadFields();
-
-                if (isset($leadFields)) {
-                    foreach ($leadFields as $fieldInfo) {
-                        $hubsFields[$fieldInfo['name']] = [
-                            'type'  => 'string',
-                            'label' => $fieldInfo['label'],
-                        ];
+                if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
+                    foreach ($hubspotObjects as $key => $object) {
+                        $leadFields = $this->getApiHelper()->getLeadFields($object);
+                        if (isset($leadFields)) {
+                            foreach ($leadFields as $fieldInfo) {
+                                if ($object != 'company') {
+                                    $hubsFields[$fieldInfo['name']] = [
+                                        'type'  => 'string',
+                                        'label' => $fieldInfo['label'],
+                                    ];
+                                } else {
+                                    $hubsFields[$object][$fieldInfo['name']] = [
+                                        'type'  => 'string',
+                                        'label' => $fieldInfo['label'],
+                                    ];
+                                }
+                            }
+                        }
+                        // Email is Required for this kind of integration
+                        $hubsFields['email']['required'] = true;
                     }
                 }
-                // Email is Required for this kind of integration
-                $hubsFields['email']['required'] = true;
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -156,5 +187,32 @@ class HubspotIntegration extends CrmAbstractIntegration
         $tokenData = $this->getKeys();
 
         return $tokenData[$this->getAuthTokenKey()];
+    }
+
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $builder->add(
+                'objects',
+                'choice',
+                [
+                    'choices' => [
+                        'contacts' => 'mautic.hubspot.object.contact',
+                        'company'  => 'mautic.hubspot.object.company',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.hubspot.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+        }
     }
 }
