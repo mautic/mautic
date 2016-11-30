@@ -4588,6 +4588,7 @@ div[data-slot],
 }
 div[data-slot="image"] img {
   z-index: 1;
+  position: relative;
 }
 .slot-placeholder {
   border-top: 1px solid #4e5e9e;

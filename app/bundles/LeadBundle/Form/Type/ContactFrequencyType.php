@@ -90,7 +90,7 @@ class ContactFrequencyType extends AbstractType
                             'label_attr' => ['class' => 'text-muted fw-n'],
                             'required'   => true,
                             'attr'       => [
-                                'class' => 'frequency form-control pull-left',
+                                'class' => 'frequency form-control',
                             ],
                             'required' => false,
                             'disabled' => in_array($channel, $data['lead_channels']) ? false : true,
@@ -110,7 +110,10 @@ class ContactFrequencyType extends AbstractType
                             'label_attr' => ['class' => 'text-muted fw-n frequency-label'],
                             'multiple'   => false,
                             'required'   => false,
-                            'disabled'   => in_array($channel, $data['lead_channels']) ? false : true,
+                            'attr'       => [
+                                'class' => 'form-control',
+                            ],
+                            'disabled' => in_array($channel, $data['lead_channels']) ? false : true,
                         ]
                     );
                     if ($data['public_view'] == false) {
@@ -120,15 +123,17 @@ class ContactFrequencyType extends AbstractType
                         ];
                         $type = 'datetime';
                     } else {
-                        $attributes = [];
-                        $type       = 'date';
+                        $attributes = [
+                            'class' => 'form-control',
+                        ];
+                        $type = 'date';
                     }
                     $form->add(
                         'contact_pause_start_date_'.$channel,
                         $type,
                         [
                             'widget'     => 'single_text',
-                            'label'      => 'mautic.lead.frequency.contact.start.date',
+                            'label'      => false, //'mautic.lead.frequency.contact.start.date',
                             'label_attr' => ['class' => 'text-muted fw-n'],
                             'attr'       => $attributes,
                             'format'     => 'yyyy-MM-dd',

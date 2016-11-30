@@ -57,6 +57,8 @@ use Symfony\Component\Intl\Intl;
  */
 class LeadModel extends FormModel
 {
+    use DefaultValueTrait;
+
     private $currentLead       = null;
     private $systemCurrentLead = null;
 
@@ -399,6 +401,8 @@ class LeadModel extends FormModel
             }
             unset($updatedFields['company']);
         }
+
+        $this->setEntityDefaultValues($entity);
 
         parent::saveEntity($entity, $unlock);
 
