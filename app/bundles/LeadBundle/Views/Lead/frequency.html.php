@@ -63,7 +63,11 @@ $leadName = $lead->getPrimaryIdentifier();
                     <td class="col-md-9" style="vertical-align: top">
                             <div>
                                 <div class="pull-left">
-                                    <?php echo $view['form']->widget($form['frequency_number_'.$channel->value]); ?>
+                                    <?php
+                                    $attr = $form['frequency_number_'.$channel->value]->vars['attr'];
+                                    $attr['class'] .= ' pull-left';
+                                    ?>
+                                    <?php echo $view['form']->widget($form['frequency_number_'.$channel->value], ['attr' => $attr]); ?>
                                     <?php echo $view['form']->label($form['frequency_time_'.$channel->value]); ?>
                                     <div class="frequency-select"><?php echo $view['form']->widget($form['frequency_time_'.$channel->value]); ?></div>
                                 </div>
@@ -73,8 +77,8 @@ $leadName = $lead->getPrimaryIdentifier();
                         <input type="radio" id="preferred_<?php echo $channel->value ?>"
                                name="lead_contact_frequency_rules[preferred_channel]" class="contact"
                                value="<?php echo $channel->value ?>" <?php if ($form['preferred_channel']->vars['value'] == $channel->value) {
-                                echo $checked;
-                            } ?> <?php echo $disabled; ?>>
+                                        echo $checked;
+                                    } ?> <?php echo $disabled; ?>>
 
                 </td>
                 </tr>
