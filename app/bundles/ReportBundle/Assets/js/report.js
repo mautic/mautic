@@ -41,7 +41,10 @@ Mautic.addReportRow = function(elId) {
 	var prototypeHolder = mQuery('div[id="'+elId+'"]');
 
 	// Fetch the index
-	var index = prototypeHolder.data('index');
+	var index = parseInt(prototypeHolder.attr('data-index'));
+	if (!index) {
+		index = 1;
+	}
 
 	// Fetch the prototype markup
 	var prototype = prototypeHolder.data('prototype');
@@ -50,7 +53,7 @@ Mautic.addReportRow = function(elId) {
 	var output = prototype.replace(/__name__/g, index);
 
 	// Increase the index for the next row
-	prototypeHolder.data('index', index + 1);
+	prototypeHolder.attr('data-index', index + 1);
 
 	// Render the new row
 	prototypeHolder.append(output);
@@ -109,7 +112,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     if (mQuery('#' + valueId + '_chosen').length) {
         mQuery('#' + valueId).chosen('destroy');
     }
-console.log(filterType);
+
     if (filterType == 'bool' || filterType == 'boolean' ) {
 		if (mQuery(valueEl).attr('type') != 'radio') {
 			var template = mQuery('#filterValueYesNoTemplate .btn-group').clone(true);
@@ -207,7 +210,7 @@ Mautic.updateReportSourceData = function (context) {
 
             // Update filter list
             Mautic.reportPrototypeFilterDefinitions = response.filterDefinitions;
-			Mautic.reportPrototypeFilterOptions     = mQuery(response.filters);
+			Mautic.reportPrototypeFilterOptions     = response.filters;
             Mautic.reportPrototypeFilterOperators   = response.filterOperators;
 
 			mQuery('#report_graphs').html(response.graphs);
