@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 
 /**
  * Class BuildJsSubscriber.
@@ -29,13 +30,22 @@ class BuildJsSubscriber extends CommonSubscriber
 
 
     /**
+     * @var TemplatingHelper
+     */
+    protected $templatingHelper;
+
+
+    /**
      * BuildJsSubscriber constructor.
      *
      * @param FormModel $formModel
      */
-    public function __construct(FormModel $formModel)
+    public function __construct(
+        FormModel $formModel,
+        TemplatingHelper $templatingHelper)
     {
         $this->formModel = $formModel;
+        $this->templatingHelper    = $templatingHelper;
     }
 
     /**
@@ -57,28 +67,39 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
+
+       $script = strip_tags($this->templatingHelper->getTemplating()->render(
+            'MauticFormBundle:Builder:script.html.php'
+        ));
+
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
         
+            if (typeof MauticDomain == 'undefined') {
+                var MauticDomain = '{$this->request->getSchemeAndHttpHost()}';
+            }            
+            if (typeof MauticLang == 'undefined') {
+                var MauticLang = {
+                     'submittingMessage': "{$this->translator->trans('mautic.form.submission.pleasewait')}"
+        };
+            }
 MauticJS.replaceDynamicContent = function () {
     var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
-
     if (dynamicContentSlots.length) {
         MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
             var slotName = node.dataset.slotName;
             var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
-
             MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
                 if (response.length) {
                     node.innerHTML = response;
-                    if (typeof MauticSDKLoaded != 'undefined') {
-                        MauticSDK.onLoad(); 
-                          
+                    if (response.search("mauticform_wrapper") > 0 && typeof MauticSDKLoaded != 'undefined') { 
+                         MauticSDK.onLoad(); 
                     }
                 }
             });
         });
+        {$script}
     }
 };
 

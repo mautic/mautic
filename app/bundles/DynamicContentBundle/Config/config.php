@@ -58,6 +58,7 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.helper.templating'
                 ],
             ],
             'mautic.dynamicContent.subscriber' => [
