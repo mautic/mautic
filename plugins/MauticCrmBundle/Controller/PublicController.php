@@ -22,33 +22,34 @@ class PublicController extends CommonController
     public function contactDataAction()
     {
         $content = $this->get('request')->getContent();
-        $object  = $this->request->get('object');
         if (!empty($content)) {
             $data = json_decode($content, true); // 2nd param to get as array
         } else {
             return new Response('ERROR');
         }
 
-        $logger            = $this->get('monolog.logger.mautic');
+        $logger = $this->get('monolog.logger.mautic');
+
         $integration       = 'Hubspot';
         $integrationHelper = $this->factory->getHelper('integration');
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        foreach ($data as $info) {
+            $object = explode('.', $info['subscriptionType']);
+            $id     = $info['objectId'];
 
-        try {
-            foreach ($data['properties'] as $key => $field) {
-                $fieldsValues[$key] = $field['value'];
+            try {
+                switch ($object[0]) {
+                    case 'contact': $integrationObject->getContacts($id);
+                        break;
+                    case 'company':
+                        $this->factory->getLogger()->addError('creating company');
+                        $integrationObject->getCompanies($id);
+                        break;
+                }
+            } catch (\Exception $ex) {
+                $logger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
             }
-            switch ($object) {
-                case 'contacts': $integrationObject->getMauticLead($fieldsValues);
-                                  break;
-                case 'companies':
-
-                    $integrationObject->getMauticCompany($fieldsValues);
-                    break;
-            }
-        } catch (\Exception $ex) {
-            $logger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
         }
 
         return new Response('OK');

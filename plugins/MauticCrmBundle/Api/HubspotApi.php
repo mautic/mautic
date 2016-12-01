@@ -18,7 +18,6 @@ class HubspotApi extends CrmApi
         $hapikey = $this->integration->getHubSpotApiKey();
         $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
-
         if (isset($request['status']) && $request['status'] == 'error') {
             $message = $request['message'];
             if (isset($request['validationResults'])) {
@@ -62,5 +61,29 @@ class HubspotApi extends CrmApi
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data);
 
         return $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
+    }
+
+    /**
+     * gets Hubspot contact.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getContacts($params = [])
+    {
+        return $this->request('v1/lists/recently_updated/contacts/recent?', $params, 'GET', 'contacts');
+    }
+
+    /**
+     * gets Hubspot company.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getCompanies($params = [])
+    {
+        return $this->request('v2/companies/recent/modified', $params, 'GET', 'companies');
     }
 }

@@ -215,4 +215,81 @@ class HubspotIntegration extends CrmAbstractIntegration
             );
         }
     }
+
+    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    {
+        foreach ($data['properties'] as $key => $field) {
+            $fieldsValues[$key] = $field['value'];
+        }
+        if ($object == 'Lead') {
+            foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
+                if ($identifiedProfile['type'] == 'EMAIL') {
+                    $fieldsValues['email'] = $identifiedProfile['value'];
+                }
+            }
+        }
+
+        return $fieldsValues;
+    }
+
+    public function getLeads($params = [], $query = null)
+    {
+        $executed = null;
+
+        try {
+            if ($this->isAuthorized()) {
+                $data = $this->getApiHelper()->getContacts($params);
+                foreach ($data['contacts'] as $contact) {
+                    if (is_array($contact)) {
+                        $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
+                        $contact     = $this->getMauticLead($contactData);
+                        if ($contact) {
+                            ++$executed;
+                        }
+                    }
+                }
+                if ($data['has-more']) {
+                    $params['vidOffset']  = $data['vid-offset'];
+                    $params['timeOffset'] = $data['time-offset'];
+                    $this->getLeads($params);
+                }
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
+
+    public function getCompanies($params = [])
+    {
+        $executed = null;
+        try {
+            if ($this->isAuthorized()) {
+                $data = $this->getApiHelper()->getCompanies($params);
+                foreach ($data['results'] as $company) {
+                    if (is_array($company)) {
+                        $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
+                        $company     = $this->getMauticCompany($companyData);
+                        if ($company) {
+                            ++$executed;
+                        }
+                    }
+                }
+                if ($data['hasMore']) {
+                    $params['vidOffset']  = $data['vid-offset'];
+                    $params['timeOffset'] = $data['time-offset'];
+                    $this->getCompanies($params);
+                }
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
 }

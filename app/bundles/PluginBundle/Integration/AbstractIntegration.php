@@ -667,7 +667,6 @@ abstract class AbstractIntegration
                 $headers[$key] = $value;
             }
         }
-
         try {
             switch ($method) {
                 case 'GET':
