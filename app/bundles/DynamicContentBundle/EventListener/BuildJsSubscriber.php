@@ -73,7 +73,8 @@ MauticJS.replaceDynamicContent = function () {
                 if (response.length) {
                     node.innerHTML = response;
                     if (typeof MauticSDKLoaded != 'undefined') {
-                        MauticSDK.onLoad();   
+                        MauticSDK.onLoad(); 
+                          
                     }
                 }
             });
