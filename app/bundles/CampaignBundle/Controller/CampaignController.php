@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormError;
@@ -258,6 +259,7 @@ class CampaignController extends FormController
         $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
 
+        /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
         $events       = $model->getEventRepository()->getCampaignEvents($entity->getId());
         $leadCount    = $model->getRepository()->getCampaignLeadCount($entity->getId());
