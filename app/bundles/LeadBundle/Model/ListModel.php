@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -40,6 +41,11 @@ class ListModel extends FormModel
      */
     protected $coreParametersHelper;
 
+    /**
+     * ListModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -56,12 +62,16 @@ class ListModel extends FormModel
      * {@inheritdoc}
      *
      * @return \Mautic\LeadBundle\Entity\LeadListRepository
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function getRepository()
     {
         /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
+        $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
 
         return $repo;
@@ -148,9 +158,12 @@ class ListModel extends FormModel
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('leadlist', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('leadlist', $entity, $options);
     }
 
     /**
@@ -301,14 +314,12 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'text',
                 'object'    => 'lead',
-
             ],
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
                 'operators'  => 'default',
                 'object'     => 'lead',
-
             ],
             'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
@@ -317,7 +328,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'multiselect',
                 'object'    => 'lead',
-
             ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
@@ -331,7 +341,6 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
             ],
             'lead_email_received_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received_date'),
@@ -362,7 +371,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'multiselect',
                 'object'    => 'lead',
-
             ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
@@ -375,7 +383,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
@@ -388,7 +395,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
@@ -401,7 +407,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_unsubscribed_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
@@ -414,7 +419,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
@@ -428,7 +432,6 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
             ],
             'referer' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
@@ -490,9 +493,23 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
+            ],
+            'globalcategory' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.categories'),
+                'properties' => [
+                    'type' => 'globalcategory',
+                ],
+                'operators' => 'multiselect',
+                'object'    => 'lead',
             ],
         ];
+
+        // Add custom choices
+        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
+            $event = new LeadListFiltersChoicesEvent($choices, $operators, $this->translator);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
+            $choices = $event->getChoices();
+        }
 
         //get list of custom fields
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
@@ -517,8 +534,8 @@ class ListModel extends FormModel
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
+                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
                 }
-                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
             $choices[$field->getObject()][$field->getAlias()] = [
                 'label'      => $field->getLabel(),

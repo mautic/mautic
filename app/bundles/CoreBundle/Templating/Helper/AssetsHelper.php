@@ -509,80 +509,62 @@ class AssetsHelper
      */
     public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
     {
-        if (strnatcmp(phpversion(), '4.0.5') >= 0) {
-            // Link attributes
-            $attr = '';
-            foreach ($attributes as $key => $val) {
-                $attr = ' '.$key.'="'.htmlentities($val).'"';
-            }
-
-            $links = [];
-
-            // Extract existing links and tags
-            $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
-                return '<'.array_push($links, $match[1]).'>';
-            }, $text);
-
-            // Extract text links for each protocol
-            foreach ((array) $protocols as $protocol) {
-                switch ($protocol) {
-                    case 'http':
-                    case 'https':
-                        $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
-                            if ($match[1]) {
-                                $protocol = $match[1];
-                            }
-                            $link = $match[2] ?: $match[3];
-
-                            return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
-                        }, $text);
-                        break;
-                    case 'mail':
-                        $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
-                            return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
-                        }, $text);
-                        break;
-                    case 'twitter':
-                        $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
-                            return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".($match[0][0] == '@' ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
-                        }, $text);
-                        break;
-                    default:
-                        $text = preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
-                            return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
-                        }, $text);
-                        break;
-                }
-            }
-
-            // Insert all link
-            return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
-                return $links[$match[1] - 1];
-            }, $text);
-        } else {
-            return preg_replace(
-                [
-                    '/(?(?=<a[^>]*>.+<\/a>)
-                        (?:<a[^>]*>.+<\/a>)
-                        |
-                        ([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+)
-                     )/iex',
-                    '/<a([^>]*)target="?[^"\']+"?/i',
-                    '/<a([^>]+)>/i',
-                    '/(^|\s)(www.[^<> \n\r]+)/iex',
-                    '/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)
-                    (\\.[A-Za-z0-9-]+)*)/iex',
-                ],
-                [
-                    "stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\">\\2</a>\\3':'\\0'))",
-                    '<a\\1',
-                    '<a\\1 target="_blank">',
-                    "stripslashes((strlen('\\2')>0?'\\1<a href=\"http://\\2\">\\2</a>\\3':'\\0'))",
-                    "stripslashes((strlen('\\2')>0?'<a href=\"mailto:\\0\">\\0</a>':'\\0'))",
-                ],
-                $text
-            );
+        // Link attributes
+        $attr = '';
+        foreach ($attributes as $key => $val) {
+            $attr = ' '.$key.'="'.htmlentities($val).'"';
         }
+
+        $links = [];
+
+        // Extract existing links and tags
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
+            return '<'.array_push($links, $match[1]).'>';
+        }, $text);
+
+        // Extract text links for each protocol
+        foreach ((array) $protocols as $protocol) {
+            switch ($protocol) {
+                case 'http':
+                case 'https':
+                    $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                        if ($match[1]) {
+                            $protocol = $match[1];
+                        }
+                        $link = $this->escape($match[2] ?: $match[3]);
+
+                        return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
+                    }, $text);
+                    break;
+                case 'mail':
+                    $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
+                        $match[1] = $this->escape($match[1]);
+
+                        return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
+                    }, $text);
+                    break;
+                case 'twitter':
+                    $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
+                        $match[0] = $this->escape($match[0]);
+                        $match[1] = $this->escape($match[1]);
+
+                        return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".($match[0][0] == '@' ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
+                    }, $text);
+                    break;
+                default:
+                    $text = preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                        $match[1] = $this->escape($match[1]);
+
+                        return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
+                    }, $text);
+                    break;
+            }
+        }
+
+        // Insert all link
+        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
+            return $links[$match[1] - 1];
+        }, $text);
     }
 
     /**
@@ -679,5 +661,15 @@ class AssetsHelper
     public function getName()
     {
         return 'assets';
+    }
+
+    /**
+     * @param $string
+     *
+     * @return string
+     */
+    private function escape($string)
+    {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }
 }

@@ -123,6 +123,10 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
+
+    if (mQuery(container + ' .panel-companies').length) {
+        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+    }
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -331,7 +335,7 @@ Mautic.addLeadListFilter = function (elId) {
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
     var fieldObject = mQuery(filterId).data('field-object');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -515,7 +519,7 @@ Mautic.leadfieldOnLoad = function (container) {
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     var defaultValueField = mQuery('input#leadfield_defaultValue');
 
-    if (selectedVal == 'lookup' || selectedVal == 'multiselect') {
+    if (selectedVal == 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
@@ -656,10 +660,41 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
+Mautic.togglePreferredChannel = function(channel) {
+    if (channel == 'all') {
+        var status = mQuery('#lead_contact_frequency_rules_doNotContactChannels_0')[0].checked;  //"select all" change
+
+       // "select all" checked status
+        mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
+            if (this.checked != status) {
+                this.checked = status;
+                Mautic.setPreferredChannel(this.value);
+            }
+        });
+    } else {
+        Mautic.setPreferredChannel(channel);
+    }
+};
+
+Mautic.setPreferredChannel = function(channel) {
+    mQuery( '#frequency_' + channel ).slideToggle();
+    mQuery( '#frequency_' + channel ).removeClass('hide');
+    if (mQuery('#' + channel)[0].checked) {
+        mQuery('#is-contactable-' + channel).removeClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , false);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
+    } else {
+        mQuery('#is-contactable-' + channel).addClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , true);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
+    }
+};
+
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
-
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
@@ -1113,3 +1148,17 @@ Mautic.updateFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+Mautic.setAsPrimaryCompany = function (companyId,leadId){
+    Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
+        if (response.success) {
+            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+            } else {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+                mQuery('#company-' + response.newPrimary).addClass('primary');
+            }
+
+        }
+    });
+}

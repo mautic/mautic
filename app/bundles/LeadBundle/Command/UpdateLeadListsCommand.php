@@ -40,17 +40,16 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container  = $this->getContainer();
-        $factory    = $container->get('mautic.factory');
-        $translator = $factory->getTranslator();
+        $translator = $container->get('translator');
 
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel = $factory->getModel('lead.list');
+        $listModel = $container->get('mautic.lead.model.list');
 
         $id    = $input->getOption('list-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-contacts');
 
-        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
+        if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 

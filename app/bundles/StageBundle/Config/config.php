@@ -22,13 +22,21 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getstages' => [
-                'path'       => '/stages',
-                'controller' => 'MauticStageBundle:Api\StageApi:getEntities',
+            'mautic_api_stagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'stages',
+                'path'            => '/stages',
+                'controller'      => 'MauticStageBundle:Api\StageApi',
             ],
-            'mautic_api_getstage' => [
-                'path'       => '/stages/{id}',
-                'controller' => 'MauticStageBundle:Api\StageApi:getEntity',
+            'mautic_api_stageddcontact' => [
+                'path'       => '/stages/{id}/contact/add/{contactId}',
+                'controller' => 'MauticStageBundle:Api\StageApi:addContact',
+                'method'     => 'POST',
+            ],
+            'mautic_api_stageremovecontact' => [
+                'path'       => '/stages/{id}/contact/remove/{contactId}',
+                'controller' => 'MauticStageBundle:Api\StageApi:removeContact',
+                'method'     => 'POST',
             ],
         ],
     ],
@@ -77,6 +85,12 @@ return [
                 'class'     => 'Mautic\StageBundle\EventListener\DashboardSubscriber',
                 'arguments' => [
                     'mautic.stage.model.stage',
+                ],
+            ],
+            'mautic.stage.stats.subscriber' => [
+                'class'     => \Mautic\StageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

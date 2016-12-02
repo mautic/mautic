@@ -164,6 +164,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'sentCount',
                 'variantParent',
                 'variantChildren',
+                'content',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')

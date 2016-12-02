@@ -79,6 +79,10 @@ class SalesforceApi extends CrmApi
      */
     public function getLeadFields($object = null)
     {
+        if ($object == 'company') {
+            $object = 'Account'; //salesforce object name
+        }
+
         return $this->request('describe', [], 'GET', false, $object);
     }
 
@@ -198,23 +202,36 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         //find out if start date is not our of range for org
-        if (isset($query['start'])) {
-            $queryUrl     = $this->integration->getQueryUrl();
-            $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+        static $organization = [];
 
+        if (isset($query['start'])) {
+            $queryUrl = $this->integration->getQueryUrl();
+
+            if (empty($organization)) {
+                $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            }
             if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
                 $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
             }
         }
-        $settings['feature_settings']['objects'][] = $object;
 
-        $fields       = $this->integration->getAvailableLeadFields($settings);
-        $fields       = $this->integration->ammendToSfFields($fields);
-        $fields['id'] = ['id' => []];
-        $result       = [];
+        if ($object == 'Account') {
+            $fields = $this->integration->getFormCompanyFields();
+            $fields = $fields['company'];
+        } else {
+            $settings['feature_settings']['objects'][] = $object;
+            $fields                                    = $this->integration->getAvailableLeadFields($settings);
+            $fields                                    = $this->integration->ammendToSfFields($fields);
+        }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields        = implode(', ', array_keys($fields));
+            $fields = implode(', ', array_keys($fields));
+
+            $config = $this->integration->mergeConfigToFeatureSettings([]);
+            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+                $fields = 'Owner.Name, Owner.Email, '.$fields;
+            }
+
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {
@@ -222,17 +239,5 @@ class SalesforceApi extends CrmApi
         }
 
         return $result;
-    }
-
-    /**
-     * Get Salesforce leads.
-     *
-     * @param string $query
-     *
-     * @return mixed
-     */
-    public function getSalesForceLeadById($id, $params, $object)
-    {
-        return $this->request($id.'/', $params, 'GET', false, $object);
     }
 }
