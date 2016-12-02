@@ -12,6 +12,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 /**
  * Class HubspotIntegration.
  */
@@ -111,6 +113,9 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if (isset($settings['feature_settings']['objects'])) {
             $hubspotObjects = $settings['feature_settings']['objects'];
+        } else {
+            $settings       = $this->settings->getFeatureSettings();
+            $hubspotObjects = $settings['objects'];
         }
 
         try {
@@ -156,7 +161,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function formatLeadDataForCreateOrUpdate($leadData = [])
+    public function formatLeadDataForCreateOrUpdate($leadData, $lead)
     {
         $formattedLeadData = [];
 
@@ -166,6 +171,14 @@ class HubspotIntegration extends CrmAbstractIntegration
                 'value'    => $value,
             ];
         }
+        //put mautic timeline link
+        $formattedLeadData['properties'][] = [
+            'property' => 'mautic_timeline',
+            'value'    => $this->factory->getRouter()->generate(
+                            'mautic_plugin_timeline_view',
+                            ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
+                            UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
 
         return $formattedLeadData;
     }

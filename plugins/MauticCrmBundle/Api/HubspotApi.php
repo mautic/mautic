@@ -48,7 +48,7 @@ class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data)
+    public function createLead(array $data, $lead)
     {
         /*
          * As Hubspot integration requires a valid email
@@ -58,7 +58,7 @@ class HubspotApi extends CrmApi
         //Check if the is a valid email
         MailHelper::validateEmail($email);
         //Format data for request
-        $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data);
+        $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead);
 
         return $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
     }
