@@ -39,7 +39,7 @@ class TokenHelper
      *
      * @return array
      */
-    public function findFormTokens($content, $clickthrough = [])
+    public function findFormTokens($content)
     {
         $tokens = [];
 
