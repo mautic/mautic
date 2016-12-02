@@ -68,6 +68,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.form.helper.token',
+                    'mautic.focus.helper.token',
                     'mautic.core.model.auditlog'
                 ],
             ],

@@ -93,10 +93,15 @@ MauticJS.replaceDynamicContent = function () {
                     if (response.search("mauticform_wrapper") > 0) {
                         // if doesn't exist
                         if(typeof MauticSDK == 'undefined'){
-                            var scrpt = document.createElement('script');
-                            scrpt.src='{$this->assetsHelper->getUrl('media/js/mautic-form.js')}';
-                            var head = document.getElementsByTagName('head')[0];
-                            head.appendChild(scrpt);
+                            
+                            var xhr  = new XMLHttpRequest();
+                              xhr.open("GET", '{$this->assetsHelper->getUrl('media/js/mautic-form.js')}');
+                              xhr.onreadystatechange = function() {
+                                 if ((xhr.status == 200) && (xhr.readyState == 4)) {
+                                        eval(xhr.responseText);
+                                 }
+                              };
+                              xhr.send();
                             // check initialize form library
                             var fileInterval = setInterval(function(){
                                 if (typeof MauticSDK != 'undefined'){
@@ -107,6 +112,23 @@ MauticJS.replaceDynamicContent = function () {
                         }else{
                             MauticSDK.onLoad();
                          }
+                    }
+
+                    var m,
+                        urls = [], 
+                        rex = /<script[^>]+src="?([^"\s]+)"?\s/g;                    
+                    
+                    while ( m = rex.exec( response ) ) {
+                          if ((m[1]).search("/focus/") > 0) {
+                              var xhr  = new XMLHttpRequest();
+                              xhr.open("GET", m[1]);
+                              xhr.onreadystatechange = function() {
+                                 if ((xhr.status == 200) && (xhr.readyState == 4)) {
+                                        eval(xhr.responseText);
+                                 }
+                              };
+                              xhr.send();
+                           }
                     }
                 }
             });

@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 
 /**
@@ -45,9 +46,14 @@ class DynamicContentSubscriber extends CommonSubscriber
     protected $assetTokenHelper;
 
     /**
-     * @var AssetTokenHelper
+     * @var FormTokenHelper
      */
     protected $formTokenHelper;
+
+    /**
+     * @var FocusTokenHelper
+     */
+    protected $focusTokenHelper;
 
     /**
      * @var AuditLogModel
@@ -68,12 +74,14 @@ class DynamicContentSubscriber extends CommonSubscriber
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
         FormTokenHelper $formTokenHelper,
+        FocusTokenHelper $focusTokenHelper,
         AuditLogModel $auditLogModel
     ) {
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
         $this->formTokenHelper = $formTokenHelper;
+        $this->focusTokenHelper = $focusTokenHelper;
         $this->auditLogModel    = $auditLogModel;
 
     }
@@ -140,7 +148,8 @@ class DynamicContentSubscriber extends CommonSubscriber
                 TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
-                $this->formTokenHelper->findFormTokens($content)
+                $this->formTokenHelper->findFormTokens($content),
+                $this->focusTokenHelper->findFocusTokens($content)
             );
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(

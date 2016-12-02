@@ -105,6 +105,15 @@ return [
                 ],
             ],
         ],
+        'other' => [
+            'mautic.focus.helper.token' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Helper\TokenHelper',
+                'arguments' => [
+                    'mautic.focus.model.focus',
+                    'router',
+                ],
+            ],
+        ],
     ],
 
     'menu' => [
