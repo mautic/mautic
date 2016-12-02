@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 /**
  * Class BuildJsSubscriber.
@@ -28,24 +28,24 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     protected $formModel;
 
-
     /**
-     * @var TemplatingHelper
+     * @var AssetsHelper
      */
-    protected $templatingHelper;
+    protected $assetsHelper;
 
 
     /**
      * BuildJsSubscriber constructor.
      *
      * @param FormModel $formModel
+     * @param AssetsHelper   $assetsHelper
      */
     public function __construct(
         FormModel $formModel,
-        TemplatingHelper $templatingHelper)
+        AssetsHelper $assetsHelper)
     {
         $this->formModel = $formModel;
-        $this->templatingHelper    = $templatingHelper;
+        $this->assetsHelper   = $assetsHelper;
     }
 
     /**
@@ -67,15 +67,11 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-
-       $script = strip_tags($this->templatingHelper->getTemplating()->render(
-            'MauticFormBundle:Builder:script.html.php'
-        ));
-
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
         
+           // call variable if doesnt exist
             if (typeof MauticDomain == 'undefined') {
                 var MauticDomain = '{$this->request->getSchemeAndHttpHost()}';
             }            
@@ -93,13 +89,28 @@ MauticJS.replaceDynamicContent = function () {
             MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
                 if (response.length) {
                     node.innerHTML = response;
-                    if (response.search("mauticform_wrapper") > 0 && typeof MauticSDKLoaded != 'undefined') { 
-                         MauticSDK.onLoad(); 
+                    // form load library
+                    if (response.search("mauticform_wrapper") > 0) {
+                        // if doesn't exist
+                        if(typeof MauticSDK == 'undefined'){
+                            var scrpt = document.createElement('script');
+                            scrpt.src='{$this->assetsHelper->getUrl('media/js/mautic-form.js')}';
+                            var head = document.getElementsByTagName('head')[0];
+                            head.appendChild(scrpt);
+                            // check initialize form library
+                            var fileInterval = setInterval(function(){
+                                if (typeof MauticSDK != 'undefined'){
+                                    MauticSDK.onLoad(); 
+                                    clearInterval(fileInterval); // clear interval
+                                 }
+                             },100); // check every 100ms
+                        }else{
+                            MauticSDK.onLoad();
+                         }
                     }
                 }
             });
         });
-        {$script}
     }
 };
 
