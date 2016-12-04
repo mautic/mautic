@@ -751,7 +751,7 @@ class LeadListRepository extends CommonRepository
                         case 'month_last':
                         case 'month_next':
                         case 'month_this':
-                            $interval = substr($key, -4);
+                            $interval = str_replace('week_', '', $timeframe);
                             $dtHelper->setDateTime('midnight first day of '.$interval.' month', null);
 
                             // This month: 2015-08-01 00:00:00
