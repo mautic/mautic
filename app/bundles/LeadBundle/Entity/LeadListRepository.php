@@ -861,7 +861,7 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'lead_email_received_date':
                 case 'notification':
-                    $operand = (($func == 'notEmpty') || ($func == 'between')  || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = (($func == 'notEmpty') || ($func == 'between') || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
                     $column = $details['field'];
                     $table = 'page_hits';
                     $select = 'id';
@@ -915,6 +915,31 @@ class LeadListRepository extends CommonRepository
                                 ->andX($q->expr()
                                 ->lt($alias.'.'.$column, $exprParameter), $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                        case 'between':
+                        case 'notBetween':
+                            // Filter should be saved with double || to separate options
+                            $parameter2    = $this->generateRandomParameterName();
+                            $parameters[$parameter]  = $details['filter'][0];
+                            $parameters[$parameter2] = $details['filter'][1];
+                            $exprParameter2          = ":$parameter2";
+                            $ignoreAutoFilter        = true;
+                            $field = $column;
+                            if ($func == 'between') {
+                                $subqb->where($q->expr()
+                                    ->andX(
+                                        $q->expr()->gte($alias.'.'.$field, $exprParameter),
+                                        $q->expr()->lt($alias.'.'.$field, $exprParameter2),
+                                        $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                    ));
+                            } else {
+                                $subqb->where($q->expr()
+                                    ->andX(
+                                        $q->expr()->lt($alias.'.'.$field, $exprParameter),
+                                        $q->expr()->gte($alias.'.'.$field, $exprParameter2),
+                                        $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                    ));
+                            }
                             break;
                     }
                     // Specific lead
