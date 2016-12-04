@@ -347,6 +347,8 @@ class ListModel extends FormModel
                 'properties' => ['type' => 'datetime'],
                 'operators' => [
                     'include' => [
+                        '=',
+                        '!=',
                         'gt',
                         'lt',
                     ],
@@ -464,6 +466,8 @@ class ListModel extends FormModel
                 'properties' => ['type' => 'datetime'],
                 'operators' => [
                     'include' => [
+                        '=',
+                        '!=',
                         'gt',
                         'lt',
                     ],
