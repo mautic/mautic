@@ -37,6 +37,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -215,6 +216,35 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
+            }
+
+            if ($type == 'file') {
+                $files = $request->files->get('mauticform');
+
+                if (!$files) {
+                    continue;
+                }
+
+                if (!array_key_exists($f->getAlias(), $files)) {
+                    continue;
+                }
+
+                $file = $files[$f->getAlias()];
+
+                if (!$file instanceof UploadedFile) {
+                    continue;
+                }
+
+                $value = $file->move(
+                    '/dev/null', // TODO Pick a location
+                    sprintf(
+                        '%s.%s.%s.%s',
+                        $form->getId(),
+                        $id,
+                        bin2hex(random_bytes(16)),
+                        $file->guessExtension()
+                    )
+                );
             }
 
             if ($f->isRequired() && empty($value)) {
