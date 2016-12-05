@@ -82,8 +82,12 @@ class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function getCompanies($params = [])
+    public function getCompanies($params, $id)
     {
+        if ($id) {
+            return $this->request('v2/companies/'.$id, $params, 'GET', 'companies');
+        }
+
         return $this->request('v2/companies/recent/modified', $params, 'GET', 'companies');
     }
 }
