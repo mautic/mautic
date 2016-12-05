@@ -20,7 +20,7 @@ $pageCount = 1;
     <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url(
         'mautic_form_postresults',
         ['formId' => $form->getId()]
-    ); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">
+    ); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>" enctype="multipart/form-data">
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">
