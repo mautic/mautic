@@ -308,8 +308,7 @@ class CommonController extends Controller implements MauticController
         }
 
         if (!empty($passthrough['route'])) {
-            //if the URL has a query built into it, breadcrumbs may fail matching
-            //so let's try to find it by the route name which will be the extras["routeName"] of the menu item
+            // Add the ajax route to the request so that the desired route is fed to plugins rather than the current request
             $baseUrl       = $this->request->getBaseUrl();
             $routePath     = str_replace($baseUrl, '', $passthrough['route']);
             $ajaxRouteName = false;
