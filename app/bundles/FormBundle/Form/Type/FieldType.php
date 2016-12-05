@@ -119,6 +119,9 @@ class FieldType extends AbstractType
                 case 'radiogrp':
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
+                case 'file':
+                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
+                    break;
             }
         }
 
@@ -483,6 +486,15 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'file':
+                    $builder->add(
+                        'properties',
+                        'formfield_file',
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
             }
         }
 
