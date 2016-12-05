@@ -107,7 +107,12 @@ $formId = $form->getId();
                         <?php if ($isTextarea) : ?>
                             <?php echo nl2br(html_entity_decode($r['value'])); ?>
                         <?php else : ?>
-                            <?php echo $r['value']; ?>
+                            <?php if ($r['type'] == 'file'): ?>
+                                <?php // TODO Print a download link?>
+                                <?php echo $r['value']; ?>
+                            <?php else : ?>
+                                <?php echo $r['value']; ?>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </td>
                 <?php endforeach; ?>
