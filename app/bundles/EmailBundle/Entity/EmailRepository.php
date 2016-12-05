@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -138,7 +139,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (!isset($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
         }
@@ -532,6 +533,10 @@ class EmailRepository extends CommonRepository
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
+        );
 
         if (!empty($id)) {
             $expr->add(

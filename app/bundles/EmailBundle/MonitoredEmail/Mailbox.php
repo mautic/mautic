@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -239,6 +240,9 @@ class Mailbox
             $this->settings           = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
             $this->imapFolder         = $this->mailboxes[$key]['folder'];
             $this->settings['folder'] = $this->mailboxes[$key]['folder'];
+            // Disconnect so that new mailbox settings are used
+            $this->disconnect();
+            // Setup new connection
             $this->setImapPath();
         } else {
             throw new MailboxException($key.' not found');

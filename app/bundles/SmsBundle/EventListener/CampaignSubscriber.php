@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -160,7 +161,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $leadIds = $lead->getId();
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, null, $defaultFrequencyNumber, $defaultFrequencyTime);
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime);
 
         if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
             $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());

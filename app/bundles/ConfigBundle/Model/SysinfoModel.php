@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -57,6 +58,7 @@ class SysinfoModel extends AbstractCommonModel
 
         if (function_exists('phpinfo')) {
             ob_start();
+            $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
             phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES);
             $phpInfo = ob_get_contents();
@@ -70,6 +72,8 @@ class SysinfoModel extends AbstractCommonModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
+            //ensure TZ is set back to default
+            date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
         } else {

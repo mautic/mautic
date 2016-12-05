@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -165,6 +166,8 @@ class ClientModel extends FormModel
 
     /**
      * @param $entity
+     *
+     * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
     {
@@ -174,10 +177,10 @@ class ClientModel extends FormModel
 
         //remove the user from the client
         if ($this->apiMode == 'oauth2') {
-            $entity->removeUser($this->user);
+            $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
         } else {
-            $this->getRepository()->deleteAccessTokens($entity, $this->user);
+            $this->getRepository()->deleteAccessTokens($entity, $this->userHelper->getUser());
         }
     }
 }

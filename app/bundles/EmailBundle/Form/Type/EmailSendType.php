@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -95,7 +96,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewEmailWindow({
+                        'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
                         'icon' => 'fa fa-plus',

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -121,6 +122,17 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
+            'properties_lookup_template',
+            'sortablelist',
+            [
+                'mapped'          => false,
+                'label'           => 'mautic.lead.field.form.properties.select',
+                'option_required' => false,
+                'with_labels'     => false,
+            ]
+        );
+
+        $builder->add(
             'default_template',
             'text',
             [
@@ -189,7 +201,7 @@ class FieldType extends AbstractType
                             'required'    => false,
                             'label'       => 'mautic.lead.field.form.properties.select',
                             'data'        => $properties,
-                            'with_labels' => true,
+                            'with_labels' => ('lookup' !== $type),
                         ]
                     );
                     break;
@@ -448,12 +460,16 @@ class FieldType extends AbstractType
             'object',
             'choice',
             [
-                'choices'     => ['lead' => 'mautic.lead.contact', 'company' => 'mautic.company.company'],
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.lead.field.object',
-                'empty_value' => false,
-                'attr'        => [
+                'choices' => [
+                    'mautic.lead.contact'    => 'lead',
+                    'mautic.company.company' => 'company',
+                ],
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.lead.field.object',
+                'empty_value'       => false,
+                'attr'              => [
                     'class' => 'form-control',
                 ],
                 'required' => true,

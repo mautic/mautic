@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -148,9 +149,20 @@ class FilterType extends AbstractType
                     $customOptions['choices'] = $options['stage'];
                     $type                     = 'choice';
                     break;
+                case 'globalcategory':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = [];
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = [$data['filter']];
+                    }
+                    $customOptions['choices']  = $options['globalcategory'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                 case 'country':
                 case 'region':
+                case 'locale':
                     switch ($fieldType) {
                         case 'timezone':
                             $choiceKey = 'timezones';
@@ -160,6 +172,9 @@ class FilterType extends AbstractType
                             break;
                         case 'region':
                             $choiceKey = 'regions';
+                            break;
+                        case 'locale':
+                            $choiceKey = 'locales';
                             break;
                     }
 
@@ -204,6 +219,7 @@ class FilterType extends AbstractType
 
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
                     $type = 'choice';
                     $attr = array_merge(
@@ -223,9 +239,9 @@ class FilterType extends AbstractType
                     }
 
                     $list    = $field['properties']['list'];
-                    $choices = FormFieldHelper::parseList($list);
+                    $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
 
-                    if ($fieldType == 'select') {
+                    if ('select' == $fieldType) {
                         // array_unshift cannot be used because numeric values get lost as keys
                         $choices     = array_reverse($choices, true);
                         $choices[''] = '';
@@ -369,6 +385,8 @@ class FilterType extends AbstractType
                 'emails',
                 'tags',
                 'stage',
+                'locales',
+                'globalcategory',
             ]
         );
 

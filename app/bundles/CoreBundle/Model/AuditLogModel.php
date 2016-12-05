@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -51,7 +52,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->user : null;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
         $userId   = 0;
         $userName = '';
         if (!$user instanceof User) {

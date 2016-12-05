@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadListEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -39,6 +41,11 @@ class ListModel extends FormModel
      */
     protected $coreParametersHelper;
 
+    /**
+     * ListModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -55,12 +62,16 @@ class ListModel extends FormModel
      * {@inheritdoc}
      *
      * @return \Mautic\LeadBundle\Entity\LeadListRepository
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function getRepository()
     {
         /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
+        $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
 
         return $repo;
@@ -110,13 +121,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -147,9 +158,12 @@ class ListModel extends FormModel
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('leadlist', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('leadlist', $entity, $options);
     }
 
     /**
@@ -300,14 +314,12 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'text',
                 'object'    => 'lead',
-
             ],
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
                 'operators'  => 'default',
                 'object'     => 'lead',
-
             ],
             'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
@@ -316,7 +328,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'multiselect',
                 'object'    => 'lead',
-
             ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
@@ -330,7 +341,6 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
             ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
@@ -339,7 +349,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'multiselect',
                 'object'    => 'lead',
-
             ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
@@ -352,7 +361,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
@@ -365,7 +373,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
@@ -378,7 +385,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'dnc_unsubscribed_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
@@ -391,7 +397,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
-
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
@@ -405,7 +410,6 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
@@ -419,9 +423,23 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
-
+            ],
+            'globalcategory' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.categories'),
+                'properties' => [
+                    'type' => 'globalcategory',
+                ],
+                'operators' => 'multiselect',
+                'object'    => 'lead',
             ],
         ];
+
+        // Add custom choices
+        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
+            $event = new LeadListFiltersChoicesEvent($choices, $operators, $this->translator);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
+            $choices = $event->getChoices();
+        }
 
         //get list of custom fields
         $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
@@ -446,8 +464,8 @@ class ListModel extends FormModel
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
+                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
                 }
-                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
             }
             $choices[$field->getObject()][$field->getAlias()] = [
                 'label'      => $field->getLabel(),
@@ -458,10 +476,8 @@ class ListModel extends FormModel
             // Set operators allowed
             if ($type == 'boolean') {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, ['select', 'country', 'timezone', 'region'])) {
+            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
-            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region'])) {
-                $choices[$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
                 $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
             } else {
@@ -496,7 +512,7 @@ class ListModel extends FormModel
     public function getUserLists($alias = '')
     {
         $user = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->user : false;
+            $this->userHelper->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
@@ -640,6 +656,9 @@ class ListModel extends FormModel
             }
         }
 
+        // Unset max ID to prevent capping at newly added max ID
+        unset($batchLimiters['maxId']);
+
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
             $list,
@@ -650,6 +669,9 @@ class ListModel extends FormModel
                 'batchLimiters'  => $batchLimiters,
             ]
         );
+
+        // Ensure the same list is used each batch
+        $batchLimiters['maxId'] = (int) $removeLeadCount[$id]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
@@ -1056,7 +1078,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1106,7 +1128,7 @@ class ListModel extends FormModel
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1118,7 +1140,7 @@ class ListModel extends FormModel
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
-                    ->setParameter('userId', $this->user->getId());
+                    ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
             if (!empty($dateFrom)) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
@@ -1139,7 +1161,7 @@ class ListModel extends FormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->user->getId();
+            $filter['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         if (isset($filter['flag'])) {
@@ -1204,7 +1226,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1277,7 +1299,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('l.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $results = $q->execute()->fetchAll();

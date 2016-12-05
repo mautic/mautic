@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -131,13 +132,11 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
-    public function getResponse($response)
+    public function getResponse()
     {
-        return $response;
+        return $this->response;
     }
 
     /**

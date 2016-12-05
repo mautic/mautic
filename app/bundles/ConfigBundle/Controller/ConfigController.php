@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -158,7 +159,10 @@ class ConfigController extends FormController
     private function mergeParamsWithLocal(&$forms, $doNotChange)
     {
         // Import the current local configuration, $parameters is defined in this file
-        $localConfigFile = $this->factory->getLocalConfigFile();
+
+        /** @var \AppKernel $kernel */
+        $kernel          = $this->container->get('kernel');
+        $localConfigFile = $kernel->getLocalConfigFile();
 
         /** @var $parameters */
         include $localConfigFile;
@@ -172,7 +176,7 @@ class ConfigController extends FormController
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
                 } elseif (array_key_exists($key, $localParams)) {
-                    $form['parameters'][$key] = $localParams[$key];
+                    $form['parameters'][$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
                 }
             }
         }

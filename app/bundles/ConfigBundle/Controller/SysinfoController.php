@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -32,7 +33,7 @@ class SysinfoController extends FormController
         $model   = $this->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
         $folders = $model->getFolders();
-        $log     = $model->getLogTail();
+        $log     = $model->getLogTail(40);
 
         return $this->delegateView([
             'viewParameters' => [

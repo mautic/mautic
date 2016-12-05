@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -47,7 +48,10 @@ class CoreParametersHelper
         }
 
         if ($this->parameterBag->has('mautic.'.$name)) {
-            return $this->parameterBag->get('mautic.'.$name);
+            // Decode %%
+            $value = str_replace('%%', '%', $this->parameterBag->get('mautic.'.$name));
+
+            return $value;
         }
 
         // Last ditch effort in case we're getting non-mautic params

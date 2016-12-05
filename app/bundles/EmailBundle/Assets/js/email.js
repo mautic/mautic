@@ -1,30 +1,15 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    var plaintext = mQuery('#emailform_plainText');
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    var textarea = mQuery('#emailform_customHtml');
-
-    mQuery(document).on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('html.set', textarea.val());
-    });
-
-    mQuery('.btn-builder').on('click', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
-
-    var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-
+    Mautic.intiSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
 };
 
@@ -32,7 +17,6 @@ Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
-    mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
@@ -264,8 +248,8 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-                heightMin: 300
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                heightMin: 100
             }));
 
             tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
@@ -329,8 +313,8 @@ Mautic.initDynamicContentItem = function (tabId) {
 
         altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
-            heightMin: 300
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+            heightMin: 100
         }));
 
         Mautic.initRemoveEvents(removeButton);
@@ -373,6 +357,8 @@ Mautic.initDynamicContentItem = function (tabId) {
     });
 
     Mautic.initRemoveEvents($el.find('.remove-item'));
+
+
 };
 
 Mautic.updateDynamicContentDropdown = function () {
@@ -467,7 +453,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -505,7 +491,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     var fieldOptions = fieldCallback = '';
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect') {
             // Generate the options
             fieldOptions = selectedOption.data("field-list");
 
@@ -617,6 +603,7 @@ Mautic.convertDynamicContentFilterInput = function(el) {
     }
 
     var newName = '';
+    var lastPos;
 
     if (filterEl.is('select')) {
         var isMultiple  = filterEl.attr('multiple');
@@ -635,7 +622,10 @@ Mautic.convertDynamicContentFilterInput = function(el) {
             filterEl.removeAttr('multiple');
 
             // Update the name
-            newName =  filterEl.attr('name').replace(/[\[\]']+/g, '');
+            newName = filterEl.attr('name');
+            lastPos = newName.lastIndexOf('[]');
+            newName = newName.substring(0, lastPos);
+
             filterEl.attr('name', newName);
 
             placeholder = mauticLang['chosenChooseOne'];

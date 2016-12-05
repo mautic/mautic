@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -406,7 +407,7 @@ class CampaignController extends FormController
 
                         $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
                         // Build and set Event entities
-                        $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
+                        $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents);
 
                         // Persist to the database before building connection so that IDs are available
                         $model->saveEntity($entity);

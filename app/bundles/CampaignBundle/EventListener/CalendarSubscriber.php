@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -68,7 +69,6 @@ class CalendarSubscriber extends CommonSubscriber
                     ->setParameter('now', $now->toUtcString());
             }
             $results = $query->execute()->fetchAll();
-            // echo "<pre>";var_dump($results);die("</pre>");
 
             // We need to convert the date to a ISO8601 compliant string
             foreach ($results as &$object) {

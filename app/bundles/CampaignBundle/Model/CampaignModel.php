@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -131,9 +132,12 @@ class CampaignModel extends CommonFormModel
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('campaign', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('campaign', $entity, $options);
     }
 
     /**
@@ -231,7 +235,7 @@ class CampaignModel extends CommonFormModel
         $parentUpdated  = [];
 
         //set the events from session
-        foreach ($sessionEvents as $id => $properties) {
+        foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
@@ -252,7 +256,7 @@ class CampaignModel extends CommonFormModel
             }
 
             $event->setCampaign($entity);
-            $events[$id] = $event;
+            $events[$properties['id']] = $event;
         }
 
         foreach ($deletedEvents as $deleteMe) {
@@ -592,7 +596,7 @@ class CampaignModel extends CommonFormModel
 
                 $viewOther = $this->security->isGranted('form:forms:viewother');
                 $repo      = $this->formModel->getRepository();
-                $repo->setCurrentUser($this->user);
+                $repo->setCurrentUser($this->userHelper->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
                 foreach ($forms as $form) {
@@ -1133,7 +1137,7 @@ class CampaignModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
                 ->andWhere('c.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);

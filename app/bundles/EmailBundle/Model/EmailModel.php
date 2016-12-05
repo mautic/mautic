@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,6 +13,7 @@ namespace Mautic\EmailBundle\Model;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -219,6 +221,9 @@ class EmailModel extends FormModel
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
+        } else {
+            // Ensure that all lists are been removed in case of a clone
+            $entity->setLists([]);
         }
 
         if (!$this->updatingTranslationChildren) {
@@ -873,6 +878,11 @@ class EmailModel extends FormModel
             $lists = $email->getLists();
         }
 
+        // Safety check
+        if ('list' !== $email->getEmailType()) {
+            return [0, 0, []];
+        }
+
         $options = [
             'source'        => ['email', $email->getId()],
             'allowResends'  => false,
@@ -1140,8 +1150,8 @@ class EmailModel extends FormModel
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
         $isMarketing      = (in_array($emailType, ['marketing']) || !empty($listId));
-        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
-        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
         if (!$email->getId()) {
@@ -1188,7 +1198,6 @@ class EmailModel extends FormModel
             $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
                 'email',
                 $leadIds,
-                $listId,
                 $defaultFrequencyNumber,
                 $defaultFrequencyTime
             );
@@ -1724,7 +1733,7 @@ class EmailModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -1902,6 +1911,14 @@ class EmailModel extends FormModel
             $dateTo
         );
 
+        if (empty($deviceStats)) {
+            $deviceStats[] = [
+                'count'   => 0,
+                'device'  => $this->translator->trans('mautic.report.report.noresults'),
+                'list_id' => 0,
+            ];
+        }
+
         foreach ($deviceStats as $device) {
             $chart->setDataset($device['device'], $device['count']);
         }
@@ -1932,7 +1949,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1971,7 +1988,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1995,7 +2012,7 @@ class EmailModel extends FormModel
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $leadEventLogRepository->setCurrentUser($this->user);
+        $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',

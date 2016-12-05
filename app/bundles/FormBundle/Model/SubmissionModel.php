@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -214,6 +215,12 @@ class SubmissionModel extends CommonFormModel
             }
 
             if ($f->isRequired() && empty($value)) {
+
+                //field is required, but hidden from form because of 'ShowWhenValueExists'
+                if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
+                    continue;
+                }
+
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
@@ -441,7 +448,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                 $s['ipAddress']['ipAddress'],
                                 $s['referer'],
                             ];
@@ -518,7 +525,7 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
-                                    $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                    $s['dateSubmitted']->format('Y-m-d H:i:s'),
                                     $s['ipAddress']['ipAddress'],
                                     $s['referer'],
                                 ];
@@ -588,7 +595,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
@@ -620,7 +627,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -656,7 +663,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -955,7 +962,13 @@ class SubmissionModel extends CommonFormModel
         $components = $this->formModel->getCustomComponents();
         foreach ([$field->getType(), 'form'] as $type) {
             if (isset($components['validators'][$type])) {
+                if (!is_array($components['validators'][$type])) {
+                    $components['validators'][$type] = [$components['validators'][$type]];
+                }
                 foreach ($components['validators'][$type] as $validator) {
+                    if (!is_array($validator)) {
+                        $validator = ['eventName' => $validator];
+                    }
                     $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
                     if (!$event->isValid()) {
                         return $event->getInvalidReason();

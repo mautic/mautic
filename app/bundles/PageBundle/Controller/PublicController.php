@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -275,7 +276,7 @@ class PublicController extends CommonFormController
 
         $model->hitPage($entity, $this->request, 404);
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -292,7 +293,7 @@ class PublicController extends CommonFormController
         $entity = $model->getEntity($id);
 
         if ($entity === null) {
-            $this->notFound();
+            return $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();

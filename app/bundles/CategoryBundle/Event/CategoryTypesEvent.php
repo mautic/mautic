@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,7 +31,15 @@ class CategoryTypesEvent extends CommonEvent
      */
     public function getCategoryTypes()
     {
-        asort($this->types);
+        if (!array_key_exists('global', $this->types)) {
+            // Alphabetize once
+            asort($this->types);
+
+            $this->types = array_merge(
+                ['global' => 'mautic.category.global'],
+                $this->types
+            );
+        }
 
         return $this->types;
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -112,7 +113,7 @@ class DashboardModel extends FormModel
                     [
                         'column' => 'w.createdBy',
                         'expr'   => 'eq',
-                        'value'  => $this->user->getId(),
+                        'value'  => $this->userHelper->getUser()->getId(),
                     ],
                 ],
             ],
@@ -181,7 +182,7 @@ class DashboardModel extends FormModel
 
         // Add the user timezone
         if (empty($resultParams['timezone'])) {
-            $resultParams['timezone'] = $this->user->getTimezone();
+            $resultParams['timezone'] = $this->userHelper->getUser()->getTimezone();
         }
 
         // Clone the objects in param array to avoid reference issues if some subscriber changes them
@@ -196,7 +197,7 @@ class DashboardModel extends FormModel
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
 
-        $event->setCacheDir($cacheDir, $this->user->getId());
+        $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
     }
@@ -207,7 +208,7 @@ class DashboardModel extends FormModel
     public function clearDashboardCache()
     {
         $cacheDir     = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper($cacheDir, $this->user->getId());
+        $cacheStorage = new CacheStorageHelper($cacheDir, $this->userHelper->getUser()->getId());
         $cacheStorage->clear();
     }
 

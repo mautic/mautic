@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -119,7 +120,7 @@ class PageModel extends FormModel
     public function getRepository()
     {
         $repo = $this->em->getRepository('MauticPageBundle:Page');
-        $repo->setCurrentUser($this->user);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
     }
@@ -224,13 +225,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(['Page']);
         }
 
-        if (!isset($options['formName'])) {
-            $options['formName'] = 'page';
+        $formName = 'page';
+
+        if (!empty($options['formName'])) {
+            $formName = $options['formName'];
         }
 
-        $params = (!empty($action)) ? ['action' => $action] : [];
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create($options['formName'], $entity, $params);
+        return $formFactory->create($formName, $entity, $options);
     }
 
     /**
@@ -311,7 +316,7 @@ class PageModel extends FormModel
             case 'page':
                 $viewOther = $this->security->isGranted('page:pages:viewother');
                 $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->user);
+                $repo->setCurrentUser($this->userHelper->getUser());
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
         }
@@ -538,6 +543,10 @@ class PageModel extends FormModel
         if ($isUnique) {
             // Add UTM tags entry if a UTM tag exist
             $queryHasUtmTags = false;
+            if (!is_array($query)) {
+                parse_str($query, $query);
+            }
+
             foreach ($query as $key => $value) {
                 if (strpos($key, 'utm_') !== false) {
                     $queryHasUtmTags = true;
@@ -577,7 +586,6 @@ class PageModel extends FormModel
                 $this->leadModel->setUtmTags($lead, $utmTags);
             }
         }
-
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
@@ -807,7 +815,7 @@ class PageModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
             ->andWhere('p.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -954,8 +962,15 @@ class PageModel extends FormModel
 
         $chart = new PieChart($data['labels']);
 
+        if (empty($results)) {
+            $results[] = [
+                'device' => $this->translator->trans('mautic.report.report.noresults'),
+                'count'  => 0,
+            ];
+        }
+
         foreach ($results as $result) {
-            $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
+            $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
             // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
             $chart->setDataset($label,  $result['count']);
@@ -987,7 +1002,7 @@ class PageModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('p.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1019,7 +1034,7 @@ class PageModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

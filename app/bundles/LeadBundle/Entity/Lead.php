@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -337,6 +338,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'stage',
                     'dateIdentified',
                     'preferredProfileImage',
+                    'doNotContact',
                 ]
             )
             ->build();
@@ -345,21 +347,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @param string $prop
      * @param mixed  $val
+     * @param null   $oldValue
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = ($oldValue) ? $oldValue : $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
+                $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
+                $this->changes['owner'] = [$current, $val->getId()];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
+                $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
@@ -397,6 +397,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 }
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
+            }
+        } elseif ($prop == 'stage') {
+            if ($current && !$val) {
+                $this->changes['stage'] = [$current->getId(), $val];
+            } elseif (!$current && $val) {
+                $this->changes['stage'] = [$current, $val->getId()];
+            } elseif ($current && $val && $current->getId() != $val->getId()) {
+                $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
@@ -671,6 +679,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function adjustPoints($points, $operator = 'plus')
     {
+        $oldPoints = $this->points;
         switch ($operator) {
             case 'plus':
                 $this->points += $points;
@@ -687,6 +696,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             default:
                 throw new \UnexpectedValueException('Invalid operator');
         }
+
+        $this->isChanged('points', $this->points, $oldPoints);
 
         return $this;
     }
@@ -728,7 +739,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
         if ($pointsDelta === 0) {
-            // No need to record a null delta
+            // No need to record no change
             return;
         }
 
@@ -761,14 +772,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Creates a points change entry.
      *
-     * @param   $type
-     * @param   $name
-     * @param   $action
+     * @param $stage
+     * @param $name
+     * @param $action
      */
-    public function stageChangeLogEntry($type, $name, $action)
+    public function stageChangeLogEntry($stage, $name, $action)
     {
         //create a new points change event
         $event = new StagesChangeLog();
+        $event->setStage($stage);
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());
@@ -1218,8 +1230,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      *
      * @return Stage
      */
-    public function setStage(Stage $stage)
+    public function setStage(Stage $stage = null)
     {
+        $this->isChanged('stage', $stage);
         $this->stage = $stage;
 
         return $this;
@@ -1236,11 +1249,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set stage.
+     * Set frequency rules.
      *
      * @param FrequencyRule $frequencyRules
      *
-     * @return frequencyRules
+     * @return Lead
      */
     public function setFrequencyRules(FrequencyRule $frequencyRules)
     {
@@ -1251,7 +1264,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get stage.
+     * Get frequency rules.
      *
      * @return array
      */

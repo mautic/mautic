@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -75,7 +76,7 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank']));
+        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels']));
     }
 
     /**

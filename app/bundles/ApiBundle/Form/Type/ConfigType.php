@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,6 +34,18 @@ class ConfigType extends AbstractType
                 'data'  => (bool) $options['data']['api_enabled'],
                 'attr'  => [
                     'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'api_enable_basic_auth',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.api.config.form.api.basic_auth_enabled',
+                'data'  => (bool) $options['data']['api_enable_basic_auth'],
+                'attr'  => [
+                    'tooltip' => 'mautic.api.config.form.api.basic_auth.tooltip',
                 ],
             ]
         );

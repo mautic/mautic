@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -147,9 +148,12 @@ class FormModel extends CommonFormModel
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('mauticform', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('mauticform', $entity, $options);
     }
 
     /**
@@ -335,6 +339,32 @@ class FormModel extends CommonFormModel
         // Persist if form is being edited
         if ($entity->getId()) {
             $this->formActionModel->saveEntities($existingActions);
+        }
+    }
+
+    /**
+     * @param Form  $entity
+     * @param array $actions
+     */
+    public function deleteActions(Form $entity, $actions)
+    {
+        if (empty($actions)) {
+            return;
+        }
+
+        $existingActions = $entity->getActions()->toArray();
+        $deleteActions   = [];
+        foreach ($actions as $actionId) {
+            if (isset($existingActions[$actionId])) {
+                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $entity->removeAction($actionEntity);
+                $deleteActions[] = $actionId;
+            }
+        }
+
+        // Delete actions from db
+        if (count($deleteActions)) {
+            $this->formActionModel->deleteEntities($deleteActions);
         }
     }
 
@@ -799,7 +829,7 @@ class FormModel extends CommonFormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

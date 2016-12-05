@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -157,7 +158,8 @@ trait EntityFieldsBuildFormTrait
                             $value = (int) $value;
                         }
                     }
-                    $typeProperties['data']        = $value;
+
+                    $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
@@ -212,7 +214,7 @@ trait EntityFieldsBuildFormTrait
                         $attr['data-target'] = $alias;
 
                         if (!empty($properties['list'])) {
-                            $attr['data-options'] = $properties['list'];
+                            $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                         }
                     }
                     $builder->add(
