@@ -251,8 +251,16 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
+                $config                         = $this->mergeConfigToFeatureSettings();
+                $fields                         = implode('&property=', array_keys($config['leadFields']));
+                $params['post_append_to_query'] = '&property='.$fields;
+
                 $data = $this->getApiHelper()->getContacts($params);
+                print_r($data);
                 foreach ($data['contacts'] as $contact) {
+                    if (isset($data['lifecyclestage'])) {
+                        $stage = $data['lifecyclestage'];
+                    }
                     if (is_array($contact)) {
                         $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                         $contact     = $this->getMauticLead($contactData);
