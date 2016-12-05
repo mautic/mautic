@@ -242,6 +242,10 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.form.type.field_propertyfile' => [
+                'class' => 'Mautic\FormBundle\Form\Type\FormFieldFileType',
+                'alias' => 'formfield_file',
+            ],
             'mautic.form.type.field_propertygroup' => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
                 'alias' => 'formfield_group',
