@@ -302,8 +302,8 @@ return [
                     '%mautic.mailer_mailjet_sandbox_default_mail%',
                 ],
                 'methodCalls'  => [
-                    'setUsername'      => ['%mautic.mailer_user%'],
-                    'setPassword'      => ['%mautic.mailer_password%']
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
                 ]
             ],
             'mautic.transport.sendgrid' => [
