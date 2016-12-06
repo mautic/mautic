@@ -20,13 +20,22 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
+
+    
+    private $sandboxMode;
+
+    private $sandboxMail;
+
     /**
      * {@inheritdoc}
      */
-    public function __construct($host = 'localhost', $port = 25, $security = null)
+    public function __construct($sandboxMode = false, $sandboxMail = '', $host = 'localhost', $port = 25, $security = null)
     {
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
+
+        $this->setSandbox($sandbox);
+        $this->setSandboxMail($sandboxMail);
     }
 
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
@@ -36,6 +45,11 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
         if (isset($message->leadIdHash)) {
             // contact leadidHeash and email to be sure not applying email stat to bcc
             $message->getHeaders()->addTextHeader('X-MJ-CUSTOMID', $message->leadIdHash.'-'.key($message->getTo()));
+        }
+
+        if ($this->isSandboxMode()) {
+            $message->setSubject(key($message->getTo()) . ' - ' .$message->getSubject());
+            $message->setTo($this->getSandboxMail());
         }
 
         parent::send($message, $failedRecipients);
@@ -115,5 +129,37 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
         }
 
         return $rows;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isSandboxMode()
+    {
+        return $this->sandboxMode;
+    }
+
+    /**
+     * @param boolean $sandboxMode
+     */
+    private function setSandboxMode($sandboxMode)
+    {
+        $this->sandboxMode = $sandboxMode;
+    }
+
+    /**
+     * @return string
+     */
+    private function getSandboxMail()
+    {
+        return $this->sandboxMail;
+    }
+
+    /**
+     * @param string $sandboxMail
+     */
+    private function setSandboxMail($sandboxMail)
+    {
+        $this->sandboxMail = $sandboxMail;
     }
 }
