@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
-
-    
     private $sandboxMode;
 
     private $sandboxMail;
@@ -34,7 +32,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
 
-        $this->setSandbox($sandbox);
+        $this->setSandboxMode($sandboxMode);
         $this->setSandboxMail($sandboxMail);
     }
 
@@ -48,7 +46,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
         }
 
         if ($this->isSandboxMode()) {
-            $message->setSubject(key($message->getTo()) . ' - ' .$message->getSubject());
+            $message->setSubject(key($message->getTo()).' - '.$message->getSubject());
             $message->setTo($this->getSandboxMail());
         }
 
@@ -132,7 +130,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     private function isSandboxMode()
     {
@@ -140,7 +138,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     }
 
     /**
-     * @param boolean $sandboxMode
+     * @param bool $sandboxMode
      */
     private function setSandboxMode($sandboxMode)
     {
