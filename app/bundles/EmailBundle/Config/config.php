@@ -303,8 +303,8 @@ return [
                 ],
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
-                    'setPassword' => ['%mautic.mailer_password%']
-                ]
+                    'setPassword' => ['%mautic.mailer_password%'],
+                ],
             ],
             'mautic.transport.sendgrid' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
