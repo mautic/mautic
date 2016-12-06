@@ -1,15 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
-$view['slots']->set("headerTitle", $email->getName());
+$view['slots']->set('headerTitle', $email->getName());
 
 $variantContent = $view->render(
     'MauticCoreBundle:Variant:index.html.php',
@@ -21,7 +22,7 @@ $variantContent = $view->render(
         'actionRoute'   => 'mautic_email_action',
     ]
 );
-$showVariants    = !empty(trim($variantContent));
+$showVariants = !empty(trim($variantContent));
 
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',
@@ -32,7 +33,7 @@ $translationContent = $view->render(
         'actionRoute'  => 'mautic_email_action',
     ]
 );
-$showTranslations   = !empty(trim($translationContent));
+$showTranslations = !empty(trim($translationContent));
 
 $emailType = $email->getEmailType();
 if (empty($emailType)) {
@@ -43,7 +44,7 @@ $customButtons = [];
 
 if ($emailType == 'list') {
     $customButtons[] = [
-        'attr'      => [
+        'attr' => [
             'data-toggle' => 'ajax',
             'href'        => $view['router']->path(
                 'mautic_email_action',
@@ -52,11 +53,12 @@ if ($emailType == 'list') {
         ],
         'iconClass' => 'fa fa-send-o',
         'btnText'   => 'mautic.email.send',
+        'primary'   => true,
     ];
 }
 
 $customButtons[] = [
-    'attr'      => [
+    'attr' => [
         'data-toggle' => 'ajax',
         'href'        => $view['router']->path(
             'mautic_email_action',
@@ -65,6 +67,7 @@ $customButtons[] = [
     ],
     'iconClass' => 'fa fa-send',
     'btnText'   => 'mautic.email.send.example',
+    'primary'   => true,
 ];
 
 // Only show A/B test button if not already a translation of an a/b test
@@ -75,9 +78,9 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'item'             => $email,
-            'templateButtons'  => [
-                'edit'   => $view['security']->hasEntityAccess(
+            'item'            => $email,
+            'templateButtons' => [
+                'edit' => $view['security']->hasEntityAccess(
                     $permissions['email:emails:editown'],
                     $permissions['email:emails:editother'],
                     $email->getCreatedBy()
@@ -89,14 +92,14 @@ $view['slots']->set(
                     $permissions['email:emails:deleteother'],
                     $email->getCreatedBy()
                 ),
-                'close'  => $view['security']->hasEntityAccess(
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['email:emails:viewown'],
                     $permissions['email:emails:viewother'],
                     $email->getCreatedBy()
                 ),
             ],
-            'routeBase'        => 'email',
-            'preCustomButtons' => $customButtons,
+            'routeBase'     => 'email',
+            'customButtons' => $customButtons,
         ]
     )
 );
@@ -214,7 +217,7 @@ $view['slots']->set(
                     'email'         => $email,
                     'isVariant'     => ($showTranslations || $showVariants),
                     'showAllStats'  => $showAllStats,
-                    'dateRangeForm' => $dateRangeForm
+                    'dateRangeForm' => $dateRangeForm,
                 ]
             ); ?>
 

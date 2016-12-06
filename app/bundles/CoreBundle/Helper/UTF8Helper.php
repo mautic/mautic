@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -36,12 +38,15 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
+/*
  * @author   "Sebastián Grignoli" <grignoli@gmail.com>
- * @package  Encoding
+ *
  * @version  2.0
+ *
  * @link     https://github.com/neitanod/forceutf8
+ *
  * @example  https://github.com/neitanod/forceutf8
+ *
  * @license  Revised BSD
  */
 
@@ -49,12 +54,11 @@ namespace Mautic\CoreBundle\Helper;
 
 class UTF8Helper
 {
+    const ICONV_TRANSLIT = 'TRANSLIT';
+    const ICONV_IGNORE   = 'IGNORE';
+    const WITHOUT_ICONV  = '';
 
-    const ICONV_TRANSLIT = "TRANSLIT";
-    const ICONV_IGNORE = "IGNORE";
-    const WITHOUT_ICONV = "";
-
-    protected static $win1252ToUtf8 = array(
+    protected static $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",
         130 => "\xe2\x80\x9a",
         131 => "\xc6\x92",
@@ -81,10 +85,10 @@ class UTF8Helper
         155 => "\xe2\x80\xba",
         156 => "\xc5\x93",
         158 => "\xc5\xbe",
-        159 => "\xc5\xb8"
-    );
+        159 => "\xc5\xb8",
+    ];
 
-    protected static $brokenUtf8ToUtf8 = array(
+    protected static $brokenUtf8ToUtf8 = [
         "\xc2\x80" => "\xe2\x82\xac",
         "\xc2\x82" => "\xe2\x80\x9a",
         "\xc2\x83" => "\xc6\x92",
@@ -111,10 +115,10 @@ class UTF8Helper
         "\xc2\x9b" => "\xe2\x80\xba",
         "\xc2\x9c" => "\xc5\x93",
         "\xc2\x9e" => "\xc5\xbe",
-        "\xc2\x9f" => "\xc5\xb8"
-    );
+        "\xc2\x9f" => "\xc5\xb8",
+    ];
 
-    protected static $utf8ToWin1252 = array(
+    protected static $utf8ToWin1252 = [
         "\xe2\x82\xac" => "\x80",
         "\xe2\x80\x9a" => "\x82",
         "\xc6\x92"     => "\x83",
@@ -141,13 +145,13 @@ class UTF8Helper
         "\xe2\x80\xba" => "\x9b",
         "\xc5\x93"     => "\x9c",
         "\xc5\xbe"     => "\x9e",
-        "\xc5\xb8"     => "\x9f"
-    );
+        "\xc5\xb8"     => "\x9f",
+    ];
 
-    static function toUTF8($text)
+    public static function toUTF8($text)
     {
         /**
-         * Function \ForceUTF8\Encoding::toUTF8
+         * Function \ForceUTF8\Encoding::toUTF8.
          *
          * This function leaves UTF8 characters alone, while converting almost all non-UTF8 to UTF8.
          *
@@ -167,12 +171,10 @@ class UTF8Helper
          *
          * @name         toUTF8
          *
-         * @param string $text Any string.
+         * @param string $text Any string
          *
-         * @return string  The same string, UTF8 encoded
-         *
+         * @return string The same string, UTF8 encoded
          */
-
         if (is_array($text)) {
             foreach ($text as $k => $v) {
                 $text[$k] = self::toUTF8($v);
@@ -187,8 +189,8 @@ class UTF8Helper
 
         $max = self::strlen($text);
 
-        $buf = "";
-        for ($i = 0; $i < $max; $i++) {
+        $buf = '';
+        for ($i = 0; $i < $max; ++$i) {
             $c1 = $text{$i};
             if ($c1 >= "\xc0") { //Should be converted to UTF8, if it's not UTF8 already
                 $c2 = $i + 1 >= $max ? "\x00" : $text{$i + 1};
@@ -197,7 +199,7 @@ class UTF8Helper
                 if ($c1 >= "\xc0" & $c1 <= "\xdf") { //looks like 2 bytes UTF8
                     if ($c2 >= "\x80" && $c2 <= "\xbf") { //yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2;
-                        $i++;
+                        ++$i;
                     } else { //not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
@@ -244,7 +246,7 @@ class UTF8Helper
         return $buf;
     }
 
-    static function toWin1252($text, $option = self::WITHOUT_ICONV)
+    public static function toWin1252($text, $option = self::WITHOUT_ICONV)
     {
         if (is_array($text)) {
             foreach ($text as $k => $v) {
@@ -259,17 +261,17 @@ class UTF8Helper
         }
     }
 
-    static function toISO8859($text)
+    public static function toISO8859($text)
     {
         return self::toWin1252($text);
     }
 
-    static function toLatin1($text)
+    public static function toLatin1($text)
     {
         return self::toWin1252($text);
     }
 
-    static function fixUTF8($text, $option = self::WITHOUT_ICONV)
+    public static function fixUTF8($text, $option = self::WITHOUT_ICONV)
     {
         if (is_array($text)) {
             foreach ($text as $k => $v) {
@@ -279,8 +281,8 @@ class UTF8Helper
             return $text;
         }
 
-        $last = "";
-        while ($last <> $text) {
+        $last = '';
+        while ($last != $text) {
             $last = $text;
             $text = self::toUTF8(static::utf8_decode($text, $option));
         }
@@ -289,7 +291,7 @@ class UTF8Helper
         return $text;
     }
 
-    static function UTF8FixWin1252Chars($text)
+    public static function UTF8FixWin1252Chars($text)
     {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
@@ -298,9 +300,9 @@ class UTF8Helper
         return str_replace(array_keys(self::$brokenUtf8ToUtf8), array_values(self::$brokenUtf8ToUtf8), $text);
     }
 
-    static function removeBOM($str = "")
+    public static function removeBOM($str = '')
     {
-        if (substr($str, 0, 3) == pack("CCC", 0xef, 0xbb, 0xbf)) {
+        if (substr($str, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
             $str = substr($str, 3);
         }
 
@@ -317,7 +319,7 @@ class UTF8Helper
     {
         $encoding     = strtoupper($encodingLabel);
         $encoding     = preg_replace('/[^a-zA-Z0-9\s]/', '', $encoding);
-        $equivalences = array(
+        $equivalences = [
             'ISO88591'    => 'ISO-8859-1',
             'ISO8859'     => 'ISO-8859-1',
             'ISO'         => 'ISO-8859-1',
@@ -326,8 +328,8 @@ class UTF8Helper
             'UTF8'        => 'UTF-8',
             'UTF'         => 'UTF-8',
             'WIN1252'     => 'ISO-8859-1',
-            'WINDOWS1252' => 'ISO-8859-1'
-        );
+            'WINDOWS1252' => 'ISO-8859-1',
+        ];
 
         if (empty($equivalences[$encoding])) {
             return 'UTF-8';
@@ -354,8 +356,8 @@ class UTF8Helper
             );
         } else {
             $o = iconv(
-                "UTF-8",
-                "Windows-1252".($option == self::ICONV_TRANSLIT ? '//TRANSLIT' : ($option == self::ICONV_IGNORE ? '//IGNORE' : '')),
+                'UTF-8',
+                'Windows-1252'.($option == self::ICONV_TRANSLIT ? '//TRANSLIT' : ($option == self::ICONV_IGNORE ? '//IGNORE' : '')),
                 $text
             );
         }

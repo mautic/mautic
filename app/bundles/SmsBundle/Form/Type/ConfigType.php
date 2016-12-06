@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -31,8 +33,8 @@ class ConfigType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.sms.config.form.sms.enabled',
-                'data' => (bool) $options['data']['sms_enabled'],
-                'attr' => [
+                'data'  => (bool) $options['data']['sms_enabled'],
+                'attr'  => [
                     'tooltip' => 'mautic.sms.config.form.sms.enabled.tooltip',
                 ],
             ]
@@ -58,9 +60,9 @@ class ConfigType extends AbstractType
                 'text',
                 [
                     'label' => 'mautic.sms.config.form.sms.username',
-                    'attr' => [
-                        'tooltip' => 'mautic.sms.config.form.sms.username.tooltip',
-                        'class' => 'form-control',
+                    'attr'  => [
+                        'tooltip'      => 'mautic.sms.config.form.sms.username.tooltip',
+                        'class'        => 'form-control',
                         'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
                     ],
                     'constraints' => $constraints,
@@ -72,9 +74,9 @@ class ConfigType extends AbstractType
                 'text',
                 [
                     'label' => 'mautic.sms.config.form.sms.password',
-                    'attr' => [
-                        'tooltip' => 'mautic.sms.config.form.sms.password.tooltip',
-                        'class' => 'form-control',
+                    'attr'  => [
+                        'tooltip'      => 'mautic.sms.config.form.sms.password.tooltip',
+                        'class'        => 'form-control',
                         'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
                     ],
                     'constraints' => $constraints,
@@ -86,40 +88,40 @@ class ConfigType extends AbstractType
                 'text',
                 [
                     'label' => 'mautic.sms.config.form.sms.sending_phone_number',
-                    'attr' => [
-                        'tooltip' => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
-                        'class' => 'form-control',
+                    'attr'  => [
+                        'tooltip'      => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
+                        'class'        => 'form-control',
                         'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
                     ],
                     'constraints' => $constraints,
                 ]
             );
         };
-        $builder->add('sms_frequency_number','number',
-            array(
+        $builder->add('sms_frequency_number', 'number',
+            [
                 'precision'  => 0,
                 'label'      => 'mautic.sms.list.frequency.number',
-                'label_attr' => array('class' => 'control-label'),
+                'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
-                'attr'       => array(
-                    'class' => 'form-control frequency'
-                )
-            ));
-        $builder->add('sms_frequency_time','choice',
-            array(
-                'choices'    => array(
-                    'DAY' => 'day',
-                    'WEEK' => 'week',
-                    'MONTH' => 'month'
-                ),
+                'attr'       => [
+                    'class' => 'form-control frequency',
+                ],
+            ]);
+        $builder->add('sms_frequency_time', 'choice',
+            [
+                'choices' => [
+                    'DAY'   => 'day',
+                    'WEEK'  => 'week',
+                    'MONTH' => 'month',
+                ],
                 'label'      => 'mautic.lead.list.frequency.times',
-                'label_attr' => array('class' => 'control-label'),
+                'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
                 'multiple'   => false,
-                'attr'       => array(
-                    'class' => 'form-control frequency'
-                )
-            ));
+                'attr'       => [
+                    'class' => 'form-control frequency',
+                ],
+            ]);
 
         // Before submit
         $builder->addEventListener(

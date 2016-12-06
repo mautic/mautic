@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -51,7 +53,7 @@ if ($tmpl == 'index') {
                     <strong><?php echo $view['translator']->trans('mautic.install.finalizing'); ?></strong>
                 </div>
             </div>
-            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', array('step' => $index, 'count' => $count, 'completedSteps' => $completedSteps)); ?>
+            <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', ['step' => $index, 'count' => $count, 'completedSteps' => $completedSteps]); ?>
         </div>
         <div class="col-sm-3">
             <?php echo $view['form']->row($form['buttons']); ?>

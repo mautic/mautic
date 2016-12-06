@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,7 +14,6 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'dynamicContent');
 $view['slots']->set('headerTitle', $entity->getName());
 
-
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',
     [
@@ -23,7 +23,7 @@ $translationContent = $view->render(
         'actionRoute'  => 'mautic_dynamicContent_action',
     ]
 );
-$showTranslations   = !empty(trim($translationContent));
+$showTranslations = !empty(trim($translationContent));
 
 $customButtons = [];
 
@@ -32,8 +32,8 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'item' => $entity,
-            'customButtons' => (isset($customButtons)) ? $customButtons : [],
+            'item'            => $entity,
+            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
                 'edit' => $view['security']->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:editown'],

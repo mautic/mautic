@@ -1,30 +1,26 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Knp\Menu\Twig\Helper as KnpHelper;
-use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\ItemInterface;
+use Knp\Menu\Matcher\MatcherInterface;
+use Knp\Menu\Twig\Helper as KnpHelper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * Class MenuHelper
+ * Class MenuHelper.
  */
 class MenuHelper extends Helper
 {
-
     /**
      * @var KnpHelper
      */
@@ -49,17 +45,17 @@ class MenuHelper extends Helper
     }
 
     /**
-     * Parses attributes for the menu view
+     * Parses attributes for the menu view.
      *
      * @param $attributes
      * @param $overrides
      *
      * @return string
      */
-    public function parseAttributes($attributes, $overrides = array())
+    public function parseAttributes($attributes, $overrides = [])
     {
         if (!is_array($attributes)) {
-            $attributes = array();
+            $attributes = [];
         }
 
         $attributes = array_merge($attributes, $overrides);
@@ -79,7 +75,7 @@ class MenuHelper extends Helper
     }
 
     /**
-     * Concats the appropriate classes for menu links
+     * Concats the appropriate classes for menu links.
      *
      * @param ItemInterface    $item
      * @param MatcherInterface $matcher
@@ -87,17 +83,17 @@ class MenuHelper extends Helper
      */
     public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options)
     {
-        $isAncestor   = $matcher->isAncestor($item, $options['matchingDepth']);
-        $isCurrent    = $matcher->isCurrent($item);
+        $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
+        $isCurrent  = $matcher->isCurrent($item);
 
-        $class    = $item->getAttribute('class');
-        $classes  = ($class) ? " {$class}" : "";
-        $classes .= ($isCurrent) ? " {$options['currentClass']}" : "";
-        $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : "";
-        $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : "";
-        $classes .= ($item->actsLikeFirst()) ? " {$options['firstClass']}" : "";
-        $classes .= ($item->actsLikeLast()) ? " {$options['lastClass']}" : "";
-        $item->setAttribute("class", trim($classes));
+        $class   = $item->getAttribute('class');
+        $classes = ($class) ? " {$class}" : '';
+        $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
+        $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
+        $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
+        $classes .= ($item->actsLikeFirst()) ? " {$options['firstClass']}" : '';
+        $classes .= ($item->actsLikeLast()) ? " {$options['lastClass']}" : '';
+        $item->setAttribute('class', trim($classes));
     }
 
     /**
@@ -127,7 +123,7 @@ class MenuHelper extends Helper
      *
      * @return \Knp\Menu\ItemInterface
      */
-    public function get($menu, array $path = array(), array $options = array())
+    public function get($menu, array $path = [], array $options = [])
     {
         return $this->helper->get($menu, $path, $options);
     }
@@ -141,7 +137,7 @@ class MenuHelper extends Helper
      *
      * @return string
      */
-    public function render($menu, array $options = array(), $renderer = null)
+    public function render($menu, array $options = [], $renderer = null)
     {
         if (null === $renderer) {
             $renderer = $menu;

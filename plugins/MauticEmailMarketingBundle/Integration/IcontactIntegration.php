@@ -1,26 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 /**
- * Class IcontactIntegration
+ * Class IcontactIntegration.
  */
 class IcontactIntegration extends EmailAbstractIntegration
 {
-
     /**
      * {@inheritdoc}
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return 'Icontact';
     }
@@ -28,7 +29,7 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @return string
      */
-    public function getDisplayName ()
+    public function getDisplayName()
     {
         return 'iContact';
     }
@@ -39,17 +40,17 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret.
      *
      * @return array
      */
-    public function getRequiredKeyFields ()
+    public function getRequiredKeyFields()
     {
-        return array(
-            'API-AppId'      => 'mautic.icontact.keyfield.appid',
-            'API-Username'   => 'mautic.icontact.keyfield.username',
-            'API-Password'   => 'mautic.icontact.keyfield.password'
-        );
+        return [
+            'API-AppId'    => 'mautic.icontact.keyfield.appid',
+            'API-Username' => 'mautic.icontact.keyfield.username',
+            'API-Password' => 'mautic.icontact.keyfield.password',
+        ];
     }
 
     /**
@@ -57,9 +58,9 @@ class IcontactIntegration extends EmailAbstractIntegration
      */
     public function getSecretKeys()
     {
-        return array(
-            'API-Password'
-        );
+        return [
+            'API-Password',
+        ];
     }
 
     public function getApiUrl()
@@ -68,12 +69,12 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * Get account ID and client folder ID
+     * Get account ID and client folder ID.
      *
      * @param array $settings
      * @param array $parameters
      */
-    public function authCallback($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         $url = $this->getApiUrl();
 
@@ -89,11 +90,11 @@ class IcontactIntegration extends EmailAbstractIntegration
             return $response['errors']['message'];
         }
 
-        $keys = array();
+        $keys = [];
         if (!empty($response['accounts'])) {
             $keys['accountId'] = $response['accounts'][0]['accountId'];
 
-            $url .= '/' . $keys['accountId'] . '/c';
+            $url .= '/'.$keys['accountId'].'/c';
             $response = $this->makeRequest($url, $parameters);
 
             if (!empty($response['clientfolders'])) {
@@ -112,17 +113,17 @@ class IcontactIntegration extends EmailAbstractIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
+    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
     {
-        $settings['headers'] = array(
+        $settings['headers'] = [
             'Except:',
             'Accept: application/json',
             'Content-Type: application/json',
             'Api-Version: 2.2',
-            'Api-AppId: ' . $this->keys['API-AppId'],
-            'Api-Username: ' . $this->keys['API-Username'],
-            'API-Password: ' . $this->keys['API-Password']
-        );
+            'Api-AppId: '.$this->keys['API-AppId'],
+            'Api-Username: '.$this->keys['API-Username'],
+            'API-Password: '.$this->keys['API-Password'],
+        ];
 
         return parent::makeRequest($url, $parameters, $method, $settings);
     }
@@ -147,31 +148,31 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * Returns settings for the integration form
+     * Returns settings for the integration form.
      *
      * @return array
      */
     public function getFormSettings()
     {
-        return array(
+        return [
             'requires_callback'      => false,
-            'requires_authorization' => true
-        );
+            'requires_authorization' => true,
+        ];
     }
 
     /**
      * @return array
      */
-    public function getAvailableLeadFields ($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
         if (!$this->isAuthorized()) {
-            return array();
+            return [];
         }
 
-        static $leadFields = array();
+        static $leadFields = [];
 
         if (empty($leadFields)) {
-            $fields = array(
+            $fields = [
                 'email',
                 'prefix',
                 'firstName',
@@ -184,27 +185,27 @@ class IcontactIntegration extends EmailAbstractIntegration
                 'postalCode',
                 'phone',
                 'fax',
-                'business'
-            );
+                'business',
+            ];
 
-            $leadFields = array();
+            $leadFields = [];
             foreach ($fields as $f) {
-                $leadFields[$f] = array(
-                    'label' => $this->factory->getTranslator()->trans('mautic.icontact.field.' . $f),
-                    'type'  => 'string',
-                    'required' => ($f == 'email' ) ? true : false
-                );
+                $leadFields[$f] = [
+                    'label'    => $this->factory->getTranslator()->trans('mautic.icontact.field.'.$f),
+                    'type'     => 'string',
+                    'required' => ($f == 'email') ? true : false,
+                ];
             }
 
-           $customfields = $this->getApiHelper()->getCustomFields();
+            $customfields = $this->getApiHelper()->getCustomFields();
 
             if (!empty($customfields['customfields'])) {
                 foreach ($customfields['customfields'] as $field) {
-                    $leadFields['cf_' . $field['customFieldId']] = array(
+                    $leadFields['cf_'.$field['customFieldId']] = [
                         'label'    => $field['publicName'],
                         'type'     => 'string',
-                        'required' => false
-                    );
+                        'required' => false,
+                    ];
                 }
             }
         }
@@ -212,11 +213,10 @@ class IcontactIntegration extends EmailAbstractIntegration
         return $leadFields;
     }
 
-
     /**
      * @param $lead
      */
-    public function pushLead($lead, $config = array())
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -232,7 +232,7 @@ class IcontactIntegration extends EmailAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $customfields = array();
+                $customfields = [];
                 foreach ($mappedData as $k => &$v) {
                     if (strpos($k, 'cf_') === 0) {
                         $customfields[str_replace('cf_', '', $k)] = (string) $v;

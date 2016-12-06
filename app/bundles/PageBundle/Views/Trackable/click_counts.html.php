@@ -11,11 +11,11 @@
             </thead>
             <tbody>
                 <?php 
-                    $totalClicks = 0;
+                    $totalClicks       = 0;
                     $totalUniqueClicks = 0;
-                    foreach ($trackables as $link): 
-                        $totalClicks +=  $link['hits'];
-                        $totalUniqueClicks +=  $link['unique_hits'];
+                    foreach ($trackables as $link):
+                        $totalClicks += $link['hits'];
+                        $totalUniqueClicks += $link['unique_hits'];
                         ?>
                         <tr>
                             <td class="long-text"><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
@@ -38,10 +38,10 @@
 <?php else: ?>
     <?php echo $view->render(
         'MauticCoreBundle:Helper:noresults.html.php',
-        array(
+        [
             'header'  => 'mautic.trackable.click_counts.header_none',
-            'message' => 'mautic.trackable.click_counts.none'
-        )
+            'message' => 'mautic.trackable.click_counts.none',
+        ]
     ); ?>
     <div class="clearfix"></div>
 <?php endif; ?>

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +16,10 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\HttpFoundation;
 
 /**
- * Class ReportController
+ * Class ReportController.
  */
 class ReportController extends FormController
 {
-
     /**
      * @param int $page
      *
@@ -40,9 +41,9 @@ class ReportController extends FormController
                 'report:reports:deleteown',
                 'report:reports:deleteother',
                 'report:reports:publishown',
-                'report:reports:publishother'
+                'report:reports:publishother',
             ],
-            "RETURN_ARRAY"
+            'RETURN_ARRAY'
         );
 
         if (!$permissions['report:reports:viewown'] && !$permissions['report:reports:viewother']) {
@@ -54,7 +55,7 @@ class ReportController extends FormController
         }
 
         //set limits
-        $limit = $this->container->get('session')->get('mautic.report.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -66,7 +67,7 @@ class ReportController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['report:reports:viewother']) {
-            $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+            $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         $orderBy    = $this->container->get('session')->get('mautic.report.orderby', 'r.name');
@@ -78,7 +79,7 @@ class ReportController extends FormController
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'orderByDir' => $orderByDir,
             ]
         );
 
@@ -96,8 +97,8 @@ class ReportController extends FormController
                     'contentTemplate' => 'MauticReportBundle:Report:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
-                        'mauticContent' => 'report'
-                    ]
+                        'mauticContent' => 'report',
+                    ],
                 ]
             );
         }
@@ -109,7 +110,7 @@ class ReportController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'searchValue' => $search,
                     'items'       => $reports,
                     'totalItems'  => $count,
@@ -118,20 +119,20 @@ class ReportController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                     'tmpl'        => $tmpl,
-                    'security'    => $this->container->get('mautic.security')
+                    'security'    => $this->container->get('mautic.security'),
                 ],
                 'contentTemplate' => 'MauticReportBundle:Report:list.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
-                    'route'         => $this->generateUrl('mautic_report_index', ['page' => $page])
-                ]
+                    'route'         => $this->generateUrl('mautic_report_index', ['page' => $page]),
+                ],
             ]
         );
     }
 
     /**
-     * Clone an entity
+     * Clone an entity.
      *
      * @param int $objectId
      *
@@ -162,7 +163,7 @@ class ReportController extends FormController
     }
 
     /**
-     * Deletes the entity
+     * Deletes the entity.
      *
      * @param $objectId
      *
@@ -180,8 +181,8 @@ class ReportController extends FormController
             'contentTemplate' => 'MauticReportBundle:Report:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
-                'mauticContent' => 'report'
-            ]
+                'mauticContent' => 'report',
+            ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
@@ -209,8 +210,8 @@ class ReportController extends FormController
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => [
                     '%name%' => $identifier,
-                    '%id%'   => $objectId
-                ]
+                    '%id%'   => $objectId,
+                ],
             ];
         } //else don't do anything
 
@@ -218,14 +219,14 @@ class ReportController extends FormController
             array_merge(
                 $postActionVars,
                 [
-                    'flashes' => $flashes
+                    'flashes' => $flashes,
                 ]
             )
         );
     }
 
     /**
-     * Deletes a group of entities
+     * Deletes a group of entities.
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -241,8 +242,8 @@ class ReportController extends FormController
             'contentTemplate' => 'MauticReportBundle:Report:index',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
-                'mauticContent' => 'report'
-            ]
+                'mauticContent' => 'report',
+            ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
@@ -258,7 +259,7 @@ class ReportController extends FormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.report.report.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->container->get('mautic.security')->hasEntityAccess(
                     'report:reports:deleteown',
@@ -282,8 +283,8 @@ class ReportController extends FormController
                     'type'    => 'notice',
                     'msg'     => 'mautic.report.report.notice.batch_deleted',
                     'msgVars' => [
-                        '%count%' => count($entities)
-                    ]
+                        '%count%' => count($entities),
+                    ],
                 ];
             }
         } //else don't do anything
@@ -292,14 +293,14 @@ class ReportController extends FormController
             array_merge(
                 $postActionVars,
                 [
-                    'flashes' => $flashes
+                    'flashes' => $flashes,
                 ]
             )
         );
     }
 
     /**
-     * Generates edit form and processes post data
+     * Generates edit form and processes post data.
      *
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
@@ -323,8 +324,8 @@ class ReportController extends FormController
             'contentTemplate' => 'MauticReportBundle:Report:index',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_report_index',
-                'mauticContent' => 'report'
-            ]
+                'mauticContent' => 'report',
+            ],
         ];
 
         //not found
@@ -337,7 +338,6 @@ class ReportController extends FormController
             'report'
         );
         if ($check !== true) {
-
             return $check;
         }
 
@@ -368,16 +368,16 @@ class ReportController extends FormController
                                 'mautic_report_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
+                                    'objectId'     => $entity->getId(),
                                 ]
-                            )
+                            ),
                         ]
                     );
 
-                    $returnUrl  = $this->generateUrl(
+                    $returnUrl = $this->generateUrl(
                         'mautic_report_view',
                         [
-                            'objectId' => $entity->getId()
+                            'objectId' => $entity->getId(),
                         ]
                     );
                     $viewParams = ['objectId' => $entity->getId()];
@@ -408,7 +408,7 @@ class ReportController extends FormController
                         [
                             'returnUrl'       => $returnUrl,
                             'viewParameters'  => $viewParams,
-                            'contentTemplate' => $template
+                            'contentTemplate' => $template,
                         ]
                     )
                 );
@@ -423,7 +423,7 @@ class ReportController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'report' => $entity,
                     'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
                 ],
@@ -435,18 +435,18 @@ class ReportController extends FormController
                         'mautic_report_action',
                         [
                             'objectAction' => 'edit',
-                            'objectId'     => $entity->getId()
+                            'objectId'     => $entity->getId(),
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
 
     /**
-     * Generates new form and processes post data
+     * Generates new form and processes post data.
      *
-     * @param  \Mautic\ReportBundle\Entity\Report|null $entity
+     * @param \Mautic\ReportBundle\Entity\Report|null $entity
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
@@ -487,9 +487,9 @@ class ReportController extends FormController
                                 'mautic_report_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
+                                    'objectId'     => $entity->getId(),
                                 ]
-                            )
+                            ),
                         ]
                     );
 
@@ -499,10 +499,10 @@ class ReportController extends FormController
                     }
 
                     $viewParameters = [
-                        'objectId' => $entity->getId()
+                        'objectId' => $entity->getId(),
                     ];
-                    $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
-                    $template       = 'MauticReportBundle:Report:view';
+                    $returnUrl = $this->generateUrl('mautic_report_view', $viewParameters);
+                    $template  = 'MauticReportBundle:Report:view';
                 }
             } else {
                 $viewParameters = ['page' => $page];
@@ -518,8 +518,8 @@ class ReportController extends FormController
                         'contentTemplate' => $template,
                         'passthroughVars' => [
                             'activeLink'    => 'mautic_asset_index',
-                            'mauticContent' => 'asset'
-                        ]
+                            'mauticContent' => 'asset',
+                        ],
                     ]
                 );
             }
@@ -527,9 +527,9 @@ class ReportController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'report' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report')
+                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
                 ],
                 'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
                 'passthroughVars' => [
@@ -538,18 +538,18 @@ class ReportController extends FormController
                     'route'         => $this->generateUrl(
                         'mautic_report_action',
                         [
-                            'objectAction' => 'new'
+                            'objectAction' => 'new',
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
 
     /**
-     * Shows a report
+     * Shows a report.
      *
-     * @param int $objectId Report ID
+     * @param int $objectId   Report ID
      * @param int $reportPage
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\Response
@@ -571,15 +571,15 @@ class ReportController extends FormController
                     'contentTemplate' => 'MauticReportBundle:Report:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
-                        'mauticContent' => 'report'
+                        'mauticContent' => 'report',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.report.report.error.notfound',
-                            'msgVars' => ['%id%' => $objectId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
@@ -653,24 +653,24 @@ class ReportController extends FormController
                 'paginate'       => true,
                 'reportPage'     => $reportPage,
                 'dateFrom'       => new \DateTime($dateRangeForm->get('date_from')->getData()),
-                'dateTo'         => new \DateTime($dateRangeForm->get('date_to')->getData())
+                'dateTo'         => new \DateTime($dateRangeForm->get('date_to')->getData()),
             ]
         );
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
-                    'data'              => $reportData['data'],
-                    'columns'           => $reportData['columns'],
-                    'dataColumns'       => $reportData['dataColumns'],
-                    'totalResults'      => $reportData['totalResults'],
-                    'debug'             => $reportData['debug'],
-                    'report'            => $entity,
-                    'reportPage'        => $reportPage,
-                    'graphs'            => $reportData['graphs'],
-                    'tmpl'              => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'limit'             => $reportData['limit'],
-                    'permissions'       => $security->isGranted(
+                'viewParameters' => [
+                    'data'         => $reportData['data'],
+                    'columns'      => $reportData['columns'],
+                    'dataColumns'  => $reportData['dataColumns'],
+                    'totalResults' => $reportData['totalResults'],
+                    'debug'        => $reportData['debug'],
+                    'report'       => $entity,
+                    'reportPage'   => $reportPage,
+                    'graphs'       => $reportData['graphs'],
+                    'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'limit'        => $reportData['limit'],
+                    'permissions'  => $security->isGranted(
                         [
                             'report:reports:viewown',
                             'report:reports:viewother',
@@ -678,9 +678,9 @@ class ReportController extends FormController
                             'report:reports:editown',
                             'report:reports:editother',
                             'report:reports:deleteown',
-                            'report:reports:deleteother'
+                            'report:reports:deleteother',
                         ],
-                        "RETURN_ARRAY"
+                        'RETURN_ARRAY'
                     ),
                     'dateRangeForm'     => $dateRangeForm->createView(),
                     'dynamicFilterForm' => $dynamicFilterForm->createView(),
@@ -693,16 +693,16 @@ class ReportController extends FormController
                         'mautic_report_view',
                         [
                             'objectId'   => $entity->getId(),
-                            'reportPage' => $reportPage
+                            'reportPage' => $reportPage,
                         ]
-                    )
-                ]
+                    ),
+                ],
             ]
         );
     }
 
     /**
-     * Checks access to an entity
+     * Checks access to an entity.
      *
      * @param object                               $entity
      * @param int                                  $objectId
@@ -723,9 +723,9 @@ class ReportController extends FormController
                             [
                                 'type'    => 'error',
                                 'msg'     => 'mautic.report.report.error.notfound',
-                                'msgVars' => ['%id%' => $objectId]
-                            ]
-                        ]
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
                     ]
                 )
             );
@@ -739,12 +739,12 @@ class ReportController extends FormController
         return true;
     }
 
-
     /**
      * @param int    $objectId
      * @param string $format
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
      * @throws \Exception
      */
     public function exportAction($objectId, $format = 'csv')
@@ -764,28 +764,28 @@ class ReportController extends FormController
                     'contentTemplate' => 'MauticReportBundle:Report:index',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
-                        'mauticContent' => 'report'
+                        'mauticContent' => 'report',
                     ],
-                    'flashes'         => [
+                    'flashes' => [
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.report.report.error.notfound',
-                            'msgVars' => ['%id%' => $objectId]
-                        ]
-                    ]
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
                 ]
             );
         } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         }
 
-        $session    = $this->get('session');
-        $fromDate   = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
-        $toDate     = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
+        $session  = $this->get('session');
+        $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
+        $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
         $reportData = $model->getReportData($entity, null, [
             'dateFrom' => new \DateTime($fromDate),
-            'dateTo'   => new \DateTime($toDate)
+            'dateTo'   => new \DateTime($toDate),
         ]);
 
         return $model->exportResults($format, $entity, $reportData);

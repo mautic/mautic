@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,21 +27,26 @@ class EmailRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDoNotEmailList()
+    public function getDoNotEmailList($leadIds = [])
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('distinct(l.email)')
+        $q->select('l.id, l.email')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
+        if ($leadIds) {
+            $q->andWhere(
+                $q->expr()->in('l.id', $leadIds)
+            );
+        }
+
         $results = $q->execute()->fetchAll();
 
         $dnc = [];
-
         foreach ($results as $r) {
-            $dnc[] = strtolower($r['email']);
+            $dnc[$r['id']] = strtolower($r['email']);
         }
 
         return $dnc;
@@ -64,7 +70,7 @@ class EmailRepository extends CommonRepository
             ->setParameter('email', $email);
 
         $results = $q->execute()->fetchAll();
-        $dnc = count($results) ? $results[0] : null;
+        $dnc     = count($results) ? $results[0] : null;
 
         if ($dnc === null) {
             return false;
@@ -73,11 +79,11 @@ class EmailRepository extends CommonRepository
         $dnc['reason'] = (int) $dnc['reason'];
 
         return [
-            'id' => $dnc['id'],
+            'id'           => $dnc['id'],
             'unsubscribed' => ($dnc['reason'] === DoNotContact::UNSUBSCRIBED),
-            'bounced' => ($dnc['reason'] === DoNotContact::BOUNCED),
-            'manual' => ($dnc['reason'] === DoNotContact::MANUAL),
-            'comments' => $dnc['comments'],
+            'bounced'      => ($dnc['reason'] === DoNotContact::BOUNCED),
+            'manual'       => ($dnc['reason'] === DoNotContact::MANUAL),
+            'comments'     => $dnc['comments'],
         ];
     }
 
@@ -93,7 +99,7 @@ class EmailRepository extends CommonRepository
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadId = (array) $leadRepo->getLeadByEmail($email, true);
+        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = [];
@@ -133,7 +139,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (!isset($args['email_type']) || $args['email_type'] == 'list') {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
             $q->leftJoin('e.stats', 'es');
@@ -382,22 +388,10 @@ class EmailRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('e.name',  ":$unique"),
-            $q->expr()->like('e.subject', ":$unique")
-        );
-
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
-        return [
-            $expr,
-            ["$unique" => $string],
-        ];
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'e.name',
+            'e.subject',
+        ]);
     }
 
     /**
@@ -414,11 +408,11 @@ class EmailRepository extends CommonRepository
         $expr = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
@@ -429,19 +423,19 @@ class EmailRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
+                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('c.alias', ":$unique");
+                $expr           = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
-                $langUnique = $this->generateRandomParameterName();
-                $langValue = $filter->string.'_%';
+                $langUnique      = $this->generateRandomParameterName();
+                $langValue       = $filter->string.'_%';
                 $forceParameters = [
                     $langUnique => $langValue,
-                    $unique => $filter->string,
+                    $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->orX(
                     $q->expr()->eq('e.language', ":$unique"),
@@ -459,7 +453,7 @@ class EmailRepository extends CommonRepository
         } elseif (!$returnParameter) {
             $parameters = [];
         } else {
-            $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
 
@@ -545,5 +539,29 @@ class EmailRepository extends CommonRepository
         }
 
         $q->execute();
+    }
+
+    /**
+     * @param null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     */
+    public function getPublishedBroadcasts($id = null)
+    {
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
+        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
+        );
+
+        if (!empty($id)) {
+            $expr->add(
+                $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
+            );
+        }
+        $qb->where($expr);
+
+        return $qb->getQuery()->iterate();
     }
 }

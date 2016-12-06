@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,8 +13,8 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class MailchimpApi extends EmailMarketingApi{
-
+class MailchimpApi extends EmailMarketingApi
+{
     private $version = '2.0';
 
     /**
@@ -21,15 +23,15 @@ class MailchimpApi extends EmailMarketingApi{
      * @param string $method
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, $parameters = array(), $method = 'GET')
+    protected function request($endpoint, $parameters = [], $method = 'GET')
     {
         if (isset($this->keys['password'])) {
             // Extract the dc from the key
-            $parts   = explode('-', $this->keys['password']);
+            $parts = explode('-', $this->keys['password']);
             if (count($parts) !== 2) {
-
                 throw new ApiErrorException('Invalid key');
             }
 
@@ -42,38 +44,37 @@ class MailchimpApi extends EmailMarketingApi{
         }
         $url = sprintf('%s/%s/%s', $apiUrl, $this->version, $endpoint);
 
-        $response = $this->integration->makeRequest($url, $parameters, $method, array('encode_parameters' => 'json'));
+        $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json']);
 
         if (is_array($response) && !empty($response['status']) && $response['status'] == 'error') {
-
             throw new ApiErrorException($response['error']);
         } elseif (is_array($response) && !empty($response['errors'])) {
-            $errors = array();
+            $errors = [];
             foreach ($response['errors'] as $error) {
                 $errors[] = $error['error'];
             }
 
             throw new ApiErrorException(implode(' ', $errors));
         } else {
-
             return $response;
         }
     }
 
     public function getLists()
     {
-        return $this->request('lists/list', array('limit' => 100));
+        return $this->request('lists/list', ['limit' => 100]);
     }
 
     /**
      * @param $listId
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getCustomFields($listId)
     {
-        return $this->request('lists/merge-vars', array('id' => array($listId)));
+        return $this->request('lists/merge-vars', ['id' => [$listId]]);
     }
 
     /**
@@ -83,17 +84,18 @@ class MailchimpApi extends EmailMarketingApi{
      * @param array $config
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    public function subscribeLead($email, $listId, $fields = array(), $config = array())
+    public function subscribeLead($email, $listId, $fields = [], $config = [])
     {
         $emailStruct        = new \stdClass();
         $emailStruct->email = $email;
 
-        $parameters = array_merge($config, array(
-            'id'           => $listId,
-            'merge_vars'   => $fields,
-        ));
+        $parameters = array_merge($config, [
+            'id'         => $listId,
+            'merge_vars' => $fields,
+        ]);
         $parameters['email'] = $emailStruct;
 
         return $this->request('lists/subscribe', $parameters, 'POST');

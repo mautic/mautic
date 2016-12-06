@@ -6263,6 +6263,103 @@ button.close {
   }
 }
 /*!
+ * bootstrap-vertical-tabs - v1.1.0
+ * https://dbtek.github.io/bootstrap-vertical-tabs
+ * 2014-06-06
+ * Copyright (c) 2014 Ä°smail Demirbilek
+ * License: MIT
+ */
+.tabs-left,
+.tabs-right {
+  border-bottom: none;
+  padding-top: 2px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.tabs-left {
+  border-right: 1px solid #ddd;
+  padding-right: 0 !important;
+}
+.tabs-right {
+  border-left: 1px solid #ddd;
+  padding-left: 0 !important;
+}
+.tabs-left > li,
+.tabs-right > li {
+  float: none;
+  margin-bottom: 2px;
+}
+.tabs-left > li {
+  margin-right: -1px;
+}
+.tabs-right > li {
+  margin-left: -1px;
+}
+.tabs-left > li.active > a,
+.tabs-left > li.active > a:hover,
+.tabs-left > li.active > a:focus {
+  border-bottom-color: #ddd;
+  border-right-color: transparent;
+}
+.tabs-right > li.active > a,
+.tabs-right > li.active > a:hover,
+.tabs-right > li.active > a:focus {
+  border-bottom: 1px solid #ddd;
+  border-left-color: transparent;
+}
+.tabs-left > li > a {
+  border-radius: 4px 0 0 4px;
+  margin-right: 0;
+  display: block;
+}
+.tabs-right > li > a {
+  border-radius: 0 4px 4px 0;
+  margin-right: 0;
+}
+.vertical-text {
+  margin-top: 50px;
+  border: none;
+  position: relative;
+}
+.vertical-text > li {
+  height: 20px;
+  width: 120px;
+  margin-bottom: 100px;
+}
+.vertical-text > li > a {
+  border-bottom: 1px solid #ddd;
+  border-right-color: transparent;
+  text-align: center;
+  border-radius: 4px 4px 0px 0px;
+}
+.vertical-text > li.active > a,
+.vertical-text > li.active > a:hover,
+.vertical-text > li.active > a:focus {
+  border-bottom-color: transparent;
+  border-right-color: #ddd;
+  border-left-color: #ddd;
+}
+.vertical-text.tabs-left {
+  left: -50px;
+}
+.vertical-text.tabs-right {
+  right: -50px;
+}
+.vertical-text.tabs-right > li {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.vertical-text.tabs-left > li {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+/*!
  *  Font Awesome 4.3.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
@@ -15921,306 +16018,6 @@ iframe.fr-iframe {
 .fr-sticky-on + .fr-sticky-dummy,
 .fr-sticky-box > .fr-sticky-dummy {
   display: block;
-}
-/*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
- * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
- */
-.clearfix::after,
-.dl-horizontal dd::after,
-.container::after,
-.container-fluid::after,
-.row::after,
-.form-horizontal .form-group::after,
-.btn-toolbar::after,
-.btn-group-vertical > .btn-group::after,
-.nav::after,
-.navbar::after,
-.navbar-header::after,
-.navbar-collapse::after,
-.pager::after,
-.panel-body::after,
-.modal-footer::after {
-  clear: both;
-  display: block;
-  content: "";
-  height: 0;
-}
-.fr-view strong {
-  font-weight: 700;
-}
-.fr-view table {
-  border: none;
-  border-collapse: collapse;
-  empty-cells: show;
-  max-width: 100%;
-}
-.fr-view table.fr-dashed-borders td,
-.fr-view table.fr-dashed-borders th {
-  border-style: dashed;
-}
-.fr-view table.fr-alternate-rows tbody tr:nth-child(2n) {
-  background: #f5f5f5;
-}
-.fr-view table td,
-.fr-view table th {
-  border: 1px solid #dddddd;
-}
-.fr-view table td:empty,
-.fr-view table th:empty {
-  height: 20px;
-}
-.fr-view table td.fr-highlighted,
-.fr-view table th.fr-highlighted {
-  border: 1px double red;
-}
-.fr-view table td.fr-thick,
-.fr-view table th.fr-thick {
-  border-width: 2px;
-}
-.fr-view table th {
-  background: #e6e6e6;
-}
-.fr-view hr {
-  clear: both;
-  user-select: none;
-  -o-user-select: none;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  page-break-after: always;
-}
-.fr-view .fr-file {
-  position: relative;
-}
-.fr-view .fr-file::after {
-  position: relative;
-  content: "\1F4CE";
-  font-weight: normal;
-}
-.fr-view pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-.fr-view[dir="rtl"] blockquote {
-  border-left: none;
-  border-right: solid 2px #5e35b1;
-  margin-right: 0;
-  padding-right: 5px;
-  padding-left: 0px;
-}
-.fr-view[dir="rtl"] blockquote blockquote {
-  border-color: #00bcd4;
-}
-.fr-view[dir="rtl"] blockquote blockquote blockquote {
-  border-color: #43a047;
-}
-.fr-view blockquote {
-  border-left: solid 2px #5e35b1;
-  margin-left: 0;
-  padding-left: 5px;
-  color: #5e35b1;
-}
-.fr-view blockquote blockquote {
-  border-color: #00bcd4;
-  color: #00bcd4;
-}
-.fr-view blockquote blockquote blockquote {
-  border-color: #43a047;
-  color: #43a047;
-}
-.fr-view span.fr-emoticon {
-  font-weight: normal;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "NotoColorEmoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols";
-  display: inline;
-  line-height: 0;
-}
-.fr-view span.fr-emoticon.fr-emoticon-img {
-  background-repeat: no-repeat !important;
-  font-size: inherit;
-  height: 1em;
-  width: 1em;
-  min-height: 20px;
-  min-width: 20px;
-  display: inline-block;
-  margin: -0.1em 0.1em 0.1em;
-  line-height: 1;
-  vertical-align: middle;
-}
-.fr-view .fr-text-gray {
-  color: #AAA !important;
-}
-.fr-view .fr-text-bordered {
-  border-top: solid 1px #222;
-  border-bottom: solid 1px #222;
-  padding: 10px 0;
-}
-.fr-view .fr-text-spaced {
-  letter-spacing: 1px;
-}
-.fr-view .fr-text-uppercase {
-  text-transform: uppercase;
-}
-.fr-view img {
-  position: relative;
-  max-width: 100%;
-}
-.fr-view img.fr-dib {
-  margin: 5px auto;
-  display: block;
-  float: none;
-  vertical-align: top;
-}
-.fr-view img.fr-dib.fr-fil {
-  margin-left: 0;
-}
-.fr-view img.fr-dib.fr-fir {
-  margin-right: 0;
-}
-.fr-view img.fr-dii {
-  display: inline-block;
-  float: none;
-  vertical-align: bottom;
-  margin-left: 5px;
-  margin-right: 5px;
-  max-width: calc(90%);
-}
-.fr-view img.fr-dii.fr-fil {
-  float: left;
-  margin: 5px 5px 5px 0;
-  max-width: calc(95%);
-}
-.fr-view img.fr-dii.fr-fir {
-  float: right;
-  margin: 5px 0 5px 5px;
-  max-width: calc(95%);
-}
-.fr-view img.fr-rounded {
-  border-radius: 100%;
-  -moz-border-radius: 100%;
-  -webkit-border-radius: 100%;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-}
-.fr-view img.fr-bordered {
-  border: solid 10px #CCC;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.fr-view .fr-video {
-  text-align: center;
-  position: relative;
-}
-.fr-view .fr-video > * {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-  max-width: 100%;
-  border: none;
-}
-.fr-view .fr-video.fr-dvb {
-  display: block;
-  clear: both;
-}
-.fr-view .fr-video.fr-dvb.fr-fvl {
-  text-align: left;
-}
-.fr-view .fr-video.fr-dvb.fr-fvr {
-  text-align: right;
-}
-.fr-view .fr-video.fr-dvi {
-  display: inline-block;
-}
-.fr-view .fr-video.fr-dvi.fr-fvl {
-  float: left;
-}
-.fr-view .fr-video.fr-dvi.fr-fvr {
-  float: right;
-}
-.fr-view a.fr-strong {
-  font-weight: 700;
-}
-.fr-view a.fr-green {
-  color: green;
-}
-.fr-view button.fr-rounded,
-.fr-view input.fr-rounded,
-.fr-view textarea.fr-rounded {
-  border-radius: 10px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-}
-.fr-view button.fr-large,
-.fr-view input.fr-large,
-.fr-view textarea.fr-large {
-  font-size: 24px;
-}
-/**
- * Image style.
- */
-a.fr-view.fr-strong {
-  font-weight: 700;
-}
-a.fr-view.fr-green {
-  color: green;
-}
-/**
- * Link style.
- */
-img.fr-view {
-  position: relative;
-  max-width: 100%;
-}
-img.fr-view.fr-dib {
-  margin: 5px auto;
-  display: block;
-  float: none;
-  vertical-align: top;
-}
-img.fr-view.fr-dib.fr-fil {
-  margin-left: 0;
-}
-img.fr-view.fr-dib.fr-fir {
-  margin-right: 0;
-}
-img.fr-view.fr-dii {
-  display: inline-block;
-  float: none;
-  vertical-align: bottom;
-  margin-left: 5px;
-  margin-right: 5px;
-  max-width: calc(90%);
-}
-img.fr-view.fr-dii.fr-fil {
-  float: left;
-  margin: 5px 5px 5px 0;
-  max-width: calc(95%);
-}
-img.fr-view.fr-dii.fr-fir {
-  float: right;
-  margin: 5px 0 5px 5px;
-  max-width: calc(95%);
-}
-img.fr-view.fr-rounded {
-  border-radius: 100%;
-  -moz-border-radius: 100%;
-  -webkit-border-radius: 100%;
-  -moz-background-clip: padding;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-}
-img.fr-view.fr-bordered {
-  border: solid 10px #CCC;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
 }
 /*!
  * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)

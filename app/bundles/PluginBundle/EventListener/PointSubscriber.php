@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,33 +16,32 @@ use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 
 /**
- * Class PointSubscriber
+ * Class PointSubscriber.
  */
 class PointSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            PointEvents::TRIGGER_ON_BUILD => array('onTriggerBuild', 0)
-        );
+        return [
+            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
+        ];
     }
 
     /**
      * @param TriggerBuilderEvent $event
      */
-    public function onTriggerBuild (TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event)
     {
-        $action = array(
+        $action = [
             'group'     => 'mautic.plugin.point.action',
             'label'     => 'mautic.plugin.actions.push_lead',
             'formType'  => 'integration_list',
             'formTheme' => 'MauticPluginBundle:FormTheme\Integration',
-            'callback'  => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
-        );
+            'callback'  => ['\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead'],
+        ];
 
         $event->addEvent('plugin.leadpush', $action);
     }

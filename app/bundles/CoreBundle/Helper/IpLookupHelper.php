@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class IpLookupHelper
+ * Class IpLookupHelper.
  */
 class IpLookupHelper
 {
@@ -81,7 +83,7 @@ class IpLookupHelper
                 'HTTP_X_CLUSTER_CLIENT_IP',
                 'HTTP_FORWARDED_FOR',
                 'HTTP_FORWARDED',
-                'REMOTE_ADDR'
+                'REMOTE_ADDR',
             ];
 
             foreach ($ipHolders as $key) {
@@ -94,7 +96,6 @@ class IpLookupHelper
 
                     // Validate IP
                     if (null !== $ip && $this->ipIsValid($ip)) {
-
                         return $ip;
                     }
                 }
@@ -106,7 +107,7 @@ class IpLookupHelper
     }
 
     /**
-     * Get an IpAddress entity for current session or for passed in IP address
+     * Get an IpAddress entity for current session or for passed in IP address.
      *
      * @param string $ip
      *
@@ -125,7 +126,7 @@ class IpLookupHelper
             $ip = '127.0.0.1';
         }
 
-        if (empty($ipAddress[$ip])) {
+        if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = ($ipAddress === null);
@@ -174,7 +175,7 @@ class IpLookupHelper
     }
 
     /**
-     * Validates if an IP address if valid
+     * Validates if an IP address if valid.
      *
      * @param $ip
      *
@@ -191,8 +192,6 @@ class IpLookupHelper
 
     /**
      * @param $ip
-     *
-     * @return null
      */
     protected function getClientIpFromProxyList($ip)
     {
@@ -213,7 +212,6 @@ class IpLookupHelper
         // X-Forwarded-For: client, proxy1, proxy2
         foreach ($ips as $ip) {
             if ($this->ipIsValid($ip)) {
-
                 return $ip;
             }
         }

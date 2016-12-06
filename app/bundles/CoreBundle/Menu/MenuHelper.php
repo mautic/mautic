@@ -1,26 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Menu;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Class MenuHelper
+ * Class MenuHelper.
  */
 class MenuHelper
 {
-
     /**
      * @var CorePermissions
      */
@@ -32,12 +31,7 @@ class MenuHelper
     protected $request;
 
     /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * Stores items that are assigned to another parent outside it's bundle
+     * Stores items that are assigned to another parent outside it's bundle.
      *
      * @var array
      */
@@ -51,48 +45,36 @@ class MenuHelper
     /**
      * MenuHelper constructor.
      *
-     * @param CorePermissions       $security
-     * @param TokenStorageInterface $tokenStorage
-     * @param RequestStack          $requestStack
-     * @param array                 $mauticParameters
+     * @param CorePermissions $security
+     * @param RequestStack    $requestStack
+     * @param array           $mauticParameters
      */
-    public function __construct(CorePermissions $security, TokenStorageInterface $tokenStorage, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters)
     {
         $this->security         = $security;
-        $this->user             = $tokenStorage->getToken()->getUser();
         $this->mauticParameters = $mauticParameters;
         $this->request          = $requestStack->getCurrentRequest();
     }
 
     /**
-     * Converts menu config into something KNP menus expects
+     * Converts menu config into something KNP menus expects.
      *
-     * @param      $items
-     * @param int  $depth
-     * @param int  $defaultPriority
+     * @param        $items
+     * @param int    $depth
+     * @param int    $defaultPriority
+     * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
                 continue;
             }
 
-            if (isset($i['bundle'])) {
-                // Category shortcut
-                $bundleName = $i['bundle'];
-                $i          = [
-                    'access'          => $bundleName.':categories:view',
-                    'route'           => 'mautic_category_index',
-                    'id'              => 'mautic_'.$bundleName.'category_index',
-                    'routeParameters' => ['bundle' => $bundleName],
-                ];
-            }
-
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
-                    if (!$this->user->isAdmin()) {
+                    if (!$this->security->isAdmin()) {
                         unset($items[$k]);
                         continue;
                     }
@@ -138,7 +120,7 @@ class MenuHelper
             if (!isset($i['linkAttributes'])) {
                 $i['linkAttributes'] = [
                     'data-menu-link' => $i['id'],
-                    'id'             => $i['id']
+                    'id'             => $i['id'],
                 ];
             } elseif (!isset($i['linkAttributes']['id'])) {
                 $i['linkAttributes']['id']             = $i['id'];
@@ -177,11 +159,15 @@ class MenuHelper
 
             // Determine if this item needs to be listed in a bundle outside it's own
             if (isset($i['parent'])) {
-                if (!isset($this->orphans[$i['parent']])) {
-                    $this->orphans[$i['parent']] = [];
+                if (!isset($this->orphans[$type])) {
+                    $this->orphans[$type] = [];
                 }
 
-                $this->orphans[$i['parent']][$k] = $i;
+                if (!isset($this->orphans[$type][$i['parent']])) {
+                    $this->orphans[$type][$i['parent']] = [];
+                }
+
+                $this->orphans[$type][$i['parent']][$k] = $i;
 
                 unset($items[$k]);
 
@@ -194,31 +180,33 @@ class MenuHelper
     }
 
     /**
-     * Get and reset orphaned menu items
+     * Get and reset orphaned menu items.
      *
-     * @return array
+     * @param string $type
+     *
+     * @return mixed
      */
-    public function resetOrphans()
+    public function resetOrphans($type = 'main')
     {
-        $orphans       = $this->orphans;
-        $this->orphans = [];
+        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $this->orphans[$type] = [];
 
         return $orphans;
     }
 
     /**
-     * Give orphaned menu items a home
+     * Give orphaned menu items a home.
      *
      * @param array $menuItems
      * @param bool  $appendOrphans
      * @param int   $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1)
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
     {
         foreach ($menuItems as $key => &$items) {
-            if (isset($this->orphans[$key])) {
+            if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
                 $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
-                foreach ($this->orphans[$key] as &$orphan) {
+                foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
                     }
@@ -228,28 +216,29 @@ class MenuHelper
                     }
                 }
 
-                $items['children'] = (!isset($items['children']))
+                $items['children'] =
+                    (!isset($items['children']))
                     ?
-                    $this->orphans[$key]
+                    $this->orphans[$type][$key]
                     :
-                    $items['children'] = array_merge($items['children'], $this->orphans[$key]);
-                unset($this->orphans[$key]);
+                    array_merge($items['children'], $this->orphans[$type][$key]);
+                unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
                 foreach ($items['children'] as $subKey => $subItems) {
-                    $this->placeOrphans($subItems, false, $depth + 1);
+                    $this->placeOrphans($subItems, false, $depth + 1, $type);
                 }
             }
         }
 
         // Append orphans that couldn't find a home
-        if ($appendOrphans && count($this->orphans)) {
-            $menuItems     = array_merge($menuItems, $this->orphans);
-            $this->orphans = [];
+        if ($appendOrphans && !empty($this->orphans[$type])) {
+            $menuItems            = array_merge($menuItems, $this->orphans[$type]);
+            $this->orphans[$type] = [];
         }
     }
 
     /**
-     * Sort menu items by priority
+     * Sort menu items by priority.
      *
      * @param $menuItems
      * @param $defaultPriority
@@ -277,7 +266,6 @@ class MenuHelper
             }
         );
     }
-
 
     /**
      * @param $name

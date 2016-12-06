@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,14 +21,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Form
- *
- * @package Mautic\FormBundle\Entity
- *
+ * Class Form.
  */
 class Form extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -60,7 +58,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction;
+    private $postAction = 'return';
 
     /**
      * @var string
@@ -105,6 +103,7 @@ class Form extends FormEntity
     /**
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
+     *
      * @var ArrayCollection
      */
     private $submissions;
@@ -120,16 +119,13 @@ class Form extends FormEntity
     private $formType;
 
     /**
-     * This var is used to cache the result once gained from the loop
+     * This var is used to cache the result once gained from the loop.
      *
-     * @var boolean
+     * @var bool
      */
     private $usesProgressiveProfiling = null;
 
-    /**
-     * @return void
-     */
-    public function __clone ()
+    public function __clone()
     {
         $this->id = null;
 
@@ -137,9 +133,9 @@ class Form extends FormEntity
     }
 
     /**
-     * Construct
+     * Construct.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
@@ -149,7 +145,7 @@ class Form extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -180,7 +176,7 @@ class Form extends FormEntity
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(array('order' => 'ASC'))
+            ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -188,7 +184,7 @@ class Form extends FormEntity
 
         $builder->createOneToMany('actions', 'Action')
             ->setIndexBy('id')
-            ->setOrderBy(array('order' => 'ASC'))
+            ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -209,7 +205,7 @@ class Form extends FormEntity
             ->build();
 
         $builder->createOneToMany('submissions', 'Submission')
-            ->setOrderBy(array('dateSubmitted' => 'DESC'))
+            ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
             ->fetchExtraLazy()
             ->build();
@@ -220,27 +216,31 @@ class Form extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
-            'groups'  => array('form')
-        )));
+            'groups'  => ['form'],
+        ]));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
             'message' => 'mautic.form.form.postactionproperty_message.notblank',
-            'groups'  => array('messageRequired')
-        )));
+            'groups'  => ['messageRequired'],
+        ]));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => array('urlRequired')
-        )));
+            'groups'  => ['urlRequired'],
+        ]));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url(array(
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url([
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => array('urlRequiredPassTwo')
-        )));
+            'groups'  => ['urlRequiredPassTwo'],
+        ]));
+
+        $metadata->addPropertyConstraint('formType', new Assert\Choice([
+            'choices' => ['standalone', 'campaign'],
+        ]));
     }
 
     /**
@@ -248,10 +248,10 @@ class Form extends FormEntity
      *
      * @return array
      */
-    public static function determineValidationGroups (\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
     {
         $data   = $form->getData();
-        $groups = array('form');
+        $groups = ['form'];
 
         $postAction = $data->getPostAction();
 
@@ -259,14 +259,13 @@ class Form extends FormEntity
             $groups[] = 'messageRequired';
         } elseif ($postAction == 'redirect') {
             $groups[] = 'urlRequired';
-            $groups[] = 'urlRequiredPassTwo';
         }
 
         return $groups;
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -274,15 +273,15 @@ class Form extends FormEntity
     {
         $metadata->setGroupPrefix('form')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'alias',
-                    'category'
-                )
+                    'category',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'description',
                     'cachedHtml',
                     'publishUp',
@@ -293,8 +292,10 @@ class Form extends FormEntity
                     'submissionCount',
                     'inKioskMode',
                     'renderStyle',
-                    'formType'
-                )
+                    'formType',
+                    'postAction',
+                    'postActionProperty',
+                ]
             )
             ->build();
     }
@@ -302,39 +303,37 @@ class Form extends FormEntity
     /**
      * @param $prop
      * @param $val
-     *
-     * @return void
      */
-    protected function isChanged ($prop, $val)
+    protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'actions' || $prop == 'fields') {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
+            $this->changes[$prop] = [$current, $val];
         }
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Form
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -343,23 +342,23 @@ class Form extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return Form
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -368,15 +367,15 @@ class Form extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ($truncate = false, $length = 45)
+    public function getDescription($truncate = false, $length = 45)
     {
         if ($truncate) {
             if (strlen($this->description) > $length) {
-                return substr($this->description, 0, $length) . "...";
+                return substr($this->description, 0, $length).'...';
             }
         }
 
@@ -384,13 +383,13 @@ class Form extends FormEntity
     }
 
     /**
-     * Set cachedHtml
+     * Set cachedHtml.
      *
      * @param string $cachedHtml
      *
      * @return Form
      */
-    public function setCachedHtml ($cachedHtml)
+    public function setCachedHtml($cachedHtml)
     {
         $this->cachedHtml = $cachedHtml;
 
@@ -398,17 +397,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Get cachedHtml
+     * Get cachedHtml.
      *
      * @return string
      */
-    public function getCachedHtml ()
+    public function getCachedHtml()
     {
         return $this->cachedHtml;
     }
 
     /**
-     * Get render style
+     * Get render style.
      *
      * @return string
      */
@@ -418,13 +417,13 @@ class Form extends FormEntity
     }
 
     /**
-     * Set postAction
+     * Set postAction.
      *
      * @param string $postAction
      *
      * @return Form
      */
-    public function setPostAction ($postAction)
+    public function setPostAction($postAction)
     {
         $this->isChanged('postAction', $postAction);
         $this->postAction = $postAction;
@@ -433,23 +432,23 @@ class Form extends FormEntity
     }
 
     /**
-     * Get postAction
+     * Get postAction.
      *
      * @return string
      */
-    public function getPostAction ()
+    public function getPostAction()
     {
         return $this->postAction;
     }
 
     /**
-     * Set postActionProperty
+     * Set postActionProperty.
      *
      * @param string $postActionProperty
      *
      * @return Form
      */
-    public function setPostActionProperty ($postActionProperty)
+    public function setPostActionProperty($postActionProperty)
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -458,31 +457,31 @@ class Form extends FormEntity
     }
 
     /**
-     * Get postActionProperty
+     * Get postActionProperty.
      *
      * @return string
      */
-    public function getPostActionProperty ()
+    public function getPostActionProperty()
     {
         return $this->postActionProperty;
     }
 
     /**
-     * Get result count
+     * Get result count.
      */
-    public function getResultCount ()
+    public function getResultCount()
     {
         return count($this->submissions);
     }
 
     /**
-     * Set publishUp
+     * Set publishUp.
      *
      * @param \DateTime $publishUp
      *
      * @return Form
      */
-    public function setPublishUp ($publishUp)
+    public function setPublishUp($publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -491,23 +490,23 @@ class Form extends FormEntity
     }
 
     /**
-     * Get publishUp
+     * Get publishUp.
      *
      * @return \DateTime
      */
-    public function getPublishUp ()
+    public function getPublishUp()
     {
         return $this->publishUp;
     }
 
     /**
-     * Set publishDown
+     * Set publishDown.
      *
      * @param \DateTime $publishDown
      *
      * @return Form
      */
-    public function setPublishDown ($publishDown)
+    public function setPublishDown($publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -516,27 +515,27 @@ class Form extends FormEntity
     }
 
     /**
-     * Get publishDown
+     * Get publishDown.
      *
      * @return \DateTime
      */
-    public function getPublishDown ()
+    public function getPublishDown()
     {
         return $this->publishDown;
     }
 
     /**
-     * Add a field
+     * Add a field.
      *
      * @param       $key
      * @param Field $field
      *
      * @return Form
      */
-    public function addField ($key, Field $field)
+    public function addField($key, Field $field)
     {
         if ($changes = $field->getChanges()) {
-            $this->isChanged('fields', array($key, $changes));
+            $this->isChanged('fields', [$key, $changes]);
         }
         $this->fields[$key] = $field;
 
@@ -544,7 +543,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove a field
+     * Remove a field.
      *
      * @param       $key
      * @param Field $field
@@ -552,29 +551,48 @@ class Form extends FormEntity
     public function removeField($key, Field $field)
     {
         if ($changes = $field->getChanges()) {
-            $this->isChanged('fields', array($key, $changes));
+            $this->isChanged('fields', [$key, $changes]);
         }
         $this->fields->removeElement($field);
     }
 
     /**
-     * Get fields
+     * Get fields.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFields ()
+    public function getFields()
     {
         return $this->fields;
     }
 
     /**
-     * Set alias
+     * Get array of field aliases.
+     *
+     * @return array
+     */
+    public function getFieldAliases()
+    {
+        $aliases = [];
+        $fields  = $this->getFields();
+
+        if ($fields) {
+            foreach ($fields as $field) {
+                $aliases[] = $field->getAlias();
+            }
+        }
+
+        return $aliases;
+    }
+
+    /**
+     * Set alias.
      *
      * @param string $alias
      *
      * @return Form
      */
-    public function setAlias ($alias)
+    public function setAlias($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -583,23 +601,23 @@ class Form extends FormEntity
     }
 
     /**
-     * Get alias
+     * Get alias.
      *
      * @return string
      */
-    public function getAlias ()
+    public function getAlias()
     {
         return $this->alias;
     }
 
     /**
-     * Add submissions
+     * Add submissions.
      *
      * @param Submission $submissions
      *
      * @return Form
      */
-    public function addSubmission (Submission $submissions)
+    public function addSubmission(Submission $submissions)
     {
         $this->submissions[] = $submissions;
 
@@ -607,37 +625,37 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove submissions
+     * Remove submissions.
      *
      * @param Submission $submissions
      */
-    public function removeSubmission (Submission $submissions)
+    public function removeSubmission(Submission $submissions)
     {
         $this->submissions->removeElement($submissions);
     }
 
     /**
-     * Get submissions
+     * Get submissions.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getSubmissions ()
+    public function getSubmissions()
     {
         return $this->submissions;
     }
 
     /**
-     * Add actions
+     * Add actions.
      *
      * @param        $key
      * @param Action $action
      *
      * @return Form
      */
-    public function addAction ($key, Action $action)
+    public function addAction($key, Action $action)
     {
         if ($changes = $action->getChanges()) {
-            $this->isChanged('actions', array($key, $changes));
+            $this->isChanged('actions', [$key, $changes]);
         }
         $this->actions[$key] = $action;
 
@@ -645,17 +663,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove actions
+     * Remove action.
      *
-     * @param Action $actions
+     * @param Action $action
      */
-    public function removeAction (Action $actions)
+    public function removeAction(Action $action)
     {
-        $this->actions->removeElement($actions);
+        $this->actions->removeElement($action);
     }
 
     /**
-     * Removes all actions
+     * Removes all actions.
      */
     public function clearActions()
     {
@@ -663,11 +681,11 @@ class Form extends FormEntity
     }
 
     /**
-     * Get actions
+     * Get actions.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getActions ()
+    public function getActions()
     {
         return $this->actions;
     }
@@ -675,7 +693,7 @@ class Form extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -683,7 +701,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }
@@ -691,7 +709,7 @@ class Form extends FormEntity
     /**
      * @return mixed
      */
-    public function getTemplate ()
+    public function getTemplate()
     {
         return $this->template;
     }
@@ -699,7 +717,7 @@ class Form extends FormEntity
     /**
      * @param mixed $template
      */
-    public function setTemplate ($template)
+    public function setTemplate($template)
     {
         $this->template = $template;
     }
@@ -761,11 +779,11 @@ class Form extends FormEntity
      */
     public function isStandalone()
     {
-        return ($this->formType != 'campaign');
+        return $this->formType != 'campaign';
     }
 
     /**
-     * Generate a form name for HTML attributes
+     * Generate a form name for HTML attributes.
      */
     public function generateFormName()
     {
@@ -776,13 +794,14 @@ class Form extends FormEntity
                 )
             )
         );
-        return (empty($name)) ? 'form-' . $this->id : $name;
+
+        return (empty($name)) ? 'form-'.$this->id : $name;
     }
 
     /**
-     * Check if some Progressive Profiling setting is turned on on any of the form fields
+     * Check if some Progressive Profiling setting is turned on on any of the form fields.
      *
-     * @return boolean
+     * @return bool
      */
     public function usesProgressiveProfiling()
     {
@@ -796,12 +815,14 @@ class Form extends FormEntity
             foreach ($this->fields->toArray() as $field) {
                 if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
                     $this->usesProgressiveProfiling = true;
+
                     return $this->usesProgressiveProfiling;
                 }
             }
         }
 
         $this->usesProgressiveProfiling = false;
+
         return $this->usesProgressiveProfiling;
     }
 }

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -32,13 +34,21 @@
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
-        <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
+        <?php echo $view->render('MauticCoreBundle:Menu:profile.html.php'); ?>
         <li>
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
                 <i class="fa fa-cog fs-16"></i>
             </a>
         </li>
     </ul>
+    <div class="navbar-toolbar pull-right mt-15 mr-10">
+    <?php
+    echo $view['buttons']->reset($app->getRequest(), \Mautic\CoreBundle\Templating\Helper\ButtonHelper::LOCATION_NAVBAR)
+        ->renderButtons();
+    ?>
+    </div>
+
+
     <!--/ end: right nav -->
 </div>
 <!--/ end: navbar nocollapse -->

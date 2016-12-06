@@ -1,10 +1,11 @@
 <?php
 
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -24,10 +25,10 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      * @var array
      */
     protected $corsHeaders = [
-        'Access-Control-Allow-Origin' => '*',
-        'Access-Control-Allow-Headers' => 'Origin, X-Requested-With, Content-Type',
-        'Access-Control-Allow-Methods' => 'PUT, GET, POST, DELETE, OPTIONS',
-        'Access-Control-Allow-Credentials' => 'true'
+        'Access-Control-Allow-Origin'      => '*',
+        'Access-Control-Allow-Headers'     => 'Origin, X-Requested-With, Content-Type',
+        'Access-Control-Allow-Methods'     => 'PUT, GET, POST, DELETE, OPTIONS',
+        'Access-Control-Allow-Credentials' => 'true',
     ];
 
     /**
@@ -57,10 +58,10 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     public function __construct(HttpKernelInterface $app)
     {
-        $this->app = $app;
-        $this->config = $this->getConfig();
+        $this->app                 = $app;
+        $this->config              = $this->getConfig();
         $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $this->config) ? (bool) $this->config['cors_restrict_domains'] : true;
-        $this->validCORSDomains = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
+        $this->validCORSDomains    = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
     }
 
     /**
@@ -70,16 +71,16 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $this->corsHeaders['Access-Control-Allow-Origin'] = $this->getAllowOriginHeaderValue($request);
 
-        // If this is an initial OPTIONS request, just set the CORS headers and exit.
-        if (
-            $request->getMethod() === 'OPTIONS'
-            && $request->headers->has('Access-Control-Request-Headers')
-            && $request->headers->has('Origin')
-        ) {
+        // Capture all OPTIONS requests
+        if ($request->getMethod() === 'OPTIONS') {
             $response = new Response('', Response::HTTP_NO_CONTENT);
 
-            // Only add the CORS headers if the request Origin is valid.
-            if ($this->requestOriginIsValid) {
+            // If this is a valid OPTIONS request, set the CORS headers on the Response and exit.
+            if (
+                $this->requestOriginIsValid
+                && $request->headers->has('Access-Control-Request-Headers')
+                && $request->headers->has('Origin')
+            ) {
                 foreach ($this->corsHeaders as $header => $value) {
                     $response->headers->set($header, $value);
                 }
@@ -90,6 +91,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         $response = $this->app->handle($request, $type, $catch);
 
+        // Add standard CORS headers to any XHR
         if ($request->isXmlHttpRequest()) {
             foreach ($this->corsHeaders as $header => $value) {
                 $response->headers->set($header, $value);
@@ -114,6 +116,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         // If we're not restricting domains, set the header to the request origin
         if (!$this->restrictCORSDomains || in_array($origin, $this->validCORSDomains)) {
             $this->requestOriginIsValid = true;
+
             return $origin;
         }
 

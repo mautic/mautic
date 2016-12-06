@@ -1,16 +1,17 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -18,9 +19,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\FormBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -37,14 +36,11 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param FormModel     $formModel
-     * @param PageModel     $pageModel
+     * @param FormModel $formModel
+     * @param PageModel $pageModel
      */
-    public function __construct(MauticFactory $factory, FormModel $formModel, PageModel $pageModel)
+    public function __construct(FormModel $formModel, PageModel $pageModel)
     {
-        parent::__construct($factory);
-
         $this->formModel = $formModel;
         $this->pageModel = $pageModel;
     }
@@ -52,7 +48,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -61,7 +57,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -73,7 +69,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -93,20 +88,20 @@ class LeadSubscriber extends CommonSubscriber
 
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
                             'label' => $form->getName(),
-                            'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()])
+                            'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()]),
                         ],
-                        'eventType'       => $eventTypeName,
-                        'timestamp'       => $row['dateSubmitted'],
-                        'extra'           => [
+                        'eventType' => $eventTypeName,
+                        'timestamp' => $row['dateSubmitted'],
+                        'extra'     => [
                             'submission' => $submission,
                             'form'       => $form,
-                            'page'       => $this->pageModel->getEntity($row['page_id'])
+                            'page'       => $this->pageModel->getEntity($row['page_id']),
                         ],
                         'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => 'fa-pencil-square-o'
+                        'icon'            => 'fa-pencil-square-o',
                     ]
                 );
             }

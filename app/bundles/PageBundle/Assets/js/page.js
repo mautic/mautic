@@ -8,15 +8,6 @@ Mautic.pageOnLoad = function (container) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
     }
 
-    if (mQuery(container + ' form[name="page"]').length) {
-        mQuery("*[data-toggle='field-lookup']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            var field  = mQuery(this).attr('id');
-            var options = mQuery(this).attr('data-options');
-            Mautic.activatePageFieldTypeahead(field, target, options);
-        });
-    }
-
     //Handle autohide of "Redirect URL" field if "Redirect Type" is none
     if (mQuery(container + ' select[name="page[redirectType]"]').length) {
         //Auto-hide on page loading
@@ -28,26 +19,10 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
-    var textarea = mQuery('#page_customHtml');
-
-    mQuery(document).on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('html.set', textarea.val());
-    });
-
-    mQuery('.btn-builder').on('click', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
+    // Preload tokens for code mode builder
+    Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
     Mautic.intiSelectTheme(mQuery('#page_template'));
 };
-
-Mautic.pageOnUnload = function (id) {
-    mQuery('#page_customHtml').froalaEditor('popups.hideAll');
-}
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
@@ -89,42 +64,6 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
         },
         complete: function () {
             Mautic.removeLabelLoadingIndicator();
-        }
-    });
-};
-
-Mautic.activatePageFieldTypeahead = function(field, target, options) {
-    if (options) {
-        var keys = values = [];
-        //check to see if there is a key/value split
-        options = options.split('||');
-        if (options.length == 2) {
-            keys = options[1].split('|');
-            values = options[0].split('|');
-        } else {
-            values = options[0].split('|');
-        }
-
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            dataOptions: values,
-            dataOptionKeys: keys,
-            minLength: 0
-        });
-    } else {
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            prefetch: true,
-            remote: true,
-            action: "page:fieldList&field=" + target
-        });
-    }
-
-    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
-        }
-    }).on('typeahead:autocompleted', function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
         }
     });
 };

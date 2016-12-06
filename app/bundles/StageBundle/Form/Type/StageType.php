@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,7 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class StageType
+ * Class StageType.
  */
 class StageType extends AbstractType
 {
@@ -38,7 +40,7 @@ class StageType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
-        $this->security = $factory->getSecurity();
+        $this->security   = $factory->getSecurity();
     }
 
     /**
@@ -46,34 +48,32 @@ class StageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('stage', $options));
 
-        $builder->add('description', 'textarea', array(
-            'label' => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' => array('class' => 'form-control editor'),
-            'required' => false
-        ));
-        $builder->add('name', 'text', array(
-            'label' => 'mautic.core.name',
-            'label_attr' => array(
-                'class' => 'control-label'
-            ), 'attr' => array(
-                'class' => 'form-control'
-            )));
-        $builder->add('weight', 'number', array(
-            'label' => 'mautic.stage.action.weight',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' =>
-                array(
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.stage.action.weight.help'
-                ),
+        $builder->add('description', 'textarea', [
+            'label'      => 'mautic.core.description',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+        ]);
+        $builder->add('name', 'text', [
+            'label'      => 'mautic.core.name',
+            'label_attr' => [
+                'class' => 'control-label',
+            ], 'attr' => [
+                'class' => 'form-control',
+            ], ]);
+        $builder->add('weight', 'number', [
+            'label'      => 'mautic.stage.action.weight',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.stage.action.weight.help',
+                ],
             'precision' => 0,
-            'required' => false
-        ));
-
+            'required'  => false,
+        ]);
 
         if (!empty($options['data']) && $options['data'] instanceof Stage) {
             $readonly = !$this->security->hasEntityAccess(
@@ -85,50 +85,50 @@ class StageType extends AbstractType
             $data = $options['data']->isPublished(false);
         } elseif (!$this->security->isGranted('stage:stages:publishown')) {
             $readonly = true;
-            $data = false;
+            $data     = false;
         } else {
             $readonly = false;
-            $data = true;
+            $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', array(
+        $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
-            'data' => $data
-        ));
+            'data'      => $data,
+        ]);
 
-        $builder->add('publishUp', 'datetime', array(
-            'widget' => 'single_text',
-            'label' => 'mautic.core.form.publishup',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format' => 'yyyy-MM-dd HH:mm',
-            'required' => false
-        ));
+        $builder->add('publishUp', 'datetime', [
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishup',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
-        $builder->add('publishDown', 'datetime', array(
-            'widget' => 'single_text',
-            'label' => 'mautic.core.form.publishdown',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format' => 'yyyy-MM-dd HH:mm',
-            'required' => false
-        ));
+        $builder->add('publishDown', 'datetime', [
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishdown',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+        ]);
 
         //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'stage'
-        ));
+        $builder->add('category', 'category', [
+            'bundle' => 'stage',
+        ]);
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -137,13 +137,11 @@ class StageType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => 'Mautic\StageBundle\Entity\Stage',
-        ));
+        ]);
 
-        $resolver->setRequired(array('stageActions'));
-
-        $resolver->setOptional(array('actionType'));
+        $resolver->setOptional(['stageActions', 'actionType']);
     }
 
     /**
@@ -151,6 +149,6 @@ class StageType extends AbstractType
      */
     public function getName()
     {
-        return "stage";
+        return 'stage';
     }
 }

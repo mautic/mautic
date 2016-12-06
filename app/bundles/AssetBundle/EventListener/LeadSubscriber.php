@@ -1,47 +1,47 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class AssetBundle
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class AssetBundle.
  */
 class LeadSubscriber extends CommonSubscriber
 {
-    protected $model;
+    /**
+     * @var AssetModel
+     */
+    protected $assetModel;
 
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
+     * @param AssetModel $assetModel
      */
-    public function __construct(MauticFactory $factory, AssetModel $model)
+    public function __construct(AssetModel $assetModel)
     {
-        parent::__construct($factory);
-
-        $this->model = $model;
+        $this->assetModel = $assetModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -51,7 +51,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -64,7 +64,6 @@ class LeadSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -81,22 +80,22 @@ class LeadSubscriber extends CommonSubscriber
 
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
-                $asset = $this->model->getEntity($download['asset_id']);
+                $asset = $this->assetModel->getEntity($download['asset_id']);
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
                             'label' => $download['title'],
-                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']])
+                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
                         ],
-                        'extra'           => [
+                        'extra' => [
                             'asset'            => $asset,
-                            'assetDownloadUrl' => $this->model->generateUrl($asset)
+                            'assetDownloadUrl' => $this->assetModel->generateUrl($asset),
                         ],
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
-                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
+                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
                     ]
                 );
             }
@@ -108,7 +107,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadChange(LeadChangeEvent $event)
     {
-        $this->model->getDownloadRepository()->updateLeadByTrackingId(
+        $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
             $event->getNewTrackingId(),
             $event->getOldTrackingId()
@@ -120,6 +119,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->model->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

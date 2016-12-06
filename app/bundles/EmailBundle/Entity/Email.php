@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,10 +11,12 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
@@ -35,6 +38,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
+    use DynamicContentEntityTrait;
 
     /**
      * @var int
@@ -99,7 +103,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var
      */
-    private $emailType;
+    private $emailType = 'template';
 
     /**
      * @var \DateTime
@@ -179,9 +183,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->revision = 0;
         $this->variantSentCount = 0;
         $this->variantStartDate = null;
-        $this->maxDateSent = null;
-        $this->emailType = null;
-        $this->sessionId = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->emailType        = null;
+        $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->maxDateSent      = null;
         $this->clearTranslations();
         $this->clearVariants();
 
@@ -216,11 +220,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->setTable('emails')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
-            ->addLifecycleEvent('cleanUrlsInContent', 'preUpdate')
-            ->addLifecycleEvent('cleanUrlsInContent', 'prePersist');
+            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
+            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-
         $builder->createField('subject', 'text')
             ->nullable()
             ->build();
@@ -299,6 +302,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
+        self::addDynamicContentMetadata($builder);
 
         $builder->createField('variantSentCount', 'integer')
             ->columnName('variant_sent_count')
@@ -424,7 +428,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'subject',
                     'language',
                     'category',
-
                 ]
             )
             ->addProperties(
@@ -433,6 +436,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'customHtml',
+                    'plainText',
+                    'template',
+                    'emailType',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -444,6 +451,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'variantReadCount',
                     'variantParent',
                     'variantChildren',
+                    'translationParent',
+                    'translationChildren',
+                    'unsubscribeForm',
+                    'dynamicContent',
+                    'lists',
                     'maxDateSent',
                 ]
             )
@@ -456,7 +468,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     protected function isChanged($prop, $val)
     {
-        $getter = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'variantParent' || $prop == 'translationParent' || $prop == 'category' || $prop == 'list') {

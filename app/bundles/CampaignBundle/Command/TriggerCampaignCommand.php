@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class TriggerCampaignCommand
+ * Class TriggerCampaignCommand.
  */
 class TriggerCampaignCommand extends ModeratedCommand
 {
@@ -43,8 +45,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of events to process per campaign for this script execution. Defaults to all.',
                 0
-            )
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+            );
 
         parent::configure();
     }
@@ -56,23 +57,19 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
-        $model = $factory->getModel('campaign.event');
+        $model = $container->get('mautic.campaign.model.event');
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $factory->getModel('campaign');
-        $translator    = $factory->getTranslator();
-        $em            = $factory->getEntityManager();
+        $campaignModel = $container->get('mautic.campaign.model.campaign');
+        $translator    = $container->get('translator');
+        $em            = $container->get('doctrine')->getManager();
         $id            = $input->getOption('campaign-id');
         $scheduleOnly  = $input->getOption('scheduled-only');
         $negativeOnly  = $input->getOption('negative-only');
         $batch         = $input->getOption('batch-limit');
         $max           = $input->getOption('max-events');
 
-        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
-
+        if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 
@@ -82,14 +79,14 @@ class TriggerCampaignCommand extends ModeratedCommand
 
             if ($campaign !== null && $campaign->isPublished()) {
                 $totalProcessed = 0;
-                $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $id)).'</info>');
+                $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $id]).'</info>');
 
                 if (!$negativeOnly && !$scheduleOnly) {
                     //trigger starting action events for newly added contacts
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                     $processed = $model->triggerStartingEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
                     );
                 }
 
@@ -98,7 +95,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
                     $processed = $model->triggerScheduledEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
                     );
                 }
 
@@ -107,17 +104,17 @@ class TriggerCampaignCommand extends ModeratedCommand
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.negative').'</comment>');
                     $processed = $model->triggerNegativeEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
                     );
                 }
             } else {
-                $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)).'</error>');
+                $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
         } else {
             $campaigns = $campaignModel->getEntities(
-                array(
-                    'iterator_mode' => true
-                )
+                [
+                    'iterator_mode' => true,
+                ]
             );
 
             while (($c = $campaigns->next()) !== false) {
@@ -127,19 +124,18 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $c = reset($c);
 
                 if ($c->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $c->getId())).'</info>');
+                    $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $c->getId()]).'</info>');
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                         $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
                         );
                     }
 
                     if ($max && $totalProcessed >= $max) {
-
                         continue;
                     }
 
@@ -148,13 +144,12 @@ class TriggerCampaignCommand extends ModeratedCommand
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
                         $processed = $model->triggerScheduledEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
                         );
                     }
 
                     if ($max && $totalProcessed >= $max) {
-
                         continue;
                     }
 
@@ -163,7 +158,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.negative').'</comment>');
                         $processed = $model->triggerNegativeEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
-                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
                         );
                     }

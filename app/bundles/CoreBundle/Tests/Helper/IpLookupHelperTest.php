@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class IpLookupHelperTest
+ * Class IpLookupHelperTest.
  */
 class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,10 +55,10 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testClientIpIsReturnedFromRequest()
     {
-        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.52', $ip->getIpAddress());
+        $this->assertEquals('73.77.245.53', $ip->getIpAddress());
     }
 
     /**
@@ -97,7 +99,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $mockEm->expects($this->once())
+        $mockEm->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($mockRepository));
 

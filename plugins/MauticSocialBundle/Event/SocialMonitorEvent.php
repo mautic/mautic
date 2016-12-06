@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 /**
- * Class SocialMonitorEvent
+ * Class SocialMonitorEvent.
  */
 class SocialMonitorEvent extends CommonEvent
 {
@@ -35,7 +37,7 @@ class SocialMonitorEvent extends CommonEvent
     /**
      * @var array
      */
-    protected $leadIds = array();
+    protected $leadIds = [];
 
     /**
      * SocialMonitorEvent constructor.
@@ -56,7 +58,7 @@ class SocialMonitorEvent extends CommonEvent
     }
 
     /**
-     * Returns the Monitoring entity
+     * Returns the Monitoring entity.
      *
      * @return Monitoring
      */
@@ -66,7 +68,7 @@ class SocialMonitorEvent extends CommonEvent
     }
 
     /**
-     * Get count of new leads
+     * Get count of new leads.
      *
      * @return int
      */
@@ -76,7 +78,7 @@ class SocialMonitorEvent extends CommonEvent
     }
 
     /**
-     * Get count of updated leads
+     * Get count of updated leads.
      *
      * @return int
      */

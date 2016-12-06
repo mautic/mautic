@@ -1,23 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class DoNotContact
- *
- * @package Mautic\EmailBundle\Entity
+ * Class DoNotContact.
  */
 class DoNotContact
 {
@@ -76,13 +75,13 @@ class DoNotContact
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_donotcontact')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
-            ->addIndex(array('reason'), 'dnc_reason_search');
+            ->addIndex(['reason'], 'dnc_reason_search');
 
         $builder->addId();
 
@@ -100,6 +99,39 @@ class DoNotContact
 
         $builder->createField('comments', 'text')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('lead')
+            ->setRoot('lead')
+            ->addListProperties(
+                [
+                    'id',
+                    'dateAdded',
+                    'reason',
+                    'comments',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
+                    'id',
+                    'dateAdded',
+                    'reason',
+                    'comments',
+                    'channel',
+                    'channelId',
+                    'lead',
+                ]
+            )
             ->build();
     }
 
