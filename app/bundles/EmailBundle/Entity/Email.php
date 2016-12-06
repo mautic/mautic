@@ -1,5 +1,6 @@
 <?php
 
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -8,6 +9,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -176,11 +178,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function __clone()
     {
-        $this->id = null;
-        $this->stats = new ArrayCollection();
-        $this->sentCount = 0;
-        $this->readCount = 0;
-        $this->revision = 0;
+        $this->id               = null;
+        $this->stats            = new ArrayCollection();
+        $this->sentCount        = 0;
+        $this->readCount        = 0;
+        $this->revision         = 0;
         $this->variantSentCount = 0;
         $this->variantStartDate = null;
         $this->emailType        = null;
@@ -197,9 +199,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function __construct()
     {
-        $this->lists = new ArrayCollection();
-        $this->stats = new ArrayCollection();
-        $this->variantChildren = new ArrayCollection();
+        $this->lists            = new ArrayCollection();
+        $this->stats            = new ArrayCollection();
+        $this->variantChildren  = new ArrayCollection();
         $this->assetAttachments = new ArrayCollection();
     }
 
@@ -473,7 +475,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         if ($prop == 'variantParent' || $prop == 'translationParent' || $prop == 'category' || $prop == 'list') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId = ($val) ? $val->getId() : null;
+            $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }

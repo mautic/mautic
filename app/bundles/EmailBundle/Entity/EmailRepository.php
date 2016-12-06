@@ -1,5 +1,6 @@
 <?php
 
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -8,6 +9,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -155,7 +157,7 @@ class EmailRepository extends CommonRepository
         $new = [];
         foreach ($result as $key => $value) {
             /** @var Email $item */
-            $item = reset($value);
+            $item        = reset($value);
             $maxDateSent = $value['max_date_sent'];
             $item->setMaxDateSent($maxDateSent);
             $new[$key] = $item;
@@ -402,10 +404,10 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command = $filter->command;
-        $unique = $this->generateRandomParameterName();
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr = false;
+        $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
                 $expr            = $q->expr()->eq('e.isPublished', ":$unique");
