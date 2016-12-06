@@ -221,7 +221,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    public function validateDbalWhereArray($args)
+    public function validateDbalWhereArray(array $args)
     {
         $msg = '"%s" is missing in the where clause array.';
         if (empty($args['expr'])) {
@@ -252,12 +252,11 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    public function validateDbalOrderByArray($args)
+    public function validateDbalOrderByArray(array $args)
     {
         $msg = '"%s" is missing in the order by clause array.';
-
         if (empty($args['col'])) {
-            throw new \InvalidArgumentException(sprintf($msg, 'expr'));
+            throw new \InvalidArgumentException(sprintf($msg, 'col'));
         }
 
         if (empty($args['dir'])) {
