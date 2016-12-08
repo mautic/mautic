@@ -46,6 +46,7 @@ class ReportSubscriber extends CommonSubscriber
         if ($event->checkContext(['emails', 'email.stats'])) {
             $prefix        = 'e.';
             $variantParent = 'vp.';
+            $channelUrlTrackables = 'cut.';
             $columns       = [
                 $prefix.'subject' => [
                     'label' => 'mautic.email.subject',
@@ -58,6 +59,40 @@ class ReportSubscriber extends CommonSubscriber
                 $prefix.'read_count' => [
                     'label' => 'mautic.email.report.read_count',
                     'type'  => 'int',
+                ],
+                'read_ratio' => [
+                    'alias'=> 'read_ratio',
+                    'label' => 'mautic.email.report.read_ratio',
+                    'type'  => 'string',
+                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
+                ],
+                $prefix.'sent_count' => [
+                    'label' => 'mautic.email.report.sent_count',
+                    'type'  => 'int',
+                ],
+                'hits' => [
+                    'alias'=> 'hits',
+                    'label' => 'mautic.email.report.hits_count',
+                    'type'  => 'string',
+                    'formula' => 'SUM('.$channelUrlTrackables.'hits)',
+                ],
+                'unique_hits' => [
+                    'alias'=> 'unique_hits',
+                    'label' => 'mautic.email.report.unique_hits_count',
+                    'type'  => 'string',
+                    'formula' => 'SUM('.$channelUrlTrackables.'unique_hits)',
+                ],
+                'hits_ratio' => [
+                    'alias'=> 'hits_ratio',
+                    'label' => 'mautic.email.report.hits_ratio',
+                    'type'  => 'string',
+                    'formula' => 'CONCAT(ROUND((SUM('.$channelUrlTrackables.'hits)/'.$prefix.'sent_count)*100),\'%\')',
+                ],
+                'unique_ratio' => [
+                    'alias'=> 'unique_ratio',
+                    'label' => 'mautic.email.report.unique_ratio',
+                    'type'  => 'string',
+                    'formula' => 'CONCAT(ROUND((SUM('.$channelUrlTrackables.'unique_hits)/'.$prefix.'sent_count)*100),\'%\')',
                 ],
                 $prefix.'revision' => [
                     'label' => 'mautic.email.report.revision',
@@ -163,7 +198,9 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'e.id = cut.channel_id')
+                    ->groupBy('e.id');
                 $event->addCategoryLeftJoin($qb, 'e');
                 break;
             case 'email.stats':
