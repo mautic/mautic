@@ -29,10 +29,10 @@ After configure the plugin.
 5 - Create the form with a email or mobile number field.
 6 - Go to Campaigns.
 7 - Create a new campaign: Contact Sources: Campaign Form.
-8 - Choose the form you created early.
+8 - Choose the form you created earlier.
 9 - In the next step, select Action.
 10 - In the select box, chose InfoBip Send text messages.
-11 - In the box of InfoBip Send text messages, put a name and choose the form message that you created early.
+11 - In the box of InfoBip Send text messages, put a name and choose the form message that you created earlier.
 12 - Save your campaign.
 13 - Go to Contacts.
 14 - Create a contact with a valid mobile number.
