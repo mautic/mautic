@@ -164,18 +164,20 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function formatLeadDataForCreateOrUpdate($leadData, $lead)
+    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false)
     {
         $formattedLeadData = [];
 
-        foreach ($leadData as $field => $value) {
-            if ($field == 'lifecyclestage' || $field == 'associatedcompanyid') {
-                continue;
+        if (!$updateLink) {
+            foreach ($leadData as $field => $value) {
+                if ($field == 'lifecyclestage' || $field == 'associatedcompanyid') {
+                    continue;
+                }
+                $formattedLeadData['properties'][] = [
+                    'property' => $field,
+                    'value'    => $value,
+                ];
             }
-            $formattedLeadData['properties'][] = [
-                'property' => $field,
-                'value'    => $value,
-            ];
         }
         //put mautic timeline link
         $formattedLeadData['properties'][] = [
@@ -448,7 +450,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
-
+        $pushData['email'] = $lead->getEmail();
+        $this->getApiHelper()->createLead($pushData, $lead, $updateLink = true);
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             try {
