@@ -31,7 +31,7 @@ class PublicController extends CommonController
         $logger = $this->get('monolog.logger.mautic');
 
         $integration       = 'Hubspot';
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
         foreach ($data as $info) {
@@ -43,7 +43,6 @@ class PublicController extends CommonController
                     case 'contact': $integrationObject->getContacts($id);
                         break;
                     case 'company':
-                        $this->factory->getLogger()->addError('creating company');
                         $integrationObject->getCompanies($id);
                         break;
                 }
