@@ -82,7 +82,6 @@ class ConfigType extends AbstractType
                     'constraints' => $constraints,
                 ]
             );
-
         };
         $builder->add('sms_frequency_number', 'number',
             [

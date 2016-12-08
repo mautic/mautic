@@ -78,20 +78,20 @@ return [
                 'alias' => 'sms_helper',
             ],
         ],
-    		
-    	'other' => [ 
-    		'mautic.sms.api' => [ 
-    				'class' => 'MauticPlugin\InfoBipSmsBundle\Api\SmsInfoBipApi', 
-    				'arguments' => [ 
-    						'mautic.page.model.trackable',
-    						'mautic.factory', 
-    						'mautic.helper.phone_number', 
-    						'%mautic.sms_sending_phone_number%',
-    						'%mautic.sms_username%',
-    						'%mautic.sms_password%'
-    				], 
-    				'alias' => 'sms_api'
-    		],
+            
+        'other' => [
+            'mautic.sms.api' => [
+                    'class' => 'MauticPlugin\InfoBipSmsBundle\Api\SmsInfoBipApi',
+                    'arguments' => [
+                            'mautic.page.model.trackable',
+                            'mautic.factory',
+                            'mautic.helper.phone_number',
+                            '%mautic.sms_sending_phone_number%',
+                            '%mautic.sms_username%',
+                            '%mautic.sms_password%'
+                    ],
+                    'alias' => 'sms_api'
+            ],
         ],
         'models' => [
             'mautic.sms.model.sms' => [
