@@ -85,12 +85,16 @@ return [
                 'controller' => 'MauticCoreBundle:Api\FileApi:delete',
                 'method'     => 'DELETE',
             ],
-           'mautic_core_api_stats' => [
+            'mautic_core_api_stats' => [
                'path'       => '/stats/{table}',
                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
                'defaults'   => [
                     'table' => '',
                 ],
+           ],
+           'mautic_core_api_version' => [
+               'path'       => '/info/version',
+               'controller' => 'MauticCoreBundle:Api\InfoApi:version',
            ],
         ],
     ],
