@@ -17,7 +17,7 @@ class HubspotApi extends CrmApi
     {
         $hapikey = $this->integration->getHubSpotApiKey();
         $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
-        $request = $this->integration->makeRequest($url, $parameters, $method);
+        $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
         if (isset($request['status']) && $request['status'] == 'error') {
             $message = $request['message'];
             if (isset($request['validationResults'])) {

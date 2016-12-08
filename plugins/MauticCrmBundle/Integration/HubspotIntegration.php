@@ -169,6 +169,9 @@ class HubspotIntegration extends CrmAbstractIntegration
         $formattedLeadData = [];
 
         foreach ($leadData as $field => $value) {
+            if ($field == 'lifecyclestage' || $field == 'associatedcompanyid') {
+                continue;
+            }
             $formattedLeadData['properties'][] = [
                 'property' => $field,
                 'value'    => $value,
