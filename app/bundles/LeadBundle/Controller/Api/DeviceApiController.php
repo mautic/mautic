@@ -56,4 +56,12 @@ class DeviceApiController extends CommonApiController
             return $this->returnError('lead ID is mandatory', Codes::HTTP_BAD_REQUEST);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkEntityAccess($entity, $action = 'view')
+    {
+        return parent::checkEntityAccess($entity->getLead(), $action);
+    }
 }

@@ -542,19 +542,14 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        // Some entities doesn't have any creator. Allow access in this case.
-        if (!method_exists($entity, 'getCreatedBy')) {
-            return true;
-        }
-
-        if ($action != 'create') {
+        if ($action != 'create' && method_exists($entity, 'getCreatedBy')) {
             $ownPerm   = "{$this->permissionBase}:{$action}own";
             $otherPerm = "{$this->permissionBase}:{$action}other";
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
         }
 
-        return $this->security->isGranted("{$this->permissionBase}:create");
+        return $this->security->isGranted("{$this->permissionBase}:{$action}");
     }
 
     /**
