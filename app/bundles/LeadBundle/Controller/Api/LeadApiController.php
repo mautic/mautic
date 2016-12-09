@@ -499,6 +499,23 @@ class LeadApiController extends CommonApiController
             unset($parameters['companies']);
         }
 
+        //Since the request can be from 3rd party, check for an IP address if included
+        if (isset($parameters['ipAddress'])) {
+            $ipAddress = $this->factory->getIpAddress($parameters['ipAddress']);
+
+            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+                $entity->addIpAddress($ipAddress);
+            }
+
+            unset($parameters['ipAddress']);
+        }
+
+        // Check for tags
+        if (isset($parameters['tags'])) {
+            $this->model->modifyTags($entity, $parameters['tags'], null, true);
+            unset($parameters['tags']);
+        }
+
         // Contact parameters which can be updated apart form contact fields
         $contactParams = ['points', 'color', 'owner'];
 
@@ -545,24 +562,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['lastActive']);
-
-        //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($parameters['ipAddress'])) {
-            $ipAddress = $this->factory->getIpAddress($parameters['ipAddress']);
-
-            if (!$entity->getIpAddresses()->contains($ipAddress)) {
-                $entity->addIpAddress($ipAddress);
-            }
-
-            unset($parameters['ipAddress']);
-        }
-
-        // Check for tags
-        if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags'], null, true);
-            unset($parameters['tags']);
-        }
+        unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter

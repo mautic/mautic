@@ -409,7 +409,8 @@ class CommonApiController extends FOSRestController implements MauticController
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
-            $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
+            $parameters   = array_merge($parameters, $submitParams);
+            $preSaveError = $this->preSaveEntity($entity, $form, $parameters, $action);
 
             if ($preSaveError instanceof Response) {
                 return $preSaveError;
