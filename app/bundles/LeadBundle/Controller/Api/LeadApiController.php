@@ -164,47 +164,102 @@ class LeadApiController extends CommonApiController
     public function getNotesAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
-            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
-                return $this->accessDenied();
-            }
 
-            $results = $this->getModel('lead.note')->getEntities(
-                [
-                    'start'  => $this->request->query->get('start', 0),
-                    'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
-                    'filter' => [
-                        'string' => $this->request->query->get('search', ''),
-                        'force'  => [
-                            [
-                                'column' => 'n.lead',
-                                'expr'   => 'eq',
-                                'value'  => $entity,
-                            ],
-                        ],
-                    ],
-                    'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
-                    'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
-                ]
-            );
-
-            list($notes, $count) = $this->prepareEntitiesForView($results);
-
-            $view = $this->view(
-                [
-                    'total' => $count,
-                    'notes' => $notes,
-                ],
-                Codes::HTTP_OK
-            );
-
-            $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
-            $view->setSerializationContext($context);
-
-            return $this->handleView($view);
+        if ($entity === null) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $results = $this->getModel('lead.note')->getEntities(
+            [
+                'start'  => $this->request->query->get('start', 0),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'filter' => [
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => [
+                        [
+                            'column' => 'n.lead',
+                            'expr'   => 'eq',
+                            'value'  => $entity,
+                        ],
+                    ],
+                ],
+                'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
+                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+            ]
+        );
+
+        list($notes, $count) = $this->prepareEntitiesForView($results);
+
+        $view = $this->view(
+            [
+                'total' => $count,
+                'notes' => $notes,
+            ],
+            Codes::HTTP_OK
+        );
+
+        $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
+        $view->setSerializationContext($context);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Obtains a list of devices on a specific lead.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getDevicesAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $results = $this->getModel('lead.device')->getEntities(
+            [
+                'start'  => $this->request->query->get('start', 0),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'filter' => [
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => [
+                        [
+                            'column' => 'd.lead',
+                            'expr'   => 'eq',
+                            'value'  => $entity,
+                        ],
+                    ],
+                ],
+                'orderBy'    => $this->request->query->get('orderBy', 'd.dateAdded'),
+                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+            ]
+        );
+
+        list($devices, $count) = $this->prepareEntitiesForView($results);
+
+        $view = $this->view(
+            [
+                'total'   => $count,
+                'devices' => $devices,
+            ],
+            Codes::HTTP_OK
+        );
+
+        $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
+        $view->setSerializationContext($context);
+
+        return $this->handleView($view);
     }
 
     /**

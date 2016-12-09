@@ -116,6 +116,10 @@ return [
                 'path'       => '/contacts/{id}/notes',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes',
             ],
+            'mautic_api_getcontactdevices' => [
+                'path'       => '/contacts/{id}/devices',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getDevices',
+            ],
             'mautic_api_getcontactcampaigns' => [
                 'path'       => '/contacts/{id}/campaigns',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns',
@@ -182,6 +186,12 @@ return [
                 'name'            => 'notes',
                 'path'            => '/notes',
                 'controller'      => 'MauticLeadBundle:Api\NoteApi',
+            ],
+            'mautic_api_devicesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'devices',
+                'path'            => '/devices',
+                'controller'      => 'MauticLeadBundle:Api\DeviceApi',
             ],
         ],
     ],
@@ -371,9 +381,12 @@ return [
                 'alias'     => 'updatelead_action',
             ],
             'mautic.form.type.leadnote' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\NoteType',
-                'arguments' => ['mautic.factory'],
-                'alias'     => 'leadnote',
+                'class' => Mautic\LeadBundle\Form\Type\NoteType::class,
+                'alias' => 'leadnote',
+            ],
+            'mautic.form.type.leaddevice' => [
+                'class' => Mautic\LeadBundle\Form\Type\DeviceType::class,
+                'alias' => 'leaddevice',
             ],
             'mautic.form.type.lead_import' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\LeadImportType',
@@ -535,6 +548,9 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
+            ],
+            'mautic.lead.model.device' => [
+                'class' => Mautic\LeadBundle\Model\DeviceModel::class,
             ],
             'mautic.lead.model.company' => [
                 'class'     => 'Mautic\LeadBundle\Model\CompanyModel',

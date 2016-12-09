@@ -20,6 +20,23 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class LeadDeviceRepository extends CommonRepository
 {
     /**
+     * {@inhertidoc}.
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities($args = [])
+    {
+        $q = $this
+            ->createQueryBuilder('d')
+            ->select('d');
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
      * @param           $emailIds
      * @param \DateTime $fromDate
      *
