@@ -494,26 +494,28 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
+        $originalParams = $this->request->request->all();
+
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
         }
 
         //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($parameters['ipAddress'])) {
-            $ipAddress = $this->factory->getIpAddress($parameters['ipAddress']);
+        if (isset($originalParams['ipAddress'])) {
+            $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
             }
 
-            unset($parameters['ipAddress']);
+            unset($originalParams['ipAddress']);
         }
 
         // Check for tags
-        if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags'], null, true);
-            unset($parameters['tags']);
+        if (isset($originalParams['tags'])) {
+            $this->model->modifyTags($entity, $originalParams['tags']);
+            unset($originalParams['tags']);
         }
 
         // Contact parameters which can be updated apart form contact fields
