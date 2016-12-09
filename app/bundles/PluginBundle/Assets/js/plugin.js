@@ -120,6 +120,37 @@ Mautic.getIntegrationLeadFields = function (integration, el, settings) {
     );
 };
 
+Mautic.getIntegrationCompanyFields = function (integration, el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    if (typeof settings == 'undefined') {
+        settings = {};
+    }
+
+    var data = {integration: integration, settings: settings};
+
+    mQuery('#companyFieldsContainer').html('');
+
+    Mautic.ajaxActionRequest('plugin:getIntegrationCompanyFields', data,
+        function(response) {
+            if (response.success) {
+                mQuery('#companyFieldsContainer').replaceWith(response.html);
+                Mautic.onPageLoad('#companyFieldsContainer');
+
+                if (mQuery('#company-fields-container').length) {
+                    mQuery('#company-fields-container').removeClass('hide');
+                }
+            } else {
+                if (mQuery('#company-fields-container').length) {
+                    mQuery('#company-fields-container').addClass('hide');
+                }
+            }
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
+};
+
+
 Mautic.getIntegrationConfig = function (el, settings) {
     Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
 

@@ -1,23 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\StageBundle\Security\Permissions;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class StagePermissions
+ * Class StagePermissions.
  */
 class StagePermissions extends AbstractPermissions
 {
-
     /**
      * {@inheritdoc}
      */

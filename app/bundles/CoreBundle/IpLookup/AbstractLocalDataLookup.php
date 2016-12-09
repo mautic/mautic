@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,19 +14,19 @@ namespace Mautic\CoreBundle\IpLookup;
 use Joomla\Http\HttpFactory;
 
 /**
- * Class AbstractLocalDataLookup
+ * Class AbstractLocalDataLookup.
  */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**
-     * Path to the local data store
+     * Path to the local data store.
      *
      * @return string
      */
     abstract public function getLocalDataStoreFilepath();
 
     /**
-     * Return the URL to manually download
+     * Return the URL to manually download.
      *
      * @return string
      */
@@ -45,11 +47,11 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function getConfigFormThemes()
     {
-        return array();
+        return [];
     }
 
     /**
-     * Download remote data store
+     * Download remote data store.
      *
      * Used by the mautic:iplookup:update_data command and form fetch button (if applicable) to update local IP data stores
      *
@@ -75,12 +77,12 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $success = false;
 
             switch (true) {
-                case ($localTargetExt === $tempExt):
+                case $localTargetExt === $tempExt:
                     $success = (bool) file_put_contents($localTarget, $data->body);
 
                     break;
 
-                case ('gz' == $tempExt):
+                case 'gz' == $tempExt:
                     if (function_exists('gzdecode')) {
                         $success = (bool) file_put_contents($localTarget, gzdecode($data->body));
                     } elseif (function_exists('gzopen')) {
@@ -100,7 +102,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
                     break;
 
-                case ('zip' == $tempExt):
+                case 'zip' == $tempExt:
                     file_put_contents($tempTarget, $data->body);
 
                     $zipper = new \ZipArchive();
@@ -121,7 +123,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     }
 
     /**
-     * Get the common directory for data
+     * Get the common directory for data.
      *
      * @return null|string
      */

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,20 +15,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CategoryRepository
- *
- * @package Mautic\CategoryBundle\Entity
+ * Class CategoryRepository.
  */
 class CategoryRepository extends CommonRepository
 {
-
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this
             ->createQueryBuilder('c')
@@ -45,15 +45,26 @@ class CategoryRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
+    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, $includeGlobal = true)
     {
         $q = $this->createQueryBuilder('c');
-        $q->select('partial c.{id, title, alias, color}');
+        $q->select('partial c.{id, title, alias, color, bundle}');
 
         $q->where('c.isPublished = :true')
             ->setParameter('true', true, 'boolean');
-        $q->andWhere('c.bundle = :bundle')
-            ->setParameter('bundle', $bundle);
+
+        $expr = $q->expr()->orX(
+            $q->expr()->eq('c.bundle', ':bundle')
+        );
+
+        if ($includeGlobal && 'global' !== $bundle) {
+            $expr->add(
+                $q->expr()->eq('c.bundle', $q->expr()->literal('global'))
+            );
+        }
+
+        $q->andWhere($expr)
+          ->setParameter('bundle', $bundle);
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('c.title', ':search'))
@@ -68,51 +79,43 @@ class CategoryRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getArrayResult();
+
         return $results;
     }
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('c.title',  ':'.$unique),
-            $q->expr()->like('c.description',  ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-        return array(
-            $expr,
-            array("$unique" => $string)
-        );
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'c.title',
+            'c.description',
+        ]);
     }
 
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $expr            = false;
+        $command = $field = $filter->command;
+        $unique  = $this->generateRandomParameterName();
+        $expr    = false;
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("c.isPublished", ":$unique");
+                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
                 $string = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("c.isPublished", ":$unique");
+                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
                 $string = false;
                 break;
         }
@@ -121,10 +124,10 @@ class CategoryRepository extends CommonRepository
             $expr = $q->expr()->not($expr);
         }
 
-        return array(
+        return [
             $expr,
-            array("$unique" => $string)
-        );
+            ["$unique" => $string],
+        ];
     }
 
     /**
@@ -132,10 +135,10 @@ class CategoryRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.core.searchcommand.ispublished',
-            'mautic.core.searchcommand.isunpublished'
-        );
+            'mautic.core.searchcommand.isunpublished',
+        ];
     }
 
     /**
@@ -143,9 +146,9 @@ class CategoryRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('c.title', 'ASC')
-        );
+        return [
+            ['c.title', 'ASC'],
+        ];
     }
 
     /**
@@ -181,5 +184,4 @@ class CategoryRepository extends CommonRepository
     {
         return 'c';
     }
-
 }

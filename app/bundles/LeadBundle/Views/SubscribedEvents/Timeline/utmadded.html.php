@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $utmTags = $event['extra']['utmtags'];
@@ -35,7 +37,6 @@ $utmTags = $event['extra']['utmtags'];
 
 $counter = 1;
 if (!empty($utmTags['query'])) {
-
     foreach ($utmTags['query'] as $k => $v) {
         if (in_array($v, ['', null, []])) {
             continue;
@@ -49,7 +50,7 @@ if (!empty($utmTags['query'])) {
         }
 
         if (!empty($v)) {
-            $counter++;
+            ++$counter;
 
             $k = ucwords(str_replace('_', ' ', $k));
 

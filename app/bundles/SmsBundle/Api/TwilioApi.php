@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Api;
 
 use libphonenumber\NumberParseException;
@@ -71,12 +73,11 @@ class TwilioApi extends AbstractSmsApi
      * @param string $number
      * @param string $content
      *
-     * @return boolean
+     * @return bool
      */
     public function sendSms($number, $content)
     {
         if ($number === null) {
-
             return false;
         }
 

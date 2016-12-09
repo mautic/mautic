@@ -1,32 +1,31 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\StageBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Action;
-use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\StageEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class StageModel
+ * Class StageModel.
  */
 class StageModel extends CommonFormModel
 {
@@ -48,12 +47,12 @@ class StageModel extends CommonFormModel
     /**
      * PointModel constructor.
      *
-     * @param Session $session
+     * @param Session   $session
      * @param LeadModel $leadModel
      */
     public function __construct(LeadModel $leadModel, Session $session)
     {
-        $this->session = $session;
+        $this->session   = $session;
         $this->leadModel = $leadModel;
     }
     /**
@@ -79,14 +78,15 @@ class StageModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Stage) {
-            throw new MethodNotAllowedHttpException(array('Stage'));
+            throw new MethodNotAllowedHttpException(['Stage']);
         }
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
         return $formFactory->create('stage', $entity, $options);
     }
 
@@ -112,20 +112,20 @@ class StageModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Stage) {
-            throw new MethodNotAllowedHttpException(array('Stage'));
+            throw new MethodNotAllowedHttpException(['Stage']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = StageEvents::STAGE_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = StageEvents::STAGE_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = StageEvents::STAGE_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = StageEvents::STAGE_POST_DELETE;
                 break;
             default:
@@ -139,6 +139,7 @@ class StageModel extends CommonFormModel
             }
 
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -146,7 +147,7 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * Gets array of custom actions from bundles subscribed StageEvents::STAGE_ON_BUILD
+     * Gets array of custom actions from bundles subscribed StageEvents::STAGE_ON_BUILD.
      *
      * @return mixed
      */
@@ -156,8 +157,8 @@ class StageModel extends CommonFormModel
 
         if (empty($actions)) {
             //build them
-            $actions = array();
-            $event = new StageBuilderEvent($this->translator);
+            $actions = [];
+            $event   = new StageBuilderEvent($this->translator);
             $this->dispatcher->dispatch(StageEvents::STAGE_ON_BUILD, $event);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
@@ -168,22 +169,22 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * Get line chart data of stages
+     * Get line chart data of stages.
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char     $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param bool     $canViewOthers
      *
      * @return array
      */
-    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q         = $query->prepareTimeDataQuery('lead_stages_change_log', 'date_added', $filter);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $q     = $query->prepareTimeDataQuery('lead_stages_change_log', 'date_added', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
@@ -193,102 +194,19 @@ class StageModel extends CommonFormModel
 
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->factory->getTranslator()->trans('mautic.stage.changes'), $data);
+
         return $chart->render();
     }
 
     /**
-     *
      * @return mixed
      */
     public function getUserStages()
     {
-        $user  = (!$this->security->isGranted('stage:stages:viewother')) ?
+        $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->factory->getUser() : false;
         $stages = $this->em->getRepository('MauticStageBundle:Stage')->getStages($user);
 
         return $stages;
-    }
-
-    /**
-     * Triggers a specific stage change (this function is not being used any more but leaving it in case we do want to move stages through different actions)
-     *
-     * @param $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
-     *
-     * @return void
-     */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
-    {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return;
-        }
-
-        if ($typeId !== null && MAUTIC_ENV === 'prod') {
-            $triggeredEvents = $this->session->get('mautic.triggered.stage.actions', array());
-            if (in_array($typeId, $triggeredEvents)) {
-                return;
-            }
-            $triggeredEvents[] = $typeId;
-            $this->session->set('mautic.triggered.stage.actions', $triggeredEvents);
-        }
-
-        //find all the actions for published stages
-        /** @var \Mautic\StageBundle\Entity\StageRepository $repo */
-        $repo            = $this->getRepository();
-        $availableStages = $repo->getPublishedByType($type);
-
-        if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
-
-            if (null === $lead || !$lead->getId()) {
-
-                return;
-            }
-        }
-
-        //get available actions
-        $availableActions = $this->getStageActions();
-
-        //get a list of actions that has already been performed on this lead
-        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-
-        $persist = array();
-        foreach ($availableStages as $action) {
-
-            //if it's already been done, then skip it
-            if (isset($completedActions[$action->getId()])) {
-                continue;
-            }
-
-            //make sure the action still exists
-            if (!isset($availableActions['actions'][$action->getName()])) {
-                continue;
-            }
-            
-            $parsed = explode('.', $action->getName());
-            $lead->stageChangeLogEntry(
-                $parsed[0],
-                $action->getId() . ": " . $action->getName(),
-                'Moved by an action'
-            );
-            $lead->setStage($action);
-            $log = new LeadStageLog();
-            $log->setStage($action);
-            $log->setLead($lead);
-            $log->setDateFired(new \DateTime());
-
-            $persist[] = $log;
-        }
-
-        if (!empty($persist)) {
-            $this->leadModel->saveEntity($lead);
-            $this->getRepository()->saveEntities($persist);
-
-            // Detach logs to reserve memory
-            $this->em->clear('Mautic\StageBundle\Entity\LeadStageLog');
-        }
     }
 }

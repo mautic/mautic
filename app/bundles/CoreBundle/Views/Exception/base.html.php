@@ -1,21 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 /** @var $exception \Symfony\Component\HttpKernel\Exception\FlattenException */
-/** @var $logger    \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
-
+/** @var $logger \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
 $message            = $view['slots']->get('message', 'mautic.core.error.generic');
 $previousExceptions = $exception->getAllPrevious();
 
 $exceptionMessage = $exception->getMessage();
 if ($exceptionMessage) {
-    $exceptionMessage = ' - ' . $exceptionMessage;
+    $exceptionMessage = ' - '.$exceptionMessage;
 }
 
 if (!$app->getRequest()->isXmlHttpRequest()) {
@@ -34,7 +35,7 @@ $src = $view['mautibot']->getImage($img);
 <div class="pa-20 mautibot-error">
     <div class="row">
         <div class="mautibot-image col-xs-4 col-md-3">
-            <img class="img-responsive" src="<?php echo $src; ?>" />
+            <img class="img-responsive mautibot" src="<?php echo $src; ?>" />
         </div>
         <div class="mautibot-content col-xs-8 col-md-9">
             <blockquote class="np break-word">
@@ -50,9 +51,9 @@ $src = $view['mautibot']->getImage($img);
     <div class="row mt-20"">
         <h5 class="ml-lg text-danger"><?php echo $exception->getClass(); ?></h5>
         <div class="well well-sm ma-md">
-            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
-                'traces' => $exception->getTrace()
-            )); ?>
+            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', [
+                'traces' => $exception->getTrace(),
+            ]); ?>
         </div>
     </div>
 
@@ -72,9 +73,9 @@ $src = $view['mautibot']->getImage($img);
                 <div id="previous_body_<?php echo $key; ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         <div class="pa-sm">
-                            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', array(
-                                'traces' => $e->getTrace()
-                            )); ?>
+                            <?php echo $view->render('MauticCoreBundle:Exception:traces.html.php', [
+                                'traces' => $e->getTrace(),
+                            ]); ?>
                         </div>
                     </div>
                 </div>

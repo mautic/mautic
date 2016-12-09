@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
@@ -29,7 +30,7 @@ class FieldFilterTransformer implements DataTransformerInterface
         }
     }
     /**
-     * From DB format to form format
+     * From DB format to form format.
      *
      * @param mixed $rawFilters
      *
@@ -38,11 +39,11 @@ class FieldFilterTransformer implements DataTransformerInterface
     public function transform($rawFilters)
     {
         if (!is_array($rawFilters)) {
-            return array();
+            return [];
         }
 
         foreach ($rawFilters as $k => $f) {
-           if ($f['type'] == 'datetime') {
+            if ($f['type'] == 'datetime') {
                 if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
                     continue;
                 }
@@ -56,7 +57,7 @@ class FieldFilterTransformer implements DataTransformerInterface
     }
 
     /**
-     * Form format to database format
+     * Form format to database format.
      *
      * @param mixed $rawFilters
      *
@@ -64,9 +65,8 @@ class FieldFilterTransformer implements DataTransformerInterface
      */
     public function reverseTransform($rawFilters)
     {
-
         if (!is_array($rawFilters)) {
-            return array();
+            return [];
         }
 
         $rawFilters = array_values($rawFilters);

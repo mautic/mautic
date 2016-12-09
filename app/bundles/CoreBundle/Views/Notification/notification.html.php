@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -15,7 +17,7 @@
             <img class="media-object" src="<?php echo substr($n['iconClass'], 4); ?>" />
         </span>
         <?php else: ?>
-        <?php $tooltip = (!empty($n['type'])) ? ' data-toggle="tooltip" title="' . $view['translator']->trans('mautic.notifications.type.' . $n['type']) . '"' : ''; ?>
+        <?php $tooltip = (!empty($n['type'])) ? ' data-toggle="tooltip" title="'.$view['translator']->trans('mautic.notifications.type.'.$n['type']).'"' : ''; ?>
         <i class="fa fa-2x <?php echo (!empty($n['iconClass'])) ? $n['iconClass'] : 'fa-star'; ?>"<?php echo $tooltip; ?>></i>
         <?php endif; ?>
     </span>
@@ -26,7 +28,7 @@
     <div class="media-body">
         <?php if (!empty($n['header'])): ?>
             <div class="media-heading fw-sb mb-0 text-primary"><?php echo $n['header']; ?></div>
-        <?php endif;?>
+        <?php endif; ?>
         <div><?php echo $n['message']; ?></div>
         <div class="clearfix mt-xs">
             <span class="fa fa-clock-o text-success pull-left mr-xs"></span>

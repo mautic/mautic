@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -25,12 +27,12 @@
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
                 <div class="scroll-content slimscroll" style="height:250px;" id="notifications">
-                    <?php echo $view->render('MauticCoreBundle:Notification:notification_messages.html.php', array(
+                    <?php echo $view->render('MauticCoreBundle:Notification:notification_messages.html.php', [
                         'notifications' => $notifications,
-                        'updateMessage' => $updateMessage
-                    )); ?>
+                        'updateMessage' => $updateMessage,
+                    ]); ?>
                     <?php $class = (!empty($notifications)) ? ' hide' : ''; ?>
-                    <div style="width: 100px; margin: 75px auto 0 auto;" class="<?php echo $class; ?>" id="notificationMautibot">
+                    <div style="width: 100px; margin: 75px auto 0 auto;" class="<?php echo $class; ?> mautibot-image" id="notificationMautibot">
                         <img class="img img-responsive" src="<?php echo $view['mautibot']->getImage('wave'); ?>" />
                     </div>
                 </div>

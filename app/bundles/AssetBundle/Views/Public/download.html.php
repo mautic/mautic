@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * @package     Mautic
  * @copyright   2015 Mautic Contributors. All rights reserved.
  * @author      Mautic

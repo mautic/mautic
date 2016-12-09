@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Redirect;
 
 /**
- * Class RedirectModel
+ * Class RedirectModel.
  */
 class RedirectModel extends FormModel
 {
@@ -50,11 +52,11 @@ class RedirectModel extends FormModel
      */
     public function getRedirectById($identifier)
     {
-        return $this->getRepository()->findOneBy(array('redirectId' => $identifier));
+        return $this->getRepository()->findOneBy(['redirectId' => $identifier]);
     }
 
     /**
-     * Generate a Mautic redirect/passthrough URL
+     * Generate a Mautic redirect/passthrough URL.
      *
      * @param Redirect $redirect
      * @param array    $clickthrough
@@ -62,11 +64,11 @@ class RedirectModel extends FormModel
      *
      * @return string
      */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array(), $shortenUrl = false)
+    public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false)
     {
         $url = $this->buildUrl(
             'mautic_url_redirect',
-            array('redirectId' => $redirect->getRedirectId()),
+            ['redirectId' => $redirect->getRedirectId()],
             true,
             $clickthrough,
             $shortenUrl
@@ -80,7 +82,7 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * Get a Redirect entity by URL
+     * Get a Redirect entity by URL.
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
@@ -88,7 +90,7 @@ class RedirectModel extends FormModel
      *
      * @return Redirect|null
      */
-    public function getRedirectByUrl ($url)
+    public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
         while (strpos($url, '&amp;') !== false) {
@@ -96,7 +98,7 @@ class RedirectModel extends FormModel
         }
 
         $repo     = $this->getRepository();
-        $redirect = $repo->findOneBy(array('url' => $url));
+        $redirect = $repo->findOneBy(['url' => $url]);
 
         if ($redirect == null) {
             $redirect = $this->createRedirectEntity($url);
@@ -106,18 +108,18 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * Get Redirect entities by an array of URLs
+     * Get Redirect entities by an array of URLs.
      *
      * @param array $urls
      *
      * @return array
      */
-    public function getRedirectsByUrls (array $urls)
+    public function getRedirectsByUrls(array $urls)
     {
         $redirects   = $this->getRepository()->findByUrls(array_values($urls));
-        $newEntities = array();
-        $return      = array();
-        $byUrl       = array();
+        $newEntities = [];
+        $return      = [];
+        $byUrl       = [];
 
         foreach ($redirects as $redirect) {
             $byUrl[$redirect->getUrl()] = $redirect;
@@ -125,14 +127,13 @@ class RedirectModel extends FormModel
 
         foreach ($urls as $key => $url) {
             if (empty($url)) {
-
                 continue;
             }
 
             if (isset($byUrl[$url])) {
                 $return[$key] = $byUrl[$url];
             } else {
-                $redirect = $this->createRedirectEntity($url);
+                $redirect      = $this->createRedirectEntity($url);
                 $newEntities[] = $redirect;
                 $return[$key]  = $redirect;
             }
@@ -149,7 +150,7 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * Create a Redirect entity for URL
+     * Create a Redirect entity for URL.
      *
      * @param $url
      *

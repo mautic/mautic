@@ -1,17 +1,19 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,11 +21,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
- * CLI command to process the e-mail queue
+ * CLI command to process the e-mail queue.
  */
-class ProcessEmailQueueCommand extends ContainerAwareCommand
+class ProcessEmailQueueCommand extends ModeratedCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -37,12 +38,14 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
             ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to process the application's e-mail queue
 
 <info>php %command.full_name%</info>
 EOT
         );
+
+        parent::configure();
     }
 
     /**
@@ -51,20 +54,22 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options    = $input->getOptions();
-        $env        =  (!empty($options['env'])) ? $options['env'] : 'dev';
+        $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
         $dispatcher = $container->get('event_dispatcher');
 
-        $skipClear  = $input->getOption('do-not-clear');
-        $quiet      = $input->getOption('quiet');
-        $timeout    = $input->getOption('clear-timeout');
-
-        $factory    = $container->get('mautic.factory');
-        $queueMode  = $factory->getParameter('mailer_spool_type');
+        $skipClear = $input->getOption('do-not-clear');
+        $quiet     = $input->getOption('quiet');
+        $timeout   = $input->getOption('clear-timeout');
+        $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
 
+            return 0;
+        }
+
+        if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
 
@@ -94,7 +99,7 @@ EOT
                     }
 
                     //rename the file so no other process tries to find it
-                    $tmpFilename = str_replace(array('.finalretry','.sending','.tryagain'), '', $failedFile);
+                    $tmpFilename = str_replace(['.finalretry', '.sending', '.tryagain'], '', $failedFile);
                     $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
@@ -106,7 +111,7 @@ EOT
                             $dispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
                             $tryAgain = $event->shouldTryAgain();
                         }
-                        
+
                         try {
                             $transport->send($message);
                         } catch (\Swift_TransportException $e) {
@@ -135,11 +140,11 @@ EOT
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
 
-        $command = $this->getApplication()->find('swiftmailer:spool:send');
-        $commandArgs = array(
-            'command'           => 'swiftmailer:spool:send',
-            '--env'             => $env
-        );
+        $command     = $this->getApplication()->find('swiftmailer:spool:send');
+        $commandArgs = [
+            'command' => 'swiftmailer:spool:send',
+            '--env'   => $env,
+        ];
         if ($quiet) {
             $commandArgs['--quiet'] = true;
         }
@@ -164,8 +169,10 @@ EOT
         } elseif ($timeout = $container->getParameter('mautic.mailer_spool_recover_timeout')) {
             $commandArgs['--recover-timeout'] = $timeout;
         }
-        $input = new ArrayInput($commandArgs);
+        $input      = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
+
+        $this->completeRun();
 
         if ($returnCode !== 0) {
             return $returnCode;

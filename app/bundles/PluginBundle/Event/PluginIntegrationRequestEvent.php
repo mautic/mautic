@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +14,7 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class PluginIntegrationRequestEvent
+ * Class PluginIntegrationRequestEvent.
  */
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
@@ -130,13 +132,11 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
-    public function getResponse($response)
+    public function getResponse()
     {
-        return $response;
+        return $this->response;
     }
 
     /**

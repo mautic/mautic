@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <div class="col-sm-12">
     <div class="panel">
@@ -19,7 +20,7 @@
             </div>
         </div>
 
-        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $graph, 'chartType' => 'line', 'chartHeight' => 300)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $graph, 'chartType' => 'line', 'chartHeight' => 300]); ?>
     </div>
 </div>
 

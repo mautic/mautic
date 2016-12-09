@@ -1,26 +1,26 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\AssetBundle\Entity\Asset;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class AssetApiController
- *
- * @package Mautic\AssetBundle\Controller\Api
+ * Class AssetApiController.
  */
 class AssetApiController extends CommonApiController
 {
-
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->getModel('asset');
@@ -28,29 +28,11 @@ class AssetApiController extends CommonApiController
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
         $this->permissionBase   = 'asset:assets';
-        $this->serializerGroups = array("assetDetails", "categoryList", "publishDetails");
+        $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
     }
 
     /**
-     * Obtains a list of assets
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        if (!$this->security->isGranted('asset:assets:viewother')) {
-            $this->listFilters[] = array(
-                'column' => 'a.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
-            );
-        }
-
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer
+     * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
      * @param        $entity
      * @param string $action
@@ -62,5 +44,41 @@ class AssetApiController extends CommonApiController
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );
+    }
+
+    /**
+     * Convert posted parameters into what the form needs in order to successfully bind.
+     *
+     * @param $parameters
+     * @param $entity
+     * @param $action
+     *
+     * @return mixed
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        $assetDir = $this->get('mautic.helper.core_parameters')->getParameter('upload_dir');
+        $entity->setUploadDir($assetDir);
+
+        if (isset($parameters['file'])) {
+            if ($parameters['storageLocation'] === 'local') {
+                $entity->setPath($parameters['file']);
+                $entity->setFileInfoFromFile();
+
+                if ($entity->loadFile() === null) {
+                    return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Codes::HTTP_BAD_REQUEST);
+                }
+            } elseif ($parameters['storageLocation'] === 'remote') {
+                $parameters['remotePath'] = $parameters['file'];
+                $entity->setFileInfoFromFile();
+                $entity->setFileNameFromRemote();
+            }
+
+            unset($parameters['file']);
+        } elseif ($action === 'new') {
+            return $this->returnError('File of the asset is required.', Codes::HTTP_BAD_REQUEST);
+        }
+
+        return $parameters;
     }
 }

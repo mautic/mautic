@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,10 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class PushLeadActivityCommand
+ * Class PushLeadActivityCommand.
  */
 class PushLeadActivityCommand extends ContainerAwareCommand
 {
@@ -28,10 +29,10 @@ class PushLeadActivityCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:integration:pushleadactivity')
             ->setAliases(
-                array(
+                [
                     'mautic:integration:pushactivity',
-                    'mautic:pushactivity:integration'
-                )
+                    'mautic:pushactivity:integration',
+                ]
             )
             ->setDescription('Push lead activity to integration.')
             ->addOption(
@@ -69,21 +70,21 @@ class PushLeadActivityCommand extends ContainerAwareCommand
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
 
-        $translator     = $factory->getTranslator();
-        $integration    = $input->getOption('integration');
-        $startDate      = $input->getOption('start-date');
-        $endDate        = $input->getOption('end-date');
-        $interval       = $input->getOption('time-interval');
+        $translator  = $factory->getTranslator();
+        $integration = $input->getOption('integration');
+        $startDate   = $input->getOption('start-date');
+        $endDate     = $input->getOption('end-date');
+        $interval    = $input->getOption('time-interval');
 
-        if(!$interval){
-            $interval = "15 minutes";
+        if (!$interval) {
+            $interval = '15 minutes';
         }
-        if(!$startDate){
-            $startDate= date('c', strtotime("-".$interval));
+        if (!$startDate) {
+            $startDate = date('c', strtotime('-'.$interval));
         }
 
-        if(!$endDate){
-            $endDate= date('c');
+        if (!$endDate) {
+            $endDate = date('c');
         }
 
         if ($integration && $startDate && $endDate) {
@@ -93,16 +94,14 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
             if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', ['%integration%' => $integration]).'</info>');
 
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', array('%integration%' => $integration)).'</info>');
-
-                $params['start']=$startDate;
-                $params['end']=$endDate;
+                $params['start'] = $startDate;
+                $params['end']   = $endDate;
 
                 $processed = intval($integrationObject->pushLeadActivity($params));
 
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.push.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
-
+                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.push.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
             }
         }
 

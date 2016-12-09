@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,12 +13,12 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Base Bundle class which should be extended by addon bundles
+ * Base Bundle class which should be extended by addon bundles.
  */
 abstract class PluginBundleBase extends Bundle
 {
@@ -28,7 +30,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @throws \Exception
      */
-    static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
+    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
         if ($metadata !== null) {
             self::installPluginSchema($metadata, $factory, $installedSchema);
@@ -36,7 +38,7 @@ abstract class PluginBundleBase extends Bundle
     }
 
     /**
-     * Install plugin schema based on Doctrine metadata
+     * Install plugin schema based on Doctrine metadata.
      *
      * @param array         $metadata
      * @param MauticFactory $factory
@@ -44,7 +46,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @throws \Exception
      */
-    static public function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
+    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
     {
         if (null !== $installedSchema) {
             // Schema exists so bail
@@ -70,7 +72,7 @@ abstract class PluginBundleBase extends Bundle
     }
 
     /**
-     * Called by PluginController::reloadAction when the addon version does not match what's installed
+     * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
      * @param Plugin        $plugin
      * @param MauticFactory $factory
@@ -79,14 +81,14 @@ abstract class PluginBundleBase extends Bundle
      *
      * @throws \Exception
      */
-    static public function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         //self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
 
     /**
-     * Update plugin schema based on Doctrine metadata
+     * Update plugin schema based on Doctrine metadata.
      *
      * WARNING - this is not recommended as Doctrine does not guarantee results. There is a risk
      * that Doctrine will generate an incorrect query leading to lost data. If using this method,
@@ -99,7 +101,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    static public function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory)
+    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory)
     {
         $db         = $factory->getDatabase();
         $schemaTool = new SchemaTool($factory->getEntityManager());
@@ -121,19 +123,18 @@ abstract class PluginBundleBase extends Bundle
     }
 
     /**
-     * Not used yet :-)
+     * Not used yet :-).
      *
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      * @param null          $metadata
      */
-    static public function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
     {
-
     }
 
     /**
-     * Drops plugin's tables based on Doctrine metadata
+     * Drops plugin's tables based on Doctrine metadata.
      *
      * @param array         $metadata
      * @param MauticFactory $factory
@@ -141,7 +142,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    static public function dropPluginSchema(array $metadata, MauticFactory $factory)
+    public static function dropPluginSchema(array $metadata, MauticFactory $factory)
     {
         $db          = $factory->getDatabase();
         $schemaTool  = new SchemaTool($factory->getEntityManager());

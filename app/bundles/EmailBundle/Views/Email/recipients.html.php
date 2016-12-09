@@ -1,5 +1,7 @@
 <form novalidate="" autocomplete="false" data-toggle="ajax" role="form" name="email" method="post" action="<?php echo $action; ?>"> 
     <div class="row">
+        <input type="hidden" required="true" name="objectId" value="<?php echo $user_id; ?>">
+
         <div class="form-group col-xs-10 ">
             <label class="control-label" >Recipients</label>
             <input type="email" required="true" name="emails[]" value="<?php echo $email; ?>" class="form-control" autocomplete="false">

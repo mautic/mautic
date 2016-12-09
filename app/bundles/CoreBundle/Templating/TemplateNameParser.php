@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -23,11 +25,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
- * Class TemplateNameParser
+ * Class TemplateNameParser.
  */
 class TemplateNameParser extends BaseTemplateNameParser
 {
-
     /**
      * @var \Mautic\CoreBundle\Factory\MauticFactory
      */

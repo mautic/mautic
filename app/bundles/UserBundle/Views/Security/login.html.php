@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticUserBundle:Security:base.html.php');
@@ -51,9 +52,9 @@ endif;
 <?php if (!empty($integrations)): ?>
 <ul class="list-group">
 <?php foreach ($integrations as $sso): ?>
-    <a href="<?php echo $view['router']->path('mautic_sso_login', array('integration' => $sso->getName())); ?>" class="list-group-item">
+    <a href="<?php echo $view['router']->path('mautic_sso_login', ['integration' => $sso->getName()]); ?>" class="list-group-item">
         <img class="pull-left mr-xs" style="height: 16px;" src="<?php echo $view['assets']->getUrl($sso->getIcon()); ?>" >
-        <p class="list-group-item-text"><?php echo $view['translator']->trans('mautic.integration.sso.' . $sso->getName()); ?></p>
+        <p class="list-group-item-text"><?php echo $view['translator']->trans('mautic.integration.sso.'.$sso->getName()); ?></p>
     </a>
 <?php endforeach; ?>
 </ul>

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,11 +17,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
- * Class Plugin
+ * Class Plugin.
  */
 class IntegrationEntity extends CommonEntity
 {
-
     /**
      * @var int
      */
@@ -65,7 +66,7 @@ class IntegrationEntity extends CommonEntity
      */
     private $internal;
 
-    public function __construct ()
+    public function __construct()
     {
         $this->internal = new ArrayCollection();
     }
@@ -73,7 +74,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -116,23 +117,23 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set integration
+     * Set integration.
      *
      * @param string $integration
      *
      * @return string
      */
-    public function setIntegration ($integration)
+    public function setIntegration($integration)
     {
         $this->integration = $integration;
 
@@ -140,33 +141,33 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getIntegration ()
+    public function getIntegration()
     {
         return $this->integration;
     }
 
     /**
-     * Set integrationEntity
+     * Set integrationEntity.
      *
      * @param string $integrationEntity
      *
      * @return integrationEntity
      */
-    public function setIntegrationEntity ($integrationEntity)
+    public function setIntegrationEntity($integrationEntity)
     {
         $this->integrationEntity = $integrationEntity;
     }
 
     /**
-     * Get integrationEntity
+     * Get integrationEntity.
      *
      * @return string
      */
-    public function getIntegrationEntity ()
+    public function getIntegrationEntity()
     {
         return $this->integrationEntity;
     }
@@ -174,16 +175,15 @@ class IntegrationEntity extends CommonEntity
     /**
      * @return int
      */
-    public function getIntegrationEntityId ()
+    public function getIntegrationEntityId()
     {
         return $this->integrationEntityId;
     }
 
-
     /**
      * @param mixed $integrationEntityId
      */
-    public function setIntegrationEntityId ($integrationEntityId)
+    public function setIntegrationEntityId($integrationEntityId)
     {
         $this->integrationEntityId = $integrationEntityId;
     }
@@ -191,7 +191,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @return string
      */
-    public function getInternalEntity ()
+    public function getInternalEntity()
     {
         return $this->integrationEntity;
     }
@@ -199,7 +199,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param mixed string
      */
-    public function setInternalEntity ($internalEntity)
+    public function setInternalEntity($internalEntity)
     {
         $this->internalEntity = $internalEntity;
     }
@@ -207,7 +207,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @return mixed
      */
-    public function getInternalEntityId ()
+    public function getInternalEntityId()
     {
         return $this->internalEntityId;
     }
@@ -215,7 +215,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param mixed $isMissing
      */
-    public function setInternalEntityId ($internalEntityId)
+    public function setInternalEntityId($internalEntityId)
     {
         $this->internalEntityId = $internalEntityId;
     }
@@ -223,7 +223,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @return mixed
      */
-    public function getInternal ()
+    public function getInternal()
     {
         return $this->internal;
     }
@@ -231,15 +231,15 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param mixed $internal
      */
-    public function setInternal ($internal)
+    public function setInternal($internal)
     {
         $this->internal = $internal;
     }
 
     /**
- * @return mixed
- */
-    public function getDateAdded ()
+     * @return mixed
+     */
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -247,7 +247,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded ($dateAdded)
+    public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
     }
@@ -255,7 +255,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @return mixed
      */
-    public function getLastSyncDate ()
+    public function getLastSyncDate()
     {
         return $this->lastSyncDate;
     }
@@ -263,7 +263,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @param mixed $dateAdded
      */
-    public function setLastSyncDate ($lastSyncDate)
+    public function setLastSyncDate($lastSyncDate)
     {
         $this->lastSyncDate = $lastSyncDate;
     }

@@ -1,17 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\Migrations;
+
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+
 /**
- * Class Version20160712000001
+ * Class Version20160712000001.
  */
 class Version20160712000001 extends AbstractMauticMigration
 {
@@ -33,7 +38,7 @@ class Version20160712000001 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD show_when_value_exists BOOLEAN DEFAULT TRUE');
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD show_after_x_submissions INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'form_fields ADD show_when_value_exists BOOLEAN DEFAULT TRUE');
+        $this->addSql('ALTER TABLE '.$this->prefix.'form_fields ADD show_after_x_submissions INT DEFAULT NULL');
     }
 }

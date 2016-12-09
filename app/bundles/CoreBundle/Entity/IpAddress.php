@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,19 +16,16 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class IpAddress
- *
- * @package Mautic\CoreBundle\Entity
+ * Class IpAddress.
  */
 class IpAddress
 {
-
     /**
-     * Set by factory of configured IPs to not track
+     * Set by factory of configured IPs to not track.
      *
      * @var array
      */
-    private $doNotTrack = array();
+    private $doNotTrack = [];
 
     /**
      * @var int
@@ -46,13 +45,13 @@ class IpAddress
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('ip_addresses')
             ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository')
-            ->addIndex(array('ip_address'), 'ip_search');
+            ->addIndex(['ip_address'], 'ip_search');
 
         $builder->addId();
 
@@ -68,27 +67,27 @@ class IpAddress
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->addProperties(
-                array(
+                [
                     'id',
                     'ipAddress',
-                    'ipDetails'
-                )
+                    'ipDetails',
+                ]
             )
             ->addGroup('ipAddress')
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -96,7 +95,7 @@ class IpAddress
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param $ipAddress
      *
@@ -110,7 +109,7 @@ class IpAddress
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return string
      */
@@ -120,7 +119,7 @@ class IpAddress
     }
 
     /**
-     * Set ipDetails
+     * Set ipDetails.
      *
      * @param string $ipDetails
      *
@@ -134,7 +133,7 @@ class IpAddress
     }
 
     /**
-     * Get ipDetails
+     * Get ipDetails.
      *
      * @return string
      */
@@ -144,7 +143,7 @@ class IpAddress
     }
 
     /**
-     * Set list of IPs to not track
+     * Set list of IPs to not track.
      *
      * @param array $ips
      */
@@ -154,7 +153,7 @@ class IpAddress
     }
 
     /**
-     * Get list of IPs to not track
+     * Get list of IPs to not track.
      *
      * @return array
      */
@@ -164,13 +163,13 @@ class IpAddress
     }
 
     /**
-     * Determine if this IP is trackable
+     * Determine if this IP is trackable.
      */
     public function isTrackable()
     {
         if (!empty($this->doNotTrack)) {
             foreach ($this->doNotTrack as $ip) {
-                if ( strpos( $ip, '/' ) == false ) {
+                if (strpos($ip, '/') == false) {
                     if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
                         return false;
                     }
@@ -178,10 +177,10 @@ class IpAddress
                     // has a netmask range
                     // https://gist.github.com/tott/7684443
                     list($range, $netmask) = explode('/', $ip, 2);
-                    $range_decimal    = ip2long($range);
-                    $ip_decimal       = ip2long($ip);
-                    $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
-                    $netmask_decimal  = ~$wildcard_decimal;
+                    $range_decimal         = ip2long($range);
+                    $ip_decimal            = ip2long($ip);
+                    $wildcard_decimal      = pow(2, (32 - $netmask)) - 1;
+                    $netmask_decimal       = ~$wildcard_decimal;
 
                     if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
                         return false;

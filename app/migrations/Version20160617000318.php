@@ -85,6 +85,5 @@ SQL;
         $this->addSql($dwcSql2);
         $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_lead_data ADD CONSTRAINT {$dwc2LeadFK} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE;");
         $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_lead_data ADD CONSTRAINT {$dwc2DwcFK} FOREIGN KEY (dynamic_content_id) REFERENCES {$this->prefix}dynamic_content (id) ON DELETE CASCADE;");
-
     }
 }

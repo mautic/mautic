@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class RoleListType
+ * Class RoleListType.
  */
 class RoleListType extends AbstractType
 {
@@ -37,10 +39,10 @@ class RoleListType extends AbstractType
                         [
                             'column' => 'r.isPublished',
                             'expr'   => 'eq',
-                            'value'  => true
-                        ]
-                    ]
-                ]
+                            'value'  => true,
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -63,7 +65,7 @@ class RoleListType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone'
+                'empty_value' => 'mautic.core.form.chooseone',
             ]
         );
     }
@@ -73,7 +75,7 @@ class RoleListType extends AbstractType
      */
     public function getName()
     {
-        return "role_list";
+        return 'role_list';
     }
 
     /**

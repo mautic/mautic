@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,13 +17,11 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class LeadList
- *
- * @package Mautic\LeadBundle\Entity
+ * Class LeadList.
  */
 class LeadList extends FormEntity
 {
@@ -48,7 +48,7 @@ class LeadList extends FormEntity
     /**
      * @var array
      */
-    private $filters = array();
+    private $filters = [];
 
     /**
      * @var bool
@@ -61,7 +61,7 @@ class LeadList extends FormEntity
     private $leads;
 
     /**
-     * Construct
+     * Construct.
      */
     public function __construct()
     {
@@ -71,7 +71,7 @@ class LeadList extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -101,17 +101,17 @@ class LeadList extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.core.name.required')
+            ['message' => 'mautic.core.name.required']
         ));
 
-        $metadata->addConstraint(new UniqueUserAlias(array(
+        $metadata->addConstraint(new UniqueUserAlias([
             'field'   => 'alias',
-            'message' => 'mautic.lead.list.alias.unique'
-        )));
+            'message' => 'mautic.lead.list.alias.unique',
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -119,26 +119,26 @@ class LeadList extends FormEntity
     {
         $metadata->setGroupPrefix('leadList')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'alias',
-                    'description'
-                )
+                    'description',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'filters',
-                    'isGlobal'
-                )
+                    'isGlobal',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -146,9 +146,10 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set name
+     * Set name.
      *
-     * @param integer $name
+     * @param int $name
+     *
      * @return LeadList
      */
     public function setName($name)
@@ -160,9 +161,9 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
-     * @return integer
+     * @return int
      */
     public function getName()
     {
@@ -170,9 +171,10 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return LeadList
      */
     public function setDescription($description)
@@ -184,7 +186,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -194,9 +196,10 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set filters
+     * Set filters.
      *
      * @param array $filters
+     *
      * @return LeadList
      */
     public function setFilters(array $filters)
@@ -208,7 +211,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get filters
+     * Get filters.
      *
      * @return array
      */
@@ -218,9 +221,10 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set isGlobal
+     * Set isGlobal.
      *
-     * @param boolean $isGlobal
+     * @param bool $isGlobal
+     *
      * @return LeadList
      */
     public function setIsGlobal($isGlobal)
@@ -232,9 +236,9 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get isGlobal
+     * Get isGlobal.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsGlobal()
     {
@@ -242,7 +246,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Proxy function to getIsGlobal()
+     * Proxy function to getIsGlobal().
      *
      * @return bool
      */
@@ -252,9 +256,10 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set alias
+     * Set alias.
      *
      * @param string $alias
+     *
      * @return LeadList
      */
     public function setAlias($alias)
@@ -266,7 +271,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get alias
+     * Get alias.
      *
      * @return string
      */
@@ -276,7 +281,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get leads
+     * Get leads.
      *
      * @return \Doctrine\Common\Collections\Collection
      */

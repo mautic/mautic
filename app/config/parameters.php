@@ -1,13 +1,14 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-include __DIR__ . '/paths_helper.php';
+include __DIR__.'/paths_helper.php';
 
 //load default parameters from bundle files
 $core    = $container->getParameter('mautic.bundles');
@@ -16,7 +17,7 @@ $plugins = $container->getParameter('mautic.plugin.bundles');
 $bundles = array_merge($core, $plugins);
 unset($core, $plugins);
 
-$mauticParams = array();
+$mauticParams = [];
 
 foreach ($bundles as $bundle) {
     if (!empty($bundle['config']['parameters'])) {
@@ -25,13 +26,13 @@ foreach ($bundles as $bundle) {
 }
 
 // Find available translations
-$locales = array();
+$locales = [];
 
-$extractLocales = function($dir) use (&$locales) {
+$extractLocales = function ($dir) use (&$locales) {
     $locale = $dir->getFilename();
 
     // Check config
-    $configFile = $dir->getRealpath() . '/config.php';
+    $configFile = $dir->getRealpath().'/config.php';
     if (file_exists($configFile)) {
         $config           = include $configFile;
         $locales[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
@@ -39,19 +40,18 @@ $extractLocales = function($dir) use (&$locales) {
 };
 
 $defaultLocalesDir = new \Symfony\Component\Finder\Finder();
-$defaultLocalesDir->directories()->in($root . '/bundles/CoreBundle/Translations')->ignoreDotFiles(true)->depth('== 0');
+$defaultLocalesDir->directories()->in($root.'/bundles/CoreBundle/Translations')->ignoreDotFiles(true)->depth('== 0');
 foreach ($defaultLocalesDir as $dir) {
     $extractLocales($dir);
 }
 
 $installedLocales = new \Symfony\Component\Finder\Finder();
-$installedLocales->directories()->in($root . '/../' . $paths['translations'])->ignoreDotFiles(true)->depth('== 0');
+$installedLocales->directories()->in($root.'/../'.$paths['translations'])->ignoreDotFiles(true)->depth('== 0');
 
 foreach ($installedLocales as $dir) {
     $extractLocales($dir);
 }
 unset($defaultLocalesDir, $installedLocales, $extractLocales);
-
 
 $mauticParams['supported_languages'] = $locales;
 
@@ -66,8 +66,8 @@ if (isset($paths['local_config'])) {
 }
 
 // Force local specific params
-if (file_exists(__DIR__ . '/parameters_local.php')) {
-    include __DIR__ . '/parameters_local.php';
+if (file_exists(__DIR__.'/parameters_local.php')) {
+    include __DIR__.'/parameters_local.php';
 
     //override default with forced
     $mauticParams = array_merge($mauticParams, $parameters);
@@ -108,14 +108,14 @@ if (isset($mauticParams['site_url'])) {
             }
         }
 
-        $scheme = (! empty($parts['scheme']) ? $parts['scheme'] : 'http');
+        $scheme           = (!empty($parts['scheme']) ? $parts['scheme'] : 'http');
         $portContainerKey = ($scheme === 'http') ? 'request_listener.http_port' : 'request_listener.https_port';
 
         $container->setParameter('router.request_context.host', $parts['host']);
         $container->setParameter('router.request_context.scheme', $scheme);
         $container->setParameter('router.request_context.base_url', $path);
 
-        if (! empty($parts['port'])) {
+        if (!empty($parts['port'])) {
             $container->setParameter($portContainerKey, (!empty($parts['port']) ? $parts['port'] : null));
         }
     }
