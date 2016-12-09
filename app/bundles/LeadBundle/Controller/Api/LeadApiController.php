@@ -263,7 +263,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of lead lists the lead is in.
+     * Obtains a list of contact segments the contact is in.
      *
      * @param $id
      *
@@ -300,6 +300,38 @@ class LeadApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * Obtains a list of contact companies the contact is in.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getCompaniesAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $companies = $this->model->getCompanies($entity);
+
+        $view = $this->view(
+            [
+                'total'     => count($companies),
+                'companies' => $companies,
+            ],
+            Codes::HTTP_OK
+        );
+
+        return $this->handleView($view);
     }
 
     /**

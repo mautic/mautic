@@ -128,6 +128,10 @@ return [
                 'path'       => '/contacts/{id}/segments',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getLists',
             ],
+            'mautic_api_getcontactscompanies' => [
+                'path'       => '/contacts/{id}/companies',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getCompanies',
+            ],
             'mautic_api_getcontactowners' => [
                 'path'       => '/contacts/list/owners',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getOwners',

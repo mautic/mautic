@@ -945,7 +945,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get a list of lists this lead belongs to.
+     * Get a list of segments this lead belongs to.
      *
      * @param Lead $lead
      * @param bool $forLists
@@ -959,6 +959,20 @@ class LeadModel extends FormModel
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
         return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+    }
+
+    /**
+     * Get a list of companies this contact belongs to.
+     *
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
+    public function getCompanies(Lead $lead)
+    {
+        $repo = $this->em->getRepository('MauticLeadBundle:CompanyLead');
+
+        return $repo->getCompaniesByLeadId($lead->getId());
     }
 
     /**
