@@ -494,24 +494,6 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($parameters['ipAddress'])) {
-            $ip = $parameters['ipAddress'];
-            unset($parameters['ipAddress']);
-
-            $ipAddress = $this->factory->getIpAddress($ip);
-
-            if (!$entity->getIpAddresses()->contains($ipAddress)) {
-                $entity->addIpAddress($ipAddress);
-            }
-        }
-
-        // Check for tag string
-        if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags']);
-            unset($parameters['tags']);
-        }
-
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
@@ -563,7 +545,24 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
+        unset($parameters['lastActive']);
+
+        //Since the request can be from 3rd party, check for an IP address if included
+        if (isset($parameters['ipAddress'])) {
+            $ipAddress = $this->factory->getIpAddress($parameters['ipAddress']);
+
+            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+                $entity->addIpAddress($ipAddress);
+            }
+
+            unset($parameters['ipAddress']);
+        }
+
+        // Check for tags
+        if (isset($parameters['tags'])) {
+            $this->model->modifyTags($entity, $parameters['tags'], null, true);
+            unset($parameters['tags']);
+        }
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
@@ -594,6 +593,7 @@ class LeadApiController extends CommonApiController
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
         if ($entity instanceof Lead) {
+            $fields        = $entity->getFields();
             $fields['all'] = $entity->getProfileFields();
             $entity->setFields($fields);
         }
