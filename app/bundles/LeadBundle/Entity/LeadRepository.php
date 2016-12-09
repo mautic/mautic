@@ -381,9 +381,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         });
 
         if (!empty($args['withPrimaryCompany'])) {
-            $tmpContacts = $args['withTotalCount'] ? $contacts['results'] : $contacts;
-            $contactIds  = array_keys($tmpContacts);
-            $companies   = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
+            $withTotalCount = array_key_exists('withTotalCount', $args);
+            $tmpContacts    = ($withTotalCount && $args['withTotalCount']) ? $contacts['results'] : $contacts;
+            $contactIds     = array_keys($tmpContacts);
+            $companies      = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
 
             foreach ($contactIds as $id) {
                 if (isset($companies[$id]) && !empty($companies[$id])) {
@@ -409,7 +410,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 }
             }
 
-            if ($args['withTotalCount']) {
+            if ($withTotalCount && $args['withTotalCount']) {
                 $contacts['results'] = $tmpContacts;
             } else {
                 $contacts = $tmpContacts;
