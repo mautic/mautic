@@ -213,6 +213,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
+        if (!isset($matchedFields['companyname'])) {
+            if (isset($matchedFields['companywebsite'])) {
+                $matchedFields['companyname'] = $matchedFields['companywebsite'];
+            }
+        }
+
         if (empty($matchedFields)) {
             return;
         }

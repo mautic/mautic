@@ -179,14 +179,17 @@ class HubspotIntegration extends CrmAbstractIntegration
                 ];
             }
         }
-        //put mautic timeline link
-        $formattedLeadData['properties'][] = [
-            'property' => 'mautic_timeline',
-            'value'    => $this->factory->getRouter()->generate(
-                            'mautic_plugin_timeline_view',
-                            ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
-                            UrlGeneratorInterface::ABSOLUTE_URL),
+
+        if ($lead && !empty($lead->getId())) {
+            //put mautic timeline link
+            $formattedLeadData['properties'][] = [
+                'property' => 'mautic_timeline',
+                'value'    => $this->factory->getRouter()->generate(
+                    'mautic_plugin_timeline_view',
+                    ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL),
             ];
+        }
 
         return $formattedLeadData;
     }
@@ -261,7 +264,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $config                         = $this->mergeConfigToFeatureSettings();
                 $fields                         = implode('&property=', array_keys($config['leadFields']));
-                $params['post_append_to_query'] = '&property='.$fields;
+                $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
 
                 $data = $this->getApiHelper()->getContacts($params);
                 if (isset($data['contacts'])) {
@@ -420,6 +423,11 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         if (isset($company)) {
+            if (!isset($matchedFields['companyname'])) {
+                if (isset($matchedFields['companywebsite'])) {
+                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
+                }
+            }
             $leadModel->addToCompany($lead, $company);
         }
 
@@ -431,24 +439,25 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $stage->setName($stageName);
                 $stages[$stageName] = $stage;
             }
+            if (!$lead->getStage() && $lead->getStage() != $stage) {
+                $lead->setStage($stage);
 
-            $lead->setStage($stage);
-
-            //add a contact stage change log
-            $log = new StagesChangeLog();
-            $log->setStage($stage);
-            $log->setEventName($stage->getId().':'.$stage->getName());
-            $log->setLead($lead);
-            $log->setActionName(
-                $this->factory->getTranslator()->trans(
-                    'mautic.stage.import.action.name',
-                    [
-                        '%name%' => $this->factory->getUser()->getUsername(),
-                    ]
-                )
-            );
-            $log->setDateAdded(new \DateTime());
-            $lead->stageChangeLog($log);
+                //add a contact stage change log
+                $log = new StagesChangeLog();
+                $log->setStage($stage);
+                $log->setEventName($stage->getId().':'.$stage->getName());
+                $log->setLead($lead);
+                $log->setActionName(
+                    $this->factory->getTranslator()->trans(
+                        'mautic.stage.import.action.name',
+                        [
+                            '%name%' => $this->factory->getUser()->getUsername(),
+                        ]
+                    )
+                );
+                $log->setDateAdded(new \DateTime());
+                $lead->stageChangeLog($log);
+            }
         }
         $pushData['email'] = $lead->getEmail();
         $this->getApiHelper()->createLead($pushData, $lead, $updateLink = true);
