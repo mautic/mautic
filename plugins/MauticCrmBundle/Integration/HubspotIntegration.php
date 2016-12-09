@@ -112,13 +112,11 @@ class HubspotIntegration extends CrmAbstractIntegration
         $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
-        $hubspotObjects = [];
-
         if (isset($settings['feature_settings']['objects'])) {
             $hubspotObjects = $settings['feature_settings']['objects'];
         } else {
             $settings       = $this->settings->getFeatureSettings();
-            $hubspotObjects = $settings['objects'];
+            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : 'contacts';
         }
 
         try {
