@@ -68,7 +68,7 @@ $customButtons[] = [
                         ),
         'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
     ],
-    'iconClass' => 'fa fa-send '.$email->getId(),
+    'iconClass' => 'fa fa-send',
     'btnText'   => 'mautic.email.send.example',
     'primary'   => true,
 ];
