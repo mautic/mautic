@@ -1558,11 +1558,14 @@ class EmailController extends FormController
         // Get the quick add form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'exampleMultiple']);
 
+        $user       = $this->factory->getUser();
+        $user_email = $user->getEmail();
 
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'action' => $action
+                    'action' => $action,
+                    'email'  => $user_email,
                 ],
                 'contentTemplate' => "MauticEmailBundle:Email:recipients.html.php",
             ]

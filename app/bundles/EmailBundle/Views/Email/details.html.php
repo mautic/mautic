@@ -55,19 +55,6 @@ if ($emailType == 'list') {
     ];
 }
 
-$customButtons[] = [
-    'attr'      => [
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->path(
-            'mautic_email_action',
-            ['objectAction' => 'example', 'objectId' => $email->getId()]
-        ),
-    ],
-    'iconClass' => 'fa fa-send',
-    'btnText'   => 'mautic.email.send.example',
-];
-
-
 
 $customButtons[] = array(
     'attr'      => array(
@@ -77,8 +64,8 @@ $customButtons[] = array(
         'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
         'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
     ),
-    'iconClass' => 'fa fa-users',
-    'btnText'   => 'mautic.email.send.example.mutiple'
+    'iconClass' => 'fa fa-send',
+    'btnText'   => 'mautic.email.send.example'
 );
 
  

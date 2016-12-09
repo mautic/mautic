@@ -1,9 +1,8 @@
-<form novalidate="" autocomplete="false" data-toggle="ajax" role="form" name="email" method="post" action="<?= $action; ?>"> 
-
+<form novalidate="" autocomplete="false" data-toggle="ajax" role="form" name="email" method="post" action="<?php echo $action; ?>"> 
     <div class="row">
         <div class="form-group col-xs-10 ">
             <label class="control-label" >Recipients</label>
-            <input type="email" required="true" name="emails[]" class="form-control" autocomplete="false">
+            <input type="email" required="true" name="emails[]" value="<?php echo $email; ?>" class="form-control" autocomplete="false">
         </div>  
 
         <div class="dynamic-field-outer"></div>   
