@@ -529,8 +529,9 @@ class EventModel extends CommonFormModel
                             ],
                         ],
                     ],
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc',
+                    'orderBy'            => 'l.id',
+                    'orderByDir'         => 'asc',
+                    'withPrimaryCompany' => true,
                 ]
             );
 
@@ -1106,8 +1107,9 @@ class EventModel extends CommonFormModel
                             ],
                         ],
                     ],
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc',
+                    'orderBy'            => 'l.id',
+                    'orderByDir'         => 'asc',
+                    'withPrimaryCompany' => true,
                 ]
             );
 
@@ -1392,8 +1394,9 @@ class EventModel extends CommonFormModel
                                     ],
                                 ],
                             ],
-                            'orderBy'    => 'l.id',
-                            'orderByDir' => 'asc',
+                            'orderBy'            => 'l.id',
+                            'orderByDir'         => 'asc',
+                            'withPrimaryCompany' => true,
                         ]
                     );
 

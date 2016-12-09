@@ -316,7 +316,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function getCompaniesForContacts(array $contacts)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('c.*, l.lead_id')
+        $qb->select('c.*, l.lead_id, l.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(

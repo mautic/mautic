@@ -19,11 +19,13 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class EventHelper
 {
     /**
-     * @param               $lead
+     * @param               $contact
      * @param MauticFactory $factory
      */
-    public static function pushLead($config, $lead, MauticFactory $factory)
+    public static function pushLead($config, $contact, MauticFactory $factory)
     {
+        $contact = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($contact);
+
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $factory->getHelper('integration');
 
@@ -40,7 +42,7 @@ class EventHelper
             }
 
             if (method_exists($s, 'pushLead')) {
-                if ($s->pushLead($lead, $config)) {
+                if ($s->pushLead($contact, $config)) {
                     $success = true;
                 }
             }

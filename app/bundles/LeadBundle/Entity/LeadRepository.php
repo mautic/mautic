@@ -325,6 +325,46 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * Get a contact entity with the primary company data populated.
+     *
+     * The primary company data will be a flat array on the entity
+     * with a key of `primaryCompany`
+     *
+     * @param mixed $entity
+     *
+     * @return mixed|null
+     */
+    public function getEntityWithPrimaryCompany($entity)
+    {
+        if (is_int($entity)) {
+            $entity = $this->getEntity($entity);
+        }
+
+        if ($entity instanceof Lead) {
+            $id        = $entity->getId();
+            $companies = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts([$id]);
+
+            if (!empty($companies[$id])) {
+                $primary = null;
+
+                foreach ($companies as $company) {
+                    if ($company['is_primary'] == 1) {
+                        $primary = $company;
+                    }
+                }
+
+                if (empty($primary)) {
+                    $primary = $companies[$id][0];
+                }
+
+                $entity->primaryCompany = $primary;
+            }
+        }
+
+        return $entity;
+    }
+
+    /**
      * Get a list of leads.
      *
      * @param array $args
@@ -333,12 +373,50 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getEntities($args = [])
     {
-        return $this->getEntitiesWithCustomFields('lead', $args, function ($r) {
+        $contacts = $this->getEntitiesWithCustomFields('lead', $args, function ($r) {
             if (!empty($this->triggerModel)) {
                 $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
             }
             $r->setAvailableSocialFields($this->availableSocialFields);
         });
+
+        if (!empty($args['withPrimaryCompany'])) {
+            $tmpContacts = $args['withTotalCount'] ? $contacts['results'] : $contacts;
+            $contactIds  = array_keys($tmpContacts);
+            $companies   = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
+
+            foreach ($contactIds as $id) {
+                if (isset($companies[$id]) && !empty($companies[$id])) {
+                    $primary = null;
+
+                    // Try to find the primary company
+                    foreach ($companies[$id] as $company) {
+                        if ($company['is_primary'] == 1) {
+                            $primary = $company;
+                        }
+                    }
+
+                    // If no primary was found, just grab the first
+                    if (empty($primary)) {
+                        $primary = $companies[$id][0];
+                    }
+
+                    if (is_array($tmpContacts[$id])) {
+                        $tmpContacts[$id]['primaryCompany'] = $primary;
+                    } elseif ($tmpContacts[$id] instanceof Lead) {
+                        $tmpContacts[$id]->primaryCompany = $primary;
+                    }
+                }
+            }
+
+            if ($args['withTotalCount']) {
+                $contacts['results'] = $tmpContacts;
+            } else {
+                $contacts = $tmpContacts;
+            }
+        }
+
+        return $contacts;
     }
 
     /**
@@ -374,7 +452,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q->select($alias.', u, i,'.$order)
             ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
             ->leftJoin($alias.'.ipAddresses', 'i')
-            ->leftJoin($alias.'.owner', 'u');
+            ->leftJoin($alias.'.owner', 'u')
+            ->indexBy($alias, $alias.'.id');
 
         return $q;
     }
