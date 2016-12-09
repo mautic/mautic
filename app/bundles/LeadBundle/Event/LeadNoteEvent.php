@@ -44,7 +44,7 @@ class LeadNoteEvent extends CommonEvent
      *
      * @param LeadNote $note
      */
-    public function setLeadNote(getNote $note)
+    public function setLeadNote(LeadNote $note)
     {
         $this->entity = $note;
     }
