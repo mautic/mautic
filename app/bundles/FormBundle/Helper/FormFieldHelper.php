@@ -49,6 +49,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'checkboxgrp' => [],
         'country'     => [],
         'date'        => [],
+        'datetime'    => [],
         'email'       => [
             'filter'      => 'email',
             'constraints' => [
