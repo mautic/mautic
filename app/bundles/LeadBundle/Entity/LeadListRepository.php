@@ -751,7 +751,8 @@ class LeadListRepository extends CommonRepository
                         case 'month_last':
                         case 'month_next':
                         case 'month_this':
-                            $interval = substr($key, -4);                             $dtHelper->setDateTime('midnight first day of '.$interval.' month', null);
+                            $interval = substr($key, -4);
+                            $dtHelper->setDateTime('midnight first day of '.$interval.' month', null);
 
                             // This month: 2015-08-01 00:00:00
                             if ($requiresBetween) {
@@ -1030,6 +1031,7 @@ class LeadListRepository extends CommonRepository
                 case 'tags':
                 case 'globalcategory':
                 case 'lead_email_received':
+                case 'lead_email_sent':
                     // Special handling of lead lists and tags
                     $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
 
@@ -1078,6 +1080,10 @@ class LeadListRepository extends CommonRepository
                                 $subQb->expr()->eq($alias.'.is_read', ":$trueParameter")
                             );
                             $parameters[$trueParameter] = true;
+                            break;
+                        case 'lead_email_sent':
+                            $table  = 'email_stats';
+                            $column = 'email_id';
                             break;
                     }
 
