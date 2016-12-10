@@ -123,6 +123,9 @@ return [
             ],
             'mautic.email.reportbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
             ],
             'mautic.email.leadbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
