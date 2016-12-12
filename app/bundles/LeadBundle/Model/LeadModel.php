@@ -2004,6 +2004,16 @@ class LeadModel extends FormModel
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
             ],
+            'empty' => [
+                'label'       => 'mautic.lead.list.form.operator.isempty',
+                'expr'        => 'empty', //special case
+                'negate_expr' => 'notEmpty',
+            ],
+            '!empty' => [
+                'label'       => 'mautic.lead.list.form.operator.isnotempty',
+                'expr'        => 'notEmpty', //special case
+                'negate_expr' => 'empty',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];

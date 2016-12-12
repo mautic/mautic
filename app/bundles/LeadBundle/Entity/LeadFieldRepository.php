@@ -160,17 +160,32 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             // Standard field
-            $q->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->$operatorExpr('l.'.$field, ':value')
+            if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
+
+                if ($operatorExpr === 'empty') {
+                    $operatorExpr = 'isNull';
+                } else {
+                    $operatorExpr = 'isNotNull';
+                }
+
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->$operatorExpr('l.'.$field)
+                    )
                 )
-            )
-            ->setParameter('lead', (int) $lead)
-            ->setParameter('value', $value);
-
+                 ->setParameter('lead', (int) $lead);
+            }else {
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->$operatorExpr('l.'.$field, ':value')
+                    )
+                )
+                ->setParameter('lead', (int) $lead)
+                ->setParameter('value', $value);
+            }
             $result = $q->execute()->fetch();
-
             return !empty($result['id']);
         }
     }
