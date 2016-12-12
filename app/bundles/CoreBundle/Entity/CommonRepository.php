@@ -143,24 +143,51 @@ class CommonRepository extends EntityRepository
     /**
      * Get an array of rows from one table using DBAL.
      *
-     * @param array $args
+     * @param int   $start
+     * @param int   $limit
+     * @param array $order
+     * @param array $where
+     * @param array $select
      *
      * @return array
      */
-    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = [])
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null)
     {
         $alias = $this->getTableAlias();
         $table = MAUTIC_TABLE_PREFIX.$this->getClassMetadata()->getTableName();
         $q     = $this->_em->getConnection()->createQueryBuilder();
-        $q->select($alias.'.*')
-            ->from($table, $alias)
+
+        $q->select('count(*)')
+          ->from($table, $alias);
+
+        $this->buildDbalWhere($q, $where);
+
+        $count = $q->execute()->fetchColumn();
+
+        if ($select) {
+            foreach ($select as &$column) {
+                if (strpos($column, '.') === false) {
+                    $column = $alias.'.'.$column;
+                }
+            }
+            $selectString = implode(', ', $select);
+        } else {
+            $selectString = $alias.'.*';
+        }
+
+        $q->resetQueryPart('select')
+            ->select($selectString)
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
         $this->buildDbalOrderBy($q, $order);
-        $this->buildDbalWhere($q, $where);
 
-        return $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAll();
+
+        return [
+            'total'   => $count,
+            'results' => $results,
+        ];
     }
 
     /**
@@ -583,7 +610,6 @@ class CommonRepository extends EntityRepository
      */
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
-        $type         = 'and';
         $parseFilters = [];
         if (isset($filters->root)) {
             // Function is determined by the second clause type
@@ -595,6 +621,10 @@ class CommonRepository extends EntityRepository
         } elseif (is_array($filters)) {
             $type         = (isset($filters[1])) ? $filters[1]->type : $filters[0]->type;
             $parseFilters = &$filters;
+        }
+
+        if (empty($type)) {
+            $type = 'and';
         }
 
         $parameters  = [];

@@ -28,5 +28,28 @@ class StatsSubscriber extends CommonStatsSubscriber
     {
         $this->repositories[] = $em->getRepository('MauticEmailBundle:StatDevice');
         $this->repositories[] = $em->getRepository('MauticEmailBundle:Stat');
+
+        // Exclude copy and tokens as these can be quite large
+        $this->selects[$em->getRepository('MauticEmailBundle:Stat')->getTableName()] =
+            [
+                'id',
+                'email_id',
+                'lead_id',
+                'list_id',
+                'ip_id',
+                'email_address',
+                'date_sent',
+                'is_read',
+                'is_failed',
+                'viewed_in_browser',
+                'date_read',
+                'tracking_hash',
+                'retry_count',
+                'source',
+                'source_id',
+                'open_count',
+                'last_opened',
+                'open_details',
+            ];
     }
 }

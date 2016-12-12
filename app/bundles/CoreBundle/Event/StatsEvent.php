@@ -28,6 +28,13 @@ class StatsEvent extends Event
     protected $table;
 
     /**
+     * Array of columns to fetch.
+     *
+     * @var null|array
+     */
+    protected $select = null;
+
+    /**
      * The page where to start with.
      *
      * @var int
@@ -84,11 +91,13 @@ class StatsEvent extends Event
     protected $repository;
 
     /**
-     * @param string $table
-     * @param int    $start
-     * @param int    $limit
-     * @param array  $order
-     * @param array  $where
+     * StatsEvent constructor.
+     *
+     * @param       $table
+     * @param int   $start
+     * @param int   $limit
+     * @param array $order
+     * @param array $where
      */
     public function __construct($table, $start = 0, $limit = 100, array $order = [], array $where = [])
     {
@@ -100,9 +109,11 @@ class StatsEvent extends Event
     }
 
     /**
-     * Returns the table name.
+     * Returns if event is for this table.
      *
-     * @return string
+     * @param $table
+     *
+     * @return bool
      */
     public function isLookingForTable($table)
     {
@@ -126,9 +137,32 @@ class StatsEvent extends Event
                 $this->getStart(),
                 $this->getLimit(),
                 $this->getOrder(),
-                $this->getWhere()
+                $this->getWhere(),
+                $this->getSelect()
             )
         );
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelect()
+    {
+        return $this->select;
+    }
+
+    /**
+     * @param array|null $select
+     *
+     * @return $this
+     */
+    public function setSelect(array $select = null)
+    {
+        $this->select = $select;
+
+        return $this;
     }
 
     /**
@@ -180,6 +214,7 @@ class StatsEvent extends Event
     {
         $this->results    = $results;
         $this->hasResults = true;
+
         $this->stopPropagation();
     }
 
