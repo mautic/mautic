@@ -1,27 +1,28 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 
 /**
- * Class CampaignSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -36,69 +37,71 @@ class CampaignSubscriber extends CommonSubscriber
     protected $formSubmissionModel;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param FormModel $formModel
+     * @param FormModel       $formModel
      * @param SubmissionModel $formSubmissionModel
+     * @param EventModel      $campaignEventModel
      */
-    public function __construct(MauticFactory $factory, FormModel $formModel, SubmissionModel $formSubmissionModel)
+    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
     {
-        $this->formModel = $formModel;
+        $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-
-        parent::__construct($factory);
+        $this->campaignEventModel  = $campaignEventModel;
     }
 
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            FormEvents::FORM_ON_SUBMIT        => array('onFormSubmit', 0),
-            FormEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION   => ['onCampaignTriggerCondition', 0]
-        );
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            FormEvents::FORM_ON_SUBMIT                => ['onFormSubmit', 0],
+            FormEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTriggerDecision', 0],
+            FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
+        ];
     }
 
     /**
-     * Add the option to the list
+     * Add the option to the list.
      *
      * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $trigger = array(
+        $trigger = [
             'label'       => 'mautic.form.campaign.event.submit',
             'description' => 'mautic.form.campaign.event.submit_descr',
             'formType'    => 'campaignevent_formsubmit',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'callback'    => array('\\Mautic\\FormBundle\\Helper\\CampaignEventHelper', 'validateFormSubmit')
-        );
-        $event->addLeadDecision('form.submit', $trigger);
+        ];
+        $event->addDecision('form.submit', $trigger);
 
-        $trigger = array(
+        $trigger = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => 'campaignevent_form_field_value',
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
-            'callback'    => array('\\Mautic\\FormBundle\\Helper\\CampaignEventHelper', 'validateFormValue'),
-            'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION
-        );
-        $event->addLeadCondition('form.field_value', $trigger);
+            'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('form.field_value', $trigger);
     }
 
     /**
-     * Trigger campaign event for when a form is submitted
+     * Trigger campaign event for when a form is submitted.
      *
      * @param SubmissionEvent $event
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->factory->getModel('campaign.event')->triggerEvent('form.submit', $form, 'form', $form->getId());
+        $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
     }
 
     /**

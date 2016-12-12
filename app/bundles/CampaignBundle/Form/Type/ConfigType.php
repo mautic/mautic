@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ConfigType
+ * Class ConfigType.
  */
 class ConfigType extends AbstractType
 {
@@ -39,11 +39,11 @@ class ConfigType extends AbstractType
                     'PT14D' => '1 week',
                     'P3M'   => '3 months',
                 ],
-                'attr'       => [
+                'attr' => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.campaignconfig.campaign_time_wait_on_event_false_tooltip'
+                    'tooltip' => 'mautic.campaignconfig.campaign_time_wait_on_event_false_tooltip',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
     }

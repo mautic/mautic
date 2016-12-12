@@ -1,22 +1,23 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
     $user   = $form->vars['data']->getName();
-    $header = $view['translator']->trans('mautic.user.user.header.edit', array("%name%" => $user));
+    $header = $view['translator']->trans('mautic.user.user.header.edit', ['%name%' => $user]);
 } else {
     $header = $view['translator']->trans('mautic.user.user.header.new');
 }
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 ?>
 <!-- start: box layout -->
 <div class="box-layout">
@@ -28,12 +29,12 @@ $view['slots']->set("headerTitle", $header);
 			    <div class="row">
                     <div class="col-sm-6<?php echo (count($form['firstName']->vars['errors'])) ? ' has-error' : ''; ?>">
                     	<label class="control-label mb-xs"><?php echo $view['form']->label($form['firstName']); ?></label>
-			            <?php echo $view['form']->widget($form['firstName'], array('attr' => array('placeholder' => $form['firstName']->vars['label']))); ?>
+			            <?php echo $view['form']->widget($form['firstName'], ['attr' => ['placeholder' => $form['firstName']->vars['label']]]); ?>
                         <?php echo $view['form']->errors($form['firstName']); ?>
 			        </div>
                     <div class="col-sm-6<?php echo (count($form['lastName']->vars['errors'])) ? ' has-error' : ''; ?>">
                         <label class="control-label mb-xs"><?php echo $view['form']->label($form['lastName']); ?></label>
-			            <?php echo $view['form']->widget($form['lastName'], array('attr' => array('placeholder' => $form['lastName']->vars['label']))); ?>
+			            <?php echo $view['form']->widget($form['lastName'], ['attr' => ['placeholder' => $form['lastName']->vars['label']]]); ?>
                         <?php echo $view['form']->errors($form['lastName']); ?>
 			        </div>
 			    </div>
@@ -44,12 +45,12 @@ $view['slots']->set("headerTitle", $header);
 			    <div class="row">
 			        <div class="col-sm-6<?php echo (count($form['role']->vars['errors'])) ? ' has-error' : ''; ?>">
 			        	<label class="control-label mb-xs"><?php echo $view['form']->label($form['role']); ?></label>
-			            <?php echo $view['form']->widget($form['role'], array('attr' => array('placeholder' => $form['role']->vars['label']))); ?>
+			            <?php echo $view['form']->widget($form['role'], ['attr' => ['placeholder' => $form['role']->vars['label']]]); ?>
                         <?php echo $view['form']->errors($form['role']); ?>
 			        </div>
 			        <div class="col-sm-6<?php echo (count($form['position']->vars['errors'])) ? ' has-error' : ''; ?>">
 				    	<label class="control-label mb-xs"><?php echo $view['form']->label($form['position']); ?></label>
-			            <?php echo $view['form']->widget($form['position'], array('attr' => array('placeholder' => $form['position']->vars['label']))); ?>
+			            <?php echo $view['form']->widget($form['position'], ['attr' => ['placeholder' => $form['position']->vars['label']]]); ?>
                         <?php echo $view['form']->errors($form['position']); ?>
 			        </div>
 			    </div>
@@ -60,7 +61,7 @@ $view['slots']->set("headerTitle", $header);
                 <div class="row">
                     <div class="col-sm-6<?php echo (count($form['signature']->vars['errors'])) ? ' has-error' : ''; ?>">
                         <label class="control-label mb-xs"><?php echo $view['form']->label($form['signature']); ?></label>
-                        <?php echo $view['form']->widget($form['signature'], array('attr' => array('placeholder' => $form['signature']->vars['label']))); ?>
+                        <?php echo $view['form']->widget($form['signature'], ['attr' => ['placeholder' => $form['signature']->vars['label']]]); ?>
                         <?php echo $view['form']->errors($form['signature']); ?>
                     </div>
                 </div>
@@ -73,17 +74,17 @@ $view['slots']->set("headerTitle", $header);
 				        <div class="col-sm-6">
 				        	<div class="form-group col-xs-12<?php echo (count($form['username']->vars['errors'])) ? ' has-error' : ''; ?>">
 				        		<label class="control-label mb-xs"><?php echo $view['form']->label($form['username']); ?></label>
-				            	<?php echo $view['form']->widget($form['username'], array('attr' => array('placeholder' => $form['username']->vars['label']))); ?>
+				            	<?php echo $view['form']->widget($form['username'], ['attr' => ['placeholder' => $form['username']->vars['label']]]); ?>
                                 <?php echo $view['form']->errors($form['username']); ?>
 				            </div>
 							<div class="form-group col-xs-12<?php echo (count($form['email']->vars['errors'])) ? ' has-error' : ''; ?>">
 					    		<label class="control-label mb-xs"><?php echo $view['form']->label($form['email']); ?></label>
-				            	<?php echo $view['form']->widget($form['email'], array('attr' => array('placeholder' => $form['email']->vars['label']))); ?>
+				            	<?php echo $view['form']->widget($form['email'], ['attr' => ['placeholder' => $form['email']->vars['label']]]); ?>
                                 <?php echo $view['form']->errors($form['email']); ?>
 				            </div>
 				        </div>
 				        <div class="col-sm-6">
-				            <?php echo $view['form']->widget($form['plainPassword'], array('attr' => array('placeholder' => $form['plainPassword']->vars['label']))); ?>
+				            <?php echo $view['form']->widget($form['plainPassword'], ['attr' => ['placeholder' => $form['plainPassword']->vars['label']]]); ?>
 				        </div>
 				    </div>
 				</div>

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,24 +14,24 @@ namespace Mautic\CoreBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class SidebarCanvasEvent
+ * Class SidebarCanvasEvent.
  */
 class SidebarCanvasEvent extends Event
 {
     /**
      * @var array
      */
-    private $sections = array('header', 'footer', 'content');
+    private $sections = ['header', 'footer', 'content'];
 
     /**
      * @var array
      */
-    private $left  = array();
+    private $left = [];
 
     /**
      * @var array
      */
-    private $right = array();
+    private $right = [];
 
     /**
      * @var
@@ -39,7 +41,7 @@ class SidebarCanvasEvent extends Event
     /**
      * @var array
      */
-    private $main  = array();
+    private $main = [];
 
     public function __construct($templating)
     {
@@ -47,7 +49,7 @@ class SidebarCanvasEvent extends Event
     }
 
     /**
-     * Insert content into left canvas
+     * Insert content into left canvas.
      *
      * @param array $sections
      */
@@ -57,7 +59,7 @@ class SidebarCanvasEvent extends Event
     }
 
     /**
-     * Insert content into right canvas
+     * Insert content into right canvas.
      *
      * @param array $sections
      */
@@ -67,7 +69,7 @@ class SidebarCanvasEvent extends Event
     }
 
     /**
-     * Insert content into main canvas
+     * Insert content into main canvas.
      *
      * Note that header is not allowed for main
      *
@@ -84,7 +86,7 @@ class SidebarCanvasEvent extends Event
      */
     private function setCanvasSection($canvas, $sections)
     {
-        $canvasSections = array();
+        $canvasSections = [];
         foreach ($this->sections as $section) {
             $canvasSections[$section] = (isset($sections[$section])) ? $sections[$section] : '';
         }
@@ -93,7 +95,7 @@ class SidebarCanvasEvent extends Event
     }
 
     /**
-     * Get the canvas sections
+     * Get the canvas sections.
      *
      * @param null $canvas
      *
@@ -104,11 +106,11 @@ class SidebarCanvasEvent extends Event
         if ($canvas) {
             return $this->$canvas;
         } else {
-            return array(
+            return [
                 'left'  => $this->left,
                 'right' => $this->right,
-                'main'  => $this->main
-            );
+                'main'  => $this->main,
+            ];
         }
     }
 

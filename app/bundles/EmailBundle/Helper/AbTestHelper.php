@@ -1,22 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Model\EmailModel;
 
 class AbTestHelper
 {
-
     /**
-     * Determines the winner of A/B test based on open rate
+     * Determines the winner of A/B test based on open rate.
      *
      * @param $factory
      * @param $parent
@@ -38,12 +38,12 @@ class AbTestHelper
 
             $translator = $factory->getTranslator();
             if ($counts) {
-                $rates      = $support = $data = [];
+                $rates      = $support      = $data      = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();
                 foreach ($counts as $id => $stats) {
-                    $name                                                           = ($parentId === $id) ? $parent->getName()
+                    $name = ($parentId === $id) ? $parent->getName()
                         : $children[$id]->getName();
                     $support['labels'][]                                            = $name.' ('.$stats['readRate'].'%)';
                     $rates[$id]                                                     = $stats['readRate'];
@@ -93,7 +93,7 @@ class AbTestHelper
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.openrate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
                 ];
             }
         }
@@ -101,13 +101,12 @@ class AbTestHelper
         return [
             'winners' => [],
             'support' => [],
-            'basedOn' => 'email.openrate'
+            'basedOn' => 'email.openrate',
         ];
     }
 
-
     /**
-     * Determines the winner of A/B test based on clickthrough rates
+     * Determines the winner of A/B test based on clickthrough rates.
      *
      * @param $factory
      * @param $parent
@@ -132,7 +131,7 @@ class AbTestHelper
 
             $translator = $factory->getTranslator();
             if ($clickthroughCounts) {
-                $rates      = $support = $data = [];
+                $rates      = $support      = $data      = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();
@@ -192,7 +191,7 @@ class AbTestHelper
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.clickthrough',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
                 ];
             }
         }
@@ -200,7 +199,7 @@ class AbTestHelper
         return [
             'winners' => [],
             'support' => [],
-            'basedOn' => 'email.clickthrough'
+            'basedOn' => 'email.clickthrough',
         ];
     }
 }

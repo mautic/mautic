@@ -1,19 +1,20 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $size            = (empty($size)) ? '' : ' modal-'.$size;
-$class           = (!empty($class)) ? " $class" : "";
-$body            = (empty($body)) ? "" : $body;
-$footer          = (empty($footer)) ? "" : $footer;
+$class           = (!empty($class)) ? " $class" : '';
+$body            = (empty($body)) ? '' : $body;
+$footer          = (empty($footer)) ? '' : $footer;
 $hidePlaceholder = (empty($body)) ? '' : ' hide';
-$header          = (!isset($header)) ? "" : $header;
-$padding         = (empty($padding)) ? "" : $padding;
+$header          = (!isset($header)) ? '' : $header;
+$padding         = (empty($padding)) ? '' : $padding;
 ?>
 
 <div class="modal fade" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true">

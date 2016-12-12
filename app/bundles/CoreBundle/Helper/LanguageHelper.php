@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +15,10 @@ use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Helper class for managing Mautic's installed languages
+ * Helper class for managing Mautic's installed languages.
  */
 class LanguageHelper
 {
-
     /**
      * @var string
      */
@@ -41,12 +42,12 @@ class LanguageHelper
         $this->factory = $factory;
 
         // Moved to outside environment folder so that it doesn't get wiped on each config update
-        $this->cacheFile = $this->factory->getSystemPath('cache') . '/../languageList.txt';
+        $this->cacheFile = $this->factory->getSystemPath('cache').'/../languageList.txt';
         $this->connector = HttpFactory::getHttp();
     }
 
     /**
-     * Extracts a downloaded package for the specified language
+     * Extracts a downloaded package for the specified language.
      *
      * This will attempt to download the package if it is not found
      *
@@ -56,8 +57,8 @@ class LanguageHelper
      */
     public function extractLanguagePackage($languageCode)
     {
-        $packagePath = $this->factory->getSystemPath('cache') . '/' . $languageCode . '.zip';
-        $translator = $this->factory->getTranslator();
+        $packagePath = $this->factory->getSystemPath('cache').'/'.$languageCode.'.zip';
+        $translator  = $this->factory->getTranslator();
 
         // Make sure the package actually exists
         if (!file_exists($packagePath)) {
@@ -70,7 +71,7 @@ class LanguageHelper
             }
         }
 
-        $zipper = new \ZipArchive();
+        $zipper  = new \ZipArchive();
         $archive = $zipper->open($packagePath);
 
         if ($archive !== true) {
@@ -98,27 +99,27 @@ class LanguageHelper
                     break;
             }
 
-            return array(
+            return [
                 'error'   => true,
-                'message' => $error
-            );
+                'message' => $error,
+            ];
         }
 
         // Extract the archive file now
-        $zipper->extractTo($this->factory->getSystemPath('translations_root') . '/translations');
+        $zipper->extractTo($this->factory->getSystemPath('translations_root').'/translations');
         $zipper->close();
 
         // We can remove the package now
         @unlink($packagePath);
 
-        return array(
+        return [
             'error'   => false,
-            'message' => 'mautic.core.language.helper.language.saved.successfully'
-        );
+            'message' => 'mautic.core.language.helper.language.saved.successfully',
+        ];
     }
 
     /**
-     * Fetches the list of available languages
+     * Fetches the list of available languages.
      *
      * @param bool $overrideCache
      *
@@ -134,7 +135,7 @@ class LanguageHelper
             } elseif (isset($overrideData['name'])) {
                 return $overrideData;
             } else {
-                return array();
+                return [];
             }
         }
 
@@ -150,18 +151,18 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', array(), array(), 10);
+            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', [], [], 10);
             $languages = json_decode($data->body, true);
             $languages = $languages['languages'];
         } catch (\Exception $exception) {
             // Log the error
             $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch the language list: ' . $exception->getMessage());
+            $logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
 
-            return (!$returnError) ? array() : array(
+            return (!$returnError) ? [] : [
                 'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.languages'
-            );
+                'message' => 'mautic.core.language.helper.error.fetching.languages',
+            ];
         }
 
         if ($data->code != 200) {
@@ -173,20 +174,20 @@ class LanguageHelper
                 is_string($data->body) ? $data->body : implode('; ', $data->body)
             ));
 
-            return (!$returnError) ? array() : array(
+            return (!$returnError) ? [] : [
                 'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.languages'
-            );
+                'message' => 'mautic.core.language.helper.error.fetching.languages',
+            ];
         }
 
         // Alphabetize the languages
         ksort($languages);
 
         // Store to cache
-        $cacheData = array(
+        $cacheData = [
             'checkedTime' => time(),
-            'languages'   => $languages
-        );
+            'languages'   => $languages,
+        ];
 
         file_put_contents($this->cacheFile, json_encode($cacheData));
 
@@ -194,7 +195,7 @@ class LanguageHelper
     }
 
     /**
-     * Fetches a language package from the remote server
+     * Fetches a language package from the remote server.
      *
      * @param string $languageCode
      *
@@ -211,60 +212,60 @@ class LanguageHelper
 
         // Make sure the language actually exists
         if (!isset($cacheData['languages'][$languageCode])) {
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.invalid.language',
-                'vars'    => array(
-                    '%language%' => $languageCode
-                )
-            );
+                'vars'    => [
+                    '%language%' => $languageCode,
+                ],
+            ];
         }
 
-        $langUrl = 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode=' . $languageCode;
+        $langUrl = 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode='.$languageCode;
 
         // GET the update data
         try {
             $data = $this->connector->get($langUrl);
         } catch (\Exception $exception) {
             $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
+            $logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.fetching.package.exception',
-                'vars'    => array(
-                    '%exception%' => $exception->getMessage()
-                )
-            );
+                'vars'    => [
+                    '%exception%' => $exception->getMessage(),
+                ],
+            ];
         }
 
         if ($data->code >= 300 && $data->code < 400) {
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.follow.redirects',
-                'vars'    => array(
-                    '%url%' => $langUrl
-                )
-            );
+                'vars'    => [
+                    '%url%' => $langUrl,
+                ],
+            ];
         } elseif ($data->code != 200) {
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.on.language.server.side',
-                'vars'    => array(
-                    '%code%' => $data->code
-                )
-            );
+                'vars'    => [
+                    '%code%' => $data->code,
+                ],
+            ];
         }
 
         // Set the filesystem target
-        $target = $this->factory->getSystemPath('cache') . '/' . $languageCode . '.zip';
+        $target = $this->factory->getSystemPath('cache').'/'.$languageCode.'.zip';
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
 
         // Return an array for the sake of consistency
-        return array(
-            'error' => false
-        );
+        return [
+            'error' => false,
+        ];
     }
 }

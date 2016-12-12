@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (isset($tmpl) && $tmpl == 'index') {
     $view->extend('MauticLeadBundle:Timeline:index.html.php');
 }
@@ -38,7 +39,7 @@ $baseUrl = $view['router']->path(
                 'class'      => 'timeline-name',
                 'sessionVar' => 'lead.'.$lead->getId().'.timeline',
                 'baseUrl'    => $baseUrl,
-                'target'     => '#timeline-table'
+                'target'     => '#timeline-table',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
@@ -47,7 +48,7 @@ $baseUrl = $view['router']->path(
                 'class'      => 'visible-md visible-lg timeline-type',
                 'sessionVar' => 'lead.'.$lead->getId().'.timeline',
                 'baseUrl'    => $baseUrl,
-                'target'     => '#timeline-table'
+                'target'     => '#timeline-table',
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
@@ -56,7 +57,7 @@ $baseUrl = $view['router']->path(
                 'class'      => 'visible-md visible-lg timeline-timestamp',
                 'sessionVar' => 'lead.'.$lead->getId().'.timeline',
                 'baseUrl'    => $baseUrl,
-                'target'     => '#timeline-table'
+                'target'     => '#timeline-table',
             ]);
             ?>
         </tr>
@@ -83,15 +84,15 @@ $baseUrl = $view['router']->path(
             } ?>">
                 <td class="timeline-icon">
                     <a href="javascript:void(0);" data-activate-details="<?php echo $counter; ?>" class="btn btn-sm btn-nospin btn-default<?php if (empty($details)) {
-                        echo " disabled";
-                    } ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
+                echo ' disabled';
+            } ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
                         <span class="fa fa-fw <?php echo $icon ?>"></span>
                     </a>
                 </td>
-                <td class="timeline-name"><span class="ellipsis"><?php echo $eventLabel; ?></span></td>
+                <td class="timeline-name"><?php echo $eventLabel; ?></td>
                 <td class="timeline-type"><?php if (isset($event['eventType'])) {
-                        echo $event['eventType'];
-                    } ?></td>
+                echo $event['eventType'];
+            } ?></td>
                 <td class="timeline-timestamp"><?php echo $view['date']->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true); ?></td>
             </tr>
             <?php if (!empty($details)): ?>

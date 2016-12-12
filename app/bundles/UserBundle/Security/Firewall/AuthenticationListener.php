@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -87,7 +89,6 @@ class AuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
-
             return;
         }
 
@@ -107,10 +108,8 @@ class AuthenticationListener implements ListenerInterface
                         $response = $this->onSuccess($request, $authToken, $response);
                     }
                 } elseif (empty($response)) {
-
                     throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
                 }
-
             }
         } catch (AuthenticationException $exception) {
             if ('api' != $this->providerKey) {
@@ -118,7 +117,7 @@ class AuthenticationListener implements ListenerInterface
             }
         }
 
-        if ($response) {
+        if (!empty($response)) {
             $event->setResponse($response);
         }
     }

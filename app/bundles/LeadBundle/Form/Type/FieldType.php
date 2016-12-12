@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,25 +16,20 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
- * Class FieldType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class FieldType.
  */
 class FieldType extends AbstractType
 {
-
     private $translator;
     private $em;
 
@@ -60,7 +57,7 @@ class FieldType extends AbstractType
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'length' => 50]
+                'attr'       => ['class' => 'form-control', 'length' => 50],
             ]
         );
 
@@ -70,27 +67,28 @@ class FieldType extends AbstractType
             'group',
             'choice',
             [
-                'choices'     => [
+                'choices' => [
                     'core'         => 'mautic.lead.field.group.core',
                     'social'       => 'mautic.lead.field.group.social',
                     'personal'     => 'mautic.lead.field.group.personal',
-                    'professional' => 'mautic.lead.field.group.professional'
+                    'professional' => 'mautic.lead.field.group.professional',
                 ],
-                'attr'        => [
+                'attr' => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.field.form.group.help'
+                    'tooltip' => 'mautic.lead.field.form.group.help',
                 ],
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.group',
                 'empty_value' => false,
                 'required'    => false,
-                'disabled'    => $disabled
+                'disabled'    => $disabled,
             ]
         );
 
         $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
-        $default     = ($new) ? 'text' : $options['data']->getType();
+        $type        = $options['data']->getType();
+        $default     = (empty($type)) ? 'text' : $type;
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
         $builder->add(
@@ -105,10 +103,10 @@ class FieldType extends AbstractType
                 'disabled'    => ($disabled || !$new),
                 'attr'        => [
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'
+                    'onchange' => 'Mautic.updateLeadFieldProperties(this.value);',
                 ],
-                'data'        => $default,
-                'required'    => false
+                'data'     => $default,
+                'required' => false,
             ]
         );
 
@@ -118,7 +116,19 @@ class FieldType extends AbstractType
             [
                 'mapped'          => false,
                 'label'           => 'mautic.lead.field.form.properties.select',
-                'option_required' => false
+                'option_required' => false,
+                'with_labels'     => true,
+            ]
+        );
+
+        $builder->add(
+            'properties_lookup_template',
+            'sortablelist',
+            [
+                'mapped'          => false,
+                'label'           => 'mautic.lead.field.form.properties.select',
+                'option_required' => false,
+                'with_labels'     => false,
             ]
         );
 
@@ -130,7 +140,7 @@ class FieldType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
-                'mapped'     => false
+                'mapped'     => false,
             ]
         );
 
@@ -138,12 +148,13 @@ class FieldType extends AbstractType
             'default_bool_template',
             'yesno_button_group',
             [
-                'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-                'mapped'     => false,
-                'data'       => false
+                'label'       => 'mautic.core.defaultvalue',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'mapped'      => false,
+                'data'        => '',
+                'empty_value' => ' x ',
             ]
         );
 
@@ -153,7 +164,7 @@ class FieldType extends AbstractType
             [
                 'required'       => false,
                 'allow_add'      => true,
-                'error_bubbling' => false
+                'error_bubbling' => false,
             ]
         );
 
@@ -174,6 +185,7 @@ class FieldType extends AbstractType
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
             switch ($type) {
+                case 'multiselect':
                 case 'select':
                 case 'lookup':
                     if (is_array($data) && isset($data['properties'])) {
@@ -182,17 +194,14 @@ class FieldType extends AbstractType
                         $properties = $data->getProperties();
                     }
 
-                    if (isset($properties['list']) && is_string($properties['list'])) {
-                        $properties['list'] = array_map('trim', explode('|', $properties['list']));
-                    }
-
                     $form->add(
                         'properties',
                         'sortablelist',
                         [
-                            'required' => false,
-                            'label'    => 'mautic.lead.field.form.properties.select',
-                            'data'     => $properties
+                            'required'    => false,
+                            'label'       => 'mautic.lead.field.form.properties.select',
+                            'data'        => $properties,
+                            'with_labels' => ('lookup' !== $type),
                         ]
                     );
                     break;
@@ -200,9 +209,6 @@ class FieldType extends AbstractType
                 case 'locale':
                 case 'timezone':
                 case 'region':
-                case 'country':
-                case 'region':
-                case 'timezone':
                     switch ($type) {
                         case 'country':
                             $choices = FormFieldHelper::getCountryChoices();
@@ -222,12 +228,12 @@ class FieldType extends AbstractType
                         'defaultValue',
                         'choice',
                         [
-                            'choices'     => $choices,
-                            'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'attr'        => ['class' => 'form-control'],
-                            'required'    => false,
-                            'data'        => !empty($value),
+                            'choices'    => $choices,
+                            'label'      => 'mautic.core.defaultvalue',
+                            'label_attr' => ['class' => 'control-label'],
+                            'attr'       => ['class' => 'form-control'],
+                            'required'   => false,
+                            'data'       => !empty($value),
                         ]
                     );
                     break;
@@ -243,6 +249,10 @@ class FieldType extends AbstractType
                         $noLabel  = !empty($props['no']) ? $props['no'] : 'matuic.core.form.no';
                     }
 
+                    if ($value !== '' && $value !== null) {
+                        $value = (int) $value;
+                    }
+
                     $form->add(
                         'defaultValue',
                         'yesno_button_group',
@@ -251,11 +261,10 @@ class FieldType extends AbstractType
                             'label_attr'  => ['class' => 'control-label'],
                             'attr'        => ['class' => 'form-control'],
                             'required'    => false,
-                            'data'        => !empty($value),
-                            'choice_list' => new ChoiceList(
-                                [false, true],
-                                [$noLabel, $yesLabel]
-                            )
+                            'data'        => $value,
+                            'no_label'    => $noLabel,
+                            'yes_label'   => $yesLabel,
+                            'empty_value' => ' x ',
                         ]
                     );
                     break;
@@ -272,7 +281,7 @@ class FieldType extends AbstractType
                                             $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                         }
                                     }
-                                )
+                                ),
                             ];
                             break;
                         case 'date':
@@ -280,7 +289,7 @@ class FieldType extends AbstractType
                                 new Assert\Callback(
                                     function ($object, ExecutionContextInterface $context) {
                                         if (!empty($object)) {
-                                            $validator  = $context->getValidator();
+                                            $validator = $context->getValidator();
                                             $violations = $validator->validateValue($object, new Assert\Date());
 
                                             if (count($violations) > 0) {
@@ -288,7 +297,7 @@ class FieldType extends AbstractType
                                             }
                                         }
                                     }
-                                )
+                                ),
                             ];
                             break;
                         case 'time':
@@ -296,7 +305,7 @@ class FieldType extends AbstractType
                                 new Assert\Callback(
                                     function ($object, ExecutionContextInterface $context) {
                                         if (!empty($object)) {
-                                            $validator  = $context->getValidator();
+                                            $validator = $context->getValidator();
                                             $violations = $validator->validateValue(
                                                 $object,
                                                 new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
@@ -307,7 +316,7 @@ class FieldType extends AbstractType
                                             }
                                         }
                                     }
-                                )
+                                ),
                             ];
                             break;
                     }
@@ -320,12 +329,11 @@ class FieldType extends AbstractType
                             'label_attr'  => ['class' => 'control-label'],
                             'attr'        => ['class' => 'form-control'],
                             'required'    => false,
-                            'constraints' => $constraints
+                            'constraints' => $constraints,
                         ]
                     );
                 break;
             }
-
         };
 
         $builder->addEventListener(
@@ -358,7 +366,7 @@ class FieldType extends AbstractType
                         return $er->createQueryBuilder('f')
                             ->orderBy('f.order', 'ASC');
                     },
-                    'required'      => false
+                    'required' => false,
                 ]
             )->addModelTransformer($transformer)
         );
@@ -374,8 +382,8 @@ class FieldType extends AbstractType
                     'length'  => 25,
                     'tooltip' => 'mautic.lead.field.help.alias',
                 ],
-                'required'   => false,
-                'disabled'   => ($disabled || !$new)
+                'required' => false,
+                'disabled' => ($disabled || !$new),
             ]
         );
 
@@ -384,7 +392,7 @@ class FieldType extends AbstractType
             'yesno_button_group',
             [
                 'disabled' => ($options['data']->getAlias() == 'email'),
-                'data'     => ($options['data']->getAlias() == 'email') ? true : $options['data']->getIsPublished()
+                'data'     => ($options['data']->getAlias() == 'email') ? true : $options['data']->getIsPublished(),
             ]
         );
 
@@ -392,7 +400,7 @@ class FieldType extends AbstractType
             'isRequired',
             'yesno_button_group',
             [
-                'label' => 'mautic.core.required'
+                'label' => 'mautic.core.required',
             ]
         );
 
@@ -400,7 +408,7 @@ class FieldType extends AbstractType
             'isVisible',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.field.form.isvisible'
+                'label' => 'mautic.lead.field.form.isvisible',
             ]
         );
 
@@ -410,7 +418,7 @@ class FieldType extends AbstractType
             [
                 'label' => 'mautic.lead.field.form.isshortvisible',
                 'attr'  => [
-                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip'
+                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip',
                 ],
             ]
         );
@@ -419,7 +427,7 @@ class FieldType extends AbstractType
             'isListable',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.field.form.islistable'
+                'label' => 'mautic.lead.field.form.islistable',
             ]
         );
 
@@ -431,9 +439,9 @@ class FieldType extends AbstractType
                 'label' => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'  => [
                     'tooltip'  => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
-                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)'
+                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)',
                 ],
-                'data'  => (!empty($data))
+                'data' => (!empty($data)),
             ]
         );
 
@@ -443,26 +451,47 @@ class FieldType extends AbstractType
             [
                 'label' => 'mautic.lead.field.form.ispubliclyupdatable',
                 'attr'  => [
-                    'tooltip' => 'mautic.lead.field.form.ispubliclyupdatable.tooltip'
-                ]
+                    'tooltip' => 'mautic.lead.field.form.ispubliclyupdatable.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'object',
+            'choice',
+            [
+                'choices' => [
+                    'mautic.lead.contact'    => 'lead',
+                    'mautic.company.company' => 'company',
+                ],
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.lead.field.object',
+                'empty_value'       => false,
+                'attr'              => [
+                    'class' => 'form-control',
+                ],
+                'required' => true,
+                'disabled' => ($disabled || !$new),
             ]
         );
 
         $builder->add('buttons', 'form_buttons');
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadField'
+                'data_class' => 'Mautic\LeadBundle\Entity\LeadField',
             ]
         );
     }
@@ -472,6 +501,6 @@ class FieldType extends AbstractType
      */
     public function getName()
     {
-        return "leadfield";
+        return 'leadfield';
     }
 }

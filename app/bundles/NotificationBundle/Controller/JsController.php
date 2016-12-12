@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -22,9 +24,10 @@ class JsController extends CommonController
      */
     public function manifestAction()
     {
-        $data = [
-            'start_url' => '/',
-            'gcm_sender_id' => '446150739532',
+        $gcmSenderId = $this->get('mautic.helper.core_parameters')->getParameter('gcm_sender_id', '446150739532');
+        $data        = [
+            'start_url'             => '/',
+            'gcm_sender_id'         => $gcmSenderId,
             'gcm_user_visible_only' => true,
         ];
 
@@ -47,7 +50,7 @@ class JsController extends CommonController
             200,
             [
                 'Service-Worker-Allowed' => '/',
-                'Content-Type' => 'application/javascript',
+                'Content-Type'           => 'application/javascript',
             ]
         );
     }
@@ -62,7 +65,7 @@ class JsController extends CommonController
             200,
             [
                 'Service-Worker-Allowed' => '/',
-                'Content-Type' => 'application/javascript',
+                'Content-Type'           => 'application/javascript',
             ]
         );
     }

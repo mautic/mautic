@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,13 +20,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadEmailData
- *
- * @package Mautic\EmailBundle\DataFixtures\ORM
+ * Class LoadEmailData.
  */
 class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -33,7 +32,6 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, 
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -47,16 +45,16 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, 
         $factory = $this->container->get('mautic.factory');
         $model   = $factory->getModel('email');
         $repo    = $model->getRepository();
-        $emails  = CsvHelper::csv_to_array(__DIR__ . '/fakeemaildata.csv');
+        $emails  = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
 
         foreach ($emails as $count => $rows) {
             $email = new Email();
-            $email->setDateAdded(new \DateTime);
-            $key = $count+1;
+            $email->setDateAdded(new \DateTime());
+            $key = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('content','variantSettings'))) {
+                if ($val != 'NULL') {
+                    $setter = 'set'.ucfirst($col);
+                    if (in_array($col, ['content', 'variantSettings'])) {
                         $val = unserialize(stripslashes($val));
                     }
                     $email->$setter($val);

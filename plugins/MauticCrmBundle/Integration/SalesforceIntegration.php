@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,18 +13,20 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class SalesforceIntegration
+ * Class SalesforceIntegration.
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
-
     /**
      * {@inheritdoc}
      *
@@ -34,7 +38,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
@@ -44,7 +48,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
@@ -54,7 +58,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for the auth token
+     * Get the array key for the auth token.
      *
      * @return string
      */
@@ -72,12 +76,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         return [
             'client_id'     => 'mautic.integration.keyfield.consumerid',
-            'client_secret' => 'mautic.integration.keyfield.consumersecret'
+            'client_secret' => 'mautic.integration.keyfield.consumersecret',
         ];
     }
 
     /**
-     * Get the keys for the refresh token and expiry
+     * Get the keys for the refresh token and expiry.
      *
      * @return array
      */
@@ -167,60 +171,91 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects']['company'] = 'company';
+
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
      * @return array|mixed
      */
     public function getAvailableLeadFields($settings = [])
     {
-        $salesFields       = [];
+        static $leadObject = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $salesForceobjects = [];
+        $salesForceObjects = [];
 
         if (isset($settings['feature_settings']['objects'])) {
-            $salesForceobjects = $settings['feature_settings']['objects'];
+            $salesForceObjects = $settings['feature_settings']['objects'];
         }
+
+        $isRequired = function (array $field) {
+            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']);
+        };
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($salesForceobjects) and is_array($salesForceobjects)) {
-                    foreach ($salesForceobjects as $sfObject) {
+                if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
+                    foreach ($salesForceObjects as $key => $sfObject) {
                         if (isset($sfObject) and $sfObject == 'Activity') {
                             continue;
                         }
-                        $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
+                        $sfObject = trim($sfObject);
+                        if (!isset($leadObject[$sfObject])) {
+                            $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
+                        }
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
-
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
-                                if (!$fieldInfo['updateable'] || !isset($fieldInfo['name'])
+                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id')) || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
-                                        ['reference', 'boolean']
+                                        ['reference']
                                     )
                                 ) {
                                     continue;
                                 }
-
-                                $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
-                                    'type'     => 'string',
-                                    'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                    'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], ['Status']))
-                                ];
+                                if ($fieldInfo['type'] == 'boolean') {
+                                    $type = 'boolean';
+                                } else {
+                                    $type = 'string';
+                                }
+                                if ($sfObject !== 'company') {
+                                    $salesFields[$fieldInfo['name'].' - '.$sfObject] = [
+                                        'type'     => $type,
+                                        'label'    => $sfObject.' - '.$fieldInfo['label'],
+                                        'required' => $isRequired($fieldInfo),
+                                    ];
+                                } else {
+                                    $salesFields[$sfObject][$fieldInfo['name']] = [
+                                        'type'     => $type,
+                                        'label'    => $fieldInfo['label'],
+                                        'required' => $isRequired($fieldInfo),
+                                    ];
+                                }
                             }
                         }
                     }
                 } else {
                     $leadObject = $this->getApiHelper()->getLeadFields('Lead');
                     if (!empty($leadObject) && isset($leadObject['fields'])) {
-
                         foreach ($leadObject['fields'] as $fieldInfo) {
-                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference', 'boolean'])) {
+                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], ['reference'])) {
                                 continue;
                             }
 
                             $salesFields[$fieldInfo['name']] = [
-                                'type'     => 'string',
-                                'label'    => $fieldInfo['label'],
-                                'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], ['Status']))
-                            ];
+                                    'type'     => 'string',
+                                    'label'    => $fieldInfo['label'],
+                                    'required' => $isRequired($fieldInfo),
+                                ];
                         }
                     }
                 }
@@ -254,14 +289,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getFetchQuery($params)
     {
-
         $dateRange = $params;
 
         return $dateRange;
     }
 
     /**
-     * Amend mapped lead data before creating to Mautic
+     * Amend mapped lead data before creating to Mautic.
      *
      * @param $data
      */
@@ -269,41 +303,56 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
+        $params['fields']                          = implode(',', $fields);
 
-        $params['fields'] = implode(',', $fields);
-
-        $count = 0;
+        $count  = 0;
+        $entity = null;
 
         if (isset($data['records']) and $object !== 'Activity') {
-
             foreach ($data['records'] as $record) {
                 $integrationEntities = [];
-
+                if (isset($record['attributes']['type']) && $record['attributes']['type'] == 'Account') {
+                    $newName = '';
+                } else {
+                    $newName = '__'.$object;
+                }
                 foreach ($record as $key => $item) {
-                    $dataObject[$key."__".$object] = $item;
+                    if ($object !== 'Activity') {
+                        $dataObject[$key.$newName] = $item;
+                    }
                 }
 
                 if ($dataObject) {
-                    $lead                  = $this->getMauticLead($dataObject, true, null, null);
-                    $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
-                    $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
-
-                    if ($integrationId == null) {
-                        $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setIntegration('Salesforce');
-                        $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($record['Id']);
-                        $integrationEntity->setInternalEntity('lead');
-                        $integrationEntity->setInternalEntityId($lead->getId());
-                        $integrationEntities[] = $integrationEntity;
-                    } else {
-
-                        $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                        $integrationEntities[] = $integrationEntity;
+                    if ($object == 'Lead' or $object == 'Contact') {
+                        $entity                = $this->getMauticLead($dataObject, true, null, null);
+                        $mauticObjectReference = 'lead';
+                    } elseif ($object == 'Account') {
+                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $mauticObjectReference = 'company';
                     }
-                    $count++;
+
+                    if ($entity) {
+                        $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
+                        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, $mauticObjectReference, $entity->getId());
+
+                        if ($integrationId == null) {
+                            $integrationEntity = new IntegrationEntity();
+                            $integrationEntity->setDateAdded(new \DateTime());
+                            $integrationEntity->setIntegration('Salesforce');
+                            $integrationEntity->setIntegrationEntity($object);
+                            $integrationEntity->setIntegrationEntityId($record['Id']);
+                            $integrationEntity->setInternalEntity($mauticObjectReference);
+                            $integrationEntity->setInternalEntityId($entity->getId());
+                            $integrationEntities[] = $integrationEntity;
+                        } else {
+                            $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntities[] = $integrationEntity;
+                        }
+                    } else {
+                        continue;
+                    }
+                    ++$count;
                 }
 
                 $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
@@ -328,8 +377,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'sandbox',
                 'choice',
                 [
-                    'choices'     => [
-                        'sandbox' => 'mautic.salesforce.sandbox'
+                    'choices' => [
+                        'sandbox' => 'mautic.salesforce.sandbox',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -344,13 +393,33 @@ class SalesforceIntegration extends CrmAbstractIntegration
             );
 
             $builder->add(
+                'updateOwner',
+                'choice',
+                [
+                    'choices' => [
+                        'updateOwner' => 'mautic.salesforce.updateOwner',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.updateOwner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
                 'objects',
                 'choice',
                 [
-                    'choices'     => [
+                    'choices' => [
                         'Lead'     => 'mautic.salesforce.object.lead',
                         'Contact'  => 'mautic.salesforce.object.contact',
-                        'Activity' => 'mautic.salesforce.object.activity'
+                        'company'  => 'mautic.salesforce.object.company',
+                        'Activity' => 'mautic.salesforce.object.activity',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -404,7 +473,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $object = 'Lead';//Salesforce objects, default is Lead
+        $object = 'Lead'; //Salesforce objects, default is Lead
 
         $fields = array_keys($config['leadFields']);
 
@@ -420,8 +489,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
-                if ($createdLeadData['Id']) {
-
+                if (isset($createdLeadData['Id'])) {
                     $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
 
@@ -439,7 +507,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $integrationEntity->setLastSyncDate(new \DateTime());
                     $this->factory->getEntityManager()->persist($integrationEntity);
                     $this->factory->getEntityManager()->flush($integrationEntity);
-
                 }
 
                 return true;
@@ -460,7 +527,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        $salesForceObjects[] = "Lead";
+        $salesForceObjects[] = 'Lead';
 
         if (isset($config['objects'])) {
             $salesForceObjects = $config['objects'];
@@ -473,7 +540,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 foreach ($salesForceObjects as $object) {
-                    if ($object !== 'Activity') {
+                    if ($object !== 'Activity' and $object !== 'company') {
                         $result = $this->getApiHelper()->getLeads($query, $object);
                         $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                         if (isset($result['nextRecordsUrl'])) {
@@ -493,9 +560,55 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $lead
+     */
+    public function getCompanies($params = [], $query = null)
+    {
+        $executed = null;
+
+        $salesForceObject = 'Account';
+
+        if (empty($query)) {
+            $query = $this->getFetchQuery($params);
+        }
+
+        try {
+            if ($this->isAuthorized()) {
+                $result = $this->getApiHelper()->getLeads($query, $salesForceObject);
+                $executed += $this->amendLeadDataBeforeMauticPopulate($result, $salesForceObject);
+                if (isset($result['nextRecordsUrl'])) {
+                    $query = $result['nextRecordsUrl'];
+                    $this->getCompanies($params, $query);
+                }
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
+    /**
+     * @param $query
+     * @param $object
+     */
+    public function ammendToSfFields($fields)
+    {
+        $newFields = [];
+        foreach ($fields as $key => $field) {
+            $key                      = explode('-', $key);
+            $newFields[trim($key[0])] = $field;
+        }
+
+        return $newFields;
+    }
+
+    /**
      * @param array $params
      *
      * @return int|null
+     *
      * @throws \Exception
      */
     public function pushLeadActivity($params = [])
@@ -508,7 +621,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         /** @var SalesforceApi $apiHelper */
         $apiHelper = $this->getApiHelper();
 
-        $salesForceObjects[] = "Lead";
+        $salesForceObjects[] = 'Lead';
         if (isset($config['objects'])) {
             $salesForceObjects = $config['objects'];
         }
@@ -516,9 +629,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->factory->getEntityManager()->getRepository(
             'MauticPluginBundle:IntegrationEntity'
         );
-        $startDate             = new \DateTime($query['start']);
-        $endDate               = new \DateTime($query['end']);
-        $limit                 = 100;
+        $startDate = new \DateTime($query['start']);
+        $endDate   = new \DateTime($query['end']);
+        $limit     = 100;
 
         foreach ($salesForceObjects as $object) {
             try {
@@ -562,8 +675,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $salesForceLeadData[$sfId]['id']      = $ids['integration_entity_id'];
                                 $salesForceLeadData[$sfId]['leadId']  = $ids['internal_entity_id'];
                                 $salesForceLeadData[$sfId]['leadUrl'] = $this->factory->getRouter()->generate(
-                                    'mautic_contact_action',
-                                    ['objectAction' => 'view', 'objectId' => $leadId],
+                                    'mautic_plugin_timeline_view',
+                                    ['integration' => 'Salesforce', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 );
                             }
@@ -597,11 +710,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Create or update existing Mautic lead from the integration's profile data
+     * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed      $data    Profile data from integration
-     * @param bool|true  $persist Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
      * @param mixed||null $identifiers
      *
      * @return Lead
@@ -620,7 +733,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {
-
             return;
         }
 
@@ -635,13 +747,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
         }
-
+        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
+            //return if uniqueIdentifiers have no data set to avoid duplicating leads.
+            return;
+        }
         // Default to new lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-
             $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
@@ -664,7 +778,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
                 $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
             }
-            
+
             $lead->setSocialCache($leadSocialCache);
         }
 
@@ -675,12 +789,65 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $lead->setInternal($internalInfo);
         }
 
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
+            && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
+            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
+                ->findOneBy(['email' => $data['Owner__Lead']['Email']]);
+            if ($mauticUser instanceof User) {
+                $lead->setOwner($mauticUser);
+            }
+        }
+
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             $leadModel->saveEntity($lead, false);
         }
 
         return $lead;
+    }
+
+    /**
+     * Create or update existing Mautic lead from the integration's profile data.
+     *
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
+     * @param mixed||null $identifiers
+     *
+     * @return Lead
+     */
+    public function getMauticCompany($data, $persist = true, $identifiers = null)
+    {
+        if (is_object($data)) {
+            // Convert to array in all levels
+            $data = json_encode(json_decode($data), true);
+        } elseif (is_string($data)) {
+            // Assume JSON
+            $data = json_decode($data, true);
+        }
+        $config = $this->mergeConfigToFeatureSettings([]);
+        // Match that data with mapped lead fields
+        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
+
+        if (empty($matchedFields)) {
+            return;
+        }
+
+        // Find unique identifier fields used by the integration
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $companyModel = $this->factory->getModel('lead.company');
+
+        // Default to new company
+        $company = new Company();
+
+        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
+        if ($existingCompany[2]) {
+            $company = $existingCompany[2];
+        }
+        $companyModel->setFieldValues($company, $matchedFields, false, false);
+        $companyModel->saveEntity($company, false);
+
+        return $company;
     }
 
     /**
@@ -742,7 +909,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $activity = [];
 
             if (isset($pointChangeLog[$leadId])) {
-
                 foreach ($pointChangeLog[$leadId] as $row) {
                     $typeString = "mautic.{$row['type']}.{$row['type']}";
                     $typeString = ($translator->hasId($typeString)) ? $translator->trans($typeString) : ucfirst($row['type']);
@@ -752,7 +918,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $subject = 'subtracted';
                         $row['delta'] *= -1;
                     }
-                    $pointsString                = $translator->transChoice(
+                    $pointsString = $translator->transChoice(
                         "mautic.salesforce.activity.points_{$subject}",
                         $row['delta'],
                         ['%points%' => $row['delta']]
@@ -762,7 +928,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $activity[$i]['description'] = "$typeString: {$row['eventName']} / {$row['actionName']}";
                     $activity[$i]['dateAdded']   = $row['dateAdded'];
                     $activity[$i]['id']          = 'pointChange'.$row['id'];
-                    $i++;
+                    ++$i;
                 }
             }
 
@@ -787,23 +953,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $activity[$i]['description'] = $translator->trans('mautic.email.sent').": $name";
                     $activity[$i]['dateAdded']   = $row['dateSent'];
                     $activity[$i]['id']          = 'emailStat'.$row['id'];
-                    $i++;
+                    ++$i;
                 }
             }
 
             if (isset($formSubmissions[$leadId])) {
                 foreach ($formSubmissions[$leadId] as $row) {
                     $activity[$i]['eventType']   = 'form';
-                    $activity[$i]['name']        = $this->getTranslator()->trans('mautic.salesforce.activity.form').": ".$row['name'];
-                    $activity[$i]['description'] = $translator->trans('mautic.form.event.submitted').": ".$row['name'];
+                    $activity[$i]['name']        = $this->getTranslator()->trans('mautic.salesforce.activity.form').': '.$row['name'];
+                    $activity[$i]['description'] = $translator->trans('mautic.form.event.submitted').': '.$row['name'];
                     $activity[$i]['dateAdded']   = $row['dateSubmitted'];
                     $activity[$i]['id']          = 'formSubmission'.$row['id'];
-                    $i++;
+                    ++$i;
                 }
             }
 
             $leadActivity[$leadId] = [
-                'records' => $activity
+                'records' => $activity,
             ];
 
             unset($activity);

@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -15,29 +16,28 @@ $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
-            'templateButtons' => array(
-                'new' => $permissions['sms:smses:create']
-            ),
-            'routeBase'       => 'sms'
-        )
+        [
+            'templateButtons' => [
+                'new' => $permissions['sms:smses:create'],
+            ],
+            'routeBase' => 'sms',
+        ]
     )
 );
 
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue' => $searchValue,
-        'searchHelp' => 'mautic.sms.help.searchcommands',
-        'searchId' => 'sms-search',
-        'action' => $currentRoute,
-        'routeBase' => 'sms',
-        'templateButtons' => [
-            'delete' => $permissions['sms:smses:deleteown'] || $permissions['sms:smses:deleteother'],
-        ],
-        // 'filters'     => $filters // @todo
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.sms.help.searchcommands',
+            'searchId'    => 'sms-search',
+            'action'      => $currentRoute,
+            // 'filters'     => $filters // @todo
+        ]
+    ); ?>
 
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

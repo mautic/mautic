@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,13 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class LeadEventLog
- *
- * @package Mautic\CampaignBundle\Entity
+ * Class LeadEventLog.
  */
 class LeadEventLog
 {
-
     /**
      * @var Event
      */
@@ -63,7 +62,7 @@ class LeadEventLog
     /**
      * @var array
      */
-    private $metadata = array();
+    private $metadata = [];
 
     /**
      * @var bool
@@ -83,7 +82,7 @@ class LeadEventLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -129,7 +128,6 @@ class LeadEventLog
             ->nullable()
             ->build();
 
-
         $builder->addNullableField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
@@ -139,7 +137,7 @@ class LeadEventLog
     /**
      * @return \DateTime
      */
-    public function getDateTriggered ()
+    public function getDateTriggered()
     {
         return $this->dateTriggered;
     }
@@ -147,7 +145,7 @@ class LeadEventLog
     /**
      * @param \DateTime $dateTriggered
      */
-    public function setDateTriggered ($dateTriggered)
+    public function setDateTriggered($dateTriggered)
     {
         $this->dateTriggered = $dateTriggered;
     }
@@ -155,7 +153,7 @@ class LeadEventLog
     /**
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -163,7 +161,7 @@ class LeadEventLog
     /**
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      */
-    public function setIpAddress ($ipAddress)
+    public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -171,7 +169,7 @@ class LeadEventLog
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -179,7 +177,7 @@ class LeadEventLog
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -187,7 +185,7 @@ class LeadEventLog
     /**
      * @return mixed
      */
-    public function getEvent ()
+    public function getEvent()
     {
         return $this->event;
     }
@@ -195,7 +193,7 @@ class LeadEventLog
     /**
      * @param mixed $event
      */
-    public function setEvent ($event)
+    public function setEvent($event)
     {
         $this->event = $event;
     }
@@ -203,7 +201,7 @@ class LeadEventLog
     /**
      * @return bool
      */
-    public function getIsScheduled ()
+    public function getIsScheduled()
     {
         return $this->isScheduled;
     }
@@ -211,7 +209,7 @@ class LeadEventLog
     /**
      * @param bool $isScheduled
      */
-    public function setIsScheduled ($isScheduled)
+    public function setIsScheduled($isScheduled)
     {
         $this->isScheduled = $isScheduled;
     }
@@ -219,7 +217,7 @@ class LeadEventLog
     /**
      * @return mixed
      */
-    public function getTriggerDate ()
+    public function getTriggerDate()
     {
         return $this->triggerDate;
     }
@@ -227,7 +225,7 @@ class LeadEventLog
     /**
      * @param mixed $triggerDate
      */
-    public function setTriggerDate ($triggerDate)
+    public function setTriggerDate($triggerDate)
     {
         $this->triggerDate = $triggerDate;
     }
@@ -235,7 +233,7 @@ class LeadEventLog
     /**
      * @return mixed
      */
-    public function getCampaign ()
+    public function getCampaign()
     {
         return $this->campaign;
     }
@@ -243,7 +241,7 @@ class LeadEventLog
     /**
      * @param mixed $campaign
      */
-    public function setCampaign ($campaign)
+    public function setCampaign($campaign)
     {
         $this->campaign = $campaign;
     }
@@ -251,7 +249,7 @@ class LeadEventLog
     /**
      * @return bool
      */
-    public function getSystemTriggered ()
+    public function getSystemTriggered()
     {
         return $this->systemTriggered;
     }
@@ -259,7 +257,7 @@ class LeadEventLog
     /**
      * @param bool $systemTriggered
      */
-    public function setSystemTriggered ($systemTriggered)
+    public function setSystemTriggered($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
     }
@@ -295,7 +293,7 @@ class LeadEventLog
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline
-            $metadata = array('timeline' => $metadata);
+            $metadata = ['timeline' => $metadata];
         }
 
         $this->metadata = $metadata;

@@ -1,30 +1,29 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Role
- *
- * @package Mautic\UserBundle\Entity
+ * Class Role.
  */
 class Role extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -61,9 +60,9 @@ class Role extends FormEntity
     private $users;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
@@ -72,7 +71,7 @@ class Role extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -101,22 +100,20 @@ class Role extends FormEntity
             ->mappedBy('role')
             ->fetchExtraLazy()
             ->build();
-
-
     }
 
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            array('message' => 'mautic.core.name.required')
+            ['message' => 'mautic.core.name.required']
         ));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -124,34 +121,35 @@ class Role extends FormEntity
     {
         $metadata->setGroupPrefix('role')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'description',
-                    'isAdmin'
-                )
+                    'isAdmin',
+                    'rawPermissions',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Role
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -160,23 +158,23 @@ class Role extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Add permissions
+     * Add permissions.
      *
      * @param Permission $permissions
      *
      * @return Role
      */
-    public function addPermission (Permission $permissions)
+    public function addPermission(Permission $permissions)
     {
         $permissions->setRole($this);
 
@@ -186,33 +184,33 @@ class Role extends FormEntity
     }
 
     /**
-     * Remove permissions
+     * Remove permissions.
      *
      * @param Permission $permissions
      */
-    public function removePermission (Permission $permissions)
+    public function removePermission(Permission $permissions)
     {
         $this->permissions->removeElement($permissions);
     }
 
     /**
-     * Get permissions
+     * Get permissions.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPermissions ()
+    public function getPermissions()
     {
         return $this->permissions;
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return Role
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -221,23 +219,23 @@ class Role extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set isAdmin
+     * Set isAdmin.
      *
-     * @param boolean $isAdmin
+     * @param bool $isAdmin
      *
      * @return Role
      */
-    public function setIsAdmin ($isAdmin)
+    public function setIsAdmin($isAdmin)
     {
         $this->isChanged('isAdmin', $isAdmin);
         $this->isAdmin = $isAdmin;
@@ -246,54 +244,54 @@ class Role extends FormEntity
     }
 
     /**
-     * Get isAdmin
+     * Get isAdmin.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsAdmin ()
+    public function getIsAdmin()
     {
         return $this->isAdmin;
     }
 
     /**
-     * Get isAdmin
+     * Get isAdmin.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isAdmin ()
+    public function isAdmin()
     {
         return $this->getIsAdmin();
     }
 
     /**
-     * Simply used to store a readable format of permissions for the changelog
+     * Simply used to store a readable format of permissions for the changelog.
      *
      * @param array $permissions
      */
-    public function setRawPermissions (array $permissions)
+    public function setRawPermissions(array $permissions)
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
     }
 
     /**
-     * Get rawPermissions
+     * Get rawPermissions.
      *
      * @return array
      */
-    public function getRawPermissions ()
+    public function getRawPermissions()
     {
         return $this->rawPermissions;
     }
 
     /**
-     * Add users
+     * Add users.
      *
      * @param User $users
      *
      * @return Role
      */
-    public function addUser (User $users)
+    public function addUser(User $users)
     {
         $this->users[] = $users;
 
@@ -301,21 +299,21 @@ class Role extends FormEntity
     }
 
     /**
-     * Remove users
+     * Remove users.
      *
      * @param User $users
      */
-    public function removeUser (User $users)
+    public function removeUser(User $users)
     {
         $this->users->removeElement($users);
     }
 
     /**
-     * Get users
+     * Get users.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUsers ()
+    public function getUsers()
     {
         return $this->users;
     }

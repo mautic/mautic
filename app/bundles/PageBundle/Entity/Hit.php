@@ -1,28 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
- * Class Hit
- *
- * @package Mautic\PageBundle\Entity
+ * Class Hit.
  */
 class Hit
 {
-
     /**
      * @var int
      */
@@ -89,7 +88,7 @@ class Hit
     private $organization;
 
     /**
-     * @var integer
+     * @var int
      */
     private $code;
 
@@ -126,7 +125,7 @@ class Hit
     /**
      * @var string
      */
-    private $browserLanguages = array();
+    private $browserLanguages = [];
 
     /**
      * @var string
@@ -139,14 +138,14 @@ class Hit
     private $source;
 
     /**
-     * @var integer
+     * @var int
      */
     private $sourceId;
 
     /**
      * @var array
      */
-    private $query = array();
+    private $query = [];
     /**
      * @var \Mautic\LeadBundle\Entity\LeadDevice
      */
@@ -155,7 +154,7 @@ class Hit
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -270,7 +269,7 @@ class Hit
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -278,7 +277,7 @@ class Hit
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
-                array(
+                [
                     'dateHit',
                     'dateLeft',
                     'page',
@@ -302,16 +301,16 @@ class Hit
                     'trackingId',
                     'source',
                     'sourceId',
-                    'query'
-                )
+                    'query',
+                ]
             )
             ->build();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -319,7 +318,7 @@ class Hit
     }
 
     /**
-     * Set dateHit
+     * Set dateHit.
      *
      * @param \DateTime $dateHit
      *
@@ -333,7 +332,7 @@ class Hit
     }
 
     /**
-     * Get dateHit
+     * Get dateHit.
      *
      * @return \DateTime
      */
@@ -363,7 +362,7 @@ class Hit
     }
 
     /**
-     * Set country
+     * Set country.
      *
      * @param string $country
      *
@@ -377,7 +376,7 @@ class Hit
     }
 
     /**
-     * Get country
+     * Get country.
      *
      * @return string
      */
@@ -387,7 +386,7 @@ class Hit
     }
 
     /**
-     * Set region
+     * Set region.
      *
      * @param string $region
      *
@@ -401,7 +400,7 @@ class Hit
     }
 
     /**
-     * Get region
+     * Get region.
      *
      * @return string
      */
@@ -411,7 +410,7 @@ class Hit
     }
 
     /**
-     * Set city
+     * Set city.
      *
      * @param string $city
      *
@@ -425,7 +424,7 @@ class Hit
     }
 
     /**
-     * Get city
+     * Get city.
      *
      * @return string
      */
@@ -435,7 +434,7 @@ class Hit
     }
 
     /**
-     * Set isp
+     * Set isp.
      *
      * @param string $isp
      *
@@ -449,7 +448,7 @@ class Hit
     }
 
     /**
-     * Get isp
+     * Get isp.
      *
      * @return string
      */
@@ -459,7 +458,7 @@ class Hit
     }
 
     /**
-     * Set organization
+     * Set organization.
      *
      * @param string $organization
      *
@@ -473,7 +472,7 @@ class Hit
     }
 
     /**
-     * Get organization
+     * Get organization.
      *
      * @return string
      */
@@ -483,9 +482,9 @@ class Hit
     }
 
     /**
-     * Set code
+     * Set code.
      *
-     * @param integer $code
+     * @param int $code
      *
      * @return Hit
      */
@@ -497,9 +496,9 @@ class Hit
     }
 
     /**
-     * Get code
+     * Get code.
      *
-     * @return integer
+     * @return int
      */
     public function getCode()
     {
@@ -507,7 +506,7 @@ class Hit
     }
 
     /**
-     * Set referer
+     * Set referer.
      *
      * @param string $referer
      *
@@ -521,7 +520,7 @@ class Hit
     }
 
     /**
-     * Get referer
+     * Get referer.
      *
      * @return string
      */
@@ -531,7 +530,7 @@ class Hit
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
      *
@@ -545,7 +544,7 @@ class Hit
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */
@@ -555,7 +554,7 @@ class Hit
     }
 
     /**
-     * Set url title
+     * Set url title.
      *
      * @param string $urlTitle
      *
@@ -569,7 +568,7 @@ class Hit
     }
 
     /**
-     * Get url title
+     * Get url title.
      *
      * @return string
      */
@@ -579,7 +578,7 @@ class Hit
     }
 
     /**
-     * Set userAgent
+     * Set userAgent.
      *
      * @param string $userAgent
      *
@@ -593,7 +592,7 @@ class Hit
     }
 
     /**
-     * Get userAgent
+     * Get userAgent.
      *
      * @return string
      */
@@ -603,7 +602,7 @@ class Hit
     }
 
     /**
-     * Set remoteHost
+     * Set remoteHost.
      *
      * @param string $remoteHost
      *
@@ -617,7 +616,7 @@ class Hit
     }
 
     /**
-     * Get remoteHost
+     * Get remoteHost.
      *
      * @return string
      */
@@ -627,7 +626,7 @@ class Hit
     }
 
     /**
-     * Set page
+     * Set page.
      *
      * @param Page $page
      *
@@ -641,7 +640,7 @@ class Hit
     }
 
     /**
-     * Get page
+     * Get page.
      *
      * @return Page
      */
@@ -651,7 +650,7 @@ class Hit
     }
 
     /**
-     * Set ipAddress
+     * Set ipAddress.
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
@@ -665,7 +664,7 @@ class Hit
     }
 
     /**
-     * Get ipAddress
+     * Get ipAddress.
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
@@ -675,9 +674,9 @@ class Hit
     }
 
     /**
-     * Set trackingId
+     * Set trackingId.
      *
-     * @param integer $trackingId
+     * @param int $trackingId
      *
      * @return Page
      */
@@ -689,9 +688,9 @@ class Hit
     }
 
     /**
-     * Get trackingId
+     * Get trackingId.
      *
-     * @return integer
+     * @return int
      */
     public function getTrackingId()
     {
@@ -699,7 +698,7 @@ class Hit
     }
 
     /**
-     * Set pageLanguage
+     * Set pageLanguage.
      *
      * @param string $pageLanguage
      *
@@ -713,7 +712,7 @@ class Hit
     }
 
     /**
-     * Get pageLanguage
+     * Get pageLanguage.
      *
      * @return string
      */
@@ -723,7 +722,7 @@ class Hit
     }
 
     /**
-     * Set browserLanguages
+     * Set browserLanguages.
      *
      * @param string $browserLanguages
      *
@@ -737,7 +736,7 @@ class Hit
     }
 
     /**
-     * Get browserLanguages
+     * Get browserLanguages.
      *
      * @return string
      */
@@ -787,7 +786,7 @@ class Hit
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getSourceId()
     {
@@ -795,7 +794,7 @@ class Hit
     }
 
     /**
-     * @param integer $sourceId
+     * @param int $sourceId
      *
      * @return Hit
      */
@@ -829,7 +828,7 @@ class Hit
     /**
      * @return mixed
      */
-    public function getEmail ()
+    public function getEmail()
     {
         return $this->email;
     }
@@ -837,7 +836,7 @@ class Hit
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email)
+    public function setEmail(Email $email)
     {
         $this->email = $email;
     }

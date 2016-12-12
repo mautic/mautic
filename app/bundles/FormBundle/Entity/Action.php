@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,16 +14,12 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Action
- *
- * @package Mautic\FormBundle\Entity
+ * Class Action.
  */
 class Action
 {
-
     /**
      * @var int
      */
@@ -50,7 +48,7 @@ class Action
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var Form
@@ -63,24 +61,24 @@ class Action
     private $changes;
 
     /**
-     * Reset properties on clone
+     * Reset properties on clone.
      */
     public function __clone()
     {
         $this->id   = null;
         $this->form = null;
     }
-    
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_actions')
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\ActionRepository')
-            ->addIndex(array('type'), 'form_action_type_search');
+            ->addIndex(['type'], 'form_action_type_search');
 
         $builder->addIdColumns();
 
@@ -101,7 +99,7 @@ class Action
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -109,57 +107,66 @@ class Action
     {
         $metadata->setGroupPrefix('form')
             ->addProperties(
-                array(
+                [
                     'id',
                     'name',
                     'description',
                     'type',
                     'order',
-                    'properties'
-                )
+                    'properties',
+                ]
             )
             ->build();
     }
 
     /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+            'groups'  => ['action'],
+        ]));
+    }
+
+    /**
      * @param $prop
      * @param $val
-     *
-     * @return void
      */
-    private function isChanged ($prop, $val)
+    private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+            $this->changes[$prop] = [$this->$prop, $val];
         }
     }
 
     /**
      * @return array
      */
-    public function getChanges ()
+    public function getChanges()
     {
         return $this->changes;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set order
+     * Set order.
      *
-     * @param integer $order
+     * @param int $order
      *
      * @return Action
      */
-    public function setOrder ($order)
+    public function setOrder($order)
     {
         $this->isChanged('order', $order);
 
@@ -169,23 +176,23 @@ class Action
     }
 
     /**
-     * Get order
+     * Get order.
      *
-     * @return integer
+     * @return int
      */
-    public function getOrder ()
+    public function getOrder()
     {
         return $this->order;
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param array $properties
      *
      * @return Action
      */
-    public function setProperties ($properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -195,23 +202,23 @@ class Action
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return array
      */
-    public function getProperties ()
+    public function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * Set form
+     * Set form.
      *
      * @param Form $form
      *
      * @return Action
      */
-    public function setForm (Form $form)
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -219,23 +226,23 @@ class Action
     }
 
     /**
-     * Get form
+     * Get form.
      *
      * @return Form
      */
-    public function getForm ()
+    public function getForm()
     {
         return $this->form;
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return Action
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -244,11 +251,11 @@ class Action
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
@@ -256,19 +263,19 @@ class Action
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return Action
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -277,23 +284,23 @@ class Action
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Action
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -302,11 +309,11 @@ class Action
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }

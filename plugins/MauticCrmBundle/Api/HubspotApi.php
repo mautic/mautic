@@ -2,21 +2,21 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class HubspotApi extends CrmApi
 {
     private $module = 'contacts';
 
-    protected $requestSettings = array(
+    protected $requestSettings = [
         'encode_parameters' => 'json',
-    );
+    ];
 
-    protected function request($operation, $parameters = array(), $method = 'GET')
+    protected function request($operation, $parameters = [], $method = 'GET')
     {
         $hapikey = $this->integration->getHubSpotApiKey();
-        $url = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $this->module, $operation, $hapikey);
+        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $this->module, $operation, $hapikey);
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
 
         if (isset($request['status']) && $request['status'] == 'error') {

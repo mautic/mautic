@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $id = $variant->getId();
 if (!isset($variants['properties'][$id])):
     $settings                    = $variant->getVariantSettings();
@@ -23,8 +24,8 @@ else:
     $thisCriteria = $criteriaLabel = '';
     $weight       = 0;
 endif;
-$isPublished   = $variant->isPublished();
-$totalWeight  += ($isPublished) ? $weight : 0;
+$isPublished = $variant->isPublished();
+$totalWeight += ($isPublished) ? $weight : 0;
 $firstCriteria = (!isset($firstCriteria)) ? $thisCriteria : $firstCriteria;
 $isWinner      = (isset($abTestResults['winners'])
     && in_array(
@@ -61,7 +62,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                 </div>
                 <div class="col-xs-11">
                     <?php if ($isWinner): ?>
-                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans(              'mautic.core.ab_test.make_winner'); ?>">
+                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.ab_test.make_winner'); ?>">
                             <a class="btn btn-warning"
                                data-toggle="confirmation"
                                href="<?php echo $view['router']->path(
@@ -72,20 +73,20 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                                    ]
                                ); ?>"
                                data-message="<?php echo $view->escape(
-                                   $view["translator"]->trans(
-                                       "mautic.core.ab_test.confirm_make_winner",
-                                       ["%name%" => $variant->$nameGetter()]
+                                   $view['translator']->trans(
+                                       'mautic.core.ab_test.confirm_make_winner',
+                                       ['%name%' => $variant->$nameGetter()]
                                    )
                                ); ?>"
                                data-confirm-text="<?php echo $view->escape(
-                                   $view["translator"]->trans(
-                                       "mautic.core.ab_test.make_winner"
+                                   $view['translator']->trans(
+                                       'mautic.core.ab_test.make_winner'
                                    )
                                ); ?>"
                                data-confirm-callback="executeAction"
                                data-cancel-text="<?php echo $view->escape(
-                                   $view["translator"]->trans(
-                                       "mautic.core.form.cancel"
+                                   $view['translator']->trans(
+                                       'mautic.core.form.cancel'
                                    )
                                ); ?>">
                                 <i class="fa fa-trophy"></i>

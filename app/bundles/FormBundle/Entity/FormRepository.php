@@ -1,28 +1,28 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\FormBundle\Entity\Form;
 
 /**
- * FormRepository
+ * FormRepository.
  */
 class FormRepository extends CommonRepository
 {
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
@@ -84,22 +84,10 @@ class FormRepository extends CommonRepository
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('f.name',  ':'.$unique),
-            $q->expr()->like('f.description',  ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $q->expr()->not($expr);
-        }
-
-        return array(
-            $expr,
-            array("$unique" => $string)
-        );
+        return $this->addStandardCatchAllWhereClause($q, $filter, [
+            'f.name',
+            'f.description',
+        ]);
     }
 
     /**
@@ -113,12 +101,12 @@ class FormRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("f.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('f.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("f.isPublished", ":$unique");
-                $forceParameters = array($unique => false);
+                $expr            = $q->expr()->eq('f.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
@@ -128,7 +116,7 @@ class FormRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq("f.createdBy", $this->currentUser->getId());
+                $expr            = $q->expr()->eq('f.createdBy', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
@@ -138,7 +126,7 @@ class FormRepository extends CommonRepository
                     $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
                 );
-                $forceParameters = array($unique => true);
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
                 $expr = $q->expr()->andX(
@@ -147,25 +135,25 @@ class FormRepository extends CommonRepository
                     $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
                 );
-                $forceParameters = array($unique => true);
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults'):
-                $sq = $this->getEntityManager()->createQueryBuilder();
-                $subquery = $sq->select("count(s.id)")
+                $sq       = $this->getEntityManager()->createQueryBuilder();
+                $subquery = $sq->select('count(s.id)')
                     ->from('MauticFormBundle:Submission', 's')
                     ->leftJoin('MauticFormBundle:Form', 'f2',
                         Join::WITH,
-                        $sq->expr()->eq('s.form', "f2")
+                        $sq->expr()->eq('s.form', 'f2')
                     )
                     ->where(
                         $q->expr()->eq('s.form', 'f')
                     )
                     ->getDql();
-                $expr = $q->expr()->gt(sprintf("(%s)",$subquery), 1);
+                $expr            = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('c.alias', ":$unique");
+                $expr           = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
@@ -177,43 +165,43 @@ class FormRepository extends CommonRepository
             $expr = $q->expr()->not($expr);
         }
 
-        $parameters = array();
+        $parameters = [];
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array(
+        return [
             $expr,
-            $parameters
-        );
+            $parameters,
+        ];
     }
 
     /**
-     * Fetch the form results
+     * Fetch the form results.
      *
-     * @param Form $form
+     * @param Form  $form
      * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getFormResults(Form $form, array $options = array())
+    public function getFormResults(Form $form, array $options = [])
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
 
-        $query->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+        $query->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->select('fr.*')
             ->leftJoin('fs', $this->getResultsTableName($form->getId(), $form->getAlias()), 'fr', 'fr.submission_id = fs.id')
             ->where('fs.form_id = :formId')
             ->setParameter('formId', $form->getId());
 
-
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = ' . (int) $options['leadId']);
+            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
         }
 
         if (!empty($options['formId'])) {
@@ -229,16 +217,16 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * Compile and return the form result table name
+     * Compile and return the form result table name.
      *
-     * @param  integer $formId
-     * @param  string  $formAlias
+     * @param int    $formId
+     * @param string $formAlias
      *
      * @return string
      */
     public function getResultsTableName($formId, $formAlias)
     {
-        return MAUTIC_TABLE_PREFIX . 'form_results_' . $formId . '_' . $formAlias;
+        return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
 
     /**
@@ -246,7 +234,7 @@ class FormRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -256,8 +244,7 @@ class FormRepository extends CommonRepository
             'mautic.form.form.searchcommand.hasresults',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
-        );
-
+        ];
     }
 
     /**
@@ -265,9 +252,9 @@ class FormRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('f.name', 'ASC')
-        );
+        return [
+            ['f.name', 'ASC'],
+        ];
     }
 
     /**

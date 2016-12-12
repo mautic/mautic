@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,12 +15,12 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class EmojiToHtmlTransformer
+ * Class EmojiToHtmlTransformer.
  */
 class EmojiToHtmlTransformer implements DataTransformerInterface
 {
     /**
-     * Convert emoji unicode to HTML
+     * Convert emoji unicode to HTML.
      *
      * @param array|string $content
      *
@@ -38,7 +40,7 @@ class EmojiToHtmlTransformer implements DataTransformerInterface
     }
 
     /**
-     * Convert HTML emoji to unicode bytes
+     * Convert HTML emoji to unicode bytes.
      *
      * @param array|string $content
      *

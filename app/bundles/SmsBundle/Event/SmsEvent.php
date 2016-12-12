@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -24,7 +26,7 @@ class SmsEvent extends CommonEvent
     public function __construct(Sms $sms, $isNew = false)
     {
         $this->entity = $sms;
-        $this->isNew = $isNew;
+        $this->isNew  = $isNew;
     }
 
     /**

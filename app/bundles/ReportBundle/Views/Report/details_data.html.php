@@ -1,13 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
+if ($tmpl == 'index') {
     $view->extend('MauticReportBundle:Report:details.html.php');
+}
 
 $dataCount   = count($data);
 $columnOrder = $report->getColumns();
@@ -27,14 +30,14 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                     <?php foreach ($columnOrder as $key): ?>
                         <?php
                         if (isset($columns[$key])):
-                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                                'sessionVar' => 'report.' . $report->getId(),
+                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                                'sessionVar' => 'report.'.$report->getId(),
                                 'orderBy'    => $key,
                                 'text'       => $columns[$key]['label'],
-                                'class'      => 'col-report-' . $columns[$key]['type'],
-                                'dataToggle' => in_array($columns[$key]['type'], array('date', 'datetime')) ? 'date' : '',
-                                'target'     => '.report-content'
-                            ));
+                                'class'      => 'col-report-'.$columns[$key]['type'],
+                                'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
+                                'target'     => '.report-content',
+                            ]);
                         else:
                             unset($columnOrder[$key]);
                         endif;
@@ -51,16 +54,22 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                                 <td>
                                     <?php $closeLink = false; ?>
                                     <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
-                                    <?php $closeLink = true; ?>
-                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
-                                    <?php endif;?>
+                                    <?php $closeLink = true;
+                                    if (array_key_exists('comp.id', $columns)) {
+                                        $objectAction = 'edit';
+                                    } else {
+                                        $objectAction = 'view';
+                                    }
+                                    ?>
+                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                    <?php endif; ?>
                                     <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
                                     <?php if ($closeLink): ?></a><?php endif; ?>
                                 </td>
 
                             <?php endforeach; ?>
                         </tr>
-                        <?php $startCount++; ?>
+                        <?php ++$startCount; ?>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
@@ -74,16 +83,16 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
             </table>
         </div>
         <div class="panel-footer">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-                'totalItems'      => $totalResults,
-                'page'            => $reportPage,
-                'limit'           => $limit,
-                'baseUrl'         => $view['router']->path('mautic_report_view', array(
-                    'objectId' => $report->getId()
-                )),
-                'sessionVar'      => 'report.' . $report->getId(),
-                'target'          => '.report-content'
-            )); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+                'totalItems' => $totalResults,
+                'page'       => $reportPage,
+                'limit'      => $limit,
+                'baseUrl'    => $view['router']->path('mautic_report_view', [
+                    'objectId' => $report->getId(),
+                ]),
+                'sessionVar' => 'report.'.$report->getId(),
+                'target'     => '.report-content',
+            ]); ?>
         </div>
     </div>
 </div>
@@ -96,14 +105,15 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
     <?php
     $rowCount = 0;
     foreach ($graphOrder as $key):
-        $details =  $graphs[$key];
-        if (!isset($details['data']))
+        $details = $graphs[$key];
+        if (!isset($details['data'])) {
             continue;
+        }
         if ($rowCount >= 12):
             echo '</div><div class="row equal">';
             $rowCount = 0;
         endif;
-        echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
+        echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'options' => $details['options'], 'report' => $report]);
         $rowCount += ($details['type'] == 'line') ? 12 : 4;
     endforeach;
     ?>

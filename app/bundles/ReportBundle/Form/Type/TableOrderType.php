@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +19,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FilterSelectorType
+ * Class FilterSelectorType.
  */
 class TableOrderType extends AbstractType
 {
@@ -37,35 +39,35 @@ class TableOrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Build a list of columns
-        $builder->add('column', 'choice', array(
+        $builder->add('column', 'choice', [
             'choices'     => $options['columnList'],
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => array('class' => 'control-label'),
+            'label_attr'  => ['class' => 'control-label'],
             'empty_value' => false,
             'required'    => false,
-            'attr'        => array(
-                'class' => 'form-control filter-columns'
-            )
-        ));
+            'attr'        => [
+                'class' => 'form-control filter-columns',
+            ],
+        ]);
 
         // Direction
-        $builder->add('direction', 'choice', array(
-            'choices'     => array(
+        $builder->add('direction', 'choice', [
+            'choices' => [
                 'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
-                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc')
-            ),
+                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
+            ],
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.core.order',
-            'label_attr'  => array('class' => 'control-label'),
+            'label_attr'  => ['class' => 'control-label'],
             'empty_value' => false,
             'required'    => false,
-            'attr'        => array(
-                'class' => 'form-control not-chosen'
-            )
-        ));
+            'attr'        => [
+                'class' => 'form-control not-chosen',
+            ],
+        ]);
     }
 
     /**
@@ -73,9 +75,9 @@ class TableOrderType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars = array_replace($view->vars, array(
-            'columnList' => $options['columnList']
-        ));
+        $view->vars = array_replace($view->vars, [
+            'columnList' => $options['columnList'],
+        ]);
     }
 
     /**
@@ -91,8 +93,8 @@ class TableOrderType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'columnList' => array()
-        ));
+        $resolver->setDefaults([
+            'columnList' => [],
+        ]);
     }
 }

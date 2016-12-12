@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
 /**
- * Class ReportGeneratorEvent
+ * Class ReportGeneratorEvent.
  */
 class ReportGeneratorEvent extends AbstractReportEvent
 {
@@ -24,14 +26,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $selectColumns = [];
 
     /**
-     * QueryBuilder object
+     * QueryBuilder object.
      *
      * @var QueryBuilder
      */
     private $queryBuilder;
 
     /**
-     * contentTemplate
+     * contentTemplate.
      *
      * @var string
      */
@@ -48,7 +50,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $filterExpression = null;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $context Event context
      */
@@ -61,15 +63,15 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Fetch the QueryBuilder object
+     * Fetch the QueryBuilder object.
      *
      * @return QueryBuilder
+     *
      * @throws \RuntimeException
      */
     public function getQueryBuilder()
     {
         if ($this->queryBuilder instanceof QueryBuilder) {
-
             return $this->queryBuilder;
         }
 
@@ -77,11 +79,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Set the QueryBuilder object
+     * Set the QueryBuilder object.
      *
      * @param QueryBuilder $queryBuilder
-     *
-     * @return void
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder)
     {
@@ -89,9 +89,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Fetch the ContentTemplate path
+     * Fetch the ContentTemplate path.
      *
      * @return QueryBuilder
+     *
      * @throws \RuntimeException
      */
     public function getContentTemplate()
@@ -105,11 +106,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Set the ContentTemplate path
+     * Set the ContentTemplate path.
      *
      * @param string $contentTemplate
-     *
-     * @return void
      */
     public function setContentTemplate($contentTemplate)
     {
@@ -125,7 +124,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Set custom select columns with aliases based on report settings
+     * Set custom select columns with aliases based on report settings.
      *
      * @param array $selectColumns
      *
@@ -173,18 +172,18 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add category left join
+     * Add category left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      */
     public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = 'c')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'categories', $categoryPrefix, 'c.id = ' . $prefix . '.category_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, 'c.id = '.$prefix.'.category_id');
     }
 
     /**
-     * Add lead left join
+     * Add lead left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
@@ -192,11 +191,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = 'l')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'leads', $leadPrefix, 'l.id = ' . $prefix . '.lead_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, 'l.id = '.$prefix.'.lead_id');
     }
 
     /**
-     * Add IP left join
+     * Add IP left join.
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
@@ -204,20 +203,20 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = 'i')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'ip_addresses', $ipPrefix, 'i.id = ' . $prefix . '.ip_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, 'i.id = '.$prefix.'.ip_id');
     }
 
     /**
-     * Apply date filters to the query
+     * Apply date filters to the query.
      *
-     * @param  QueryBuilder $query
-     * @param  string       $dateColumn
-     * @param  string       $tablePrefix
+     * @param QueryBuilder $query
+     * @param string       $dateColumn
+     * @param string       $tablePrefix
      */
     public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
     {
         if ($tablePrefix) {
-            $tablePrefix  .= ".";
+            $tablePrefix .= '.';
         }
 
         if (empty($this->options['dateFrom'])) {
@@ -241,7 +240,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Check if the report has a specific column
+     * Check if the report has a specific column.
      *
      * @param $column
      *
@@ -262,10 +261,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
         if (is_array($column)) {
             foreach ($column as $checkMe) {
                 if (isset($sorted[$checkMe])) {
-
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -273,7 +272,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Check if the report has a specific filter
+     * Check if the report has a specific filter.
      *
      * @param $column
      *
@@ -294,10 +293,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
         if (is_array($column)) {
             foreach ($column as $checkMe) {
                 if (isset($sorted[$checkMe])) {
-
                     return true;
                 }
             }
+
             return false;
         }
 

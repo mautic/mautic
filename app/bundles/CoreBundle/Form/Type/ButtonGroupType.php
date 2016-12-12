@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +17,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class ButtonGroupType
+ * Class ButtonGroupType.
  */
 class ButtonGroupType extends AbstractType
 {
@@ -40,14 +42,14 @@ class ButtonGroupType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'expanded'           => true,
             'multiple'           => false,
             'empty_value'        => false,
             'required'           => false,
-            'label_attr'         => array('class' => 'control-label'),
-            'button_group_class' => 'btn-block'
-        ));
+            'label_attr'         => ['class' => 'control-label'],
+            'button_group_class' => 'btn-block',
+        ]);
     }
 
     /**

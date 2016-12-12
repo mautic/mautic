@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,19 +14,19 @@ namespace Mautic\ReportBundle\Event;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ReportBuilderEvent
+ * Class ReportBuilderEvent.
  */
 class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
-     * Container with registered tables and columns
+     * Container with registered tables and columns.
      *
      * @var array
      */
     private $tableArray = [];
 
     /**
-     * Supported graphs
+     * Supported graphs.
      *
      * @var array
      */
@@ -32,11 +34,11 @@ class ReportBuilderEvent extends AbstractReportEvent
         'table',
         'bar',
         'pie',
-        'line'
+        'line',
     ];
 
     /**
-     * Container with registered graphs
+     * Container with registered graphs.
      *
      * @var array
      */
@@ -111,11 +113,12 @@ class ReportBuilderEvent extends AbstractReportEvent
         if ($this->context == $context) {
             $this->stopPropagation();
         }
+
         return $this;
     }
 
     /**
-     * Fetch the tables in the lookup array
+     * Fetch the tables in the lookup array.
      *
      * @return array
      */
@@ -125,67 +128,67 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * Returns standard form fields such as id, name, publish_up, etc
+     * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param        $prefix
+     * @param   $prefix
      *
      * @return array
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {
         $aliasPrefix = str_replace('.', '_', $prefix);
-        $columns = [
-            $prefix.'id'               => [
+        $columns     = [
+            $prefix.'id' => [
                 'label' => 'mautic.core.id',
                 'type'  => 'int',
                 'link'  => $idLink,
-                'alias' => "{$aliasPrefix}id"
+                'alias' => "{$aliasPrefix}id",
             ],
-            $prefix.'name'             => [
+            $prefix.'name' => [
                 'label' => 'mautic.core.name',
                 'type'  => 'string',
-                'alias' => "{$aliasPrefix}name"
+                'alias' => "{$aliasPrefix}name",
             ],
-            $prefix.'created_by_user'  => [
+            $prefix.'created_by_user' => [
                 'label' => 'mautic.core.createdby',
                 'type'  => 'string',
-                'alias' => "{$aliasPrefix}created_by_user"
+                'alias' => "{$aliasPrefix}created_by_user",
             ],
-            $prefix.'date_added'       => [
+            $prefix.'date_added' => [
                 'label' => 'mautic.report.field.date_added',
                 'type'  => 'datetime',
-                'alias' => "{$aliasPrefix}date_added"
+                'alias' => "{$aliasPrefix}date_added",
             ],
             $prefix.'modified_by_user' => [
                 'label' => 'mautic.report.field.modified_by_user',
                 'type'  => 'string',
-                'alias' => "{$aliasPrefix}modified_by_user"
+                'alias' => "{$aliasPrefix}modified_by_user",
             ],
-            $prefix.'date_modified'    => [
+            $prefix.'date_modified' => [
                 'label' => 'mautic.report.field.date_modified',
                 'type'  => 'datetime',
-                'alias' => "{$aliasPrefix}date_modified"
+                'alias' => "{$aliasPrefix}date_modified",
             ],
-            $prefix.'description'      => [
+            $prefix.'description' => [
                 'label' => 'mautic.core.description',
                 'type'  => 'string',
-                'alias' => "{$aliasPrefix}description"
+                'alias' => "{$aliasPrefix}description",
             ],
-            $prefix.'publish_up'       => [
+            $prefix.'publish_up' => [
                 'label' => 'mautic.report.field.publish_up',
                 'type'  => 'datetime',
-                'alias' => "{$aliasPrefix}publish_up"
+                'alias' => "{$aliasPrefix}publish_up",
             ],
-            $prefix.'publish_down'     => [
+            $prefix.'publish_down' => [
                 'label' => 'mautic.report.field.publish_down',
                 'type'  => 'datetime',
-                'alias' => "{$aliasPrefix}publish_down"
+                'alias' => "{$aliasPrefix}publish_down",
             ],
-            $prefix.'is_published'     => [
+            $prefix.'is_published' => [
                 'label' => 'mautic.report.field.is_published',
                 'type'  => 'bool',
-                'alias' => "{$aliasPrefix}is_published"
-            ]
+                'alias' => "{$aliasPrefix}is_published",
+            ],
         ];
 
         if (empty($idLink)) {
@@ -204,78 +207,78 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * Returns lead columns
+     * Returns lead columns.
      *
-     * @param        $prefix
+     * @param   $prefix
      *
      * @return array
      */
     public function getLeadColumns($prefix = 'l.')
     {
         return [
-            $prefix.'id'        => [
+            $prefix.'id' => [
                 'label' => 'mautic.report.field.lead.id',
                 'type'  => 'int',
-                'alias' => 'contact_id'
+                'alias' => 'contact_id',
             ],
-            $prefix.'title'     => [
+            $prefix.'title' => [
                 'label' => 'mautic.report.field.lead.title',
                 'type'  => 'string',
-                'alias' => 'contact_title'
+                'alias' => 'contact_title',
             ],
             $prefix.'firstname' => [
                 'label' => 'mautic.report.field.lead.firstname',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'lastname'  => [
+            $prefix.'lastname' => [
                 'label' => 'mautic.report.field.lead.lastname',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'email'     => [
+            $prefix.'email' => [
                 'label' => 'mautic.report.field.lead.email',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'company'   => [
+            $prefix.'company' => [
                 'label' => 'mautic.report.field.lead.company',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'position'  => [
+            $prefix.'position' => [
                 'label' => 'mautic.report.field.lead.position',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'phone'     => [
+            $prefix.'phone' => [
                 'label' => 'mautic.report.field.lead.phone',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'mobile'    => [
+            $prefix.'mobile' => [
                 'label' => 'mautic.report.field.lead.mobile',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'address1'  => [
+            $prefix.'address1' => [
                 'label' => 'mautic.report.field.lead.address1',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'address2'  => [
+            $prefix.'address2' => [
                 'label' => 'mautic.report.field.lead.address2',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'country'   => [
+            $prefix.'country' => [
                 'label' => 'mautic.report.field.lead.country',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'city'      => [
+            $prefix.'city' => [
                 'label' => 'mautic.report.field.lead.city',
-                'type'  => 'string'
+                'type'  => 'string',
             ],
-            $prefix.'state'     => [
+            $prefix.'state' => [
                 'label' => 'mautic.report.field.lead.zipcode',
-                'type'  => 'string'
-            ]
+                'type'  => 'string',
+            ],
         ];
     }
 
     /**
-     * Get IP Address column
+     * Get IP Address column.
      *
      * @param string $prefix
      *
@@ -286,13 +289,13 @@ class ReportBuilderEvent extends AbstractReportEvent
         return [
             $prefix.'ip_address' => [
                 'label' => 'mautic.core.ipaddress',
-                'type'  => 'string'
-            ]
+                'type'  => 'string',
+            ],
         ];
     }
 
     /**
-     * Add category columns
+     * Add category columns.
      *
      * @param string $prefix
      *
@@ -301,15 +304,15 @@ class ReportBuilderEvent extends AbstractReportEvent
     public function getCategoryColumns($prefix = 'c.')
     {
         return [
-            $prefix.'id'    => [
+            $prefix.'id' => [
                 'label' => 'mautic.report.field.category_id',
                 'type'  => 'int',
-                'alias' => 'category_id'
+                'alias' => 'category_id',
             ],
             $prefix.'title' => [
                 'label' => 'mautic.report.field.category_name',
                 'type'  => 'string',
-                'alias' => 'category_title'
+                'alias' => 'category_title',
             ],
         ];
     }
@@ -327,7 +330,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         if (in_array($type, $this->supportedGraphs)) {
             $this->graphArray[$context][$graphId] = [
                 'options' => $options,
-                'type'    => $type
+                'type'    => $type,
             ];
         }
 
@@ -335,7 +338,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * Get graphs
+     * Get graphs.
      *
      * @return array
      */

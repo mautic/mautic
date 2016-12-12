@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +19,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class ConfigType
+ * Class ConfigType.
  */
 class ConfigType extends AbstractType
 {
@@ -41,9 +43,9 @@ class ConfigType extends AbstractType
     {
         foreach ($options['data'] as $config) {
             if (isset($config['formAlias']) && isset($config['parameters'])) {
-                $builder->add($config['formAlias'], $config['formAlias'], array(
-                    'data' => $config['parameters']
-                ));
+                $builder->add($config['formAlias'], $config['formAlias'], [
+                    'data' => $config['parameters'],
+                ]);
             }
         }
 
@@ -54,21 +56,20 @@ class ConfigType extends AbstractType
             foreach ($form as $config => $configForm) {
                 foreach ($configForm as $key => $child) {
                     if (in_array($key, $options['doNotChange'])) {
-
                         if ($options['doNotChangeDisplayMode'] == 'mask') {
                             $fieldOptions = $child->getConfig()->getOptions();
 
-                            $configForm->add($key, 'text', array(
-                                'label'      => $fieldOptions['label'],
-                                'required'   => false,
-                                'mapped'     => false,
-                                'disabled'   => true,
-                                'attr'       => array(
+                            $configForm->add($key, 'text', [
+                                'label'    => $fieldOptions['label'],
+                                'required' => false,
+                                'mapped'   => false,
+                                'disabled' => true,
+                                'attr'     => [
                                     'placeholder' => $translator->trans('mautic.config.restricted'),
-                                    'class'       => 'form-control'
-                                ),
-                                'label_attr' => array('class' => 'control-label'),
-                            ));
+                                    'class'       => 'form-control',
+                                ],
+                                'label_attr' => ['class' => 'control-label'],
+                            ]);
                         } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
                             $configForm->remove($key);
                         }
@@ -78,10 +79,10 @@ class ConfigType extends AbstractType
         });
 
         $builder->add('buttons', 'form_buttons',
-            array(
+            [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
-                'save_onclick'  => 'Mautic.activateBackdrop()'
-            )
+                'save_onclick'  => 'Mautic.activateBackdrop()',
+            ]
         );
 
         if (!empty($options['action'])) {
@@ -104,10 +105,9 @@ class ConfigType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array(
+        $resolver->setRequired([
             'doNotChange',
-            'doNotChangeDisplayMode'
-        ));
-
+            'doNotChangeDisplayMode',
+        ]);
     }
 }

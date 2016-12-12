@@ -1,16 +1,17 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -20,7 +21,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
 
 /**
- * Class LeadSubscriber
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -32,20 +33,17 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param TriggerModel  $triggerModel
+     * @param TriggerModel $triggerModel
      */
-    public function __construct(MauticFactory $factory, TriggerModel $triggerModel)
+    public function __construct(TriggerModel $triggerModel)
     {
-        parent::__construct($factory);
-
         $this->triggerModel = $triggerModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],
@@ -56,7 +54,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Trigger applicable events for the lead
+     * Trigger applicable events for the lead.
      *
      * @param PointsChangeEvent $event
      */
@@ -66,7 +64,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Handle point triggers for new leads (including 0 point triggers)
+     * Handle point triggers for new leads (including 0 point triggers).
      *
      * @param LeadEvent $event
      */
@@ -78,7 +76,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -90,7 +88,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         if (!$event->isApplicable($eventTypeKey)) {
-
             return;
         }
 
@@ -115,7 +112,7 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon'       => 'fa-calculator'
+                        'icon' => 'fa-calculator',
                     ]
                 );
             }
@@ -123,7 +120,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {

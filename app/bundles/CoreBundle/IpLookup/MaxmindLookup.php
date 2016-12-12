@@ -1,16 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\IpLookup;
 
 /**
- * Class MaxmindLookup
+ * Class MaxmindLookup.
  */
 class MaxmindLookup extends AbstractRemoteDataLookup
 {
@@ -27,7 +29,7 @@ class MaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
-        return array('Authorization' => 'Basic ' . base64_encode($this->auth));
+        return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
     /**
@@ -35,7 +37,7 @@ class MaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getUrl()
     {
-        $url = "https://geoip.maxmind.com/geoip/v2.1/";
+        $url = 'https://geoip.maxmind.com/geoip/v2.1/';
 
         switch ($this->getName()) {
             case 'maxmind_country':
@@ -92,7 +94,7 @@ class MaxmindLookup extends AbstractRemoteDataLookup
                     $this->organization = $data->traits->organization;
                 }
             } elseif (null !== $this->logger) {
-                $this->logger->warning('IP LOOKUP: ' . $data->error);
+                $this->logger->warning('IP LOOKUP: '.$data->error);
             }
         }
     }

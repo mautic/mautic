@@ -10,7 +10,9 @@
 !/app/bundles/CoreBundle/Assets/css/libraries/froala/plugins/gated_video.css
 !/app/bundles/CoreBundle/Assets/css/*.css
 /app/cache/*
+!/app/cache/.gitkeep
 /app/logs/*
+!/app/logs/.gitkeep
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php

@@ -133,6 +133,7 @@
                 if (formId !== null) {
                     Form.prepareMessengerForm(formId);
                     Form.prepareValidation(formId);
+                    Form.preparePagination(formId);
                 }
             }
         };
@@ -196,41 +197,134 @@
             }
         };
 
+        Form.preparePagination = function(formId) {
+            var theForm        = document.getElementById('mauticform_'+formId);
+            var pages          = theForm.querySelectorAll('[data-mautic-form-page]');
+            var lastPageNumber = pages.length;
+
+            [].forEach.call(pages, function (page) {
+                var pageNumber       = parseInt(page.getAttribute('data-mautic-form-page'));
+                var pageBreak        = theForm.querySelector('[data-mautic-form-pagebreak="'+pageNumber+'"]');
+
+                if (pageNumber > 1) {
+                    // Hide other pages by default
+                    page.style.display = 'none';
+                }
+
+                if (pageBreak) {
+                    var prevPageNumber    = pageNumber - 1;
+                    var nextPageNumber    = pageNumber + 1;
+
+                    var prevButton = pageBreak.querySelector('[data-mautic-form-pagebreak-button="prev"]');
+                    var nextButton = pageBreak.querySelector('[data-mautic-form-pagebreak-button="next"]');
+
+                    // Add button handlers
+                    prevButton.onclick = function(theForm, showPageNumber) {
+                        return function() {
+                            Form.switchPage(theForm, showPageNumber);
+                        }
+                    } (theForm, prevPageNumber);
+
+                    nextButton.onclick = function(theForm, hidePageNumber, showPageNumber) {
+                        return function () {
+                            // Validate fields first
+                            var validations = theForm.querySelector('[data-mautic-form-page="' + hidePageNumber + '"]').querySelectorAll('[data-validate]');
+                            var isValid = true;
+                            [].forEach.call(validations, function (container) {
+                                var fieldKey = container.getAttribute('data-validate');
+                                if (!Core.getValidator(formId).validateField(theForm, fieldKey)) {
+                                    isValid = false;
+                                }
+                            });
+                            if (!isValid) {
+                                return;
+                            }
+
+                            Form.switchPage(theForm, showPageNumber);
+                        }
+                    } (theForm, pageNumber, nextPageNumber);
+
+                    if (1 === pageNumber) {
+                        prevButton.setAttribute('disabled', 'disabled');
+                        pageBreak.style.display = 'block';
+                    } else {
+                        if (lastPageNumber === pageNumber) {
+                            var theSubmit = theForm.querySelector('button[type="submit"]').parentNode;
+                            nextButton.parentNode.appendChild(theSubmit);
+                            nextButton.remove();
+                        }
+                    }
+                }
+            });
+        };
+
+        Form.switchPage = function(theForm, showPageNumber) {
+            var pages          = theForm.querySelectorAll('[data-mautic-form-page]');
+            [].forEach.call(pages, function (page) {
+                // Hide all pages
+                page.style.display = 'none';
+
+                var pageNumber = parseInt(page.getAttribute('data-mautic-form-page'));
+                var pageBreak  = theForm.querySelector('[data-mautic-form-pagebreak="'+pageNumber+'"]');
+                if (pageBreak) {
+                    pageBreak.style.display = 'none';
+                }
+            });
+
+            // Show the wanted page
+            theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]').style.display = 'block';
+            var showPageBreak = theForm.querySelector('[data-mautic-form-pagebreak="' + showPageNumber + '"]');
+            if (showPageBreak) {
+                showPageBreak.style.display = 'block';
+            }
+        };
+
+        Form.getPageForField = function (formId, fieldId, switchPage) {
+            if (typeof switchPage === 'undefined') {
+                switchPage = true;
+            }
+            var containerId = Form.getFieldContainerId(formId, fieldId);
+
+            // If within a page break - go back to the page that includes this field
+            var pageBreak = pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
+            if (pageBreak) {
+                var page = pageBreak.getAttribute('data-mautic-form-page');
+                if (switchPage) {
+                    Form.switchPage(document.getElementById('mauticform_' + formId), page);
+                }
+
+                return page;
+            }
+        };
+
+        Form.findAncestor = function (el, cls) {
+            var ancestor = false;
+            while (true) {
+                var parent = el.parentElement
+                if (!parent || Form.hasClass(parent, 'mauticform-innerform')) {
+                    break;
+                } else if (Form.hasClass(parent, cls)) {
+                    ancestor = parent;
+                    break;
+                }
+            }
+
+            return ancestor;
+        };
+
+        Form.hasClass = function (el, cls) {
+            return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
+        };
+
         Form.validator = function(formId) {
             var validator = {
                 validateForm: function (submitForm) {
                     if (!submitForm) {
                         Form.prepareMessengerForm(formId);
                     }
-                    function validateOptions(elOptions) {
-                        if (typeof elOptions === 'undefined') {
-                            return;
-                        }
-
-                        var optionsValid = false;
-
-                        if (elOptions.length == undefined) {
-                            elOptions = [elOptions];
-                        }
-
-                        for (var i = 0; i < elOptions.length; i++) {
-                            if (elOptions[i].checked) {
-                                optionsValid = true;
-                                break;
-                            }
-                        }
-
-                        return optionsValid;
-                    }
-
-                    function validateEmail(email) {
-                        var atpos = email.indexOf("@");
-                        var dotpos = email.lastIndexOf(".");
-                        var valid = (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) ? false : true;
-                        return valid;
-                    }
 
                     var formValid = Form.customCallbackHandler(formId, 'onValidate');
+                    var firstInvalidField = false;
 
                     // If true, then a callback handled it
                     if (formValid === null) {
@@ -249,52 +343,13 @@
 
                         var formValid = true;
                         var elId      = 'mauticform_' + formId;
-                        var elForm    = document.getElementById(elId);
+                        var theForm   = document.getElementById(elId);
 
                         // Find each required element
                         for (var fieldKey in MauticFormValidations[formId]) {
-                            var field = MauticFormValidations[formId][fieldKey];
-                            var name  = 'mauticform[' + field.name + ']';
-
-                            if (field.multiple == 'true' || field.type == 'checkboxgrp') {
-                                name = name + '[]';
-                            }
-
-                            var valid = true;
-                            if (typeof elForm.elements[name] != 'undefined') {
-                                switch (field.type) {
-                                    case 'radiogrp':
-                                        var elOptions = elForm.elements[name];
-                                        valid = validateOptions(elOptions);
-                                        break;
-
-                                    case 'checkboxgrp':
-                                        var elOptions = elForm.elements[name];
-                                        valid = validateOptions(elOptions);
-                                        break;
-
-                                    case 'email':
-                                        valid = validateEmail(elForm.elements[name].value);
-                                        break;
-
-                                    default:
-                                        valid = (elForm.elements[name].value != '')
-                                        break;
-                                }
-                            }
-
-                            var containerId = 'mauticform_' + formId + '_' + fieldKey;
-                            if (!document.getElementById(containerId)) {
-                                containerId = 'mauticform_' + fieldKey;
-                            }
-
-                            if (!valid) {
-                                validator.markError(containerId, valid);
+                            if (!validator.validateField(theForm, fieldKey)) {
                                 formValid = false;
-
-                                validator.enableSubmitButton();
-                            } else {
-                                validator.clearError(containerId);
+                                firstInvalidField = fieldKey;
                             }
                         }
 
@@ -306,10 +361,90 @@
                     Form.customCallbackHandler(formId, 'onValidateEnd', formValid);
 
                     if (formValid && submitForm) {
-                        elForm.submit();
+                        theForm.submit();
+                    } else {
+                        Form.getPageForField(formId, firstInvalidField);
+
+                        // Otherwise enable submit button after response is received
+                        validator.enableSubmitButton();
                     }
 
                     return formValid;
+                },
+
+                validateField: function(theForm, fieldKey) {
+                    var field = MauticFormValidations[formId][fieldKey];
+                    var valid = Form.customCallbackHandler(formId, 'onValidateField', {fieldKey: fieldKey, field: field});
+
+                    // If true, then a callback handled it
+                    if (valid === null) {
+                        var name = 'mauticform[' + field.name + ']';
+
+                        if (field.multiple == 'true' || field.type == 'checkboxgrp') {
+                            name = name + '[]';
+                        }
+
+                        var valid = true;
+                        if (typeof theForm.elements[name] != 'undefined') {
+                            switch (field.type) {
+                                case 'radiogrp':
+                                    var elOptions = theForm.elements[name];
+                                    valid = validator.validateOptions(elOptions);
+                                    break;
+
+                                case 'checkboxgrp':
+                                    var elOptions = theForm.elements[name];
+                                    valid = validator.validateOptions(elOptions);
+                                    break;
+
+                                case 'email':
+                                    valid = validator.validateEmail(theForm.elements[name].value);
+                                    break;
+
+                                default:
+                                    valid = (theForm.elements[name].value != '')
+                                    break;
+                            }
+                        }
+
+                        var containerId = Form.getFieldContainerId(formId, fieldKey);
+
+                        if (!valid) {
+                            validator.markError(containerId, valid);
+                        } else {
+                            validator.clearError(containerId);
+                        }
+                    }
+
+                    return valid;
+                },
+
+                validateOptions: function(elOptions) {
+                    if (typeof elOptions === 'undefined') {
+                        return;
+                    }
+
+                    var optionsValid = false;
+
+                    if (elOptions.length == undefined) {
+                        elOptions = [elOptions];
+                    }
+
+                    for (var i = 0; i < elOptions.length; i++) {
+                        if (elOptions[i].checked) {
+                            optionsValid = true;
+                            break;
+                        }
+                    }
+
+                    return optionsValid;
+                },
+
+                validateEmail: function(email) {
+                    var atpos = email.indexOf("@");
+                    var dotpos = email.lastIndexOf(".");
+                    var valid = (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) ? false : true;
+                    return valid;
                 },
 
                 markError: function(containerId, valid, validationMessage) {
@@ -343,9 +478,9 @@
                 },
 
                 clearErrors: function() {
-                    var elForm    = document.getElementById('mauticform_' + formId);
-                    var hasErrors = elForm.querySelectorAll('.mauticform-has-error');
-                    var that      = this;
+                    var theForm    = document.getElementById('mauticform_' + formId);
+                    var hasErrors  = theForm.querySelectorAll('.mauticform-has-error');
+                    var that       = this;
                     [].forEach.call(hasErrors, function(container) {
                         that.clearError(container.id);
                     });
@@ -389,8 +524,22 @@
                         } else if (response.redirect) {
                             window.location = response.redirect;
                         } else if (response.validationErrors) {
+                            var firstPage = false;
                             for (var field in response.validationErrors) {
+                                var elPage = Form.getPageForField(formId, field, false);
+                                if (elPage) {
+                                    elPage = parseInt(elPage);
+                                    if (firstPage) {
+                                        firstPage = (firstPage < elPage) ? firstPage : elPage;
+                                    } else {
+                                        firstPage = elPage;
+                                    }
+                                }
                                 this.markError('mauticform_' + formId + '_' + field, false, response.validationErrors[field]);
+                            }
+
+                            if (firstPage) {
+                                Form.switchPage(document.getElementById('mauticform_' + formId), firstPage);
                             }
                         } else if (response.errorMessage) {
                             this.setMessage(response.errorMessage, 'error');
@@ -432,6 +581,7 @@
                 resetForm: function () {
 
                     this.clearErrors();
+                    Form.switchPage(document.getElementById('mauticform_' + formId), 1);
 
                     document.getElementById('mauticform_' + formId).reset();
                 },
@@ -481,6 +631,15 @@
             }, false);
 
             if (Core.debug()) console.log('Messenger listener started.');
+        };
+
+        Form.getFieldContainerId = function(formId, fieldKey) {
+            var containerId = 'mauticform_' + formId + '_' + fieldKey;
+            if (!document.getElementById(containerId)) {
+                containerId = 'mauticform_' + fieldKey;
+            }
+
+            return containerId;
         };
 
         Core.getValidator = function(formId) {

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,18 +13,18 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class IcontactApi extends EmailMarketingApi{
-
+class IcontactApi extends EmailMarketingApi
+{
     private $version = '2.2';
 
-    protected function request($endpoint, $parameters = array(), $method = 'GET')
+    protected function request($endpoint, $parameters = [], $method = 'GET')
     {
         $url = sprintf('%s/%s/c/%s/%s', $this->integration->getApiUrl(), $this->keys['accountId'], $this->keys['clientFolderId'], $endpoint);
 
-        $response = $this->integration->makeRequest($url, $parameters, $method, array(
+        $response = $this->integration->makeRequest($url, $parameters, $method, [
             'encode_parameters'    => 'json',
-            'encoding_headers_set' => true
-        ));
+            'encoding_headers_set' => true,
+        ]);
 
         if (is_array($response) && !empty($response['errors'])) {
             throw new ApiErrorException(implode(' ', $response['errors']));
@@ -33,6 +35,7 @@ class IcontactApi extends EmailMarketingApi{
 
     /**
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getLists()
@@ -42,6 +45,7 @@ class IcontactApi extends EmailMarketingApi{
 
     /**
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getCustomFields()
@@ -54,24 +58,25 @@ class IcontactApi extends EmailMarketingApi{
      * @param array $fields
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function subscribeLead($listId, $fields)
     {
         $fields['status'] = 'normal';
 
-        $contacts = $this->request('contacts', array($fields), 'POST');
+        $contacts = $this->request('contacts', [$fields], 'POST');
 
         if (!empty($contacts['contacts'][0]['contactId'])) {
             $contactId = $contacts['contacts'][0]['contactId'];
 
-            $fields = array(
+            $fields = [
                 'status'    => 'normal',
                 'listId'    => $listId,
-                'contactId' => $contactId
-            );
+                'contactId' => $contactId,
+            ];
 
-            return $this->request("subscriptions", array($fields), 'POST');
+            return $this->request('subscriptions', [$fields], 'POST');
         }
 
         return $contacts;

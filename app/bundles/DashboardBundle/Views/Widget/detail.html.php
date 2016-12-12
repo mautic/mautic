@@ -1,14 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 
-<div class="card" style="height: <?php echo ($widget->getHeight() ? ($widget->getHeight() - 10) . 'px' : '300px') ?>">
+<div class="card" style="height: <?php echo $widget->getHeight() ? ($widget->getHeight() - 10).'px' : '300px' ?>">
     <div class="card-header">
         <h4><?php echo $widget->getName(); ?></h4>
         <?php if ($widget->getId()) : ?>
@@ -18,7 +20,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $widget->getId())); ?>"
+                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $widget->getId()]); ?>"
                         data-toggle="ajaxmodal"
                         data-target="#MauticSharedModal"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.edit'); ?>">
@@ -27,7 +29,7 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li  class="dropdown-header">
-                    <?php echo $view['translator']->trans('mautic.dashboard.widget.load.time', array('%time%' => round($widget->getLoadTime() * 1000, 1))); ?>
+                    <?php echo $view['translator']->trans('mautic.dashboard.widget.load.time', ['%time%' => round($widget->getLoadTime() * 1000, 1)]); ?>
                 </li>
                 <li  class="dropdown-header">
                     <?php if ($widget->isCached()) : ?>
@@ -38,7 +40,7 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $widget->getId())); ?>"
+                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'delete', 'objectId' => $widget->getId()]); ?>"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>"
                         class="remove-widget">
                         <i class="fa fa-remove"></i> Remove

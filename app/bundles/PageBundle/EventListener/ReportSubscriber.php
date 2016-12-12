@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,19 +13,18 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
- * Class ReportSubscriber
+ * Class ReportSubscriber.
  */
 class ReportSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
@@ -32,16 +33,14 @@ class ReportSubscriber extends CommonSubscriber
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
         ];
     }
 
     /**
-     * Add available tables and columns to the report builder lookup
+     * Add available tables and columns to the report builder lookup.
      *
      * @param ReportBuilderEvent $event
-     *
-     * @return void
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -51,63 +50,63 @@ class ReportSubscriber extends CommonSubscriber
             $variantPrefix     = 'vp.';
 
             $columns = [
-                $prefix.'title'              => [
+                $prefix.'title' => [
                     'label' => 'mautic.core.title',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'alias'              => [
+                $prefix.'alias' => [
                     'label' => 'mautic.core.alias',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'revision'           => [
+                $prefix.'revision' => [
                     'label' => 'mautic.page.report.revision',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'hits'               => [
+                $prefix.'hits' => [
                     'label' => 'mautic.page.field.hits',
-                    'type'  => 'int'
+                    'type'  => 'int',
                 ],
-                $prefix.'unique_hits'        => [
+                $prefix.'unique_hits' => [
                     'label' => 'mautic.page.field.unique_hits',
-                    'type'  => 'int'
+                    'type'  => 'int',
                 ],
-                $translationPrefix.'id'      => [
+                $translationPrefix.'id' => [
                     'label' => 'mautic.page.report.translation_parent_id',
-                    'type'  => 'int'
+                    'type'  => 'int',
                 ],
-                $translationPrefix.'title'   => [
+                $translationPrefix.'title' => [
                     'label' => 'mautic.page.report.translation_parent_title',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $variantPrefix.'id'          => [
+                $variantPrefix.'id' => [
                     'label' => 'mautic.page.report.variant_parent_id',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $variantPrefix.'title'       => [
+                $variantPrefix.'title' => [
                     'label' => 'mautic.page.report.variant_parent_title',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'lang'               => [
+                $prefix.'lang' => [
                     'label' => 'mautic.core.language',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
                 $prefix.'variant_start_date' => [
                     'label' => 'mautic.page.report.variant_start_date',
-                    'type'  => 'datetime'
+                    'type'  => 'datetime',
                 ],
-                $prefix.'variant_hits'       => [
+                $prefix.'variant_hits' => [
                     'label' => 'mautic.page.report.variant_hits',
-                    'type'  => 'int'
-                ]
+                    'type'  => 'int',
+                ],
             ];
             $columns = array_merge(
                 $columns,
                 $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
                 $event->getCategoryColumns()
             );
-            $data    = [
+            $data = [
                 'display_name' => 'mautic.page.pages',
-                'columns'      => $columns
+                'columns'      => $columns,
             ];
             $event->addTable('pages', $data);
 
@@ -115,115 +114,115 @@ class ReportSubscriber extends CommonSubscriber
                 $hitPrefix   = 'ph.';
                 $redirectHit = 'r.';
                 $hitColumns  = [
-                    $hitPrefix.'date_hit'          => [
+                    $hitPrefix.'date_hit' => [
                         'label' => 'mautic.page.report.hits.date_hit',
-                        'type'  => 'datetime'
+                        'type'  => 'datetime',
                     ],
-                    $hitPrefix.'date_left'         => [
+                    $hitPrefix.'date_left' => [
                         'label' => 'mautic.page.report.hits.date_left',
-                        'type'  => 'datetime'
+                        'type'  => 'datetime',
                     ],
-                    $hitPrefix.'country'           => [
+                    $hitPrefix.'country' => [
                         'label' => 'mautic.page.report.hits.country',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'region'            => [
+                    $hitPrefix.'region' => [
                         'label' => 'mautic.page.report.hits.region',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'city'              => [
+                    $hitPrefix.'city' => [
                         'label' => 'mautic.page.report.hits.city',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'isp'               => [
+                    $hitPrefix.'isp' => [
                         'label' => 'mautic.page.report.hits.isp',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'organization'      => [
+                    $hitPrefix.'organization' => [
                         'label' => 'mautic.page.report.hits.organization',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'code'              => [
+                    $hitPrefix.'code' => [
                         'label' => 'mautic.page.report.hits.code',
-                        'type'  => 'int'
+                        'type'  => 'int',
                     ],
-                    $hitPrefix.'referer'           => [
+                    $hitPrefix.'referer' => [
                         'label' => 'mautic.page.report.hits.referer',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'url'               => [
+                    $hitPrefix.'url' => [
                         'label' => 'mautic.page.report.hits.url',
-                        'type'  => 'url'
+                        'type'  => 'url',
                     ],
-                    $hitPrefix.'url_title'         => [
+                    $hitPrefix.'url_title' => [
                         'label' => 'mautic.page.report.hits.url_title',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'user_agent'        => [
+                    $hitPrefix.'user_agent' => [
                         'label' => 'mautic.page.report.hits.user_agent',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'remote_host'       => [
+                    $hitPrefix.'remote_host' => [
                         'label' => 'mautic.page.report.hits.remote_host',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
                     $hitPrefix.'browser_languages' => [
                         'label' => 'mautic.page.report.hits.browser_languages',
-                        'type'  => 'array'
+                        'type'  => 'array',
                     ],
-                    $hitPrefix.'source'            => [
+                    $hitPrefix.'source' => [
                         'label' => 'mautic.report.field.source',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $hitPrefix.'source_id'         => [
+                    $hitPrefix.'source_id' => [
                         'label' => 'mautic.report.field.source_id',
-                        'type'  => 'int'
+                        'type'  => 'int',
                     ],
-                    $redirectHit.'url'             => [
+                    $redirectHit.'url' => [
                         'label' => 'mautic.page.report.hits.redirect_url',
-                        'type'  => 'url'
+                        'type'  => 'url',
                     ],
-                    $redirectHit.'hits'            => [
+                    $redirectHit.'hits' => [
                         'label' => 'mautic.page.report.hits.redirect_hit_count',
-                        'type'  => 'int'
+                        'type'  => 'int',
                     ],
-                    $redirectHit.'unique_hits'     => [
+                    $redirectHit.'unique_hits' => [
                         'label' => 'mautic.page.report.hits.redirect_unique_hits',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device'         => [
+                    'ds.device' => [
                         'label' => 'mautic.lead.device',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_brand'         => [
+                    'ds.device_brand' => [
                         'label' => 'mautic.lead.device_brand',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_model'         => [
+                    'ds.device_model' => [
                         'label' => 'mautic.lead.device_model',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_os_name'         => [
+                    'ds.device_os_name' => [
                         'label' => 'mautic.lead.device_os_name',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_os_shortname'         => [
+                    'ds.device_os_shortname' => [
                         'label' => 'mautic.lead.device_os_shortname',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_os_version'         => [
+                    'ds.device_os_version' => [
                         'label' => 'mautic.lead.device_os_version',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    'ds.device_os_platform'         => [
+                    'ds.device_os_platform' => [
                         'label' => 'mautic.lead.device_os_platform',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
 
                 ];
-                $data        = [
+                $data = [
                     'display_name' => 'mautic.page.hits',
-                    'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
+                    'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
                 ];
                 $event->addTable('page.hits', $data, 'pages');
 
@@ -243,11 +242,9 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGeneratorEvent $event
-     *
-     * @return void
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -269,7 +266,7 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id')
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id')
-                    ->leftJoin('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
+                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
 
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
@@ -281,11 +278,9 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGraphEvent $event
-     *
-     * @return void
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -296,14 +291,14 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs  = $event->getRequestedGraphs();
         $qb      = $event->getQueryBuilder();
-        $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $hitRepo = $this->em->getRepository('MauticPageBundle:Hit');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
 
             /** @var ChartQuery $chartQuery */
-            $chartQuery   = clone $options['chartQuery'];
+            $chartQuery = clone $options['chartQuery'];
             $chartQuery->applyDateFilters($queryBuilder, 'date_hit', 'ph');
 
             switch ($g) {
@@ -347,7 +342,7 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-clock-o'
+                            'iconClass' => 'fa-clock-o',
                         ]
                     );
                     break;
@@ -361,15 +356,15 @@ class ReportSubscriber extends CommonSubscriber
                     $all       = $chartQuery->fetchCount($allQ);
                     $unique    = $chartQuery->fetchCount($uniqueQ);
                     $returning = $all - $unique;
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+                    $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
+                    $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 
                     $event->setGraph(
                         $g,
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-bookmark-o'
+                            'iconClass' => 'fa-bookmark-o',
                         ]
                     );
                     break;
@@ -390,7 +385,7 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe'
+                            'iconClass' => 'fa-globe',
                         ]
                     );
                     break;
@@ -401,7 +396,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart = new PieChart();
 
                     foreach ($data as $device) {
-                        $label = substr(empty($device['device'])?  $this->translator->trans('mautic.core.no.info'): $device['device'],0,12);
+                        $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);
                         $chart->setDataset($label, $device['the_count']);
                     }
 
@@ -410,7 +405,7 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe'
+                            'iconClass' => 'fa-globe',
                         ]
                     );
                     break;

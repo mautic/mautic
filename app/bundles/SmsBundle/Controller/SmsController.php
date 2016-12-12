@@ -1,18 +1,19 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,7 +68,7 @@ class SmsController extends FormController
         $listFilters['filters']['groups'] = [];
 
         //set limits
-        $limit = $session->get('mautic.sms.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -80,25 +81,25 @@ class SmsController extends FormController
 
         if (!$permissions['sms:smses:viewother']) {
             $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         //retrieve a list of categories
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
             'options' => $this->getModel('category')->getLookupResults('email', '', 0),
-            'prefix' => 'category',
+            'prefix'  => 'category',
         ];
 
         //retrieve a list of Lead Lists
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => $this->getModel('lead.list')->getUserLists(),
-            'prefix' => 'list',
+            'prefix'  => 'list',
         ];
 
         //retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
             'options' => $this->factory->getInstalledThemes('email'),
-            'prefix' => 'theme',
+            'prefix'  => 'theme',
         ];
 
         $currentFilters = $session->get('mautic.sms.list_filters', []);
@@ -108,7 +109,7 @@ class SmsController extends FormController
             // Filters have been updated
 
             // Parse the selected values
-            $newFilters = [];
+            $newFilters     = [];
             $updatedFilters = json_decode($updatedFilters, true);
 
             if ($updatedFilters) {
@@ -160,14 +161,14 @@ class SmsController extends FormController
             }
         }
 
-        $orderBy = $session->get('mautic.sms.orderby', 'e.name');
+        $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
         $orderByDir = $session->get('mautic.sms.orderbydir', 'DESC');
 
         $smss = $model->getEntities([
-            'start' => $start,
-            'limit' => $limit,
-            'filter' => $filter,
-            'orderBy' => $orderBy,
+            'start'      => $start,
+            'limit'      => $limit,
+            'filter'     => $filter,
+            'orderBy'    => $orderBy,
             'orderByDir' => $orderByDir,
         ]);
 
@@ -184,11 +185,11 @@ class SmsController extends FormController
             $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $lastPage]);
 
             return $this->postActionRedirect([
-                'returnUrl' => $returnUrl,
-                'viewParameters' => ['page' => $lastPage],
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $lastPage],
                 'contentTemplate' => 'MauticSmsBundle:Sms:index',
                 'passthroughVars' => [
-                    'activeLink' => '#mautic_sms_index',
+                    'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
                 ],
             ]);
@@ -198,22 +199,22 @@ class SmsController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters' => $listFilters,
-                'items' => $smss,
-                'totalItems' => $count,
-                'page' => $page,
-                'limit' => $limit,
-                'tmpl' => $this->request->get('tmpl', 'index'),
+                'filters'     => $listFilters,
+                'items'       => $smss,
+                'totalItems'  => $count,
+                'page'        => $page,
+                'limit'       => $limit,
+                'tmpl'        => $this->request->get('tmpl', 'index'),
                 'permissions' => $permissions,
-                'model' => $model,
-                'security' => $this->get('mautic.security'),
-                'configured' => $this->factory->getParameter('sms_enabled'),
+                'model'       => $model,
+                'security'    => $this->get('mautic.security'),
+                'configured'  => $this->coreParametersHelper->getParameter('sms_enabled'),
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
             'passthroughVars' => [
-                'activeLink' => '#mautic_sms_index',
+                'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
-                'route' => $this->generateUrl('mautic_sms_index', ['page' => $page]),
+                'route'         => $this->generateUrl('mautic_sms_index', ['page' => $page]),
             ],
         ]);
     }
@@ -228,7 +229,7 @@ class SmsController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->getModel('sms');
+        $model    = $this->getModel('sms');
         $security = $this->get('mautic.security');
 
         /** @var \Mautic\SmsBundle\Entity\Sms $sms */
@@ -241,17 +242,17 @@ class SmsController extends FormController
             $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
 
             return $this->postActionRedirect([
-                'returnUrl' => $returnUrl,
-                'viewParameters' => ['page' => $page],
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
                 'contentTemplate' => 'MauticSmsBundle:Sms:index',
                 'passthroughVars' => [
-                    'activeLink' => '#mautic_sms_index',
+                    'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
                 ],
                 'flashes' => [
                     [
-                        'type' => 'error',
-                        'msg' => 'mautic.sms.error.notfound',
+                        'type'    => 'error',
+                        'msg'     => 'mautic.sms.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ],
                 ],
@@ -270,9 +271,9 @@ class SmsController extends FormController
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
-        $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
-        $entityViews = $model->getHitsLineChartData(
+        $action          = $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -284,11 +285,11 @@ class SmsController extends FormController
         $trackableLinks = $model->getSmsClickStats($sms->getId());
 
         return $this->delegateView([
-            'returnUrl' => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
+            'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
             'viewParameters' => [
-                'sms' => $sms,
-                'trackables' => $trackableLinks,
-                'logs' => $logs,
+                'sms'         => $sms,
+                'trackables'  => $trackableLinks,
+                'logs'        => $logs,
                 'permissions' => $security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
@@ -300,13 +301,13 @@ class SmsController extends FormController
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
-                'security' => $security,
+                'security'    => $security,
                 'entityViews' => $entityViews,
-                'contacts' => $this->forward(
+                'contacts'    => $this->forward(
                     'MauticSmsBundle:Sms:contacts',
                     [
-                        'objectId' => $sms->getId(),
-                        'page' => $this->get('session')->get('mautic.sms.contact.page', 1),
+                        'objectId'   => $sms->getId(),
+                        'page'       => $this->get('session')->get('mautic.sms.contact.page', 1),
                         'ignoreAjax' => true,
                     ]
                 )->getContent(),
@@ -314,7 +315,7 @@ class SmsController extends FormController
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:details.html.php',
             'passthroughVars' => [
-                'activeLink' => '#mautic_sms_index',
+                'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
             ],
         ]);
@@ -337,7 +338,7 @@ class SmsController extends FormController
             $entity = $model->getEntity();
         }
 
-        $method = $this->request->getMethod();
+        $method  = $this->request->getMethod();
         $session = $this->get('session');
 
         if (!$this->get('mautic.security')->isGranted('sms:smses:create')) {
@@ -345,7 +346,7 @@ class SmsController extends FormController
         }
 
         //set the page we came from
-        $page = $session->get('mautic.sms.page', 1);
+        $page   = $session->get('mautic.sms.page', 1);
         $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
 
         $updateSelect = ($method == 'POST')
@@ -370,13 +371,13 @@ class SmsController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.created',
                         [
-                            '%name%' => $entity->getName(),
+                            '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_sms_index',
-                            '%url%' => $this->generateUrl(
+                            '%url%'       => $this->generateUrl(
                                 'mautic_sms_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId' => $entity->getId(),
+                                    'objectId'     => $entity->getId(),
                                 ]
                             ),
                         ]
@@ -385,10 +386,10 @@ class SmsController extends FormController
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
-                            'objectId' => $entity->getId(),
+                            'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_sms_action', $viewParameters);
-                        $template = 'MauticSmsBundle:Sms:view';
+                        $template  = 'MauticSmsBundle:Sms:view';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -396,27 +397,27 @@ class SmsController extends FormController
                 }
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl = $this->generateUrl('mautic_sms_index', $viewParameters);
-                $template = 'MauticSmsBundle:Sms:index';
+                $returnUrl      = $this->generateUrl('mautic_sms_index', $viewParameters);
+                $template       = 'MauticSmsBundle:Sms:index';
                 //clear any modified content
-                $session->remove('mautic.sms.'.$entity->getSessionId().'.content');
+                $session->remove('mautic.sms.'.$entity->getId().'.content');
             }
 
             $passthrough = [
-                'activeLink' => 'mautic_sms_index',
+                'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
             ];
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
-                $template = false;
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId' => $entity->getId(),
-                        'smsName' => $entity->getName(),
-                        'smsLang' => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }
@@ -424,8 +425,8 @@ class SmsController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     [
-                        'returnUrl' => $returnUrl,
-                        'viewParameters' => $viewParameters,
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
                         'passthroughVars' => $passthrough,
                     ]
@@ -437,14 +438,14 @@ class SmsController extends FormController
             [
                 'viewParameters' => [
                     'form' => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
-                    'sms' => $entity,
+                    'sms'  => $entity,
                 ],
                 'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
                 'passthroughVars' => [
-                    'activeLink' => '#mautic_sms_index',
+                    'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
-                    'updateSelect' => InputHelper::clean($this->request->query->get('updateSelect')),
-                    'route' => $this->generateUrl(
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'route'         => $this->generateUrl(
                         'mautic_sms_action',
                         [
                             'objectAction' => 'new',
@@ -465,21 +466,21 @@ class SmsController extends FormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->getModel('sms');
-        $method = $this->request->getMethod();
-        $entity = $model->getEntity($objectId);
+        $model   = $this->getModel('sms');
+        $method  = $this->request->getMethod();
+        $entity  = $model->getEntity($objectId);
         $session = $this->get('session');
-        $page = $session->get('mautic.sms.page', 1);
+        $page    = $session->get('mautic.sms.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
 
         $postActionVars = [
-            'returnUrl' => $returnUrl,
-            'viewParameters' => ['page' => $page],
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => 'MauticSmsBundle:Sms:index',
             'passthroughVars' => [
-                'activeLink' => 'mautic_sms_index',
+                'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
             ],
         ];
@@ -492,8 +493,8 @@ class SmsController extends FormController
                     [
                         'flashes' => [
                             [
-                                'type' => 'error',
-                                'msg' => 'mautic.sms.error.notfound',
+                                'type'    => 'error',
+                                'msg'     => 'mautic.sms.error.notfound',
                                 'msgVars' => ['%id%' => $objectId],
                             ],
                         ],
@@ -532,13 +533,13 @@ class SmsController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [
-                            '%name%' => $entity->getName(),
+                            '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_sms_index',
-                            '%url%' => $this->generateUrl(
+                            '%url%'       => $this->generateUrl(
                                 'mautic_sms_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId' => $entity->getId(),
+                                    'objectId'     => $entity->getId(),
                                 ]
                             ),
                         ],
@@ -553,7 +554,7 @@ class SmsController extends FormController
             }
 
             $passthrough = [
-                'activeLink' => 'mautic_sms_index',
+                'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
             ];
 
@@ -561,14 +562,14 @@ class SmsController extends FormController
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
-                $template = false;
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId' => $entity->getId(),
-                        'smsName' => $entity->getName(),
-                        'smsLang' => $entity->getLanguage(),
+                        'smsId'        => $entity->getId(),
+                        'smsName'      => $entity->getName(),
+                        'smsLang'      => $entity->getLanguage(),
                     ]
                 );
             }
@@ -576,15 +577,15 @@ class SmsController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
-                    'objectId' => $entity->getId(),
+                    'objectId'     => $entity->getId(),
                 ];
 
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
                         [
-                            'returnUrl' => $this->generateUrl('mautic_sms_action', $viewParameters),
-                            'viewParameters' => $viewParameters,
+                            'returnUrl'       => $this->generateUrl('mautic_sms_action', $viewParameters),
+                            'viewParameters'  => $viewParameters,
                             'contentTemplate' => $template,
                             'passthroughVars' => $passthrough,
                         ]
@@ -599,20 +600,20 @@ class SmsController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
-                    'sms' => $entity,
+                    'form'               => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
+                    'sms'                => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                 ],
                 'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
                 'passthroughVars' => [
-                    'activeLink' => '#mautic_sms_index',
+                    'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
-                    'updateSelect' => InputHelper::clean($this->request->query->get('updateSelect')),
-                    'route' => $this->generateUrl(
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'route'         => $this->generateUrl(
                         'mautic_sms_action',
                         [
                             'objectAction' => 'edit',
-                            'objectId' => $entity->getId(),
+                            'objectId'     => $entity->getId(),
                         ]
                     ),
                 ],
@@ -629,7 +630,7 @@ class SmsController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model = $this->getModel('sms');
+        $model  = $this->getModel('sms');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -644,10 +645,6 @@ class SmsController extends FormController
             }
 
             $entity = clone $entity;
-            $session = $this->get('session');
-            $contentName = 'mautic.sms.'.$entity->getSessionId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($entity);
@@ -662,28 +659,28 @@ class SmsController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page = $this->get('session')->get('mautic.sms.page', 1);
+        $page      = $this->get('session')->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
-        $flashes = [];
+        $flashes   = [];
 
         $postActionVars = [
-            'returnUrl' => $returnUrl,
-            'viewParameters' => ['page' => $page],
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => 'MauticSmsBundle:Sms:index',
             'passthroughVars' => [
-                'activeLink' => 'mautic_sms_index',
+                'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms',
             ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $model = $this->getModel('sms');
+            $model  = $this->getModel('sms');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [
-                    'type' => 'error',
-                    'msg' => 'mautic.sms.error.notfound',
+                    'type'    => 'error',
+                    'msg'     => 'mautic.sms.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -700,11 +697,11 @@ class SmsController extends FormController
             $model->deleteEntity($entity);
 
             $flashes[] = [
-                'type' => 'notice',
-                'msg' => 'mautic.core.notice.deleted',
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => [
-                    '%name%' => $entity->getTitle(),
-                    '%id%' => $objectId,
+                    '%name%' => $entity->getName(),
+                    '%id%'   => $objectId,
                 ],
             ];
         } //else don't do anything
@@ -724,23 +721,23 @@ class SmsController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page = $this->get('session')->get('mautic.sms.page', 1);
+        $page      = $this->get('session')->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
-        $flashes = [];
+        $flashes   = [];
 
         $postActionVars = [
-            'returnUrl' => $returnUrl,
-            'viewParameters' => ['page' => $page],
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
             'contentTemplate' => 'MauticSmsBundle:Sms:index',
             'passthroughVars' => [
-                'activeLink' => '#mautic_sms_index',
+                'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
             ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('sms');
-            $ids = json_decode($this->request->query->get('ids', '{}'));
+            $ids   = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
@@ -750,8 +747,8 @@ class SmsController extends FormController
 
                 if ($entity === null) {
                     $flashes[] = [
-                        'type' => 'error',
-                        'msg' => 'mautic.sms.error.notfound',
+                        'type'    => 'error',
+                        'msg'     => 'mautic.sms.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -773,8 +770,8 @@ class SmsController extends FormController
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
-                    'type' => 'notice',
-                    'msg' => 'mautic.sms.notice.batch_deleted',
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.sms.notice.batch_deleted',
                     'msgVars' => [
                         '%count%' => count($entities),
                     ],
@@ -798,8 +795,8 @@ class SmsController extends FormController
     public function previewAction($objectId)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->getModel('sms');
-        $sms = $model->getEntity($objectId);
+        $model    = $this->getModel('sms');
+        $sms      = $model->getEntity($objectId);
         $security = $this->get('mautic.security');
 
         if ($sms !== null && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
@@ -822,7 +819,6 @@ class SmsController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-
         return $this->generateContactsGrid(
             $objectId,
             $page,

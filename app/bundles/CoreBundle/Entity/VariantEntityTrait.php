@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -28,7 +30,7 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $variantSettings = array();
+    private $variantSettings = [];
 
     /**
      * @var \DateTime
@@ -39,7 +41,7 @@ trait VariantEntityTrait
      * @param ClassMetadata $builder
      * @param               $entityClass
      */
-    static protected function addVariantMetadata(ClassMetadataBuilder $builder, $entityClass)
+    protected static function addVariantMetadata(ClassMetadataBuilder $builder, $entityClass)
     {
         $builder->createManyToOne('variantParent', $entityClass)
             ->inversedBy('variantChildren')
@@ -64,13 +66,13 @@ trait VariantEntityTrait
     }
 
     /**
-     * Add variant
+     * Add variant.
      *
      * @param VariantEntityInterface $child
      *
      * @return $this
      */
-    public function addVariantChild (VariantEntityInterface $child)
+    public function addVariantChild(VariantEntityInterface $child)
     {
         if (!$this->variantChildren->contains($child)) {
             $this->variantChildren[] = $child;
@@ -80,33 +82,33 @@ trait VariantEntityTrait
     }
 
     /**
-     * Remove variant
+     * Remove variant.
      *
      * @param VariantEntityInterface $child
      */
-    public function removeVariantChild (VariantEntityInterface $child)
+    public function removeVariantChild(VariantEntityInterface $child)
     {
         $this->variantChildren->removeElement($child);
     }
 
     /**
-     * Get variantChildren
+     * Get variantChildren.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVariantChildren ()
+    public function getVariantChildren()
     {
         return $this->variantChildren;
     }
 
     /**
-     * Set variantParent
+     * Set variantParent.
      *
      * @param VarientEntityEnterface $parent
      *
-     * @return $This
+     * @return $this
      */
-    public function setVariantParent (VariantEntityInterface $parent = null)
+    public function setVariantParent(VariantEntityInterface $parent = null)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantParent', $parent);
@@ -118,17 +120,17 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantParent
+     * Get variantParent.
      *
      * @return $this
      */
-    public function getVariantParent ()
+    public function getVariantParent()
     {
         return $this->variantParent;
     }
 
     /**
-     * Remove variant parent
+     * Remove variant parent.
      */
     public function removeVariantParent()
     {
@@ -136,13 +138,13 @@ trait VariantEntityTrait
     }
 
     /**
-     * Set variantSettings
+     * Set variantSettings.
      *
      * @param array $variantSettings
      *
      * @return $this
      */
-    public function setVariantSettings ($variantSettings)
+    public function setVariantSettings($variantSettings)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantSettings', $variantSettings);
@@ -154,11 +156,11 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantSettings
+     * Get variantSettings.
      *
      * @return array
      */
-    public function getVariantSettings ()
+    public function getVariantSettings()
     {
         return $this->variantSettings;
     }
@@ -166,7 +168,7 @@ trait VariantEntityTrait
     /**
      * @return mixed
      */
-    public function getVariantStartDate ()
+    public function getVariantStartDate()
     {
         return $this->variantStartDate;
     }
@@ -176,7 +178,7 @@ trait VariantEntityTrait
      *
      * @return $this
      */
-    public function setVariantStartDate ($variantStartDate)
+    public function setVariantStartDate($variantStartDate)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantStartDate', $variantStartDate);
@@ -198,16 +200,14 @@ trait VariantEntityTrait
         $children = $this->getVariantChildren();
 
         if ($isChild) {
-
             return ($parent === null) ? false : true;
         } else {
-
             return (!empty($parent) || count($children)) ? true : false;
         }
     }
 
     /**
-     * Check if this entity has variants
+     * Check if this entity has variants.
      *
      * @return int
      */
@@ -219,7 +219,7 @@ trait VariantEntityTrait
     }
 
     /**
-     * Clear variants
+     * Clear variants.
      */
     public function clearVariants()
     {
@@ -229,7 +229,8 @@ trait VariantEntityTrait
 
     /**
      * Get the variant parent/children.
-     **
+     **.
+     *
      * @return array[$parent, $children]
      */
     public function getVariants()
@@ -253,7 +254,7 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get an array of all IDs for parent/child variants and associated translations if applicable
+     * Get an array of all IDs for parent/child variants and associated translations if applicable.
      *
      * @param VariantEntityInterface $entity
      * @param bool                   $publishedOnly
@@ -264,7 +265,6 @@ trait VariantEntityTrait
 
         // If parent is not published and only published has been requested, no need to proceed
         if ($parent && $publishedOnly && !$parent->isPublished()) {
-
             return [];
         }
 
@@ -294,7 +294,7 @@ trait VariantEntityTrait
     protected function getAccumulativeVariantCount($getter)
     {
         list($parent, $children) = $this->getVariants();
-        $count = $parent->$getter();
+        $count                   = $parent->$getter();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable
@@ -314,7 +314,7 @@ trait VariantEntityTrait
     }
 
     /**
-     * Finds and appends IDs for translations of a variant
+     * Finds and appends IDs for translations of a variant.
      *
      * @param $entity
      * @param $ids
@@ -323,7 +323,6 @@ trait VariantEntityTrait
     protected function appendTranslationEntityIds($entity, &$ids, $publishedOnly)
     {
         if (!($entity instanceof TranslationEntityInterface && method_exists($this, 'getTranslations'))) {
-
             return;
         }
 
@@ -332,7 +331,6 @@ trait VariantEntityTrait
         list($parentTranslation, $childrenTranslations) = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {
-
                 $ids[] = $parentTranslation->getId();
             }
         }

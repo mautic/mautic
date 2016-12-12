@@ -76,7 +76,7 @@ Mautic.campaignOnLoad = function (container) {
             var option  = mQuery('#'+thisId+' option[value="' + mQuery(this).val() + '"]');
 
             if (option.attr('data-href') && Mautic.campaignBuilderAnchorNameClicked) {
-                var updatedUrl = option.attr('data-href').replace(/anchor=(.*?)$/, "anchor=" + Mautic.campaignBuilderAnchorNameClicked);
+                var updatedUrl = option.attr('data-href').replace(/anchor=(.*?)$/, "anchor=" + Mautic.campaignBuilderAnchorNameClicked + "&anchorEventType=" + Mautic.campaignBuilderAnchorEventTypeClicked);
                 // Replace the anchor in the URL with that clicked
                 option.attr('data-href', updatedUrl);
             }
@@ -117,7 +117,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
             if (destroy) {
                 mQuery(chosenOption).tooltip('destroy');
             } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body'});
+                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
             }
         }
     });
@@ -423,11 +423,19 @@ Mautic.launchCampaignEditor = function() {
             var epDetails          = Mautic.campaignBuilderGetEndpointDetails(info.sourceEndpoint);
             var targetElementId    = info.targetEndpoint.elementId;
             var previousConnection = mQuery('#'+targetElementId).attr('data-connected')
-            if (previousConnection && previousConnection != epDetails.anchorName && (previousConnection == 'no' || epDetails.anchorName == 'no')) {
-                var editButton = mQuery('#'+targetElementId).find('a.btn-edit');
-                editButton.attr('data-prevent-dismiss', true);
-                var updatedUrl = editButton.attr('data-href', editButton.attr('href')+'&anchor=' + epDetails.anchorName);
+            var editButton         = mQuery('#'+targetElementId).find('a.btn-edit');
+            var editUrl            = editButton.attr('href');
 
+            var anchorQueryParams  = '&anchor=' + epDetails.anchorName + "&anchorEventType=" + epDetails.eventType;
+            if (editUrl.search('anchor=') !== -1) {
+                editUrl.replace(/anchor=(.*?)$/, anchorQueryParams);
+            } else {
+                editUrl = editUrl + anchorQueryParams;
+            }
+            editButton.attr('data-href', editUrl);
+
+            if (previousConnection && previousConnection != epDetails.anchorName && (previousConnection == 'no' || epDetails.anchorName == 'no')) {
+                editButton.attr('data-prevent-dismiss', true);
                 Mautic.campaignBuilderConnectionRequiresUpdate = true;
 
                 editButton.trigger('click');
@@ -1015,6 +1023,7 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
             var clickedAnchorName = epDetails.anchorName;
             Mautic.campaignBuilderAnchorClicked = endpoint.elementId+'_'+clickedAnchorName;
             Mautic.campaignBuilderAnchorNameClicked = clickedAnchorName;
+            Mautic.campaignBuilderAnchorEventTypeClicked = epDetails.eventType;
 
             // Get the position of the event
             var elPos = Mautic.campaignBuilderGetEventPosition(endpoint.element)
@@ -1263,6 +1272,9 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
         });
 
         var newWidth = (500 / 3) * groupsEnabled;
+        if (newWidth >= mQuery(window).width()) {
+            newWidth = mQuery(window).width() - 10;
+        }
 
         var leftPos = (forcePosition) ? forcePosition.left : Mautic.campaignBuilderAnchorClickedPosition.left - (newWidth / 2 - 10);
         var topPos  = (forcePosition) ? forcePosition.top : Mautic.campaignBuilderAnchorClickedPosition.top + 25;

@@ -1,36 +1,37 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticCloudStorageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\AssetBundle\Event as Events;
 use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\Event as Events;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
- * Class RemoteAssetBrowseSubscriber
+ * Class RemoteAssetBrowseSubscriber.
  */
 class RemoteAssetBrowseSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            AssetEvents::ASSET_ON_REMOTE_BROWSE => array('onAssetRemoteBrowse', 0)
-        );
+        return [
+            AssetEvents::ASSET_ON_REMOTE_BROWSE => ['onAssetRemoteBrowse', 0],
+        ];
     }
 
     /**
-     * Fetches the connector for an event's integration
+     * Fetches the connector for an event's integration.
      *
      * @param Events\RemoteAssetBrowseEvent $event
      */

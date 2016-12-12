@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,20 +14,20 @@
 
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
-chdir($baseDir . '/packaging');
+chdir($baseDir.'/packaging');
 
 system('rm -f app/phpunit.*');
 system('rm -f app/tests.bootstrap*');
 system('rm -rf app/bundles/*/Tests');
 system('rm -rf app/bundles/CoreBundle/Test');
-system('rm -rf app/cache/dev');
+system('rm -rf app/cache/*');
 system('rm -rf media/files/*');
 system('rm -f app/config/config_dev.php');
 system('rm -f app/config/config_test.php');
 system('rm -f app/config/local*.php');
 system('rm -f app/config/routing_dev.php');
 system('rm -f app/config/security_test.php');
-system('rm -rf app/logs');
+system('rm -rf app/logs/*');
 
 // babdev/transifex
 system('rm -f vendor/babdev/transifex/.scrutinizer.yml');

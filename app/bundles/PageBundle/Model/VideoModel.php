@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,7 +21,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class PageModel
+ * Class PageModel.
  */
 class VideoModel extends FormModel
 {
@@ -41,7 +43,7 @@ class VideoModel extends FormModel
      */
     public function __construct(LeadModel $leadModel, IpLookupHelper $ipLookupHelper)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel      = $leadModel;
         $this->ipLookupHelper = $ipLookupHelper;
     }
 
@@ -153,12 +155,11 @@ class VideoModel extends FormModel
             $this->em->flush($hit);
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
-
                 throw $exception;
             } else {
                 $this->logger->addError(
                     $exception->getMessage(),
-                    array('exception' => $exception)
+                    ['exception' => $exception]
                 );
             }
         }

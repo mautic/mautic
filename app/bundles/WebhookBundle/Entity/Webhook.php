@@ -1,27 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\WebhookBundle\Entity;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Form\Form;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Mautic\WebhookBundle\Entity\Event;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+
 /**
- * Class Webhook
- *
- * @package Mautic\WebhookBundle\Entity
+ * Class Webhook.
  */
 class Webhook extends FormEntity
 {
@@ -68,7 +68,7 @@ class Webhook extends FormEntity
     /**
      * @var array
      */
-    private $removedEvents = array();
+    private $removedEvents = [];
 
     /*
      * Constructor
@@ -106,7 +106,7 @@ class Webhook extends FormEntity
             ->cascadePersist()
             ->build();
         // 1:M for logs
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(array('dateAdded' => 'DESC'))
+        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
@@ -127,35 +127,35 @@ class Webhook extends FormEntity
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                array(
-                    'message' => 'mautic.core.name.required'
-                )
+                [
+                    'message' => 'mautic.core.name.required',
+                ]
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                array(
-                    'message' => 'mautic.core.valid_url_required'
-                )
+                [
+                    'message' => 'mautic.core.valid_url_required',
+                ]
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\NotBlank(
-                array(
-                    'message' => 'mautic.core.valid_url_required'
-                )
+                [
+                    'message' => 'mautic.core.valid_url_required',
+                ]
             )
         );
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -163,7 +163,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
@@ -178,7 +178,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -188,7 +188,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
@@ -203,7 +203,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -213,7 +213,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set webhookUrl
+     * Set webhookUrl.
      *
      * @param string $webhookUrl
      *
@@ -228,7 +228,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get webhookUrl
+     * Get webhookUrl.
      *
      * @return string
      */
@@ -238,7 +238,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set category
+     * Set category.
      *
      * @param Category $category
      *
@@ -253,7 +253,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get category
+     * Get category.
      *
      * @return Category
      */
@@ -280,7 +280,7 @@ class Webhook extends FormEntity
         $this->isChanged('events', $events);
 
         $this->events = $events;
-        /**  @var \Mautic\WebhookBundle\Entity\Event $event */
+        /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($events as $event) {
             $event->setWebhook($this);
         }
@@ -333,7 +333,7 @@ class Webhook extends FormEntity
     {
         $this->queues = $queues;
 
-        /**  @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
+        /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queues as $queue) {
             $queue->setWebhook($this);
         }
@@ -366,7 +366,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get log entities
+     * Get log entities.
      *
      * @return ArrayCollection
      */
@@ -384,7 +384,7 @@ class Webhook extends FormEntity
     {
         $this->logs = $logs;
 
-        /**  @var \Mautic\WebhookBundle\Entity\Log $log */
+        /** @var \Mautic\WebhookBundle\Entity\Log $log */
         foreach ($logs as $log) {
             $log->setWebhook($this);
         }
@@ -422,18 +422,18 @@ class Webhook extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = "get".ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
+                $this->changes[$prop] = [$currentId, $newId];
             }
         } elseif ($prop == 'events') {
-            $this->changes[$prop] = array();
+            $this->changes[$prop] = [];
         } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
+            $this->changes[$prop] = [$current, $val];
         }
     }
 }

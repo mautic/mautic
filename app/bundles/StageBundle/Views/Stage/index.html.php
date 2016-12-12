@@ -1,26 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'stage');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.stages.menu.root'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.stages.menu.root'));
 
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
-            'templateButtons' => array(
-                'new' => $permissions['stage:stages:create']
-            ),
-            'routeBase'       => 'stage'
-        )
+        [
+            'templateButtons' => [
+                'new' => $permissions['stage:stages:create'],
+            ],
+            'routeBase' => 'stage',
+        ]
     )
 );
 ?>
@@ -28,15 +29,11 @@ $view['slots']->set(
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
-        array(
+        [
             'searchValue' => $searchValue,
             'searchHelp'  => 'mautic.core.help.searchcommands',
-            'action'          => $currentRoute,
-            'routeBase'       => 'stage',
-            'templateButtons' => array(
-                'delete' => $permissions['stage:stages:delete']
-            )
-        )
+            'action'      => $currentRoute,
+        ]
     ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

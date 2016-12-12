@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -37,15 +39,14 @@ $groups = array_keys($fields);
 $edit   = $view['security']->hasEntityAccess(
     $permissions['lead:leads:editown'],
     $permissions['lead:leads:editother'],
-    $lead->getOwner()
+    $lead->getPermissionUser()
 );
 
 $buttons = [];
-
 //Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = [
-        'attr'      => [
+        'attr' => [
             'id'          => 'sendEmailButton',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
@@ -53,57 +54,41 @@ if (!empty($fields['core']['email']['value'])) {
                 'mautic.lead.email.send_email.header',
                 ['%email%' => $fields['core']['email']['value']]
             ),
-            'href'        => $view['router']->path(
+            'href' => $view['router']->path(
                 'mautic_contact_action',
                 ['objectId' => $lead->getId(), 'objectAction' => 'email']
             ),
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
         'iconClass' => 'fa fa-send',
+        'primary'   => true,
     ];
 }
-//View Lead List button
-$buttons[] = [
-    'attr'      => [
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans(
-            'mautic.lead.lead.header.lists',
-            ['%name%' => $lead->getPrimaryIdentifier()]
-        ),
-        'data-footer' => 'false',
-        'href'        => $view['router']->path(
-            'mautic_contact_action',
-            ["objectId" => $lead->getId(), "objectAction" => "list"]
-        ),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-pie-chart',
-];
+
 //View Contact Frequency button
 
 if ($edit) {
     $buttons[] = [
-        'attr'      => [
+        'attr' => [
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
                 'mautic.lead.lead.header.contact.frequency',
                 ['%name%' => $lead->getPrimaryIdentifier()]
             ),
-            'href'        => $view['router']->path(
+            'href' => $view['router']->path(
                 'mautic_contact_action',
-                ["objectId" => $lead->getId(), "objectAction" => "contactFrequency"]
-            )
+                ['objectId' => $lead->getId(), 'objectAction' => 'contactFrequency']
+            ),
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.contact.frequency'),
-        'iconClass' => 'fa fa-signal'
+        'iconClass' => 'fa fa-signal',
     ];
 }
 //View Campaigns List button
 if ($view['security']->isGranted('campaign:campaigns:edit')) {
     $buttons[] = [
-        'attr'      => [
+        'attr' => [
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
@@ -113,7 +98,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
             'data-footer' => 'false',
             'href'        => $view['router']->path(
                 'mautic_contact_action',
-                ["objectId" => $lead->getId(), "objectAction" => "campaign"]
+                ['objectId' => $lead->getId(), 'objectAction' => 'campaign']
             ),
         ],
         'btnText'   => $view['translator']->trans('mautic.campaign.campaigns'),
@@ -124,29 +109,27 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
 if (($view['security']->hasEntityAccess(
         $permissions['lead:leads:deleteown'],
         $permissions['lead:leads:deleteother'],
-        $lead->getOwner()
+        $lead->getPermissionUser()
     ))
     && $edit
 ) {
-
     $buttons[] = [
-        'attr'      => [
+        'attr' => [
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
                 'mautic.lead.lead.header.merge',
                 ['%name%' => $lead->getPrimaryIdentifier()]
             ),
-            'href'        => $view['router']->path(
+            'href' => $view['router']->path(
                 'mautic_contact_action',
-                ["objectId" => $lead->getId(), "objectAction" => "merge"]
+                ['objectId' => $lead->getId(), 'objectAction' => 'merge']
             ),
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.merge'),
         'iconClass' => 'fa fa-user',
     ];
 }
-
 
 $view['slots']->set(
     'actions',
@@ -158,20 +141,16 @@ $view['slots']->set(
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:leads:editother'],
-                    $lead->getCreatedBy()
-                ),
+                'edit'   => $edit,
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:deleteown'],
                     $permissions['lead:leads:deleteother'],
-                    $lead->getOwner()
+                    $lead->getPermissionUser()
                 ),
-                'close'  => $view['security']->hasEntityAccess(
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:viewown'],
                     $permissions['lead:leads:viewother'],
-                    $lead->getCreatedBy()
+                    $lead->getPermissionUser()
                 ),
             ],
         ]
@@ -193,13 +172,13 @@ $view['slots']->set(
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
                             <li class="<?php if ($step === 0) {
-                                echo "active";
-                            } ?>">
+    echo 'active';
+} ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                                 </a>
                             </li>
-                            <?php $step++; ?>
+                            <?php ++$step; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
@@ -219,14 +198,16 @@ $view['slots']->set(
                                                 <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span>
                                                 </td>
                                                 <td>
-                                                    <?php if ($group == 'core' && $field['alias'] == 'country'
-                                                    && !empty($flag)): ?>
-                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt=""
-                                                         style="max-height: 24px;"/>
+                                                    <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
+                                                    <?php else: ?>
+                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
+                                                            <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
                                                         <?php endif; ?>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -235,7 +216,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                         </div>
-                        <?php $i++; ?>
+                        <?php ++$i; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -329,7 +310,7 @@ $view['slots']->set(
                     [
                         'events' => $events,
                         'lead'   => $lead,
-                        'tmpl'   => 'index'
+                        'tmpl'   => 'index',
                     ]
                 ); ?>
             </div>
@@ -445,6 +426,11 @@ $view['slots']->set(
                 </div>
             </div>
             <div class="panel-body pt-sm">
+            <?php if ($lead->getOwner()) : ?>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
+            <?php endif; ?>
+
                 <h6 class="fw-sb">
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>
@@ -455,8 +441,8 @@ $view['slots']->set(
                     <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value']
                         .'<br>'; endif ?>
                     <?php echo $lead->getLocation(); ?> <?php if (isset($fields['core']['zipcode'])) {
-                        echo $fields['core']['zipcode']['value'];
-                    } ?><br>
+                            echo $fields['core']['zipcode']['value'];
+                        } ?><br>
                 </address>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>
@@ -492,7 +478,7 @@ $view['slots']->set(
                                 <div class="media-body">
                                     <?php $link = '<a href="'.$view['router']->path(
                                             'mautic_campaign_action',
-                                            ["objectAction" => "view", "objectId" => $event['campaign_id']]
+                                            ['objectAction' => 'view', 'objectId' => $event['campaign_id']]
                                         ).'" data-toggle="ajax">'.$event['campaign_name'].'</a>'; ?>
                                     <?php echo $view['translator']->trans(
                                         'mautic.lead.lead.upcoming.event.triggered.at',
@@ -510,6 +496,17 @@ $view['slots']->set(
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
                 <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span>
+                </h5>
+            <?php endforeach; ?>
+            <div class="clearfix"></div>
+        </div>
+        <div class="pa-sm panel-companies">
+            <div class="panel-title">  <?php echo $view['translator']->trans(
+                    'mautic.lead.lead.companies'); ?></div>
+            <?php foreach ($companies as $key => $company): ?>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success" >
+                       <i id="company-<?php echo $company['id']; ?>" class="fa fa-check <?php if ($company['is_primary'] == 1): ?>primary<?php endif?>" onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);" title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>"></i> <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
+                    </span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>

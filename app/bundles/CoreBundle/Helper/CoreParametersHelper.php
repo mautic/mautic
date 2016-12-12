@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +15,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class CoreParametersHelper
+ * Class CoreParametersHelper.
  */
 class CoreParametersHelper
 {
@@ -24,7 +26,7 @@ class CoreParametersHelper
 
     /**
      * CoreParametersHelper constructor.
-     * 
+     *
      * @param Kernel $kernel
      */
     public function __construct(Kernel $kernel)
@@ -35,7 +37,7 @@ class CoreParametersHelper
     /**
      * @param string $name
      * @param mixed  $default
-     * 
+     *
      * @return mixed
      */
     public function getParameter($name, $default = null)
@@ -45,25 +47,28 @@ class CoreParametersHelper
             return MAUTIC_TABLE_PREFIX;
         }
 
-        if ($this->parameterBag->has('mautic.' . $name)) {
-            return $this->parameterBag->get('mautic.' . $name);
+        if ($this->parameterBag->has('mautic.'.$name)) {
+            // Decode %%
+            $value = str_replace('%%', '%', $this->parameterBag->get('mautic.'.$name));
+
+            return $value;
         }
 
         // Last ditch effort in case we're getting non-mautic params
         if ($this->parameterBag->has($name)) {
             return $this->parameterBag->get($name);
         }
-        
+
         return $default;
     }
 
     /**
      * @param string $name
-     * 
+     *
      * @return bool
      */
     public function hasParameter($name)
     {
-        return $this->parameterBag->has('mautic.' . $name);
+        return $this->parameterBag->has('mautic.'.$name);
     }
 }

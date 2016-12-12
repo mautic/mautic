@@ -1,15 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sysinfo');
-$view['slots']->set("headerTitle", $view['translator']->trans('System Info'));
+$view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
 ?>
 
 <!-- start: box layout -->
@@ -59,10 +60,10 @@ $view['slots']->set("headerTitle", $view['translator']->trans('System Info'));
                                 <th><?php echo $view['translator']->trans('mautic.sysinfo.is.writable'); ?></th>
                             </tr>
                         </thead>
-                        <?php foreach($folders as $folder => $isWritable) : ?>
+                        <?php foreach ($folders as $folder => $isWritable) : ?>
                             <tr class="<?php echo ($isWritable) ? 'success' : 'danger'; ?>">
                                 <td><?php echo $folder; ?></td>
-                                <td><?php echo ($isWritable) ? $view['translator']->trans('mautic.sysinfo.writable') : $view['translator']->trans('mautic.sysinfo.unwritable');?></td>
+                                <td><?php echo ($isWritable) ? $view['translator']->trans('mautic.sysinfo.writable') : $view['translator']->trans('mautic.sysinfo.unwritable'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
