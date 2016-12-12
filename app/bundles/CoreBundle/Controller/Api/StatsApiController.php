@@ -24,7 +24,9 @@ class StatsApiController extends CommonApiController
     /**
      * Lists stats for a database table.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @param null $table
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction($table = null)
     {
@@ -42,7 +44,9 @@ class StatsApiController extends CommonApiController
             $response['availableTables'] = $event->getTables();
         }
 
-        $response['stats'] = $event->getResults();
+        $results           = $event->getResults();
+        $response['total'] = $results['total'];
+        $response['stats'] = $results['results'];
 
         $view = $this->view($response);
 
