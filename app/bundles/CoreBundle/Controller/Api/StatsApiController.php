@@ -44,7 +44,12 @@ class StatsApiController extends CommonApiController
             $response['availableTables'] = $event->getTables();
         }
 
-        $results           = $event->getResults();
+        $results = $event->getResults();
+        if (empty($results)) {
+            // Table not found
+            return $this->notFound();
+        }
+
         $response['total'] = $results['total'];
         $response['stats'] = $results['results'];
 

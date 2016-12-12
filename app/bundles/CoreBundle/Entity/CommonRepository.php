@@ -154,7 +154,7 @@ class CommonRepository extends EntityRepository
     public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null)
     {
         $alias = $this->getTableAlias();
-        $table = MAUTIC_TABLE_PREFIX.$this->getClassMetadata()->getTableName();
+        $table = $this->getClassMetadata()->getTableName();
         $q     = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(*)')

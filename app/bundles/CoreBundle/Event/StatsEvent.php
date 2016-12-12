@@ -119,7 +119,12 @@ class StatsEvent extends Event
     {
         $this->tables[] = $table;
 
-        return $this->table === $table;
+        $testTable = $this->table;
+        if (strpos($testTable, MAUTIC_TABLE_PREFIX) !== 0) {
+            $testTable = MAUTIC_TABLE_PREFIX.$testTable;
+        }
+
+        return $testTable === $table;
     }
 
     /**
