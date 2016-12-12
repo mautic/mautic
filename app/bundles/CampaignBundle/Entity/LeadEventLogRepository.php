@@ -165,7 +165,8 @@ class LeadEventLogRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('o.event_id, count(o.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
+            ->innerJoin('o', MAUTIC_TABLE_PREFIX.'campaign_leads', 'l', 'o.lead_id = l.lead_id and l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0');
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId),

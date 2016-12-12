@@ -289,6 +289,46 @@ final class LeadEvents
     const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
 
     /**
+     * The mautic.lead_device_pre_save event is dispatched right before a lead device is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadEvent instance.
+     *
+     * @var string
+     */
+    const DEVICE_PRE_SAVE = 'mautic.lead_device_pre_save';
+
+    /**
+     * The mautic.lead_device_post_save event is dispatched right after a lead device is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const DEVICE_POST_SAVE = 'mautic.lead_device_post_save';
+
+    /**
+     * The mautic.lead_device_pre_delete event is dispatched before a lead device is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const DEVICE_PRE_DELETE = 'mautic.lead_device_pre_delete';
+
+    /**
+     * The mautic.lead_device_post_delete event is dispatched after a lead device is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
+
+    /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
      *
      * The event listener receives a

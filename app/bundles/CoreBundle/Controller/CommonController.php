@@ -307,6 +307,37 @@ class CommonController extends Controller implements MauticController
             $passthrough['route'] = $args['returnUrl'];
         }
 
+        if (!empty($passthrough['route'])) {
+            // Add the ajax route to the request so that the desired route is fed to plugins rather than the current request
+            $baseUrl       = $this->request->getBaseUrl();
+            $routePath     = str_replace($baseUrl, '', $passthrough['route']);
+            $ajaxRouteName = false;
+
+            try {
+                $routeParams   = $this->get('router')->match($routePath);
+                $ajaxRouteName = $routeParams['_route'];
+
+                $this->request->attributes->set('ajaxRoute',
+                    [
+                        '_route'        => $ajaxRouteName,
+                        '_route_params' => $routeParams,
+                    ]
+                );
+            } catch (\Exception $e) {
+                //do nothing
+            }
+
+            //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
+            $this->request->query->set('overrideRouteUri', $passthrough['route']);
+            if ($ajaxRouteName) {
+                if (isset($routeParams['objectAction'])) {
+                    //action urls share same route name so tack on the action to differentiate
+                    $ajaxRouteName .= "|{$routeParams['objectAction']}";
+                }
+                $this->request->query->set('overrideRouteName', $ajaxRouteName);
+            }
+        }
+
         //Ajax call so respond with json
         $newContent = '';
         if ($contentTemplate) {
@@ -341,27 +372,6 @@ class CommonController extends Controller implements MauticController
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
-            if (!empty($passthrough['route'])) {
-                //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
-                $this->request->query->set('overrideRouteUri', $passthrough['route']);
-
-                //if the URL has a query built into it, breadcrumbs may fail matching
-                //so let's try to find it by the route name which will be the extras["routeName"] of the menu item
-                $baseUrl   = $this->request->getBaseUrl();
-                $routePath = str_replace($baseUrl, '', $passthrough['route']);
-                try {
-                    $routeParams = $this->get('router')->match($routePath);
-                    $routeName   = $routeParams['_route'];
-                    if (isset($routeParams['objectAction'])) {
-                        //action urls share same route name so tack on the action to differentiate
-                        $routeName .= "|{$routeParams['objectAction']}";
-                    }
-                    $this->request->query->set('overrideRouteName', $routeName);
-                } catch (\Exception $e) {
-                    //do nothing
-                }
-            }
-
             $updatedContent = [];
             if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
