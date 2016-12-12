@@ -376,4 +376,24 @@ class LeadDevice
     {
         $this->dateAdded = $dateAdded;
     }
+
+    /**
+     * @return mixed
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use getDateAdded instead
+     */
+    public function getDateOpen()
+    {
+        return $this->getDateAdded();
+    }
+
+    /**
+     * @param mixed $dateOpen
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use setDateAdded instead
+     */
+    public function setDateOpen($dateOpen)
+    {
+        $this->setDateAdded($dateOpen);
+    }
 }
