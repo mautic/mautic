@@ -136,7 +136,29 @@ class LeadFieldRepository extends CommonRepository
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        if ($field === 'tags') {
+        if ($field === 'segments') {
+            // Special reserved tags field
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'l.id = lll.lead_id')
+                ->join('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'lll.leadlist_id = ll.id')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->eq('ll.name', ':value')
+                    )
+                )
+                ->setParameter('lead', (int) $lead)
+                ->setParameter('value', $value);
+
+            $result = $q->execute()->fetch();
+
+            if (($operatorExpr === 'eq') || ($operatorExpr === 'like')) {
+                return !empty($result['id']);
+            } elseif (($operatorExpr === 'neq') || ($operatorExpr === 'notLike')) {
+                return empty($result['id']);
+            } else {
+                return false;
+            }
+            }elseif ($field === 'tags') {
             // Special reserved tags field
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
                 ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
