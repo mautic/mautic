@@ -70,7 +70,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         $this->providerKey       = $providerKey;
         $this->userProvider      = $userProvider;
         $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack->getCurrentRequest();
+        $this->requestStack      = $requestStack;
     }
 
     /**
