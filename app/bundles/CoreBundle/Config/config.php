@@ -92,10 +92,6 @@ return [
                     'table' => '',
                 ],
            ],
-           'mautic_core_api_version' => [
-               'path'       => '/info/version',
-               'controller' => 'MauticCoreBundle:Api\InfoApi:version',
-           ],
         ],
     ],
     'menu' => [

@@ -736,6 +736,8 @@ class CommonApiController extends FOSRestController implements MauticController
             $data = $data->getIterator()->getArrayCopy();
         }
 
+        $headers['Mautic-Version'] = $this->get('kernel')->getVersion();
+
         return parent::view($data, $statusCode, $headers);
     }
 
