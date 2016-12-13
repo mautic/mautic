@@ -172,7 +172,7 @@ if (count($items)):
                                 'mautic.email.stat.readcount',
                                 ['%count%' => $item->getReadCount(true)]
                             ); ?></span>
-			<span class="mt-xs label label-primary"><?php echo $view['translator']->trans('mautic.email.stat.readpercent', array('%count%' => round($item->getSentCount(true) > 0 ? (($item->getReadCount(true)/($item->getSentCount(true)))*100) : 0, 2))); ?></span>
+			<span class="mt-xs label label-primary"><?php echo $view['translator']->trans('mautic.email.stat.readpercent', array('%count%' => $item->getReadPercentage(true))); ?></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
