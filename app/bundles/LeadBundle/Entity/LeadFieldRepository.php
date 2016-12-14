@@ -150,7 +150,6 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('value', $value);
 
             $result = $q->execute()->fetch();
-
             if (($operatorExpr === 'eq') || ($operatorExpr === 'like')) {
                 return !empty($result['id']);
             } elseif (($operatorExpr === 'neq') || ($operatorExpr === 'notLike')) {
@@ -197,6 +196,22 @@ class LeadFieldRepository extends CommonRepository
                     )
                 )
                  ->setParameter('lead', (int) $lead);
+            }elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
+
+                if ($operatorExpr === 'regexp') {
+                    $where = 'l.'.$field.' REGEXP  :value';
+                } else {
+                    $where = 'l.'.$field.' NOT REGEXP  :value';
+                }
+
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->andX($where)
+                    )
+                )
+                ->setParameter('lead', (int) $lead)
+                ->setParameter('value', $value);
             }else {
                 $q->where(
                     $q->expr()->andX(
