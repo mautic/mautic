@@ -95,34 +95,34 @@ class AssetRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $field                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
                 $expr            = $q->expr()->eq('a.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
                 $expr            = $q->expr()->eq('a.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
-                $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
                     $q->expr()->isNull('a.category'),
                     $q->expr()->eq('a.category', $q->expr()->literal(''))
                 );
-                $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(a.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
+                $expr = $q->expr()->eq('IDENTITY(a.createdBy)', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict = true;
+                $expr            = $q->expr()->like('c.alias', ":$unique");
+                $filter->strict  = true;
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
@@ -135,6 +135,7 @@ class AssetRepository extends CommonRepository
                     $q->expr()->eq('a.language', ":$unique"),
                     $q->expr()->like('a.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -159,7 +160,7 @@ class AssetRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -167,6 +168,8 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

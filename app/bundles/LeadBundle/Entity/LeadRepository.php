@@ -457,12 +457,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $string          = $filter->string;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
-        $parameters      = [];
+        $command                 = $filter->command;
+        $string                  = $filter->string;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = true; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         //DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
@@ -684,7 +683,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $commands = array_merge($commands, $this->availableSearchFields);
         }
 
-        return $commands;
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

@@ -585,7 +585,7 @@ class CommonRepository extends EntityRepository
      */
     public function getSearchCommands()
     {
-        return [];
+        return ['mautic.core.searchcommand.ids'];
     }
 
     /**
@@ -611,11 +611,11 @@ class CommonRepository extends EntityRepository
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
         $parseFilters = [];
-        if (isset($filters->root)) {
+        if (isset($filters->root[0])) {
             // Function is determined by the second clause type
             $type         = (isset($filters->root[1])) ? $filters->root[1]->type : $filters->root[0]->type;
             $parseFilters = &$filters->root;
-        } elseif (isset($filters->children)) {
+        } elseif (isset($filters->children[0])) {
             $type         = (isset($filters->children[1])) ? $filters->children[1]->type : $filters->children[0]->type;
             $parseFilters = &$filters->children;
         } elseif (is_array($filters)) {
@@ -676,11 +676,38 @@ class CommonRepository extends EntityRepository
      * @param $qb
      * @param $filter
      *
+     * @return mixed
+     */
+    protected function getIdsExpr(&$q, $filter)
+    {
+        if ($ids = array_map('intval', explode(',', $filter->string))) {
+            return $q->expr()->in($this->getTableAlias().'.id', $ids);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $qb
+     * @param $filter
+     *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$qb, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        return [false, false];
+        $command = $filter->command;
+        $expr    = false;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr = $this->getIdsExpr($q, $filter);
+                break;
+        }
+
+        return [
+            $expr,
+            [],
+        ];
     }
 
     /**
@@ -934,6 +961,10 @@ class CommonRepository extends EntityRepository
                 $expr           = $q->expr()->like("{$catPrefix}.alias", ":$unique");
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr            = $this->getIdsExpr($q, $filter);
+                $returnParameter = false;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -969,6 +1000,7 @@ class CommonRepository extends EntityRepository
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.core.searchcommand.ids',
         ];
     }
 

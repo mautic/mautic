@@ -1202,15 +1202,14 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
-                $returnParameter = false;
+                $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
@@ -1225,11 +1224,11 @@ class LeadListRepository extends CommonRepository
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like('l.name', ':'.$unique);
+                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
-        $parameters = [];
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
@@ -1248,13 +1247,15 @@ class LeadListRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.lead.list.searchcommand.isglobal',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isinactive',
             'mautic.core.searchcommand.name',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
