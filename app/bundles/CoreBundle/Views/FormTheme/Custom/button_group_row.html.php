@@ -1,5 +1,5 @@
 <?php
-$hasErrors = count($form->vars['errors']);
+$hasErrors     = count($form->vars['errors']);
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? ' has-error' : '';
 
 ?>

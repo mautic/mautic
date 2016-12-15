@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,14 +25,15 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dwc_slot_name',
             'text',
             [
-                'label' => 'mautic.dynamicContent.send.slot_name',
+                'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
                 ],
+                'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.slot_name.notblank']),
+                    new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
             ]
         );
@@ -41,16 +44,17 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dynamicContent',
             'dwc_list',
             [
-                'label' => 'mautic.dynamicContent.send.selectDynamicContents.default',
+                'label'      => 'mautic.dynamicContent.send.selectDynamicContents.default',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
                     'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'multiple' => false,
+                'multiple'    => false,
+                'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank']),
+                    new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
             ]
         );

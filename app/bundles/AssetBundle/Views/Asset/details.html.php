@@ -1,49 +1,51 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
-$view['slots']->set("headerTitle", $activeAsset->getTitle());
+$view['slots']->set('headerTitle', $activeAsset->getTitle());
 
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
+        [
             'item'            => $activeAsset,
-            'templateButtons' => array(
-                'edit'   => $security->hasEntityAccess(
+            'templateButtons' => [
+                'edit' => $security->hasEntityAccess(
                     $permissions['asset:assets:editown'],
                     $permissions['asset:assets:editother'],
                     $activeAsset->getCreatedBy()
                 ),
+                'clone'  => $permissions['asset:assets:create'],
                 'delete' => $security->hasEntityAccess(
                     $permissions['asset:assets:deleteown'],
                     $permissions['asset:assets:deleteother'],
                     $activeAsset->getCreatedBy()
                 ),
-                'close'  => $security->hasEntityAccess(
+                'close' => $security->hasEntityAccess(
                     $permissions['asset:assets:viewown'],
                     $permissions['asset:assets:viewother'],
                     $activeAsset->getCreatedBy()
-                )
-            ),
-            'routeBase'       => 'asset',
-            'langVar'         => 'asset.asset',
-            'nameGetter'      => 'getTitle'
-        )
+                ),
+            ],
+            'routeBase'  => 'asset',
+            'langVar'    => 'asset.asset',
+            'nameGetter' => 'getTitle',
+        ]
     )
 );
 
 $view['slots']->set(
     'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset))
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $activeAsset])
 );
 
 ?>
@@ -70,7 +72,7 @@ $view['slots']->set(
                             <tbody>
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:details.html.php',
-                                array('entity' => $activeAsset)
+                                ['entity' => $activeAsset]
                             ); ?>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
@@ -131,16 +133,16 @@ $view['slots']->set(
                                     </h5>
                                 </div>
                                 <div class="col-md-2 va-m text-center">
-                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.total', array('count' => $stats['downloads']['total'])); ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.total', ['count' => $stats['downloads']['total']]); ?></span>
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
-                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', ['count' => $stats['downloads']['unique']]); ?></span>
                                 </div>
                                 <div class="col-md-8 va-m">
-                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['downloads']['timeStats'], 'chartType' => 'line', 'chartHeight' => 300)); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $stats['downloads']['timeStats'], 'chartType' => 'line', 'chartHeight' => 300]); ?>
                             </div>
                         </div>
                     </div>
@@ -153,7 +155,7 @@ $view['slots']->set(
         <div class="tab-content pa-md preview-detail">
             <?php echo $view->render(
                 'MauticAssetBundle:Asset:preview.html.php',
-                array('activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl)
+                ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl]
             ); ?>
         </div>
         <!--/ end: tab-content -->
@@ -185,7 +187,7 @@ $view['slots']->set(
         <hr class="hr-w-2" style="width:50%">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="<?php echo $activeAsset->getId(); ?>"/>

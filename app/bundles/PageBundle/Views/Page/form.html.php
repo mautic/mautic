@@ -1,32 +1,40 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
+$isExisting = $activePage->getId();
 
 $variantParent = $activePage->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.page.header.editvariant', array(
-    '%name%' => $activePage->getTitle(),
-    '%parent%' => $variantParent->getTitle()
-)) . '</span></div>' : '';
+$subheader     = ($variantParent) ? '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
+    '%name%'   => $activePage->getTitle(),
+    '%parent%' => $variantParent->getTitle(),
+]).'</span></div>' : '';
 
-$header = ($activePage->getId()) ?
+$header = $isExisting ?
     $view['translator']->trans('mautic.page.header.edit',
-        array('%name%' => $activePage->getTitle())) :
+        ['%name%' => $activePage->getTitle()]) :
     $view['translator']->trans('mautic.page.header.new');
 
-$view['slots']->set("headerTitle", $header.$subheader);
+$view['slots']->set('headerTitle', $header.$subheader);
 
 $template = $form['template']->vars['data'];
+
+$attr                               = $form->vars['attr'];
+$attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
+
+$isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
+
 ?>
 
-<?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->start($form, ['attr' => $attr]); ?>
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
@@ -35,8 +43,11 @@ $template = $form['template']->vars['data'];
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page'); ?></a></li>
-                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
+                    <li class="active">
+                        <a href="#theme-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.form.theme'); ?>
+                        </a>
+                    </li>
                 </ul>
 
                 <!--/ tabs controls -->
@@ -48,19 +59,11 @@ $template = $form['template']->vars['data'];
                             </div>
                         </div>
 
-                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', [
                             'type'   => 'page',
                             'themes' => $themes,
-                            'active' => $form['template']->vars['value']
-                        )); ?>
-                    </div>
-
-                    <div class="tab-pane fade bdr-w-0" id="source-container">
-                        <div class="row">
-                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
-                                <?php echo $view['form']->row($form['customHtml']); ?>
-                            </div>
-                        </div>
+                            'active' => $form['template']->vars['value'],
+                        ]); ?>
                     </div>
                 </div>
             </div>
@@ -104,12 +107,14 @@ $template = $form['template']->vars['data'];
         </div>
     </div>
 </div>
+<?php echo $view['form']->row($form['customHtml']); ?>
 <?php echo $view['form']->end($form); ?>
 
-<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
+<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'page',
+    'isCodeMode'    => $isCodeMode,
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
-    'objectId'      => $activePage->getSessionId()
-)); ?>
+    'objectId'      => $activePage->getSessionId(),
+]); ?>

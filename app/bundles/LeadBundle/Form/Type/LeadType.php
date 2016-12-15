@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,36 +13,34 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class LeadType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class LeadType.
  */
 class LeadType extends AbstractType
 {
+    use EntityFieldsBuildFormTrait;
 
     private $translator;
     private $factory;
+    private $companyModel;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, CompanyModel $companyModel)
     {
-        $this->translator = $factory->getTranslator();
-        $this->factory    = $factory;
+        $this->translator   = $factory->getTranslator();
+        $this->factory      = $factory;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -53,10 +53,10 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
-            $imageChoices = array(
+            $imageChoices = [
                 'gravatar' => 'Gravatar',
-                'custom'   => 'mautic.lead.lead.field.custom_avatar'
-            );
+                'custom'   => 'mautic.lead.lead.field.custom_avatar',
+            ];
 
             $cache = $options['data']->getSocialCache();
             if (count($cache)) {
@@ -68,222 +68,79 @@ class LeadType extends AbstractType
             $builder->add(
                 'preferred_profile_image',
                 'choice',
-                array(
+                [
                     'choices'    => $imageChoices,
                     'label'      => 'mautic.lead.lead.field.preferred_profile',
-                    'label_attr' => array('class' => 'control-label'),
+                    'label_attr' => ['class' => 'control-label'],
                     'required'   => true,
                     'multiple'   => false,
-                    'attr'       => array(
-                        'class' => 'form-control'
-                    )
-                )
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                ]
             );
 
             $builder->add(
                 'custom_avatar',
                 'file',
-                array(
+                [
                     'label'      => false,
-                    'label_attr' => array('class' => 'control-label'),
+                    'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
-                    'attr'       => array(
-                        'class' => 'form-control'
-                    ),
-                    'mapped'     => false,
-                    'constraints' => array(
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'mapped'      => false,
+                    'constraints' => [
                         new File(
-                            array(
-                                'mimeTypes' => array(
+                            [
+                                'mimeTypes' => [
                                     'image/gif',
                                     'image/jpeg',
-                                    'image/png'
-                                ),
-                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid'
-                            )
-                        )
-                    )
-                )
+                                    'image/png',
+                                ],
+                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
+                            ]
+                        ),
+                    ],
+                ]
             );
         }
 
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
-        foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false) continue;
-            $attr        = array('class' => 'form-control');
-            $properties  = $field['properties'];
-            $type        = $field['type'];
-            $required    = $field['isRequired'];
-            $alias       = $field['alias'];
-            $group       = $field['group'];
-            $value       = (isset($fieldValues[$group][$alias]['value'])) ?
-                $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
-            $constraints = array();
-            if ($required) {
-                $constraints[] = new NotBlank(
-                    array('message' => 'mautic.lead.customfield.notblank')
-                );
-            }
-            if ($type == 'number') {
-                if (empty($properties['precision'])) {
-                    $properties['precision'] = null;
-                } //ensure default locale is used
-                else {
-                    $properties['precision'] = (int) $properties['precision'];
-                }
-
-                $builder->add(
-                    $alias,
-                    $type,
-                    array(
-                        'required'      => $required,
-                        'label'         => $field['label'],
-                        'label_attr'    => array('class' => 'control-label'),
-                        'attr'          => $attr,
-                        'data'          => (isset($fieldValues[$group][$alias]['value'])) ?
-                            (float) $fieldValues[$group][$alias]['value'] : (float) $field['defaultValue'],
-                        'mapped'        => false,
-                        'constraints'   => $constraints,
-                        'precision'     => $properties['precision'],
-                        'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0
-                    )
-                );
-            } elseif (in_array($type, array('date', 'datetime', 'time'))) {
-                $attr['data-toggle'] = $type;
-                $opts = array(
-                    'required'    => $required,
-                    'label'       => $field['label'],
-                    'label_attr'  => array('class' => 'control-label'),
-                    'widget'      => 'single_text',
-                    'attr'        => $attr,
-                    'mapped'      => false,
-                    'input'       => 'string',
-                    'html5'       => false,
-                    'constraints' => $constraints
-                );
-
-                try {
-                    $dtHelper = new DateTimeHelper($value, null, 'local');
-                } catch (\Exception $e) {
-                    // Rather return empty value than break the page
-                    $value = '';
-                }
-
-                if ($type == 'datetime') {
-                    $opts['model_timezone'] = 'UTC';
-                    $opts['view_timezone']  = date_default_timezone_get();
-                    $opts['format']         = 'yyyy-MM-dd HH:mm';
-                    $opts['with_seconds']   = false;
-
-                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                } elseif ($type == 'date') {
-                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
-                } else {
-                    $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
-                }
-
-                $builder->add($alias, $type, $opts);
-            } elseif ($type == 'select' || $type == 'boolean') {
-                $choices = array();
-                if ($type == 'select' && !empty($properties['list'])) {
-                    $list = explode('|', $properties['list']);
-                    foreach ($list as $l) {
-                        $l           = trim($l);
-                        $choices[$l] = $l;
-                    }
-                    $expanded = false;
-                }
-                if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                    $expanded = true;
-                    $choices  = array(1 => $properties['yes'], 0 => $properties['no']);
-                    $attr     = array();
-                }
-
-                if (!empty($choices)) {
-                    $builder->add(
-                        $alias,
-                        'choice',
-                        array(
-                            'choices'     => $choices,
-                            'required'    => $required,
-                            'label'       => $field['label'],
-                            'label_attr'  => array('class' => 'control-label'),
-                            'data'        => ($type == 'boolean') ? (int) $value : $value,
-                            'attr'        => $attr,
-                            'mapped'      => false,
-                            'multiple'    => false,
-                            'empty_value' => false,
-                            'expanded'    => $expanded,
-                            'constraints' => $constraints
-                        )
-                    );
-                }
-            } elseif ($type == 'country' || $type == 'region' || $type == 'timezone') {
-                if ($type == 'country') {
-                    $choices = FormFieldHelper::getCountryChoices();
-                } elseif ($type == 'region') {
-                    $choices = FormFieldHelper::getRegionChoices();
-                } else {
-                    $choices = FormFieldHelper::getTimezonesChoices();
-                }
-
-                $builder->add(
-                    $alias,
-                    'choice',
-                    array(
-                        'choices'     => $choices,
-                        'required'    => $required,
-                        'label'       => $field['label'],
-                        'label_attr'  => array('class' => 'control-label'),
-                        'data'        => $value,
-                        'attr'        => array(
-                            'class'            => 'form-control',
-                            'data-placeholder' => $field['label']
-                        ),
-                        'mapped'      => false,
-                        'multiple'    => false,
-                        'expanded'    => false,
-                        'constraints' => $constraints
-                    )
-                );
-            } else {
-                if ($type == 'lookup') {
-                    $type                = "text";
-                    $attr['data-toggle'] = 'field-lookup';
-                    $attr['data-target'] = $alias;
-
-                    if (!empty($properties['list'])) {
-                        $attr['data-options'] = $properties['list'];
-                    }
-                }
-                $builder->add(
-                    $alias,
-                    $type,
-                    array(
-                        'required'    => $field['isRequired'],
-                        'label'       => $field['label'],
-                        'label_attr'  => array('class' => 'control-label'),
-                        'attr'        => $attr,
-                        'data'        => $value,
-                        'mapped'      => false,
-                        'constraints' => $constraints
-                    )
-                );
-            }
-        }
+        $this->getFormFields($builder, $options);
 
         $builder->add(
             'tags',
             'lead_tag',
-            array(
+            [
                 'by_reference' => false,
-                'attr'         => array(
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadTag(this)'
-                )
-            )
+                'attr'         => [
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.createLeadTag(this)',
+                ],
+            ]
+        );
+
+        $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
+        $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
+        $leadCompanies   = [];
+        foreach ($companies as $company) {
+            $leadCompanies[$company['company_id']] = $company['company_id'];
+        }
+
+        $builder->add(
+        'companies',
+            'company_list',
+            [
+                'label'      => 'mautic.company.selectcompany',
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => true,
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => $leadCompanies,
+            ]
         );
 
         $transformer = new IdToEntityModelTransformer(
@@ -295,15 +152,15 @@ class LeadType extends AbstractType
             $builder->create(
                 'owner',
                 'user_list',
-                array(
+                [
                     'label'      => 'mautic.lead.lead.field.owner',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class' => 'form-control'
-                    ),
-                    'required'   => false,
-                    'multiple'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                    'multiple' => false,
+                ]
             )
             ->addModelTransformer($transformer)
         );
@@ -317,15 +174,15 @@ class LeadType extends AbstractType
             $builder->create(
                 'stage',
                 'stage_list',
-                array(
+                [
                     'label'      => 'mautic.lead.lead.field.stage',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class' => 'form-control'
-                    ),
-                    'required'   => false,
-                    'multiple'   => false
-                )
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                    'multiple' => false,
+                ]
             )
                 ->addModelTransformer($transformer)
         );
@@ -336,15 +193,15 @@ class LeadType extends AbstractType
             $builder->add(
                 'buttons',
                 'form_buttons',
-                array(
+                [
                     'apply_text' => false,
-                    'save_text'  => 'mautic.core.form.save'
-                )
+                    'save_text'  => 'mautic.core.form.save',
+                ]
             );
         }
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -354,13 +211,13 @@ class LeadType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
-                'isShortForm' => false
-            )
+                'isShortForm' => false,
+            ]
         );
 
-        $resolver->setRequired(array('fields', 'isShortForm'));
+        $resolver->setRequired(['fields', 'isShortForm']);
     }
 
     /**
@@ -368,6 +225,6 @@ class LeadType extends AbstractType
      */
     public function getName()
     {
-        return "lead";
+        return 'lead';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -13,26 +14,27 @@ class SugarcrmApi extends CrmApi
      * @param string $method
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    public function request($sMethod, $data = array(), $method = 'GET')
+    public function request($sMethod, $data = [], $method = 'GET')
     {
         $tokenData = $this->integration->getKeys();
 
         if ($tokenData['version'] == '6') {
             $request_url = sprintf('%s/service/v4_1/rest.php', $tokenData['sugarcrm_url']);
 
-            $sessionParams = array_merge(array(
+            $sessionParams = array_merge([
                 'session'     => $tokenData['id'],
-                'module_name' => $this->module
-            ), $data);
+                'module_name' => $this->module,
+            ], $data);
 
-            $parameters = array(
+            $parameters = [
                 'method'        => $sMethod,
                 'input_type'    => 'JSON',
                 'response_type' => 'JSON',
-                'rest_data'     => json_encode($sessionParams)
-            );
+                'rest_data'     => json_encode($sessionParams),
+            ];
 
             $response = $this->integration->makeRequest($request_url, $parameters, $method);
 
@@ -55,20 +57,20 @@ class SugarcrmApi extends CrmApi
 
     /**
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
-    public function getLeadFields ()
+    public function getLeadFields()
     {
         $tokenData = $this->integration->getKeys();
 
         if ($tokenData['version'] == '6') {
             return $this->request('get_module_fields');
-
         } else {
-            $parameters = array(
+            $parameters = [
                 'module_filter' => $this->module,
-                'type_filter'   => 'modules'
-            );
+                'type_filter'   => 'modules',
+            ];
 
             $response = $this->request('metadata', $parameters);
 
@@ -80,27 +82,27 @@ class SugarcrmApi extends CrmApi
      * @param array $fields
      *
      * @return array
+     *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
-    public function createLead (array $fields)
+    public function createLead(array $fields)
     {
         $tokenData = $this->integration->getKeys();
 
         if ($tokenData['version'] == '6') {
-            $leadFields = array();
+            $leadFields = [];
             foreach ($fields as $name => $value) {
-                $leadFields[] = array(
-                    'name' => $name,
-                    'value' => $value
-                );
+                $leadFields[] = [
+                    'name'  => $name,
+                    'value' => $value,
+                ];
             }
-            $parameters = array(
-                'name_value_list' => $leadFields
-            );
+            $parameters = [
+                'name_value_list' => $leadFields,
+            ];
 
             return $this->request('set_entry', $parameters, 'POST');
         } else {
-
             return $this->request('Leads', $fields, 'POST');
         }
     }

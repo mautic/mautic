@@ -1,19 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\NotificationBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
-use Mautic\NotificationBundle\Event\NotificationClickEvent;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -22,7 +27,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class NotificationModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class NotificationModel extends FormModel
 {
@@ -30,10 +34,10 @@ class NotificationModel extends FormModel
      * @var TrackableModel
      */
     protected $pageTrackableModel;
-    
+
     /**
      * NotificationModel constructor.
-     * 
+     *
      * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
@@ -68,7 +72,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Save an array of entities
+     * Save an array of entities.
      *
      * @param  $entities
      * @param  $unlock
@@ -86,13 +90,13 @@ class NotificationModel extends FormModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             if ($dispatchEvent = $entity instanceof Notification) {
-                $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
             $this->getRepository()->saveEntity($entity, false);
 
             if ($dispatchEvent) {
-                $this->dispatchEvent("post_save", $entity, $isNew, $event);
+                $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
             if ((($k + 1) % $batchSize) === 0) {
@@ -111,13 +115,14 @@ class NotificationModel extends FormModel
      * @param array $options
      *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm ($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Notification) {
-            throw new MethodNotAllowedHttpException(array('Notification'));
+            throw new MethodNotAllowedHttpException(['Notification']);
         }
         if (!empty($action)) {
             $options['action'] = $action;
@@ -127,7 +132,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
      *
@@ -136,12 +141,28 @@ class NotificationModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            $entity = new Notification;
+            $entity = new Notification();
         } else {
             $entity = parent::getEntity($id);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param Notification $notification
+     * @param Lead         $lead
+     * @param string       $source
+     */
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null)
+    {
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setLead($lead);
+        $stat->setNotification($notification);
+        $stat->setSource($source);
+
+        $this->getStatRepository()->saveEntity($stat);
     }
 
     /**
@@ -157,24 +178,24 @@ class NotificationModel extends FormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Notification) {
-            throw new MethodNotAllowedHttpException(array('Notification'));
+            throw new MethodNotAllowedHttpException(['Notification']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = NotificationEvents::NOTIFICATION_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = NotificationEvents::NOTIFICATION_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = NotificationEvents::NOTIFICATION_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = NotificationEvents::NOTIFICATION_POST_DELETE;
                 break;
             default:
-                return null;
+                return;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -187,8 +208,58 @@ class NotificationModel extends FormModel
 
             return $event;
         } else {
-            return null;
+            return;
         }
+    }
+
+    /**
+     * Joins the page table and limits created_by to currently logged in user.
+     *
+     * @param QueryBuilder $q
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'push_notifications', 'p', 'p.id = t.notification_id')
+            ->andWhere('p.created_by = :userId')
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    /**
+     * Get line chart data of hits.
+     *
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param bool      $canViewOthers
+     *
+     * @return array
+     */
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    {
+        $flag = null;
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$flag || $flag === 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('push_notification_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.notification.show.total.sent'), $data);
+        }
+
+        return $chart->render();
     }
 
     /**
@@ -202,7 +273,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Search for an notification stat by notification and lead IDs
+     * Search for an notification stat by notification and lead IDs.
      *
      * @param $notificationId
      * @param $leadId
@@ -212,16 +283,16 @@ class NotificationModel extends FormModel
     public function getNotificationStatByLeadId($notificationId, $leadId)
     {
         return $this->getStatRepository()->findBy(
-            array(
+            [
                 'notification' => (int) $notificationId,
-                'lead'  => (int) $leadId
-            ),
-            array('dateSent' => 'DESC')
+                'lead'         => (int) $leadId,
+            ],
+            ['dateSent' => 'DESC']
         );
     }
 
     /**
-     * Get an array of tracked links
+     * Get an array of tracked links.
      *
      * @param $notificationId
      *

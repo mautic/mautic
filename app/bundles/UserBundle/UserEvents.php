@@ -1,22 +1,23 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle;
 
 /**
- * Class UserEvents
+ * Class UserEvents.
  *
  * Events available for UserBundle
  */
 final class UserEvents
 {
-
     /**
      * The mautic.user_pre_save event is dispatched right before a user is persisted.
      *
@@ -91,7 +92,7 @@ final class UserEvents
 
     /**
      * The mautic.user_logout event is dispatched during the logout routine giving a chance to carry out tasks before
-     * the session is lost
+     * the session is lost.
      *
      * The event listener receives a Mautic\UserBundle\Event\LogoutEvent instance.
      *
@@ -100,7 +101,7 @@ final class UserEvents
     const USER_LOGOUT = 'mautic.user_logout';
 
     /**
-     * The mautic.user_login event is dispatched right after a user logs in
+     * The mautic.user_login event is dispatched right after a user logs in.
      *
      * The event listener receives a Mautic\UserBundle\Event\LoginEvent instance.
      *
@@ -109,7 +110,7 @@ final class UserEvents
     const USER_LOGIN = 'mautic.user_login';
 
     /**
-     * The mautic.user_form_authentication event is dispatched when a user logs in so that listeners can authenticate a user, i.e. via a 3rd party service
+     * The mautic.user_form_authentication event is dispatched when a user logs in so that listeners can authenticate a user, i.e. via a 3rd party service.
      *
      * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
      *
@@ -119,7 +120,7 @@ final class UserEvents
 
     /**
      * The mautic.user_pre_authentication event is dispatched when a user browses a page under /s/ except for /login. This allows support for
-     * 3rd party authentication providers outside the login form
+     * 3rd party authentication providers outside the login form.
      *
      * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
      *
@@ -129,7 +130,7 @@ final class UserEvents
 
     /**
      * The mautic.user_authentication_content event is dispatched to collect HTML from plugins to be injected into the UI to assist with
-     * authentication
+     * authentication.
      *
      * The event listener receives a Mautic\UserBundle\Event\AuthenticationContentEvent instance.
      *
@@ -138,7 +139,7 @@ final class UserEvents
     const USER_AUTHENTICATION_CONTENT = 'mautic.user_authentication_content';
 
     /**
-     * The mautic.user_status_change event is dispatched when a user's online status is changed
+     * The mautic.user_status_change event is dispatched when a user's online status is changed.
      *
      * The event listener receives a Mautic\UserBundle\Event\StatusChangeEvent instance.
      *

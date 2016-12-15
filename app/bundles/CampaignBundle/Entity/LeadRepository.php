@@ -1,24 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * LeadRepository
+ * LeadRepository.
  */
 class LeadRepository extends CommonRepository
 {
     /**
-     * Get the details of leads added to a campaign
+     * Get the details of leads added to a campaign.
      *
      * @param      $campaignId
      * @param null $leads
@@ -44,7 +45,7 @@ class LeadRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        $return = array();
+        $return = [];
         foreach ($results as $r) {
             $return[$r['lead_id']][] = $r;
         }
@@ -53,7 +54,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Get leads for a specific campaign
+     * Get leads for a specific campaign.
+     *
+     * @deprecated  2.1.0; Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead
      *
      * @param $args
      *
@@ -61,56 +64,17 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadsWithFields($args)
     {
-        //DBAL
-        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dq->select('count(id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
-
-        //Fix arguments if necessary
-        $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
-
-        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('cl.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
-
-        $expr = $sq->expr()->andX(
-            $sq->expr()->eq('cl.manually_removed', ':false')
+        return $this->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityContacts(
+            $args,
+            'campaign_leads',
+            isset($args['campaign_id']) ? $args['campaign_id'] : 0,
+            ['manually_removed' => 0],
+            'campaign_id'
         );
-        $dq->setParameter('false', false, 'boolean');
-
-        if (isset($args['campaign_id'])) {
-            $expr->add(
-                $sq->expr()->eq('cl.campaign_id', (int) $args['campaign_id'])
-            );
-        }
-        $sq->where($expr);
-
-        $dq->andWhere(
-            sprintf('l.id IN (%s)', $sq->getSQL())
-        );
-
-        //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = $result[0]['count'];
-
-        //now get the actual paginated results
-        $this->buildOrderByClause($dq, $args);
-        $this->buildLimiterClauses($dq, $args);
-
-        $dq->resetQueryPart('select')
-            ->select('l.*');
-
-        $leads = $dq->execute()->fetchAll();
-
-        return (!empty($args['withTotalCount'])) ?
-            array(
-                'count' => $total,
-                'results' => $leads
-            ) : $leads;
     }
 
     /**
-     * Get leads for a specific campaign
+     * Get leads for a specific campaign.
      *
      * @param      $campaignId
      * @param null $eventId
@@ -153,7 +117,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -163,19 +127,19 @@ class LeadRepository extends CommonRepository
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.campaign_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-            ->where('cl.lead_id = ' . $toLeadId)
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where('cl.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $campaigns = array();
+        $campaigns = [];
         foreach ($results as $r) {
             $campaigns[] = $r['campaign_id'];
         }
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_leads')
-            ->set('lead_id', (int)$toLeadId)
-            ->where('lead_id = ' . (int)$fromLeadId);
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId);
 
         if (!empty($campaigns)) {
             $q->andWhere(
@@ -184,8 +148,8 @@ class LeadRepository extends CommonRepository
 
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
-                ->delete(MAUTIC_TABLE_PREFIX . 'campaign_leads')
-                ->where('lead_id = ' . (int)$fromLeadId)
+                ->delete(MAUTIC_TABLE_PREFIX.'campaign_leads')
+                ->where('lead_id = '.(int) $fromLeadId)
                 ->execute();
         } else {
             $q->execute();

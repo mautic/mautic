@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,31 +13,31 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class MandrillTransport
+ * Class MandrillTransport.
  */
 class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
 {
-
     /**
      * {@inheritdoc}
      */
     protected function getPayload()
     {
         $metadata     = $this->getMetadata();
-        $mauticTokens = $mandrillMergeVars = $mandrillMergePlaceholders = array();
+        $mauticTokens = $mandrillMergeVars = $mandrillMergePlaceholders = [];
 
         // Mandrill uses *|PLACEHOLDER|* for tokens so Mautic's need to be replaced
         if (!empty($metadata)) {
             $metadataSet  = reset($metadata);
-            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : array();
+            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens = array_keys($tokens);
 
-            $mandrillMergeVars = $mandrillMergePlaceholders = array();
+            $mandrillMergeVars = $mandrillMergePlaceholders = [];
             foreach ($mauticTokens as $token) {
-                $mandrillMergeVars[$token]         = strtoupper(preg_replace("/[^a-z0-9]+/i", "", $token));
+                $mandrillMergeVars[$token]         = strtoupper(preg_replace('/[^a-z0-9]+/i', '', $token));
                 $mandrillMergePlaceholders[$token] = '*|'.$mandrillMergeVars[$token].'|*';
             }
         }
@@ -72,7 +74,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         }
 
         // Generate the recipients
-        $recipients = $rcptMergeVars = $rcptMetadata = array();
+        $recipients = $rcptMergeVars = $rcptMetadata = [];
 
         $translator = $this->factory->getTranslator();
 
@@ -83,30 +85,30 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
                 if ($type == 'to' && isset($metadata[$rcpt['email']])) {
                     if (!empty($metadata[$rcpt['email']]['tokens'])) {
-                        $mergeVars = array(
+                        $mergeVars = [
                             'rcpt' => $rcpt['email'],
-                            'vars' => array()
-                        );
+                            'vars' => [],
+                        ];
 
                         // This must not be included for CC and BCCs
-                        $trackingPixelToken = array();
+                        $trackingPixelToken = [];
 
                         foreach ($metadata[$rcpt['email']]['tokens'] as $token => $value) {
                             if ($token == '{tracking_pixel}') {
-                                $trackingPixelToken = array(
-                                    array(
+                                $trackingPixelToken = [
+                                    [
                                         'name'    => $mandrillMergeVars[$token],
-                                        'content' => $value
-                                    )
-                                );
+                                        'content' => $value,
+                                    ],
+                                ];
 
                                 continue;
                             }
 
-                            $mergeVars['vars'][] = array(
+                            $mergeVars['vars'][] = [
                                 'name'    => $mandrillMergeVars[$token],
-                                'content' => $value
-                            );
+                                'content' => $value,
+                            ];
                         }
 
                         if (!empty($insertCcEmailHeader)) {
@@ -115,16 +117,16 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                             $mergeVars['vars'] = array_merge(
                                 $mergeVars['vars'],
                                 $trackingPixelToken,
-                                array(
-                                    array(
+                                [
+                                    [
                                         'name'    => 'HTMLCCEMAILHEADER',
-                                        'content' => ''
-                                    ),
-                                    array(
+                                        'content' => '',
+                                    ],
+                                    [
                                         'name'    => 'TEXTCCEMAILHEADER',
-                                        'content' => ''
-                                    )
-                                )
+                                        'content' => '',
+                                    ],
+                                ]
                             );
                         } else {
                             // Just merge the tracking pixel tokens
@@ -138,28 +140,30 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                         if (!empty($cc) || !empty($bcc)) {
                             $ccMergeVars['vars'] = array_merge(
                                 $ccMergeVars['vars'],
-                                array(
-                                    array(
+                                [
+                                    [
                                         'name'    => 'HTMLCCEMAILHEADER',
-                                        'content' => $translator->trans('mautic.core.email.cc.copy',
-                                            array(
-                                                '%email%' => $rcpt['email']
-                                            )
-                                        ) . "<br /><br />"
-                                    ),
-                                    array(
+                                        'content' => $translator->trans(
+                                                'mautic.core.email.cc.copy',
+                                                [
+                                                    '%email%' => $rcpt['email'],
+                                                ]
+                                            ).'<br /><br />',
+                                    ],
+                                    [
                                         'name'    => 'TEXTCCEMAILHEADER',
-                                        'content' => $translator->trans('mautic.core.email.cc.copy',
-                                            array(
-                                                '%email%' => $rcpt['email']
-                                            )
-                                        ) . "\n\n"
-                                    ),
-                                    array(
+                                        'content' => $translator->trans(
+                                                'mautic.core.email.cc.copy',
+                                                [
+                                                    '%email%' => $rcpt['email'],
+                                                ]
+                                            )."\n\n",
+                                    ],
+                                    [
                                         'name'    => 'TRACKINGPIXEL',
-                                        'content' => MailHelper::getBlankPixel()
-                                    )
-                                )
+                                        'content' => MailHelper::getBlankPixel(),
+                                    ],
+                                ]
                             );
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
@@ -193,10 +197,10 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                     }
 
                     if (!empty($metadata[$rcpt['email']])) {
-                        $rcptMetadata[] = array(
+                        $rcptMetadata[] = [
                             'rcpt'   => $rcpt['email'],
-                            'values' => $metadata[$rcpt['email']]
-                        );
+                            'values' => $metadata[$rcpt['email']],
+                        ];
                         unset($metadata[$rcpt['email']]);
                     }
                 }
@@ -221,10 +225,10 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         // Package it up
         $payload = json_encode(
-            array(
+            [
                 'key'     => $this->getPassword(),
-                'message' => $message
-            )
+                'message' => $message,
+            ]
         );
 
         return $payload;
@@ -235,7 +239,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      */
     protected function getHeaders()
     {
-
     }
 
     /**
@@ -251,16 +254,22 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      */
     public function start()
     {
+        $key = $this->getApiKey();
+        if (empty($key)) {
+            // BC support @deprecated - remove in 3.0
+            $key = $this->getPassword();
+        }
+
         // Make an API call to the ping endpoint
         $this->post(
-            array(
+            [
                 'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
                 'payload' => json_encode(
-                    array(
-                        'key' => $this->getPassword()
-                    )
-                )
-            )
+                    [
+                        'key' => $key,
+                    ]
+                ),
+            ]
         );
 
         $this->started = true;
@@ -273,6 +282,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
      * @param $info
      *
      * @return array
+     *
      * @throws \Swift_TransportException
      */
     protected function handlePostResponse($response, $info)
@@ -287,23 +297,29 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         if (!$this->started) {
             // Check the response for PONG!
             if ('PONG!' !== $response) {
-                $this->throwException('Mandrill failed to authenticate');
+                $message = 'Mandrill failed to authenticate';
+                //array ( 'status' => 'error', 'code' => -1, 'name' => 'Invalid_Key', 'message' => 'Invalid API key', )"
+                if (is_array($response) && isset($response['message'])) {
+                    $message .= ': '.$response['message'];
+                }
+
+                $this->throwException($message);
             }
 
             return true;
         }
 
-        $return     = array();
+        $return     = [];
         $hasBounces = false;
-        $bounces    = array(
-            'bounced'      => array(
-                'emails' => array()
-            ),
-            'unsubscribed' => array(
-                'emails' => array()
-            )
-        );
-        $metadata   = $this->getMetadata();
+        $bounces    = [
+            DoNotContact::BOUNCED => [
+                'emails' => [],
+            ],
+            DoNotContact::UNSUBSCRIBED => [
+                'emails' => [],
+            ],
+        ];
+        $metadata = $this->getMetadata();
 
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
@@ -311,7 +327,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                 $error          = true;
             } else {
                 foreach ($response as $stat) {
-                    if (in_array($stat['status'], array('rejected', 'invalid'))) {
+                    if (in_array($stat['status'], ['rejected', 'invalid'])) {
                         $return[]       = $stat['email'];
                         $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
 
@@ -322,14 +338,14 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                         // Extract lead ID from metadata if applicable
                         $leadId = (!empty($metadata[$stat['email']]['leadId'])) ? $metadata[$stat['email']]['leadId'] : null;
 
-                        if (in_array($stat['reject_reason'], array('hard-bounce', 'soft-bounce', 'reject', 'spam', 'invalid', 'unsub'))) {
+                        if (in_array($stat['reject_reason'], ['hard-bounce', 'soft-bounce', 'reject', 'spam', 'invalid', 'unsub'])) {
                             $hasBounces = true;
-                            $type       = ('unsub' == $stat['reject_reason']) ? 'unsubscribed' : 'bounced';
+                            $type       = ('unsub' == $stat['reject_reason']) ? DoNotContact::UNSUBSCRIBED : DoNotContact::BOUNCED;
 
-                            $bounces[$type]['emails'][$stat['email']] = array(
+                            $bounces[$type]['emails'][$stat['email']] = [
                                 'leadId' => $leadId,
-                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason'])
-                            );
+                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason']),
+                            ];
                         }
                     }
                 }
@@ -356,9 +372,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         return $return;
     }
 
-
     /**
-     * Returns a "transport" string to match the URL path /mailer/{transport}/callback
+     * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
      * @return mixed
      */
@@ -390,7 +405,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     }
 
     /**
-     * Handle response
+     * Handle response.
      *
      * @param Request       $request
      * @param MauticFactory $factory
@@ -401,23 +416,23 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     {
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
-        $rows           = array(
-            'bounced' => array(
-                'hashIds' => array(),
-                'emails'  => array()
-            ),
-            'unsubscribed' => array(
-                'hashIds' => array(),
-                'emails'  => array()
-            )
-        );
+        $rows           = [
+            DoNotContact::BOUNCED => [
+                'hashIds' => [],
+                'emails'  => [],
+            ],
+            DoNotContact::UNSUBSCRIBED => [
+                'hashIds' => [],
+                'emails'  => [],
+            ],
+        ];
 
         if (is_array($mandrillEvents)) {
             foreach ($mandrillEvents as $event) {
-                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid'));
+                $isBounce      = in_array($event['event'], ['hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid']);
                 $isUnsubscribe = ('unsub' === $event['event']);
                 if ($isBounce || $isUnsubscribe) {
-                    $type = ($isBounce) ? 'bounced' : 'unsubscribed';
+                    $type = ($isBounce) ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
 
                     if (!empty($event['msg']['diag'])) {
                         $reason = $event['msg']['diag'];

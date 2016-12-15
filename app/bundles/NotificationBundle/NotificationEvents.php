@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,25 +13,22 @@ namespace Mautic\NotificationBundle;
 
 /**
  * Class NotificationEvents
- * Events available for NotificationBundle
- *
- * @package Mautic\NotificationBundle
+ * Events available for NotificationBundle.
  */
 final class NotificationEvents
 {
-
     /**
-     * The mautic.notification_on_click event is thrown when an email is opened
+     * The mautic.notification_token_replacement event is thrown right before the content is returned.
      *
      * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationClickEvent instance.
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
      *
      * @var string
      */
-    const NOTIFICATION_ON_CLICK = 'mautic.notification_on_click';
+    const TOKEN_REPLACEMENT = 'mautic.notification_token_replacement';
 
     /**
-     * The mautic.notification_on_send event is thrown when a notification is sent
+     * The mautic.notification_on_send event is thrown when a notification is sent.
      *
      * The event listener receives a
      * Mautic\NotificationBundle\Event\NotificationSendEvent instance.
@@ -86,5 +85,5 @@ final class NotificationEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.notification.on_campaign_trigger_action';
 }

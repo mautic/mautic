@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,6 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class FieldToOrderTransformer implements DataTransformerInterface
 {
-
     private $em;
 
     public function __construct(EntityManager $em)
@@ -25,7 +26,8 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms an object to an integer (order).
      *
-     * @param  LeadField|null $field
+     * @param LeadField|null $field
+     *
      * @return string
      */
     public function transform($order)
@@ -36,7 +38,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
 
         $field = $this->em
             ->getRepository('MauticLeadBundle:LeadField')
-            ->findOneBy(array('order' => $order));
+            ->findOneBy(['order' => $order]);
 
         return $field;
     }

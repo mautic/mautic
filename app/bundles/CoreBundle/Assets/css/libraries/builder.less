@@ -1,6 +1,6 @@
 //Froala
 @import "froala/froala_editor";
-@import "froala/froala_style";
+//@import "froala/froala_style";
 @import "froala/plugins/char_counter";
 @import "froala/plugins/draggable";
 @import "froala/plugins/fullscreen";
@@ -14,6 +14,7 @@
 @import "froala/plugins/colors";
 @import "froala/plugins/file";
 @import "froala/plugins/table";
+@import "froala/plugins/gated_video";
 
 //Font-awesome
 @import "font-awesome/font-awesome";
@@ -126,6 +127,7 @@ div[data-slot], [data-section-wrapper] {
 
 div[data-slot="image"] img {
     z-index: 1;
+    position: relative;
 }
 
 .slot-placeholder {
@@ -142,7 +144,7 @@ div[data-slot="image"] img {
             position: absolute;
             left: -15px;
             bottom: initial !important;
-            min-width: 340px;
+            min-width: 385px;
 
             &.fr-top {
                 top: -78px !important;
@@ -171,7 +173,7 @@ div[data-slot="image"] img {
             }
         }
     }
-} 
+}
 
 .slot-type-handle.btn {
     float: left;

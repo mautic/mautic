@@ -1,15 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//Set vars commonly used
-if (!isset($buttonCount)) {
-    $buttonCount = 0;
+if (isset($customButtons)) {
+    $view['buttons']->addButtons($customButtons);
 }
 
 //Function used to get identifier string for entity
@@ -22,7 +23,7 @@ if (empty($pull)) {
 
 //Custom query parameters for URLs
 if (!isset($query)) {
-    $query = array();
+    $query = [];
 }
 
 if (isset($tmpl)) {
@@ -31,24 +32,16 @@ if (isset($tmpl)) {
 
 //Edit mode for edit/actions (allows use of ajaxmodal)
 if (!isset($editMode)) {
-    $editMode = "ajax";
+    $editMode = 'ajax';
 }
 
 if (!isset($editAttr)) {
-    $editAttr = '';
-} elseif (is_array($editAttr)) {
-    $string = "";
-    foreach ($editAttr as $attr => $val) {
-        $string .= " $attr=\"$val\"";
-    }
-    $editAttr = $string;
-} else {
-    $editAttr = " $editAttr";
+    $editAttr = [];
 }
 
 //Template/common buttons
 if (!isset($templateButtons)) {
-    $templateButtons = array();
+    $templateButtons = [];
 }
 
 //Set langVar to routeBase if not set
@@ -56,11 +49,15 @@ if (!isset($langVar) && isset($routeBase)) {
     $langVar = $routeBase;
 }
 
-//Set a default button type (group or dropdown)
-if (!isset($groupType)) {
-    $groupType = 'group';
+// Set index and action routes
+if (isset($route) && !isset($actionRoute)) {
+    $actionRoute = $route;
+} elseif (!isset($actionRoute)) {
+    $actionRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_action' : '';
 }
-$view['buttons']->setGroupType($groupType);
+if (!isset($indexRoute)) {
+    $indexRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_index' : '';
+}
 
 //Extra HTML to be inserted after the buttons
 if (!isset($extraHtml)) {
@@ -74,19 +71,22 @@ if (!isset($wrapOpeningTag)) {
 $view['buttons']->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
 
 //Builder for custom buttons
-$menuLink  = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
+$menuLink = (isset($menuLink)) ? " data-menu-link=\"{$menuLink}\"" : '';
 $view['buttons']->setMenuLink($menuLink);
 
-//Build pre template custom buttons
-if (!isset($preCustomButtons)) {
-    $preCustomButtons = array();
+//Set a default button type (group or dropdown)
+if (isset($groupType)) {
+    $view['buttons']->setGroupType($groupType);
 }
 
-//Build post template custom buttons
-if (isset($customButtons)) {
-    $postCustomButtons = $customButtons;
-} elseif (!isset($postCustomButtons)) {
-    $postCustomButtons = array();
+// @deprecated 2.3; to be removed in 3.0; use $view['button']->addButton/addButtons instead
+//Build pre template custom buttons
+if (!isset($preCustomButtons)) {
+    $preCustomButtons = [];
+}
+if (!isset($postCustomButtons)) {
+    $postCustomButtons = [];
 }
 
 $view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
+$buttonCount = $view['buttons']->getButtonCount();

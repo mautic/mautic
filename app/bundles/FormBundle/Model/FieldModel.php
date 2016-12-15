@@ -1,21 +1,23 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Class FieldModel
+ * Class FieldModel.
  */
 class FieldModel extends CommonFormModel
 {
@@ -25,11 +27,69 @@ class FieldModel extends CommonFormModel
     protected $session;
 
     /**
+     * @var LeadFieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
+     * FieldModel constructor.
+     *
+     * @param LeadFieldModel $leadFieldModel
+     */
+    public function __construct(LeadFieldModel $leadFieldModel)
+    {
+        $this->leadFieldModel = $leadFieldModel;
+    }
+
+    /**
      * @param Session $session
      */
     public function setSession(Session $session)
     {
         $this->session = $session;
+    }
+
+    /**
+     * @param object                              $entity
+     * @param \Symfony\Component\Form\FormFactory $formFactory
+     * @param null                                $action
+     * @param array                               $options
+     *
+     * @return \Symfony\Component\Form\FormInterface
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = [])
+    {
+        $fields  = $this->leadFieldModel->getFieldListWithProperties();
+        $choices = [];
+
+        foreach ($fields as $alias => $field) {
+            if (!isset($choices[$field['group_label']])) {
+                $choices[$field['group_label']] = [];
+            }
+
+            $choices[$field['group_label']][$alias] = $field['label'];
+        }
+
+        // Only show the lead fields not already used
+        $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
+        $testLeadFields   = array_flip($usedLeadFields);
+        $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
+        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
+            unset($testLeadFields[$currentLeadField]);
+        }
+
+        foreach ($choices as &$group) {
+            $group = array_diff_key($group, $testLeadFields);
+        }
+
+        $options['leadFields']          = $choices;
+        $options['leadFieldProperties'] = $fields;
+
+        if ($action) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('formfield', $entity, $options);
     }
 
     /**
@@ -63,7 +123,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * Get the fields saved in session
+     * Get the fields saved in session.
      *
      * @param $formId
      *
@@ -71,8 +131,9 @@ class FieldModel extends CommonFormModel
      */
     public function getSessionFields($formId)
     {
-        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', array());
-        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', array());
+        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', []);
+        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', []);
+
         return array_diff_key($fields, array_flip($remove));
     }
 
@@ -89,13 +150,19 @@ class FieldModel extends CommonFormModel
         //make sure alias is not already taken
         $testAlias = $alias;
 
-        $count     = (int) in_array($alias, $aliases);
-        $aliasTag  = $count;
+        $count    = (int) in_array($alias, $aliases);
+        $aliasTag = $count;
 
         while ($count) {
-            $testAlias = $alias . $aliasTag;
+            $testAlias = $alias.$aliasTag;
             $count     = (int) in_array($testAlias, $aliases);
-            $aliasTag++;
+            ++$aliasTag;
+        }
+
+        // Prevent internally used identifiers in the form HTML from colliding with the generated field's ID
+        $internalUse = ['message', 'error', 'id', 'return', 'name', 'messenger'];
+        if (in_array($testAlias, $internalUse)) {
+            $testAlias = 'f_'.$testAlias;
         }
 
         $aliases[] = $testAlias;

@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Skyline Reignite Email</title>
+    <title>{subject}</title>
     <style type="text/css">
         @import url(https://fonts.googleapis.com/css?family=Lato:400);
 
@@ -103,14 +103,14 @@
                 <tr>
                     <td valign="top" style="text-align:left;" class="mobile-center" data-slot-container>
                         <div data-slot="image">
-                            <img width="250" height="62" src="{{ getAssetUrl('themes/skyline/img/logo.gif', null, null, true) }}">
+                            <img width="250" height="62" src="{{ getAssetUrl('themes/'~template~'/img/logo.gif', null, null, true) }}">
                         </div>
                     </td>
                 </tr>
             </table>
         </center>
     </div>
-    <div data-section-wrapper  background="{{ getAssetUrl('themes/skyline/img/bg.gif', null, null, true) }}" bgcolor="#64594b" valign="top" style="background: url({{ getAssetUrl('themes/skyline/img/bg.gif', null, null, true) }}) no-repeat center; background-color: #64594b; background-position: center;">
+    <div data-section-wrapper  background="{{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}" bgcolor="#64594b" valign="top" style="background: url({{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}) no-repeat center; background-color: #64594b; background-position: center;">
         <center>
             <table data-section cellspacing="0" cellpadding="0" width="530" height="303" class="w320">
                 <tr>
@@ -198,13 +198,13 @@
                                 <td style="text-align:center;" data-slot-container>
                                     <div data-slot="text">
                                         <a href="#">
-                                            <img width="61" height="51" src="{{ getAssetUrl('themes/skyline/img/twitter.gif', null, null, true) }}" alt="twitter" />
+                                            <img width="61" height="51" src="{{ getAssetUrl('themes/'~template~'/img/twitter.gif', null, null, true) }}" alt="twitter" />
                                         </a>
                                         <a href="#">
-                                            <img width="61" height="51" src="{{ getAssetUrl('themes/skyline/img/gplus.gif', null, null, true) }}" alt="google plus" />
+                                            <img width="61" height="51" src="{{ getAssetUrl('themes/'~template~'/img/gplus.gif', null, null, true) }}" alt="google plus" />
                                         </a>
                                         <a href="#">
-                                            <img width="61" height="51" src="{{ getAssetUrl('themes/skyline/img/facebook.gif', null, null, true) }}" alt="facebook" />
+                                            <img width="61" height="51" src="{{ getAssetUrl('themes/'~template~'/img/facebook.gif', null, null, true) }}" alt="facebook" />
                                         </a>
                                     </div>
                                 </td>
@@ -220,7 +220,7 @@
                                     <td style="text-align:center; margin:0 auto;" width="100%" data-slot-container>
                                         <div data-slot="image">
                                             <a href="#" style="text-align:center;">
-                                                <img style="margin:0 auto;" width="123" height="24" src="{{ getAssetUrl('themes/skyline/img/logo-footer.gif', null, null, true) }}" alt="logo link" />
+                                                <img style="margin:0 auto;" width="123" height="24" src="{{ getAssetUrl('themes/'~template~'/img/logo-footer.gif', null, null, true) }}" alt="logo link" />
                                             </a>
                                         </div>
                                     </td>

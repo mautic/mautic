@@ -2,10 +2,11 @@
 <html>
     <head>
         {% if page is defined %}
-            <title>{{ page.getTitle() }}</title>
-            <meta name="description" content="{{ page.metaDescription }}">
-        {% endif %}
-        {{ outputHeadDeclarations() }}
+        <title>{pagetitle}</title>
+            <meta name="description" content="{pagemetadescription}">
+            {% endif %}
+        {% block stylesheets %}{% endblock %}
+            {{ outputHeadDeclarations() }}
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}

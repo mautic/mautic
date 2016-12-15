@@ -2,13 +2,41 @@
     width: 75px;
 }
 
-#campaignEvents .campaign-event-timeframe {
-    margin-right: 5px;
+.btn-close-campaign-builder {
+    position: fixed;
+    top: 15px;
+    right: 30px;
+    z-index: 1040;
+}
+
+.campaign-builder .builder-content {
+    right: 0;
 }
 
 #CampaignCanvas {
     height: 10000px;
     width: 10000px;
+}
+
+#CampaignEvent_newsource_hide {
+    display: none;
+}
+
+#CampaignEventPanel {
+    position: absolute;
+    padding: 10px 20px;
+    background-color: #ededed;
+    border: 1px solid #cdcdcd;
+    border-radius: 4px;
+    z-index:1035;
+}
+
+#CampaignEventPanelLists .disabled-result {
+    display: none;
+}
+
+#CampaignEventPanelGroups .panel-body {
+    height: 150px;
 }
 
 ._jsPlumb_endpoint {
@@ -32,6 +60,19 @@
 
 ._jsPlumb_connector {
     z-index: 1000;
+}
+
+._jsPlumb_clickable_anchor {
+    cursor: pointer;
+    z-index: 1050;
+}
+
+._jsPlumb_endpoint svg text {
+    display: none;
+}
+
+._jsPlumb_clickable_anchor svg text {
+    display: block;
 }
 
 .list-campaign-event, .list-campaign-source {
@@ -74,27 +115,40 @@
     white-space: nowrap;
 }
 
-
-.list-campaign-decision,  a.list-campaign-decision {
+.list-campaign-decision {
     /*background-color: #e5ffff;*/
     border: solid 1px #00b49d;
 }
 
-.list-campaign-condition,  a.list-campaign-condition {
+.list-campaign-condition {
     /*background-color: #ffe9d1;*/
     border: solid 1px #ffb79f;
 }
 
-.list-campaign-action, a.list-campaign-action {
+.list-campaign-action {
     /*background-color: #cdddff;*/
     border: solid 1px #9babeb;
     /*color: #fff;*/
 }
 
-.list-campaign-leadsource, a.list-campaign-leadsource {
+.list-campaign-leadsource {
     /*background-color: #ffffe6;*/
     border: solid 1px #fdb933;
     /*color: #fff;*/
+}
+
+#CampaignEventSelector_chosen .list-campaign-action,
+#CampaignEventSelector_chosen .list-campaign-condition,
+#CampaignEventSelector_chosen .list-campaign-decision,
+#CampaignEventSelector_chosen .list-campaign-leadsource {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 10px 5px;
+}
+
+#CampaignEventSelector_chosen .disabled-result {
+    display: none;
 }
 
 .campaign-builder .list-group-item.ui-draggable-dragging {

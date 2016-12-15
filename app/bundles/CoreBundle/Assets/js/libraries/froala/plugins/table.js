@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -572,7 +572,7 @@
           for (i = selection.max_i; i >= selection.min_i; i--) {
             $row = $($table.find('tr').not($table.find('table tr')).get(i));
 
-            // Go through the table map to check for rowspan.
+            // Go through the table map to check for rowspan on the row to delete.
             for (j = 0; j < map[i].length; j++) {
               // Don't do this twice if we have a colspan.
               if (j === 0 || map[i][j] != map[i][j - 1]) {
@@ -621,6 +621,8 @@
             // Table has changed.
             map = _tableMap($table);
           }
+
+          _updateCellSpan(0, map.length - 1, 0, map[0].length - 1, $table);
 
           // Update cursor position
           if (selection.min_i > 0) {
@@ -848,7 +850,7 @@
                 // We should decrease colspan.
                 $cell = $(map[i][j]);
 
-                if (parseInt($cell.attr('colspan'), 10) > 1) {
+                if ((parseInt($cell.attr('colspan'), 10) || 1) > 1) {
                   var colspan = parseInt($cell.attr('colspan'), 10) - 1;
 
                   if (colspan == 1) {
@@ -881,6 +883,8 @@
             }
           }
 
+          _updateCellSpan(0, map.length - 1, 0, map[0].length - 1, $table);
+
           // Update cursor position
           if (selection.min_j > 0) {
             // Place cursor in the column before selection.
@@ -910,6 +914,206 @@
     }
 
     /*
+     * Update or remove colspan attribute.
+     */
+    function _updateColspan (min_j, max_j, $table) {
+      var i;
+      var j;
+      var k;
+      var first_span;
+      var span;
+      var decrease = 0;
+
+      // Create a table map.
+      var map = _tableMap($table);
+
+      // A column might have been deleted.
+      max_j = Math.min(max_j, map[0].length - 1);
+
+      // Find out how much we should decrease colspan.
+      // Parsing only the first row is enough.
+      for (j = min_j; j <= max_j; j++) {
+        // This cell has colspan and has already been checked.
+        if (j > min_j && map[0][j] == map[0][j - 1]) {
+          continue;
+        }
+
+        // Current cell colspan
+        first_span = parseInt(map[0][j].getAttribute('colspan'), 10) || 1;
+
+        // Cell has colspan between min_j and max_j.
+        /* j + 1 will never exceed the number of columns in a table.
+         * A colspan is detected before the last column and all next cells on that row are skipped.
+         */
+        if (first_span > 1 && map[0][j] == map[0][j + 1]) {
+          // The value we should decrease rowspan with.
+          decrease = first_span - 1;
+
+          // Check all columns on the current row.
+          // We found a colspan on the first row (i = 0), continue with second row (i = 1).
+          for (i = 1; i < map.length; i++) {
+            // This cell has rowspan and has already been checked.
+            if (map[i][j] == map[i - 1][j]) {
+              continue;
+            }
+
+            // Look for a colspan on the same columns.
+            for (k = j; k < j + first_span; k++) {
+              span = parseInt(map[i][k].getAttribute('colspan'), 10) || 1;
+
+              // There are other cells with colspan on this column.
+              /* k + 1 will never exceed the number of columns in a table.
+               * A colspan is detected before the last column and all next cells on that row are skipped.
+               */
+              if (span > 1 && map[i][k] == map[i][k + 1]) {
+                decrease = Math.min(decrease, span - 1);
+
+                // Skip colspan.
+                k += decrease;
+              }
+              else {
+                decrease = Math.max (0, decrease - 1);
+
+                // Stop if decrease reaches 0.
+                if (!decrease) {
+                  break;
+                }
+              }
+            }
+
+            // Stop looking on the next columns if decrease reaches 0.
+            if (!decrease) {
+              break;
+            }
+          }
+        }
+      }
+
+      // Update colspan attribute.
+      if (decrease) {
+        _decreaseCellSpan(map, decrease, 'colspan', 0, map.length - 1, min_j, max_j);
+      }
+    }
+
+    /*
+     * Update or remove rowspan attribute.
+     */
+    function _updateRowspan (min_i, max_i, $table) {
+      var i;
+      var j;
+      var k;
+      var first_span;
+      var span;
+      var decrease = 0;
+
+      // Create a table map.
+      var map = _tableMap($table);
+
+      // A row might have been deleted.
+      max_i = Math.min(max_i, map.length - 1);
+
+      // Find out how much we should decrease rowspan.
+      // Parsing only the first column is enough.
+      for (i = min_i; i <= max_i; i++) {
+        // This cell has rowspan and has already been checked.
+        if (i > min_i && map[i][0] == map[i - 1][0]) {
+          continue;
+        }
+
+        // Current cell rowspan
+        first_span = parseInt(map[i][0].getAttribute('rowspan'), 10) || 1;
+
+        // Cell has rowspan between min_i and max_i.
+        /* i + 1 will never exceed the number of rows in a table.
+         * A rowspan is detected before the last row and all next cells on that column are skipped.
+         */
+        if (first_span > 1 && map[i][0] == map[i + 1][0]) {
+          // The value we should decrease rowspan with.
+          decrease = first_span - 1;
+
+          // Check all columns on the current row.
+          // We found a rowspan on the first column (j = 0), continue with second column (j = 1).
+          for (j = 1; j < map[0].length; j++) {
+            // This cell has colspan and has already been checked.
+            if (map[i][j] == map[i][j - 1]) {
+              continue;
+            }
+
+            // Look for a rowspan on the same rows.
+            for (k = i; k < i + first_span; k++) {
+              span = parseInt(map[k][j].getAttribute('rowspan'), 10) || 1;
+
+              // There are other cells with rowspan on this row.
+              /* k + 1 will never exceed the number of rows in a table.
+               * A rowspan is detected before the last row and all next cells on that column are skipped.
+               */
+              if (span > 1 && map[k][j] == map[k + 1][j]) {
+                decrease = Math.min(decrease, span - 1);
+
+                // Skip rowspan.
+                k += decrease;
+              }
+              else {
+                decrease = Math.max (0, decrease - 1);
+
+                // Stop if decrease reaches 0.
+                if (!decrease) {
+                  break;
+                }
+              }
+            }
+
+            // Stop looking on the next columns if decrease reaches 0.
+            if (!decrease) {
+              break;
+            }
+          }
+        }
+      }
+
+      // Update rowspan attribute.
+      if (decrease) {
+        _decreaseCellSpan(map, decrease, 'rowspan', min_i, max_i, 0, map[0].length - 1);
+      }
+    }
+
+    /*
+     * Decrease the colspan or rowspan with the amount specified.
+     */
+    function _decreaseCellSpan (map, decrease, span_type, min_i, max_i, min_j, max_j) {
+      // Update span attribute.
+      var i;
+      var j;
+      var span;
+
+      // Go only through lines and columns that need to be updated.
+      for (i = min_i; i <= max_i; i++) {
+        for (j = min_j; j <= max_j; j++) {
+          // This cell has rowspan or colspan and has already been checked.
+          if ((i > min_i && map[i][j] == map[i - 1][j]) || (j > min_j && map[i][j] == map[i][j - 1])) {
+            continue;
+          }
+
+          span = parseInt(map[i][j].getAttribute(span_type), 10) || 1;
+
+          // Update cell span.
+          if (span > 1) {
+            if (span - decrease > 1) map[i][j].setAttribute(span_type, span - decrease);
+            else map[i][j].removeAttribute(span_type);
+          }
+        }
+      }
+    }
+
+    /*
+     * Update or remove colspan and rowspan attributes.
+     */
+    function _updateCellSpan (min_i, max_i, min_j, max_j, $table) {
+      _updateRowspan(min_i, max_i, $table);
+      _updateColspan(min_j, max_j, $table);
+    }
+
+    /*
      * Merge selected cells method.
      */
     function mergeCells () {
@@ -923,7 +1127,6 @@
 
         var i;
         var $cell;
-        var $row;
         var cells = editor.$el.find('.fr-selected-cell');
         var $first_cell = $(cells[0]);
         var $first_row = $first_cell.parent();
@@ -937,7 +1140,7 @@
           width += $(first_row_cells[i]).outerWidth();
         }
 
-        $first_cell.css('width', (width / $first_row.outerWidth() * 100).toFixed(4) + '%');
+        $first_cell.css('width', (width / $current_table.outerWidth() * 100).toFixed(4) + '%');
 
         // Set the colspan for the merged cells.
         if (selection.min_j < selection.max_j) {
@@ -970,18 +1173,18 @@
         // Enable toolbar.
         editor.toolbar.enable();
 
+        // Update rowspan before removing empty rows (otherwise table map is not correct).
+        _updateRowspan(selection.min_i, selection.max_i, $current_table);
+
         // Merge is done, check if we have empty trs to clean.
         var empty_trs = $current_table.find('tr:empty');
 
         for (i = empty_trs.length - 1; i >= 0; i--) {
-          $row = $(empty_trs[i]);
-
-          // Check if it is okay to delete the tr.
-          if ($row.prev().length === 0 || $row.next().length === 0 ||
-              $row.prev().find('> th[rowspan], > td[rowspan]').length < $row.prev().find('> th, > td').length) {
-            $row.remove();
-          }
+          $(empty_trs[i]).remove();
         }
+
+        // Update colspan after removing empty rows and updating rowspan.
+        _updateColspan(selection.min_j, selection.max_j, $current_table);
 
         // Reposition table edit popup.
         _showEditPopup();
@@ -1198,17 +1401,16 @@
     /*
      * Create a table map.
      */
-    function _tableMap (table) {
-      table = table || null;
+    function _tableMap ($table) {
+      $table = $table || null;
 
       var map = [];
 
-      if (table == null && selectedCells().length > 0) {
-        table = selectedTable();
+      if ($table == null && selectedCells().length > 0) {
+        $table = selectedTable();
       }
 
-      if (table) {
-        var $table = $(table);
+      if ($table) {
         $table.find('tr').not($table.find('table tr')).each (function (row, tr) {
           var $tr = $(tr);
 
@@ -1824,6 +2026,7 @@
     function _placeResizer (e, tag_under) {
       var $tag_under = $(tag_under);
       var $table = $tag_under.closest('table');
+      var $table_parent = $table.parent();
 
       // We might have another tag inside the table cell.
       if (tag_under && (tag_under.tagName != 'TD' && tag_under.tagName != 'TH')) {
@@ -1868,72 +2071,100 @@
           var max_left;
           var max_right;
 
-          // Mouse is near the cells's left margin (skip left table border).
-          if (tag_origin.col > 0 && e.pageX - tag_left <= editor.opts.tableResizerOffset) {
-            // Table resizer's left position.
-            resizer_left = tag_left;
-
-            // Previous table cell. (There's always a prev cell since we're skipping the left table border)
-            var $prev_tag = $(map[tag_origin.row][tag_origin.col - 1]);
-
-            // Left limit.
-            if ((parseInt($prev_tag.attr('colspan'), 10) || 1) == 1) {
-              max_left = $prev_tag.offset().left - 1 + editor.opts.tableResizingLimit;
-            } else {
-              max_left = tag_left - _columnWidth(tag_origin.col - 1, map) + editor.opts.tableResizingLimit;
-            }
-
-            // Right limit.
-            if ((parseInt($tag_under.attr('colspan'), 10) || 1) == 1) {
-              max_right = tag_left + $tag_under.outerWidth() - editor.opts.tableResizingLimit;
-            } else {
-              max_right = tag_left + _columnWidth(tag_origin.col, map) - editor.opts.tableResizingLimit;
-            }
-
-            // Columns to resize.
-            first = tag_origin.col - 1;
-            second = tag_origin.col;
-          }
-
-          // Mouse is near the cell's right margin.
-          else if (tag_right - e.pageX <= editor.opts.tableResizerOffset) {
-            // Table resizer's left possition.
-            resizer_left = tag_right;
-
-            // Check for next td.
-            if (tag_end.col < map[tag_end.row].length && map[tag_end.row][tag_end.col + 1]) {
-              // Next table cell.
-              var $next_tag = $(map[tag_end.row][tag_end.col + 1]);
+          if (editor.opts.direction != 'rtl') {
+            // Mouse is near the cells's left margin (skip left table border).
+            if (tag_origin.col > 0 && e.pageX - tag_left <= editor.opts.tableResizerOffset) {
+              // Table resizer's left position.
+              resizer_left = tag_left;
 
               // Left limit.
-              if ((parseInt($tag_under.attr('colspan'), 10) || 1) == 1) {
-                max_left = tag_left + editor.opts.tableResizingLimit;
-              } else {
-                max_left = tag_right - _columnWidth(tag_end.col, map) + editor.opts.tableResizingLimit;
-              }
+              max_left = tag_left - _columnWidth(tag_origin.col - 1, map) + editor.opts.tableResizingLimit;
 
               // Right limit.
-              if ((parseInt($next_tag.attr('colspan'), 10) || 1) == 1) {
-                max_right = tag_right + $next_tag.outerWidth() - editor.opts.tableResizingLimit;
-              } else {
-                max_right = tag_right + _columnWidth(tag_origin.col + 1, map) - editor.opts.tableResizingLimit;
-              }
+              max_right = tag_left + _columnWidth(tag_origin.col, map) - editor.opts.tableResizingLimit;
 
               // Columns to resize.
-              first = tag_end.col;
-              second = tag_end.col + 1;
+              first = tag_origin.col - 1;
+              second = tag_origin.col;
             }
 
-            // Resize table.
-            else {
-              // Columns to resize.
-              first = tag_end.col;
-              second = null;
+            // Mouse is near the cell's right margin.
+            else if (tag_right - e.pageX <= editor.opts.tableResizerOffset) {
+              // Table resizer's left possition.
+              resizer_left = tag_right;
 
-              // Resizer limits.
-              var $table_parent = $table.parent();
-              max_left = $table.offset().left - 1 + map[0].length * editor.opts.tableResizingLimit;
-              max_right = $table_parent.offset().left - 1 + $table_parent.width() + parseFloat($table_parent.css('padding-left'));
+              // Check for next td.
+              if (tag_end.col < map[tag_end.row].length && map[tag_end.row][tag_end.col + 1]) {
+                // Left limit.
+                max_left = tag_right - _columnWidth(tag_end.col, map) + editor.opts.tableResizingLimit;
+
+                // Right limit.
+                max_right = tag_right + _columnWidth(tag_end.col + 1, map) - editor.opts.tableResizingLimit;
+
+                // Columns to resize.
+                first = tag_end.col;
+                second = tag_end.col + 1;
+              }
+
+              // Resize table.
+              else {
+                // Columns to resize.
+                first = tag_end.col;
+                second = null;
+
+                // Resizer limits.
+                max_left = $table.offset().left - 1 + map[0].length * editor.opts.tableResizingLimit;
+                max_right = $table_parent.offset().left - 1 + $table_parent.width() + parseFloat($table_parent.css('padding-left'));
+              }
+            }
+          }
+
+          // RTL
+          else {
+            // Mouse is near the cell's right margin (skip right table border).
+            if (tag_origin.col > 0 && tag_right - e.pageX <= editor.opts.tableResizerOffset) {
+              // Table resizer's left position.
+              resizer_left = tag_right;
+
+              // Left limit.
+              max_left = tag_right - _columnWidth(tag_origin.col, map) + editor.opts.tableResizingLimit;
+
+              // Right limit.
+              max_right = tag_right + _columnWidth(tag_origin.col - 1, map) - editor.opts.tableResizingLimit;
+
+              // Columns to resize.
+              first = tag_origin.col;
+              second = tag_origin.col - 1;
+            }
+
+            // Mouse is near the cell's left margin.
+            else if (e.pageX - tag_left <= editor.opts.tableResizerOffset) {
+              // Table resizer's left position.
+              resizer_left = tag_left;
+
+              // Check for next td.
+              if (tag_end.col < map[tag_end.row].length && map[tag_end.row][tag_end.col + 1]) {
+                // Left limit.
+                max_left = tag_left - _columnWidth(tag_end.col + 1, map) + editor.opts.tableResizingLimit;
+
+                // Right limit.
+                max_right = tag_left + _columnWidth(tag_end.col, map) - editor.opts.tableResizingLimit;
+
+                // Columns to resize.
+                first = tag_end.col + 1;
+                second = tag_end.col;
+              }
+
+              // Resize table.
+              else {
+                // Columns to resize.
+                first = null;
+                second = tag_end.col;
+
+                // Resizer limits.
+                max_left = $table_parent.offset().left + parseFloat($table_parent.css('padding-left'));
+                max_right = $table_parent.offset().left - 1 + $table_parent.width() + parseFloat($table_parent.css('padding-left')) - map[0].length * editor.opts.tableResizingLimit;
+              }
             }
           }
 

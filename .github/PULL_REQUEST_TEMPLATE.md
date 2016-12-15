@@ -1,4 +1,4 @@
-Please answer the following questions. 
+[//]: # ( Please answer the following questions: )
 
 | Q  | A
 | --- | ---
@@ -10,9 +10,9 @@ Please answer the following questions.
 | BC breaks? | 
 | Deprecations? | 
 
-**Note that all new features should have a related user and/or developer documentation PR in their respective repositories.** 
+[//]: # ( Note that all new features should have a related user and/or developer documentation PR in their respective repositories. )
 
-### Required
+[//]: # ( Required: )
 #### Description:
 
 
@@ -20,7 +20,7 @@ Please answer the following questions.
 1. 
 2. 
 
-### As applicable
+[//]: # ( As applicable: )
 #### Steps to reproduce the bug:
 1. 
 2. 

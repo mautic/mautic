@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,21 +14,19 @@ namespace Mautic\PluginBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Class SocialMediaKeysType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class SocialMediaKeysType.
  */
 class KeysType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $object       = $options['integration_object'];
         $secretKeys   = $object->getSecretKeys();
@@ -41,30 +41,33 @@ class KeysType extends AbstractType
                 $required = false;
             }
 
-            $constraints = ($required) ? array(
-                new NotBlank(
-                    array(
-                        'message' => 'mautic.core.value.required'
-                    )
-                )
-            ) : array();
+            $constraints = ($required)
+                ? [
+                    new Callback(
+                        function ($validateMe, ExecutionContextInterface $context) use ($options) {
+                            if (empty($validateMe) && !empty($options['is_published'])) {
+                                $context->buildViolation('mautic.core.value.required')->addViolation();
+                            }
+                        }
+                    ),
+                ] : [];
 
             $type = ($isSecret) ? 'password' : 'text';
 
             $builder->add(
                 $key,
                 $type,
-                array(
-                    'label'          => $label,
-                    'label_attr'     => array('class' => 'control-label'),
-                    'attr'           => array(
+                [
+                    'label'      => $label,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'       => 'form-control',
-                        'placeholder' => ($type == 'password') ? '**************' : ''
-                    ),
+                        'placeholder' => ($type == 'password') ? '**************' : '',
+                    ],
                     'required'       => $required,
                     'constraints'    => $constraints,
-                    'error_bubbling' => false
-                )
+                    'error_bubbling' => false,
+                ]
             );
         }
         $object->appendToForm($builder, $options['data'], 'keys');
@@ -75,15 +78,16 @@ class KeysType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('integration_object', 'integration_keys'));
-        $resolver->setOptional(array('secret_keys'));
-        $resolver->setDefaults(array('secret_keys' => array()));
+        $resolver->setRequired(['integration_object', 'integration_keys']);
+        $resolver->setOptional(['secret_keys']);
+        $resolver->setDefaults(['secret_keys' => [], 'is_published' => true]);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "integration_keys";
+    public function getName()
+    {
+        return 'integration_keys';
     }
 }

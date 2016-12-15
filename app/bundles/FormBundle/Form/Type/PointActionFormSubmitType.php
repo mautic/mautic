@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class PointActionFormSubmitType
+ * Class PointActionFormSubmitType.
  */
 class PointActionFormSubmitType extends AbstractType
 {
@@ -23,15 +24,15 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('forms', 'form_list', array(
-            'label'         => 'mautic.form.point.action.forms',
-            'label_attr'    => array('class' => 'control-label'),
-            'required'      => false,
-            'attr'       => array(
+        $builder->add('forms', 'form_list', [
+            'label'      => 'mautic.form.point.action.forms',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.form.point.action.forms.descr'
-            )
-        ));
+                'tooltip' => 'mautic.form.point.action.forms.descr',
+            ],
+        ]);
     }
 
     /**
@@ -39,6 +40,6 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function getName()
     {
-        return "pointaction_formsubmit";
+        return 'pointaction_formsubmit';
     }
 }

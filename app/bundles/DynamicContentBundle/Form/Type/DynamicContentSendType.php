@@ -1,20 +1,21 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class DynamicContentSendType.
@@ -27,20 +28,13 @@ class DynamicContentSendType extends AbstractType
     protected $router;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
      * DynamicContentSendType constructor.
      *
-     * @param RouterInterface   $router
-     * @param RequestStack|null $requestStack
+     * @param RouterInterface $router
      */
-    public function __construct(RouterInterface $router, RequestStack $requestStack)
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -53,18 +47,18 @@ class DynamicContentSendType extends AbstractType
             'dynamicContent',
             'dwc_list',
             [
-                'label' => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label'      => 'mautic.dynamicContent.send.selectDynamicContents',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
                     'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'multiple' => false,
+                'multiple'    => false,
+                'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank']),
+                    new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
-                'variantParent' => $this->request->get('variantParent', 0),
             ]
         );
 
@@ -73,7 +67,7 @@ class DynamicContentSendType extends AbstractType
                 'mautic_dynamicContent_action',
                 [
                     'objectAction' => 'new',
-                    'contentOnly' => 1,
+                    'contentOnly'  => 1,
                     'updateSelect' => $options['update_select'],
                 ]
             );
@@ -83,9 +77,9 @@ class DynamicContentSendType extends AbstractType
                 'button',
                 [
                     'label' => 'mautic.dynamicContent.send.new.dynamicContent',
-                    'attr' => [
-                        'class' => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewDynamicContentWindow({
+                    'attr'  => [
+                        'class'   => 'btn btn-primary btn-nospin',
+                        'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
                         'icon' => 'fa fa-plus',
@@ -93,15 +87,16 @@ class DynamicContentSendType extends AbstractType
                 ]
             );
 
-            $dynamicContent = is_array($options['data']) && array_key_exists('dynamicContent', $options['data']) ? $options['data']['dynamicContent'] : null;
+            $dynamicContent = is_array($options['data']) && array_key_exists('dynamicContent', $options['data']) ? $options['data']['dynamicContent']
+                : null;
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate(
                 'mautic_dynamicContent_action',
                 [
                     'objectAction' => 'edit',
-                    'objectId' => 'dynamicContentId',
-                    'contentOnly' => 1,
+                    'objectId'     => 'dynamicContentId',
+                    'contentOnly'  => 1,
                     'updateSelect' => $options['update_select'],
                 ]
             );
@@ -111,11 +106,11 @@ class DynamicContentSendType extends AbstractType
                 'button',
                 [
                     'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
-                    'attr' => [
-                        'class' => 'btn btn-primary btn-nospin',
-                        'onclick' => 'Mautic.loadNewDynamicContentWindow(Mautic.standardDynamicContentUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                    'attr'  => [
+                        'class'    => 'btn btn-primary btn-nospin',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardDynamicContentUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($dynamicContent),
-                        'icon' => 'fa fa-edit',
+                        'icon'     => 'fa fa-edit',
                     ],
                 ]
             );

@@ -1,15 +1,17 @@
 <?php
 
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\Middleware\Dev;
 
+use Mautic\Middleware\ConfigAwareTrait;
 use Mautic\Middleware\PrioritizedMiddlewareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +19,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
+    use ConfigAwareTrait;
+
     const PRIORITY = 20;
 
     /**
@@ -36,8 +40,13 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      */
     public function __construct(HttpKernelInterface $app)
     {
-        $this->app = $app;
+        $this->app        = $app;
         $this->allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
+
+        $parameters = $this->getConfig();
+        if (array_key_exists('dev_hosts', $parameters) && is_array($parameters['dev_hosts'])) {
+            $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
+        }
 
         if (isset($_SERVER['MAUTIC_DEV_HOSTS'])) {
             $localIps         = explode(' ', $_SERVER['MAUTIC_DEV_HOSTS']);

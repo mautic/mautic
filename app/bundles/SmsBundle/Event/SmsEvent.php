@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,15 +15,13 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\SmsBundle\Entity\Sms;
 
 /**
- * Class SmsEvent
- *
- * @package Mautic\SmsBundle\Event
+ * Class SmsEvent.
  */
 class SmsEvent extends CommonEvent
 {
     /**
-     * @param Sms $sms
-     * @param bool  $isNew
+     * @param Sms  $sms
+     * @param bool $isNew
      */
     public function __construct(Sms $sms, $isNew = false)
     {
@@ -30,7 +30,7 @@ class SmsEvent extends CommonEvent
     }
 
     /**
-     * Returns the Sms entity
+     * Returns the Sms entity.
      *
      * @return Sms
      */
@@ -40,7 +40,7 @@ class SmsEvent extends CommonEvent
     }
 
     /**
-     * Sets the Sms entity
+     * Sets the Sms entity.
      *
      * @param Sms $sms
      */

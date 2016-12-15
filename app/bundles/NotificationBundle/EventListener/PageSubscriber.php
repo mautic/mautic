@@ -1,34 +1,58 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PageSubscriber
- *
- * @package Mautic\NotificationBundle\EventListener
+ * Class PageSubscriber.
  */
 class PageSubscriber extends CommonSubscriber
 {
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var AssetsHelper
+     */
+    protected $assetsHelper;
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param AssetsHelper         $assetsHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->assetsHelper         = $assetsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
+    /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            PageEvents::PAGE_ON_DISPLAY => array('onPageDisplay', 0)
-        );
+        return [
+            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+        ];
     }
 
     /**
@@ -36,24 +60,25 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        if (! $this->factory->getParameter('notification_enabled')) {
+        if (!$this->coreParametersHelper->getParameter('notification_enabled')) {
             return;
         }
+        $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
+        $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
+        $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
 
-        $router = $this->factory->getRouter();
-        $appId = $this->factory->getParameter('notification_app_id');
-        $safariWebId = $this->factory->getParameter('notification_safari_web_id');
+        $this->assetsHelper->addScript($this->router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
+        $this->assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
 
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
+        $manifestUrl = $this->router->generate('mautic_onesignal_manifest');
+        $this->assetsHelper->addCustomDeclaration('<link rel="manifest" href="'.$manifestUrl.'" />', 'onPageDisplay_headClose');
 
-        $assetsHelper->addScript($router->generate('mautic_js'), 'onPageDisplay_headClose', true);
-        $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
+        $leadAssociationUrl = $this->router->generate('mautic_subscribe_notification', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $manifestUrl = $router->generate('mautic_onesignal_manifest');
-        $assetsHelper->addCustomDeclaration('<link rel="manifest" href="' . $manifestUrl . '" />', 'onPageDisplay_headClose');
-
-        $leadAssociationUrl = $router->generate('mautic_subscribe_notification', array(), UrlGeneratorInterface::ABSOLUTE_URL);
+        $welcomenotificationText = '';
+        if (!$welcomenotificationEnabled) {
+            $welcomenotificationText = 'welcomeNotification: { "disable": true },';
+        }
 
         $oneSignalInit = <<<JS
 
@@ -63,6 +88,7 @@ class PageSubscriber extends CommonSubscriber
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
         autoRegister: true,
+        {$welcomenotificationText}
         notifyButton: {
             enable: false // Set to false to hide
         }
@@ -100,6 +126,6 @@ class PageSubscriber extends CommonSubscriber
     };
 JS;
 
-        $assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');
+        $this->assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');
     }
 }

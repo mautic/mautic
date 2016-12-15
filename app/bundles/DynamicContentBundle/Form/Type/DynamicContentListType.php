@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -32,7 +34,7 @@ class DynamicContentListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->viewOther = $factory->getSecurity()->isGranted('dynamicContent:dynamicContents:viewother');
-        $this->repo = $factory->getModel('dynamicContent')->getRepository();
+        $this->repo      = $factory->getModel('dynamicContent')->getRepository();
 
         $this->repo->setCurrentUser($factory->getUser());
     }
@@ -43,7 +45,7 @@ class DynamicContentListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $viewOther = $this->viewOther;
-        $repo = $this->repo;
+        $repo      = $this->repo;
 
         $resolver->setDefaults(
             [
@@ -54,12 +56,9 @@ class DynamicContentListType extends AbstractType
                         return $choices;
                     }
 
-                    $variantParent = (int) (isset($options['variantParent']) ? $options['variantParent'] : 0);
-                    $ignoreIds = isset($options['ignore_ids']) ? $options['ignore_ids'] : [];
-
                     $choices = [];
 
-                    $entities = $repo->getDynamicContentList('', 0, 0, $viewOther, $variantParent, $ignoreIds);
+                    $entities = $repo->getDynamicContentList('', 0, 0, $viewOther, $options['top_level'], $options['ignore_ids']);
                     foreach ($entities as $entity) {
                         $choices[$entity['language']][$entity['id']] = $entity['name'];
                     }
@@ -69,9 +68,11 @@ class DynamicContentListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded' => false,
-                'multiple' => false,
-                'required' => false,
+                'expanded'    => false,
+                'multiple'    => false,
+                'required'    => false,
+                'top_level'   => 'translation',
+                'ignore_ids'  => [],
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.dynamicContent.no.dynamicContent.note' : 'mautic.core.form.chooseone';
                 },
@@ -81,7 +82,7 @@ class DynamicContentListType extends AbstractType
             ]
         );
 
-        $resolver->setOptional(['ignore_ids', 'variantParent']);
+        $resolver->setOptional(['ignore_ids', 'top_level']);
     }
 
     /**

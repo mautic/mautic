@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,10 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class FetchLeadsCommand
+ * Class FetchLeadsCommand.
  */
 class FetchLeadsCommand extends ContainerAwareCommand
 {
@@ -28,10 +29,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:integration:fetchleads')
             ->setAliases(
-                array(
+                [
                     'mautic:integration:fetchleads',
-                    'mautic:fetchleads:integration'
-                )
+                    'mautic:fetchleads:integration',
+                ]
             )
             ->setDescription('Fetch leads from integration.')
             ->addOption(
@@ -49,14 +50,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
-                '--sf-object',
-                '-sf',
-                InputOption::VALUE_OPTIONAL,
-                'Send the object name Lead - will import leads to mautic contacts, Contact will import contacts to mautic contacts.'
-            )
-            ->addOption(
                 '--time-interval',
-                '-ti',
+                '-a',
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
             )
@@ -75,51 +70,56 @@ class FetchLeadsCommand extends ContainerAwareCommand
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
 
+        $translator  = $factory->getTranslator();
+        $integration = $input->getOption('integration');
+        $startDate   = $input->getOption('start-date');
+        $endDate     = $input->getOption('end-date');
+        $interval    = $input->getOption('time-interval');
 
-        $translator     = $factory->getTranslator();
-        $integration    = $input->getOption('integration');
-        $startDate      = $input->getOption('start-date');
-        $endDate        = $input->getOption('end-date');
-        $object         = $input->getOption('sf-object');
-        $interval       = $input->getOption('time-interval');
-
-        if(!$interval){
-            $interval = "15 minutes";
+        if (!$interval) {
+            $interval = '15 minutes';
         }
-        if(!$startDate){
-            $startDate= date('c', strtotime("-".$interval));
+        if (!$startDate) {
+            $startDate = date('c', strtotime('-'.$interval));
         }
-
-        if(!$endDate){
-            $endDate= date('c');
+        if (!$endDate) {
+            $endDate = date('c');
         }
-
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+            $config            = $integrationObject->mergeConfigToFeatureSettings();
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
+            $params['start'] = $startDate;
+            $params['end']   = $endDate;
 
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', array('%integration%' => $integration)).'</info>');
-
-                $params['start']=$startDate;
-                $params['end']=$endDate;
-                $params['object']=$object;
-
-                if(strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = 0;
+            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
+                if (strtotime($startDate) > strtotime('-30 days')) {
                     $processed = intval($integrationObject->getLeads($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
-                }
-                else{
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                } else {
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }
-               
+            }
+
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && in_array('company', $config['objects'])) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+
+                if (strtotime($startDate) > strtotime('-30 days')) {
+                    $processed = intval($integrationObject->getCompanies($params));
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                } else {
+                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                }
             }
         }
 

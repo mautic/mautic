@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -104,7 +104,7 @@
         })
         .fail(function (xhr) {
           // (error)
-          _throwError(ERROR_ON_SERVER, xhr.response);
+          _throwError(ERROR_ON_SERVER, xhr.response || xhr.responseText);
         });
       } else {
         // (error)

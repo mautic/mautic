@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class RedirectRepository
+ * Class RedirectRepository.
  */
 class RedirectRepository extends CommonRepository
 {
@@ -69,7 +70,7 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count
+     * Up the hit count.
      *
      * @param            $id
      * @param int        $increaseBy
@@ -80,11 +81,11 @@ class RedirectRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'page_redirects')
-            ->set('hits', 'hits + ' . (int) $increaseBy)
-            ->where('id = ' . (int) $id);
+            ->set('hits', 'hits + '.(int) $increaseBy)
+            ->where('id = '.(int) $id);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + ' . (int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
         $q->execute();

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -32,24 +34,24 @@ abstract class AbstractNotificationApi
 
     /**
      * @param MauticFactory $factory
-     * @param Http $http
+     * @param Http          $http
      */
     public function __construct(MauticFactory $factory, Http $http)
     {
         $this->factory = $factory;
-        $this->http = $http;
+        $this->http    = $http;
     }
 
     /**
      * @param string $endpoint One of "apps", "players", or "notifications"
-     * @param string $data JSON encoded array of data to send
+     * @param string $data     JSON encoded array of data to send
      *
      * @return Response
      */
     abstract public function send($endpoint, $data);
 
     /**
-     * @param mixed $id
+     * @param mixed        $id
      * @param string|array $message
      * @param string|array $title
      *
@@ -58,19 +60,19 @@ abstract class AbstractNotificationApi
     abstract public function sendNotification($id, $message, $title = '');
 
     /**
-     * Convert a non-tracked url to a tracked url
+     * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array $clickthrough
+     * @param array  $clickthrough
      *
      * @return string
      */
-    public function convertToTrackedUrl($url, array $clickthrough = array())
+    public function convertToTrackedUrl($url, array $clickthrough = [])
     {
         /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
         $trackableModel = $this->factory->getModel('page.trackable');
 
-        /** @var \Mautic\PageBundle\Entity\Redirect $redirect */
+        /* @var \Mautic\PageBundle\Entity\Redirect $redirect */
         $trackable = $trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
 
         return $trackableModel->generateTrackableUrl($trackable, $clickthrough);

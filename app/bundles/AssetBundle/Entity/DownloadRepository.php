@@ -1,28 +1,30 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class DownloadRepository
- *
- * @package Mautic\AssetBundle\Entity
+ * Class DownloadRepository.
  */
 class DownloadRepository extends CommonRepository
 {
+    use TimelineTrait;
 
     /**
-     * Determine if the download is a unique download
+     * Determine if the download is a unique download.
      *
      * @param $assetId
      * @param $trackingId
@@ -53,42 +55,37 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's page downloads
+     * Get a lead's page downloads.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param       $leadId
+     * @param array $options
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadDownloads($leadId, array $options = array())
+    public function getLeadDownloads($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('d')
-            ->select('IDENTITY(d.asset) AS asset_id, d.dateDownload')
-            ->where('d.lead = ' . $leadId);
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('a.id as asset_id, d.date_download as dateDownload, a.title')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd')
+            ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id')
+            ->where('d.lead_id = '.(int) $leadId);
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('d.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-            $query->leftJoin('d.asset', 'a')
-                ->andWhere($query->expr()->like('a.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
-        }
-
-        return $query->getQuery()
-            ->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download']);
     }
 
     /**
-     * Get list of assets ordered by it's download count
+     * Get list of assets ordered by it's download count.
      *
      * @param QueryBuilder $query
-     * @param integer $limit
-     * @param integer $offset
+     * @param int          $limit
+     * @param int          $offset
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -106,13 +103,14 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * Get list of asset referrals ordered by it's count
+     * Get list of asset referrals ordered by it's count.
      *
      * @param QueryBuilder $query
-     * @param integer $limit
-     * @param integer $offset
+     * @param int          $limit
+     * @param int          $offset
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -130,11 +128,12 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for http statuses
+     * Get pie graph data for http statuses.
      *
      * @param QueryBuilder $query
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -147,7 +146,7 @@ class DownloadRepository extends CommonRepository
         $results = $query->execute()->fetchAll();
         $chart   = new PieChart();
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
             $chart->setDataset($result['status'], $result['count']);
         }
 
@@ -170,7 +169,6 @@ class DownloadRepository extends CommonRepository
         if (is_array($pageId)) {
             $q->where($q->expr()->in('p.id', $pageId))
                 ->groupBy('p.id, a.source_id, p.title, p.hits');
-
         } else {
             $q->where($q->expr()->eq('p.id', ':page'))
                 ->setParameter('page', (int) $pageId);
@@ -187,7 +185,7 @@ class DownloadRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $downloads = array();
+        $downloads = [];
         foreach ($results as $r) {
             $downloads[$r['id']] = $r;
         }
@@ -197,7 +195,7 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Get download count by email by linking emails that have been associated with a page hit that has the
-     * same tracking ID as an asset download tracking ID and thus assumed happened in the same session
+     * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
      * @param           $emailId
      * @param \DateTime $fromDate
@@ -230,7 +228,7 @@ class DownloadRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $downloads = array();
+        $downloads = [];
         foreach ($results as $r) {
             $downloads[$r['id']] = $r;
         }
@@ -246,21 +244,21 @@ class DownloadRepository extends CommonRepository
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'asset_downloads')
+        $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
             ->set('lead_id', (int) $leadId)
             ->set('tracking_id', ':newTrackingId')
             ->where(
                 $q->expr()->eq('tracking_id', ':oldTrackingId')
             )
-            ->setParameters(array(
+            ->setParameters([
                 'newTrackingId' => $newTrackingId,
-                'oldTrackingId' => $oldTrackingId
-            ))
+                'oldTrackingId' => $oldTrackingId,
+            ])
             ->execute();
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -268,9 +266,9 @@ class DownloadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'asset_downloads')
+        $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 }

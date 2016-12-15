@@ -1,18 +1,20 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\UserBundle\Event;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,11 +24,10 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
- * Class AuthenticationEvent
+ * Class AuthenticationEvent.
  */
 class AuthenticationEvent extends Event
 {
-
     /**
      * @var Response
      */
@@ -83,7 +84,7 @@ class AuthenticationEvent extends Event
     protected $request;
 
     /**
-     * Message to display to user if there is a failed authentication
+     * Message to display to user if there is a failed authentication.
      *
      * @var string
      */
@@ -107,8 +108,8 @@ class AuthenticationEvent extends Event
         $authenticatingService = null,
         $integrations = null
     ) {
-        $this->token                 = $token;
-        $this->user                  = $user;
+        $this->token = $token;
+        $this->user  = $user;
 
         $this->isFormLogin           = ($token instanceof UsernamePasswordToken);
         $this->integrations          = $integrations;
@@ -132,7 +133,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get user returned by username search
+     * Get user returned by username search.
      *
      * @return string|User
      */
@@ -142,7 +143,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Set the user to be used after authentication
+     * Set the user to be used after authentication.
      *
      * @param User      $user
      * @param bool|true $saveUser
@@ -158,7 +159,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get the token that has credentials, etc used to login
+     * Get the token that has credentials, etc used to login.
      *
      * @return PluginToken
      */
@@ -173,7 +174,7 @@ class AuthenticationEvent extends Event
      */
     public function setToken($service, TokenInterface $token)
     {
-        $this->token = $token;
+        $this->token                 = $token;
         $this->authenticatingService = $service;
         $this->isAuthenticated       = $token->isAuthenticated();
 
@@ -181,7 +182,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get the username used
+     * Get the username used.
      *
      * @return string
      */
@@ -191,7 +192,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get user provider to find and/or create new users
+     * Get user provider to find and/or create new users.
      *
      * @return UserProvider
      */
@@ -201,9 +202,9 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Set if this user is successfully authenticated
+     * Set if this user is successfully authenticated.
      *
-     * @param string    $service Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
+     * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
      * @param User|null $user
      * @param bool|true $createIfNotExists
      */
@@ -221,7 +222,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Check if the user has been authenticated
+     * Check if the user has been authenticated.
      *
      * @return bool
      */
@@ -232,7 +233,7 @@ class AuthenticationEvent extends Event
 
     /**
      * Prevent any other authentication method from authorizing the user.
-     * Mainly used to prevent a form login from trying to auth with the given password for a local user (think two-factor requirements)
+     * Mainly used to prevent a form login from trying to auth with the given password for a local user (think two-factor requirements).
      */
     public function setIsFailedAuthentication()
     {
@@ -243,7 +244,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Set the message to display to the user for failing auth
+     * Set the message to display to the user for failing auth.
      *
      * @param $message
      */
@@ -253,7 +254,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Returns message to display to user for failing auth
+     * Returns message to display to user for failing auth.
      *
      * @return string
      */
@@ -263,7 +264,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Returns true if a plugin has forcefully failed authentication
+     * Returns true if a plugin has forcefully failed authentication.
      *
      * @return bool
      */
@@ -273,7 +274,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get the service that authenticated the user
+     * Get the service that authenticated the user.
      *
      * @return string
      */
@@ -283,7 +284,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Set a response such as a redirect
+     * Set a response such as a redirect.
      *
      * @param Response $response
      */
@@ -296,7 +297,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get the response if set by the listener
+     * Get the response if set by the listener.
      *
      * @return Response|null
      */
@@ -306,7 +307,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Get the request
+     * Get the request.
      *
      * @return Request
      */
@@ -316,7 +317,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Check if this is a form login authentication request or pre-auth
+     * Check if this is a form login authentication request or pre-auth.
      *
      * @return bool
      */
@@ -326,7 +327,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * Check if the event is executed as the result of accessing mautic_sso_login_check
+     * Check if the event is executed as the result of accessing mautic_sso_login_check.
      *
      * @return bool
      */

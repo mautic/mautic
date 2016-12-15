@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,9 +17,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class NotificationListType
- *
- * @package Mautic\NotificationBundle\Form\Type
+ * Class NotificationListType.
  */
 class NotificationListType extends AbstractType
 {
@@ -44,17 +44,17 @@ class NotificationListType extends AbstractType
         $repo      = $this->repo;
 
         $resolver->setDefaults(
-            array(
-                'choices'     => function (Options $options) use ($repo, $viewOther) {
+            [
+                'choices' => function (Options $options) use ($repo, $viewOther) {
                     static $choices;
 
                     if (is_array($choices)) {
                         return $choices;
                     }
 
-                    $choices = array();
+                    $choices = [];
 
-                    $notifications  = $repo->getNotificationList('', 0, 0, $viewOther, $options['notification_type']);
+                    $notifications = $repo->getNotificationList('', 0, 0, $viewOther);
                     foreach ($notifications as $notification) {
                         $choices[$notification['language']][$notification['id']] = $notification['name'];
                     }
@@ -70,21 +70,22 @@ class NotificationListType extends AbstractType
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.notification.no.notifications.note' : 'mautic.core.form.chooseone';
                 },
-                'notification_type'  => 'template',
-                'disabled'    => function (Options $options) {
-                    return (empty($options['choices']));
+                'notification_type' => 'template',
+                'disabled'          => function (Options $options) {
+                    return empty($options['choices']);
                 },
-            )
+            ]
         );
 
-        $resolver->setOptional(array('notification_type'));
+        $resolver->setOptional(['notification_type']);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "notification_list";
+    public function getName()
+    {
+        return 'notification_list';
     }
 
     /**

@@ -1,8 +1,9 @@
 <?php
-/**
+
+/*
  *	Filemanager PHP connector
  *  This file should at least declare auth() function
- *  and instantiate the Filemanager as '$fm'
+ *  and instantiate the Filemanager as '$fm'.
  *
  *  IMPORTANT : by default Read and Write access is granted to everyone
  *  Copy/paste this file to 'user.config.php' file to implement your own auth() function
@@ -16,9 +17,9 @@
  *	@copyright	Authors
  */
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -33,7 +34,7 @@ try {
     $request   = Request::createFromGlobals();
     $container->enterScope('request');
     $container->set('request', $request, 'request');
-    
+
     // Dispatch REQUEST event to setup authentication
     $httpKernel = $container->get('http_kernel');
     $event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
@@ -49,12 +50,13 @@ try {
 }
 
 /**
- *	Check if user is authorized
+ *	Check if user is authorized.
  *
  *
- *	@return boolean true if access granted, false if no access
+ *	@return bool true if access granted, false if no access
  */
-function auth() {
+function auth()
+{
     global $authenticated;
     // You can insert your own code over here to check if the user is authorized.
     // If you use a session variable, you've got to start the session first (session_start())

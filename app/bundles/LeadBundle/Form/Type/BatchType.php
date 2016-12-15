@@ -1,21 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class BatchType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -25,27 +26,27 @@ class BatchType extends AbstractType
         $builder->add(
             'add',
             'choice',
-            array(
+            [
                 'label'      => 'mautic.lead.batch.add_to',
                 'multiple'   => true,
                 'choices'    => $options['items'],
                 'required'   => false,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
         );
 
         $builder->add(
             'remove',
             'choice',
-            array(
+            [
                 'label'      => 'mautic.lead.batch.remove_from',
                 'multiple'   => true,
                 'choices'    => $options['items'],
                 'required'   => false,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-            )
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
         );
 
         $builder->add(
@@ -56,18 +57,18 @@ class BatchType extends AbstractType
         $builder->add(
             'buttons',
             'form_buttons',
-            array(
+            [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
-                'cancel_attr'    => array(
-                    'data-dismiss' => 'modal'
-                )
-            )
+                'cancel_attr'    => [
+                    'data-dismiss' => 'modal',
+                ],
+            ]
         );
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -77,9 +78,9 @@ class BatchType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(
-            array(
-                'items'
-            )
+            [
+                'items',
+            ]
         );
     }
 
@@ -88,6 +89,6 @@ class BatchType extends AbstractType
      */
     public function getName()
     {
-        return "lead_batch";
+        return 'lead_batch';
     }
 }

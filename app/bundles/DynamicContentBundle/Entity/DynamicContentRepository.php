@@ -1,15 +1,16 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Entity;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -49,17 +50,17 @@ class DynamicContentRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command = $filter->command;
-        $unique = $this->generateRandomParameterName();
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr = false;
+        $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
@@ -70,19 +71,19 @@ class DynamicContentRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
+                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('e.alias', ":$unique");
+                $expr           = $q->expr()->like('e.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
-                $langUnique = $this->generateRandomParameterName();
-                $langValue = $filter->string.'_%';
+                $langUnique      = $this->generateRandomParameterName();
+                $langValue       = $filter->string.'_%';
                 $forceParameters = [
                     $langUnique => $langValue,
-                    $unique => $filter->string,
+                    $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->orX(
                     $q->expr()->eq('e.language', ":$unique"),
@@ -100,7 +101,7 @@ class DynamicContentRepository extends CommonRepository
         } elseif (!$returnParameter) {
             $parameters = [];
         } else {
-            $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
 
@@ -162,12 +163,12 @@ class DynamicContentRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param int    $variantParentId
+     * @param bool   $topLevel
      * @param array  $ignoreIds
      *
      * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $variantParentId = 0, $ignoreIds = [])
+    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -182,10 +183,10 @@ class DynamicContentRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($variantParentId) {
-            $q->andWhere($q->expr()->eq('e.variantParent', ':variant_parent_id'))
-                ->setParameter('variant_parent_id', $variantParentId);
-        } else {
+        if ($topLevel == 'translation') {
+            //only get top level pages
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
@@ -223,13 +224,13 @@ class DynamicContentRepository extends CommonRepository
 
             if (isset($properties['dynamicContent'])) {
                 $dwc = $this->getEntity($properties['dynamicContent']);
-                
+
                 if ($dwc instanceof DynamicContent) {
                     return $dwc;
                 }
             }
         }
-        
+
         return false;
     }
 }

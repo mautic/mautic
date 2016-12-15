@@ -1,25 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadTriggerLogRepository
+ * Class LeadTriggerLogRepository.
  */
 class LeadTriggerLogRepository extends CommonRepository
 {
-
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -33,7 +33,7 @@ class LeadTriggerLogRepository extends CommonRepository
             ->where('pl.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $events  = array();
+        $events = [];
         foreach ($results as $r) {
             $events[] = $r['event_id'];
         }

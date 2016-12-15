@@ -1,26 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class LeadPointLog
- *
- * @package Mautic\PointBundle\Entity
+ * Class LeadPointLog.
  */
 class LeadPointLog
 {
-
     /**
      * @var Point
      **/
@@ -44,7 +42,7 @@ class LeadPointLog
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -69,7 +67,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getDateFired ()
+    public function getDateFired()
     {
         return $this->dateFired;
     }
@@ -77,7 +75,7 @@ class LeadPointLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired ($dateFired)
+    public function setDateFired($dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -85,7 +83,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -93,7 +91,7 @@ class LeadPointLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress ($ipAddress)
+    public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -101,7 +99,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -109,7 +107,7 @@ class LeadPointLog
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -117,7 +115,7 @@ class LeadPointLog
     /**
      * @return mixed
      */
-    public function getPoint ()
+    public function getPoint()
     {
         return $this->point;
     }
@@ -125,7 +123,7 @@ class LeadPointLog
     /**
      * @param mixed $point
      */
-    public function setPoint ($point)
+    public function setPoint($point)
     {
         $this->point = $point;
     }

@@ -1,19 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Helper;
 
+use Mautic\EmailBundle\Entity\Email;
+
 class AbTestHelper
 {
-
     /**
-     * Determines the winner of A/B test based on open rate
+     * Determines the winner of A/B test based on open rate.
      *
      * @param $factory
      * @param $parent
@@ -21,61 +24,56 @@ class AbTestHelper
      *
      * @return array
      */
-    public static function determineOpenRateWinner ($factory, $parent, $children)
+    public static function determineOpenRateWinner($factory, $parent, $children)
     {
         /** @var \Mautic\EmailBundle\Entity\StatRepository $repo */
         $repo = $factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
-
-        $ids = array($parent->getId());
-
-        foreach ($children as $c) {
-            if ($c->isPublished()) {
-                $ids[] = $c->getId();
-            }
-        }
-
+        /** @var Email $parent */
+        $ids       = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
+
         if ($startDate != null && !empty($ids)) {
             //get their bounce rates
             $counts = $repo->getOpenedRates($ids, $startDate);
 
             $translator = $factory->getTranslator();
             if ($counts) {
-                $rates      = $support = $data = array();
-                $hasResults = array();
+                $rates      = $support      = $data      = [];
+                $hasResults = [];
 
                 $parentId = $parent->getId();
                 foreach ($counts as $id => $stats) {
-                    $name                                                              = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
-                    $support['labels'][]                                               = $name . ' (' . $stats['readRate'] . '%)';
-                    $rates[$id]                                                        = $stats['readRate'];
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]    = $stats['readCount'];
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]      = $stats['totalCount'];
-                    $hasResults[]                                                      = $id;
+                    $name = ($parentId === $id) ? $parent->getName()
+                        : $children[$id]->getName();
+                    $support['labels'][]                                            = $name.' ('.$stats['readRate'].'%)';
+                    $rates[$id]                                                     = $stats['readRate'];
+                    $data[$translator->trans('mautic.email.abtest.label.opened')][] = $stats['readCount'];
+                    $data[$translator->trans('mautic.email.abtest.label.sent')][]   = $stats['totalCount'];
+                    $hasResults[]                                                   = $id;
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {
                     //make sure that parent and published children are included
-                    $support['labels'][] = $parent->getName() . ' (0%)';
+                    $support['labels'][] = $parent->getName().' (0%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]    = 0;
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]      = 0;
+                    $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
+                    $data[$translator->trans('mautic.email.abtest.label.sent')][]   = 0;
                 }
 
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
                             //make sure that parent and published children are included
-                            $support['labels'][]                                               = $c->getName() . ' (0%)';
-                            $data[$translator->trans('mautic.email.abtest.label.opened')][]    = 0;
-                            $data[$translator->trans('mautic.email.abtest.label.sent')][]      = 0;
+                            $support['labels'][]                                            = $c->getName().' (0%)';
+                            $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
+                            $data[$translator->trans('mautic.email.abtest.label.sent')][]   = 0;
                         }
                     }
                 }
                 $support['data'] = $data;
 
                 //set max for scales
-                $maxes = array();
+                $maxes = [];
                 foreach ($support['data'] as $label => $data) {
                     $maxes[] = max($data);
                 }
@@ -89,27 +87,26 @@ class AbTestHelper
                 $max = max($rates);
 
                 //get the page ids with the most number of downloads
-                $winners = ($max > 0) ? array_keys($rates, $max) : array();
+                $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return array(
+                return [
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.openrate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
-                );
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                ];
             }
         }
 
-        return array(
-            'winners' => array(),
-            'support' => array(),
-            'basedOn' => 'email.openrate'
-        );
+        return [
+            'winners' => [],
+            'support' => [],
+            'basedOn' => 'email.openrate',
+        ];
     }
 
-
     /**
-     * Determines the winner of A/B test based on clickthrough rates
+     * Determines the winner of A/B test based on clickthrough rates.
      *
      * @param $factory
      * @param $parent
@@ -117,21 +114,14 @@ class AbTestHelper
      *
      * @return array
      */
-    public static function determineClickthroughRateWinner ($factory, $parent, $children)
+    public static function determineClickthroughRateWinner($factory, $parent, $children)
     {
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
         $pageRepo = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-
         /** @var \Mautic\EmailBundle\Entity\StatRepository $emailRepo */
         $emailRepo = $factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
-
-        $ids = array($parent->getId());
-
-        foreach ($children as $c) {
-            if ($c->isPublished()) {
-                $ids[] = $c->getId();
-            }
-        }
+        /** @var Email $parent */
+        $ids = $parent->getRelatedEntityIds();
 
         $startDate = $parent->getVariantStartDate();
         if ($startDate != null && !empty($ids)) {
@@ -141,8 +131,8 @@ class AbTestHelper
 
             $translator = $factory->getTranslator();
             if ($clickthroughCounts) {
-                $rates      = $support = $data = array();
-                $hasResults = array();
+                $rates      = $support      = $data      = [];
+                $hasResults = [];
 
                 $parentId = $parent->getId();
                 foreach ($clickthroughCounts as $id => $count) {
@@ -153,35 +143,35 @@ class AbTestHelper
                     $rates[$id] = $sentCounts[$id] ? round(($count / $sentCounts[$id]) * 100, 2) : 0;
 
                     $name                = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
-                    $support['labels'][] = $name . ' (' . $rates[$id] . '%)';
+                    $support['labels'][] = $name.' ('.$rates[$id].'%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = $count;
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]              = $sentCounts[$id];
-                    $hasResults[]                                                              = $id;
+                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = $count;
+                    $data[$translator->trans('mautic.email.abtest.label.sent')][]         = $sentCounts[$id];
+                    $hasResults[]                                                         = $id;
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {
                     //make sure that parent and published children are included
-                    $support['labels'][] = $parent->getName() . ' (0%)';
+                    $support['labels'][] = $parent->getName().' (0%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = 0;
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]              = 0;
+                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
+                    $data[$translator->trans('mautic.email.abtest.label.sent')][]         = 0;
                 }
 
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
                             //make sure that parent and published children are included
-                            $support['labels'][]                                                       = $c->getName() . ' (0%)';
-                            $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]      = 0;
-                            $data[$translator->trans('mautic.email.abtest.label.sent')][]              = 0;
+                            $support['labels'][]                                                  = $c->getName().' (0%)';
+                            $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
+                            $data[$translator->trans('mautic.email.abtest.label.sent')][]         = 0;
                         }
                     }
                 }
                 $support['data'] = $data;
 
                 //set max for scales
-                $maxes = array();
+                $maxes = [];
                 foreach ($support['data'] as $label => $data) {
                     $maxes[] = max($data);
                 }
@@ -195,21 +185,21 @@ class AbTestHelper
                 $max = max($rates);
 
                 //get the page ids with the most number of downloads
-                $winners = ($max > 0) ? array_keys($rates, $max) : array();
+                $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return array(
+                return [
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.clickthrough',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
-                );
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                ];
             }
         }
 
-        return array(
-            'winners' => array(),
-            'support' => array(),
-            'basedOn' => 'email.clickthrough'
-        );
+        return [
+            'winners' => [],
+            'support' => [],
+            'basedOn' => 'email.clickthrough',
+        ];
     }
 }

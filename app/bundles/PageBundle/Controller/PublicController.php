@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,44 +13,49 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Model\VideoModel;
+use Mautic\PageBundle\PageEvents;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PublicController
+ * Class PublicController.
  */
 class PublicController extends CommonFormController
 {
-
     /**
      * @param         $slug
      * @param Request $request
      *
      * @return Response
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     public function indexAction($slug, Request $request)
     {
-        //find the page
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model    = $this->getModel('page.page');
-        $security = $this->factory->getSecurity();
-        $entity   = $model->getEntityBySlugs($slug);
+        $model    = $this->getModel('page');
+        $security = $this->get('mautic.security');
+        /** @var Page $entity */
+        $entity = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
-            $published = $entity->isPublished();
+            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+            $published  = $entity->isPublished();
 
-            //make sure the page is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
-                //If the page has a redirect type, handle it
+            // Make sure the page is published or deny access if not
+            if (!$published && !$userAccess) {
+                // If the page has a redirect type, handle it
                 if ($entity->getRedirectType() != null) {
+                    $model->hitPage($entity, $this->request, $entity->getRedirectType());
+
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
                 } else {
                     $model->hitPage($entity, $this->request, 401);
@@ -57,54 +64,73 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if ($request->attributes->has('ignore_mismatch')) {
-                //make sure URLs match up
+            $lead  = null;
+            $query = null;
+            if (!$userAccess) {
+                /** @var LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+                // Extract the lead from the request so it can be used to determine language if applicable
+                $query = $model->getHitQuery($this->request, $entity);
+                $lead  = $leadModel->getContactFromRequest($query);
+            }
+
+            // Correct the URL if it doesn't match up
+            if (!$request->attributes->get('ignore_mismatch', 0)) {
+                // Make sure URLs match up
                 $url        = $model->generateUrl($entity, false);
                 $requestUri = $this->request->getRequestUri();
 
-                //remove query
+                // Remove query when comparing
                 $query = $this->request->getQueryString();
                 if (!empty($query)) {
                     $requestUri = str_replace("?{$query}", '', $url);
                 }
 
-                //redirect if they don't match
+                // Redirect if they don't match
                 if ($requestUri != $url) {
-                    $model->hitPage($entity, $this->request, 301);
+                    $model->hitPage($entity, $this->request, 301, $lead, $query);
 
                     return $this->redirect($url, 301);
                 }
             }
 
-            //check for variants
-            $parentVariant   = $entity->getVariantParent();
-            $childrenVariant = $entity->getVariantChildren();
+            // Check for variants
+            list($parentVariant, $childrenVariants) = $entity->getVariants();
 
-            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
-
-            //is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
-            if ($parentVariant && !$userAccess) {
-                $model->hitPage($entity, $this->request, 301);
+            // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
+            if ($parentVariant != $entity && !$userAccess) {
+                $model->hitPage($entity, $this->request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
                 return $this->redirect($url, 301);
             }
 
+            // First determine the A/B test to display if applicable
             if (!$userAccess) {
-                //check to see if a variant should be shown versus the parent but ignore if a user is previewing
-                if (count($childrenVariant)) {
-
+                // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
+                if (count($childrenVariants)) {
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
-                    foreach ($childrenVariant as $id => $child) {
+
+                    foreach ($childrenVariants as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
                             $variants[$id]   = [
                                 'weight' => ($variantSettings['weight'] / 100),
-                                'hits'   => $child->getVariantHits()
+                                'hits'   => $child->getVariantHits(),
                             ];
                             $variantWeight += $variantSettings['weight'];
+
+                            // Count translations for this variant as well
+                            $translations = $child->getTranslations(true);
+                            /** @var Page $translation */
+                            foreach ($translations as $translation) {
+                                if ($translation->isPublished()) {
+                                    $variants[$id]['hits'] += (int) $translation->getVariantHits();
+                                }
+                            }
+
                             $totalHits += $variants[$id]['hits'];
                         }
                     }
@@ -117,132 +143,89 @@ class PublicController extends CommonFormController
                             if (isset($variants[$variantCookie])) {
                                 //if not the parent, show the specific variant already displayed to the visitor
                                 if ($variantCookie !== $entity->getId()) {
-                                    $entity = $childrenVariant[$variantCookie];
+                                    $entity = $childrenVariants[$variantCookie];
                                 } //otherwise proceed with displaying parent
                             }
                         } else {
-                            //add parent weight
+                            // Add parent weight
                             $variants[$entity->getId()] = [
                                 'weight' => ((100 - $variantWeight) / 100),
-                                'hits'   => $entity->getVariantHits()
+                                'hits'   => $entity->getVariantHits(),
                             ];
 
-                            //determine variant to show
-                            $byWeight = [];
-                            foreach ($variants as $id => $v) {
-                                $byWeight[$id] = ($totalHits) ? ($v['hits'] / $totalHits) - $v['weight'] : 0;
+                            // Count translations for the parent as well
+                            $translations = $entity->getTranslations(true);
+                            /** @var Page $translation */
+                            foreach ($translations as $translation) {
+                                if ($translation->isPublished()) {
+                                    $variants[$entity->getId()]['hits'] += (int) $translation->getVariantHits();
+                                }
                             }
+                            $totalHits += $variants[$id]['hits'];
+
+                            //determine variant to show
+                            foreach ($variants as $id => &$variant) {
+                                $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
+                            }
+
+                            // Reorder according to send_weight so that campaigns which currently send one at a time alternate
+                            uasort(
+                                $variants,
+                                function ($a, $b) {
+                                    if ($a['weight_deficit'] === $b['weight_deficit']) {
+                                        if ($a['hits'] === $b['hits']) {
+                                            return 0;
+                                        }
+
+                                        // if weight is the same - sort by least number displayed
+                                        return ($a['hits'] < $b['hits']) ? -1 : 1;
+                                    }
+
+                                    // sort by the one with the greatest deficit first
+                                    return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
+                                }
+                            );
 
                             //find the one with the most difference from weight
-                            $greatestDiff = min($byWeight);
-                            $useId        = array_search($greatestDiff, $byWeight);
+
+                            reset($variants);
+                            $useId = key($variants);
 
                             //set the cookie - 14 days
-                            $this->factory->getHelper('cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
+                            $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
 
                             if ($useId != $entity->getId()) {
-                                $entity = $childrenVariant[$useId];
+                                $entity = $childrenVariants[$useId];
                             }
                         }
                     }
                 }
-            }
-            //let's check for preferred languages if we have a multi-language group of pages
-            $translationParent   = $entity->getTranslationParent();
-            $translationChildren = $entity->getTranslationChildren();
-            if ($translationParent || count($translationChildren)) {
-                $session = $this->factory->getSession();
-                if ($translationParent) {
-                    $translationChildren = $translationParent->getTranslationChildren();
-                } else {
-                    $translationParent = $entity;
-                }
 
-                //check to see if this group has already been redirected
-                $doNotRedirect = $session->get('mautic.page.'.$translationParent->getId().'.donotredirect', false);
+                // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
+                if ($entity->isTranslation() && empty($entity->languageSlug)) {
+                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
 
-                if (empty($doNotRedirect)) {
-                    $session->set('mautic.page.'.$translationParent->getId().'.donotredirect', 1);
+                    if ($translationParent && $translatedEntity !== $entity) {
+                        if (!$this->request->get('ntrd', 0)) {
+                            $url = $model->generateUrl($translatedEntity, false);
+                            $model->hitPage($entity, $this->request, 302, $lead, $query);
 
-                    //generate a list of translations
-                    $langs = [$translationParent->getLanguage()];
-                    foreach ($translationChildren as $c) {
-                        $langs[$c->getId()] = $c->getLanguage();
-                    }
-
-                    //loop through the translations to ensure there is a generic option for each
-                    //dialect (i.e en if en_US is present)
-                    $pageLangs = [];
-                    $pageIds   = [];
-                    foreach ($langs as $id => $l) {
-                        $pageIds[]   = $id;
-                        $pageLangs[] = $l;
-                        if (strpos($l, '_') !== false) {
-                            $base = substr($l, 0, 2);
-                            if (!in_array($base, $pageLangs)) {
-                                $pageLangs[] = $base;
-                                $pageIds[]   = $id;
-                            }
-                        }
-                    }
-
-                    //get the browser preferred languages
-                    $browserLangs = $this->request->server->get('HTTP_ACCEPT_LANGUAGE');
-                    if (!empty($browserLangs)) {
-                        $langs = explode(',', $browserLangs);
-                        if (!empty($langs)) {
-                            foreach ($langs as $k => $l) {
-                                if ($pos = strpos($l, ';q=') !== false) {
-                                    //remove weights
-                                    $l = substr($l, 0, ($pos + 1));
-                                }
-                                //change - to _
-                                $langs[$k] = str_replace('-', '_', $l);
-                            }
-                        }
-
-                        //loop through the browser languages to ensure there is a generic option for each
-                        //dialect (i.e en if en_US is present)
-                        $userLangs = [];
-                        foreach ($langs as $k => $l) {
-                            $userLangs[] = $l;
-
-                            if (strpos($l, '_') !== false) {
-                                $base = substr($l, 0, 2);
-                                if (!in_array($base, $langs) && !in_array($base, $userLangs)) {
-                                    $userLangs[] = $base;
-                                }
-                            }
-                        }
-
-                        //get translations in order of browser preference
-                        $matches = array_intersect($userLangs, $pageLangs);
-                        if (!empty($matches)) {
-                            $preferred = reset($matches);
-                            $key       = array_search($preferred, $pageLangs);
-                            $pageId    = $pageIds[$key];
-
-                            //redirect if not already on the correct page
-                            if ($pageId && $pageId != $entity->getId()) {
-                                $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
-                                if ($page !== null) {
-                                    $url = $model->generateUrl($page, false);
-                                    $model->hitPage($entity, $this->request, 302);
-
-                                    return $this->redirect($url, 302);
-                                }
-                            }
+                            return $this->redirect($url, 302);
                         }
                     }
                 }
             }
 
-            $analytics = $this->factory->getHelper('template.analytics')->getCode();
+            // Generate contents
+            $analytics = $this->get('mautic.helper.template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
-            $content = $entity->getCustomHtml();
+            $content   = $entity->getCustomHtml();
             // This condition remains so the Mautic v1 themes would display the content
             if (empty($content) && !empty($BCcontent)) {
+                /**
+                 * @deprecated  BC support to be removed in 3.0
+                 */
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
@@ -264,7 +247,7 @@ class PublicController extends CommonFormController
                         'content'  => $content,
                         'page'     => $entity,
                         'template' => $template,
-                        'public'   => true
+                        'public'   => true,
                     ]
                 );
 
@@ -275,24 +258,32 @@ class PublicController extends CommonFormController
                 }
             }
 
+            $this->get('templating.helper.assets')->addScript(
+                $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                'onPageDisplay_headClose',
+                true,
+                'mautic_js'
+            );
+
             $event = new PageDisplayEvent($content, $entity);
-            $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $this->request, 200);
+            $model->hitPage($entity, $this->request, 200, $lead, $query);
 
             return new Response($content);
         }
 
         $model->hitPage($entity, $this->request, 404);
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
      * @param $id
      *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
@@ -301,14 +292,14 @@ class PublicController extends CommonFormController
         $model  = $this->getModel('page');
         $entity = $model->getEntity($id);
 
-        if ($entity === null || !$entity->isPublished(false)) {
-            $this->notFound();
+        if ($entity === null) {
+            return $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
         $BCcontent = $entity->getContent();
-        $content = $entity->getCustomHtml();
+        $content   = $entity->getCustomHtml();
         if (empty($content) && !empty($BCcontent)) {
             $template = $entity->getTemplate();
             //all the checks pass so display the content
@@ -331,7 +322,7 @@ class PublicController extends CommonFormController
                     'content'  => $content,
                     'page'     => $entity,
                     'template' => $template,
-                    'public'   => true // @deprecated Remove in 2.0
+                    'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
 
@@ -369,6 +360,7 @@ class PublicController extends CommonFormController
      * @param $redirectId
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function redirectAction($redirectId)
@@ -378,7 +370,7 @@ class PublicController extends CommonFormController
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
         if (empty($redirect) || !$redirect->isPublished(false)) {
-            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 
         $this->getModel('page')->hitPage($redirect, $this->request);
@@ -413,6 +405,8 @@ class PublicController extends CommonFormController
     /**
      * PreProcess page slots for public view.
      *
+     * @deprecated - to be removed in 3.0
+     *
      * @param array $slots
      * @param Page  $entity
      */
@@ -445,7 +439,7 @@ class PublicController extends CommonFormController
                         'interval'         => 5000,
                         'pause'            => 'hover',
                         'wrap'             => true,
-                        'keyboard'         => true
+                        'keyboard'         => true,
                     ];
                 }
 
@@ -455,13 +449,13 @@ class PublicController extends CommonFormController
                         [
                             'order'            => 0,
                             'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1'
+                            'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
                             'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2'
-                        ]
+                            'captionheader'    => 'Caption 2',
+                        ],
                     ];
                 }
 
@@ -479,11 +473,11 @@ class PublicController extends CommonFormController
                 $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
-                $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
+                $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
             } else {
                 // Fallback for other types like html, text, textarea and all unknown
-                $value = isset($content[$slot]) ? $content[$slot] : "";
+                $value = isset($content[$slot]) ? $content[$slot] : '';
                 $slotsHelper->set($slot, $value);
             }
         }
@@ -491,5 +485,42 @@ class PublicController extends CommonFormController
         $parentVariant = $entity->getVariantParent();
         $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
         $slotsHelper->set('pageTitle', $title);
+    }
+
+    /**
+     * Track video views.
+     */
+    public function hitVideoAction()
+    {
+        // Only track XMLHttpRequests, because the hit should only come from there
+        if ($this->request->isXmlHttpRequest()) {
+            /** @var VideoModel $model */
+            $model = $this->getModel('page.video');
+
+            try {
+                $model->hitVideo($this->request);
+            } catch (\Exception $e) {
+                return new JsonResponse(['success' => false]);
+            }
+
+            return new JsonResponse(['success' => true]);
+        }
+
+        return new Response();
+    }
+
+    /**
+     * Get the ID of the currently tracked Contact.
+     *
+     * @return JsonResponse
+     */
+    public function getContactIdAction()
+    {
+        $data = [];
+        if ($this->get('mautic.security')->isAnonymous()) {
+            $data = ['id' => $this->getModel('lead')->getCurrentLead()->getId()];
+        }
+
+        return new JsonResponse($data);
     }
 }

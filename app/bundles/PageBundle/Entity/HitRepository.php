@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,15 +14,17 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class HitRepository
+ * Class HitRepository.
  */
 class HitRepository extends CommonRepository
 {
+    use TimelineTrait;
 
     /**
-     * Determine if the page hit is a unique
+     * Determine if the page hit is a unique.
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
@@ -60,35 +64,33 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's page hits
+     * Get a lead's page hits.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $options = array())
+    public function getLeadHits($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page) AS page_id, h.userAgent, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query')
-            ->where('h.lead = ' . (int) $leadId);
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('h.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        $query->select('h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->where('h.lead_id = '.(int) $leadId);
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%'.$options['search'].'%')));
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-            $query->leftJoin('h.page', 'p')
-                ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
-        }
+        $query->leftjoin('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id');
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft']);
     }
 
     /**
@@ -101,7 +103,7 @@ class HitRepository extends CommonRepository
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
     {
         $query = $this->createQueryBuilder('h');
-        $query->select("count(distinct(h.trackingId)) as \"hitCount\"");
+        $query->select('count(distinct(h.trackingId)) as "hitCount"');
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
         if ($sourceId != null) {
@@ -124,7 +126,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get an array of hits via an email clickthrough
+     * Get an array of hits via an email clickthrough.
      *
      * @param           $emailIds
      * @param \DateTime $fromDate
@@ -137,7 +139,7 @@ class HitRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         if (!is_array($emailIds)) {
-            $emailIds = array($emailIds);
+            $emailIds = [$emailIds];
         }
 
         $q->select('count(distinct(h.tracking_id)) as hit_count, h.email_id')
@@ -153,9 +155,9 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $results = $q->execute()->fetchAll();;
+        $results = $q->execute()->fetchAll();
 
-        $hits = array();
+        $hits = [];
         foreach ($results as $r) {
             $hits[$r['email_id']] = $r['hit_count'];
         }
@@ -164,7 +166,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count returning IP addresses
+     * Count returning IP addresses.
      *
      * @return int
      */
@@ -180,7 +182,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count email clickthrough
+     * Count email clickthrough.
      *
      * @return int
      */
@@ -194,7 +196,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count how many visitors hit some page in last X $seconds
+     * Count how many visitors hit some page in last X $seconds.
      *
      * @param int  $seconds
      * @param bool $notLeft
@@ -203,7 +205,7 @@ class HitRepository extends CommonRepository
      */
     public function countVisitors($seconds = 60, $notLeft = false)
     {
-        $now = new \DateTime();
+        $now         = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
         $now->sub($viewingTime);
         $query = $this->createQueryBuilder('h');
@@ -229,7 +231,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the latest hit
+     * Get the latest hit.
      *
      * @param array $options
      *
@@ -238,7 +240,7 @@ class HitRepository extends CommonRepository
     public function getLatestHit($options)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('MAX(h.date_hit) latest_hit')
+        $sq->select('h.date_hit latest_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
         if (isset($options['leadId'])) {
@@ -246,141 +248,123 @@ class HitRepository extends CommonRepository
                 $sq->expr()->eq('h.lead_id', $options['leadId'])
             );
         }
-
         if (isset($options['urls']) && $options['urls']) {
-            $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
+            $inUrls = (!is_array($options['urls'])) ? [$options['urls']] : $options['urls'];
             foreach ($inUrls as $k => $u) {
                 $sq->andWhere($sq->expr()->like('h.url', ':url_'.$k))
                     ->setParameter('url_'.$k, $u);
             }
         }
-
+        if (isset($options['second_to_last'])) {
+            $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
+        } else {
+            $sq->orderBy('h.date_hit', 'DESC limit 1');
+        }
         $result = $sq->execute()->fetch();
 
-        return new \DateTime($result['latest_hit']);
+        return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
 
     /**
-     * Get the number of bounces
+     * Get the number of bounces.
      *
      * @param array|string $pageIds
      * @param \DateTime    $fromDate
+     * @param bool         $isVariantCheck
      *
      * @return array
      */
-    public function getBounces($pageIds, \DateTime $fromDate = null)
+    public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false)
     {
-        $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
+        $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
-        // Get the total number of hits
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('p.id, p.unique_hits')
+        $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
+        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->in('p.id', $inIds));
-        $results = $q->execute()->fetchAll();
+            ->where($q->expr()->$inOrEq('p.id', $pageIds))
+            ->execute()
+            ->fetchAll();
 
-        $return  = array();
-        foreach ($results as $p) {
-            $return[$p['id']] = array(
-                'totalHits' => $p['unique_hits'],
+        $return = [];
+        foreach ($pages as $p) {
+            $return[$p['id']] = [
+                'totalHits' => (int) $p['totalHits'],
                 'bounces'   => 0,
-                'rate'      => 0
-            );
+                'rate'      => 0,
+                'title'     => $p['title'],
+            ];
         }
 
-        // Find what sessions were bounces
-        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('b.tracking_id')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
-            ->leftJoin('b', MAUTIC_TABLE_PREFIX.'pages', 'p', 'b.page_id = p.id')
-            ->andWhere($sq->expr()->eq('b.code', '200'));
+        // Get the total number of bounces - simplified query for if date_left is null, it'll more than likely be a bounce or
+        // else we would have recorded the date_left on a subsequent page hit
+        $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $expr = $q->expr()->andX(
+            $q->expr()->$inOrEq('h.page_id', $pageIds),
+            $q->expr()->eq('h.code', 200),
+            $q->expr()->isNull('h.date_left')
+        );
 
         if ($fromDate !== null) {
             //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
-            $sq->andWhere(
-                $sq->expr()->gte('b.date_hit', $sq->expr()->literal($dt->toUtcString()))
+            $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
+            $expr->add(
+                $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
 
-        // Group by tracking ID to determine if the same session visited multiple pages
-        $sq->groupBy('b.tracking_id');
-
-        // Include if a single hit to page or multiple hits to the same page
-        $sq->having('count(distinct(b.page_id)) = 1');
-
-        // Load this data into a temporary table
-        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-        $tempTableName = $platform->getTemporaryTableName('tmp_0');
-        $sql = $platform->getCreateTemporaryTableSnippetSQL().' '.$tempTableName.' AS ('.$sq->getSQL().');';
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
-
-        // Now group bounced sessions by page_id to get the number of bounces per page
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
+        $q->select('count(*) as bounces, h.page_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->innerJoin(
-                'h',
-                $tempTableName,
-                't',
-                $q->expr()->andx(
-                    $q->expr()->eq('h.tracking_id', 't.tracking_id'),
-                    $q->expr()->in('h.page_id', $inIds)
-                )
-            )
+            ->where($expr)
             ->groupBy('h.page_id');
 
         $results = $q->execute()->fetchAll();
 
-        // Drop the temporary table now
-        $stmt = $this->getEntityManager()->getConnection()->prepare($platform->getDropTemporaryTableSQL($tempTableName));
-        $stmt->execute();
-
-        foreach ($results as $r) {
-            $return[$r['page_id']]['bounces'] = (int) $r['bounces'];
-            $return[$r['page_id']]['rate']    = ($return[$r['page_id']]['totalHits']) ?
-                round(($r['bounces'] / $return[$r['page_id']]['totalHits']) * 100, 2) :
-                0;
+        foreach ($results as $p) {
+            $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
+            $return[$p['page_id']]['rate']    = ($return[$p['page_id']]['totalHits']) ? round(
+                ($p['bounces'] / $return[$p['page_id']]['totalHits']) * 100,
+                2
+            ) : 0;
         }
 
         return (!is_array($pageIds)) ? $return[$pageIds] : $return;
     }
 
     /**
-     * Get array of dwell time labels with ranges
+     * Get array of dwell time labels with ranges.
      *
      * @return array
      */
     public function getDwellTimeLabels()
     {
-        return array(
-            array(
+        return [
+            [
                 'label' => '< 1m',
-                'from' => 0,
-                'till' => 60
-            ),
-            array(
+                'from'  => 0,
+                'till'  => 60,
+            ],
+            [
                 'label' => '1 - 5m',
-                'from' => 60,
-                'till' => 300
-            ),
-            array(
+                'from'  => 60,
+                'till'  => 300,
+            ],
+            [
                 'label' => '5 - 10m',
                 'value' => 0,
-                'from' => 300,
-                'till' => 600
-            ),
-            array(
+                'from'  => 300,
+                'till'  => 600,
+            ],
+            [
                 'label' => '> 10m',
-                'from' => 600,
-                'till' => 999999
-            )
-        );
+                'from'  => 600,
+                'till'  => 999999,
+            ],
+        ];
     }
 
     /**
-     * Get the dwell times for bunch of pages
+     * Get the dwell times for bunch of pages.
      *
      * @param array $pageIds
      * @param array $options
@@ -390,8 +374,8 @@ class HitRepository extends CommonRepository
     public function getDwellTimesForPages(array $pageIds, array $options)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
-            ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id')
+        $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.page_id, ph.date_hit, ph.date_left, p.title')
             ->orderBy('ph.date_hit', 'ASC')
             ->andWhere(
@@ -411,22 +395,22 @@ class HitRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         //loop to structure
-        $times = array();
-        $titles = array();
+        $times  = [];
+        $titles = [];
 
         foreach ($results as $r) {
             $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
             $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
 
-            $titles[$r['page_id']] = $r['title'];
+            $titles[$r['page_id']]  = $r['title'];
             $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
         }
 
         //now loop to create stats
-        $stats = array();
+        $stats = [];
 
         foreach ($times as $pid => $time) {
-            $stats[$pid] = $this->countStats($time);
+            $stats[$pid]          = $this->countStats($time);
             $stats[$pid]['title'] = $titles[$pid];
         }
 
@@ -434,7 +418,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the dwell times for bunch of URLs
+     * Get the dwell times for bunch of URLs.
      *
      * @param string $url
      * @param array  $options
@@ -444,8 +428,8 @@ class HitRepository extends CommonRepository
     public function getDwellTimesForUrl($url, array $options)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
-            ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id')
+        $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title')
             ->orderBy('ph.date_hit', 'ASC')
             ->andWhere($q->expr()->like('ph.url', ':url'))
@@ -459,7 +443,7 @@ class HitRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $times = array();
+        $times = [];
 
         foreach ($results as $r) {
             $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
@@ -471,7 +455,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count stats from hit times
+     * Count stats from hit times.
      *
      * @param array $times
      *
@@ -479,39 +463,40 @@ class HitRepository extends CommonRepository
      */
     public function countStats($times)
     {
-        return array(
+        return [
             'sum'     => array_sum($times),
             'min'     => count($times) ? min($times) : 0,
             'max'     => count($times) ? max($times) : 0,
             'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
-            'count'   => count($times)
-        );
+            'count'   => count($times),
+        ];
     }
 
     /**
-     * Update a hit with the the time the user left
+     * Update a hit with the the time the user left.
      *
      * @param int $lastHitId
      */
     public function updateHitDateLeft($lastHitId)
     {
         $dt = new DateTimeHelper();
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('date_left', ':datetime')
-            ->where('id = ' . (int) $lastHitId)
+            ->where('id = '.(int) $lastHitId)
             ->setParameter('datetime', $dt->toUtcString());
         $q->execute();
     }
 
     /**
-     * Get list of referers ordered by it's count
+     * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int                               $limit
      * @param int                               $offset
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -527,7 +512,7 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get list of referers ordered by it's count
+     * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int                               $limit
@@ -536,17 +521,18 @@ class HitRepository extends CommonRepository
      * @param string                            $as
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = '')
     {
         if ($as) {
-            $as = ' as "' . $as . '"';
+            $as = ' as "'.$as.'"';
         }
 
-        $query->select('p.title, p.id, ' . $column . $as)
-            ->groupBy('p.id, p.title, ' . $column)
+        $query->select('p.title, p.id, '.$column.$as)
+            ->groupBy('p.id, p.title, '.$column)
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -562,21 +548,21 @@ class HitRepository extends CommonRepository
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'page_hits')
+        $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $leadId)
             ->set('tracking_id', ':newTrackingId')
             ->where(
                 $q->expr()->eq('tracking_id', ':oldTrackingId')
             )
-            ->setParameters(array(
+            ->setParameters([
                 'newTrackingId' => $newTrackingId,
-                'oldTrackingId' => $oldTrackingId
-            ))
+                'oldTrackingId' => $oldTrackingId,
+            ])
             ->execute();
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -584,9 +570,9 @@ class HitRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'page_hits')
+        $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = ' . (int) $fromLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 }

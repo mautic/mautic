@@ -1,69 +1,70 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * Check Step.
  */
 class CheckStep implements StepInterface
 {
-
     /**
-     * Flag if the configuration file is writable
+     * Flag if the configuration file is writable.
      *
      * @var bool
      */
     private $configIsWritable;
 
     /**
-     * Path to the kernel root
+     * Path to the kernel root.
      *
      * @var string
      */
     private $kernelRoot;
 
     /**
-     * Absolute path to cache directory
+     * Absolute path to cache directory.
      *
      * @var string
      */
     public $cache_path = '%kernel.root_dir%/cache';
 
     /**
-     * Absolute path to log directory
+     * Absolute path to log directory.
      *
      * @var string
      */
-    public $log_path   = '%kernel.root_dir%/logs';
+    public $log_path = '%kernel.root_dir%/logs';
 
     /**
-     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
      *
      * @var string
      */
     public $site_url;
 
     /**
-     * Set the name of the source that installed Mautic
+     * Set the name of the source that installed Mautic.
      *
      * @var string
      */
     public $install_source = 'Mautic';
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Configurator $configurator Configurator service
      * @param string       $kernelRoot   Kernel root path
@@ -91,13 +92,13 @@ class CheckStep implements StepInterface
      */
     public function checkRequirements()
     {
-        $messages = array();
+        $messages = [];
 
         if (version_compare(PHP_VERSION, '5.6.19', '<')) {
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 
-        if (!is_dir(dirname($this->kernelRoot) . '/vendor/composer')) {
+        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 
@@ -105,15 +106,15 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot . '/cache')) {
+        if (!is_writable($this->kernelRoot.'/cache')) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot . '/logs')) {
+        if (!is_writable($this->kernelRoot.'/logs')) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
-        $timezones = array();
+        $timezones = [];
 
         foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
             foreach ($abbreviations as $abbreviation) {
@@ -260,7 +261,7 @@ class CheckStep implements StepInterface
             }
         }
 
-        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $memoryLimit    = $this->toBytes(ini_get('memory_limit'));
         $suggestedLimit = 128 * 1024 * 1024;
 
         if ($memoryLimit < $suggestedLimit) {
@@ -323,11 +324,11 @@ class CheckStep implements StepInterface
      */
     public function update(StepInterface $data)
     {
-        $parameters = array();
+        $parameters = [];
 
         foreach ($data as $key => $value) {
             // Exclude keys from the config
-            if (!in_array($key, array('configIsWritable', 'kernelRoot'))) {
+            if (!in_array($key, ['configIsWritable', 'kernelRoot'])) {
                 $parameters[$key] = $value;
             }
         }
@@ -340,17 +341,18 @@ class CheckStep implements StepInterface
      *
      * @param string $val
      *
-     * @return integer
+     * @return int
      */
-    public function toBytes($val) {
+    public function toBytes($val)
+    {
         $val = trim($val);
 
         if ($val == -1) {
             return PHP_INT_MAX;
         }
 
-        $last = strtolower($val[strlen($val)-1]);
-        switch($last) {
+        $last = strtolower($val[strlen($val) - 1]);
+        switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $val *= 1024;

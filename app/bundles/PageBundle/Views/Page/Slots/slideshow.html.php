@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,11 +16,11 @@ if (isset($slideshow_enabled) && !$slideshow_enabled && $public) {
 
 // define default values
 if (!isset($height) || !$height) {
-	$height = '300px';
+    $height = '300px';
 }
 
 if (!isset($width) || !$width) {
-	$width = '100%';
+    $width = '100%';
 }
 
 if (!isset($background_color) || !$background_color) {
@@ -26,7 +28,7 @@ if (!isset($background_color) || !$background_color) {
 }
 
 if ($background_color != 'transparent') {
-    $background_color = '#' . $background_color;
+    $background_color = '#'.$background_color;
 }
 
 // css declaration for whole slideshow
@@ -52,7 +54,7 @@ $view['assets']->addStyleDeclaration($css);
 <?php if (isset($dot_navigation) && $dot_navigation) : ?>
     <!-- Indicators -->
     <ol class="carousel-indicators">
-    <?php foreach($slides as $key => $slide) : ?>
+    <?php foreach ($slides as $key => $slide) : ?>
         <li data-target="#carousel-generic-<?php echo $slot ?>" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
 	<?php endforeach; ?>
     </ol>
@@ -60,7 +62,7 @@ $view['assets']->addStyleDeclaration($css);
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
-	<?php foreach($slides as $key => $slide) : ?>
+	<?php foreach ($slides as $key => $slide) : ?>
 		<?php
 // css declaration for each slide
 $css = <<<CSS
@@ -71,7 +73,7 @@ $css = <<<CSS
 CSS;
 
 $view['assets']->addStyleDeclaration($css);
-		?>
+        ?>
         <div class="item text-center <?php echo $key == 0 ? 'active' : '' ?> slide-<?php echo $slot ?>-<?php echo $key ?>">
             <?php if (!empty($slide['captionheader']) || !empty($slide['captionheader'])) : ?>
             <div class="carousel-caption">
@@ -158,7 +160,7 @@ $view['assets']->addStyleDeclaration($css);
 			<div class="modal-body">
 				<div class="col-md-3 bg-white height-auto list-of-slides">
 					<ul class="list-group list-group-tabs" data-toggle="sortablelist">
-					<?php foreach($slides as $key => $slide) : ?>
+					<?php foreach ($slides as $key => $slide) : ?>
 		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
 							<a href="#slide-tab-<?php echo $key; ?>" class="steps" data-toggle="tab">
 								Slide <span class="slide-id"><?php echo $key; ?></span>
@@ -178,14 +180,14 @@ $view['assets']->addStyleDeclaration($css);
 					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo $key == 0 ? 'in active' : '' ?>" id="slide-tab-<?php echo $key; ?>">
 						<?php echo $view['form']->start($slide['form']); ?>
 						<div class="row text-right">
-							<?php echo $view['form']->row($slide['form']['slides:' . $key . ':remove']); ?>
+							<?php echo $view['form']->row($slide['form']['slides:'.$key.':remove']); ?>
 						</div>
-						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionheader']); ?>
-						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':captionbody']); ?>
-						<?php echo $view['form']->row($slide['form']['slides:' . $key . ':order']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:'.$key.':captionheader']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:'.$key.':captionbody']); ?>
+						<?php echo $view['form']->row($slide['form']['slides:'.$key.':order']); ?>
 						<div class="row">
 							<div class="col-md-9">
-								<?php echo $view['form']->row($slide['form']['slides:' . $key . ':background-image']); ?>
+								<?php echo $view['form']->row($slide['form']['slides:'.$key.':background-image']); ?>
 							</div>
 							<div class="col-md-3">
 								<button type="button" onclick="SlideshowManager.BrowseServer('slides:<?php echo $key; ?>:background-image');" class="btn button-default file-manager-toggle">

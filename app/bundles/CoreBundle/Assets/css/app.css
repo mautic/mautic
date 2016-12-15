@@ -352,7 +352,7 @@ body > #app-wrapper {
 }
 .app-sidebar {
   position: fixed;
-  z-index: 0;
+  z-index: 990;
   top: 0;
   bottom: 0;
 }
@@ -1628,16 +1628,6 @@ ul.dropdown-menu-form {
   padding: 0 5px 0 30px;
   max-height: 300px;
   overflow-y: auto;
-}
-@media (max-width: 767px) {
-  .table-responsive .dropdown-menu {
-    position: static !important;
-  }
-}
-@media (min-width: 768px) {
-  .table-responsive {
-    overflow: visible;
-  }
 }
 .nav > li > a {
   font-weight: normal;
@@ -4314,11 +4304,56 @@ lesshat-selector { -lh-property: 0 ;
   right: 300px;
   height: 100%;
 }
+.code-mode .builder-panel {
+  width: 50%;
+  position: fixed;
+}
+.code-mode .builder-content {
+  width: 50%;
+}
+.code-mode .btn-close-builder {
+  width: 150px;
+  float: right;
+}
 .builder-panel .panel a.btn {
   white-space: normal;
 }
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
+}
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+.CodeMirror-hints {
+  position: absolute;
+  z-index: 9999 !important;
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  -webkit-box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  border: 1px solid silver;
+  background: white;
+  font-size: 90%;
+  font-family: monospace;
+  max-height: 20em;
+  overflow-y: auto;
+}
+.CodeMirror-hint {
+  margin: 0;
+  padding: 0 4px;
+  border-radius: 2px;
+  white-space: pre;
+  color: black;
+  cursor: pointer;
+}
+li.CodeMirror-hint-active {
+  background: #08f;
+  color: white;
 }
 @media (max-width: 767px) {
   .builder .builder-panel {
@@ -4329,6 +4364,7 @@ lesshat-selector { -lh-property: 0 ;
     padding-left: 30px !important;
     padding-right: 30px !important;
     border-top: 1px solid #757575;
+    position: fixed;
   }
   .builder .builder-content {
     right: 0;
@@ -4547,4 +4583,43 @@ body.noscroll {
 .CodeMirror {
   border: 1px solid #d5d5d5;
   border-radius: 3px;
+}
+table.table > tbody > tr > td.long-text {
+  max-width: 500px;
+  min-width: 300px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.dynamicContentFilterContainer .btn-primary:hover {
+  color: #5d6c7c;
+}
+#dynamicContentContainer .remove-item {
+  display: block;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul {
+  white-space: nowrap;
+  overflow: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul li {
+  display: inline-block;
+  vertical-align: top;
+  float: none;
+}
+div[data-filter-container] .in-group {
+  margin-left: 20px;
+}
+div[data-filter-container] .panel {
+  margin-bottom: 0;
+  margin-top: 20px;
+}
+div[data-filter-container] .panel.in-group {
+  margin-top: 0;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }

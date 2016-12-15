@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +13,7 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TweetType extends AbstractType
 {
@@ -24,61 +26,68 @@ class TweetType extends AbstractType
         $builder->add(
             'tweet_text',
             'textarea',
-            array(
+            [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.text.tooltip',
-                    'class'   => 'form-control'
-                )
-            )
+                    'class'   => 'form-control',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
+            ]
         );
 
         $builder->add(
             'asset_link',
             'asset_list',
-            array(
+            [
                 'label'       => 'mautic.social.monitoring.twitter.assets',
                 'empty_value' => 'mautic.social.monitoring.list.choose',
-                'label_attr'  => array('class' => 'control-label'),
+                'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
-                'attr'        => array(
+                'attr'        => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.social.monitoring.twitter.assets.descr'
-                )
-            )
+                    'tooltip' => 'mautic.social.monitoring.twitter.assets.descr',
+                ],
+            ]
         );
 
         $builder->add(
             'page_link',
             'page_list',
-            array(
+            [
                 'label'       => 'mautic.social.monitoring.twitter.pages',
                 'empty_value' => 'mautic.social.monitoring.list.choose',
-                'label_attr'  => array('class' => 'control-label'),
+                'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
-                'attr'        => array(
+                'attr'        => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.social.monitoring.twitter.pages.descr'
-                )
-            )
+                    'tooltip' => 'mautic.social.monitoring.twitter.pages.descr',
+                ],
+            ]
         );
 
         $builder->add(
             'handle',
             'button',
-            array(
+            [
                 'label' => '@',
-                'attr'  => array(
+                'attr'  => [
                     'class' => 'form-control btn-primary',
-                )
-            )
+                ],
+            ]
         );
     }
 
     public function getName()
     {
-        return "twitter_tweet";
+        return 'twitter_tweet';
     }
 }

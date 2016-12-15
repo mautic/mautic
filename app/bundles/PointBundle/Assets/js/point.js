@@ -110,3 +110,12 @@ Mautic.getPointActionPropertiesForm = function(actionType) {
         }
     });
 };
+Mautic.EnablesOption = function (urlActionProperty) {
+    if (urlActionProperty === 'point_properties_returns_within' && mQuery('#point_properties_returns_within').val() > 0) {
+        mQuery('#point_properties_returns_after').val(0);
+    } else {
+        if (urlActionProperty === 'point_properties_returns_after' && mQuery('#point_properties_returns_after').val() > 0) {
+            mQuery('#point_properties_returns_within').val(0);
+        }
+    }
+};

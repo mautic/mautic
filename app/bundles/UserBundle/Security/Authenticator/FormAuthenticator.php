@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -44,9 +46,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     protected $integrationHelper;
 
     /**
-     * @var null|Request
+     * @var null|RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @param IntegrationHelper            $integrationHelper
@@ -63,7 +65,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         $this->encoder           = $encoder;
         $this->dispatcher        = $dispatcher;
         $this->integrationHelper = $integrationHelper;
-        $this->request           = $requestStack->getCurrentRequest();
+        $this->requestStack      = $requestStack;
     }
 
     /**
@@ -93,7 +95,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
             // Try authenticating with a plugin first
             if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
                 $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_form'], false, null, true);
-                $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
+                $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->requestStack->getCurrentRequest(), false, $authenticatingService, $integrations);
                 $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
@@ -117,7 +119,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         }
 
         if ($authenticated) {
-
             return new PluginToken(
                 $providerKey,
                 $authenticatingService,
@@ -127,7 +128,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $response
             );
         } elseif ($response) {
-
             return new PluginToken(
                 $providerKey,
                 $authenticatingService,
@@ -153,7 +153,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function supportsToken(TokenInterface $token, $providerKey)
     {
-
         return ($token instanceof PluginToken || $token instanceof UsernamePasswordToken) && $token->getProviderKey() === $providerKey;
     }
 
@@ -167,7 +166,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     public function createToken(Request $request, $username, $password, $providerKey)
     {
-
         return new PluginToken(
             $providerKey,
             null,

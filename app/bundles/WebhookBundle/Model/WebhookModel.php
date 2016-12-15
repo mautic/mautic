@@ -1,34 +1,34 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\Model;
 
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
+use Joomla\Http\Http;
+use Joomla\Http\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Joomla\Http\Http;
-use Joomla\Http\Response;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
+use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\WebhookEvents;
-Use Mautic\WebhookBundle\Event\WebhookEvent;
-use Monolog\Logger;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
-use JMS\Serializer\SerializationContext;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class ReportModel
+ * Class ReportModel.
  */
 class WebhookModel extends FormModel
 {
@@ -42,11 +42,6 @@ class WebhookModel extends FormModel
      * @var Serializer
      */
     protected $serializer;
-
-    /**
-     * @var Logger
-     */
-    protected $logger;
 
     /**
      * WebhookModel constructor.
@@ -64,14 +59,6 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @param       $entity
@@ -80,12 +67,13 @@ class WebhookModel extends FormModel
      * @param array $options
      *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $params = [])
     {
         if (!$entity instanceof Webhook) {
-            throw new MethodNotAllowedHttpException (['Webhook']);
+            throw new MethodNotAllowedHttpException(['Webhook']);
         }
 
         if (!empty($action)) {
@@ -120,7 +108,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Gets array of custom events from bundles subscribed MauticWehbhookBundle::WEBHOOK_ON_BUILD
+     * Gets array of custom events from bundles subscribed MauticWehbhookBundle::WEBHOOK_ON_BUILD.
      *
      * @return mixed
      */
@@ -171,7 +159,6 @@ class WebhookModel extends FormModel
             return;
         }
 
-        $queueList   = [];
         $webhookList = [];
 
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
@@ -183,9 +170,6 @@ class WebhookModel extends FormModel
 
             // add the queuelist and save everything
             $this->saveEntity($webhook);
-
-            // reset to empty array
-            $queueList = [];
         }
 
         if ($this->queueMode == 'immediate_process') {
@@ -258,10 +242,13 @@ class WebhookModel extends FormModel
             return;
         }
 
-        /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
+        // Set up custom headers
+        $headers = ['Content-Type' => 'application/json'];
+
+        /* @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
         try {
             /** @var \Joomla\Http\Http $http */
-            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
+            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload), $headers);
             $this->addLog($webhook, $response);
             // throw an error exception if we don't get a 200 back
             if ($response->code != 200) {
@@ -339,7 +326,7 @@ class WebhookModel extends FormModel
         $queuesArray = $this->getWebhookQueues($webhook);
         $payload     = [];
 
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
+        /* @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
 
@@ -387,10 +374,10 @@ class WebhookModel extends FormModel
                         [
                             'column' => 'IDENTITY(e.webhook)',
                             'expr'   => 'eq',
-                            'value'  => $webhook->getId()
-                        ]
-                    ]
-                ]
+                            'value'  => $webhook->getId(),
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -414,16 +401,16 @@ class WebhookModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = WebhookEvents::WEBHOOK_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = WebhookEvents::WEBHOOK_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = WebhookEvents::WEBHOOK_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = WebhookEvents::WEBHOOK_POST_DELETE;
                 break;
             default:
@@ -444,7 +431,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Serialize Data
+     * Serialize Data.
      */
     public function serializeData($payload, $groups = [])
     {

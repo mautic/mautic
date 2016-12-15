@@ -1,17 +1,20 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Helper;
+
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class BundleHelper
+ * Class BundleHelper.
  */
 class BundleHelper
 {
@@ -27,24 +30,25 @@ class BundleHelper
 
     /**
      * BundleHelper constructor.
-     * 
+     *
      * @param CoreParametersHelper $coreParametersHelper
-     * @param Kernel $kernel
+     * @param Kernel               $kernel
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, Kernel $kernel)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->kernel = $kernel;
+        $this->kernel               = $kernel;
     }
 
     /**
      * @param bool $includePlugins
+     *
      * @return mixed
      */
     public function getMauticBundles($includePlugins = true)
     {
         $bundles = $this->coreParametersHelper->getParameter('mautic.bundles');
-        
+
         if ($includePlugins) {
             $plugins = $this->coreParametersHelper->getParameter('mautic.plugin.bundles');
             $bundles = array_merge($bundles, $plugins);
@@ -54,7 +58,7 @@ class BundleHelper
     }
 
     /**
-     * Get's an array of details for enabled Mautic plugins
+     * Get's an array of details for enabled Mautic plugins.
      *
      * @return array
      */
@@ -64,13 +68,14 @@ class BundleHelper
     }
 
     /**
-     * Gets an array of a specific bundle's config settings
+     * Gets an array of a specific bundle's config settings.
      *
      * @param        $bundleName
      * @param string $configKey
      * @param bool   $includePlugins
      *
      * @return mixed
+     *
      * @throws \Exception
      */
     public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)

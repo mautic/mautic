@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,17 +16,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class AssetListType
- *
- * @package Mautic\AssetBundle\Form\Type
+ * Class AssetListType.
  */
 class AssetListType extends AbstractType
 {
-
     /**
      * @var array
      */
-    private $choices = array();
+    private $choices = [];
 
     /**
      * @param MauticFactory $factory
@@ -32,10 +31,10 @@ class AssetListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $viewOther = $factory->getSecurity()->isGranted('asset:assets:viewother');
-        $repo = $factory->getModel('asset')->getRepository();
+        $repo      = $factory->getModel('asset')->getRepository();
         $repo->setCurrentUser($factory->getUser());
         $choices = $repo->getAssetList('', 0, 0, $viewOther);
- 
+
         foreach ($choices as $asset) {
             $this->choices[$asset['language']][$asset['id']] = $asset['title'];
         }
@@ -49,13 +48,13 @@ class AssetListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices'       => $this->choices,
-            'empty_value'   => false,
-            'expanded'      => false,
-            'multiple'      => true,
-            'required'      => false
-        ));
+        $resolver->setDefaults([
+            'choices'     => $this->choices,
+            'empty_value' => false,
+            'expanded'    => false,
+            'multiple'    => true,
+            'required'    => false,
+        ]);
     }
 
     /**
@@ -63,7 +62,7 @@ class AssetListType extends AbstractType
      */
     public function getName()
     {
-        return "asset_list";
+        return 'asset_list';
     }
 
     /**

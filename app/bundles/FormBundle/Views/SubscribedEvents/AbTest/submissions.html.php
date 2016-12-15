@@ -1,15 +1,16 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $support = $results['support'];
-$label = $view['translator']->trans($variants['criteria'][$results['basedOn']]['label']);
-$chart = new \Mautic\CoreBundle\Helper\Chart\BarChart($support['labels']);
+$label   = $view['translator']->trans($variants['criteria'][$results['basedOn']]['label']);
+$chart   = new \Mautic\CoreBundle\Helper\Chart\BarChart($support['labels']);
 
 if ($support['data']) {
     foreach ($support['data'] as $datasetLabel => $values) {
@@ -18,6 +19,7 @@ if ($support['data']) {
 }
 
 ?>
+
 <div class="panel ovf-h bg-auto bg-light-xs abtest-bar-chart">
     <div class="panel-body box-layout">
         <div class="col-xs-8 va-m">
@@ -40,7 +42,7 @@ if ($support['data']) {
     mQuery(document).ready(function() {
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo json_encode($chart->render()); ?>');
+            var barData = mQuery.parseJSON('<?php echo str_replace('\'', '\\\'', json_encode($chart->render())); ?>');
             var barGraph = new Chart(canvas, {type: 'bar', data: barData});
         });
     });

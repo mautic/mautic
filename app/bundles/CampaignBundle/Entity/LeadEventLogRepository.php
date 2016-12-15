@@ -1,107 +1,96 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\UserBundle\Entity\User;
-use Doctrine\ORM\EntityRepository;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * LeadEventLogRepository
+ * LeadEventLogRepository.
  */
-class LeadEventLogRepository extends EntityRepository
+class LeadEventLogRepository extends CommonRepository
 {
-    /**
-     * @var User
-     */
-    protected $currentUser;
+    use TimelineTrait;
 
     /**
-     * Set the current user (i.e. from security context) for use within repositories
+     * Get a lead's page event log.
      *
-     * @param User $user
-     *
-     * @return void
-     */
-    public function setCurrentUser(User $user)
-    {
-        $this->currentUser = $user;
-    }
-
-	/**
-     * Get a lead's page event log
-     *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadLogs($leadId, array $options = array())
+    public function getLeadLogs($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('ll')
-            ->select('IDENTITY(ll.event) AS event_id,
-                    IDENTITY(e.campaign) AS campaign_id,
-                    ll.dateTriggered,
+        $query = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('ll.event_id,
+                    ll.campaign_id,
+                    ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
                     e.type,
-                    ll.isScheduled,
-                    ll.triggerDate
+                    ll.is_scheduled as isScheduled,
+                    ll.trigger_date as triggerDate
                     '
             )
-            ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
-            ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
-            ->where('ll.lead = ' . (int) $leadId)
-            ->andWhere('e.eventType = :eventType')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+            ->where('ll.lead_id = '.(int) $leadId)
+            ->andWhere('e.event_type = :eventType')
+            ->andWhere('ll.metadata NOT LIKE \'%{s:6:"failed";i:1%\'')
             ->setParameter('eventType', 'action');
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('ll.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
-        }
-
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
-                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('e.description', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('c.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('c.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
+                $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
+                $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
+                $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
             ));
         }
 
         if (isset($options['scheduledState'])) {
             $query->andWhere(
-                $query->expr()->eq('ll.isScheduled', ':scheduled')
+                $query->expr()->eq('ll.is_scheduled', ':scheduled')
             )
                 ->setParameter('scheduled', $options['scheduledState'], 'boolean');
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
     }
 
     /**
-     * Get a lead's upcoming events
+     * Get a lead's upcoming events.
      *
      * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getUpcomingEvents(array $options = null)
     {
-        $leadIps = array();
+        $leadIps = [];
 
         $query = $this->_em->getConnection()->createQueryBuilder();
         $today = new DateTimeHelper();
@@ -155,7 +144,7 @@ class LeadEventLogRepository extends EntityRepository
         $query->orderBy('ll.trigger_date');
 
         if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN (' . implode(',', $ipIds) . ')');
+            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
         }
 
         if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
@@ -176,7 +165,8 @@ class LeadEventLogRepository extends EntityRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('o.event_id, count(o.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
+            ->innerJoin('o', MAUTIC_TABLE_PREFIX.'campaign_leads', 'l', 'o.lead_id = l.lead_id and l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0');
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId),
@@ -198,7 +188,7 @@ class LeadEventLogRepository extends EntityRepository
 
         $results = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
 
         //group by event id
         foreach ($results as $l) {
@@ -215,15 +205,15 @@ class LeadEventLogRepository extends EntityRepository
     public function removeScheduledEvents($campaignId, $leadId)
     {
         $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', array(
-            'lead_id'     => (int) $leadId,
-            'campaign_id' => (int) $campaignId,
-            'is_scheduled' => 1
-        ));
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'lead_id'      => (int) $leadId,
+            'campaign_id'  => (int) $campaignId,
+            'is_scheduled' => 1,
+        ]);
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -237,7 +227,7 @@ class LeadEventLogRepository extends EntityRepository
             ->where('cl.lead_id = '.$toLeadId)
             ->execute()
             ->fetchAll();
-        $exists = array();
+        $exists = [];
         foreach ($results as $r) {
             $exists[] = $r['event_id'];
         }

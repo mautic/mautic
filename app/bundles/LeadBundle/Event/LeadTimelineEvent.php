@@ -1,65 +1,130 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class LeadTimelineEvent
+ * Class LeadTimelineEvent.
  */
 class LeadTimelineEvent extends Event
 {
-
     /**
-     * Container with all filtered events
+     * Container with all filtered events.
      *
      * @var array
      */
-    private $events = array();
+    protected $events = [];
 
     /**
-     * Container with all registered events types
+     * Container with all registered events types.
      *
      * @var array
      */
-    private $eventTypes = array();
+    protected $eventTypes = [];
 
     /**
      * Array of filters
      *  search => (string) search term
      *  includeEvents => (array) event types to include
-     *  excludeEvents => (array) event types to exclude
+     *  excludeEvents => (array) event types to exclude.
      *
      * @var array
      */
-    private $filters = array();
+    protected $filters = [];
 
     /**
-     * Lead entity for the lead the timeline is being generated for
+     * @var array|null
+     */
+    protected $orderBy = null;
+
+    /**
+     * Lead entity for the lead the timeline is being generated for.
      *
      * @var Lead
      */
-    private $lead;
+    protected $lead;
 
     /**
-     * Constructor
-     *
-     * @param Lead $lead Lead entity for the lead the timeline is being generated for
-     * @param array $filters  Array of filter string, include filter types and exclude filter types
+     * @var int
      */
-    public function __construct(Lead $lead, array $filters = array())
+    protected $totalEvents = [];
+
+    /**
+     * @var array
+     */
+    protected $totalEventsByUnit = [];
+
+    /**
+     * @var int
+     */
+    protected $page = 1;
+
+    /**
+     * @var int
+     */
+    protected $limit;
+
+    /**
+     * @var bool
+     */
+    protected $countOnly = false;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $dateFrom;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $dateTo;
+
+    /**
+     * Time unit to group counts by (M = month, D = day, Y = year, null = no grouping).
+     *
+     * @var string
+     */
+    protected $groupUnit;
+
+    /**
+     * @var ChartQuery
+     */
+    protected $chartQuery;
+
+    /**
+     * LeadTimelineEvent constructor.
+     *
+     * @param Lead       $lead
+     * @param array      $filters
+     * @param array|null $orderBy
+     * @param int        $page
+     * @param int        $limit   Limit per type
+     */
+    public function __construct(Lead $lead, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
     {
         $this->lead    = $lead;
-        $this->filters = $filters;
+        $this->filters = !empty($filters) ? $filters :
+            [
+                'search'        => '',
+                'includeEvents' => [],
+                'excludeEvents' => [],
+            ];
+        $this->orderBy = $orderBy;
+        $this->page    = $page;
+        $this->limit   = $limit;
     }
 
     /**
@@ -71,87 +136,118 @@ class LeadTimelineEvent extends Event
      * 'extra'     => array     An optional array of extra data for the event
      *
      * @param array $data Data array for the table
-     *
-     * @return void
      */
     public function addEvent(array $data)
     {
-        $this->events[] = $data;
+        if ($this->countOnly) {
+            // BC support for old format
+            if ($this->groupUnit && $this->chartQuery) {
+                $countData = [
+                    [
+                        'date'  => $data['timestamp'],
+                        'count' => 1,
+                    ],
+                ];
+
+                $count = $this->chartQuery->completeTimeData($countData);
+                $this->addToCounter($data['event'], $count);
+            } else {
+                if (!isset($this->totalEvents[$data['event']])) {
+                    $this->totalEvents[$data['event']] = 0;
+                }
+                ++$this->totalEvents[$data['event']];
+            }
+        } else {
+            if (!isset($this->events[$data['event']])) {
+                $this->events[$data['event']] = [];
+            }
+            $this->events[$data['event']][] = $data;
+        }
     }
 
     /**
-     * Fetch the events
+     * Fetch the events.
      *
      * @return array Events sorted by timestamp with most recent event first
      */
-    public function getEvents($returnGrouped = false)
+    public function getEvents()
     {
-        $events = $this->events;
+        if (empty($this->events)) {
+            return [];
+        }
 
-        $byDate = array();
+        $events = call_user_func_array('array_merge', $this->events);
 
-        // Group by date
-        foreach ($events as $e) {
+        foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {
-                $dt = new DateTimeHelper($e['timestamp'], 'Y-m-d H:i:s', 'UTC');
+                $dt             = new DateTimeHelper($e['timestamp'], 'Y-m-d H:i:s', 'UTC');
                 $e['timestamp'] = $dt->getDateTime();
                 unset($dt);
             }
-            $dateString = $e['timestamp']->format('Y-m-d H:i:s');
-            if (!isset($byDate[$dateString])) {
-                $byDate[$dateString] = array();
-            }
-
-            $byDate[$dateString][] = $e;
         }
 
-        // Sort by date
-        krsort($byDate);
-
-        // Sort by certain event actions
-        $order = array(
-            'lead.ipadded',
-            'lead.utmtagsadded',
-            'page.hit',
-            'form.submitted',
-            'asset.download',
-            'lead.merge',
-            'lead.create',
-            'lead.identified'
-        );
-
-        $events = array();
-        foreach ($byDate as $date => $dateEvents) {
+        if (!empty($this->orderBy)) {
             usort(
-                $dateEvents,
-                function ($a, $b) use ($order) {
-                    if (!in_array($a['event'], $order) || !in_array($b['event'], $order)) {
-                        // No specific order so push to the end
+                $events,
+                function ($a, $b) {
+                    switch ($this->orderBy[0]) {
+                        case 'eventLabel':
+                            $aLabel = '';
+                            if (isset($a['eventLabel'])) {
+                                $aLabel = (is_array($a['eventLabel'])) ? $a['eventLabel']['label'] : $a['eventLabel'];
+                            }
 
-                        return 1;
+                            $bLabel = '';
+                            if (isset($b['eventLabel'])) {
+                                $bLabel = (is_array($b['eventLabel'])) ? $b['eventLabel']['label'] : $b['eventLabel'];
+                            }
+
+                            return strnatcmp($aLabel, $bLabel);
+
+                        case 'timestamp':
+                            if ($a['timestamp'] == $b['timestamp']) {
+                                $aPriority = isset($a['eventPriority']) ? (int) $a['eventPriority'] : 0;
+                                $bPriority = isset($b['eventPriority']) ? (int) $b['eventPriority'] : 0;
+
+                                return $aPriority - $bPriority;
+                            }
+
+                            return $a['timestamp'] < $b['timestamp'] ? -1 : 1;
                     }
-
-                    $pos_a = array_search($a['event'], $order);
-                    $pos_b = array_search($b['event'], $order);
-
-                    return $pos_a - $pos_b;
                 }
             );
 
-            $byDate[$date] = $dateEvents;
-            $events = array_merge($events, array_reverse($dateEvents));
+            if ($this->orderBy[1] == 'DESC') {
+                $events = array_reverse($events);
+            }
         }
 
-        return ($returnGrouped) ? $byDate : $events;
+        return $events;
+    }
+
+    /**
+     * Get the max number of pages for pagination.
+     *
+     * @return float|int
+     */
+    public function getMaxPage()
+    {
+        if (!$this->totalEvents) {
+            return 1;
+        }
+
+        // Find the type that has the largest number of total records
+        $largest = max($this->totalEvents);
+
+        // Max page is $largest / $limit
+        return ($largest) ? ceil($largest / $this->limit) : 1;
     }
 
     /**
      * Add an event type to the container.
      *
-     * @param string $eventTypeKey Identifier of the event type
+     * @param string $eventTypeKey  Identifier of the event type
      * @param string $eventTypeName Name of the event type for humans
-     *
-     * @return void
      */
     public function addEventType($eventTypeKey, $eventTypeName)
     {
@@ -159,27 +255,73 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Fetch the event types
+     * Fetch the event types.
      *
      * @return array of available types
      */
     public function getEventTypes()
     {
+        natcasesort($this->eventTypes);
+
         return $this->eventTypes;
     }
 
     /**
-     * Fetch the event filter array
+     * Fetch the filter array for queries.
      *
-     * @return array of wanted filteres. Empty == all.
+     * @return array of wanted filteres. Empty == all
      */
     public function getEventFilters()
     {
-        return $this->filters;
+        return $this->filters['search'];
     }
 
     /**
-     * Fetches the lead being acted on
+     * Fetch the order for queries.
+     *
+     * @return array|null
+     */
+    public function getEventOrder()
+    {
+        return $this->orderBy;
+    }
+
+    /**
+     * Fetch start/limit for queries.
+     *
+     * @return array
+     */
+    public function getEventLimit()
+    {
+        return [
+            'leadId' => $this->lead->getId(),
+            'limit'  => $this->limit,
+            'start'  => (1 === $this->page) ? 0 : ($this->page - 1) * $this->limit,
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getQueryOptions()
+    {
+        return array_merge(
+            [
+                'search'     => $this->filters['search'],
+                'order'      => $this->orderBy,
+                'paginated'  => !$this->countOnly,
+                'unitCounts' => $this->countOnly && $this->groupUnit,
+                'unit'       => $this->groupUnit,
+                'fromDate'   => $this->dateFrom,
+                'toDate'     => $this->dateTo,
+                'chartQuery' => $this->chartQuery,
+            ],
+            $this->getEventLimit()
+        );
+    }
+
+    /**
+     * Fetches the lead being acted on.
      *
      * @return Lead
      */
@@ -189,7 +331,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Determine if an event type should be included
+     * Determine if an event type should be included.
      *
      * @param      $eventType
      * @param bool $inclusive
@@ -211,5 +353,127 @@ class LeadTimelineEvent extends Event
         }
 
         return true;
+    }
+
+    /**
+     * Check if the event is getting an engagement count only.
+     *
+     * @return bool
+     */
+    public function isEngagementCount()
+    {
+        return $this->countOnly;
+    }
+
+    /**
+     * Get the date range to get counts by.
+     *
+     * @return array
+     */
+    public function getCountDateRange()
+    {
+        return ['from' => $this->dateFrom, 'to' => $this->dateTo];
+    }
+
+    /**
+     * Get the unit counts are to be grouped by.
+     *
+     * @return string
+     */
+    public function getCountGroupingUnit()
+    {
+        return $this->groupUnit;
+    }
+
+    /**
+     * Get total number of events for pagination.
+     */
+    public function getEventCounter()
+    {
+        // BC support for old formats
+        foreach ($this->events as $type => $events) {
+            if (!isset($this->totalEvents[$type])) {
+                $this->totalEvents[$type] = count($events);
+            }
+        }
+
+        $counter = [
+            'total' => array_sum($this->totalEvents),
+        ];
+
+        if ($this->countOnly && $this->groupUnit) {
+            $counter['byUnit'] = $this->totalEventsByUnit;
+        }
+
+        return $counter;
+    }
+
+    /**
+     * Add to the event counters.
+     *
+     * @param int|array $count
+     */
+    public function addToCounter($eventType, $count)
+    {
+        if (!isset($this->totalEvents[$eventType])) {
+            $this->totalEvents[$eventType] = 0;
+        }
+
+        if (is_array($count)) {
+            if (isset($count['total'])) {
+                $this->totalEvents[$eventType] += $count['total'];
+            } elseif ($this->isEngagementCount() && $this->groupUnit) {
+                // Group counts across events by unit
+                foreach ($count as $key => $data) {
+                    if (!isset($this->totalEventsByUnit[$key])) {
+                        $this->totalEventsByUnit[$key] = 0;
+                    }
+                    $this->totalEventsByUnit[$key] += (int) $data;
+                    $this->totalEvents[$eventType] += (int) $data;
+                }
+            } else {
+                $this->totalEvents[$eventType] = array_sum($count);
+            }
+        } else {
+            $this->totalEvents[$eventType] += (int) $count;
+        }
+    }
+
+    /**
+     * Subtract from the total counter if there is an event that was skipped for whatever reason.
+     *
+     * @param $eventType
+     * @param $count
+     */
+    public function subtractFromCounter($eventType, $count = 1)
+    {
+        $this->totalEvents[$eventType] -= $count;
+    }
+
+    /**
+     * Calculate engagement counts only.
+     *
+     * @param \DateTime       $dateFrom
+     * @param \DateTime       $dateTo
+     * @param null            $groupUnit
+     * @param ChartQuery|null $chartQuery
+     */
+    public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null)
+    {
+        $this->countOnly  = true;
+        $this->dateFrom   = $dateFrom;
+        $this->dateTo     = $dateTo;
+        $this->groupUnit  = $groupUnit;
+        $this->chartQuery = $chartQuery;
+    }
+
+    /**
+     * Get chart query helper to format dates.
+     *
+     * @return ChartQuery
+     */
+    public function getChartQuery()
+    {
+        return $this->chartQuery;
     }
 }

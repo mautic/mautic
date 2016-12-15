@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -12,8 +14,10 @@
 <div class="pt-md pr-md pb-md pl-md">
     <ul class="media-list media-list-feed">
         <?php foreach ($logs as $log) : ?>
-        <?php // If the data are loaded from cache array: ?>
-        <?php if (is_array($log['dateAdded']) && isset($log['dateAdded']['date'])) $log['dateAdded'] = new \DateTime($log['dateAdded']['date'], (new \DateTimeZone($log['dateAdded']['timezone']))); ?>
+        <?php // If the data are loaded from cache array:?>
+        <?php if (is_array($log['dateAdded']) && isset($log['dateAdded']['date'])) {
+    $log['dateAdded'] = new \DateTime($log['dateAdded']['date'], (new \DateTimeZone($log['dateAdded']['timezone'])));
+} ?>
         <li class="media">
             <div class="media-object pull-left">
                 <span class="figure featured <?php echo ($log['action'] == 'create') ? 'bg-success' : ''; ?>">
@@ -22,7 +26,7 @@
             </div>
             <div class="media-body">
                 <?php if (isset($log['userId']) && $log['userId']) : ?>
-                    <a href="<?php echo $view['router']->path('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $log['userId']]); ?>" data-toggle="ajax">
                         <?php echo $log['userName']; ?>
                     </a>
                 <?php elseif ($log['userName']) : ?>
@@ -30,7 +34,7 @@
                 <?php else: ?>
                     <?php echo $view['translator']->trans('mautic.core.system'); ?>
                 <?php endif; ?>
-                <?php echo $view['translator']->trans('mautic.dashboard.' . $log['action'] . '.past.tense'); ?>
+                <?php echo $view['translator']->trans('mautic.dashboard.'.$log['action'].'.past.tense'); ?>
 
                 <?php if (!empty($log['route'])): ?>
                 <a href="<?php echo $log['route']; ?>" data-toggle="ajax">

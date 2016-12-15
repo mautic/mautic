@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,15 +16,14 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class SugarcrmIntegration
+ * Class SugarcrmIntegration.
  */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
-
     private $authorzationError;
 
     /**
-     * Returns the name of the social integration that must match the name of the file
+     * Returns the name of the social integration that must match the name of the file.
      *
      * @return string
      */
@@ -32,7 +33,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
@@ -42,7 +43,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
@@ -58,32 +59,31 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getSecretKeys()
     {
-        return array(
+        return [
             'client_secret',
-            'password'
-        );
+            'password',
+        ];
     }
 
-
     /**
-     * Get the array key for the auth token
+     * Get the array key for the auth token.
      *
      * @return string
      */
-    public function getAuthTokenKey ()
+    public function getAuthTokenKey()
     {
         return (isset($this->keys['version']) && $this->keys['version'] == '6') ? 'id' : 'access_token';
     }
 
     /**
-     * SugarCRM 7 refresh tokens
+     * SugarCRM 7 refresh tokens.
      */
     public function getRefreshTokenKeys()
     {
-        return array(
+        return [
             'refresh_token',
-            'expires'
-        );
+            'expires',
+        ];
     }
 
     /**
@@ -103,20 +103,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getAuthLoginUrl ()
+    public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', array('integration' => $this->getName()));
+        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**
-     * Retrieves and stores tokens returned from oAuthLogin
+     * Retrieves and stores tokens returned from oAuthLogin.
      *
      * @param array $settings
      * @param array $parameters
      *
      * @return array
      */
-    public function authCallback ($settings = array(), $parameters = array())
+    public function authCallback($settings = [], $parameters = [])
     {
         if (isset($this->keys['version']) && $this->keys['version'] == '6') {
             $success = $this->isAuthorized();
@@ -126,15 +126,15 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 return false;
             }
         } else {
-            $settings   = array(
+            $settings = [
                 'grant_type'         => 'password',
-                'ignore_redirecturi' => true
-            );
-            $parameters = array(
+                'ignore_redirecturi' => true,
+            ];
+            $parameters = [
                 'username' => $this->keys['username'],
                 'password' => $this->keys['password'],
-                'platform' => 'base'
-            );
+                'platform' => 'base',
+            ];
 
             return parent::authCallback($settings, $parameters);
         }
@@ -147,51 +147,52 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
+        return [
             'sugarcrm_url'  => 'mautic.sugarcrm.form.url',
             'client_id'     => 'mautic.sugarcrm.form.clientkey',
             'client_secret' => 'mautic.sugarcrm.form.clientsecret',
             'username'      => 'mautic.sugarcrm.form.username',
-            'password'      => 'mautic.sugarcrm.form.password'
-        );
+            'password'      => 'mautic.sugarcrm.form.password',
+        ];
     }
 
     /**
      * @param array $settings
      *
      * @return array
+     *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = array())
+    public function getAvailableLeadFields($settings = [])
     {
-        $sugarFields       = array();
+        $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
             if ($this->isAuthorized()) {
-                $leadObject  = $this->getApiHelper()->getLeadFields();
+                $leadObject = $this->getApiHelper()->getLeadFields();
                 if ($leadObject != null) {
                     if (isset($leadObject['module_fields'])) {
                         //6.x/community
                         foreach ($leadObject['module_fields'] as $fieldInfo) {
-                            if (isset($fieldInfo['name']) && !in_array($fieldInfo['type'], array('id', 'assigned_user_name', 'bool', 'link', 'relate'))) {
-                                $sugarFields[$fieldInfo['name']] = array(
+                            if (isset($fieldInfo['name']) && !in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])) {
+                                $sugarFields[$fieldInfo['name']] = [
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['label'],
-                                    'required' => !empty($fieldInfo['required'])
-                                );
+                                    'required' => !empty($fieldInfo['required']),
+                                ];
                             }
                         }
                     } elseif (isset($leadObject['fields'])) {
                         //7.x
                         foreach ($leadObject['fields'] as $fieldInfo) {
-                            if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], array('id', 'team_list', 'bool', 'link', 'relate'))) {
+                            if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], ['id', 'team_list', 'bool', 'link', 'relate'])) {
                                 $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
 
-                                $sugarFields[$fieldName] = array(
+                                $sugarFields[$fieldName] = [
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['comment'],
-                                    'required' => !empty($fieldInfo['required'])
-                                );
+                                    'required' => !empty($fieldInfo['required']),
+                                ];
                             }
                         }
                     }
@@ -221,7 +222,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if (!empty($response['name'])) {
                 return $response['description'];
             } else {
-                return $this->factory->getTranslator()->trans("mautic.integration.error.genericerror", array(), "flashes");
+                return $this->factory->getTranslator()->trans('mautic.integration.error.genericerror', [], 'flashes');
             }
         } else {
             return parent::getErrorsFromResponse($response);
@@ -252,13 +253,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($authType == 'oauth2' && empty($settings['authorize_session'])) {
 
             // Append the access token as the oauth-token header
-            $headers                   = array(
-                "oauth-token: {$this->keys['access_token']}"
-            );
+            $headers = [
+                "oauth-token: {$this->keys['access_token']}",
+            ];
 
-            return array($parameters, $headers);
+            return [$parameters, $headers];
         } else {
-
             return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
         }
     }
@@ -275,24 +275,24 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         if ($this->keys['version'] == '6') {
-            $loginParams = array(
-                'user_auth'        => array(
+            $loginParams = [
+                'user_auth' => [
                     'user_name' => $this->keys['username'],
                     'password'  => md5($this->keys['password']),
-                    'version'   => '1'
-                ),
+                    'version'   => '1',
+                ],
                 'application_name' => 'Mautic',
-                'name_value_list'  => array(),
+                'name_value_list'  => [],
                 'method'           => 'login',
                 'input_type'       => 'JSON',
                 'response_type'    => 'JSON',
-            );
-            $parameters = array(
+            ];
+            $parameters = [
                 'method'        => 'login',
                 'input_type'    => 'JSON',
                 'response_type' => 'JSON',
-                'rest_data'     => json_encode($loginParams)
-            );
+                'rest_data'     => json_encode($loginParams),
+            ];
 
             $settings['auth_type'] = 'rest';
             $response              = $this->makeRequest($this->getAccessTokenUrl(), $parameters, 'GET', $settings);
@@ -302,7 +302,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $this->authorzationError = $error;
 
-            return (empty($error));
+            return empty($error);
         } else {
             if ($this->isConfigured()) {
                 // SugarCRM 7 uses password grant type so login each time to ensure session is valid
@@ -336,19 +336,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'keys') {
-            $builder->add('version', 'button_group', array(
-                'choices' => array(
+            $builder->add('version', 'button_group', [
+                'choices' => [
                     '6' => '6.x/community',
-                    '7' => '7.x'
-                ),
-                'label' => 'mautic.sugarcrm.form.version',
-                'constraints' => array(
-                    new NotBlank(array(
-                        'message' => 'mautic.core.value.required'
-                    ))
-                ),
-                'required' => true
-            ));
+                    '7' => '7.x',
+                ],
+                'label'       => 'mautic.sugarcrm.form.version',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'mautic.core.value.required',
+                    ]),
+                ],
+                'required' => true,
+            ]);
         }
     }
 
@@ -357,9 +357,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
-        return array(
+        return [
             'requires_callback'      => false,
-            'requires_authorization' => true
-        );
+            'requires_authorization' => true,
+        ];
     }
 }

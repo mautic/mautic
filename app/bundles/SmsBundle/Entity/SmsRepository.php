@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,19 +16,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class SmsRepository
- *
- * @package Mautic\SmsBundle\Entity
+ * Class SmsRepository.
  */
 class SmsRepository extends CommonRepository
 {
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities($args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
@@ -42,7 +43,7 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * Get amounts of sent and read emails
+     * Get amounts of sent and read emails.
      *
      * @return array
      */
@@ -63,6 +64,7 @@ class SmsRepository extends CommonRepository
     /**
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
@@ -73,12 +75,12 @@ class SmsRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq("e.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq("e.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
                 $expr = $q->expr()->orX(
@@ -88,20 +90,20 @@ class SmsRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq("IDENTITY(e.createdBy)", $this->currentUser->getId());
+                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('e.alias', ":$unique");
+                $expr           = $q->expr()->like('e.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
-                $langUnique       = $this->generateRandomParameterName();
-                $langValue        = $filter->string . "_%";
-                $forceParameters = array(
+                $langUnique      = $this->generateRandomParameterName();
+                $langValue       = $filter->string.'_%';
+                $forceParameters = [
                     $langUnique => $langValue,
-                    $unique     => $filter->string
-                );
+                    $unique     => $filter->string,
+                ];
                 $expr = $q->expr()->orX(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
@@ -116,13 +118,13 @@ class SmsRepository extends CommonRepository
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif (!$returnParameter) {
-            $parameters = array();
+            $parameters = [];
         } else {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array( $expr, $parameters );
+        return [$expr, $parameters];
     }
 
     /**
@@ -130,14 +132,14 @@ class SmsRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        return [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
-            'mautic.core.searchcommand.lang'
-        );
+            'mautic.core.searchcommand.lang',
+        ];
     }
 
     /**
@@ -145,9 +147,9 @@ class SmsRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('e.name', 'ASC')
-        );
+        return [
+            ['e.name', 'ASC'],
+        ];
     }
 
     /**
@@ -159,11 +161,11 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * Up the click/sent counts
+     * Up the click/sent counts.
      *
-     * @param            $id
-     * @param string     $type
-     * @param int        $increaseBy
+     * @param        $id
+     * @param string $type
+     * @param int    $increaseBy
      */
     public function upCount($id, $type = 'sent', $increaseBy = 1)
     {

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +18,6 @@ use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
@@ -47,9 +48,9 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     protected $integrationHelper;
 
     /**
-     * @var null|Request
+     * @var null|requestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @param IntegrationHelper        $integrationHelper
@@ -69,7 +70,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         $this->providerKey       = $providerKey;
         $this->userProvider      = $userProvider;
         $this->integrationHelper = $integrationHelper;
-        $this->request           = $requestStack->getCurrentRequest();
+        $this->requestStack      = $requestStack;
     }
 
     /**
@@ -80,13 +81,13 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-
             return null;
         }
 
         $user                  = $token->getUser();
         $authenticatingService = $token->getAuthenticatingService();
         $response              = null;
+        $request               = $this->requestStack->getCurrentRequest();
 
         if (!$user instanceof User) {
             $authenticated = false;
@@ -95,12 +96,12 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
             if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
                 $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_service'], false, null, true);
 
-                $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
+                $loginCheck = ('mautic_sso_login_check' == $request->attributes->get('_route'));
                 $authEvent  = new AuthenticationEvent(
                     null,
                     $token,
                     $this->userProvider,
-                    $this->request,
+                    $request,
                     $loginCheck,
                     $authenticatingService,
                     $integrations
@@ -128,7 +129,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
             }
 
             if (!$authenticated && empty($response)) {
-
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
         }

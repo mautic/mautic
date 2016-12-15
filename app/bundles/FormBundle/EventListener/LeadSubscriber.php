@@ -1,30 +1,54 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PageBundle\Model\PageModel;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\FormBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
     /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param FormModel $formModel
+     * @param PageModel $pageModel
+     */
+    public function __construct(FormModel $formModel, PageModel $pageModel)
+    {
+        $this->formModel = $formModel;
+        $this->pageModel = $pageModel;
+    }
+
+    /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -33,7 +57,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
@@ -44,50 +68,43 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
-        $filters = $event->getEventFilters();
-
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead    = $event->getLead();
-        $options = ['ipIds' => [], 'leadId' => $lead->getId(), 'filters' => $filters];
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
-
         /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
+        $submissionRepository = $this->em->getRepository('MauticFormBundle:Submission');
+        $rows                 = $submissionRepository->getSubmissions($event->getQueryOptions());
 
-        $rows = $submissionRepository->getSubmissions($options);
+        // Add total to counter
+        $event->addToCounter($eventTypeKey, $rows);
 
-        $pageModel = $this->factory->getModel('page.page');
-        $formModel = $this->factory->getModel('form.form');
+        if (!$event->isEngagementCount()) {
+            // Add the submissions to the event array
+            foreach ($rows['results'] as $row) {
+                // Convert to local from UTC
+                $form       = $this->formModel->getEntity($row['form_id']);
+                $submission = $submissionRepository->getEntity($row['id']);
 
-        // Add the submissions to the event array
-        foreach ($rows as $row) {
-            // Convert to local from UTC
-            $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
-
-            $submission = $submissionRepository->getEntity($row['id']);
-            $event->addEvent(
-                [
-                    'event'           => $eventTypeKey,
-                    'eventLabel'      => $eventTypeName,
-                    'timestamp'       => $dtHelper->getLocalDateTime(),
-                    'extra'           => [
-                        'submission' => $submission,
-                        'form'       => $formModel->getEntity($row['form_id']),
-                        'page'       => $pageModel->getEntity($row['page_id'])
-                    ],
-                    'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
-                    'icon'            => 'fa-pencil-square-o'
-                ]
-            );
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
+                            'label' => $form->getName(),
+                            'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()]),
+                        ],
+                        'eventType' => $eventTypeName,
+                        'timestamp' => $row['dateSubmitted'],
+                        'extra'     => [
+                            'submission' => $submission,
+                            'form'       => $form,
+                            'page'       => $this->pageModel->getEntity($row['page_id']),
+                        ],
+                        'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'fa-pencil-square-o',
+                    ]
+                );
+            }
         }
     }
 
@@ -96,6 +113,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->factory->getModel('form.submission')->getRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->em->getRepository('MauticFormBundle:Submission')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

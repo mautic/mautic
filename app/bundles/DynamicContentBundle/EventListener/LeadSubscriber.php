@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -16,60 +17,72 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\DynamicContent\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0]
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
         ];
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKeySent  = 'dynamic.content.sent';
+        $eventTypeKey      = 'dynamic.content.sent';
         $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
-        $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
+        $event->addEventType($eventTypeKey, $eventTypeNameSent);
+
+        if (!$event->isApplicable($eventTypeKey)) {
+            return;
+        }
 
         $lead = $event->getLead();
 
         /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
-        $statRepository = $this->factory->getEntityManager()->getRepository('MauticDynamicContentBundle:Stat');
+        $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
+        $stats          = $statRepository->getLeadStats($lead->getId(), $event->getQueryOptions());
 
-        $stats = $statRepository->getLeadStats($lead->getId(), ['filters' => $event->getEventFilters()]);
+        // Add total number to counter
+        $event->addToCounter($eventTypeKey, $stats);
 
-        // Add the events to the event array
-        foreach ($stats as $stat) {
-            // Email sent
-            if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
-                $event->addEvent(
-                    array(
-                        'event'           => $eventTypeKeySent,
-                        'eventLabel'      => $eventTypeNameSent,
-                        'timestamp'       => $stat['dateSent'],
-                        'extra'           => [
-                            'stat' => $stat,
-                            'type' => 'sent'
-                        ],
-                        'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => 'fa-envelope'
-                    )
-                );
+        if (!$event->isEngagementCount()) {
+
+            // Add the events to the event array
+            foreach ($stats['results'] as $stat) {
+                if ($stat['dateSent']) {
+                    $event->addEvent(
+                        [
+                            'event'      => $eventTypeKey,
+                            'eventLabel' => [
+                                'label' => $stat['name'],
+                                'href'  => $this->router->generate(
+                                    'mautic_dynamicContent_action',
+                                    ['objectId' => $stat['dynamic_content_id'], 'objectAction' => 'view']
+                                ),
+                            ],
+                            'eventType' => $eventTypeNameSent,
+                            'timestamp' => $stat['dateSent'],
+                            'extra'     => [
+                                'stat' => $stat,
+                                'type' => 'sent',
+                            ],
+                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                            'icon'            => 'fa-envelope',
+                        ]
+                    );
+                }
             }
         }
     }
@@ -79,7 +92,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->factory->getEntityManager()->getRepository('MauticDynamicContentBundle:Stat')->updateLead(
+        $this->em->getRepository('MauticDynamicContentBundle:Stat')->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

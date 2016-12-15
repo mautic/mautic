@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticUserBundle:Security:base.html.php');
@@ -23,14 +24,14 @@ endif;
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
                class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
-               placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>' />
+               placeholder="<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>" />
     </div>
     <div class="input-group mb-md">
         <span class="input-group-addon"><i class="fa fa-key"></i></span>
         <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.core.password'); ?>:</label>
         <input type="password" id="password" name="_password"
                class="form-control input-lg" required
-               placeholder='<?php echo $view['translator']->trans('mautic.core.password'); ?>' />
+               placeholder="<?php echo $view['translator']->trans('mautic.core.password'); ?>" />
     </div>
 
     <div class="checkbox-inline custom-primary pull-left mb-md">
@@ -51,9 +52,9 @@ endif;
 <?php if (!empty($integrations)): ?>
 <ul class="list-group">
 <?php foreach ($integrations as $sso): ?>
-    <a href="<?php echo $view['router']->path('mautic_sso_login', array('integration' => $sso->getName())); ?>" class="list-group-item">
+    <a href="<?php echo $view['router']->path('mautic_sso_login', ['integration' => $sso->getName()]); ?>" class="list-group-item">
         <img class="pull-left mr-xs" style="height: 16px;" src="<?php echo $view['assets']->getUrl($sso->getIcon()); ?>" >
-        <p class="list-group-item-text"><?php echo $view['translator']->trans('mautic.integration.sso.' . $sso->getName()); ?></p>
+        <p class="list-group-item-text"><?php echo $view['translator']->trans('mautic.integration.sso.'.$sso->getName()); ?></p>
     </a>
 <?php endforeach; ?>
 </ul>

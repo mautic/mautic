@@ -1,30 +1,30 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
- *
- * @package Mautic\EmailBundle\EventListener
+ * Class LeadSubscriber.
  */
 class LeadSubscriber extends CommonSubscriber
 {
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -33,74 +33,15 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Compile events for the lead timeline
+     * Compile events for the lead timeline.
      *
      * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        // Set available event types
-        $eventTypeKeySent  = 'email.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.email.sent');
-        $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
-
-        $eventTypeKeyRead  = 'email.read';
-        $eventTypeNameRead = $this->translator->trans('mautic.email.read');
-        $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
-
-        // Decide if those events are filtered
-        $filters = $event->getEventFilters();
-
-        $lead    = $event->getLead();
-        $options = ['ipIds' => [], 'filters' => $filters];
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
-
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $statRepository = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
-
-        $stats = $statRepository->getLeadStats($lead->getId(), $options);
-
-        // Add the events to the event array
-        foreach ($stats as $stat) {
-            if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead, true)) {
-                $event->addEvent(
-                    [
-                        'event'           => $eventTypeKeyRead,
-                        'eventLabel'      => $eventTypeNameRead,
-                        'timestamp'       => $stat['dateRead'],
-                        'extra'           => [
-                            'stat' => $stat,
-                            'type' => 'read'
-                        ],
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => 'fa-envelope-o'
-                    ]
-                );
-            }
-
-            // Email read
-            if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
-                $event->addEvent(
-                    [
-                        'event'           => $eventTypeKeySent,
-                        'eventLabel'      => $eventTypeNameSent,
-                        'timestamp'       => $stat['dateSent'],
-                        'extra'           => [
-                            'stat' => $stat,
-                            'type' => 'sent'
-                        ],
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => 'fa-envelope'
-                    ]
-                );
-            }
-        }
+        $this->addEmailEvents($event, 'read');
+        $this->addEmailEvents($event, 'sent');
+        $this->addEmailEvents($event, 'failed');
     }
 
     /**
@@ -108,9 +49,80 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->updateLead(
+        $this->em->getRepository('MauticEmailBundle:Stat')->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
+    }
+
+    /**
+     * @param LeadTimelineEvent $event
+     * @param                   $state
+     */
+    protected function addEmailEvents(LeadTimelineEvent $event, $state)
+    {
+        // Set available event types
+        $eventTypeKey  = 'email.'.$state;
+        $eventTypeName = $this->translator->trans('mautic.email.'.$state);
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        if (!$event->isApplicable($eventTypeKey)) {
+            return;
+        }
+
+        $lead = $event->getLead();
+
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
+        $statRepository        = $this->em->getRepository('MauticEmailBundle:Stat');
+        $queryOptions          = $event->getQueryOptions();
+        $queryOptions['state'] = $state;
+        $stats                 = $statRepository->getLeadStats($lead->getId(), $queryOptions);
+
+        // Add total to counter
+        $event->addToCounter($eventTypeKey, $stats);
+
+        if (!$event->isEngagementCount()) {
+            // Add the events to the event array
+            foreach ($stats['results'] as $stat) {
+                if (!empty($stat['storedSubject'])) {
+                    $label = $this->translator->trans('mautic.email.timeline.event.custom_email').': '.$stat['storedSubject'];
+                } elseif (!empty($stat['email_name'])) {
+                    $label = $stat['email_name'];
+                } else {
+                    $label = $this->translator->trans('mautic.email.timeline.event.custom_email');
+                }
+
+                if (!empty($stat['idHash'])) {
+                    $eventName = [
+                        'label'      => $label,
+                        'href'       => $this->router->generate('mautic_email_webview', ['idHash' => $stat['idHash']]),
+                        'isExternal' => true,
+                    ];
+                } else {
+                    $eventName = $label;
+                }
+                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                    $dateSent = 'sent';
+                } else {
+                    $dateSent = 'read';
+                }
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => $eventName,
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $stat['date'.ucfirst($dateSent)],
+                        'dateSent'   => $stat['dateSent'],
+                        'extra'      => [
+                            'stat' => $stat,
+                            'type' => $state,
+                        ],
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
+                    ]
+                );
+            }
+        }
     }
 }

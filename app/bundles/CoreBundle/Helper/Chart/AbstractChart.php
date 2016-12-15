@@ -1,122 +1,132 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
-use Doctrine\DBAL\Connection;
 
 /**
- * Class AbstractChart
+ * Class AbstractChart.
  */
 abstract class AbstractChart
 {
     /**
-     * Datasets of the chart
+     * Datasets of the chart.
      *
      * @var array
      */
-    protected $datasets = array();
+    protected $datasets = [];
 
     /**
-     * Labels of the time axe
+     * Labels of the time axe.
      *
      * @var array
      */
-    protected $labels = array();
+    protected $labels = [];
 
     /**
-     * Date from
+     * Date from.
      *
      * @var \DateTime
      */
     protected $dateFrom;
 
     /**
-     * Date to
+     * Date to.
      *
      * @var \DateTime
      */
     protected $dateTo;
 
     /**
-     * Timezone data is requested to be in
+     * Timezone data is requested to be in.
      *
      * @var
      */
     protected $timezone;
 
     /**
-     * Time unit
+     * Time unit.
      *
      * @var string
      */
     protected $unit;
 
     /**
-     * amount of items
+     * True if unit is H, i, or s.
      *
-     * @var integer
+     * @var bool
+     */
+    protected $isTimeUnit = false;
+
+    /**
+     * amount of items.
+     *
+     * @var int
      */
     protected $amount;
 
     /**
-     * Default Mautic colors
+     * Default Mautic colors.
      *
      * @var array
      */
-    public $colors = array('#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935');
+    public $colors = ['#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935'];
 
     /**
-     * Create a DateInterval time unit
+     * Create a DateInterval time unit.
      *
-     * @param  string  $unit
+     * @param string $unit
      *
      * @return \DateInterval
      */
     public function getUnitInterval($unit = null)
     {
-        if (!$unit) $unit = $this->unit;
-        $isTime  = in_array($unit, array('H', 'i', 's')) ? 'T' : '';
-        $toUpper = array('d', 'i');
+        if (!$unit) {
+            $unit = $this->unit;
+        }
+        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
+        $toUpper = ['d', 'i'];
 
         if ($unit == 'i') {
             $unit = 'M';
         }
 
-        return new \DateInterval('P' . $isTime . '1' . strtoupper($unit));
+        return new \DateInterval('P'.$isTime.'1'.strtoupper($unit));
     }
 
     /**
-     * Helper function to shorten/truncate a string
+     * Helper function to shorten/truncate a string.
      *
-     * @param string  $string
-     * @param integer $length
-     * @param string  $append
+     * @param string $string
+     * @param int    $length
+     * @param string $append
      *
      * @return string
      */
-    public static function truncate($string, $length = 100, $append = "...")
+    public static function truncate($string, $length = 100, $append = '...')
     {
         $string = trim($string);
 
         if (strlen($string) > $length) {
             $string = wordwrap($string, $length);
             $string = explode("\n", $string, 2);
-            $string = $string[0] . $append;
+            $string = $string[0].$append;
         }
 
         return $string;
     }
 
     /**
-     * Sets the clones of the date range and validates it
+     * Sets the clones of the date range and validates it.
      *
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
@@ -131,9 +141,9 @@ abstract class AbstractChart
             $this->dateTo->modify('+1 day');
         }
 
-        // Adjust dateTo to be end of day or to current hour if today
+        // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
         $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d')) {
+        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && $this->isTimeUnit) {
             $this->dateTo = $now;
         } else {
             $this->dateTo->setTime(23, 59, 59);
@@ -154,7 +164,7 @@ abstract class AbstractChart
     }
 
     /**
-     * Count amount of time slots of a time unit from a date range
+     * Count amount of time slots of a time unit from a date range.
      *
      * @return int
      */
@@ -166,24 +176,28 @@ abstract class AbstractChart
                 break;
             case 'W':
                 $dayAmount = $this->dateTo->diff($this->dateFrom)->format('%a');
-                $amount = (ceil($dayAmount / 7) + 1);
+                $amount    = (ceil($dayAmount / 7) + 1);
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
 
                 // Add 1 month if there are some days left
-                if ($this->dateTo->diff($this->dateFrom)->format('%d') > 0) $amount++;
+                if ($this->dateTo->diff($this->dateFrom)->format('%d') > 0) {
+                    ++$amount;
+                }
 
                 // Add 1 month if count of days are greater or equal than in date to
-                if ($this->dateFrom->format('d') >= $this->dateTo->format('d')) $amount++;
+                if ($this->dateFrom->format('d') >= $this->dateTo->format('d')) {
+                    ++$amount;
+                }
                 break;
             case 'H':
                 $dateDiff = $this->dateTo->diff($this->dateFrom);
-                $amount = $dateDiff->h + $dateDiff->days * 24;
-                $amount++;
+                $amount   = $dateDiff->h + $dateDiff->days * 24;
+                ++$amount;
                 break;
             default:
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $this->unit) + 1);
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%'.$this->unit) + 1);
                 break;
         }
 
@@ -191,33 +205,44 @@ abstract class AbstractChart
     }
 
     /**
-     * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty
+     * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty.
+     *
+     * @param $dateFrom
+     * @param $dateTo
      *
      * @return string
      */
-    public function getTimeUnitFromDateRange()
+    public function getTimeUnitFromDateRange($dateFrom, $dateTo)
     {
-        $diff = $this->dateTo->diff($this->dateFrom)->format('%a');
+        $diff = $dateTo->diff($dateFrom)->format('%a');
         $unit = 'd';
 
-        if ($diff <= 1) $unit = 'H';
-        if ($diff > 31) $unit = 'W';
-        if ($diff > 100) $unit = 'm';
-        if ($diff > 1000) $unit = 'Y';
+        if ($diff <= 1) {
+            $unit = 'H';
+        }
+        if ($diff > 31) {
+            $unit = 'W';
+        }
+        if ($diff > 100) {
+            $unit = 'm';
+        }
+        if ($diff > 1000) {
+            $unit = 'Y';
+        }
 
         return $unit;
     }
 
     /**
-     * Generate unique color for the dataset
+     * Generate unique color for the dataset.
      *
-     * @param  integer  $datasetId
+     * @param int $datasetId
      *
      * @return ColorHelper
      */
     public function configureColorHelper($datasetId)
     {
-        $colorHelper = new ColorHelper;
+        $colorHelper = new ColorHelper();
 
         if (isset($this->colors[$datasetId])) {
             $color = $colorHelper->setHex($this->colors[$datasetId]);

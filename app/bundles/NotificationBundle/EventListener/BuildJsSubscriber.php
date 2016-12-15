@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class BuildJsSubscriber
+ * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
@@ -24,23 +26,20 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 254)
-        );
+        return [
+            CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 254],
+        ];
     }
 
     /**
      * @param BuildJsEvent $event
-     *
-     * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $subscribeUrl = $router->generate('mautic_notification_popup', array(), UrlGeneratorInterface::ABSOLUTE_URL);
+        $subscribeUrl   = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $subscribeTitle = 'Subscribe To Notifications';
-        $width = 450;
-        $height = 450;
+        $width          = 450;
+        $height         = 450;
 
         $js = <<<JS
 MauticJS.notification = {

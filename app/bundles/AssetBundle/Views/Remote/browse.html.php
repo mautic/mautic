@@ -1,16 +1,17 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if ($tmpl == 'index') :
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.remote.file.browse'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.asset.remote.file.browse'));
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
@@ -26,12 +27,14 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.remo
                             <?php $step = 1; ?>
                             <?php /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */ ?>
                             <?php foreach ($integrations as $integration): ?>
-                                <li class="list-group-item<?php if ($step === 1) echo " active"; ?>" id="tab<?php echo $integration->getName(); ?>">
+                                <li class="list-group-item<?php if ($step === 1) {
+    echo ' active';
+} ?>" id="tab<?php echo $integration->getName(); ?>">
                                     <a href="#" class="steps" onclick="Mautic.updateRemoteBrowser('<?php echo $integration->getName(); ?>');">
                                         <?php echo $integration->getDisplayName(); ?>
                                     </a>
                                 </li>
-                                <?php $step++; ?>
+                                <?php ++$step; ?>
                             <?php endforeach; ?>
                         </ul>
                     </div>

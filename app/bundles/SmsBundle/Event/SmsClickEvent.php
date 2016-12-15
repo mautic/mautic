@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +16,7 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 
 /**
- * Class SmsClickEvent
- *
- * @package Mautic\SmsBundle\Event
+ * Class SmsClickEvent.
  */
 class SmsClickEvent extends CommonEvent
 {
@@ -31,12 +31,12 @@ class SmsClickEvent extends CommonEvent
     public function __construct(Stat $stat, $request)
     {
         $this->entity  = $stat;
-        $this->sms = $stat->getSms();
+        $this->sms     = $stat->getSms();
         $this->request = $request;
     }
 
     /**
-     * Returns the Sms entity
+     * Returns the Sms entity.
      *
      * @return Sms
      */
@@ -46,7 +46,7 @@ class SmsClickEvent extends CommonEvent
     }
 
     /**
-     * Get sms request
+     * Get sms request.
      *
      * @return string
      */

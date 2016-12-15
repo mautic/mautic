@@ -1,49 +1,50 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\DependencyInjection;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Mautic Application Kernel
+ * Mautic Application Kernel.
  */
 class AppKernel extends Kernel
 {
-
     /**
-     * Major version number
+     * Major version number.
      *
      * @const integer
      */
     const MAJOR_VERSION = 2;
 
     /**
-     * Minor version number
+     * Minor version number.
      *
      * @const integer
      */
-    const MINOR_VERSION = 0;
+    const MINOR_VERSION = 4;
 
     /**
-     * Patch version number
+     * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 1;
 
     /**
-     * Extra version identifier
+     * Extra version identifier.
      *
      * This constant is used to define additional version segments such as development
      * or beta status.
@@ -81,7 +82,6 @@ class AppKernel extends Kernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
             define('MAUTIC_INSTALLER', 1);
         }
@@ -91,7 +91,7 @@ class AppKernel extends Kernel
             if (strpos($uri, 'installer') === false) {
                 $base = $request->getBaseUrl();
                 //check to see if the .htaccess file exists or if not running under apache
-                if ((strpos(strtolower($_SERVER["SERVER_SOFTWARE"]), 'apache') === false
+                if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
                     && strpos(
                         $base,
@@ -106,7 +106,6 @@ class AppKernel extends Kernel
         }
 
         if (false === $this->booted) {
-
             $this->boot();
         }
 
@@ -121,7 +120,7 @@ class AppKernel extends Kernel
                     $this->getContainer()->get('translator')->trans(
                         'mautic.core.db.connection.error',
                         [
-                            '%code%' => $e->getCode()
+                            '%code%' => $e->getCode(),
                         ]
                     )
                 );
@@ -153,6 +152,7 @@ class AppKernel extends Kernel
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
+            new Debril\RssAtomBundle\DebrilRssAtomBundle(),
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
@@ -230,14 +230,13 @@ class AppKernel extends Kernel
     public function boot()
     {
         if (true === $this->booted) {
-
             return;
         }
 
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
             $localParams = $this->getLocalParams();
-            $prefix = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
@@ -271,7 +270,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Returns a list of addon bundles that are enabled
+     * Returns a list of addon bundles that are enabled.
      *
      * @return array
      */
@@ -289,7 +288,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Retrieves the application's version number
+     * Retrieves the application's version number.
      *
      * @return string
      */
@@ -299,7 +298,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Checks if the application has been installed
+     * Checks if the application has been installed.
      *
      * @return bool
      */
@@ -319,6 +318,7 @@ class AppKernel extends Kernel
      * @param array $params
      *
      * @return \Doctrine\DBAL\Connection
+     *
      * @throws Exception
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -383,7 +383,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Get Mautic's local configuration file
+     * Get Mautic's local configuration file.
      *
      * @return array
      */
@@ -422,7 +422,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Get local config file
+     * Get local config file.
      *
      * @param bool $checkExists If true, then return false if the file doesn't exist
      *
@@ -445,7 +445,7 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Get the container file name or path
+     * Get the container file name or path.
      *
      * @param bool|true $fullPath
      *

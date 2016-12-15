@@ -1,30 +1,28 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\LeadBundle\Entity\LeadList;
 
 /**
- * Class Stat
- *
- * @package Mautic\SmsBundle\Entity
+ * Class Stat.
  */
 class Stat
 {
-
     /**
      * @var int
      */
@@ -73,20 +71,20 @@ class Stat
     /**
      * @var array
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_message_stats')
             ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
-            ->addIndex(array('sms_id', 'lead_id'), 'stat_sms_search')
-            ->addIndex(array('tracking_hash'), 'stat_sms_hash_search')
-            ->addIndex(array('source', 'source_id'), 'stat_sms_source_search');
+            ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
+            ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
+            ->addIndex(['source', 'source_id'], 'stat_sms_source_search');
 
         $builder->addId();
 
@@ -127,7 +125,7 @@ class Stat
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -135,7 +133,7 @@ class Stat
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
-                array(
+                [
                     'id',
                     'ipAddress',
                     'dateSent',
@@ -143,8 +141,8 @@ class Stat
                     'sourceId',
                     'trackingHash',
                     'lead',
-                    'sms'
-                )
+                    'sms',
+                ]
             )
             ->build();
     }

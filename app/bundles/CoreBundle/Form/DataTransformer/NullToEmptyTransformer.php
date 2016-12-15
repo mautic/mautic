@@ -1,8 +1,11 @@
-<?php /**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+<?php
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,9 +16,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 class NullToEmptyTransformer implements DataTransformerInterface
 {
     /**
-     * Does not transform anything
+     * Does not transform anything.
      *
-     * @param  string|null $value
+     * @param string|null $value
      *
      * @return string
      */
@@ -27,7 +30,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
     /**
      * Transforms a null to an empty string.
      *
-     * @param  string $value
+     * @param string $value
      *
      * @return string
      */

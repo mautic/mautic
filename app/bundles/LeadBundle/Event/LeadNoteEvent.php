@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,25 +15,22 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadNote;
 
 /**
- * Class LeadNoteEvent
- *
- * @package Mautic\LeadBundle\Event
+ * Class LeadNoteEvent.
  */
 class LeadNoteEvent extends CommonEvent
 {
-
     /**
      * @param LeadNote $note
-     * @param bool $isNew
+     * @param bool     $isNew
      */
     public function __construct(LeadNote &$note, $isNew = false)
     {
-        $this->entity  =& $note;
-        $this->isNew   = $isNew;
+        $this->entity = &$note;
+        $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the LeadNote entity
+     * Returns the LeadNote entity.
      *
      * @return LeadNote
      */
@@ -41,17 +40,17 @@ class LeadNoteEvent extends CommonEvent
     }
 
     /**
-     * Sets the LeadNote entity
+     * Sets the LeadNote entity.
      *
      * @param LeadNote $note
      */
-    public function setLeadNote(getNote $note)
+    public function setLeadNote(LeadNote $note)
     {
         $this->entity = $note;
     }
 
     /**
-     * Returns the Lead
+     * Returns the Lead.
      *
      * @return Lead
      */

@@ -1,27 +1,29 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
-use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
- * Class BuilderSubscriber
+ * Class BuilderSubscriber.
  */
 class BuilderSubscriber extends CommonSubscriber
 {
@@ -31,22 +33,28 @@ class BuilderSubscriber extends CommonSubscriber
     protected $tokenHelper;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * @var PageModel
      */
     protected $pageModel;
 
-    protected $pageTokenRegex = '{pagelink=(.*?)}';
-    protected $langBarRegex = '{langbar}';
-    protected $shareButtonsRegex = '{sharebuttons}';
+    protected $pageTokenRegex      = '{pagelink=(.*?)}';
+    protected $langBarRegex        = '{langbar}';
+    protected $shareButtonsRegex   = '{sharebuttons}';
+    protected $titleRegex          = '{pagetitle}';
+    protected $descriptionRegex    = '{pagemetadescription}';
     protected $emailIsInternalSend = false;
-    protected $emailEntity = null;
+    protected $emailEntity         = null;
 
-    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper, PageModel $pageModel)
+    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
-        $this->tokenHelper = $tokenHelper;
-        $this->pageModel   = $pageModel;
-
-        parent::__construct($factory);
+        $this->tokenHelper       = $tokenHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->pageModel         = $pageModel;
     }
 
     /**
@@ -59,12 +67,12 @@ class BuilderSubscriber extends CommonSubscriber
             PageEvents::PAGE_ON_BUILD     => ['onPageBuild', 0],
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0]
+            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
         ];
     }
 
     /**
-     * Add forms to available page tokens
+     * Add forms to available page tokens.
      *
      * @param Events\PageBuilderEvent $event
      */
@@ -85,9 +93,9 @@ class BuilderSubscriber extends CommonSubscriber
                     [
                         'filter' => [
                             'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull']
-                            ]
-                        ]
+                                ['column' => 'p.variantParent', 'expr' => 'isNull'],
+                            ],
+                        ],
                     ]
                 ),
                 -254
@@ -99,14 +107,14 @@ class BuilderSubscriber extends CommonSubscriber
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner'
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner',
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner'
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner',
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
@@ -119,6 +127,8 @@ class BuilderSubscriber extends CommonSubscriber
                     [
                         $this->langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
+                        $this->titleRegex        => $this->translator->trans('mautic.core.title'),
+                        $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
                     ]
                 )
             );
@@ -178,6 +188,14 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
+        if (strpos($content, $this->titleRegex) !== false) {
+            $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
+        }
+
+        if (strpos($content, $this->descriptionRegex) !== false) {
+            $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
+        }
+
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
 
@@ -189,16 +207,16 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * Renders the HTML for the social share buttons
+     * Renders the HTML for the social share buttons.
      *
      * @return string
      */
     protected function renderSocialShareButtons()
     {
-        static $content = "";
+        static $content = '';
 
         if (empty($content)) {
-            $shareButtons = $this->factory->getHelper('integration')->getShareButtons();
+            $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
             foreach ($shareButtons as $network => $button) {
@@ -214,7 +232,7 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * Renders the HTML for the language bar for a given page
+     * Renders the HTML for the language bar for a given page.
      *
      * @param $page
      *
@@ -230,7 +248,6 @@ class BuilderSubscriber extends CommonSubscriber
 
             //check to see if this page is grouped with another
             if (empty($parent) && empty($children)) {
-
                 return;
             }
 
@@ -250,8 +267,9 @@ class BuilderSubscriber extends CommonSubscriber
                     $trans = $lang;
                 }
                 $related[$parent->getId()] = [
-                    "lang" => $trans,
-                    "url"  => $this->pageModel->generateUrl($parent, false)
+                    'lang' => $trans,
+                    // Add ntrd to not auto redirect to another language
+                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -260,8 +278,9 @@ class BuilderSubscriber extends CommonSubscriber
                         $trans = $lang;
                     }
                     $related[$c->getId()] = [
-                        "lang" => $trans,
-                        "url"  => $this->pageModel->generateUrl($c, false)
+                        'lang' => $trans,
+                        // Add ntrd to not auto redirect to another language
+                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }
@@ -275,7 +294,6 @@ class BuilderSubscriber extends CommonSubscriber
             );
 
             if (empty($related)) {
-
                 return;
             }
 
@@ -287,8 +305,6 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * @param EmailBuilderEvent $event
-     *
-     * @return void
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
@@ -302,9 +318,9 @@ class BuilderSubscriber extends CommonSubscriber
                     [
                         'filter' => [
                             'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull']
-                            ]
-                        ]
+                                ['column' => 'p.variantParent', 'expr' => 'isNull'],
+                            ],
+                        ],
                     ]
                 ),
                 -254
@@ -318,8 +334,6 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * @param EmailSendEvent $event
-     *
-     * @return void
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {

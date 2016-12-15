@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\WebhookBundle\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
+
 /**
- * Class Log
- *
- * @package Mautic\WebhookBundle\Entity
+ * Class Log.
  */
 class Log
 {
@@ -37,7 +38,7 @@ class Log
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
@@ -73,6 +74,7 @@ class Log
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
     /**
@@ -88,6 +90,7 @@ class Log
     public function setWebhook($webhook)
     {
         $this->webhook = $webhook;
+
         return $this;
     }
     /**
@@ -103,6 +106,7 @@ class Log
     public function setStatusCode($statusCode)
     {
         $this->statusCode = $statusCode;
+
         return $this;
     }
     /**
@@ -118,6 +122,7 @@ class Log
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
+
         return $this;
     }
 }

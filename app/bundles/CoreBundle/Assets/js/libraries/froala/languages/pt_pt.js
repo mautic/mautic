@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -89,8 +89,8 @@ $.FE.LANGUAGE['pt_pt'] = {
     "Tags": "Etiquetas",
     "Are you sure? Image will be deleted.": "Voc\u00ea tem certeza? Imagem ser\u00e1 apagada.",
     "Replace": "Substituir",
-    "Uploading": "Carregar imagem",
-    "Loading image": "Carregar imagem",
+    "Uploading": "Carregando imagem",
+    "Loading image": "Carregando imagem",
     "Display": "Exibir",
     "Inline": "Em linha",
     "Break Text": "Texto de quebra",

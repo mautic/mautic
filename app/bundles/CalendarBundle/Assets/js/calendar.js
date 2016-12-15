@@ -36,7 +36,12 @@ Mautic.loadCalendarEvents = function (container) {
                 element.attr(event.attr);
             }
             if (event.description) {
-                element.tooltip({'title': event.description});
+                var checkDay = new Date(event.start._d);
+                if (checkDay.getDay() == 0) {
+                    element.tooltip({'title': event.description, placement: 'right'});
+                } else {
+                    element.tooltip({'title': event.description, placement: 'left'});
+                }
             }
         },
         loading: function(bool) {

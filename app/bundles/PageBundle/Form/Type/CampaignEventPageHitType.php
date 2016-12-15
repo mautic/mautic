@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventPageHitType
+ * Class CampaignEventPageHitType.
  */
 class CampaignEventPageHitType extends AbstractType
 {
@@ -22,24 +24,34 @@ class CampaignEventPageHitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('pages', 'page_list', array(
+        $builder->add('pages', 'page_list', [
             'label'      => 'mautic.page.campaign.event.form.pages',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.campaign.event.form.pages.descr'
-            )
-        ));
+                'tooltip' => 'mautic.page.campaign.event.form.pages.descr',
+            ],
+        ]);
 
-        $builder->add('url', 'text', array(
+        $builder->add('url', 'text', [
             'label'      => 'mautic.page.campaign.event.form.url',
-            'label_attr' => array('class' => 'control-label'),
+            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
-            'attr'       => array(
+            'attr'       => [
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.campaign.event.form.url.descr'
-            )
-        ));
+                'tooltip' => 'mautic.page.campaign.event.form.url.descr',
+            ],
+        ]);
+
+        $builder->add('referer', 'text', [
+            'label'      => 'mautic.page.campaign.event.form.referer',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.campaign.event.form.referer.descr',
+            ],
+        ]);
     }
 
     /**

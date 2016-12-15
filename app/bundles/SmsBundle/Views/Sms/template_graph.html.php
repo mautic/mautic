@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -24,7 +26,7 @@ delete if it is not require
                     </div>
                     <div class="col-xs-6 va-m" id="legend"></div>
                     <div class="col-xs-2 va-m">
-                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateSmsStatsChart')); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['callback' => 'updateSmsStatsChart']); ?>
 
                     </div>
                 </div>

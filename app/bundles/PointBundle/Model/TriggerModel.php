@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -23,7 +25,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class TriggerModel
+ * Class TriggerModel.
  */
 class TriggerModel extends CommonFormModel
 {
@@ -52,14 +54,14 @@ class TriggerModel extends CommonFormModel
     /**
      * EventModel constructor.
      *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel $leadModel
+     * @param IpLookupHelper    $ipLookupHelper
+     * @param LeadModel         $leadModel
      * @param TriggerEventModel $pointTriggerEventModel
      */
     public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel = $leadModel;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
     }
 
@@ -74,7 +76,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Retrieves an instance of the TriggerEventRepository
+     * Retrieves an instance of the TriggerEventRepository.
      *
      * @return \Mautic\PointBundle\Entity\TriggerEventRepository
      */
@@ -96,20 +98,24 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Trigger) {
-            throw new MethodNotAllowedHttpException(array('Trigger'));
+            throw new MethodNotAllowedHttpException(['Trigger']);
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('pointtrigger', $entity, $params);
+
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('pointtrigger', $entity, $options);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param  \Mautic\PointBundle\Entity\Trigger $entity
-     * @param  bool                               $unlock
+     * @param \Mautic\PointBundle\Entity\Trigger $entity
+     * @param bool                               $unlock
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -121,39 +127,39 @@ class TriggerModel extends CommonFormModel
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
             $events    = $entity->getEvents();
             $repo      = $this->getEventRepository();
-            $persist   = array();
+            $persist   = [];
             $ipAddress = $this->ipLookupHelper->getIpAddress();
 
             foreach ($events as $event) {
-                $filter = array('force' => array(
-                    array(
+                $filter = ['force' => [
+                    [
                         'column' => 'l.date_added',
                         'expr'   => 'lte',
-                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString()
-                    ),
-                    array(
+                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                    ],
+                    [
                         'column' => 'l.points',
                         'expr'   => 'gte',
-                        'value'  => $entity->getPoints()
-                    )
-                ));
+                        'value'  => $entity->getPoints(),
+                    ],
+                ]];
 
                 if (!$isNew) {
                     //get a list of leads that has already had this event applied
                     $leadIds = $repo->getLeadsForEvent($event->getId());
                     if (!empty($leadIds)) {
-                        $filter['force'][] = array(
+                        $filter['force'][] = [
                             'column' => 'l.id',
                             'expr'   => 'notIn',
-                            'value'  => $leadIds
-                        );
+                            'value'  => $leadIds,
+                        ];
                     }
                 }
 
                 //get a list of leads that are before the trigger's date_added and trigger if not already done so
-                $leads     = $this->leadModel->getEntities(array(
-                    'filter' => $filter
-                ));
+                $leads = $this->leadModel->getEntities([
+                    'filter' => $filter,
+                ]);
 
                 foreach ($leads as $l) {
                     if ($this->triggerEvent($event->convertToArray(), $l, true)) {
@@ -196,20 +202,20 @@ class TriggerModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Trigger) {
-            throw new MethodNotAllowedHttpException(array('Trigger'));
+            throw new MethodNotAllowedHttpException(['Trigger']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = PointEvents::TRIGGER_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = PointEvents::TRIGGER_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = PointEvents::TRIGGER_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = PointEvents::TRIGGER_POST_DELETE;
                 break;
             default:
@@ -222,6 +228,7 @@ class TriggerModel extends CommonFormModel
             }
 
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -231,12 +238,10 @@ class TriggerModel extends CommonFormModel
     /**
      * @param Trigger $entity
      * @param array   $sessionEvents
-     *
-     * @return void
      */
     public function setEvents(Trigger $entity, $sessionEvents)
     {
-        $order   = 1;
+        $order           = 1;
         $existingActions = $entity->getEvents();
 
         foreach ($sessionEvents as $properties) {
@@ -244,17 +249,18 @@ class TriggerModel extends CommonFormModel
             $event = !$isNew ? $existingActions[$properties['id']] : new TriggerEvent();
 
             foreach ($properties as $f => $v) {
-                if (in_array($f, array('id', 'order')))
+                if (in_array($f, ['id', 'order'])) {
                     continue;
+                }
 
-                $func = "set" .  ucfirst($f);
+                $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
             }
             $event->setTrigger($entity);
             $event->setOrder($order);
-            $order++;
+            ++$order;
             $entity->addTriggerEvent($properties['id'], $event);
         }
 
@@ -265,7 +271,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD
+     * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD.
      *
      * @return mixed
      */
@@ -275,35 +281,37 @@ class TriggerModel extends CommonFormModel
 
         if (empty($events)) {
             //build them
-            $events = array();
+            $events = [];
             $event  = new Events\TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::TRIGGER_ON_BUILD, $event);
             $events = $event->getEvents();
         }
+
         return $events;
     }
 
     /**
-     * Gets array of custom events from bundles inside groups
+     * Gets array of custom events from bundles inside groups.
      *
      * @return mixed
      */
     public function getEventGroups()
     {
         $events = $this->getEvents();
-        $groups = array();
+        $groups = [];
         foreach ($events as $key => $event) {
             $groups[$event['group']][$key] = $event;
         }
+
         return $groups;
     }
 
     /**
-     * Triggers a specific event
+     * Triggers a specific event.
      *
-     * @param array   $event
-     * @param Lead    $lead
-     * @param bool    $force
+     * @param array $event
+     * @param Lead  $lead
+     * @param bool  $force
      *
      * @return bool Was event triggered
      */
@@ -315,7 +323,7 @@ class TriggerModel extends CommonFormModel
         }
 
         if ($lead == null) {
-            $lead      = $this->leadModel->getCurrentLead();
+            $lead = $this->leadModel->getCurrentLead();
         }
 
         if (!$force) {
@@ -337,12 +345,12 @@ class TriggerModel extends CommonFormModel
         }
 
         $settings = $availableEvents[$eventType];
-        $args     = array(
-            'event'    => $event,
-            'lead'     => $lead,
-            'factory'  => $this->factory, // WHAT??
-            'config'   => $event['properties']
-        );
+        $args     = [
+            'event'   => $event,
+            'lead'    => $lead,
+            'factory' => $this->factory, // WHAT??
+            'config'  => $event['properties'],
+        ];
 
         if (is_callable($settings['callback'])) {
             if (is_array($settings['callback'])) {
@@ -354,7 +362,7 @@ class TriggerModel extends CommonFormModel
                 $reflection = new \ReflectionMethod(null, $settings['callback']);
             }
 
-            $pass = array();
+            $pass = [];
             foreach ($reflection->getParameters() as $param) {
                 if (isset($args[$param->getName()])) {
                     $pass[] = $args[$param->getName()];
@@ -370,7 +378,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Trigger events for the current lead
+     * Trigger events for the current lead.
      *
      * @param Lead $lead
      */
@@ -387,7 +395,7 @@ class TriggerModel extends CommonFormModel
             //get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
-            $persist       = array();
+            $persist       = [];
             foreach ($events as $event) {
                 if (isset($appliedEvents[$event['id']])) {
                     //don't apply the event to the lead if it's already been done
@@ -414,7 +422,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Returns configured color based on passed in $points
+     * Returns configured color based on passed in $points.
      *
      * @param $points
      *

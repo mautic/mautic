@@ -1,33 +1,40 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticSmsBundle
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
     /**
      * @var LeadModel
      */
@@ -44,20 +51,31 @@ class CampaignSubscriber extends CommonSubscriber
     protected $smsApi;
 
     /**
+     * @var smsHelper
+     */
+    protected $smsHelper;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param SmsModel $smsModel
-     * @param AbstractSmsApi $smsApi
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel            $leadModel
+     * @param SmsModel             $smsModel
+     * @param AbstractSmsApi       $smsApi
+     * @param SmsHelper            $smsHelper
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi)
-    {
-        $this->leadModel = $leadModel;
-        $this->smsModel  = $smsModel;
-        $this->smsApi    = $smsApi;
-
-        parent::__construct($factory);
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        LeadModel $leadModel,
+        SmsModel $smsModel,
+        AbstractSmsApi $smsApi,
+        SmsHelper $smsHelper
+    ) {
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadModel            = $leadModel;
+        $this->smsModel             = $smsModel;
+        $this->smsApi               = $smsApi;
+        $this->smsHelper            = $smsHelper;
     }
 
     /**
@@ -66,8 +84,8 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
+            SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -76,7 +94,7 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->factory->getParameter('sms_enabled')) {
+        if ($this->coreParametersHelper->getParameter('sms_enabled')) {
             $event->addAction(
                 'sms.send_text_sms',
                 [
@@ -86,7 +104,7 @@ class CampaignSubscriber extends CommonSubscriber
                     'formType'         => 'smssend_list',
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
-                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
+                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                 ]
             );
         }
@@ -122,24 +140,48 @@ class CampaignSubscriber extends CommonSubscriber
 
         $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
         $smsEvent->setSmsId($smsId);
-
         $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
-        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
+
+        $tokenEvent = $this->dispatcher->dispatch(
+            SmsEvents::TOKEN_REPLACEMENT,
+            new TokenReplacementEvent(
+                $smsEvent->getContent(),
+                $lead,
+                ['channel' => ['sms', $sms->getId()]]
+            )
+        );
+
+        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
+
+        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('sms_frequency_number');
+        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter('sms_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();
+
+        $leadIds = $lead->getId();
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
+            $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
+        }
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
             return $event->setResult(false);
         }
 
+        $this->smsModel->createStatEntry($sms, $lead);
         $this->smsModel->getRepository()->upCount($smsId);
-        
+        $event->setChannel('sms', $sms->getId());
         $event->setResult(
             [
                 'type'    => 'mautic.sms.sms',
                 'status'  => 'mautic.sms.timeline.status.delivered',
                 'id'      => $sms->getId(),
                 'name'    => $sms->getName(),
-                'content' => $smsEvent->getContent()
+                'content' => $tokenEvent->getContent(),
             ]
         );
     }

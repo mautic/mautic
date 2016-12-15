@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,47 +14,39 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'dynamicContent');
 $view['slots']->set('headerTitle', $entity->getName());
 
-$showVariants = (count($variants['children'])
-    || (!empty($variants['parent'])
-        && $variants['parent']->getId() != $entity->getId()));
+$translationContent = $view->render(
+    'MauticCoreBundle:Translation:index.html.php',
+    [
+        'activeEntity' => $entity,
+        'translations' => $translations,
+        'model'        => 'dynamicContent',
+        'actionRoute'  => 'mautic_dynamicContent_action',
+    ]
+);
+$showTranslations = !empty(trim($translationContent));
 
 $customButtons = [];
-//if ((empty($variants['parent']) || ($variants['parent']->getId() == $entity->getId()))
-//    && $permissions['dynamicContent:dynamicContents:create']
-//) {
-//    $customButtons[] = [
-//        'attr' => [
-//            'data-toggle' => 'ajax',
-//            'href' => $view['router']->generate(
-//                'mautic_dynamicContent_action',
-//                ['objectAction' => 'addvariant', 'objectId' => $entity->getId()]
-//            ),
-//        ],
-//        'iconClass' => 'fa fa-sitemap',
-//        'btnText' => $view['translator']->trans('mautic.core.form.addvariant'),
-//    ];
-//}
 
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'item' => $entity,
-            'customButtons' => (isset($customButtons)) ? $customButtons : [],
+            'item'            => $entity,
+            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
-                'edit' => $security->hasEntityAccess(
+                'edit' => $view['security']->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:editown'],
                     $permissions['dynamicContent:dynamicContents:editother'],
                     $entity->getCreatedBy()
                 ),
-                'clone' => $security->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:editown'],
-                    $permissions['dynamicContent:dynamicContents:editother'],
+                'clone'  => $permissions['dynamicContent:dynamicContents:create'],
+                'delete' => $view['security']->hasEntityAccess(
+                    $permissions['dynamicContent:dynamicContents:deleteown'],
+                    $permissions['dynamicContent:dynamicContents:deleteother'],
                     $entity->getCreatedBy()
                 ),
-                'delete' => $permissions['dynamicContent:dynamicContents:create'],
-                'close' => $security->hasEntityAccess(
+                'close' => $view['security']->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:viewown'],
                     $permissions['dynamicContent:dynamicContents:viewother'],
                     $entity->getCreatedBy()
@@ -79,6 +72,20 @@ $view['slots']->set(
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $entity->getDescription(); ?></div>
+                        <?php if ($entity->isVariant(true)): ?>
+                            <div class="small">
+                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                    <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($entity->isTranslation(true)): ?>
+                            <div class="small">
+                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
+                                    <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -107,7 +114,9 @@ $view['slots']->set(
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
-                       data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                       data-target="#page-details">
+                        <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
+                    </a>
                 </span>
             </div>
             <!--/ page detail collapseable toggler -->
@@ -144,10 +153,10 @@ $view['slots']->set(
                         <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
-                <?php if ($showVariants): ?>
+                <?php if ($showTranslations): ?>
                 <li class>
-                    <a href="#variants-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.dynamicContent.variants'); ?>
+                    <a href="#translation-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.core.translations'); ?>
                     </a>
                 </li>
                 <?php endif; ?>
@@ -156,9 +165,16 @@ $view['slots']->set(
         </div>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <div class="tab-pane active bdr-w-0" id="clicks-container">
+            <div class="tab-pane active active bdr-w-0" id="clicks-container">
                 <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
             </div>
+            <!-- #translation-container -->
+            <?php if ($showTranslations): ?>
+                <div class="tab-pane bdr-w-0" id="translation-container">
+                    <?php echo $translationContent; ?>
+                </div>
+            <?php endif; ?>
+            <!--/ #translation-container -->
         </div>
         <!-- end: tab-content -->
     </div>

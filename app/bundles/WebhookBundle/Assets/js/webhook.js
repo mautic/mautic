@@ -1,6 +1,6 @@
 Mautic.sendHookTest = function() {
 
-    var url = mQuery('#webhook_webhook_url').val();
+    var url = mQuery('#webhook_webhookUrl').val();
     var eventTypes = mQuery("#event-types input[type='checkbox']");
     var selectedTypes = [];
 

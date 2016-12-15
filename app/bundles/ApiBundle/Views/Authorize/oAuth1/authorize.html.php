@@ -1,16 +1,17 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticUserBundle:Security:base.html.php');
 $view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
 $name = $consumer->getName();
-$msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
+$msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', ['%name%' => $name]) :
     $view['translator']->trans('mautic.api.oauth.clientnoname');
 ?>
 <h4 class="mb-lg"><?php echo $msg; ?></h4>
