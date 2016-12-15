@@ -117,7 +117,7 @@ class AssetRepository extends CommonRepository
                 );
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq('IDENTITY(a.createdBy)', $this->currentUser->getId());
+                $expr = $q->expr()->eq('a.createdBy', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
                 $expr            = $q->expr()->like('c.alias', ":$unique");
