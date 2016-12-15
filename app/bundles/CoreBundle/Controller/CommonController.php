@@ -11,10 +11,15 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Exporter\Handler;
+use Exporter\Source\ArraySourceIterator;
+use Exporter\Writer\CsvWriter;
+use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -23,6 +28,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -749,5 +755,55 @@ class CommonController extends Controller implements MauticController
 
             $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
         }
+    }
+
+    public function exportResultsAs($type, $filename, AbstractCommonModel $model, array $args)
+    {
+        if (!in_array($type, ['csv', 'xlsx'])) {
+            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.type', ['type' => $type]));
+        }
+
+        $args['limit'] = $args['limit'] < 100 ? 100 : $args['limit'];
+        $args['start'] = 0;
+
+        $results    = $model->getEntities($args);
+        $count      = $results['count'];
+        $contacts   = $results['results'];
+        $iterations = ceil($count / $args['limit']);
+        $loop       = 1;
+
+        $toExport = [];
+
+        /** @var Lead $contact */
+        foreach ($contacts as $contact) {
+            $toExport[] = $contact->getProfileFields();
+        }
+
+        $this->getDoctrine()->getManager()->clear(Lead::class);
+
+        while ($loop < $iterations) {
+            /** @var Lead $contact */
+            foreach ($contacts as $contact) {
+                $toExport[] = $contact->getProfileFields();
+            }
+
+            $args['start'] = $loop * $args['limit'];
+
+            $results  = $model->getEntities($args);
+            $contacts = $results['results'];
+
+            $this->getDoctrine()->getManager()->clear(Lead::class);
+
+            ++$loop;
+        }
+
+        $sourceIterator = new ArraySourceIterator($toExport);
+        $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $filename       = $filename.'_'.((new \DateTime())->format('U')).'.'.$type;
+
+        return new StreamedResponse(function () use ($sourceIterator, $writer) {
+            Handler::create($sourceIterator, $writer)->export();
+        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
     }
 }

@@ -94,16 +94,21 @@ class LeadController extends FormController
             $filter['force'] .= " $mine";
         }
 
-        $results = $model->getEntities(
-            [
-                'start'          => $start,
-                'limit'          => $limit,
-                'filter'         => $filter,
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'withTotalCount' => true,
-            ]
-        );
+        $args = [
+            'start'          => $start,
+            'limit'          => $limit,
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ];
+
+        if ($dataType = $this->request->get('downloadAsList')) {
+            return $this->exportResultsAs($dataType, 'contacts', $model, $args);
+        }
+
+        $results = $model->getEntities($args);
+
         $count = $results['count'];
         unset($results['count']);
 
