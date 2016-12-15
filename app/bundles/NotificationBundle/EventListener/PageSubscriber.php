@@ -60,7 +60,7 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        if (!$this->coreParametersHelper->getParameter('notification_enabled')) {
+        if (!$this->coreParametersHelper->getParameter('notification_landing_page_enabled')) {
             return;
         }
         $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
