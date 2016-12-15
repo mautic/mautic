@@ -57,7 +57,9 @@ class EventType extends AbstractType
                 'date'      => 'mautic.campaign.form.type.date',
             ];
 
-            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['eventType']) {
+            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
+                && 'condition' != $options['data']['eventType']
+            ) {
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
@@ -159,6 +161,14 @@ class EventType extends AbstractType
 
         $builder->add('type', 'hidden');
         $builder->add('eventType', 'hidden');
+        $builder->add(
+            'anchorEventType',
+            'hidden',
+            [
+                'mapped' => false,
+                'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
+            ]
+        );
 
         $builder->add(
             'canvasSettings',

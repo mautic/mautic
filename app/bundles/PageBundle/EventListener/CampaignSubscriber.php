@@ -136,6 +136,19 @@ class CampaignSubscriber extends CommonSubscriber
             }
         }
 
+        $refererMatches = [];
+
+        // Check Landing Pages URL or Tracing Pixel URL
+        if (isset($config['referer']) && $config['referer']) {
+            $refererUrl      = $eventDetails->getReferer();
+            $limitToReferers = explode(',', $config['referer']);
+
+            foreach ($limitToReferers as $referer) {
+                $referer                  = trim($referer);
+                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
+            }
+        }
+
         // **Page hit is true if:**
         // 1. no landing page is set and no URL rule is set
         $applyToAny = (empty($config['url']) && empty($limitToPages));
@@ -146,7 +159,10 @@ class CampaignSubscriber extends CommonSubscriber
         // 3. URL rule is set and match with URL hit
         $urlIsHit = (!empty($config['url']) && in_array(true, $urlMatches));
 
-        if ($applyToAny || $langingPageIsHit || $urlIsHit) {
+        // 3. URL rule is set and match with URL hit
+        $refererIsHit = (!empty($config['referer']) && in_array(true, $refererMatches));
+
+        if ($applyToAny || $langingPageIsHit || $urlIsHit || $refererIsHit) {
             return $event->setResult(true);
         }
 

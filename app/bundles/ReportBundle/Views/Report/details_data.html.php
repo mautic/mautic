@@ -54,8 +54,14 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                                 <td>
                                     <?php $closeLink = false; ?>
                                     <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
-                                    <?php $closeLink = true; ?>
-                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                    <?php $closeLink = true;
+                                    if (array_key_exists('comp.id', $columns)) {
+                                        $objectAction = 'edit';
+                                    } else {
+                                        $objectAction = 'view';
+                                    }
+                                    ?>
+                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
                                     <?php endif; ?>
                                     <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
                                     <?php if ($closeLink): ?></a><?php endif; ?>

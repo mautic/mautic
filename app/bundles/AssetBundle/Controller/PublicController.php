@@ -105,6 +105,6 @@ class PublicController extends CommonFormController
 
         $model->trackDownload($entity, $this->request, 404);
 
-        $this->notFound();
+        return $this->notFound();
     }
 }

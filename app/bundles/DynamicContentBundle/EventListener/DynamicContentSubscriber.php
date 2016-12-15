@@ -111,7 +111,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         $log    = [
             'bundle'   => 'dynamicContent',
             'object'   => 'dynamicContent',
-            'objectId' => $entity->getId(),
+            'objectId' => $entity->deletedId,
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];

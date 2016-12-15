@@ -202,7 +202,10 @@ class CommonController extends Controller implements MauticController
         $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : [];
         $template   = $args['contentTemplate'];
 
-        return $this->render($template, $parameters);
+        $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+        $response = new Response('', $code);
+
+        return $this->render($template, $parameters, $response);
     }
 
     /**
@@ -297,10 +300,42 @@ class CommonController extends Controller implements MauticController
         $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : [];
         $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
+        $code            = array_key_exists('responseCode', $args) ? $args['responseCode'] : 200;
 
         //set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
             $passthrough['route'] = $args['returnUrl'];
+        }
+
+        if (!empty($passthrough['route'])) {
+            // Add the ajax route to the request so that the desired route is fed to plugins rather than the current request
+            $baseUrl       = $this->request->getBaseUrl();
+            $routePath     = str_replace($baseUrl, '', $passthrough['route']);
+            $ajaxRouteName = false;
+
+            try {
+                $routeParams   = $this->get('router')->match($routePath);
+                $ajaxRouteName = $routeParams['_route'];
+
+                $this->request->attributes->set('ajaxRoute',
+                    [
+                        '_route'        => $ajaxRouteName,
+                        '_route_params' => $routeParams,
+                    ]
+                );
+            } catch (\Exception $e) {
+                //do nothing
+            }
+
+            //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
+            $this->request->query->set('overrideRouteUri', $passthrough['route']);
+            if ($ajaxRouteName) {
+                if (isset($routeParams['objectAction'])) {
+                    //action urls share same route name so tack on the action to differentiate
+                    $ajaxRouteName .= "|{$routeParams['objectAction']}";
+                }
+                $this->request->query->set('overrideRouteName', $ajaxRouteName);
+            }
         }
 
         //Ajax call so respond with json
@@ -320,10 +355,7 @@ class CommonController extends Controller implements MauticController
         //there was a redirect within the controller leading to a double call of this function so just return the content
         //to prevent newContent from being json
         if ($this->request->get('ignoreAjax', false)) {
-            $response = new Response();
-            $response->setContent($newContent);
-
-            return $response;
+            return new Response($newContent, $code);
         }
 
         //render flashes
@@ -340,27 +372,6 @@ class CommonController extends Controller implements MauticController
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
-            if (!empty($passthrough['route'])) {
-                //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
-                $this->request->query->set('overrideRouteUri', $passthrough['route']);
-
-                //if the URL has a query built into it, breadcrumbs may fail matching
-                //so let's try to find it by the route name which will be the extras["routeName"] of the menu item
-                $baseUrl   = $this->request->getBaseUrl();
-                $routePath = str_replace($baseUrl, '', $passthrough['route']);
-                try {
-                    $routeParams = $this->get('router')->match($routePath);
-                    $routeName   = $routeParams['_route'];
-                    if (isset($routeParams['objectAction'])) {
-                        //action urls share same route name so tack on the action to differentiate
-                        $routeName .= "|{$routeParams['objectAction']}";
-                    }
-                    $this->request->query->set('overrideRouteName', $routeName);
-                } catch (\Exception $e) {
-                    //do nothing
-                }
-            }
-
             $updatedContent = [];
             if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
@@ -377,8 +388,6 @@ class CommonController extends Controller implements MauticController
                 ['newContent' => $newContent]
             );
         }
-
-        $code = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
 
         if ($newContent instanceof Response) {
             $response = $newContent;
@@ -463,11 +472,13 @@ class CommonController extends Controller implements MauticController
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
-        throw new NotFoundHttpException(
-            $this->translator->trans($msg,
-                [
-                    '%url%' => $this->request->getRequestUri(),
-                ]
+        return $this->renderException(
+            new NotFoundHttpException(
+                $this->translator->trans($msg,
+                    [
+                        '%url%' => $this->request->getRequestUri(),
+                    ]
+                )
             )
         );
     }

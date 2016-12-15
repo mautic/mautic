@@ -534,6 +534,10 @@ class EmailRepository extends CommonRepository
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
 
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
+        );
+
         if (!empty($id)) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)

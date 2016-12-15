@@ -97,8 +97,13 @@ class PointModel extends CommonFormModel
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
         }
+
         if (!empty($action)) {
             $options['action'] = $action;
+        }
+
+        if (empty($options['pointActions'])) {
+            $options['pointActions'] = $this->getPointActions();
         }
 
         return $formFactory->create('point', $entity, $options);
@@ -185,11 +190,10 @@ class PointModel extends CommonFormModel
     /**
      * Triggers a specific point change.
      *
-     * @param $type
+     * @param       $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
      * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
-     *25
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {

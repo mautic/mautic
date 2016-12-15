@@ -43,6 +43,12 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+            'mautic.notification.stats.subscriber' => [
+                'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
@@ -110,7 +116,6 @@ return [
             'mautic_receive_notification' => [
                 'path'       => '/notification/receive',
                 'controller' => 'MauticNotificationBundle:Api\NotificationApi:receive',
-
             ],
             'mautic_subscribe_notification' => [
                 'path'       => '/notification/subscribe',
@@ -135,6 +140,14 @@ return [
                 'controller' => 'MauticNotificationBundle:Js:manifest',
             ],
         ],
+        'api' => [
+            'mautic_api_notificationsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'notifications',
+                'path'            => '/notifications',
+                'controller'      => 'MauticNotificationBundle:Api\NotificationApi',
+            ],
+        ],
     ],
     'menu' => [
         'main' => [
@@ -157,11 +170,11 @@ return [
     //    'notification' => null
     //],
     'parameters' => [
-        'notification_enabled'       => false,
-        'notification_app_id'        => null,
-        'notification_rest_api_key'  => null,
-        'notification_safari_web_id' => null,
-        'gcm_sender_id'              => '482941778795',
+        'notification_enabled'        => false,
+        'notification_app_id'         => null,
+        'notification_rest_api_key'   => null,
+        'notification_safari_web_id'  => null,
+        'gcm_sender_id'               => '482941778795',
         'welcomenotification_enabled' => true,
     ],
 ];

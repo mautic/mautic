@@ -11,32 +11,16 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
-use Mautic\UserBundle\Entity\User;
 
 /**
  * LeadEventLogRepository.
  */
-class LeadEventLogRepository extends EntityRepository
+class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
-
-    /**
-     * @var User
-     */
-    protected $currentUser;
-
-    /**
-     * Set the current user (i.e. from security context) for use within repositories.
-     *
-     * @param User $user
-     */
-    public function setCurrentUser(User $user)
-    {
-        $this->currentUser = $user;
-    }
 
     /**
      * Get a lead's page event log.
@@ -181,7 +165,8 @@ class LeadEventLogRepository extends EntityRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('o.event_id, count(o.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
+            ->innerJoin('o', MAUTIC_TABLE_PREFIX.'campaign_leads', 'l', 'o.lead_id = l.lead_id and l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0');
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId),

@@ -8,11 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\NotificationBundle\Entity\Notification;
 
 /**
  * Class NotificationSendEvent.
@@ -41,7 +41,7 @@ class NotificationSendEvent extends CommonEvent
     public function __construct($message, $heading, Lead $lead)
     {
         $this->message = $message;
-        $this->heading  = $heading;
+        $this->heading = $heading;
         $this->lead    = $lead;
     }
 

@@ -31,13 +31,9 @@ echo $view['assets']->includeScript('plugins/MauticFocusBundle/Assets/js/focus.j
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.core.help.searchcommands',
-            'action'          => $currentRoute,
-            'routeBase'       => 'focus',
-            'templateButtons' => [
-                'delete' => $permissions['plugin:focus:items:delete'],
-            ],
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.core.help.searchcommands',
+            'action'      => $currentRoute,
         ]
     ); ?>
     <div class="page-list">

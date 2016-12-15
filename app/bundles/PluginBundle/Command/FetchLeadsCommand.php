@@ -90,19 +90,33 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $factory->getHelper('integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+            $config            = $integrationObject->mergeConfigToFeatureSettings();
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
+            $params['start'] = $startDate;
+            $params['end']   = $endDate;
+
+            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-
-                $params['start'] = $startDate;
-                $params['end']   = $endDate;
-
                 if (strtotime($startDate) > strtotime('-30 days')) {
                     $processed = intval($integrationObject->getLeads($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                } else {
+                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                }
+            }
+
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && in_array('company', $config['objects'])) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+
+                if (strtotime($startDate) > strtotime('-30 days')) {
+                    $processed = intval($integrationObject->getCompanies($params));
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
                 } else {
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }

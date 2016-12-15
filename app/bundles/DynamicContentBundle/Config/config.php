@@ -36,11 +36,19 @@ return [
         'public' => [
             'mautic_api_dynamicContent_index' => [
                 'path'       => '/dwc',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities',
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:getEntities',
             ],
             'mautic_api_dynamicContent_action' => [
                 'path'       => '/dwc/{objectAlias}',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:process',
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:process',
+            ],
+        ],
+        'api' => [
+            'mautic_api_dynamicContent_standard' => [
+                'standard_entity' => true,
+                'name'            => 'dynamicContents',
+                'path'            => '/dynamiccontents',
+                'controller'      => 'MauticDynamicContentBundle:Api\DynamicContentApi',
             ],
         ],
     ],
@@ -64,6 +72,12 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.dynamicContent.stats.subscriber' => [
+                'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

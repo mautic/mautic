@@ -68,7 +68,7 @@ class MenuEvent extends Event
 
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == $items['name']);
         if (!$isRoot) {
-            $this->helper->createMenuStructure($items, 0, $defaultPriority);
+            $this->helper->createMenuStructure($items, 0, $defaultPriority, $this->type);
 
             $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
         } else {
@@ -92,9 +92,9 @@ class MenuEvent extends Event
      */
     public function getMenuItems()
     {
-        $this->helper->placeOrphans($this->menuItems['children'], true);
+        $this->helper->placeOrphans($this->menuItems['children'], true, 1, $this->type);
         $this->helper->sortByPriority($this->menuItems['children']);
-        $this->helper->resetOrphans();
+        $this->helper->resetOrphans($this->type);
 
         return $this->menuItems;
     }

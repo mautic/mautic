@@ -11,6 +11,7 @@
 
 namespace Mautic\StageBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -31,5 +32,79 @@ class StageApiController extends CommonApiController
         $this->entityNameMulti  = 'stages';
         $this->permissionBase   = 'stage:stages';
         $this->serializerGroups = ['stageDetails', 'categoryList', 'publishDetails'];
+    }
+
+    /**
+     * Adds a contact to a list.
+     *
+     * @param int $id        Stage ID
+     * @param int $contactId Lead ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function addContactAction($id, $contactId)
+    {
+        $stage = $this->model->getEntity($id);
+
+        if (null === $stage) {
+            return $this->notFound();
+        }
+
+        $leadModel = $this->getModel('lead');
+        $contact   = $leadModel->getEntity($contactId);
+
+        if ($contact == null) {
+            return $this->notFound();
+        }
+
+        // Does the lead exist and the user has permission to edit
+        $canEditContact = $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getOwner());
+        $canViewStage   = $this->security->isGranted('stage:stages:view');
+
+        if (!$canEditContact || !$canViewStage) {
+            return $this->accessDenied();
+        }
+
+        $leadModel->addToStages($contact, $stage);
+
+        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+    }
+
+    /**
+     * Removes given contact from a list.
+     *
+     * @param int $id        Stage ID
+     * @param int $contactId Lead ID
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function removeContactAction($id, $contactId)
+    {
+        $stage = $this->model->getEntity($id);
+
+        if (null === $stage) {
+            return $this->notFound();
+        }
+
+        $leadModel = $this->getModel('lead');
+        $contact   = $leadModel->getEntity($contactId);
+
+        // Does the lead exist and the user has permission to edit
+        $canEditContact = $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getOwner());
+        $canViewStage   = $this->security->isGranted('stage:stages:view');
+
+        if ($contact == null) {
+            return $this->notFound();
+        } elseif (!$canEditContact || !$canViewStage) {
+            return $this->accessDenied();
+        }
+
+        $leadModel->removeFromStages($contact, $stage);
+
+        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
 }

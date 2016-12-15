@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -30,7 +29,7 @@ class EmailApiController extends CommonApiController
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->permissionBase   = 'email:emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList'];
+        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
     }
 
     /**
@@ -125,13 +124,16 @@ class EmailApiController extends CommonApiController
             $post   = $this->request->request->all();
             $tokens = (!empty($post['tokens'])) ? $post['tokens'] : [];
 
-            $cleantokens = array_map(function ($v) {
-                return InputHelper::clean($v);
-            }, $tokens);
+            $cleantokens = array_map(
+                function ($v) {
+                    return InputHelper::clean($v);
+                },
+                $tokens
+            );
 
             $leadFields = array_merge(['id' => $leadId], $leadModel->flattenFields($lead->getFields()));
 
-            if (MailHelper::applyFrequencyRules($lead)) {
+            if ($this->get('mautic.helper.mailer')->applyFrequencyRules($lead)) {
                 $this->model->sendEmail(
                     $entity,
                     $leadFields,
@@ -148,5 +150,39 @@ class EmailApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        $method          = $this->request->getMethod();
+        $segmentModel    = $this->getModel('lead.list');
+        $requestSegments = isset($parameters['lists']) ? $parameters['lists'] : [];
+        $currentSegments = [];
+        $deletedSegments = [];
+
+        foreach ($entity->getLists() as $currentSegment) {
+            $currentSegments[] = $currentSegment->getId();
+
+            // delete events and sources which does not exist in the PUT request
+            if ($method === 'PUT' && !in_array($currentSegment->getId(), $requestSegments)) {
+                $event->removeList($currentSegment);
+            }
+        }
+
+        // Add new segments
+        foreach ($requestSegments as $requestSegment) {
+            if (!in_array($requestSegment, $currentSegments)) {
+                $segment = $segmentModel->getEntity($requestSegment);
+                $event->addList($segment);
+            }
+        }
     }
 }
