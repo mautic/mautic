@@ -1901,7 +1901,10 @@ class LeadModel extends FormModel
                     $tagToBeAdded = $foundTags[$tag];
                 }
 
-                $lead->addTag($tagToBeAdded);
+                if (isset($tagToBeAdded)) {
+                    $lead->addTag($tagToBeAdded);
+                }
+
                 $tagsModified = true;
 
                 $this->logger->debug('CONTACT: Added '.$tag);
