@@ -460,7 +460,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $command                 = $filter->command;
         $string                  = $filter->string;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = true; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         //DBAL QueryBuilder does not have an expr()->not() function; boo!!
@@ -482,43 +482,42 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $innerJoinTables = (isset($this->advancedFilterCommands[$command])
             && SearchStringHelper::COMMAND_NEGATE !== $this->advancedFilterCommands[$command]);
-        $setParameter = true;
-        $likeExpr     = $operators['like'][$exprType];
-        $eqExpr       = $operators['='][$exprType];
-        $nullExpr     = $operators['null'][$exprType];
-        $inExpr       = $operators['in'][$exprType];
-        $xExpr        = $operators['x'][$exprType];
+        $likeExpr = $operators['like'][$exprType];
+        $eqExpr   = $operators['='][$exprType];
+        $nullExpr = $operators['null'][$exprType];
+        $inExpr   = $operators['in'][$exprType];
+        $xExpr    = $operators['x'][$exprType];
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
-                $expr            = $q->expr()->$nullExpr('l.date_identified');
-                $returnParameter = false;
+                $expr = $q->expr()->$nullExpr('l.date_identified');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->$eqExpr('l.owner_id', $this->currentUser->getId());
-                $returnParameter = false;
+                $expr = $q->expr()->$eqExpr('l.owner_id', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$eqExpr('l.owner_id', 0),
                     $q->expr()->$nullExpr('l.owner_id')
                 );
-                $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('u.first_name', ':'.$unique),
                     $q->expr()->$likeExpr('u.last_name', ':'.$unique)
                 );
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('l.firstname', ":$unique"),
                     $q->expr()->$likeExpr('l.lastname', ":$unique")
                 );
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
-                $expr = $q->expr()->$likeExpr('l.email', ":$unique");
+                $expr            = $q->expr()->$likeExpr('l.email', ":$unique");
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
                 $this->applySearchQueryRelationship(
@@ -545,6 +544,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     )
                 );
+                $returnParameter = true;
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ip'):
@@ -567,6 +567,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $innerJoinTables,
                     $this->generateFilterExpression($q, 'ip.ip_address', $likeExpr, $unique, null)
                 );
+                $returnParameter = true;
 
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate'):
@@ -594,7 +595,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->groupBy('duplicate.lead_id')
                     ->having("COUNT(duplicate.lead_id) = $pluck");
 
-                $expr = $q->expr()->$inExpr('l.id', sprintf('(%s)', $sq->getSQL()));
+                $expr            = $q->expr()->$inExpr('l.id', sprintf('(%s)', $sq->getSQL()));
+                $returnParameter = true;
 
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
@@ -617,6 +619,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $innerJoinTables,
                     $this->generateFilterExpression($q, 'tag.tag', $likeExpr, $unique, null)
                 );
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
                 $this->applySearchQueryRelationship(
@@ -638,22 +641,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $innerJoinTables,
                     $this->generateFilterExpression($q, 'comp.companyname', $likeExpr, $unique, null)
                 );
+                $returnParameter = true;
                 break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
                 }
+                $returnParameter = true;
                 break;
         }
 
-        if ($setParameter) {
+        if ($returnParameter) {
             $string              = ($filter->strict) ? $filter->string : "{$filter->string}%";
             $parameters[$unique] = $string;
         }
 
         return [
             $expr,
-            ($returnParameter) ? $parameters : [],
+            $parameters,
         ];
     }
 
