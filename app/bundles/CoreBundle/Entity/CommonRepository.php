@@ -480,7 +480,8 @@ class CommonRepository extends EntityRepository
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
                 list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $queryExpression->add($expr);
+                $this->appendExpression($queryExpression, $expr);
+
                 if (is_array($parameters)) {
                     $queryParameters = array_merge($queryParameters, $parameters);
                 }
@@ -489,12 +490,15 @@ class CommonRepository extends EntityRepository
             //parse the filter if set
             if ($queryExpression->count()) {
                 $q->andWhere($queryExpression);
-                foreach ($queryParameters as $k => $v) {
-                    if ($v === true || $v === false) {
-                        $q->setParameter($k, $v, 'boolean');
-                    } else {
-                        $q->setParameter($k, $v);
-                    }
+            }
+
+            // Parameters have to be set even if there are no expressions just in case a search command
+            // passed back a parameter it used
+            foreach ($queryParameters as $k => $v) {
+                if ($v === true || $v === false) {
+                    $q->setParameter($k, $v, 'boolean');
+                } else {
+                    $q->setParameter($k, $v);
                 }
             }
         }
@@ -631,7 +635,7 @@ class CommonRepository extends EntityRepository
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-            $this->parseSearchFitlers($parseFilters, $qb, $expressions, $parameters);
+            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
         }
 
         return [$expressions, $parameters];
@@ -642,7 +646,7 @@ class CommonRepository extends EntityRepository
      * @param $expr
      * @param $parameters
      */
-    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
@@ -666,10 +670,36 @@ class CommonRepository extends EntityRepository
                 $parameters = array_merge($parameters, $params);
             }
 
-            if (!empty($expr)) {
-                $expressions->add($expr);
-            }
+            $this->appendExpression($expressions, $expr);
         }
+    }
+
+    /**
+     * @param $appendTo
+     * @param $expr
+     */
+    protected function appendExpression($appendTo, $expr)
+    {
+        if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
+            if ($expr->count()) {
+                $appendTo->add($expr);
+            }
+        } elseif (!empty($expr)) {
+            $appendTo->add($expr);
+        }
+    }
+
+    /**
+     * @deprecated 2.5 to be removed in 3.0; BC for mispelled method
+     *
+     * @param $parseFilters
+     * @param $qb
+     * @param $expressions
+     * @param $parameters
+     */
+    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    {
+        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
     }
 
     /**
