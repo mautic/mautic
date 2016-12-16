@@ -11,34 +11,37 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class IdEntry
 {
     /**
+     * @var int
+     */
+    protected $id;
+
+    /**
      * @var string
      */
     protected $entityId;
 
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var int
-
      */
     protected $expiryTimestamp;
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('saml_id_entry');
 
-        $builder->addId();
+        $builder->createField('id', 'string')
+             ->makePrimaryKey()
+             ->generatedValue('NONE')
+             ->build();
 
         $builder->createField('entityId', 'string')
             ->columnName('entity_id')
+            ->makePrimaryKey()
             ->generatedValue('NONE')
             ->build();
 
@@ -98,7 +101,7 @@ class IdEntry
     }
 
     /**
-     * @param string $id
+     * @param int $id
      *
      * @return IdEntry
      */

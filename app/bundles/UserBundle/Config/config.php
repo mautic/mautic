@@ -46,6 +46,13 @@ return [
                 'path'       => '/sso_login_check/{integration}',
                 'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
             ],
+            'lightsaml_sp.login' => [
+                'path'       => '/saml/login',
+                'controller' => 'LightSamlSpBundle:Default:login',
+            ],
+            'lightsaml_sp.login_check' => [
+                'path' => '/saml/login_check',
+            ],
             'mautic_user_index' => [
                 'path'       => '/users/{page}',
                 'controller' => 'MauticUserBundle:User:index',
@@ -104,6 +111,21 @@ return [
                 'path'       => '/passwordresetconfirm',
                 'controller' => 'MauticUserBundle:Public:passwordResetConfirm',
             ],
+            'lightsaml_sp.metadata' => [
+                'path'       => '/saml/metadata.xml',
+                'controller' => 'LightSamlSpBundle:Default:metadata',
+            ],
+
+            'lightsaml_sp.discovery' => [
+                'path'       => '/saml/discovery',
+                'controller' => 'LightSamlSpBundle:Default:discovery',
+            ],
+
+            'lightsaml_sp.sessions' => [
+                'path'       => '/saml/sessions',
+                'controller' => 'LightSamlSpBundle:Default:sessions',
+            ],
+
         ],
     ],
 
@@ -281,11 +303,8 @@ return [
         ],
     ],
     'parameters' => [
-        'saml_enabled'     => 'no',
+        'saml_enabled'     => false,
         'idp_entity_id'    => '',
-        'idp_entity_id'    => '',
-        'idp_login_url'    => '',
-        'idp_logout_url'   => '',
         'idp_ceritificate' => '',
     ],
 ];

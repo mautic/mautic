@@ -1,35 +1,37 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\UserBundle\Security\User;
 
-use Mautic\UserBundle\Entity\User;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
 use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
 {
-    /** @var ObjectManager */
-    private $objectManager;
+    /** @var EntityManager */
+    private $entityManager;
 
     /** @var UsernameMapperInterface */
     private $usernameMapper;
 
     /**
-     * @param ObjectManager           $objectManager
+     * @param EntityManager           $entityManager
      * @param UsernameMapperInterface $usernameMapper
      */
-    public function __construct($objectManager, $usernameMapper)
+    public function __construct($entityManager, $usernameMapper)
     {
-        $this->objectManager = $objectManager;
+        $this->entityManager  = $entityManager;
         $this->usernameMapper = $usernameMapper;
     }
 
@@ -43,13 +45,15 @@ class UserCreator implements UserCreatorInterface
         $username = $this->usernameMapper->getUsername($response);
 
         $user = new User();
-        $user
-            ->setUsername($username)
-            ->setRoles(['ROLE_USER'])
-        ;
+        $user->setUsername($username)
+            ->setFirstName('Saml')
+            ->setLastName('Saml')
+            ->setPassword(1234)
+            ->setEmail('saml@saml.com')
+            ->setRole($this->entityManager->getReference('MauticUserBundle:Role', 1));
 
-        $this->objectManager->persist($user);
-        $this->objectManager->flush();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         return $user;
     }

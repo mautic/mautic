@@ -52,6 +52,16 @@ $container->loadFromExtension(
                 'mautic_plugin_auth' => true,
                 'context'            => 'mautic',
             ],
+            'saml_login' => [
+                'pattern'   => '^/s/saml/login$',
+                'anonymous' => true,
+                'context'   => 'mautic',
+            ],
+            'saml_discovery' => [
+                'pattern'   => '^/saml/discovery$',
+                'anonymous' => true,
+                'context'   => 'mautic',
+            ],
             'oauth2_token' => [
                 'pattern'  => '^/oauth/v2/token',
                 'security' => false,
@@ -90,25 +100,6 @@ $container->loadFromExtension(
                 'stateless'          => true,
                 'http_basic'         => '%mautic.api_enable_basic_auth%',
             ],
-            'saml_login' => [
-                'pattern'   => '^/saml/login$',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-            'saml_discovery' => [
-                'pattern'   => '^/saml/discovery$',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-            'saml' => [
-                'pattern'       => '^/saml/',
-                'light_saml_sp' => [
-                    'user_creator' => 'mautic.security.saml.user_creator',
-                    'login_path'   => '/saml/login',
-                    'check_path'   => '/saml/login_check',
-                ],
-                'context' => 'mautic',
-            ],
             'main' => [
                 'pattern'     => '^/s/',
                 'simple_form' => [
@@ -118,6 +109,14 @@ $container->loadFromExtension(
                     'failure_handler'      => 'mautic.security.authentication_handler',
                     'login_path'           => '/s/login',
                     'check_path'           => '/s/login_check',
+                ],
+                'light_saml_sp' => [
+                    'provider'        => 'user_provider',
+                    'success_handler' => 'mautic.security.authentication_handler',
+                    'failure_handler' => 'mautic.security.authentication_handler',
+                    'user_creator'    => 'mautic.security.saml.user_creator',
+                    'login_path'      => '/s/saml/login',
+                    'check_path'      => '/s/saml/login_check',
                 ],
                 'logout' => [
                     'handlers' => [
@@ -145,25 +144,25 @@ $container->loadFromExtension(
         ],
     ]
 );
-$container->loadFromExtension(
-    'light_saml_symfony_bridge', [
 
+$samlEnabled = ($container->hasParameter('mautic.saml_enabled') ? $container->getParameter('mautic.saml_enabled') : false);
+$container->loadFromExtension(
+    'light_saml_symfony_bridge',
+    [
         'own' => [
             'entity_id'   => '%mautic.site_url%',
             'credentials' => [
-                   ['certificate'  => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.crt',
-                       'key'       => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.key',
-                        'password' => '',
-                       ],
+                [
+                    'certificate' => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.crt',
+                    'key'         => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.key',
+                    'password'    => '',
+                ],
             ],
         ],
         'party' => [
-          'idp' => [
-              'files' => [
-                  '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/openidp.feide.no.xml',
-                  '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/testshib-providers.xml',
-              ],
-          ],
+            'idp' => [
+                'files' => true ? ['%kernel.root_dir%/cache/saml.xml'] : [],
+            ],
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',

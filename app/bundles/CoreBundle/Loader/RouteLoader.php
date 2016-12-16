@@ -101,15 +101,6 @@ class RouteLoader extends Loader
         }
         $collection->addCollection($secureCollection);
 
-        // SAML
-        $samlCollection = new RouteCollection();
-        $samlCollection->addCollection($this->import('@LightSamlSpBundle/Resources/config/routing.yml'));
-        $samlCollection->addPrefix('/saml');
-
-        if ($forceSSL) {
-            $samlCollection->setSchemes('https');
-        }
-        $collection->addCollection($samlCollection);
         // Catch all
         $event = new RouteEvent($this, 'catchall');
         $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
