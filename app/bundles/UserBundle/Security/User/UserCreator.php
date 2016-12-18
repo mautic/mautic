@@ -17,6 +17,7 @@ use LightSaml\SpBundle\Security\User\UserCreatorInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
@@ -84,7 +85,7 @@ class UserCreator implements UserCreatorInterface
         foreach ($this->requiredFields as $field) {
             $getter = 'get'.ucfirst($field);
             if (!$user->$getter()) {
-                throw new \InvalidResponseException('User does not include required fields.');
+                throw new BadCredentialsException('User does not include required fields.');
             }
         }
 

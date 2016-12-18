@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class ConfigSubscriber extends CommonSubscriber
 {
-    private $fileFields = ['saml_idp_metadata', 'saml_idp_certificate', 'saml_idp_private_key'];
+    private $fileFields = ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key'];
 
     /**
      * @return array
@@ -63,13 +63,18 @@ class ConfigSubscriber extends CommonSubscriber
 
                 switch ($field) {
                     case 'saml_idp_metadata':
-                        if (strpos($data[$field], '<EntityDescriptor') !== 0) {
-                            $event->setError('mautic.user.saml.metadata.invalid', [], 'userconfig', 'saml_idp_metadata');
+                        if (!$this->validateXml($data[$field])) {
+                            $event->setError('mautic.user.saml.metadata.invalid', [], 'userconfig', $field);
                         }
                         break;
-                    case 'saml_idp_certificate':
+                    case 'saml_idp_own_certificate':
                         if (strpos($data[$field], '-----BEGIN CERTIFICATE-----') !== 0) {
-                            $event->setError('mautic.user.saml.certificate.invalid', [], 'userconfig', 'saml_idp_certificate');
+                            $event->setError('mautic.user.saml.certificate.invalid', [], 'userconfig', $field);
+                        }
+                        break;
+                    case 'saml_idp_own_private_key':
+                        if (strpos($data[$field], '-----BEGIN RSA PRIVATE KEY-----') !== 0) {
+                            $event->setError('mautic.user.saml.private_key.invalid', [], 'userconfig', $field);
                         }
                         break;
                 }
@@ -79,5 +84,24 @@ class ConfigSubscriber extends CommonSubscriber
         }
 
         $event->setConfig($data, 'userconfig');
+    }
+
+    /**
+     * @param $content
+     *
+     * @return bool
+     */
+    protected function validateXml($content)
+    {
+        $valid = true;
+
+        libxml_use_internal_errors(true);
+        $doc = simplexml_load_string($content);
+        if (false === $doc) {
+            $valid = false;
+            libxml_clear_errors();
+        }
+
+        return $valid;
     }
 }

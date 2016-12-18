@@ -11,8 +11,9 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Mautic\ConfigBundle\Form\Type\ConfigFileType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
@@ -31,7 +32,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'saml_idp_metadata',
-            FileType::class,
+            ConfigFileType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.metadata',
                 'label_attr' => ['class' => 'control-label'],
@@ -53,14 +54,14 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'saml_idp_certificate',
-            FileType::class,
+            'saml_idp_own_certificate',
+            ConfigFileType::class,
             [
-                'label'      => 'mautic.user.config.form.saml.idp.certificate',
+                'label'      => 'mautic.user.config.form.saml.idp.own_certificate',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.user.config.form.saml.idp.certificate.tooltip',
+                    'tooltip' => 'mautic.user.config.form.saml.idp.own_certificate.tooltip',
                 ],
                 'required'    => false,
                 'constraints' => [
@@ -71,6 +72,42 @@ class ConfigType extends AbstractType
                         ]
                     ),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'saml_idp_own_private_key',
+            ConfigFileType::class,
+            [
+                'label'      => 'mautic.user.config.form.saml.idp.own_private_key',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.user.config.form.saml.idp.own_private_key.tooltip',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new File(
+                        [
+                            'mimeTypes'        => ['text/plain'],
+                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'saml_idp_own_password',
+            PasswordType::class,
+            [
+                'label'      => 'mautic.user.config.form.saml.idp.own_private_key',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.user.config.form.saml.idp.own_private_key.tooltip',
+                ],
+                'required' => false,
             ]
         );
 
@@ -115,7 +152,13 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => false,
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
             ]
         );
 
@@ -128,7 +171,13 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => false,
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
             ]
         );
 
@@ -141,7 +190,8 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => true,
+                'required'    => true,
+                'empty_value' => false,
             ]
         );
     }

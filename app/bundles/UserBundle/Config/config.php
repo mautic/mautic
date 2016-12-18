@@ -303,9 +303,10 @@ return [
     ],
     'parameters' => [
         'saml_idp_metadata'            => '',
-        'saml_idp_certificate'         => '',
-        'saml_idp_private_key'         => '',
-        'saml_idp_key_password'        => '',
+        'saml_idp_own_entity_id'       => '',
+        'saml_idp_own_certificate'     => '',
+        'saml_idp_own_private_key'     => '',
+        'saml_idp_own_password'        => '',
         'saml_idp_email_attribute'     => '',
         'saml_idp_username_attribute'  => '',
         'saml_idp_firstname_attribute' => '',

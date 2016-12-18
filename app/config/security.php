@@ -145,18 +145,21 @@ $container->loadFromExtension(
     ]
 );
 
+$entityId = 'mautic';
+if ($container->hasParameter('mautic.site_url')) {
+    $parts = parse_url($container->getParameter('mautic.site_url'));
+
+    if (!empty($parts['host'])) {
+        $scheme   = (!empty($parts['scheme']) ? $parts['scheme'] : 'http');
+        $entityId = $scheme.'://'.$parts['host'];
+    }
+}
+$container->setParameter('mautic.saml_idp_entity_id', $entityId);
 $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
         'own' => [
-            'entity_id'   => '%mautic.site_url%',
-            'credentials' => [
-                [
-                    'certificate' => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.crt',
-                    'key'         => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.key',
-                    'password'    => '',
-                ],
-            ],
+            'entity_id' => $entityId,
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',

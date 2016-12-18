@@ -2423,7 +2423,7 @@ var Mautic = {
      *
      * @param action
      */
-    executeAction: function (action) {
+    executeAction: function (action, callback) {
         if (typeof Mautic.activeActions == 'undefined') {
             Mautic.activeActions = {};
         } else if (typeof Mautic.activeActions[action] != 'undefined') {
@@ -2442,6 +2442,10 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 Mautic.processPageContent(response);
+
+                if (typeof callback == 'function') {
+                    callback(response);
+                }
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);

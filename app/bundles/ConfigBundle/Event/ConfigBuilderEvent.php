@@ -28,7 +28,9 @@ class ConfigBuilderEvent extends Event
     /**
      * @var array
      */
-    private $formThemes = [];
+    private $formThemes = [
+        'MauticConfigBundle:FormTheme',
+    ];
 
     /**
      * @var PathsHelper

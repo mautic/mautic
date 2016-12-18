@@ -19,29 +19,48 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class SamlPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
         if ($xml = $container->getParameter('mautic.saml_idp_metadata')) {
-            $certificateContent = $container->getParameter('mautic.saml_idp_certificate');
+            $certificateContent = $container->getParameter('mautic.saml_idp_own_certificate');
+            $privateKeyContent  = $container->getParameter('mautic.saml_idp_own_private_key');
+            $keyPassword        = $container->getParameter('mautic.saml_idp_own_password');
 
-            if ($certificateContent) {
+            if ($certificateContent && $privateKeyContent) {
                 $certificateContent = base64_decode($certificateContent);
+                $privateKeyContent  = base64_decode($privateKeyContent);
 
                 $certDefId             = 'mautic.security.saml.own.credential_cert';
                 $certificateDefinition = (new Definition(X509Certificate::class))
                     ->addMethodCall('loadPem', [$certificateContent]);
                 $container->setDefinition($certDefId, $certificateDefinition);
 
+                $privKeyDefId         = 'mautic.security.saml.own.credential_private_key';
+                $privateKeyDefinition = (new Definition('LightSaml\Credential\KeyHelper'))
+                    ->setFactory('LightSaml\Credential\KeyHelper::createPrivateKey')
+                    ->setArguments(
+                        [
+                            $privateKeyContent,
+                            $keyPassword,
+                            false,
+                            new Expression('service("'.$certDefId.'").getSignatureAlgorithm()'),
+                        ]
+                    );
+                $container->setDefinition($privKeyDefId, $privateKeyDefinition);
+
                 $credId                = 'mautic.security.saml.own.credentials';
-                $credentialsDefinition = new Definition(
+                $credentialsDefinition = (new Definition(
                     X509Credential::class,
                     [
                         new Reference($certDefId),
+                        new Reference($privKeyDefId),
                     ]
-                );
+                ))
+                    ->addMethodCall('setEntityId', ['%mautic.saml_idp_entity_id%']);
                 $container->setDefinition($credId, $credentialsDefinition);
 
                 $credentialStore = (new Definition(StaticCredentialStore::class))
@@ -65,7 +84,7 @@ class SamlPass implements CompilerPassInterface
             $container->setDefinition('mautic.security.saml.idp_entity_descriptor_store.xml', $definition);
 
             $container->getDefinition('lightsaml_sp.username_mapper.simple')
-                ->setClass('Mautic\UserBundle\Security\User\UserMapper');
+                      ->setClass('Mautic\UserBundle\Security\User\UserMapper');
         }
     }
 }

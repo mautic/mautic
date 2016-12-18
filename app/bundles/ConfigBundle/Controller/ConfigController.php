@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -217,6 +218,39 @@ class ConfigController extends FormController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function removeAction($objectId)
+    {
+        //admin only allowed
+        if (!$this->user->isAdmin()) {
+            return $this->accessDenied();
+        }
+
+        $success    = 0;
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+
+        // Extract and base64 encode file contents
+        $fileFields = $event->getFileFields();
+
+        if (in_array($objectId, $fileFields)) {
+            $configurator = $this->get('mautic.configurator');
+            $configurator->mergeParameters([$objectId => null]);
+            try {
+                $configurator->write();
+                $success = 1;
+            } catch (\Exception $exception) {
+            }
+        }
+
+        return new JsonResponse(['success' => $success]);
     }
 
     /**

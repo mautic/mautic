@@ -8,38 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$fields              = $form->children;
-$fieldKeys           = array_keys($fields);
-$generateDownloadRow = function ($field) use ($formConfig, $fields, $view) {
-    $hasErrors     = count($fields[$field]->vars['errors']);
-    $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
-    $hide          = (!empty($formConfig['parameters'][$field])) ? '' : ' hide';
-    $filename      = \Mautic\CoreBundle\Helper\InputHelper::alphanum($view['translator']->trans($fields[$field]->vars['label']), true, '_');
-    $downloadUrl   = $view['router']->path('mautic_config_action',
-        [
-            'objectAction' => 'download',
-            'objectId'     => $field,
-            'filename'     => $filename,
-        ]
-    );
-    echo <<<HTML
-            
-    <div class="row">
-        <div class="form-group col-xs-12 {$feedbackClass}">
-            {$view['form']->label($fields[$field], $fields[$field]->vars['label'])}
-            <span class="small pull-right{$hide}">
-                <a href="{$downloadUrl}">{$view['translator']->trans('mautic.core.download')}</a>
-            </span>
-            {$view['form']->widget($fields[$field])}
-            {$view['form']->errors($fields[$field])}
-        </div>
-    </div>
-
-HTML;
-}
+$fields    = $form->children;
+$fieldKeys = array_keys($fields);
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['saml_idp_metadata', 'saml_idp_certificate', 'saml_idp_private_key', 'saml_idp_key_password']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key', 'saml_idp_own_password']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.user.config.header.saml'); ?></h3>
@@ -47,10 +20,10 @@ HTML;
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                <?php echo $generateDownloadRow('saml_idp_metadata'); ?>
+                <?php echo $view['form']->row($fields['saml_idp_metadata'], ['fieldValue' => $formConfig['parameters']['saml_idp_metadata']]); ?>
             </div>
             <div class="col-md-6">
-                <?php echo $generateDownloadRow('saml_idp_certificate'); ?>
+                <?php echo $view['form']->row($fields['saml_idp_default_role']); ?>
             </div>
         </div>
         <hr />
@@ -72,9 +45,18 @@ HTML;
             </div>
         </div>
         <hr />
+        <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.user.config.form.saml.idp.own_certificate.description'); ?></div>
         <div class="row">
             <div class="col-md-6">
-                <?php echo $view['form']->row($fields['saml_idp_default_role']); ?>
+                <?php echo $view['form']->row($fields['saml_idp_own_certificate'], ['fieldValue' => $formConfig['parameters']['saml_idp_own_certificate']]); ?>
+            </div>
+            <div class="col-md-6">
+                <?php echo $view['form']->row($fields['saml_idp_own_private_key'], ['fieldValue' => $formConfig['parameters']['saml_idp_own_private_key']]); ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($fields['saml_idp_own_password']); ?>
             </div>
         </div>
     </div>
