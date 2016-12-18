@@ -44,7 +44,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'with_tags'   => true,
-                'with_segments'   => true,
                 'empty_value' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
