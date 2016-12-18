@@ -1,0 +1,71 @@
+<?php
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\UserBundle\DependencyInjection\Compiler;
+
+use LightSaml\Credential\X509Certificate;
+use LightSaml\Credential\X509Credential;
+use LightSaml\Model\Metadata\EntityDescriptor;
+use LightSaml\Store\Credential\StaticCredentialStore;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
+class SamlPass implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container)
+    {
+        if ($xml = $container->getParameter('mautic.saml_idp_metadata')) {
+            $certificateContent = $container->getParameter('mautic.saml_idp_certificate');
+
+            if ($certificateContent) {
+                $certificateContent = base64_decode($certificateContent);
+
+                $certDefId             = 'mautic.security.saml.own.credential_cert';
+                $certificateDefinition = (new Definition(X509Certificate::class))
+                    ->addMethodCall('loadPem', [$certificateContent]);
+                $container->setDefinition($certDefId, $certificateDefinition);
+
+                $credId                = 'mautic.security.saml.own.credentials';
+                $credentialsDefinition = new Definition(
+                    X509Credential::class,
+                    [
+                        new Reference($certDefId),
+                    ]
+                );
+                $container->setDefinition($credId, $credentialsDefinition);
+
+                $credentialStore = (new Definition(StaticCredentialStore::class))
+                    ->addMethodCall('add', [new Reference($credId)])
+                    ->addTag('lightsaml.own_credential_store');
+                $container->setDefinition('mautic.security.saml.own.credential_store', $credentialStore);
+            }
+
+            // Create the entity descriptor
+            $id                         = 'mautic.security.saml.idp_entity_descriptor';
+            $xml                        = base64_decode($xml);
+            $entityDescriptorDefinition = (new Definition(EntityDescriptor::class))
+                ->setFactory(EntityDescriptor::class.'::loadXml')
+                ->addArgument($xml);
+            $container->setDefinition($id, $entityDescriptorDefinition);
+
+            // Create the entity descriptor store
+            $definition = new Definition('LightSaml\Store\EntityDescriptor\FixedEntityDescriptorStore');
+            $definition->addTag('lightsaml.idp_entity_store')
+                       ->addMethodCall('add', [new Reference($id)]);
+            $container->setDefinition('mautic.security.saml.idp_entity_descriptor_store.xml', $definition);
+
+            $container->getDefinition('lightsaml_sp.username_mapper.simple')
+                ->setClass('Mautic\UserBundle\Security\User\UserMapper');
+        }
+    }
+}

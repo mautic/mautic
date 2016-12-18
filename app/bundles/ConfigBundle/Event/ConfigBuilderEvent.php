@@ -11,7 +11,8 @@
 
 namespace Mautic\ConfigBundle\Event;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -30,22 +31,38 @@ class ConfigBuilderEvent extends Event
     private $formThemes = [];
 
     /**
-     * @var MauticFactory
+     * @var PathsHelper
      */
-    private $factory;
+    private $pathsHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @var BundleHelper
      */
-    public function __construct(MauticFactory $factory)
+    private $bundleHelper;
+
+    /**
+     * @var array
+     */
+    protected $encodedFields = [];
+
+    /**
+     * ConfigBuilderEvent constructor.
+     *
+     * @param PathsHelper  $pathsHelper
+     * @param BundleHelper $bundleHelper
+     */
+    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
     {
-        $this->factory = $factory;
+        $this->pathsHelper  = $pathsHelper;
+        $this->bundleHelper = $bundleHelper;
     }
 
     /**
      * Set new form to the forms array.
      *
-     * @param array $form
+     * @param $form
+     *
+     * @return $this
      */
     public function addForm($form)
     {
@@ -54,6 +71,8 @@ class ConfigBuilderEvent extends Event
         }
 
         $this->forms[$form['formAlias']] = $form;
+
+        return $this;
     }
 
     /**
@@ -77,16 +96,6 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * Returns the factory.
-     *
-     * @return MauticFactory
-     */
-    public function getFactory()
-    {
-        return $this->factory;
-    }
-
-    /**
      * Helper method can load $parameters array from a config file.
      *
      * @param string $path (relative from the root dir)
@@ -95,7 +104,7 @@ class ConfigBuilderEvent extends Event
      */
     public function getParameters($path = null)
     {
-        $paramsFile = $this->factory->getSystemPath('app').$path;
+        $paramsFile = $this->pathsHelper->getSystemPath('app').$path;
 
         if (file_exists($paramsFile)) {
             // Import the bundle configuration, $parameters is defined in this file
@@ -104,6 +113,14 @@ class ConfigBuilderEvent extends Event
 
         if (!isset($parameters)) {
             $parameters = [];
+        }
+
+        $fields     = $this->getBase64EncodedFields();
+        $checkThese = array_intersect(array_keys($parameters), $fields);
+        foreach ($checkThese as $checkMe) {
+            if (!empty($parameters[$checkMe])) {
+                $parameters[$checkMe] = base64_decode($parameters[$checkMe]);
+            }
         }
 
         return $parameters;
@@ -119,7 +136,7 @@ class ConfigBuilderEvent extends Event
         static $allBundles;
 
         if (empty($allBundles)) {
-            $allBundles = $this->factory->getMauticBundles(true);
+            $allBundles = $this->bundleHelper->getMauticBundles(true);
         }
 
         if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
@@ -127,5 +144,25 @@ class ConfigBuilderEvent extends Event
         } else {
             return [];
         }
+    }
+
+    /**
+     * @param $fields
+     *
+     * @return $this
+     */
+    public function addFileFields($fields)
+    {
+        $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileFields()
+    {
+        return $this->encodedFields;
     }
 }

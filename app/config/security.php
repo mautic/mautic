@@ -145,7 +145,6 @@ $container->loadFromExtension(
     ]
 );
 
-$samlEnabled = ($container->hasParameter('mautic.saml_enabled') ? $container->getParameter('mautic.saml_enabled') : false);
 $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
@@ -159,13 +158,21 @@ $container->loadFromExtension(
                 ],
             ],
         ],
-        'party' => [
-            'idp' => [
-                'files' => true ? ['%kernel.root_dir%/cache/saml.xml'] : [],
-            ],
-        ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',
+        ],
+    ]
+);
+
+$container->loadFromExtension(
+    'light_saml_sp',
+    [
+        'username_mapper' => [
+            'email'     => '%mautic.saml_idp_email_attribute%',
+            'username'  => '%mautic.saml_idp_username_attribute%',
+            'firstname' => '%mautic.saml_idp_firstname_attribute%',
+            'lastname'  => '%mautic.saml_idp_lastname_attribute%',
+            'nameId'    => \Mautic\UserBundle\Security\User\UserMapper::NAME_ID,
         ],
     ]
 );

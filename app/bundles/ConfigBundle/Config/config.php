@@ -13,7 +13,7 @@ return [
     'routes' => [
         'main' => [
             'mautic_config_action' => [
-                'path'       => '/config/{objectAction}',
+                'path'       => '/config/{objectAction}/{objectId}',
                 'controller' => 'MauticConfigBundle:Config:execute',
             ],
             'mautic_sysinfo_index' => [
@@ -56,7 +56,7 @@ return [
         'forms' => [
             'mautic.form.type.config' => [
                 'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'translator',
                 'alias'     => 'config',
             ],
         ],

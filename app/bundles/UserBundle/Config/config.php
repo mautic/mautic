@@ -115,17 +115,10 @@ return [
                 'path'       => '/saml/metadata.xml',
                 'controller' => 'LightSamlSpBundle:Default:metadata',
             ],
-
             'lightsaml_sp.discovery' => [
                 'path'       => '/saml/discovery',
                 'controller' => 'LightSamlSpBundle:Default:discovery',
             ],
-
-            'lightsaml_sp.sessions' => [
-                'path'       => '/saml/sessions',
-                'controller' => 'LightSamlSpBundle:Default:sessions',
-            ],
-
         ],
     ],
 
@@ -147,6 +140,9 @@ return [
             ],
             'mautic.user.config.subscriber' => [
                 'class' => 'Mautic\UserBundle\EventListener\ConfigSubscriber',
+            ],
+            'mautic.user.route.subscriber' => [
+                'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
             ],
         ],
         'forms' => [
@@ -191,9 +187,9 @@ return [
                 'arguments' => 'mautic.user.model.role',
                 'alias'     => 'role_list',
             ],
-            'mautic.form.type.saml_config' => [
+            'mautic.form.type.userconfig' => [
                 'class' => 'Mautic\UserBundle\Form\Type\ConfigType',
-                'alias' => 'saml_config',
+                'alias' => 'userconfig',
             ],
         ],
         'other' => [
@@ -287,6 +283,9 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'lightsaml_sp.username_mapper.simple',
+                    'mautic.user.model.user',
+                    'security.encoder_factory',
+                    '%mautic.saml_idp_default_role%',
                 ],
             ],
         ],
@@ -303,8 +302,14 @@ return [
         ],
     ],
     'parameters' => [
-        'saml_enabled'     => false,
-        'idp_entity_id'    => '',
-        'idp_ceritificate' => '',
+        'saml_idp_metadata'            => '',
+        'saml_idp_certificate'         => '',
+        'saml_idp_private_key'         => '',
+        'saml_idp_key_password'        => '',
+        'saml_idp_email_attribute'     => '',
+        'saml_idp_username_attribute'  => '',
+        'saml_idp_firstname_attribute' => '',
+        'saml_idp_lastname_attribute'  => '',
+        'saml_idp_default_role'        => '',
     ],
 ];

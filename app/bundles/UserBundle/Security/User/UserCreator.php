@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,26 +14,59 @@ namespace Mautic\UserBundle\Security\User;
 use Doctrine\ORM\EntityManager;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
-use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
-use Mautic\UserBundle\Entity\User;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
 {
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
-    /** @var UsernameMapperInterface */
-    private $usernameMapper;
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
 
     /**
-     * @param EntityManager           $entityManager
-     * @param UsernameMapperInterface $usernameMapper
+     * @var UserModel
      */
-    public function __construct($entityManager, $usernameMapper)
+    private $userModel;
+
+    /**
+     * @var EncoderFactoryInterface
+     */
+    private $encoder;
+
+    /**
+     * @var
+     */
+    private $defaultRole;
+
+    /**
+     * @var array
+     */
+    private $requiredFields = ['username', 'firstname', 'lastname', 'email'];
+
+    /**
+     * UserCreator constructor.
+     *
+     * @param                         $entityManager
+     * @param                         $userMapper
+     * @param UserModel               $userModel
+     * @param EncoderFactoryInterface $encoder
+     * @param                         $defaultRole
+     */
+    public function __construct($entityManager, $userMapper, UserModel $userModel, EncoderFactoryInterface $encoder, $defaultRole)
     {
-        $this->entityManager  = $entityManager;
-        $this->usernameMapper = $usernameMapper;
+        $this->entityManager = $entityManager;
+        $this->userMapper    = $userMapper;
+        $this->userModel     = $userModel;
+        $this->encoder       = $encoder;
+        $this->defaultRole   = (int) $defaultRole;
     }
 
     /**
@@ -42,18 +76,19 @@ class UserCreator implements UserCreatorInterface
      */
     public function createUser(Response $response)
     {
-        $username = $this->usernameMapper->getUsername($response);
+        $user = $this->userMapper->getUsername($response, true);
+        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder->getEncoder($user), EncryptionHelper::generateKey()));
+        $user->setRole($this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole));
 
-        $user = new User();
-        $user->setUsername($username)
-            ->setFirstName('Saml')
-            ->setLastName('Saml')
-            ->setPassword(1234)
-            ->setEmail('saml@saml.com')
-            ->setRole($this->entityManager->getReference('MauticUserBundle:Role', 1));
+        // Validate that the user has all that's required
+        foreach ($this->requiredFields as $field) {
+            $getter = 'get'.ucfirst($field);
+            if (!$user->$getter()) {
+                throw new \InvalidResponseException('User does not include required fields.');
+            }
+        }
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $this->userModel->saveEntity($user);
 
         return $user;
     }
