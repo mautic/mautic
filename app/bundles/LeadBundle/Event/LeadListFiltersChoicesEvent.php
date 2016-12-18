@@ -1,7 +1,7 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -11,24 +11,23 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class LeadListFiltersChoicesEvent
- *
- * @package Mautic\FieldBundle\Event
+ * Class LeadListFiltersChoicesEvent.
  */
 class LeadListFiltersChoicesEvent extends CommonEvent
 {
     /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices
+     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
+     *
      * @var array
      */
     protected $choices;
 
     /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled
+     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
+     *
      * @var array
      */
     protected $operators;
@@ -39,14 +38,14 @@ class LeadListFiltersChoicesEvent extends CommonEvent
     protected $translator;
 
     /**
-     * @param array $choices
-     * @param array $operators
+     * @param array               $choices
+     * @param array               $operators
      * @param TranslatorInterface $translator
      */
     public function __construct($choices, $operators, TranslatorInterface $translator)
     {
-        $this->choices = $choices;
-        $this->operators = $operators;
+        $this->choices    = $choices;
+        $this->operators  = $operators;
         $this->translator = $translator;
     }
 
@@ -76,11 +75,11 @@ class LeadListFiltersChoicesEvent extends CommonEvent
 
     /**
      * Add a new choice for list filters
-     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices
+     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
      *
      * @param string $object
      * @param string $choiceKey
-     * @param array $choiceConfig
+     * @param array  $choiceConfig
      */
     public function addChoice($object, $choiceKey, $choiceConfig)
     {

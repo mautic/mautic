@@ -1,7 +1,7 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,14 +14,13 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class LeadListFiltersOperatorsEvent
- *
- * @package Mautic\FieldBundle\Event
+ * Class LeadListFiltersOperatorsEvent.
  */
 class LeadListFiltersOperatorsEvent extends CommonEvent
 {
     /**
-     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators
+     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators.
+     *
      * @var array
      */
     protected $operators;
@@ -32,12 +31,12 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
     protected $translator;
 
     /**
-     * @param array $operators
+     * @param array               $operators
      * @param TranslatorInterface $translator
      */
     public function __construct($operators, TranslatorInterface $translator)
     {
-        $this->operators = $operators;
+        $this->operators  = $operators;
         $this->translator = $translator;
     }
 
@@ -59,10 +58,12 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
 
     /**
      * Add a new operator for list filters
-     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators
+     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators.
+     *
      * @see OperatorListTrait
+     *
      * @param string $operatorKey
-     * @param array $operatorConfig
+     * @param array  $operatorConfig
      */
     public function addOperator($operatorKey, $operatorConfig)
     {
