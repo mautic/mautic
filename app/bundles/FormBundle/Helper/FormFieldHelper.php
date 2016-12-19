@@ -220,10 +220,15 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'checkboxgrp':
-                if (!is_array($value)) {
+                if (is_string($value) && strrpos($value, '|') > 0) {
+                    $value = explode('|', $value);
+                }
+                else if (!is_array($value)) {
                     $value = [$value];
                 }
+                // This function marks the items as checked if they match
                 foreach ($value as $val) {
+                    //var_dump(htmlentities($formHtml)); continue;
                     $val = urldecode($val);
                     if (preg_match(
                         '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
