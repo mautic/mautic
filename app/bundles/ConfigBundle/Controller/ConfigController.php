@@ -245,6 +245,10 @@ class ConfigController extends FormController
             $configurator->mergeParameters([$objectId => null]);
             try {
                 $configurator->write();
+                // We must clear the application cache for the updated values to take effect
+                /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                $cacheHelper = $this->get('mautic.helper.cache');
+                $cacheHelper->clearContainerFile();
                 $success = 1;
             } catch (\Exception $exception) {
             }

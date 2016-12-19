@@ -13,8 +13,10 @@ namespace Mautic\UserBundle\DependencyInjection\Compiler;
 
 use LightSaml\Credential\X509Certificate;
 use LightSaml\Credential\X509Credential;
+use LightSaml\Meta\TrustOptions\TrustOptions;
 use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Store\Credential\StaticCredentialStore;
+use LightSaml\Store\TrustOptions\FixedTrustOptionsStore;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -29,44 +31,69 @@ class SamlPass implements CompilerPassInterface
             $certificateContent = $container->getParameter('mautic.saml_idp_own_certificate');
             $privateKeyContent  = $container->getParameter('mautic.saml_idp_own_private_key');
             $keyPassword        = $container->getParameter('mautic.saml_idp_own_password');
-
-            if ($certificateContent && $privateKeyContent) {
+            $usingDefaults      = false;
+            if (!$certificateContent) {
+                $usingDefaults      = true;
+                $appPath            = $container->getParameter('kernel.root_dir');
+                $certificateContent = file_get_contents($appPath.'/../vendor/lightsaml/lightsaml/web/sp/saml.crt');
+                $privateKeyContent  = file_get_contents($appPath.'/../vendor/lightsaml/lightsaml/web/sp/saml.key');
+                $keyPassword        = '';
+            } else {
                 $certificateContent = base64_decode($certificateContent);
                 $privateKeyContent  = base64_decode($privateKeyContent);
+            }
 
-                $certDefId             = 'mautic.security.saml.own.credential_cert';
-                $certificateDefinition = (new Definition(X509Certificate::class))
-                    ->addMethodCall('loadPem', [$certificateContent]);
-                $container->setDefinition($certDefId, $certificateDefinition);
+            $certDefId             = 'mautic.security.saml.own.credential_cert';
+            $certificateDefinition = (new Definition(X509Certificate::class))
+                ->addMethodCall('loadPem', [$certificateContent]);
+            $container->setDefinition($certDefId, $certificateDefinition);
 
-                $privKeyDefId         = 'mautic.security.saml.own.credential_private_key';
-                $privateKeyDefinition = (new Definition('LightSaml\Credential\KeyHelper'))
-                    ->setFactory('LightSaml\Credential\KeyHelper::createPrivateKey')
-                    ->setArguments(
+            $privKeyDefId         = 'mautic.security.saml.own.credential_private_key';
+            $privateKeyDefinition = (new Definition('LightSaml\Credential\KeyHelper'))
+                ->setFactory('LightSaml\Credential\KeyHelper::createPrivateKey')
+                ->setArguments(
+                    [
+                        $privateKeyContent,
+                        $keyPassword,
+                        false,
+                        new Expression('service("'.$certDefId.'").getSignatureAlgorithm()'),
+                    ]
+                );
+            $container->setDefinition($privKeyDefId, $privateKeyDefinition);
+
+            $credId                = 'mautic.security.saml.own.credentials';
+            $credentialsDefinition = (new Definition(
+                X509Credential::class,
+                [
+                    new Reference($certDefId),
+                    new Reference($privKeyDefId),
+                ]
+            ))
+                ->addMethodCall('setEntityId', ['%mautic.saml_idp_entity_id%']);
+            $container->setDefinition($credId, $credentialsDefinition);
+
+            $credentialStore = (new Definition(StaticCredentialStore::class))
+                ->addMethodCall('add', [new Reference($credId)])
+                ->addTag('lightsaml.own_credential_store');
+            $container->setDefinition('mautic.security.saml.own.credential_store', $credentialStore);
+
+            if (!$usingDefaults) {
+                $trustId                = 'mautic.security.saml.trust_options';
+                $trustOptionsDefinition = (new Definition(TrustOptions::class))
+                    ->setMethodCalls(
                         [
-                            $privateKeyContent,
-                            $keyPassword,
-                            false,
-                            new Expression('service("'.$certDefId.'").getSignatureAlgorithm()'),
+                            ['setSignAuthnRequest', [true]],
+                            ['setEncryptAssertions', [true]],
+                            ['setEncryptAuthnRequest', [true]],
+                            ['setSignAssertions', [true]],
+                            ['setSignResponse', [true]],
                         ]
                     );
-                $container->setDefinition($privKeyDefId, $privateKeyDefinition);
+                $container->setDefinition($trustId, $trustOptionsDefinition);
 
-                $credId                = 'mautic.security.saml.own.credentials';
-                $credentialsDefinition = (new Definition(
-                    X509Credential::class,
-                    [
-                        new Reference($certDefId),
-                        new Reference($privKeyDefId),
-                    ]
-                ))
-                    ->addMethodCall('setEntityId', ['%mautic.saml_idp_entity_id%']);
-                $container->setDefinition($credId, $credentialsDefinition);
-
-                $credentialStore = (new Definition(StaticCredentialStore::class))
-                    ->addMethodCall('add', [new Reference($credId)])
-                    ->addTag('lightsaml.own_credential_store');
-                $container->setDefinition('mautic.security.saml.own.credential_store', $credentialStore);
+                $trustOptionStoresDefinition = (new Definition(FixedTrustOptionsStore::class, [new Reference($trustId)]))
+                    ->addTag('lightsaml.trust_options_store');
+                $container->setDefinition('mautic.security.saml.trust_options_store', $trustOptionStoresDefinition);
             }
 
             // Create the entity descriptor
