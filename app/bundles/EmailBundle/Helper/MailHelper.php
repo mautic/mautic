@@ -421,7 +421,6 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
-//                var_dump($this->mailer);die;
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
