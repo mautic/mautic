@@ -1304,7 +1304,7 @@ class EmailController extends FormController
         ];
 
         // Send to current user
-        $errors = $model->sendEmailToUser($entity, $users, $fields, [], [], false);
+        $errors = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
         if (count($errors)) {
             $this->addFlash(implode('; ', $errors));
         } else {

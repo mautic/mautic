@@ -264,6 +264,26 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality.
+     *
+     * @param bool $cleanSlate
+     *
+     * @return $this
+     */
+    public function getSampleMailer($cleanSlate = true)
+    {
+        $queueMode = $this->factory->getParameter('mailer_spool_type');
+        if ($queueMode != 'file') {
+            return $this->getMailer($cleanSlate);
+        }
+        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $mailer     = new \Swift_Mailer($transport);
+        $mailHelper = new self($this->factory, $mailer, $this->from);
+
+        return $mailHelper->getMailer($cleanSlate);
+    }
+
+    /**
      * Send the message.
      *
      * @param bool $dispatchSendEvent
@@ -401,7 +421,7 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
-
+//                var_dump($this->mailer);die;
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
