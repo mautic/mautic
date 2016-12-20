@@ -59,17 +59,21 @@ class ConfigType extends AbstractType
                         if ($options['doNotChangeDisplayMode'] == 'mask') {
                             $fieldOptions = $child->getConfig()->getOptions();
 
-                            $configForm->add($key, 'text', [
-                                'label'    => $fieldOptions['label'],
-                                'required' => false,
-                                'mapped'   => false,
-                                'disabled' => true,
-                                'attr'     => [
-                                    'placeholder' => $translator->trans('mautic.config.restricted'),
-                                    'class'       => 'form-control',
-                                ],
-                                'label_attr' => ['class' => 'control-label'],
-                            ]);
+                            $configForm->add(
+                                $key,
+                                'text',
+                                [
+                                    'label'    => $fieldOptions['label'],
+                                    'required' => false,
+                                    'mapped'   => false,
+                                    'disabled' => true,
+                                    'attr'     => [
+                                        'placeholder' => $translator->trans('mautic.config.restricted'),
+                                        'class'       => 'form-control',
+                                    ],
+                                    'label_attr' => ['class' => 'control-label'],
+                                ]
+                            );
                         } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
                             $configForm->remove($key);
                         }
