@@ -28,5 +28,6 @@ class StatsSubscriber extends CommonStatsSubscriber
     {
         $this->repositories[] = $em->getRepository('MauticPageBundle:Hit');
         $this->repositories[] = $em->getRepository('MauticPageBundle:VideoHit');
+        $this->repositories[] = $em->getRepository('MauticPageBundle:Trackable');
     }
 }
