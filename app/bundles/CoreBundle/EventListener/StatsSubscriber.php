@@ -39,6 +39,7 @@ class StatsSubscriber extends CommonSubscriber
     public function __construct(EntityManager $em)
     {
         $this->repositories[] = $em->getRepository('MauticCoreBundle:AuditLog');
+        $this->repositories[] = $em->getRepository('MauticCoreBundle:IpAddress');
     }
 
     /**
