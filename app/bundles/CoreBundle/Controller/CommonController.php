@@ -760,7 +760,7 @@ class CommonController extends Controller implements MauticController
     public function exportResultsAs($type, $filename, AbstractCommonModel $model, array $args)
     {
         if (!in_array($type, ['csv', 'xlsx'])) {
-            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.type', ['type' => $type]));
+            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
         $args['limit'] = $args['limit'] < 100 ? 100 : $args['limit'];

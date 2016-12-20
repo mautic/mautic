@@ -94,20 +94,14 @@ class LeadController extends FormController
             $filter['force'] .= " $mine";
         }
 
-        $args = [
+        $results = $model->getEntities([
             'start'          => $start,
             'limit'          => $limit,
             'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
             'withTotalCount' => true,
-        ];
-
-        if ($dataType = $this->request->get('downloadAsList')) {
-            return $this->exportResultsAs($dataType, 'contacts', $model, $args);
-        }
-
-        $results = $model->getEntities($args);
+        ]);
 
         $count = $results['count'];
         unset($results['count']);
@@ -2326,5 +2320,76 @@ class LeadController extends FormController
                 ]
             );
         }
+    }
+
+    /**
+     * Bulk export contacts.
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function batchExportAction()
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model      = $this->getModel('lead');
+        $session    = $this->get('session');
+        $search     = $session->get('mautic.lead.filter', '');
+        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
+        $ids        = $this->request->get('ids');
+
+        $filter     = ['string' => $search, 'force' => ''];
+        $translator = $this->get('translator');
+        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+        $dataType   = $this->request->get('downloadAsList', 'csv');
+
+        if (!empty($ids)) {
+            $filter['force'] = [
+                [
+                    'column' => 'l.id',
+                    'expr'   => 'in',
+                    'value'  => json_decode($ids, true),
+                ],
+            ];
+        } else {
+            if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'] .= " !$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'] .= " $mine";
+            }
+        }
+
+        $args = [
+            'start'          => 0,
+            'limit'          => 100,
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ];
+
+        return $this->exportResultsAs($dataType, 'contacts', $model, $args);
     }
 }

@@ -316,6 +316,9 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.lead.button.subscriber' => [
+                'class' => \Mautic\LeadBundle\EventListener\ButtonSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [

@@ -1992,6 +1992,11 @@ var Mautic = {
             return false;
         }
 
+        if (route.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(route);
+            return true;
+        }
+
         if (event.ctrlKey || event.metaKey) {
             //open the link in a new window
             route = route.split("?")[0];
@@ -2418,6 +2423,13 @@ var Mautic = {
         Mautic.loadContent(route, '', 'POST', target);
     },
 
+    initiateFileDownload: function (action) {
+        var downloadFrame = mQuery('<iframe>');
+
+        downloadFrame.hide().prop('src', action);
+        downloadFrame.appendTo('body');
+    },
+
     /**
      * Executes an object action
      *
@@ -2435,6 +2447,12 @@ var Mautic = {
 
         //dismiss modal if activated
         Mautic.dismissConfirmation();
+
+        if (action.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(action);
+            return;
+        }
+
         mQuery.ajax({
             showLoadingBar: true,
             url: action,
