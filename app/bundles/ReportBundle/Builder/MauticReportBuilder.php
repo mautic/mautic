@@ -231,7 +231,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
                     $select = '';
-                    $select .= (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+                    if (isset($options['columns'][$field]['alias']) && $options['columns'][$field]['alias'] == 'tag') {
+                        $selField = (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+                        $select .= "GROUP_CONCAT({$selField})";
+                    } else {
+                        $select .= (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+                    }
 
                     if (strpos($select, '{{count}}')) {
                         $select = str_replace('{{count}}', $countSql, $select);
