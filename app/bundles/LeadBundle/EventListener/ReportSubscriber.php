@@ -325,7 +325,7 @@ class ReportSubscriber extends CommonSubscriber
                 if ($event->hasFilter('s.leadlist_id')) {
                     $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
-                if ($event->hasFilter('lt.tag')) {
+                if ($event->hasFilter('lt.tag') || $event->hasColumn('lt.tag')) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx', 'ltx.lead_id = l.id')
                             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags', 'lt', 'ltx.tag_id = lt.id');
                 }
