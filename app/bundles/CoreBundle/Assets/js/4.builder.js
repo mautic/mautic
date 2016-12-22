@@ -228,6 +228,9 @@ Mautic.closeBuilder = function(model) {
             // Remove Mautic's assets
             themeHtml.find('[data-source="mautic"]').remove();
             themeHtml.find('.atwho-container').remove();
+            themeHtml.find('.fr-image-overlay').remove();
+            themeHtml.find('.fr-quick-insert').remove();
+            themeHtml.find('.fr-tooltip').remove();
 
             // Remove the slot focus highlight
             themeHtml.find('[data-slot-focus], [data-slot-handle], [data-section-focus]').remove();
