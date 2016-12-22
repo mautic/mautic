@@ -45,7 +45,7 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['data'] as $config) {
-            if (isset($config['formAlias']) && isset($config['parameters'])) {
+            if (isset($config['formAlias']) && !empty($config['parameters'])) {
                 $checkThese = array_intersect(array_keys($config['parameters']), $options['fileFields']);
                 foreach ($checkThese as $checkMe) {
                     // Unset base64 encoded values

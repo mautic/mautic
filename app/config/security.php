@@ -111,7 +111,9 @@ $firewalls = [
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],
-        'context' => 'mautic',
+        'fos_oauth'     => true,
+        'bazinga_oauth' => true,
+        'context'       => 'mautic',
     ],
     'public' => [
         'pattern'   => '^/',
@@ -136,7 +138,9 @@ if (!$container->getParameter('mautic.api_enabled')) {
         $firewalls['oauth1_request_token'],
         $firewalls['oauth1_access_token'],
         $firewalls['oauth1_area'],
-        $firewalls['api']
+        $firewalls['api'],
+        $firewalls['main']['fos_oauth'],
+        $firewalls['main']['bazinga_oauth']
     );
 }
 
