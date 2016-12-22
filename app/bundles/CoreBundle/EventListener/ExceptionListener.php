@@ -31,12 +31,16 @@ class ExceptionListener extends KernelExceptionListener
     {
         $exception = $event->getException();
 
+        if ($exception instanceof LightSamlAuthenticationException ||
+            $exception instanceof LightSamlContextException
+        ) {
+            throw new AuthenticationException($exception->getMessage());
+        }
+
         // Check for exceptions we don't want to handle
         if ($exception instanceof AuthenticationException ||
             $exception instanceof AccessDeniedException ||
-            $exception instanceof LogoutException ||
-            $exception instanceof LightSamlAuthenticationException ||
-            $exception instanceof LightSamlContextException
+            $exception instanceof LogoutException
         ) {
             return;
         }
