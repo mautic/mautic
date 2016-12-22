@@ -488,6 +488,7 @@ return [
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
+                    'router',
                     '"MauticCoreBundle:Exception:show"',
                     'monolog.logger.mautic',
                 ],
