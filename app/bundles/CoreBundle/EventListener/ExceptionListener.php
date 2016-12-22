@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use LightSaml\Error\LightSamlAuthenticationException;
+use LightSaml\Error\LightSamlContextException;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as KernelExceptionListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -31,7 +32,12 @@ class ExceptionListener extends KernelExceptionListener
         $exception = $event->getException();
 
         // Check for exceptions we don't want to handle
-        if ($exception instanceof AuthenticationException || $exception instanceof AccessDeniedException || $exception instanceof LogoutException || $exception instanceof LightSamlAuthenticationException) {
+        if ($exception instanceof AuthenticationException ||
+            $exception instanceof AccessDeniedException ||
+            $exception instanceof LogoutException ||
+            $exception instanceof LightSamlAuthenticationException ||
+            $exception instanceof LightSamlContextException
+        ) {
             return;
         }
 
