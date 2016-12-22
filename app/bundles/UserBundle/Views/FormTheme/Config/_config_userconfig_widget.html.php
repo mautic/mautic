@@ -18,6 +18,8 @@ $fieldKeys = array_keys($fields);
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.user.config.header.saml'); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.user.config.form.saml.idp_entity_id', ['%entityId%' => $entityId]); ?></div>
+
         <div class="row">
             <div class="col-md-6">
                 <?php echo $view['form']->row($fields['saml_idp_metadata'], ['fieldValue' => $formConfig['parameters']['saml_idp_metadata']]); ?>

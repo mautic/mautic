@@ -188,8 +188,11 @@ return [
                 'alias'     => 'role_list',
             ],
             'mautic.form.type.userconfig' => [
-                'class' => 'Mautic\UserBundle\Form\Type\ConfigType',
-                'alias' => 'userconfig',
+                'class'     => 'Mautic\UserBundle\Form\Type\ConfigType',
+                'alias'     => 'userconfig',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
         ],
         'other' => [
@@ -303,7 +306,7 @@ return [
     ],
     'parameters' => [
         'saml_idp_metadata'            => '',
-        'saml_idp_own_entity_id'       => '',
+        'saml_idp_entity_id'           => '',
         'saml_idp_own_certificate'     => '',
         'saml_idp_own_private_key'     => '',
         'saml_idp_own_password'        => '',

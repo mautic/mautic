@@ -12,10 +12,13 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Type\ConfigFileType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -24,6 +27,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ConfigType extends AbstractType
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $parameters;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param CoreParametersHelper $parametersHelper
+     */
+    public function __construct(CoreParametersHelper $parametersHelper)
+    {
+        $this->parameters = $parametersHelper;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -194,6 +212,16 @@ class ConfigType extends AbstractType
                 'empty_value' => false,
             ]
         );
+    }
+
+    /**
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');
     }
 
     /**
