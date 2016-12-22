@@ -8,6 +8,138 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$firewalls = [
+    'install' => [
+        'pattern'   => '^/installer',
+        'anonymous' => true,
+        'context'   => 'mautic',
+        'security'  => false,
+    ],
+    'dev' => [
+        'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
+        'security'  => true,
+        'anonymous' => true,
+    ],
+    'login' => [
+        'pattern'   => '^/s/login$',
+        'anonymous' => true,
+        'context'   => 'mautic',
+    ],
+    'sso_login' => [
+        'pattern'            => '^/s/sso_login',
+        'anonymous'          => true,
+        'mautic_plugin_auth' => true,
+        'context'            => 'mautic',
+    ],
+    'saml_login' => [
+        'pattern'   => '^/s/saml/login$',
+        'anonymous' => true,
+        'context'   => 'mautic',
+    ],
+    'saml_discovery' => [
+        'pattern'   => '^/saml/discovery$',
+        'anonymous' => true,
+        'context'   => 'mautic',
+    ],
+    'oauth2_token' => [
+        'pattern'  => '^/oauth/v2/token',
+        'security' => false,
+    ],
+    'oauth2_area' => [
+        'pattern'    => '^/oauth/v2/authorize',
+        'form_login' => [
+            'provider'   => 'user_provider',
+            'check_path' => '/oauth/v2/authorize_login_check',
+            'login_path' => '/oauth/v2/authorize_login',
+        ],
+        'anonymous' => true,
+    ],
+    'oauth1_request_token' => [
+        'pattern'  => '^/oauth/v1/request_token',
+        'security' => false,
+    ],
+    'oauth1_access_token' => [
+        'pattern'  => '^/oauth/v1/access_token',
+        'security' => false,
+    ],
+    'oauth1_area' => [
+        'pattern'    => '^/oauth/v1/authorize',
+        'form_login' => [
+            'provider'   => 'user_provider',
+            'check_path' => '/oauth/v1/authorize_login_check',
+            'login_path' => '/oauth/v1/authorize_login',
+        ],
+        'anonymous' => true,
+    ],
+    'api' => [
+        'pattern'            => '^/api',
+        'fos_oauth'          => true,
+        'bazinga_oauth'      => true,
+        'mautic_plugin_auth' => true,
+        'stateless'          => true,
+        'http_basic'         => '%mautic.api_enable_basic_auth%',
+    ],
+    'main' => [
+        'pattern'       => '^/s/',
+        'light_saml_sp' => [
+            'provider'        => 'user_provider',
+            'success_handler' => 'mautic.security.authentication_handler',
+            'failure_handler' => 'mautic.security.authentication_handler',
+            'user_creator'    => 'mautic.security.saml.user_creator',
+            'login_path'      => '/s/saml/login',
+            'check_path'      => '/s/saml/login_check',
+        ],
+        'simple_form' => [
+            'authenticator'        => 'mautic.user.form_authenticator',
+            'csrf_token_generator' => 'security.csrf.token_manager',
+            'success_handler'      => 'mautic.security.authentication_handler',
+            'failure_handler'      => 'mautic.security.authentication_handler',
+            'login_path'           => '/s/login',
+            'check_path'           => '/s/login_check',
+        ],
+        'logout' => [
+            'handlers' => [
+                'mautic.security.logout_handler',
+            ],
+            'path'   => '/s/logout',
+            'target' => '/s/login',
+        ],
+        'remember_me' => [
+            'secret'   => '%mautic.rememberme_key%',
+            'lifetime' => '%mautic.rememberme_lifetime%',
+            'path'     => '%mautic.rememberme_path%',
+            'domain'   => '%mautic.rememberme_domain%',
+        ],
+        'context' => 'mautic',
+    ],
+    'public' => [
+        'pattern'   => '^/',
+        'anonymous' => true,
+        'context'   => 'mautic',
+    ],
+];
+
+// If SAML is disabled, remove it from the firewall so that Symfony doesn't default to it
+if (!$container->getParameter('mautic.saml_idp_metadata')) {
+    unset(
+        $firewalls['saml_login'],
+        $firewalls['saml_discover'],
+        $firewalls['main']['light_saml_sp']
+    );
+}
+
+if (!$container->getParameter('mautic.api_enabled')) {
+    unset(
+        $firewalls['oauth2_token'],
+        $firewalls['oauth2_area'],
+        $firewalls['oauth1_request_token'],
+        $firewalls['oauth1_access_token'],
+        $firewalls['oauth1_area'],
+        $firewalls['api']
+    );
+}
+
 $container->loadFromExtension(
     'security',
     [
@@ -29,116 +161,7 @@ $container->loadFromExtension(
         'role_hierarchy' => [
             'ROLE_ADMIN' => 'ROLE_USER',
         ],
-        'firewalls' => [
-            'install' => [
-                'pattern'   => '^/installer',
-                'anonymous' => true,
-                'context'   => 'mautic',
-                'security'  => false,
-            ],
-            'dev' => [
-                'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
-                'security'  => true,
-                'anonymous' => true,
-            ],
-            'login' => [
-                'pattern'   => '^/s/login$',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-            'sso_login' => [
-                'pattern'            => '^/s/sso_login',
-                'anonymous'          => true,
-                'mautic_plugin_auth' => true,
-                'context'            => 'mautic',
-            ],
-            'saml_login' => [
-                'pattern'   => '^/s/saml/login$',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-            'saml_discovery' => [
-                'pattern'   => '^/saml/discovery$',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-            'oauth2_token' => [
-                'pattern'  => '^/oauth/v2/token',
-                'security' => false,
-            ],
-            'oauth2_area' => [
-                'pattern'    => '^/oauth/v2/authorize',
-                'form_login' => [
-                    'provider'   => 'user_provider',
-                    'check_path' => '/oauth/v2/authorize_login_check',
-                    'login_path' => '/oauth/v2/authorize_login',
-                ],
-                'anonymous' => true,
-            ],
-            'oauth1_request_token' => [
-                'pattern'  => '^/oauth/v1/request_token',
-                'security' => false,
-            ],
-            'oauth1_access_token' => [
-                'pattern'  => '^/oauth/v1/access_token',
-                'security' => false,
-            ],
-            'oauth1_area' => [
-                'pattern'    => '^/oauth/v1/authorize',
-                'form_login' => [
-                    'provider'   => 'user_provider',
-                    'check_path' => '/oauth/v1/authorize_login_check',
-                    'login_path' => '/oauth/v1/authorize_login',
-                ],
-                'anonymous' => true,
-            ],
-            'api' => [
-                'pattern'            => '^/api',
-                'fos_oauth'          => true,
-                'bazinga_oauth'      => true,
-                'mautic_plugin_auth' => true,
-                'stateless'          => true,
-                'http_basic'         => '%mautic.api_enable_basic_auth%',
-            ],
-            'main' => [
-                'pattern'     => '^/s/',
-                'simple_form' => [
-                    'authenticator'        => 'mautic.user.form_authenticator',
-                    'csrf_token_generator' => 'security.csrf.token_manager',
-                    'success_handler'      => 'mautic.security.authentication_handler',
-                    'failure_handler'      => 'mautic.security.authentication_handler',
-                    'login_path'           => '/s/login',
-                    'check_path'           => '/s/login_check',
-                ],
-                'light_saml_sp' => [
-                    'provider'        => 'user_provider',
-                    'success_handler' => 'mautic.security.authentication_handler',
-                    'failure_handler' => 'mautic.security.authentication_handler',
-                    'user_creator'    => 'mautic.security.saml.user_creator',
-                    'login_path'      => '/s/saml/login',
-                    'check_path'      => '/s/saml/login_check',
-                ],
-                'logout' => [
-                    'handlers' => [
-                        'mautic.security.logout_handler',
-                    ],
-                    'path'   => '/s/logout',
-                    'target' => '/s/login',
-                ],
-                'remember_me' => [
-                    'secret'   => '%mautic.rememberme_key%',
-                    'lifetime' => '%mautic.rememberme_lifetime%',
-                    'path'     => '%mautic.rememberme_path%',
-                    'domain'   => '%mautic.rememberme_domain%',
-                ],
-                'context' => 'mautic',
-            ],
-            'public' => [
-                'pattern'   => '^/',
-                'anonymous' => true,
-                'context'   => 'mautic',
-            ],
-        ],
+        'firewalls'      => $firewalls,
         'access_control' => [
             ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
         ],
