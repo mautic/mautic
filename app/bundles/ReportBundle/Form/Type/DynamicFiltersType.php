@@ -61,6 +61,11 @@ class DynamicFiltersType extends AbstractType
                     $type = 'datetime';
                     break;
                 case 'multiselect':
+                    $args['attr']['onchange'] = "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this,'list','.report-content');";
+                    $type                     = 'choice';
+                    $args['choices']          = $definition['list'];
+                    $args['multiple']         = true;
+                    break;
                 case 'select':
                     $type            = 'choice';
                     $args['choices'] = $definition['list'];

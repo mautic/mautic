@@ -130,6 +130,11 @@ class ReportSubscriber extends CommonSubscriber
         $companyContexts = ['companies'];
 
         if ($event->checkContext($leadContexts)) {
+            $aTags     = [];
+            $aTagsList = $this->leadModel->getTagList();
+            foreach ($aTagsList as $aTemp) {
+                $aTags[$aTemp['value']] = $aTemp['label'];
+            }
             $columns = [
                 'l.id' => [
                     'label' => 'mautic.lead.report.contact_id',
@@ -163,7 +168,8 @@ class ReportSubscriber extends CommonSubscriber
                 ],
                 'lt.tag' => [
                     'label' => 'mautic.lead.tags',
-                    'type'  => 'text',
+                    'type'  => 'multiselect',
+                    'list'  => $aTags,
                 ],
             ];
 

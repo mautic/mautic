@@ -50,6 +50,10 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 $dt         = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }
+            if (in_array($type, ['multiselect'])) {
+                $tmpVal     = $f['value'];
+                $f['value'] = ($tmpVal) ? implode(',', $tmpVal) : '';
+            }
         }
 
         return $filters;

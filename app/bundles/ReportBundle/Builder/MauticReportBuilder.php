@@ -289,6 +289,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $expr->eq($filter['column'], $expr->literal(''))
                         );
                         break;
+                    case 'in':
+                        $queryBuilder->setParameter($paramName, implode(',', $filter['value']));
+                        $filterExpr->add(
+                            $expr->in('lt.id', ":$paramName")
+                        );
+                        break;
                     default:
                         if (trim($filter['value']) == '') {
                             // Ignore empty
