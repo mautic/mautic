@@ -1,3 +1,5 @@
+@import "../app/less/variables";
+
 //Froala
 @import "froala/froala_editor";
 //@import "froala/froala_style";
@@ -22,30 +24,20 @@
 //Other
 @import "other/at";
 
-/* BUILDER CSS */
-div[data-slot-handle] {
-    cursor: move!important;
-    bottom: -1px;
-    content: '';
-    left: -15px;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    right: -15px;
-    top: -1px;
-    border: 1px solid #4e5e9e;
+.fr-popup {
+    z-index: 9999 !important;
 }
 
+/* BUILDER CSS */
 div[data-slot-focus] {
-    cursor: move!important;
     bottom: -1px;
     content: '';
-    left: -15px;
+    left: -1px;
     margin: 0;
     padding: 0;
     position: absolute;
-    right: -15px;
-    top: -1px;
+    right: -1px;
+    top: 0px;
     border: 1px solid #4e5e9e;
 }
 
@@ -81,15 +73,16 @@ div[data-section-focus="left"] {
 
 div[data-slot-toolbar] {
     position: absolute;
-    right: -10px;
-    top: -12px;
+    top: 0;
+    height: 25px;
+    width: 100%;
     z-index: 10;
     cursor: pointer;
-    cursor: hand;
+    cursor: move;
+    background-color: @mautic-primary;
 }
 
 div[data-slot-toolbar] .btn {
-    border-radius: 10px;
     width: 20px;
     height: 20px;
     padding: 0;
@@ -109,16 +102,12 @@ div[data-slot-toolbar] .btn {
     user-select: none;
     font-size: 11px;
     line-height: 1.456;
+    float: right;
+    margin-right: 5px;
 }
 
 div[data-slot-toolbar] .btn .fa {
     padding-top: 4px;
-}
-
-div[data-slot-toolbar] .btn-danger {
-    color: #ffffff;
-    background-color: #f86b4f;
-    border-color: #fff;
 }
 
 div[data-slot], [data-section-wrapper] {
@@ -131,7 +120,7 @@ div[data-slot="image"] img {
 }
 
 .slot-placeholder {
-    border-top: 1px solid #4e5e9e;
+    border-top: 3px solid #4e5e9e;
     margin-top: -1px;
 }
 
@@ -177,7 +166,7 @@ div[data-slot="image"] img {
 
 .slot-type-handle.btn {
     float: left;
-    width: 106px;
+    width: 111px;
     margin: 2px;
 }
 

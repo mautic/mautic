@@ -253,14 +253,12 @@ return [
                 'alias'     => 'builder_section',
             ],
             'mautic.form.type.slot' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotType',
+                'alias' => 'slot',
             ],
             'mautic.form.type.slot.button' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot_button',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
+                'alias' => 'slot_button',
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',

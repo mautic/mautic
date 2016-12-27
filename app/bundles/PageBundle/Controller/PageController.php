@@ -1065,10 +1065,10 @@ class PageController extends FormController
 
     private function buildSlotForms($slotTypes)
     {
-        foreach ($slotTypes as &$slotType) {
+        foreach ($slotTypes as $key => $slotType) {
             if (isset($slotType['form'])) {
-                $slotForm         = $this->get('form.factory')->create($slotType['form']);
-                $slotType['form'] = $slotForm->createView();
+                $slotForm                = $this->get('form.factory')->create($slotType['form']);
+                $slotTypes[$key]['form'] = $slotForm->createView();
             }
         }
 
