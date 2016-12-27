@@ -657,7 +657,7 @@ Mautic.initSlotListeners = function() {
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
                     var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
-                    mQuery(this).html(slotHtml.html());
+                    slotClicked.html(slotHtml.html());
                 });
                 parent.mQuery(this).val(slotHtml.html());
 
