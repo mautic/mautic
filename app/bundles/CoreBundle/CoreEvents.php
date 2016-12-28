@@ -44,6 +44,15 @@ final class CoreEvents
     const GLOBAL_SEARCH = 'mautic.global_search';
 
     /**
+     * The mautic.list_stats event is thrown to build statistical results from applicable bundles/database tables.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StatsEvent instance.
+     *
+     * @var string
+     */
+    const LIST_STATS = 'mautic.list_stats';
+
+    /**
      * The mautic.build_command_list event is thrown to build global search's autocomplete list.
      *
      * The event listener receives a Mautic\CoreBundle\Event\CommandListEvent instance.

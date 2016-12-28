@@ -52,13 +52,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getpages' => [
-                'path'       => '/pages',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntities',
-            ],
-            'mautic_api_getpage' => [
-                'path'       => '/pages/{id}',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntity',
+            'mautic_api_pagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'pages',
+                'path'            => '/pages',
+                'controller'      => 'MauticPageBundle:Api\PageApi',
             ],
         ],
         'catchall' => [
@@ -172,6 +170,12 @@ return [
                 'class'     => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.page.stats.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

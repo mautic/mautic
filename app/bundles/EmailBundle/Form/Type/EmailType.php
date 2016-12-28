@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -353,10 +354,10 @@ class EmailType extends AbstractType
                 $data = $event->getData();
                 $variantSettingsModifier(
                     $event,
-                    $data['variantParent']
+                    !empty($data['variantParent'])
                 );
 
-                if ($data['emailType'] == 'list') {
+                if (isset($data['emailType']) && $data['emailType'] == 'list') {
                     $data['translationParent'] = isset($data['segmentTranslationParent']) ? $data['segmentTranslationParent'] : null;
                 } else {
                     $data['translationParent'] = isset($data['templateTranslationParent']) ? $data['templateTranslationParent'] : null;

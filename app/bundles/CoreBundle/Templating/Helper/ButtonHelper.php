@@ -236,15 +236,15 @@ class ButtonHelper extends Helper
         $content              = '';
         $dropdownHtmlAppended = false;
         if (!empty($this->buttons)) {
-            $buttonCount = 1;
+            $buttonCount = 0;
 
             foreach ($this->buttons as $button) {
-                $content .= $this->buildButton($button, $buttonCount);
                 ++$buttonCount;
 
-                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount === $this->listMarker
-                    && $this->buttonCount !== $this->listMarker
-                ) {
+                $content .= $this->buildButton($button, $buttonCount);
+
+                $nextButton = $buttonCount + 1;
+                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
                     $content .= $dropdownHtml;
                     $dropdownHtmlAppended = true;
                 }
@@ -298,6 +298,8 @@ class ButtonHelper extends Helper
         $this->request        = $request;
         $this->item           = $item;
         $this->listMarker     = 3;
+        $this->wrapOpeningTag = null;
+        $this->wrapClosingTag = null;
 
         return $this;
     }
@@ -321,7 +323,7 @@ class ButtonHelper extends Helper
         $buttons = '';
 
         //Wrap links in a tag
-        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount >= $this->listMarker && $this->buttonCount != $this->listMarker)) {
+        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -330,7 +332,7 @@ class ButtonHelper extends Helper
             $button['attr'] = [];
         }
 
-        if (($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount < $this->listMarker || ($this->buttonCount === $this->listMarker && $buttonCount == $this->buttonCount)))) {
+        if ($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -365,9 +367,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param Request $request
-     * @param null    $item
-     *
      * @return $this
      */
     protected function fetchCustomButtons()
@@ -431,16 +430,12 @@ class ButtonHelper extends Helper
 
                 if (empty($button['primary'])) {
                     $this->listMarker = $counter;
+
                     break;
                 }
             }
 
-            if ($this->buttonCount <= 3 && $this->listMarker <= 3) {
-                // If the last button is a delete button, hide it; otherwise show all buttons
-                $lastButton       = end($this->buttons);
-                $this->listMarker = (!empty($lastButton['confirm']['template']) && 'delete' == $lastButton['confirm']['template']) ? 2 : 3;
-                reset($this->buttons);
-            } elseif ($this->listMarker <= 1 && $this->buttonCount) {
+            if ($this->listMarker <= 1 && $this->buttonCount) {
                 // Show at least one button
                 $this->listMarker = 2;
             }
@@ -454,7 +449,7 @@ class ButtonHelper extends Helper
     {
         if (!empty($button['primary'])) {
             if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
-                $button['priority'] = 201;
+                $button['priority'] = 215;
             }
         } elseif (!isset($button['priority'])) {
             $button['priority'] = 0;
@@ -563,9 +558,10 @@ class ButtonHelper extends Helper
         }
 
         if (!empty($removeFrom['btnClass'])) {
-            $removeFrom['attr']['class'] = $removeFrom['btnClass'];
+            $removeFrom['attr']['class'] = &$removeFrom['btnClass'];
         } elseif (!isset($removeFrom['attr']['class'])) {
             $removeFrom['attr']['class'] = '';
+            $removeFrom['btnClass']      = false;
         }
 
         $search = [

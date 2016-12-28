@@ -8,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -221,10 +222,12 @@ class PageType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
-                $formModifier(
-                    $event->getForm(),
-                    $data['variantParent']
-                );
+                if (isset($data['variantParent'])) {
+                    $formModifier(
+                        $event->getForm(),
+                        $data['variantParent']
+                    );
+                }
             }
         );
 

@@ -126,19 +126,45 @@ $template  = '<div class="col-md-6">{content}</div>';
     </div>
     <div class="panel-body">
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'webview_text', $template); ?>
         </div>
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
-        </div>
+
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+        </div>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.unsubscribe'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferences', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_segments', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_frequency', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_pause_dates', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
         </div>
     </div>
 </div>

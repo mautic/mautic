@@ -92,57 +92,60 @@ class NoteModel extends FormModel
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('leadnote', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('leadnote', $entity, $options);
     }
 
-     /**
-      * {@inheritdoc}
-      *
-      * @param $action
-      * @param $event
-      * @param $entity
-      * @param $isNew
-      *
-      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-      */
-     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
-     {
-         if (!$entity instanceof LeadNote) {
-             throw new MethodNotAllowedHttpException(['LeadNote']);
-         }
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof LeadNote) {
+            throw new MethodNotAllowedHttpException(['LeadNote']);
+        }
 
-         switch ($action) {
-             case 'pre_save':
-                 $name = LeadEvents::NOTE_PRE_SAVE;
-                 break;
-             case 'post_save':
-                 $name = LeadEvents::NOTE_POST_SAVE;
-                 break;
-             case 'pre_delete':
-                 $name = LeadEvents::NOTE_PRE_DELETE;
-                 break;
-             case 'post_delete':
-                 $name = LeadEvents::NOTE_POST_DELETE;
-                 break;
-             default:
-                 return null;
-         }
+        switch ($action) {
+            case 'pre_save':
+                $name = LeadEvents::NOTE_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = LeadEvents::NOTE_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = LeadEvents::NOTE_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = LeadEvents::NOTE_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
 
-         if ($this->dispatcher->hasListeners($name)) {
-             if (empty($event)) {
-                 $event = new LeadNoteEvent($entity, $isNew);
-                 $event->setEntityManager($this->em);
-             }
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new LeadNoteEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
 
-             $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($name, $event);
 
-             return $event;
-         } else {
-             return null;
-         }
-     }
+            return $event;
+        } else {
+            return null;
+        }
+    }
 
     /**
      * @param Lead $lead

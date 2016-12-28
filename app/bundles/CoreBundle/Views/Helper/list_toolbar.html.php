@@ -22,7 +22,7 @@ include 'action_button_helper.php';
             <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
                     'searchId'    => (empty($searchId)) ? null : $searchId,
                     'searchValue' => $searchValue,
-                    'action'      => $action,
+                    'action'      => (isset($action)) ? $action : '',
                     'searchHelp'  => (isset($searchHelp)) ? $searchHelp : '',
                     'target'      => (empty($target)) ? null : $target,
                     'tmpl'        => (empty($tmpl)) ? null : $tmpl,

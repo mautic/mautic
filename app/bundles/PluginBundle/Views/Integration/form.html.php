@@ -61,7 +61,7 @@ unset($form['featureSettings']['companyFields']);
                 <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
             </div>
         <?php endif; ?>
-        <?php if (!empty($callbackUrl)): ?>
+        <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
             <div class="well well-sm">
                 <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
                 <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $callbackUrl; ?>" class="form-control" />

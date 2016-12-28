@@ -89,6 +89,7 @@ class LeadNote extends FormEntity
                     'text',
                     'type',
                     'dateTime',
+                    'lead',
                 ]
             )
             ->build();

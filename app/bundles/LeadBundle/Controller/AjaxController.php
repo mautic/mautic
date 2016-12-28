@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -320,6 +321,36 @@ class AjaxController extends CommonAjaxController
             if ($lead !== null && $list !== null) {
                 $class = $action == 'add' ? 'addToLists' : 'removeFromLists';
                 $leadModel->$class($lead, $list);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function togglePreferredLeadChannelAction(Request $request)
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $channel   = InputHelper::clean($request->request->get('channel'));
+        $action    = InputHelper::clean($request->request->get('channelAction'));
+
+        if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
+            $leadModel = $this->getModel('lead');
+
+            $lead = $leadModel->getEntity($leadId);
+
+            if ($lead !== null && $channel !== null) {
+                if ($action === 'remove') {
+                    $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
+                } elseif ($action === 'add') {
+                    $leadModel->removeDncForLead($lead, $channel);
+                }
                 $dataArray['success'] = 1;
             }
         }

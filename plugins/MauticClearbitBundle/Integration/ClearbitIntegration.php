@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright  2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -16,7 +17,6 @@ use Symfony\Component\Form\FormBuilder;
 
 class ClearbitIntegration extends AbstractIntegration
 {
-    
     public function getName()
     {
         return 'Clearbit';
@@ -48,13 +48,12 @@ class ClearbitIntegration extends AbstractIntegration
 
     /**
      * @param FormBuilder|Form $builder
-     * @param array $data
-     * @param string $formArea
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea === 'keys') {
-
             $builder->add(
                 'auto_update',
                 'yesno_button_group',
@@ -66,7 +65,6 @@ class ClearbitIntegration extends AbstractIntegration
                     ],
                 ]
             );
-
         }
     }
 

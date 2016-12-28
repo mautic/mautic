@@ -22,6 +22,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'editAttr'  => [
         'data-target' => '#MauticSharedModal',
         'data-header' => $view['translator']->trans('mautic.category.header.new'),
+        'data-toggle' => 'ajaxmodal',
     ],
 ]));
 ?>

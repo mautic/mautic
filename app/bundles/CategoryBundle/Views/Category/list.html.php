@@ -98,6 +98,7 @@ if ($tmpl == 'index') {
                                 'editAttr' => [
                                     'data-target' => '#MauticSharedModal',
                                     'data-header' => $title,
+                                    'data-toggle' => 'ajaxmodal',
                                 ],
                                 'routeBase' => 'category',
                                 'query'     => [

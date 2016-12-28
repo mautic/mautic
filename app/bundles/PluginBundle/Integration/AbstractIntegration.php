@@ -587,6 +587,11 @@ abstract class AbstractIntegration
             unset($parameters['append_to_query']);
         }
 
+        if (isset($parameters['post_append_to_query'])) {
+            $postAppend = $parameters['post_append_to_query'];
+            unset($parameters['post_append_to_query']);
+        }
+
         if (!$this->isConfigured()) {
             return [
                 'error' => [
@@ -604,6 +609,10 @@ abstract class AbstractIntegration
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
             $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+        }
+
+        if (isset($postAppend)) {
+            $url .= $postAppend;
         }
 
         // Check for custom content-type header
@@ -653,7 +662,6 @@ abstract class AbstractIntegration
         );
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
-
         // HTTP library requires that headers are in key => value pairs
         $headers = [];
         if (is_array($parseHeaders)) {
@@ -667,7 +675,6 @@ abstract class AbstractIntegration
                 $headers[$key] = $value;
             }
         }
-
         try {
             switch ($method) {
                 case 'GET':
@@ -756,7 +763,7 @@ abstract class AbstractIntegration
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
-                                $useClientSecretKey => $this->keys[$clientSecretKey],
+                                $useClientSecretKey => isset($this->keys[$clientSecretKey]) ? $this->keys[$clientSecretKey] : '',
                                 'grant_type'        => $grantType,
                             ]
                         );
@@ -1291,7 +1298,6 @@ abstract class AbstractIntegration
         if ($object == null) {
             $object = 'lead';
         }
-
         if ($object == 'company') {
             if (!isset($config['companyFields'])) {
                 $config = $this->mergeConfigToFeatureSettings($config);
@@ -1315,7 +1321,6 @@ abstract class AbstractIntegration
         }
 
         $matched = [];
-
         foreach ($gleanedData as $key => $field) {
             if (isset($fields[$key]) && isset($gleanedData[$key])) {
                 $matched[$fields[$key]] = $gleanedData[$key];

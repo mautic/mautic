@@ -612,6 +612,11 @@ class PageController extends FormController
             $entity->setVariantStartDate(null);
             $entity->setVariantHits(0);
             $entity->setIsPublished(false);
+
+            $session     = $this->get('session');
+            $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+
+            $session->set($contentName, $entity->getCustomHtml());
         }
 
         return $this->newAction($entity);

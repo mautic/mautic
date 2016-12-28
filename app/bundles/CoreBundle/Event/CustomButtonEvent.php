@@ -11,9 +11,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Router;
 
 class CustomButtonEvent extends Event
 {
@@ -28,6 +28,16 @@ class CustomButtonEvent extends Event
      * @var Request
      */
     protected $request;
+
+    /**
+     * @var
+     */
+    protected $route;
+
+    /**
+     * @var array
+     */
+    protected $routeParams = [];
 
     /**
      * @var array
@@ -46,18 +56,31 @@ class CustomButtonEvent extends Event
      *
      * @param         $location
      * @param Request $request
-     * @param Router  $router
      * @param array   $buttons
      * @param null    $item
      */
     public function __construct($location, Request $request, array $buttons = [], $item = null)
     {
         $this->location = $location;
-        $this->buttons  = $buttons;
         $this->item     = $item;
 
-        // The original request will be stored in the subrequest
         $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
+        if ($this->request->attributes->has('ajaxRoute')) {
+            $ajaxRoute         = $this->request->attributes->get('ajaxRoute');
+            $this->route       = $ajaxRoute['_route'];
+            $this->routeParams = $ajaxRoute['_route_params'];
+        } else {
+            $this->route       = $this->request->attributes->get('_route');
+            $this->routeParams = $this->request->attributes->get('_route_params');
+        }
+
+        if (null === $this->routeParams) {
+            $this->routeParams = [];
+        }
+
+        foreach ($buttons as $button) {
+            $this->buttons[$this->generateButtonKey($button)] = $button;
+        }
     }
 
     /**
@@ -85,8 +108,7 @@ class CustomButtonEvent extends Event
      */
     public function getRoute($withParams = false)
     {
-        return ($withParams) ? [$this->request->attributes->get('_route'), $this->request->attributes->get('_route_params')]
-            : $this->request->attributes->get('_route');
+        return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
     /**
@@ -114,11 +136,11 @@ class CustomButtonEvent extends Event
 
         foreach ($buttons as $key => $button) {
             if (!isset($button['priority'])) {
-                $buttons[$key]['priority'] = 0;
+                $button['priority'] = 0;
             }
-        }
 
-        $this->buttons = array_merge($this->buttons, $buttons);
+            $this->buttons[$this->generateButtonKey($button)] = $button;
+        }
 
         return $this;
     }
@@ -142,9 +164,20 @@ class CustomButtonEvent extends Event
             $button['priority'] = 0;
         }
 
-        $this->buttons[] = $button;
+        $this->buttons[$this->generateButtonKey($button)] = $button;
 
         return $this;
+    }
+
+    /**
+     * @param $button
+     */
+    public function removeButton($button)
+    {
+        $buttonKey = $this->generateButtonKey($button);
+        if (isset($this->buttons[$buttonKey])) {
+            unset($this->buttons[$buttonKey]);
+        }
     }
 
     /**
@@ -180,9 +213,8 @@ class CustomButtonEvent extends Event
     {
         if (null !== $route) {
             list($currentRoute, $routeParams) = $this->getRoute(true);
-
-            $givenRoute       = $route;
-            $givenRouteParams = [];
+            $givenRoute                       = $route;
+            $givenRouteParams                 = [];
             if (is_array($route)) {
                 list($givenRoute, $givenRouteParams) = $route;
             }
@@ -199,5 +231,54 @@ class CustomButtonEvent extends Event
         }
 
         return true;
+    }
+
+    /**
+     * Generate a button ID that can be overridden by other plugins.
+     *
+     * @param $button
+     *
+     * @return string
+     */
+    protected function generateButtonKey($button)
+    {
+        $buttonKey = '';
+        if (!empty($button['btnText'])) {
+            $buttonKey .= $button['btnText'];
+        } elseif (isset($button['confirm'])) {
+            if (!empty($button['confirm']['btnText'])) {
+                $buttonKey .= $button['confirm']['btnText'];
+            }
+
+            if (!empty($button['confirm']['template'])) {
+                $buttonKey .= $button['confirm']['template'];
+            }
+
+            if (!empty($button['confirm']['iconClass'])) {
+                $buttonKey .= $button['confirm']['iconClass'];
+            }
+        }
+
+        if (!empty($button['iconClass'])) {
+            $buttonKey .= $button['iconClass'];
+        }
+
+        // Ensure buttons aren't overwritten unintentionally
+        if (empty($buttonKey)) {
+            $buttonKey = uniqid(time());
+        }
+
+        if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
+            // Include the request
+            list($currentRoute, $routeParams) = $this->getRoute(true);
+
+            $buttonKey .= $currentRoute;
+
+            foreach ($routeParams as $paramKey => $paramValue) {
+                $buttonKey .= $paramKey.$paramValue;
+            }
+        }
+
+        return $buttonKey;
     }
 }

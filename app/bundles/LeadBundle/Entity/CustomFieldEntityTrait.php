@@ -38,6 +38,36 @@ trait CustomFieldEntityTrait
     }
 
     /**
+     * @param $name
+     */
+    public function __set($name, $value)
+    {
+        return $this->addUpdatedField(strtolower($name), $value);
+    }
+
+    /**
+     * @param string $name
+     * @param        $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $isSetter = strpos($name, 'set') === 0;
+        $isGetter = strpos($name, 'get') === 0;
+
+        if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
+            $fieldRequested = mb_strtolower(mb_substr($name, 3));
+            $fields         = $this->getProfileFields();
+            if (array_key_exists($fieldRequested, $fields)) {
+                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($name);
+            }
+        }
+
+        return parent::__call($name, $arguments);
+    }
+
+    /**
      * @param $fields
      */
     public function setFields($fields)
@@ -70,6 +100,8 @@ trait CustomFieldEntityTrait
      * @param        $alias
      * @param        $value
      * @param string $oldValue
+     *
+     * @return $this
      */
     public function addUpdatedField($alias, $value, $oldValue = '')
     {
@@ -77,14 +109,18 @@ trait CustomFieldEntityTrait
             $this->wasAnonymous = $this->isAnonymous();
         }
 
-        $value = trim($value);
-        if ($value == '') {
-            // Ensure value is null for consistency
-            $value = null;
+        if (is_string($value)) {
+            $value = trim($value);
+            if ('' === $value) {
+                // Ensure value is null for consistency
+                $value = null;
+            }
         }
 
         $this->addChange('fields', [$alias => [$oldValue, $value]]);
         $this->updatedFields[$alias] = $value;
+
+        return $this;
     }
 
     /**

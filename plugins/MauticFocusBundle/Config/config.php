@@ -71,6 +71,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.focus.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.focus.form.type.color' => [

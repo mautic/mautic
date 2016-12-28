@@ -24,7 +24,7 @@ if (is_array($item)) {
 ?>
 <div class="input-group input-group-sm">
     <span class="input-group-addon">
-        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>" />
+        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>"/>
     </span>
 
     <div class="input-group-btn">
@@ -34,46 +34,61 @@ if (is_array($item)) {
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
             <?php
             if (!empty($templateButtons['edit'])):
-                    $view['buttons']->addButton(
-                        [
-                            'attr' => array_merge($editAttr, [
-                                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
-                                'href'        => $view['router']->path($actionRoute, array_merge(['objectAction' => 'edit', 'objectId' => $id], $query)),
+                $view['buttons']->addButton(
+                    [
+                        'attr' => array_merge(
+                            [
+                                'class' => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                                'href'  => $view['router']->path(
+                                    $actionRoute,
+                                    array_merge(['objectAction' => 'edit', 'objectId' => $id], $query)
+                                ),
                                 'data-toggle' => $editMode,
-                            ]),
-                            'iconClass' => 'fa fa-pencil-square-o',
-                            'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
-                            'primary'   => true,
-                        ]
-                    );
+                            ],
+                            $editAttr
+                        ),
+                        'iconClass' => 'fa fa-pencil-square-o',
+                        'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
+                        'primary'   => true,
+                    ]
+                );
             endif;
             if (!empty($templateButtons['clone'])):
-                    $view['buttons']->addButton(
-                        [
-                            'attr' => array_merge($editAttr, [
-                                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
-                                'href'        => $view['router']->path($actionRoute, array_merge(['objectAction' => 'clone', 'objectId' => $id], $query)),
+                $view['buttons']->addButton(
+                    [
+                        'attr' => array_merge(
+                            [
+                                'class' => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                                'href'  => $view['router']->path(
+                                    $actionRoute,
+                                    array_merge(['objectAction' => 'clone', 'objectId' => $id], $query)
+                                ),
                                 'data-toggle' => 'ajax',
-                            ]),
-                            'iconClass' => 'fa fa-copy',
-                            'btnText'   => $view['translator']->trans('mautic.core.form.clone'),
-                            'priority'  => 200,
-                        ]
-                    );
+                            ],
+                            $editAttr
+                        ),
+                        'iconClass' => 'fa fa-copy',
+                        'btnText'   => $view['translator']->trans('mautic.core.form.clone'),
+                        'priority'  => 200,
+                    ]
+                );
             endif;
             if (!empty($templateButtons['delete'])):
-                    $view['buttons']->addButton(
-                        [
-                            'confirm' => [
-                                'btnClass'      => false,
-                                'btnText'       => $view['translator']->trans('mautic.core.form.delete'),
-                                'message'       => $view['translator']->trans('mautic.'.$langVar.'.form.confirmdelete', ['%name%' => $name.' ('.$id.')']),
-                                'confirmAction' => $view['router']->path($actionRoute, array_merge(['objectAction' => 'delete', 'objectId' => $id], $query)),
-                                'template'      => 'delete',
-                            ],
-                            'priority' => -1,
-                        ]
-                    );
+                $view['buttons']->addButton(
+                    [
+                        'confirm' => [
+                            'btnClass'      => false,
+                            'btnText'       => $view['translator']->trans('mautic.core.form.delete'),
+                            'message'       => $view['translator']->trans('mautic.'.$langVar.'.form.confirmdelete', ['%name%' => $name.' ('.$id.')']),
+                            'confirmAction' => $view['router']->path(
+                                $actionRoute,
+                                array_merge(['objectAction' => 'delete', 'objectId' => $id], $query)
+                            ),
+                            'template' => 'delete',
+                        ],
+                        'priority' => -1,
+                    ]
+                );
             endif;
 
             echo $view['buttons']->renderButtons();

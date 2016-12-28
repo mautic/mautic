@@ -3,9 +3,10 @@
     <head>
         {% if page is defined %}
         <title>{pagetitle}</title>
-        <meta name="description" content="{pagemetadescription}">
-        {% endif %}
-        {{ outputHeadDeclarations() }}
+            <meta name="description" content="{pagemetadescription}">
+            {% endif %}
+        {% block stylesheets %}{% endblock %}
+            {{ outputHeadDeclarations() }}
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}

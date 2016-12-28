@@ -16,11 +16,10 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
  */
 class Clearbit_Company extends Clearbit_Base
 {
-
     public function __construct($api_key)
     {
         parent::__construct($api_key);
-        $this->_baseUri = 'https://company.clearbit.com/';
+        $this->_baseUri     = 'https://company.clearbit.com/';
         $this->_resourceUri = '/companies/find';
     }
 

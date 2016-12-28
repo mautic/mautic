@@ -17,13 +17,13 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
+use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
-use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
-use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 
 /**
  * Class DynamicContentSubscriber.
@@ -66,7 +66,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
-     * @param FormTokenHelper $formTokenHelper
+     * @param FormTokenHelper  $formTokenHelper
      * @param AuditLogModel    $auditLogModel
      */
     public function __construct(
@@ -80,10 +80,9 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper = $formTokenHelper;
+        $this->formTokenHelper  = $formTokenHelper;
         $this->focusTokenHelper = $focusTokenHelper;
         $this->auditLogModel    = $auditLogModel;
-
     }
 
     /**
@@ -129,7 +128,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         $log    = [
             'bundle'   => 'dynamicContent',
             'object'   => 'dynamicContent',
-            'objectId' => $entity->getId(),
+            'objectId' => $entity->deletedId,
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];

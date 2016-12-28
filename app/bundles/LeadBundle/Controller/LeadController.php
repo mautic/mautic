@@ -952,17 +952,40 @@ class LeadController extends FormController
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
-        $data  = [];
+        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category.category');
+        $categories    = $categoryModel->getLookupResults('global');
+        $data          = [];
+
         if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $frequencyRules = $model->getFrequencyRule($lead);
 
-            foreach ($frequencyRules as $frequencyRule) {
-                $data['channels'][]       = $frequencyRule['channel'];
-                $data['frequency_number'] = $frequencyRule['frequency_number'];
-                $data['frequency_time']   = $frequencyRule['frequency_time'];
+            $action                = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+            $channels              = $model->getDoNotContactChannels($lead);
+            $allChannels           = $model->getAllChannels();
+            $data['channels']      = $allChannels;
+            $data['lead_channels'] = $channels;
+            $data['leadId']        = $lead->getId();
+            $data['categories']    = $categories;
+            $data['public_view']   = false;
+
+            foreach ($allChannels as $channel) {
+                foreach ($frequencyRules as $frequencyRule) {
+                    if ($channel == $frequencyRule['channel']) {
+                        $data['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
+                        $data['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
+                        if ($frequencyRule['pause_from_date']) {
+                            $data['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
+                        }
+                        if ($frequencyRule['pause_to_date']) {
+                            $data['contact_pause_end_date_'.$channel] = new \DateTime($frequencyRule['pause_to_date']);
+                        }
+                    }
+                }
             }
 
-            $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+            // Get a list of lists for the lead
+            $leadsLists = $model->getLists($lead, true, true);
 
             $form = $this->get('form.factory')->create(
                 'lead_contact_frequency_rules',
@@ -972,11 +995,26 @@ class LeadController extends FormController
                     'data'   => $data,
                 ]
             );
+
             if ($this->request->getMethod() == 'POST') {
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
-                        $formdata = $form->getData();
-                        $model->setFrequencyRules($lead, $formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
+                        $formData = $form->getData();
+                        foreach ($formData['doNotContactChannels'] as $contactChannel) {
+                            if (!isset($formData['lead_channels'][$contactChannel])) {
+                                $contactable = $model->isContactable($lead, $contactChannel);
+                                if ($contactable !== DoNotContact::UNSUBSCRIBED) {
+                                    // Only resubscribe if the contact did not opt out themselves
+                                    $model->removeDncForLead($lead, $contactChannel);
+                                }
+                            }
+                        }
+                        if (!empty($deletedChannels = array_diff_key($formData['lead_channels'], $formData['doNotContactChannels']))) {
+                            foreach ($deletedChannels as $deletedChannel) {
+                                $model->addDncForLead($lead, $deletedChannel, 'user', DoNotContact::MANUAL);
+                            }
+                        }
+                        $model->setFrequencyRules($lead, $formData, $leadsLists);
                     }
                 }
 
@@ -1011,8 +1049,12 @@ class LeadController extends FormController
                             [
                                 'objectAction' => 'contactFrequency',
                                 'objectId'     => $lead->getId(),
+                                'channels'     => $allChannels,
                             ]
                         ),
+                        'channels'     => $allChannels,
+                        'leadChannels' => $channels,
+                        'lead'         => $lead,
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
                     'passthroughVars' => [
