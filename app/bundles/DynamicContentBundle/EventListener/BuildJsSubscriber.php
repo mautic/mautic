@@ -14,9 +14,9 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class BuildJsSubscriber.
@@ -33,19 +33,18 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     protected $assetsHelper;
 
-
     /**
      * BuildJsSubscriber constructor.
      *
-     * @param FormModel $formModel
-     * @param AssetsHelper   $assetsHelper
+     * @param FormModel    $formModel
+     * @param AssetsHelper $assetsHelper
      */
     public function __construct(
         FormModel $formModel,
         AssetsHelper $assetsHelper)
     {
-        $this->formModel = $formModel;
-        $this->assetsHelper   = $assetsHelper;
+        $this->formModel    = $formModel;
+        $this->assetsHelper = $assetsHelper;
     }
 
     /**
@@ -92,34 +91,28 @@ MauticJS.replaceDynamicContent = function () {
                     // form load library
                     if (response.search("mauticform_wrapper") > 0) {
                         // if doesn't exist
-                        if(typeof MauticSDK == 'undefined'){
-                            var scrpt = document.createElement('script');
-                            scrpt.src='{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}';
-                            var head = document.getElementsByTagName('head')[0];
-                            head.appendChild(scrpt);
+                        if (typeof MauticSDK == 'undefined') {
+                            MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
+                            
                             // check initialize form library
-                            var fileInterval = setInterval(function(){
-                                if (typeof MauticSDK != 'undefined'){
+                            var fileInterval = setInterval(function() {
+                                if (typeof MauticSDK != 'undefined') {
                                     MauticSDK.onLoad(); 
                                     clearInterval(fileInterval); // clear interval
                                  }
-                             },100); // check every 100ms
-                        }else{
+                             }, 100); // check every 100ms
+                        } else {
                             MauticSDK.onLoad();
                          }
                     }
 
-                    var m,
-                        urls = [], 
-                        rex = /<script[^>]+src="?([^"\s]+)"?\s/g;                    
+                    var m;
+                    var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;                    
                     
-                    while ( m = rex.exec( response ) ) {
-                          if ((m[1]).search("/focus/") > 0) {
-                            var scrpt = document.createElement('script');
-                            scrpt.src=m[1];
-                            var head = document.getElementsByTagName('head')[0];
-                            head.appendChild(scrpt);
-                           }
+                    while (m = regEx.exec(response)) {
+                        if ((m[1]).search("/focus/") > 0) {
+                            MauticJS.insertScript(m[1]);
+                        }
                     }
                 }
             });
