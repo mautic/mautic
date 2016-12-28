@@ -396,12 +396,12 @@ Mautic.initSections = function() {
 
         parent.mQuery('#section-form-container').on('change.minicolors', function(e, hex) {
             var field = mQuery(e.target);
-            var focussedSectionWrapper = mQuery('[data-section-focus]').parent();
-            var focussedSection = focussedSectionWrapper.find('[data-section]');
-            if (focussedSection.length && field.attr('id') === 'builder_section_content-background-color') {
-                Mautic.sectionBackgroundChanged(focussedSection, field.val());
+            var focusedSectionWrapper = mQuery('[data-section-focus]').parent();
+            var focusedSection = focusedSectionWrapper.find('[data-section]');
+            if (focusedSection.length && field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(focusedSection, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                Mautic.sectionBackgroundChanged(focussedSectionWrapper, field.val());
+                Mautic.sectionBackgroundChanged(focusedSectionWrapper, field.val());
             }
         });
     });
@@ -414,6 +414,15 @@ Mautic.sectionBackgroundChanged = function(element, color) {
         color = 'transparent';
     }
     element.css('background-color', color).attr('bgcolor', color);
+
+
+    // Change the color of the editor for selected slots
+    mQuery(element).find('[data-slot-focus]').each(function() {
+        var focusedSlot = mQuery(this).closest('[data-slot]');
+        if (focusedSlot.attr('data-slot') == 'text') {
+            Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), focusedSlot);
+        }
+    });
 }
 
 Mautic.rgb2hex = function(orig) {
@@ -631,7 +640,7 @@ Mautic.initSlotListeners = function() {
                 clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                 // Trigger the slot:change event
-                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
+                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field, type: focusType});
             });
 
             focusForm.find('.btn').on('click', function(e) {
@@ -642,7 +651,7 @@ Mautic.initSlotListeners = function() {
                     clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                     // Trigger the slot:change event
-                    clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
+                    clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field, type: focusType});
                 }
             });
 
@@ -678,7 +687,9 @@ Mautic.initSlotListeners = function() {
 
                 // init AtWho in a froala editor
                 parent.mQuery(this).on('froalaEditor.initialized', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, Mautic.getBuilderTokensMethod(), editor);
+                    parent.Mautic.initAtWho(editor.$el, parent.Mautic.getBuilderTokensMethod(), editor);
+
+                    Mautic.setTextSlotEditorStyle(editor.$el, clickedSlot);
                 });
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
@@ -697,7 +708,7 @@ Mautic.initSlotListeners = function() {
                 clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                 // Trigger the slot:change event
-                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
+                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field, type: focusType});
             });
         });
 
@@ -773,6 +784,10 @@ Mautic.initSlotListeners = function() {
         } else if (fieldParam === 'color') {
             params.slot.find('a').css(fieldParam, '#'+params.field.val());
         }
+
+        if (params.type == 'text') {
+            Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), params.slot);
+        }
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
@@ -792,6 +807,61 @@ Mautic.initSlotListeners = function() {
     });
 };
 
+Mautic.setTextSlotEditorStyle = function(editorEl, slot)
+{
+    // Set the editor CSS to that of the slot
+    var wrapper = parent.mQuery(editorEl).closest('.form-group').find('.fr-wrapper .fr-element').first();
+
+    if (typeof wrapper == 'undefined') {
+        return;
+    }
+
+    if (typeof slot.attr('style') !== 'undefined') {
+        wrapper.attr('style', slot.attr('style'));
+    }
+
+    mQuery.each(['background-color', 'color', 'font-family', 'font-size', 'line-height', 'text-align'], function(key, style) {
+        var overrideStyle = Mautic.getSlotStyle(slot, style, false);
+        if (overrideStyle) {
+            wrapper.css(style, overrideStyle);
+        }
+    });
+}
+
+Mautic.getSlotStyle = function(slot, styleName, fallback) {
+    if ('background-color' == styleName) {
+        // Get this browser's take on no fill
+        // Must be appended else Chrome etc return 'initial'
+        var temp = mQuery('<div style="background:none;display:none;"/>').appendTo('body');
+        var transparent = temp.css(styleName);
+        temp.remove();
+    }
+
+    var findStyle = function (slot) {
+        function test(elem) {
+            if ('background-color' == styleName) {
+                if (typeof elem.attr('bgcolor') !== 'undefined') {
+                    // Email tables
+                    return elem.attr('bgcolor');
+                }
+
+                if (elem.css(styleName) == transparent) {
+                    return !elem.is('body') ? test(elem.parent()) : fallback || transparent;
+                } else {
+                    return elem.css(styleName);
+                }
+            } else if (typeof elem.css(styleName) !== 'undefined') {
+                return elem.css(styleName);
+            } else {
+                return !elem.is('body') ? test(elem.parent()) : fallback;
+            }
+        }
+
+        return test(slot);
+    };
+
+    return findStyle(slot);
+}
 
 // Init inside the builder's iframe
 mQuery(function() {
