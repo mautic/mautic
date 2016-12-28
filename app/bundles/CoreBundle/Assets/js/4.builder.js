@@ -437,6 +437,7 @@ Mautic.initSlots = function() {
 
     // Make slots sortable
     var bodyOverflow = {};
+    Mautic.sortActive = false;
     slotContainers.sortable({
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
@@ -450,12 +451,12 @@ Mautic.initSlots = function() {
             return ui;
         },
         items: '[data-slot]',
-        handle: 'div[data-slot-toolbar]',
+        handle: '[data-slot-toolbar]',
         placeholder: 'slot-placeholder',
         connectWith: '[data-slot-container]',
         start: function(event, ui) {
-            // Deactivate image focus
-
+            Mautic.sortActive = true;
+            ui.placeholder.height(ui.helper.outerHeight());
         },
         stop: function(event, ui) {
             // Restore original overflow
@@ -467,6 +468,8 @@ Mautic.initSlots = function() {
                 Mautic.builderContents.trigger('slot:init', newSlot);
                 ui.item.replaceWith(newSlot);
             }
+
+            Mautic.sortActive = false;
         }
     });
 
@@ -546,8 +549,13 @@ Mautic.initSlotListeners = function() {
         var focus = mQuery('<div/>').attr('data-slot-focus', true);
 
         slot.hover(function() {
-            slot.append(focus);
+            if (Mautic.sortActive) {
+                // don't activate while sorting
 
+                return;
+            }
+
+            slot.append(focus);
             deleteLink.click(function(e) {
                 slot.trigger('slot:destroy', {slot: slot, type: type});
                 mQuery.each(Mautic.builderSlots, function(i, slotParams) {
@@ -560,8 +568,21 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
 
+            if (mQuery(this).offset().top < 25) {
+                // If at the top of the page, move the toolbar to be visible
+                slotToolbar.css('top', '0');
+            } else {
+                slotToolbar.css('top', '-24px');
+            }
+
             slot.append(slotToolbar);
         }, function() {
+            if (Mautic.sortActive) {
+                // don't activate while sorting
+
+                return;
+            }
+
             slotToolbar.remove();
             focus.remove();
         });
@@ -626,7 +647,7 @@ Mautic.initSlotListeners = function() {
             var slotClicked = mQuery(this);
             focusForm.find('textarea.editor').each(function() {
                 var theEditor = this;
-                var slotHtml = parent.mQuery('<div/>').append(parent.mQuery(slotClicked.html()));
+                var slotHtml = parent.mQuery('<div/>').html(slotClicked.html());
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
@@ -641,7 +662,6 @@ Mautic.initSlotListeners = function() {
                 }
 
                 var froalaOptions = {
-                    enter: mQuery.FroalaEditor.ENTER_P,
                     toolbarButtons: buttons,
                     toolbarButtonsMD: buttons,
                     toolbarButtonsSM: buttons,

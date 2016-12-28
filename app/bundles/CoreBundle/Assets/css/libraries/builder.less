@@ -30,21 +30,22 @@
 
 /* BUILDER CSS */
 div[data-slot-focus] {
+    top: -1px;
+    right: -1px;
     bottom: -1px;
-    content: '';
     left: -1px;
+    content: '';
     margin: 0;
     padding: 0;
     position: absolute;
-    right: -1px;
-    top: 0px;
-    border: 1px solid #4e5e9e;
+    border: 1px solid @mautic-primary;
+    z-index: 1;
 }
 
 div[data-section-focus] {
     content: '';
     position: absolute;
-    border: 1px solid #fdb933;
+    border: 1px solid @mautic-secondary;
 }
 
 div[data-section-focus="top"] {
@@ -73,13 +74,17 @@ div[data-section-focus="left"] {
 
 div[data-slot-toolbar] {
     position: absolute;
-    top: 0;
+    top: -24px;
+    left: -1px;
+    right: -1px;
     height: 25px;
     width: 100%;
     z-index: 10;
     cursor: pointer;
     cursor: move;
     background-color: @mautic-primary;
+    border-left: 1px solid @mautic-primary;
+    border-right: 1px solid @mautic-primary;
 }
 
 div[data-slot-toolbar] .btn {
@@ -92,7 +97,6 @@ div[data-slot-toolbar] .btn {
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
-    background-image: none;
     border: 1px solid transparent;
     white-space: nowrap;
     line-height: 1.3856;
@@ -104,6 +108,7 @@ div[data-slot-toolbar] .btn {
     line-height: 1.456;
     float: right;
     margin-right: 5px;
+    color: #ffffff;
 }
 
 div[data-slot-toolbar] .btn .fa {
@@ -114,14 +119,17 @@ div[data-slot], [data-section-wrapper] {
     position: relative;
 }
 
+div[data-slot="image"] {
+    padding-top: 1px; // prevent z-index of image from hiding the bottom border of a slot with focus above it
+}
+
 div[data-slot="image"] img {
-    z-index: 1;
+    z-index: 2;
     position: relative;
 }
 
 .slot-placeholder {
-    border-top: 3px solid #4e5e9e;
-    margin-top: -1px;
+    border: 2px dotted @mautic-primary;
 }
 
 [data-slot="text"] {
@@ -129,7 +137,7 @@ div[data-slot="image"] img {
         padding: initial;
 
         .fr-toolbar {
-            border-top: 2px solid #4e5e9e;
+            border-top: 2px solid @mautic-primary;
             position: absolute;
             left: -15px;
             bottom: initial !important;
