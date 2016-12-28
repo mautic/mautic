@@ -161,11 +161,15 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['leadField'] && in_array($contactFields[$field['leadField']]['type'], ['datetime', 'date'])) {
+    if ($field['leadField'] && !empty($contactFields[$field['leadField']]['type']) && in_array($contactFields[$field['leadField']]['type'], ['datetime', 'date'])) {
         $tempLeadFieldType = $contactFields[$field['leadField']]['type'];
         $mauticParameter   = $this->container->getParameter('mautic.parameters');
         foreach ($parseList as $key => $aTemp) {
-            $date = date_create_from_format('Y-m-d', $aTemp['label']);
+            if ($contactFields[$field['leadField']]['type'] == 'datetime') {
+                $date = date_create_from_format('Y-m-d H:i:s', $aTemp['label']);
+            } else {
+                $date = date_create_from_format('Y-m-d', $aTemp['label']);
+            }
             if ($date) {
                 $parseList[$key]['label'] = $date->format($tempLeadFieldType == 'datetime' ? $mauticParameter['date_format_full'] : $mauticParameter['date_format_dateonly']);
             }
