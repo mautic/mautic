@@ -24,7 +24,6 @@ Mautic.launchBuilder = function (formName, actionName) {
         height: "100%"
     };
 
-
     // Load the theme from the custom HTML textarea
     var themeHtml = mQuery('textarea.builder-html').val();
 
@@ -228,10 +227,7 @@ Mautic.closeBuilder = function(model) {
             // Remove Mautic's assets
             themeHtml.find('[data-source="mautic"]').remove();
             themeHtml.find('.atwho-container').remove();
-            themeHtml.find('.fr-image-overlay').remove();
-            themeHtml.find('.fr-quick-insert').remove();
-            themeHtml.find('.fr-tooltip').remove();
-            themeHtml.find('.fr-toolbar').remove();
+            themeHtml.find('.fr-image-overlay, .fr-quick-insert, .fr-tooltip, .fr-toolbar, .fr-popup, .fr-image-resizer').remove();
 
             // Remove the slot focus highlight
             themeHtml.find('[data-slot-focus], [data-section-focus]').remove();
@@ -457,6 +453,15 @@ Mautic.initSlots = function() {
         start: function(event, ui) {
             Mautic.sortActive = true;
             ui.placeholder.height(ui.helper.outerHeight());
+            Mautic.builderContents.find('[data-slot-focus]').remove();
+
+            if (ui.item.attr('data-slot') == 'image') {
+                // Deactivate froala toolbar
+                ui.item.find('img').each( function() {
+                    mQuery(this).froalaEditor('popups.hideAll');
+                });
+                Mautic.builderContents.find('.fr-image-resizer.fr-active').removeClass('fr-active');
+            }
         },
         stop: function(event, ui) {
             // Restore original overflow
@@ -465,8 +470,8 @@ Mautic.initSlots = function() {
             if (ui.item.hasClass('slot-type-handle')) {
                 var slotTypeContent = ui.item.find('script').html();
                 var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
-                Mautic.builderContents.trigger('slot:init', newSlot);
                 ui.item.replaceWith(newSlot);
+                Mautic.builderContents.trigger('slot:init', newSlot);
             }
 
             Mautic.sortActive = false;
@@ -588,8 +593,10 @@ Mautic.initSlotListeners = function() {
         });
 
         slot.on('click', function() {
+            var clickedSlot = mQuery(this);
+
             // Trigger the slot:change event
-            mQuery(this).trigger('slot:selected', mQuery(this));
+            clickedSlot.trigger('slot:selected', clickedSlot);
 
             // Destroy previously initiated minicolors
             var minicolors = parent.mQuery('#slot-form-container .minicolors');
@@ -601,12 +608,12 @@ Mautic.initSlotListeners = function() {
             }
 
             // Update form in the Customize tab to the form of the focused slot type
-            var focusType = mQuery(this).attr('data-slot');
+            var focusType = clickedSlot.attr('data-slot');
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
             parent.mQuery('#slot-form-container').html(focusForm);
 
             // Prefill the form field values with the values from slot attributes if any
-            mQuery.each(mQuery(this).get(0).attributes, function(i, attr) {
+            parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
                 var attrPrefix = 'data-param-';
                 var regex = /data-param-(.*)/;
                 var match = regex.exec(attr.name);
@@ -621,10 +628,10 @@ Mautic.initSlotListeners = function() {
                 var field = mQuery(e.target);
 
                 // Store the slot settings as attributes
-                mQuery(this).attr('data-param-'+field.attr('data-slot-param'), field.val());
+                clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                 // Trigger the slot:change event
-                mQuery(this).trigger('slot:change', {slot: mQuery(this), field: field});
+                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
             });
 
             focusForm.find('.btn').on('click', function(e) {
@@ -632,10 +639,10 @@ Mautic.initSlotListeners = function() {
 
                 if (field.length) {
                     // Store the slot settings as attributes
-                    mQuery(this).attr('data-param-'+field.attr('data-slot-param'), field.val());
+                    clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                     // Trigger the slot:change event
-                    mQuery(this).trigger('slot:change', {slot: mQuery(this), field: field});
+                    clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
                 }
             });
 
@@ -644,10 +651,9 @@ Mautic.initSlotListeners = function() {
                 parent.Mautic.activateColorPicker(this);
             });
 
-            var slotClicked = mQuery(this);
             focusForm.find('textarea.editor').each(function() {
                 var theEditor = this;
-                var slotHtml = parent.mQuery('<div/>').html(slotClicked.html());
+                var slotHtml = parent.mQuery('<div/>').html(clickedSlot.html());
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
@@ -677,7 +683,7 @@ Mautic.initSlotListeners = function() {
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
                     var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
-                    slotClicked.html(slotHtml.html());
+                    clickedSlot.html(slotHtml.html());
                 });
                 parent.mQuery(this).val(slotHtml.html());
 
@@ -688,10 +694,10 @@ Mautic.initSlotListeners = function() {
                 var field = mQuery(e.target);
 
                 // Store the slot settings as attributes
-                mQuery(this).attr('data-param-'+field.attr('data-slot-param'), field.val());
+                clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                 // Trigger the slot:change event
-                mQuery(this).trigger('slot:change', {slot: slot, field: field});
+                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field});
             });
         });
 
@@ -708,7 +714,7 @@ Mautic.initSlotListeners = function() {
             // Init Froala editor
             image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
+                    imageEditButtons: ['imageReplace', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }
             ));
         } else if (type === 'button') {

@@ -121,11 +121,16 @@ div[data-slot], [data-section-wrapper] {
 
 div[data-slot="image"] {
     padding-top: 1px; // prevent z-index of image from hiding the bottom border of a slot with focus above it
+    padding-bottom: 1px;
 }
 
 div[data-slot="image"] img {
     z-index: 2;
     position: relative;
+}
+
+div[data-slot].ui-sortable-helper {
+    border: 1px solid @mautic-primary;
 }
 
 .slot-placeholder {
