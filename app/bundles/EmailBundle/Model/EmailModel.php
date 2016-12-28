@@ -2066,7 +2066,7 @@ class EmailModel extends FormModel
      *
      * @param       $email
      * @param       $users
-     * @param mixed $lead
+     * @param mixed $leadFields
      * @param array $tokens
      * @param array $assetAttachments
      * @param bool  $saveStat
@@ -2075,7 +2075,7 @@ class EmailModel extends FormModel
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendSampleEmailToUser($email, $users, $lead = null, $tokens = [], $assetAttachments = [], $saveStat = true)
+    public function sendSampleEmailToUser($email, $users, $leadFields = null, $tokens = [], $assetAttachments = [], $saveStat = true)
     {
         if (!$emailId = $email->getId()) {
             return false;
@@ -2095,7 +2095,7 @@ class EmailModel extends FormModel
         }
 
         $mailer = $this->mailHelper->getSampleMailer();
-        $mailer->setLead($lead, true);
+        $mailer->setLead($leadFields, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
 
