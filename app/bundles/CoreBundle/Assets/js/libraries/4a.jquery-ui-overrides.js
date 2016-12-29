@@ -115,13 +115,7 @@
                     pageY = this.originalPageY;
                 }
             }
-console.log((
-        pageY -                                                                 // The absolute mouse position
-        this.offset.click.top   -                                               // Click offset (relative to the element)
-        this.offset.relative.top -                                              // Only for relative positioned nodes: Relative offset from element to offset parent
-        this.offset.parent.top +                                                // The offsetParent's offset without borders (offset + border)
-        ( this.cssPosition === "fixed" ? -this.offset.scroll.top : ( scrollIsRootNode ? 0 : this.offset.scroll.top ) )
-    ) + 200);
+
             return {
                 top: (
                     pageY -                                                                 // The absolute mouse position
@@ -129,7 +123,7 @@ console.log((
                     this.offset.relative.top -                                              // Only for relative positioned nodes: Relative offset from element to offset parent
                     this.offset.parent.top +                                                // The offsetParent's offset without borders (offset + border)
                     ( this.cssPosition === "fixed" ? -this.offset.scroll.top : ( scrollIsRootNode ? 0 : this.offset.scroll.top ) )
-                ) + 200,
+                ),
                 left: (
                     pageX -                                                                 // The absolute mouse position
                     this.offset.click.left -                                                // Click offset (relative to the element)
