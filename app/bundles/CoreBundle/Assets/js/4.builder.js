@@ -333,6 +333,7 @@ Mautic.toggleBuilderButton = function (hide) {
         }
     }
 };
+
 Mautic.initSections = function() {
     var sectionWrappers = Mautic.builderContents.find('[data-section-wrapper]');
 
@@ -462,29 +463,38 @@ Mautic.initSlots = function() {
         start: function(event, ui) {
             Mautic.sortActive = true;
             ui.placeholder.height(ui.helper.outerHeight());
-            Mautic.builderContents.find('[data-slot-focus]').remove();
 
-            if (ui.item.attr('data-slot') == 'image') {
-                // Deactivate froala toolbar
-                ui.item.find('img').each( function() {
-                    mQuery(this).froalaEditor('popups.hideAll');
-                });
-                Mautic.builderContents.find('.fr-image-resizer.fr-active').removeClass('fr-active');
-            }
+            Mautic.builderContents.find('[data-slot-focus]').each( function() {
+                var focusedSlot = mQuery(this).closest('[data-slot]');
+                if (focusedSlot.attr('data-slot') == 'image') {
+                    // Deactivate froala toolbar
+                    focusedSlot.find('img').each( function() {
+                        mQuery(this).froalaEditor('popups.hideAll');
+                    });
+                    Mautic.builderContents.find('.fr-image-resizer.fr-active').removeClass('fr-active');
+                }
+            });
+
+            Mautic.builderContents.find('[data-slot-focus]').remove();
         },
         stop: function(event, ui) {
-            // Restore original overflow
-            mQuery('body').css(bodyOverflow);
-
             if (ui.item.hasClass('slot-type-handle')) {
-                var slotTypeContent = ui.item.find('script').html();
-                var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
+                // Restore original overflow
+                mQuery('body', parent.document).css(bodyOverflow);
+
+                var newSlot = mQuery('<div/>')
+                    .attr('data-slot', ui.item.attr('data-slot-type'))
+                    .html(ui.item.find('script').html())
                 ui.item.replaceWith(newSlot);
+
                 Mautic.builderContents.trigger('slot:init', newSlot);
+            } else {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
             }
 
             Mautic.sortActive = false;
-        }
+        },
     });
 
     // Allow to drag&drop new slots from the slot type menu
@@ -493,40 +503,28 @@ Mautic.initSlots = function() {
         iframeId: 'builder-template-content',
         connectToSortable: slotContainers,
         revert: 'invalid',
-        appendTo: '.builder',
+        appendTo: '#builder-template-content',
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
-            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
-            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
-            mQuery('body').css({
+            bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body', parent.document).css('overflow-y');
+            mQuery('body', parent.document).css({
                 overflowX: 'visible',
                 overflowY: 'visible'
             });
 
-            return mQuery(this).clone();
+            var helper = mQuery(this).clone()
+                .css('height', mQuery(this).height())
+                .css('width', mQuery(this).width());
+
+            return helper;
         },
         zIndex: 8000,
-        scroll: true,
         cursorAt: {top: 15, left: 15},
-        start: function( event, ui ) {
-            mQuery(ui.helper).css({
-                color: '#5d6c7c',
-                background: '#f5f5f5',
-                border: '1px solid #d3d3d3',
-                height: '60px',
-                width: '115px',
-                borderRadius: '4px',
-                fontSize: '16px',
-                padding: '10px 16px',
-                lineHeight: '1.25'
-            });
-        },
         stop: function(event, ui) {
             // Restore original overflow
-            mQuery('body').css(bodyOverflow);
-
-            ui.helper = mQuery(event.target).closest('[data-slot-type]');
-        }
+            mQuery('body', parent.document).css(bodyOverflow);
+        },
     }).disableSelection();
 
     // Initialize the slots
