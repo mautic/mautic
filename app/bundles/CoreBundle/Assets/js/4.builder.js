@@ -616,6 +616,13 @@ Mautic.initSlotListeners = function() {
                 parent.mQuery('#slot-form-container').off('change.minicolors');
             }
 
+            if (parent.mQuery('#slot-form-container').find('textarea.editor')) {
+                // Deactivate all popups
+                parent.mQuery('#slot-form-container').find('textarea.editor').each( function() {
+                    parent.mQuery(this).froalaEditor('popups.hideAll');
+                });
+            }
+
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = clickedSlot.attr('data-slot');
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
