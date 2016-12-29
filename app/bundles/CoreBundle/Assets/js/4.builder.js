@@ -444,6 +444,7 @@ Mautic.initSlots = function() {
     // Make slots sortable
     var bodyOverflow = {};
     Mautic.sortActive = false;
+
     slotContainers.sortable({
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
@@ -498,19 +499,19 @@ Mautic.initSlots = function() {
     });
 
     // Allow to drag&drop new slots from the slot type menu
+    var iframe = mQuery('#builder-template-content', parent.document).contents();
     mQuery('#slot-type-container .slot-type-handle', parent.document).draggable({
         iframeFix: true,
-        iframeId: 'builder-template-content',
         connectToSortable: slotContainers,
         revert: 'invalid',
-        appendTo: '#builder-template-content',
+        iframeOffset: iframe.offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
             bodyOverflow.overflowY = mQuery('body', parent.document).css('overflow-y');
             mQuery('body', parent.document).css({
-                overflowX: 'visible',
-                overflowY: 'visible'
+                overflowX: 'hidden',
+                overflowY: 'hidden'
             });
 
             var helper = mQuery(this).clone()
@@ -521,11 +522,24 @@ Mautic.initSlots = function() {
         },
         zIndex: 8000,
         cursorAt: {top: 15, left: 15},
+        start: function(event, ui) {
+            mQuery('#builder-template-content', parent.document).css('overflow', 'hidden');
+            mQuery('#builder-template-content', parent.document).attr('scrolling', 'no');
+            slotContainers.sortable('option', 'scroll', false);
+        },
         stop: function(event, ui) {
             // Restore original overflow
             mQuery('body', parent.document).css(bodyOverflow);
+
+            mQuery('#builder-template-content', parent.document).css('overflow', 'visible');
+            mQuery('#builder-template-content', parent.document).attr('scrolling', 'yes');
+            slotContainers.sortable('option', 'scroll', true);
         },
     }).disableSelection();
+
+    iframe.on('scroll', function() {
+        mQuery('#slot-type-container .slot-type-handle', parent.document).draggable("option", "cursorAt", { top: -1 * iframe.scrollTop() + 15 });
+    });
 
     // Initialize the slots
     Mautic.builderContents.find('[data-slot]').each(function() {
