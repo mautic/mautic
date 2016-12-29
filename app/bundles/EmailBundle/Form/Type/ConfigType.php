@@ -485,6 +485,42 @@ class ConfigType extends AbstractType
             ]
         );
 
+         $builder->add(
+            'mailer_mailjet_sandbox',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.mailjet.sandbox',
+                ],
+                'data'     => empty($options['data']['mailer_sandbox']) ? false : true,
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_mailjet_sandbox_default_mail',
+            'text',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                ],
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                        ]
+                    ),
+                ],
+                'required' => false,
+            ]
+        );
+
         $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
 
         $builder->add(
