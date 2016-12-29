@@ -21,8 +21,13 @@ $formId = $form->getId();
                 <?php
                 if ($canDelete):
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'checkall' => 'true',
-                    'target'   => '#formResultTable',
+                    'checkall'        => 'true',
+                    'target'          => '#formResultTable',
+                    'routeBase'       => 'form_results',
+                    'query'           => ['formId' => $formId],
+                    'templateButtons' => [
+                        'delete' => $canDelete,
+                    ],
                 ]);
                 endif;
 
@@ -83,9 +88,12 @@ $formId = $form->getId();
                         'templateButtons' => [
                             'delete' => $canDelete,
                         ],
-                        'route'   => 'mautic_form_results_delete',
+                        'route'   => 'mautic_form_results_action',
                         'langVar' => 'form.results',
-                        'query'   => ['formId' => $formId],
+                        'query'   => [
+                            'formId'       => $formId,
+                            'objectAction' => 'delete',
+                        ],
                     ]);
                     ?>
                 </td>
