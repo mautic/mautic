@@ -38,7 +38,7 @@
                             <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                 <?php foreach ($field as $value => $params):
                                     $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                    $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
+                                    $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
                                     $list      = json_encode($choices);
                                     $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                     $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';

@@ -30,6 +30,16 @@ class CustomButtonEvent extends Event
     protected $request;
 
     /**
+     * @var
+     */
+    protected $route;
+
+    /**
+     * @var array
+     */
+    protected $routeParams = [];
+
+    /**
      * @var array
      */
     protected $buttons = [];
@@ -54,8 +64,19 @@ class CustomButtonEvent extends Event
         $this->location = $location;
         $this->item     = $item;
 
-        // The original request will be stored in the subrequest
         $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
+        if ($this->request->attributes->has('ajaxRoute')) {
+            $ajaxRoute         = $this->request->attributes->get('ajaxRoute');
+            $this->route       = $ajaxRoute['_route'];
+            $this->routeParams = $ajaxRoute['_route_params'];
+        } else {
+            $this->route       = $this->request->attributes->get('_route');
+            $this->routeParams = $this->request->attributes->get('_route_params');
+        }
+
+        if (null === $this->routeParams) {
+            $this->routeParams = [];
+        }
 
         foreach ($buttons as $button) {
             $this->buttons[$this->generateButtonKey($button)] = $button;
@@ -87,8 +108,7 @@ class CustomButtonEvent extends Event
      */
     public function getRoute($withParams = false)
     {
-        return ($withParams) ? [$this->request->attributes->get('_route'), $this->request->attributes->get('_route_params')]
-            : $this->request->attributes->get('_route');
+        return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
     /**
@@ -193,9 +213,8 @@ class CustomButtonEvent extends Event
     {
         if (null !== $route) {
             list($currentRoute, $routeParams) = $this->getRoute(true);
-
-            $givenRoute       = $route;
-            $givenRouteParams = [];
+            $givenRoute                       = $route;
+            $givenRouteParams                 = [];
             if (is_array($route)) {
                 list($givenRoute, $givenRouteParams) = $route;
             }

@@ -164,51 +164,106 @@ class LeadApiController extends CommonApiController
     public function getNotesAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
-            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
-                return $this->accessDenied();
-            }
 
-            $results = $this->getModel('lead.note')->getEntities(
-                [
-                    'start'  => $this->request->query->get('start', 0),
-                    'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
-                    'filter' => [
-                        'string' => $this->request->query->get('search', ''),
-                        'force'  => [
-                            [
-                                'column' => 'n.lead',
-                                'expr'   => 'eq',
-                                'value'  => $entity,
-                            ],
-                        ],
-                    ],
-                    'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
-                    'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
-                ]
-            );
-
-            list($notes, $count) = $this->prepareEntitiesForView($results);
-
-            $view = $this->view(
-                [
-                    'total' => $count,
-                    'notes' => $notes,
-                ],
-                Codes::HTTP_OK
-            );
-
-            $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
-            $view->setSerializationContext($context);
-
-            return $this->handleView($view);
+        if ($entity === null) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $results = $this->getModel('lead.note')->getEntities(
+            [
+                'start'  => $this->request->query->get('start', 0),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'filter' => [
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => [
+                        [
+                            'column' => 'n.lead',
+                            'expr'   => 'eq',
+                            'value'  => $entity,
+                        ],
+                    ],
+                ],
+                'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
+                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+            ]
+        );
+
+        list($notes, $count) = $this->prepareEntitiesForView($results);
+
+        $view = $this->view(
+            [
+                'total' => $count,
+                'notes' => $notes,
+            ],
+            Codes::HTTP_OK
+        );
+
+        $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
+        $view->setSerializationContext($context);
+
+        return $this->handleView($view);
     }
 
     /**
-     * Obtains a list of lead lists the lead is in.
+     * Obtains a list of devices on a specific lead.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getDevicesAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $results = $this->getModel('lead.device')->getEntities(
+            [
+                'start'  => $this->request->query->get('start', 0),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'filter' => [
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => [
+                        [
+                            'column' => 'd.lead',
+                            'expr'   => 'eq',
+                            'value'  => $entity,
+                        ],
+                    ],
+                ],
+                'orderBy'    => $this->request->query->get('orderBy', 'd.dateAdded'),
+                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+            ]
+        );
+
+        list($devices, $count) = $this->prepareEntitiesForView($results);
+
+        $view = $this->view(
+            [
+                'total'   => $count,
+                'devices' => $devices,
+            ],
+            Codes::HTTP_OK
+        );
+
+        $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
+        $view->setSerializationContext($context);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Obtains a list of contact segments the contact is in.
      *
      * @param $id
      *
@@ -245,6 +300,38 @@ class LeadApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * Obtains a list of contact companies the contact is in.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getCompaniesAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            return $this->accessDenied();
+        }
+
+        $companies = $this->model->getCompanies($entity);
+
+        $view = $this->view(
+            [
+                'total'     => count($companies),
+                'companies' => $companies,
+            ],
+            Codes::HTTP_OK
+        );
+
+        return $this->handleView($view);
     }
 
     /**
@@ -407,27 +494,28 @@ class LeadApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        //Since the request can be from 3rd party, check for an IP address if included
-        if (isset($parameters['ipAddress'])) {
-            $ip = $parameters['ipAddress'];
-            unset($parameters['ipAddress']);
-
-            $ipAddress = $this->factory->getIpAddress($ip);
-
-            if (!$entity->getIpAddresses()->contains($ipAddress)) {
-                $entity->addIpAddress($ipAddress);
-            }
-        }
-
-        // Check for tag string
-        if (isset($parameters['tags'])) {
-            $this->model->modifyTags($entity, $parameters['tags']);
-            unset($parameters['tags']);
-        }
+        $originalParams = $this->request->request->all();
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
+        }
+
+        //Since the request can be from 3rd party, check for an IP address if included
+        if (isset($originalParams['ipAddress'])) {
+            $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
+
+            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+                $entity->addIpAddress($ipAddress);
+            }
+
+            unset($originalParams['ipAddress']);
+        }
+
+        // Check for tags
+        if (isset($originalParams['tags'])) {
+            $this->model->modifyTags($entity, $originalParams['tags']);
+            unset($originalParams['tags']);
         }
 
         // Contact parameters which can be updated apart form contact fields
@@ -476,7 +564,7 @@ class LeadApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        unset($parameters['ipAddress'], $parameters['lastActive'], $parameters['tags']);
+        unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
@@ -507,6 +595,7 @@ class LeadApiController extends CommonApiController
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
         if ($entity instanceof Lead) {
+            $fields        = $entity->getFields();
             $fields['all'] = $entity->getProfileFields();
             $entity->setFields($fields);
         }

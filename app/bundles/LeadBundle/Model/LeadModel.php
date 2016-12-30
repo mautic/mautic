@@ -945,7 +945,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get a list of lists this lead belongs to.
+     * Get a list of segments this lead belongs to.
      *
      * @param Lead $lead
      * @param bool $forLists
@@ -959,6 +959,20 @@ class LeadModel extends FormModel
         $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
 
         return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+    }
+
+    /**
+     * Get a list of companies this contact belongs to.
+     *
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
+    public function getCompanies(Lead $lead)
+    {
+        $repo = $this->em->getRepository('MauticLeadBundle:CompanyLead');
+
+        return $repo->getCompaniesByLeadId($lead->getId());
     }
 
     /**
@@ -1852,8 +1866,10 @@ class LeadModel extends FormModel
         $tagsModified = false;
         $leadTags     = $lead->getTags();
 
-        if ($leadTags) {
-            $this->logger->debug('LEAD: Lead currently has tags '.implode(', ', $leadTags->getKeys()));
+        if (!$leadTags->isEmpty()) {
+            $this->logger->debug('CONTACT: Contact currently has tags '.implode(', ', $leadTags->getKeys()));
+        } else {
+            $this->logger->debug('CONTACT: Contact currently does not have any tags');
         }
 
         if (!is_array($tags)) {
@@ -1875,24 +1891,20 @@ class LeadModel extends FormModel
                     $tagsModified = true;
                     $lead->removeTag($foundTags[$tag]);
 
-                    $this->logger->debug('LEAD: Removed '.$tag);
+                    $this->logger->debug('CONTACT: Removed '.$tag);
                 }
             } else {
-                // Tag to be added
                 if (!array_key_exists($tag, $foundTags)) {
-                    // New tag
-                    $newTag = new Tag();
-                    $newTag->setTag($tag);
-                    $lead->addTag($newTag);
-                    $tagsModified = true;
-
-                    $this->logger->debug('LEAD: Added '.$tag);
+                    $tagToBeAdded = new Tag();
+                    $tagToBeAdded->setTag($tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
-                    $lead->addTag($foundTags[$tag]);
-                    $tagsModified = true;
-
-                    $this->logger->debug('LEAD: Added '.$tag);
+                    $tagToBeAdded = $foundTags[$tag];
                 }
+
+                $lead->addTag($tagToBeAdded);
+                $tagsModified = true;
+
+                $this->logger->debug('CONTACT: Added '.$tag);
             }
         }
 
@@ -1910,7 +1922,7 @@ class LeadModel extends FormModel
                     $lead->removeTag($foundRemoveTags[$tag]);
                     $tagsModified = true;
 
-                    $this->logger->debug('LEAD: Removed '.$tag);
+                    $this->logger->debug('CONTACT: Removed '.$tag);
                 }
             }
         }

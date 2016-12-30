@@ -13,32 +13,18 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadNote;
-use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Event\LeadDeviceEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class NoteModel
+ * Class DeviceModel
  * {@inheritdoc}
  */
-class NoteModel extends FormModel
+class DeviceModel extends FormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @param Session $session
-     */
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -46,7 +32,7 @@ class NoteModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadNote');
+        return $this->em->getRepository('MauticLeadBundle:LeadDevice');
     }
 
     /**
@@ -56,7 +42,7 @@ class NoteModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'lead:notes';
+        return 'lead:leads';
     }
 
     /**
@@ -69,7 +55,7 @@ class NoteModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            return new LeadNote();
+            return new LeadDevice();
         }
 
         return parent::getEntity($id);
@@ -89,15 +75,15 @@ class NoteModel extends FormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        if (!$entity instanceof LeadNote) {
-            throw new MethodNotAllowedHttpException(['LeadNote']);
+        if (!$entity instanceof LeadDevice) {
+            throw new MethodNotAllowedHttpException(['LeadDevice']);
         }
 
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadnote', $entity, $options);
+        return $formFactory->create('leaddevice', $entity, $options);
     }
 
     /**
@@ -112,22 +98,22 @@ class NoteModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
-        if (!$entity instanceof LeadNote) {
-            throw new MethodNotAllowedHttpException(['LeadNote']);
+        if (!$entity instanceof LeadDevice) {
+            throw new MethodNotAllowedHttpException(['LeadDevice']);
         }
 
         switch ($action) {
             case 'pre_save':
-                $name = LeadEvents::NOTE_PRE_SAVE;
+                $name = LeadEvents::DEVICE_PRE_SAVE;
                 break;
             case 'post_save':
-                $name = LeadEvents::NOTE_POST_SAVE;
+                $name = LeadEvents::DEVICE_POST_SAVE;
                 break;
             case 'pre_delete':
-                $name = LeadEvents::NOTE_PRE_DELETE;
+                $name = LeadEvents::DEVICE_PRE_DELETE;
                 break;
             case 'post_delete':
-                $name = LeadEvents::NOTE_POST_DELETE;
+                $name = LeadEvents::DEVICE_POST_DELETE;
                 break;
             default:
                 return null;
@@ -135,7 +121,7 @@ class NoteModel extends FormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new LeadNoteEvent($entity, $isNew);
+                $event = new LeadDeviceEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
@@ -145,19 +131,5 @@ class NoteModel extends FormModel
         } else {
             return null;
         }
-    }
-
-    /**
-     * @param Lead $lead
-     * @param      $useFilters
-     *
-     * @return mixed
-     */
-    public function getNoteCount(Lead $lead, $useFilters = false)
-    {
-        $filter   = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
-
-        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
     }
 }

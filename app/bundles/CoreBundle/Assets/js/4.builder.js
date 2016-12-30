@@ -37,6 +37,7 @@ Mautic.launchBuilder = function (formName, actionName) {
             lineNumbers: true,
             mode: 'htmlmixed',
             extraKeys: {"Ctrl-Space": "autocomplete"},
+            lineWrapping: true,
             hintOptions: {
                 hint: function (editor) {
                     var cursor = editor.getCursor();

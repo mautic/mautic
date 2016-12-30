@@ -615,7 +615,7 @@ class PageModel extends FormModel
             $device->setDeviceBrand($dd->getBrand());
             $device->setDeviceModel($dd->getModel());
             $device->setDeviceOs($dd->getOs());
-            $device->setDateOpen($hit->getDateHit());
+            $device->setDateAdded($hit->getDateHit());
             $device->setLead($lead);
 
             $this->em->persist($device);
