@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
     dragInline: true
@@ -51,7 +51,10 @@
         return false;
       }
 
-      $(e.target).addClass('fr-dragging');
+      // Save in undo step if we cannot do.
+      if (!editor.undo.canDo()) {
+        editor.undo.saveStep();
+      }
 
       if (editor.opts.dragInline) {
         editor.$el.attr('contenteditable', true);
@@ -62,8 +65,7 @@
 
       if (editor.opts.toolbarInline) editor.toolbar.hide();
 
-      // Save in undo step if we cannot do.
-      if (!editor.undo.canDo()) editor.undo.saveStep();
+      $(e.target).addClass('fr-dragging');
 
       if (!editor.browser.msie && !editor.browser.edge) {
         editor.selection.clear();
@@ -239,15 +241,13 @@
       else if ($draggedEl.length) {
         e.preventDefault();
         e.stopPropagation();
-
-        if ($draggable_helper && !$draggable_helper.hasClass('fr-visible')) {
-          $draggedEl.removeClass('fr-dragging');
-        }
       }
 
       if ($draggable_helper && editor.$box.find($draggable_helper).length) {
         $draggable_helper.removeClass('fr-visible');
       }
+
+      $draggedEl.removeClass('fr-dragging');
     }
 
     function _getDraggedEl () {
@@ -266,7 +266,7 @@
       var $draggedEl;
       var inst;
 
-      // Search of the instance we're dragging from.
+      // Inst is the intance we're dragging from.
       for (var i = 0; i < $.FE.INSTANCES.length; i++) {
         $draggedEl = $.FE.INSTANCES[i].$el.find('.fr-dragging');
         if ($draggedEl.length) {
@@ -275,11 +275,13 @@
         }
       }
 
+      // There is a dragged element.
       if ($draggedEl.length) {
         // Cancel anything else.
         e.preventDefault();
         e.stopPropagation();
 
+        // Look for draggable helper.
         if ($draggable_helper && $draggable_helper.hasClass('fr-visible') && editor.$box.find($draggable_helper).length) {
           $draggable_helper.data('fr-tag')[$draggable_helper.data('fr-position')]('<span class="fr-marker"></span>');
           $draggable_helper.removeClass('fr-visible');
@@ -289,13 +291,8 @@
           if (ok === false) return false;
         }
 
-        // Hide all popups.
-        editor.popups.hideAll();
-
-        // Save undo step if the current instance is different than the original one.
-        if (inst != editor && !editor.undo.canDo()) {
-          editor.undo.saveStep();
-        }
+        // Remove dragging class.
+        $draggedEl.removeClass('fr-dragging');
 
         // Image with link.
         var $droppedEl = $draggedEl;
@@ -306,7 +303,20 @@
         // Replace marker with the dragged element.
         if (!editor.core.isEmpty()) {
           var $marker = editor.$el.find('.fr-marker');
-          $marker.replaceWith($droppedEl);
+          $marker.replaceWith($.FE.MARKERS);
+          editor.selection.restore();
+        }
+        else {
+          editor.events.focus();
+        }
+
+        // Save undo step if the current instance is different than the original one.
+        if (inst != editor && !editor.undo.canDo()) editor.undo.saveStep();
+
+        // Place new elements.
+        if (!editor.core.isEmpty()) {
+          var marker = editor.markers.insert();
+          $(marker).replaceWith($droppedEl);
           $draggedEl.after($.FE.MARKERS);
           editor.selection.restore();
         }
@@ -314,27 +324,28 @@
           editor.$el.html($droppedEl);
         }
 
-        $draggedEl.removeClass('fr-dragging');
+        // Hide all popups.
+        editor.popups.hideAll();
+        editor.selection.save();
         editor.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
         editor.html.wrap();
         editor.html.fillEmptyBlocks();
+        editor.selection.restore();
         editor.undo.saveStep();
-
         if (editor.opts.iframe) editor.size.syncIframe();
 
         // Mark changes in the original instance as well.
         if (inst != editor) {
           inst.popups.hideAll();
-          inst.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
+          inst.$el.find(inst.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
           inst.html.wrap();
           inst.html.fillEmptyBlocks();
           inst.undo.saveStep();
           inst.events.trigger('element.dropped');
-
           if (inst.opts.iframe) inst.size.syncIframe();
         }
 
-        editor.events.trigger('element.dropped', [$draggedEl]);
+        editor.events.trigger('element.dropped', [$droppedEl]);
 
         // Stop bubbling.
         return false;
