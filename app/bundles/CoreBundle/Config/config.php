@@ -458,8 +458,11 @@ return [
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'routing.loader',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+                'tag' => 'routing.loader',
             ],
             'mautic.security' => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
@@ -485,6 +488,7 @@ return [
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
+                    'router',
                     '"MauticCoreBundle:Exception:show"',
                     'monolog.logger.mautic',
                 ],
