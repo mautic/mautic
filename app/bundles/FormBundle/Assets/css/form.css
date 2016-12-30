@@ -91,3 +91,6 @@ textarea.form-html {
 #mauticforms_fields input[type="month"] {
     line-height: inherit;
 }
+#mauticforms_fields input.mauticform-radiogrp-radio {
+    width: auto;
+}

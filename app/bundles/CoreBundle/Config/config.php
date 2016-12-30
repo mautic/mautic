@@ -302,8 +302,14 @@ return [
             ],
             'mautic.helper.template.date' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'date',
+                'arguments' => [
+                    '%mautic.date_format_full%',
+                    '%mautic.date_format_short%',
+                    '%mautic.date_format_dateonly%',
+                    '%mautic.date_format_timeonly%',
+                    'translator',
+                ],
+                'alias' => 'date',
             ],
             'mautic.helper.template.exception' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
