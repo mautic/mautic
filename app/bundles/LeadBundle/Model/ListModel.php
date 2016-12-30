@@ -342,6 +342,43 @@ class ListModel extends FormModel
                 ],
                 'object' => 'lead',
             ],
+            'lead_email_sent' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent'),
+                'properties' => [
+                    'type' => 'lead_email_received',
+                ],
+                'operators' => [
+                    'include' => [
+                        'in',
+                        '!in',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'lead_email_received_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        '!=',
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
+            'lead_email_received_count' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received_count'),
+                'properties' => ['type' => 'number'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => [
@@ -410,6 +447,56 @@ class ListModel extends FormModel
                     ],
                 ],
                 'object' => 'lead',
+            ],
+            'referer' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        'like',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'notification' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        'empty',
+                        '!empty',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'hit_url_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        '!=',
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
+            'hit_url_count' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
+                'properties' => ['type' => 'number'],
+                'operators' => [
+                    'include' => [
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
