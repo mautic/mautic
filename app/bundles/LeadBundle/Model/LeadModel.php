@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
@@ -57,7 +58,7 @@ use Symfony\Component\Intl\Intl;
  */
 class LeadModel extends FormModel
 {
-    use DefaultValueTrait;
+    use DefaultValueTrait, OperatorListTrait;
 
     private $currentLead       = null;
     private $systemCurrentLead = null;
@@ -1954,79 +1955,6 @@ class LeadModel extends FormModel
     public function getTagList()
     {
         return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
-    }
-
-    /**
-     * @param null $operator
-     *
-     * @return array
-     */
-    public function getFilterExpressionFunctions($operator = null)
-    {
-        $operatorOptions = [
-            '=' => [
-                'label'       => 'mautic.lead.list.form.operator.equals',
-                'expr'        => 'eq',
-                'negate_expr' => 'neq',
-            ],
-            '!=' => [
-                'label'       => 'mautic.lead.list.form.operator.notequals',
-                'expr'        => 'neq',
-                'negate_expr' => 'eq',
-            ],
-            'gt' => [
-                'label'       => 'mautic.lead.list.form.operator.greaterthan',
-                'expr'        => 'gt',
-                'negate_expr' => 'lt',
-            ],
-            'gte' => [
-                'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-                'expr'        => 'gte',
-                'negate_expr' => 'lt',
-            ],
-            'lt' => [
-                'label'       => 'mautic.lead.list.form.operator.lessthan',
-                'expr'        => 'lt',
-                'negate_expr' => 'gt',
-            ],
-            'lte' => [
-                'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-                'expr'        => 'lte',
-                'negate_expr' => 'gt',
-            ],
-            'like' => [
-                'label'       => 'mautic.lead.list.form.operator.islike',
-                'expr'        => 'like',
-                'negate_expr' => 'notLike',
-            ],
-            '!like' => [
-                'label'       => 'mautic.lead.list.form.operator.isnotlike',
-                'expr'        => 'notLike',
-                'negate_expr' => 'like',
-            ],
-            'empty' => [
-                'label'       => 'mautic.lead.list.form.operator.isempty',
-                'expr'        => 'empty', //special case
-                'negate_expr' => 'notEmpty',
-            ],
-            '!empty' => [
-                'label'       => 'mautic.lead.list.form.operator.isnotempty',
-                'expr'        => 'notEmpty', //special case
-                'negate_expr' => 'empty',
-            ],
-            'regexp' => [
-                'label'       => 'mautic.lead.list.form.operator.regexp',
-                'expr'        => 'regexp', //special case
-                'negate_expr' => 'notRegexp',
-            ],
-            '!regexp' => [
-                'label'       => 'mautic.lead.list.form.operator.notregexp',
-                'expr'        => 'notRegexp', //special case
-                'negate_expr' => 'regexp',
-            ],
-        ];
-
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 
     /**
