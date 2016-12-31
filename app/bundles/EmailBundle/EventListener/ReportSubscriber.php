@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -91,25 +92,27 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'hits',
                     'label'   => 'mautic.email.report.hits_count',
                     'type'    => 'string',
-                    'formula' => ''.$channelUrlTrackables.'hits',
+                    'formula' => $channelUrlTrackables.'hits',
                 ],
                 'unique_hits' => [
                     'alias'   => 'unique_hits',
                     'label'   => 'mautic.email.report.unique_hits_count',
                     'type'    => 'string',
-                    'formula' => ''.$channelUrlTrackables.'unique_hits',
+                    'formula' => $channelUrlTrackables.'unique_hits',
                 ],
                 'hits_ratio' => [
                     'alias'   => 'hits_ratio',
                     'label'   => 'mautic.email.report.hits_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND(('.$channelUrlTrackables.'hits/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                        .'trackable_count)*100),\'%\')',
                 ],
                 'unique_ratio' => [
                     'alias'   => 'unique_ratio',
                     'label'   => 'mautic.email.report.unique_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND(('.$channelUrlTrackables.'unique_hits/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                        .'trackable_count)*100),\'%\')',
                 ],
                 'unsubscribed' => [
                     'alias'   => 'unsubscribed',
@@ -148,14 +151,27 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int',
                 ],
             ];
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_email_action'), $event->getCategoryColumns());
-            $data    = [
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, [], 'mautic_email_action'),
+                $event->getCategoryColumns()
+            );
+            $data = [
                 'display_name' => 'mautic.email.emails',
                 'columns'      => $columns,
             ];
             $event->addTable('emails', $data);
 
             if ($event->checkContext('email.stats')) {
+                // Ratios are not applicable for individual stats
+                unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
+
+                // Email counts are not applicable for individual stats
+                unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
+
+                // Prevent null DNC records from filtering the results
+                $columns['unsubscribed']['formula'] = 'dnc.reason';
+
                 $statPrefix  = 'es.';
                 $statColumns = [
                     $statPrefix.'email_address' => [
@@ -223,34 +239,73 @@ class ReportSubscriber extends CommonSubscriber
     {
         $context = $event->getContext();
         $qb      = $event->getQueryBuilder();
+
         // channel_url_trackables subquery
-        $qbcut = $this->db->createQueryBuilder();
-        $qbcut->select('SUM(cut2.hits) AS hits', 'SUM(cut2.unique_hits) AS unique_hits', 'cut2.channel_id')
-            ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
-            ->where('cut2.channel = \'email\'')
-            ->groupBy('cut2.channel_id');
+        $qbcut        = $this->db->createQueryBuilder();
+        $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio'];
+        $dncColumns   = ['unsubscribed', 'unsubscribed_ratio'];
 
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                    ->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc', 'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason=1')
-                    ->groupBy('e.id');
+                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
+                   ->groupBy('e.id');
                 $event->addCategoryLeftJoin($qb, 'e');
+
+                if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
+                    $qbcut->select(
+                        'COUNT(cut2.channel_id) AS trackable_count, SUM(cut2.hits) AS hits',
+                        'SUM(cut2.unique_hits) AS unique_hits',
+                        'cut2.channel_id'
+                    )
+                          ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
+                          ->where('cut2.channel = \'email\'')
+                          ->groupBy('cut2.channel_id');
+                    $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
+                }
+
+                if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
+                    $qb->leftJoin(
+                        'e',
+                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                        'dnc',
+                        'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason='.DoNotContact::UNSUBSCRIBED
+                    );
+                }
                 break;
             case 'email.stats':
-                $event->applyDateFilters($qb, 'date_sent', 'es');
-
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-                    ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                    ->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id')
-                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc', 'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason=1')
-                    ->groupBy('e.id, es.date_sent, es.date_read, es.email_address');
-                $event->addCategoryLeftJoin($qb, 'e');
-                $event->addLeadLeftJoin($qb, 'es');
-                $event->addIpAddressLeftJoin($qb, 'es');
+                   ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
+                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+
+                $event->addCategoryLeftJoin($qb, 'e')
+                      ->addLeadLeftJoin($qb, 'es')
+                      ->addIpAddressLeftJoin($qb, 'es')
+                      ->applyDateFilters($qb, 'date_sent', 'es');
+
+                if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
+                    $qbcut->select('COUNT(ph.id) AS hits', 'COUNT(DISTINCT(ph.redirect_id)) AS unique_hits', 'cut2.channel_id', 'ph.lead_id')
+                          ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
+                          ->join(
+                              'cut2',
+                              MAUTIC_TABLE_PREFIX.'page_hits',
+                              'ph',
+                              'cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id'
+                          )
+                          ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
+                          ->groupBy('cut2.channel_id, ph.lead_id');
+                    $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id AND es.lead_id = cut.lead_id');
+                }
+
+                if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
+                    $qb->leftJoin(
+                        'e',
+                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                        'dnc',
+                        'e.id = dnc.channel_id AND dnc.channel=\'email\' AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' AND es.lead_id = dnc.lead_id'
+                    );
+                }
+
                 break;
         }
 
@@ -321,8 +376,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.sent':
                     $queryBuilder->select('e.id, e.subject as title, count(es.id) as sent')
-                        ->groupBy('e.id, e.subject')
-                        ->orderBy('sent', 'DESC');
+                                 ->groupBy('e.id, e.subject')
+                                 ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -336,8 +391,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.read':
                     $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read"')
-                        ->groupBy('e.id, e.subject')
-                        ->orderBy('"read"', 'DESC');
+                                 ->groupBy('e.id, e.subject')
+                                 ->orderBy('"read"', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -351,9 +406,9 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.failed':
                     $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed')
-                        ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
-                        ->groupBy('e.id, e.subject')
-                        ->orderBy('failed', 'DESC');
+                                 ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
+                                 ->groupBy('e.id, e.subject')
+                                 ->orderBy('failed', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -367,8 +422,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.read.percent':
                     $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
-                        ->groupBy('e.id, e.subject')
-                        ->orderBy('ratio', 'DESC');
+                                 ->groupBy('e.id, e.subject')
+                                 ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
