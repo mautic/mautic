@@ -59,11 +59,14 @@ if ($emailType == 'list') {
 
 $customButtons[] = [
     'attr' => [
-        'data-toggle' => 'ajax',
+        'class'       => 'btn btn-default btn-nospin quickadd',
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
         'href'        => $view['router']->path(
-            'mautic_email_action',
-            ['objectAction' => 'example', 'objectId' => $email->getId()]
-        ),
+                            'mautic_email_action',
+                            ['objectAction' => 'sendExampleMultiple']
+                        ),
+        'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
     ],
     'iconClass' => 'fa fa-send',
     'btnText'   => 'mautic.email.send.example',
