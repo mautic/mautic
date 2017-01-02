@@ -1304,7 +1304,7 @@ class EmailController extends FormController
         ];
 
         // Send to current user
-        $errors = $model->sendEmailToUser($entity, $users, $fields, [], [], false);
+        $errors = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
         if (count($errors)) {
             $this->addFlash(implode('; ', $errors));
         } else {
@@ -1459,10 +1459,10 @@ class EmailController extends FormController
      */
     private function buildSlotForms($slotTypes)
     {
-        foreach ($slotTypes as &$slotType) {
+        foreach ($slotTypes as $key => $slotType) {
             if (isset($slotType['form'])) {
-                $slotForm         = $this->get('form.factory')->create($slotType['form']);
-                $slotType['form'] = $slotForm->createView();
+                $slotForm                = $this->get('form.factory')->create($slotType['form']);
+                $slotTypes[$key]['form'] = $slotForm->createView();
             }
         }
 

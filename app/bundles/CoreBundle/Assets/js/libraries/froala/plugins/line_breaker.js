@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -277,7 +277,7 @@
     function _mouseTimer (e) {
       if ($line_breaker.hasClass('fr-visible') && !editor.core.sameInstance($line_breaker)) return false;
 
-      if (editor.popups.areVisible() || editor.$el.get(0).querySelectorAll('.fr-selected-cell').length) {
+      if (editor.popups.areVisible() || editor.el.querySelector('.fr-selected-cell')) {
         $line_breaker.removeClass('fr-visible');
         return true;
       }
@@ -370,7 +370,7 @@
     function _initLineBreaker () {
       // Append line breaker HTML to editor wrapper.
       if (!editor.shared.$line_breaker) {
-        editor.shared.$line_breaker = $('<div class="fr-line-breaker"><a class="fr-floating-btn" role="button" tabindex="-1" title="' + editor.language.translate('Break') + '"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="21" y="11" width="2" height="8"/><rect x="14" y="17" width="7" height="2"/><path d="M14.000,14.000 L14.000,22.013 L9.000,18.031 L14.000,14.000 Z"/></svg></a></div>');
+        editor.shared.$line_breaker = $('<div class="fr-line-breaker"><a class="fr-floating-btn" role="button" tabIndex="-1" title="' + editor.language.translate('Break') + '"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="21" y="11" width="2" height="8"/><rect x="14" y="17" width="7" height="2"/><path d="M14.000,14.000 L14.000,22.013 L9.000,18.031 L14.000,14.000 Z"/></svg></a></div>');
       }
 
       $line_breaker = editor.shared.$line_breaker;
@@ -419,6 +419,9 @@
 
       // Hide the line breaker on cell edit.
       editor.events.on('popups.show.table.edit', _hide);
+
+      // Hide the line breaker after command is ran.
+      editor.events.on('commands.after', _hide);
 
       // Prevent line breaker from showing while selecting text or dragging images.
       editor.events.$on($(editor.win), 'mousedown', _mouseDown);

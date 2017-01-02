@@ -95,6 +95,16 @@ trait OperatorListTrait
                 'expr'        => 'notIn',
                 'negate_expr' => 'in',
             ],
+            'regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.regexp',
+                'expr'        => 'regexp', //special case
+                'negate_expr' => 'notRegexp',
+            ],
+            '!regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.notregexp',
+                'expr'        => 'notRegexp', //special case
+                'negate_expr' => 'regexp',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];

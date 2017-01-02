@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,11 +32,11 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.quote = function (editor) {
     function _deepestParent(node) {
-      while (node.parentNode && node.parentNode != editor.$el.get(0)) {
+      while (node.parentNode && node.parentNode != editor.el) {
         node = node.parentNode;
       }
 

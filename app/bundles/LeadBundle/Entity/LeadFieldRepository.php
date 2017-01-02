@@ -160,15 +160,48 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             // Standard field
-            $q->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->$operatorExpr('l.'.$field, ':value')
+            if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        ($operatorExpr === 'empty') ?
+                            $q->expr()->orX(
+                                $q->expr()->isNull('l.'.$field),
+                                $q->expr()->eq('l.'.$field, $q->expr()->literal(''))
+                            )
+                        :
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.'.$field),
+                            $q->expr()->neq('l.'.$field, $q->expr()->literal(''))
+                        )
+                    )
                 )
-            )
-            ->setParameter('lead', (int) $lead)
-            ->setParameter('value', $value);
+                  ->setParameter('lead', (int) $lead);
+            } elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
+                if ($operatorExpr === 'regexp') {
+                    $where = 'l.'.$field.' REGEXP  :value';
+                } else {
+                    $where = 'l.'.$field.' NOT REGEXP  :value';
+                }
 
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->andX($where)
+                    )
+                )
+                  ->setParameter('lead', (int) $lead)
+                  ->setParameter('value', $value);
+            } else {
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->$operatorExpr('l.'.$field, ':value')
+                    )
+                )
+                  ->setParameter('lead', (int) $lead)
+                  ->setParameter('value', $value);
+            }
             $result = $q->execute()->fetch();
 
             return !empty($result['id']);

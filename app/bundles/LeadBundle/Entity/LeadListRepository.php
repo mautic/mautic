@@ -869,18 +869,33 @@ class LeadListRepository extends CommonRepository
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->eq($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
                             break;
                         case 'like':
                         case '!like':
                             $details['filter'] = '%'.$details['filter'].'%';
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->like($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->like($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
+                            break;
+                        case 'regexp':
+                        case 'notRegexp':
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                    $alias.'.url'.$not.' REGEXP '.$exprParameter
+                                )
+                            );
                             break;
                     }
                     // Specific lead
@@ -1117,7 +1132,15 @@ class LeadListRepository extends CommonRepository
                                 $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
                             );
                             break;
-
+                        case 'regexp':
+                        case 'notRegexp':
+                            $ignoreAutoFilter       = true;
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $groupExpr->add(
+                                $field.$not.' REGEXP '.$exprParameter
+                            );
+                            break;
                         default:
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }

@@ -74,8 +74,7 @@
                     <?php if ($slots): ?>
                         <?php foreach ($slots as $slotKey => $slot): ?>
                             <script type="text/html" data-slot-type-form="<?php echo $slotKey; ?>">
-                                <?php echo $view['form']->start($slot['form']); ?>
-                                <?php echo $view['form']->end($slot['form']); ?>
+                                <?php echo $view['form']->form($slot['form']); ?>
                             </script>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -92,8 +91,7 @@
                         </p>
                     </div>
                     <script type="text/html" data-section-form>
-                        <?php echo $view['form']->start($sectionForm); ?>
-                        <?php echo $view['form']->end($sectionForm); ?>
+                        <?php echo $view['form']->form($sectionForm); ?>
                     </script>
                 </div>
             </div>

@@ -93,8 +93,8 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound     = false;
-            $preferredCore  = false;
+            $matchFound    = false;
+            $preferredCore = false;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {

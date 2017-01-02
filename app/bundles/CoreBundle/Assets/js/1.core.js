@@ -589,7 +589,7 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                 if (textarea.hasClass('editor-email')) {
@@ -601,7 +601,7 @@ var Mautic = {
                 }
 
                 if (textarea.hasClass('editor-dynamic-content')) {
-                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
                 }
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
@@ -2423,7 +2423,7 @@ var Mautic = {
      *
      * @param action
      */
-    executeAction: function (action) {
+    executeAction: function (action, callback) {
         if (typeof Mautic.activeActions == 'undefined') {
             Mautic.activeActions = {};
         } else if (typeof Mautic.activeActions[action] != 'undefined') {
@@ -2442,6 +2442,10 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 Mautic.processPageContent(response);
+
+                if (typeof callback == 'function') {
+                    callback(response);
+                }
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
