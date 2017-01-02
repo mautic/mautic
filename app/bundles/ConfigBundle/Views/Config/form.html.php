@@ -62,7 +62,7 @@ $configKeys = array_keys($form->children);
             ?>
             <div role="tabpanel" class="tab-pane fade <?php echo $i === 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $key; ?>">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <?php echo $view['form']->widget($form[$key]); ?>
+                    <?php echo $view['form']->widget($form[$key], ['formConfig' => $formConfigs[$key]]); ?>
                 </div>
             </div>
             <?php endforeach; ?>

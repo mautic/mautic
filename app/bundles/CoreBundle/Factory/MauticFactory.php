@@ -508,4 +508,18 @@ class MauticFactory
     {
         return $this->container->has($service);
     }
+
+    /**
+     * @param $service
+     *
+     * @return bool
+     */
+    public function get($service)
+    {
+        if ($this->serviceExists($service)) {
+            return $this->container->get($service);
+        }
+
+        return false;
+    }
 }

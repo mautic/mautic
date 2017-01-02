@@ -254,6 +254,8 @@ class ListModel extends FormModel
                     '!empty',
                     'like',
                     '!like',
+                    'regexp',
+                    '!regexp',
                 ],
             ],
             'select' => [
@@ -262,6 +264,8 @@ class ListModel extends FormModel
                     '!=',
                     'empty',
                     '!empty',
+                    'regexp',
+                    '!regexp',
                     'in',
                     '!in',
                 ],
@@ -407,6 +411,7 @@ class ListModel extends FormModel
                     'include' => [
                         '=',
                         'like',
+                        'regexp',
                     ],
                 ],
                 'object' => 'lead',

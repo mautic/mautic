@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'link.edit': '[_BUTTONS_]',
@@ -76,6 +76,10 @@
       var $current_image = editor.image ? editor.image.get() : null;
 
       if (!$current_image && editor.$wp) {
+        var c_el = editor.selection.ranges(0).commonAncestorContainer;
+        if (c_el && (c_el.contains && c_el.contains(editor.el) || !editor.el.contains(c_el) || editor.el == c_el)) c_el = null;
+        if (c_el && c_el.tagName === 'A') return c_el;
+
         var s_el = editor.selection.element();
         var e_el = editor.selection.endElement();
 
@@ -87,14 +91,17 @@
           e_el = $(e_el).parentsUntil(editor.$el, 'a:first').get(0);
         }
 
+        if (e_el && (e_el.contains && e_el.contains(editor.el) || !editor.el.contains(e_el) || editor.el == e_el)) e_el = null;
+        if (s_el && (s_el.contains && s_el.contains(editor.el) || !editor.el.contains(s_el) || editor.el == s_el)) s_el = null;
+
         if (e_el && e_el == s_el && e_el.tagName == 'A') {
           return s_el;
         }
 
         return null;
       }
-      else if (editor.$el.get(0).tagName == 'A' && editor.core.hasFocus()) {
-        return editor.$el.get(0);
+      else if (editor.el.tagName == 'A') {
+        return editor.el;
       }
       else {
         if ($current_image && $current_image.get(0).parentNode && $current_image.get(0).parentNode.tagName == 'A') {
@@ -229,7 +236,7 @@
       // Link buttons.
       var link_buttons = '';
       if (editor.opts.linkEditButtons.length > 1) {
-        if (editor.$el.get(0).tagName == 'A' && editor.opts.linkEditButtons.indexOf('linkRemove') >= 0) {
+        if (editor.el.tagName == 'A' && editor.opts.linkEditButtons.indexOf('linkRemove') >= 0) {
           editor.opts.linkEditButtons.splice(editor.opts.linkEditButtons.indexOf('linkRemove'), 1);
         }
 
@@ -346,10 +353,10 @@
       var input_layer = '';
       var tab_idx = 0;
       input_layer = '<div class="fr-link-insert-layer fr-layer fr-active" id="fr-link-insert-layer-' + editor.id + '">';
-      input_layer += '<div class="fr-input-line"><input name="href" type="text" class="fr-link-attr" placeholder="URL" tabIndex="' + (++tab_idx) + '"></div>';
+      input_layer += '<div class="fr-input-line"><input id="fr-link-insert-layer-url-' + editor.id + '" name="href" type="text" class="fr-link-attr" placeholder="URL" tabIndex="' + (++tab_idx) + '"></div>';
 
       if (editor.opts.linkText) {
-        input_layer += '<div class="fr-input-line"><input name="text" type="text" class="fr-link-attr" placeholder="' + editor.language.translate('Text') + '" tabIndex="' + (++tab_idx) + '"></div>';
+        input_layer += '<div class="fr-input-line"><input id="fr-link-insert-layer-text-' + editor.id + '" name="text" type="text" class="fr-link-attr" placeholder="' + editor.language.translate('Text') + '" tabIndex="' + (++tab_idx) + '"></div>';
       }
 
       // Add any additional fields.
@@ -364,7 +371,7 @@
         input_layer += '<div class="fr-checkbox-line"><span class="fr-checkbox"><input name="target" class="fr-link-attr" data-checked="_blank" type="checkbox" id="fr-link-target-' + editor.id + '" tabIndex="' + (++tab_idx) + '"><span>' + checkmark + '</span></span><label for="fr-link-target-' + editor.id + '">' + editor.language.translate('Open in new tab') + '</label></div>';
       }
 
-      input_layer += '<div class="fr-action-buttons"><button class="fr-command fr-submit" data-cmd="linkInsert" href="#" tabIndex="' + (++tab_idx) + '" type="button">' + editor.language.translate('Insert') + '</button></div></div>'
+      input_layer += '<div class="fr-action-buttons"><button class="fr-command fr-submit" role="button" data-cmd="linkInsert" href="#" tabIndex="' + (++tab_idx) + '" type="button">' + editor.language.translate('Insert') + '</button></div></div>'
 
       var template = {
         buttons: link_buttons,
@@ -425,9 +432,18 @@
       _initInsertPopup(true);
 
       // Init on link.
-      if (editor.$el.get(0).tagName == 'A') {
+      if (editor.el.tagName == 'A') {
         editor.$el.addClass('fr-view');
       }
+
+      // Hit ESC when focus is in link edit popup.
+      editor.events.on('toolbar.esc', function () {
+        if (editor.popups.isVisible('link.edit')) {
+          editor.events.disableBlur();
+          editor.events.focus();
+          return false;
+        }
+      }, true);
     }
 
     function usePredefined (val) {
@@ -453,6 +469,7 @@
         $input = $(check_inputs[i]);
         $input.prop('checked', $input.data('checked') == link[$input.attr('name')]);
       }
+      editor.accessibility.focusPopup($popup);
     }
 
     function insertCallback () {
@@ -531,14 +548,16 @@
     function insert (href, text, attrs) {
       if (typeof attrs == 'undefined') attrs = {};
 
+      if (editor.events.trigger('link.beforeInsert', [href, text, attrs]) === false) return false;
+
       // Get image if we have one selected.
       var $current_image = editor.image ? editor.image.get() : null;
 
-      if (!$current_image && editor.$el.get(0).tagName != 'A') {
+      if (!$current_image && editor.el.tagName != 'A') {
         editor.selection.restore();
         editor.popups.hide('link.insert');
       }
-      else if (editor.$el.get(0).tagName == 'A') {
+      else if (editor.el.tagName == 'A') {
         editor.$el.focus();
       }
 
@@ -568,6 +587,12 @@
       if (editor.opts.linkAlwaysBlank) attrs.target = '_blank';
       if (editor.opts.linkAlwaysNoFollow) attrs.rel = 'nofollow';
 
+      // https://github.com/froala/wysiwyg-editor/issues/1576.
+      if (attrs.target == '_blank') {
+        if (!attrs.rel) attrs.rel = 'noopener noreferrer';
+        else attrs.rel += ' noopener noreferrer';
+      }
+
       // Format text.
       text = text || '';
 
@@ -589,7 +614,7 @@
         var a_list = editor.node.rawAttributes(link);
         for (var attr in a_list) {
           if (a_list.hasOwnProperty(attr)) {
-            if (attr != 'class' && attr != 'style') {
+            if (attr != 'class' && attr != 'style' && attr != 'id' && attr != 'contenteditable') {
               $link.removeAttr(attr);
             }
           }
@@ -717,7 +742,7 @@
           _hideEditPopup();
           _edit();
         }
-        else if (editor.$el.get(0).tagName == 'A') {
+        else if (editor.el.tagName == 'A') {
           editor.$el.focus();
           _edit();
         }
@@ -799,7 +824,7 @@
         this.link.showInsertPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }
@@ -835,6 +860,7 @@
     title: 'Edit Link',
     undo: false,
     refreshAfterCallback: false,
+    popup: true,
     callback: function () {
       this.link.update();
     },
@@ -877,7 +903,7 @@
       this.link.back();
     },
     refresh: function ($btn) {
-      var link = this.link.get();
+      var link = this.link.get() && this.doc.hasFocus();
       var $current_image = this.image ? this.image.get() : null;
       if (!$current_image && !link && !this.opts.toolbarInline) {
         $btn.addClass('fr-hidden');
@@ -898,10 +924,10 @@
     undo: false,
     refreshAfterCallback: false,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.linkList;
       for (var i = 0; i < options.length; i++) {
-        c += '<li><a class="fr-command" data-cmd="linkList" data-param1="' + i + '">' + (options[i].displayText || options[i].text) + '</a></li>';
+        c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="linkList" data-param1="' + i + '">' + (options[i].displayText || options[i].text) + '</a></li>';
       }
       c += '</ul>';
 
@@ -935,6 +961,7 @@
     title: 'Insert Link',
     undo: false,
     focus: false,
+    popup: true,
     callback: function () {
       this.link.imageLink();
     },
@@ -967,11 +994,11 @@
     title: 'Style',
     type: 'dropdown',
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.linkStyles;
       for (var cls in options) {
         if (options.hasOwnProperty(cls)) {
-          c += '<li><a class="fr-command" data-cmd="linkStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="linkStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -988,7 +1015,8 @@
         var $link = $(link);
         $dropdown.find('.fr-command').each (function () {
           var cls = $(this).data('param1');
-          $(this).toggleClass('fr-active', $link.hasClass(cls));
+          var active = $link.hasClass(cls);
+          $(this).toggleClass('fr-active', active).attr('aria-selected', active);
         })
       }
     }

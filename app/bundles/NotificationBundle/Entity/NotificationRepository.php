@@ -72,10 +72,11 @@ class NotificationRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
                 $expr            = $q->expr()->eq('e.isPublished', ":$unique");
@@ -90,15 +91,14 @@ class NotificationRepository extends CommonRepository
                     $q->expr()->isNull('e.category'),
                     $q->expr()->eq('e.category', $q->expr()->literal(''))
                 );
-                $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
+                $expr = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('e.alias', ":$unique");
-                $filter->strict = true;
+                $expr            = $q->expr()->like('e.alias', ":$unique");
+                $filter->strict  = true;
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
@@ -111,6 +111,7 @@ class NotificationRepository extends CommonRepository
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -120,9 +121,7 @@ class NotificationRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -135,7 +134,7 @@ class NotificationRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -143,6 +142,8 @@ class NotificationRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
