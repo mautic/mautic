@@ -155,7 +155,10 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $leadFields = $this->getModel('plugin')->getLeadFields();
+        $pluginModel = $this->getModel('plugin');
+
+        $leadFields    = $pluginModel->getLeadFields();
+        $companyFields = $pluginModel->getCompanyFields();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
@@ -166,6 +169,7 @@ class PluginController extends FormController
             [
                 'integration'        => $entity->getName(),
                 'lead_fields'        => $leadFields,
+                'company_fields'     => $companyFields,
                 'integration_object' => $integrationObject,
                 'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name]),
             ]

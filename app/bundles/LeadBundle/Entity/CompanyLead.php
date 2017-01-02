@@ -61,7 +61,6 @@ class CompanyLead
 
         $builder->createManyToOne('company', 'Company')
             ->isPrimaryKey()
-            ->inversedBy('leads')
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->build();
 

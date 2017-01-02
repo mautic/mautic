@@ -12,8 +12,11 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class FormSubscriber.
@@ -21,12 +24,28 @@ use Mautic\FormBundle\FormEvents;
 class FormSubscriber extends CommonSubscriber
 {
     /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * FormSubscriber constructor.
+     *
+     * @param EmailModel $emailModel
+     */
+    public function __construct(EmailModel $emailModel)
+    {
+        $this->emailModel = $emailModel;
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
+            FormEvents::FORM_ON_BUILD                    => ['onFormBuilder', 0],
+            LeadEvents::FORM_SUBMIT_REMOVE_DO_NO_CONTACT => ['removeFromDoNotContact', 0],
         ];
     }
 
@@ -79,5 +98,40 @@ class FormSubscriber extends CommonSubscriber
             'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags',
         ];
         $event->addSubmitAction('lead.addutmtags', $action);
+
+        // add Do Not Contact
+        $action = [
+            'group'             => 'mautic.lead.lead.submitaction',
+            'label'             => 'mautic.lead.lead.events.removedonotcontact',
+            'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
+            'formType'          => 'lead_action_removedonotcontact',
+            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
+            'eventName'         => LeadEvents::FORM_SUBMIT_REMOVE_DO_NO_CONTACT,
+            'allowCampaignForm' => true,
+        ];
+        $event->addSubmitAction('lead.removeronotcontact', $action);
+
+        // score contact's companies
+        $action = [
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.changecompanyscore',
+            'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
+            'formType'    => 'scorecontactscompanies_action',
+            'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::scoreContactsCompanies',
+        ];
+        $event->addSubmitAction('lead.scorecontactscompanies', $action);
+    }
+
+    /**
+     * Trigger event for when a form is submitted.
+     *
+     * @param SubmissionEvent $event
+     */
+    public function removeFromDoNotContact(SubmissionEvent $event)
+    {
+        $form = $event->getResults();
+        if (isset($form['email']) && !empty($form['email'])) {
+            $this->emailModel->removeDoNotContact($form['email']);
+        }
     }
 }

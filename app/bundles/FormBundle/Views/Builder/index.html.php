@@ -84,6 +84,7 @@ $formId = $form['sessionId']->vars['data'];
                                     </ul>
                                 </div>
                             </div>
+                            <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
                                 <?php if (!in_array($field['id'], $deletedFields)) : ?>
                                     <?php if (!empty($field['isCustom'])):
@@ -105,10 +106,11 @@ $formId = $form['sessionId']->vars['data'];
                                     ); ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            </div>
                             <?php if (!count($formFields)): ?>
-                                <div class="alert alert-info" id="form-field-placeholder">
-                                    <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                                </div>
+                            <div class="alert alert-info" id="form-field-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -153,6 +155,7 @@ $formId = $form['sessionId']->vars['data'];
                                     </ul>
                                 </div>
                             </div>
+                            <div class="drop-here">
                             <?php foreach ($formActions as $action): ?>
                                 <?php if (!in_array($action['id'], $deletedActions)) : ?>
                                     <?php $template = (isset($actionSettings[$action['type']]['template']))
@@ -171,10 +174,11 @@ $formId = $form['sessionId']->vars['data'];
                                     ); ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            </div>
                             <?php if (!count($formActions)): ?>
-                                <div class="alert alert-info" id="form-action-placeholder">
-                                    <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
-                                </div>
+                            <div class="alert alert-info" id="form-action-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>

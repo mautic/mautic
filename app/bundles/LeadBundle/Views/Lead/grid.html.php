@@ -20,7 +20,6 @@ if ($tmpl == 'index') {
         foreach ($items as $item):
         echo $view->render('MauticLeadBundle:Lead:grid_card.html.php', [
             'contact'       => $item,
-            'showCheckbox'  => !empty($showCheckbox), // default is false
             'noContactList' => (isset($noContactList)) ? $noContactList : [],
         ]);
         endforeach;

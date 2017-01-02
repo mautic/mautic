@@ -52,10 +52,11 @@ class TokenSubscriber extends CommonSubscriber
 
         $lead                  = $event->getLead();
         $email                 = $event->getEmail();
+        $tokens                = $event->getTokens();
         $dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null;
 
         if (!empty($dynamicContentAsArray)) {
-            $tokenEvent = new TokenReplacementEvent(null, $lead, ['lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
+            $tokenEvent = new TokenReplacementEvent(null, $lead, ['tokens' => $tokens, 'lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
         }
@@ -73,6 +74,7 @@ class TokenSubscriber extends CommonSubscriber
         }
 
         $lead      = $event->getLead();
+        $tokens    = $clickthrough['tokens'];
         $tokenData = $clickthrough['dynamicContent'];
 
         if ($lead instanceof Lead) {
@@ -80,8 +82,8 @@ class TokenSubscriber extends CommonSubscriber
         }
 
         foreach ($tokenData as $data) {
-            $defaultContent = $data['content'];
-            $filterContent  = null;
+            // Default content
+            $filterContent = $data['content'];
 
             foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
@@ -89,7 +91,21 @@ class TokenSubscriber extends CommonSubscriber
                 }
             }
 
-            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent ?: $defaultContent);
+            // Replace lead tokens in dynamic content (but no recurrence on dynamic content to avoid infinite loop)
+            $emailSendEvent = new EmailSendEvent(
+                null,
+                [
+                    'content' => $filterContent,
+                    'email'   => null,
+                    'idHash'  => null,
+                    'tokens'  => $tokens,
+                    'lead'    => $lead,
+                ]
+            );
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
+            $untokenizedContent = $emailSendEvent->getContent(true);
+
+            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
     }
 
@@ -179,6 +195,12 @@ class TokenSubscriber extends CommonSubscriber
                     break;
                 case '!in':
                     $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
+                    break;
+                case 'regexp':
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) === 1;
+                    break;
+                case '!regexp':
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) !== 1;
                     break;
             }
         }

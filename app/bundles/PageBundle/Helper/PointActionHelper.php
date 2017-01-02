@@ -40,7 +40,10 @@ class PointActionHelper
             $pageHitId = 0;
         }
 
-        $limitToPages = $action['properties']['pages'];
+        // If no pages are selected, the pages array does not exist
+        if (isset($action['properties']['pages'])) {
+            $limitToPages = $action['properties']['pages'];
+        }
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
             //no points change

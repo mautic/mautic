@@ -58,7 +58,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction;
+    private $postAction = 'return';
 
     /**
      * @var string
@@ -232,6 +232,15 @@ class Form extends FormEntity
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
             'groups'  => ['urlRequired'],
         ]));
+
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url([
+            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
+            'groups'  => ['urlRequiredPassTwo'],
+        ]));
+
+        $metadata->addPropertyConstraint('formType', new Assert\Choice([
+            'choices' => ['standalone', 'campaign'],
+        ]));
     }
 
     /**
@@ -284,6 +293,8 @@ class Form extends FormEntity
                     'inKioskMode',
                     'renderStyle',
                     'formType',
+                    'postAction',
+                    'postActionProperty',
                 ]
             )
             ->build();
@@ -556,6 +567,25 @@ class Form extends FormEntity
     }
 
     /**
+     * Get array of field aliases.
+     *
+     * @return array
+     */
+    public function getFieldAliases()
+    {
+        $aliases = [];
+        $fields  = $this->getFields();
+
+        if ($fields) {
+            foreach ($fields as $field) {
+                $aliases[] = $field->getAlias();
+            }
+        }
+
+        return $aliases;
+    }
+
+    /**
      * Set alias.
      *
      * @param string $alias
@@ -633,13 +663,13 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove actions.
+     * Remove action.
      *
-     * @param Action $actions
+     * @param Action $action
      */
-    public function removeAction(Action $actions)
+    public function removeAction(Action $action)
     {
-        $this->actions->removeElement($actions);
+        $this->actions->removeElement($action);
     }
 
     /**

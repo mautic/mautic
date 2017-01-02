@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     fontFamily: {
@@ -53,8 +53,8 @@
     }
 
     function refreshOnShow($btn, $dropdown) {
-      $dropdown.find('.fr-command.fr-active').removeClass('fr-active');
-      $dropdown.find('.fr-command[data-param1="' + _getSelection() + '"]').addClass('fr-active');
+      $dropdown.find('.fr-command.fr-active').removeClass('fr-active').attr('aria-selected', false);
+      $dropdown.find('.fr-command[data-param1="' + _getSelection() + '"]').addClass('fr-active').attr('aria-selected', true);
 
       var $list = $dropdown.find('.fr-dropdown-list');
       var $active = $dropdown.find('.fr-active').parent();
@@ -146,11 +146,11 @@
     },
     displaySelectionWidth: 120,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options = this.opts.fontFamily;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="fontFamily" data-param1="' + val + '" style="font-family: ' + val + '" title="' + options[val] + '">' + options[val] + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="fontFamily" data-param1="' + val + '" style="font-family: ' + val + '" title="' + options[val] + '">' + options[val] + '</a></li>';
         }
       }
       c += '</ul>';

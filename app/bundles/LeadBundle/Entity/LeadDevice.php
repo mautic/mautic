@@ -101,7 +101,7 @@ class LeadDevice
 
         $builder->addId();
 
-        $builder->addLead(false, 'CASCADE');
+        $builder->addLead(false, 'CASCADE', false, 'devices');
 
         $builder->addDateAdded();
 
@@ -159,8 +159,8 @@ class LeadDevice
             ->addProperties(
                 [
                     'id',
+                    'lead',
                     'clientInfo',
-                    'dateOpened',
                     'device',
                     'deviceBrand',
                     'deviceModel',
@@ -248,6 +248,86 @@ class LeadDevice
     /**
      * @return string
      */
+    public function getDeviceOsName()
+    {
+        return $this->deviceOsName;
+    }
+
+    /**
+     * @param string $deviceOsName
+     *
+     * @return $this
+     */
+    public function setDeviceOsName($deviceOsName)
+    {
+        $this->deviceOsName = $deviceOsName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsShortName()
+    {
+        return $this->deviceOsShortName;
+    }
+
+    /**
+     * @param string $deviceOsShortName
+     *
+     * @return $this
+     */
+    public function setDeviceOsShortName($deviceOsShortName)
+    {
+        $this->deviceOsShortName = $deviceOsShortName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsVersion()
+    {
+        return $this->deviceOsVersion;
+    }
+
+    /**
+     * @param string $deviceOsVersion
+     *
+     * @return $this
+     */
+    public function setDeviceOsVersion($deviceOsVersion)
+    {
+        $this->deviceOsVersion = $deviceOsVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsPlatform()
+    {
+        return $this->deviceOsPlatform;
+    }
+
+    /**
+     * @param string $deviceOsPlatform
+     *
+     * @return $this
+     */
+    public function setDeviceOsPlatform($deviceOsPlatform)
+    {
+        $this->deviceOsPlatform = $deviceOsPlatform;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getDeviceOs()
     {
         return $this->deviceOsName;
@@ -311,16 +391,36 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDateOpen()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
     /**
+     * @param mixed $dateAdded
+     */
+    public function setDateAdded($dateAdded)
+    {
+        $this->dateAdded = $dateAdded;
+    }
+
+    /**
+     * @return mixed
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use getDateAdded instead
+     */
+    public function getDateOpen()
+    {
+        return $this->getDateAdded();
+    }
+
+    /**
      * @param mixed $dateOpen
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use setDateAdded instead
      */
     public function setDateOpen($dateOpen)
     {
-        $this->dateAdded = $dateOpen;
+        $this->setDateAdded($dateOpen);
     }
 }

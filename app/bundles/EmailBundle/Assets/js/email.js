@@ -1,30 +1,15 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    var plaintext = mQuery('#emailform_plainText');
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    var textarea = mQuery('#emailform_customHtml');
-
-    mQuery(document).on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('html.set', textarea.val());
-    });
-
-    mQuery('.btn-builder').on('click', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
-
-    var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-
+    Mautic.intiSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
 };
 
@@ -32,7 +17,6 @@ Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
-    mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
@@ -264,7 +248,7 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
                 heightMin: 100
             }));
 

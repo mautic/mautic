@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -65,12 +64,13 @@ class AssetType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
         $builder->add('storageLocation', 'button_group', [
-            'label'       => 'mautic.asset.asset.form.storageLocation',
-            'choice_list' => new ChoiceList(
-                ['local', 'remote'],
-                ['mautic.asset.asset.form.storageLocation.local', 'mautic.asset.asset.form.storageLocation.remote']
-            ),
-            'attr' => [
+            'label'   => 'mautic.asset.asset.form.storageLocation',
+            'choices' => [
+                'mautic.asset.asset.form.storageLocation.local'  => 'local',
+                'mautic.asset.asset.form.storageLocation.remote' => 'remote',
+            ],
+            'choices_as_values' => true,
+            'attr'              => [
                 'onchange' => 'Mautic.changeAssetStorageLocation();',
             ],
         ]);

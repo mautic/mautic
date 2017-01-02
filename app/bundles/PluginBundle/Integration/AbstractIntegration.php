@@ -587,6 +587,11 @@ abstract class AbstractIntegration
             unset($parameters['append_to_query']);
         }
 
+        if (isset($parameters['post_append_to_query'])) {
+            $postAppend = $parameters['post_append_to_query'];
+            unset($parameters['post_append_to_query']);
+        }
+
         if (!$this->isConfigured()) {
             return [
                 'error' => [
@@ -604,6 +609,10 @@ abstract class AbstractIntegration
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
             $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+        }
+
+        if (isset($postAppend)) {
+            $url .= $postAppend;
         }
 
         // Check for custom content-type header
@@ -653,7 +662,6 @@ abstract class AbstractIntegration
         );
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
-
         // HTTP library requires that headers are in key => value pairs
         $headers = [];
         if (is_array($parseHeaders)) {
@@ -667,7 +675,6 @@ abstract class AbstractIntegration
                 $headers[$key] = $value;
             }
         }
-
         try {
             switch ($method) {
                 case 'GET':
@@ -756,7 +763,7 @@ abstract class AbstractIntegration
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
-                                $useClientSecretKey => $this->keys[$clientSecretKey],
+                                $useClientSecretKey => isset($this->keys[$clientSecretKey]) ? $this->keys[$clientSecretKey] : '',
                                 'grant_type'        => $grantType,
                             ]
                         );
@@ -1279,28 +1286,44 @@ abstract class AbstractIntegration
      *
      * @param       $data
      * @param array $config
+     * @param null  $object
      *
      * @return array
      */
-    public function populateMauticLeadData($data, $config = [])
+    public function populateMauticLeadData($data, $config = [], $object = null)
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
 
-        if (!isset($config['leadFields'])) {
-            $config = $this->mergeConfigToFeatureSettings($config);
+        if ($object == null) {
+            $object = 'lead';
+        }
+        if ($object == 'company') {
+            if (!isset($config['companyFields'])) {
+                $config = $this->mergeConfigToFeatureSettings($config);
 
-            if (empty($config['leadFields'])) {
-                return [];
+                if (empty($config['companyFields'])) {
+                    return [];
+                }
             }
+
+            $fields = $config['companyFields'];
+        }
+        if ($object == 'lead') {
+            if (!isset($config['leadFields'])) {
+                $config = $this->mergeConfigToFeatureSettings($config);
+
+                if (empty($config['leadFields'])) {
+                    return [];
+                }
+            }
+            $fields = $config['leadFields'];
         }
 
-        $leadFields = $config['leadFields'];
-        $matched    = [];
-
+        $matched = [];
         foreach ($gleanedData as $key => $field) {
-            if (isset($leadFields[$key]) && isset($gleanedData[$key])) {
-                $matched[$leadFields[$key]] = $gleanedData[$key];
+            if (isset($fields[$key]) && isset($gleanedData[$key])) {
+                $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
 
@@ -1646,6 +1669,24 @@ abstract class AbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
+        if (isset($settings['feature_settings']['objects']['company'])) {
+            unset($settings['feature_settings']['objects']['company']);
+        }
+
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects']['company'] = 'company';
+
         return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
     }
 

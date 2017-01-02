@@ -103,9 +103,12 @@ class TriggerModel extends CommonFormModel
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('pointtrigger', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('pointtrigger', $entity, $options);
     }
 
     /**

@@ -132,13 +132,11 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
-    public function getResponse($response)
+    public function getResponse()
     {
-        return $response;
+        return $this->response;
     }
 
     /**

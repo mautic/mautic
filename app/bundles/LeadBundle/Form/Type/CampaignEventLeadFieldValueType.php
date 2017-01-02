@@ -155,12 +155,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'attr'       => [
                             'class' => 'form-control',
                         ],
-                        'required'    => true,
-                        'constraints' => [
-                            new NotBlank(
-                                ['message' => 'mautic.core.value.required']
-                            ),
-                        ],
                     ]
                 );
             }

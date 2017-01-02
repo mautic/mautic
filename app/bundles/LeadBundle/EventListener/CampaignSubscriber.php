@@ -68,6 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionUpdateLead', 2],
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
+                ['onCampaignTriggerActionChangeCompanyScore', 4],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -121,6 +122,14 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.addtocompany', $action);
+
+        $action = [
+            'label'       => 'mautic.lead.lead.events.changecompanyscore',
+            'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
+            'formType'    => 'scorecontactscompanies_action',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+        ];
+        $event->addAction('lead.scorecontactscompanies', $action);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
@@ -247,6 +256,26 @@ class CampaignSubscriber extends CommonSubscriber
 
         if (!empty($company)) {
             $somethingHappened = $this->leadModel->addToCompany($lead, $company);
+        }
+
+        return $event->setResult($somethingHappened);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerActionChangeCompanyScore(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('lead.scorecontactscompanies')) {
+            return;
+        }
+
+        $score             = $event->getConfig()['score'];
+        $lead              = $event->getLead();
+        $somethingHappened = false;
+
+        if (!empty($score)) {
+            $somethingHappened = $this->leadModel->scoreContactsCompany($lead, $score);
         }
 
         return $event->setResult($somethingHappened);

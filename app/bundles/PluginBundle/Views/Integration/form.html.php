@@ -24,24 +24,29 @@ if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && c
     }
 }
 
-$fieldHtml     = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass = ($hasFields) ? '' : ' hide';
+$fieldHtml        = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$companyFieldHtml = (isset($form['featureSettings']['companyFields']) && count($form['featureSettings']['companyFields'])) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
+$fieldLabel       = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldTabClass    = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
+unset($form['featureSettings']['companyFields']);
 ?>
 
-<?php if (!empty($description)): ?>
+<?php if (!empty($description)) : ?>
     <div class="alert alert-info">
         <?php echo $description; ?>
     </div>
 <?php endif; ?>
-<ul class="nav nav-tabs pr-md pl-md">
+<ul class="nav nav-tabs">
     <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
         <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
     <?php endif; ?>
     <?php if ($hasFields): ?>
         <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
+    <?php endif; ?>
+    <?php if (!empty($companyFieldHtml)) : ?>
+    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#company-fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.companyfieldmapping'); ?></a></li>
     <?php endif; ?>
 </ul>
 
@@ -56,7 +61,7 @@ unset($form['featureSettings']['leadFields']);
                 <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
             </div>
         <?php endif; ?>
-        <?php if (!empty($callbackUrl)): ?>
+        <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
             <div class="well well-sm">
                 <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
                 <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $callbackUrl; ?>" class="form-control" />
@@ -92,5 +97,9 @@ unset($form['featureSettings']['leadFields']);
             <?php echo $fieldHtml; ?>
         </div>
     <?php endif; ?>
+    <div class="tab-pane fade bdr-w-0" id="company-fields-container">
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
+        <?php echo $companyFieldHtml; ?>
+    </div>
 </div>
 <?php echo $view['form']->end($form); ?>

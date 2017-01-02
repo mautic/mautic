@@ -36,6 +36,7 @@ trait TranslationModelTrait
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
+        $chosenLanguage = null;
         if (count($translationChildren)) {
             if ($translationParent) {
                 $translationChildren = $translationParent->getTranslationChildren();
@@ -92,9 +93,8 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound     = false;
-            $preferredCore  = false;
-            $chosenLanguage = null;
+            $matchFound    = false;
+            $preferredCore = false;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {

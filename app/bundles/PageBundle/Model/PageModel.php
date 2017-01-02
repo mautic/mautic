@@ -225,13 +225,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(['Page']);
         }
 
-        if (!isset($options['formName'])) {
-            $options['formName'] = 'page';
+        $formName = 'page';
+
+        if (!empty($options['formName'])) {
+            $formName = $options['formName'];
         }
 
-        $params = (!empty($action)) ? ['action' => $action] : [];
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create($options['formName'], $entity, $params);
+        return $formFactory->create($formName, $entity, $options);
     }
 
     /**
@@ -608,7 +612,7 @@ class PageModel extends FormModel
             $device->setDeviceBrand($dd->getBrand());
             $device->setDeviceModel($dd->getModel());
             $device->setDeviceOs($dd->getOs());
-            $device->setDateOpen($hit->getDateHit());
+            $device->setDateAdded($hit->getDateHit());
             $device->setLead($lead);
         } else {
             $fingerprint = $device['device_fingerprint'];

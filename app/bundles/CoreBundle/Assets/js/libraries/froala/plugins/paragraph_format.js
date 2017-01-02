@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     paragraphFormat: {
@@ -197,14 +197,14 @@
         var blk = blocks[0];
         var tag = 'N';
         var default_tag = editor.html.defaultTag();
-        if (blk.tagName.toLowerCase() != default_tag && blk != editor.$el.get(0)) {
+        if (blk.tagName.toLowerCase() != default_tag && blk != editor.el) {
           tag = blk.tagName;
         }
 
-        $dropdown.find('.fr-command[data-param1="' + tag + '"]').addClass('fr-active');
+        $dropdown.find('.fr-command[data-param1="' + tag + '"]').addClass('fr-active').attr('aria-selected', true);
       }
       else {
-        $dropdown.find('.fr-command[data-param1="N"]').addClass('fr-active');
+        $dropdown.find('.fr-command[data-param1="N"]').addClass('fr-active').attr('aria-selected', true);
       }
     }
 
@@ -216,7 +216,7 @@
           var blk = blocks[0];
           var tag = 'N';
           var default_tag = editor.html.defaultTag();
-          if (blk.tagName.toLowerCase() != default_tag && blk != editor.$el.get(0)) {
+          if (blk.tagName.toLowerCase() != default_tag && blk != editor.el) {
             tag = blk.tagName;
           }
 
@@ -248,7 +248,7 @@
     defaultSelection: 'Normal',
     displaySelectionWidth: 100,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.paragraphFormat;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
@@ -260,7 +260,7 @@
             shortcut = '';
           }
 
-          c += '<li><' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + ' style="padding: 0 !important; margin: 0 !important;"><a class="fr-command" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + '></li>';
+          c += '<li role="presentation"><' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + ' style="padding: 0 !important; margin: 0 !important;" role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + '></li>';
         }
       }
       c += '</ul>';

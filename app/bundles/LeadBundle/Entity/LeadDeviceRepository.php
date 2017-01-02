@@ -19,6 +19,23 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class LeadDeviceRepository extends CommonRepository
 {
     /**
+     * {@inhertidoc}.
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities($args = [])
+    {
+        $q = $this
+            ->createQueryBuilder('d')
+            ->select('d');
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
      * @param      $lead
      * @param null $deviceName
      * @param null $deviceBrand

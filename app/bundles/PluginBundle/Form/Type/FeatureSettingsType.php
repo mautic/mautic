@@ -43,15 +43,26 @@ class FeatureSettingsType extends AbstractType
 
         //add custom feature settings
         $integration_object->appendToForm($builder, $options['data'], 'features');
-        $leadFields = $options['lead_fields'];
+        $leadFields               = $options['lead_fields'];
+        $companyFields            = $options['company_fields'];
+        $integrationCompanyFields = [];
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields) {
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
             ];
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
+                $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                unset($fields['company']);
+                if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
+                    $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                    if (isset($integrationCompanyFields['company'])) {
+                        $integrationCompanyFields = $integrationCompanyFields['company'];
+                    }
+                }
+
                 if (!is_array($fields)) {
                     $fields = [];
                 }
@@ -60,9 +71,7 @@ class FeatureSettingsType extends AbstractType
                 $fields = [];
                 $error  = $e->getMessage();
             }
-
             list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
-
             /**
              * Auto Match Integration Fields with Mautic Fields.
              */
@@ -70,7 +79,6 @@ class FeatureSettingsType extends AbstractType
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
             }
-
             $integrationFields  = array_keys($fields);
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
@@ -89,7 +97,17 @@ class FeatureSettingsType extends AbstractType
                 'special_instructions' => $specialInstructions,
                 'alert_type'           => $alertType,
             ]);
-
+            if (!empty($integrationCompanyFields)) {
+                $form->add('companyFields', 'integration_company_fields', [
+                    'label'          => 'mautic.integration.comapanyfield_matches',
+                    'required'       => false,
+                    'company_fields' => $companyFields,
+                    //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
+                    'integration_company_fields' => $integrationCompanyFields,
+                    'special_instructions'       => $specialInstructions,
+                    'alert_type'                 => $alertType,
+                ]);
+            }
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
             }
@@ -115,7 +133,7 @@ class FeatureSettingsType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['integration', 'integration_object', 'lead_fields']);
+        $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
     /**

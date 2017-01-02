@@ -118,6 +118,11 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects'] = ['Company'];
+    }
+
     /**
      * {@inheritdoc}
      */

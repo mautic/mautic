@@ -148,9 +148,12 @@ class FormModel extends CommonFormModel
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('mauticform', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('mauticform', $entity, $options);
     }
 
     /**
