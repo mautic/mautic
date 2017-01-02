@@ -228,4 +228,35 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         return Intl::getLocaleBundle()->getLocaleNames();
     }
+
+    /**
+     * Get date field choices.
+     *
+     * @return array
+     */
+    public function getDateChoices()
+    {
+        $options = [
+            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
+            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
+        ];
+
+        $daysOptions = [];
+        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
+            $daysOptions['+P'.$dayInterval.'D'] = '+ '.$dayInterval.' days';
+        }
+
+        $options = array_merge($options, $daysOptions);
+
+        $beforeDaysOptions = [];
+        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
+            $beforeDaysOptions['-P'.$dayInterval.'D'] = $dayInterval.' days before';
+        }
+
+        $options = array_merge($options, $beforeDaysOptions);
+
+        return $options;
+    }
 }

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     codeMirror: true,
@@ -52,7 +52,8 @@
       indent_char: '\t',
       indent_size: 1,
       wrap_line_length: 0
-    }
+    },
+    codeViewKeepActiveButtons: ['fullscreen']
   })
 
   $.FE.PLUGINS.codeView = function (editor) {
@@ -87,8 +88,8 @@
       editor.$el.blur();
 
       // Toolbar no longer disabled.
-      editor.$tb.find(' > .fr-command').not($btn).removeClass('fr-disabled');
-      $btn.removeClass('fr-active');
+      editor.$tb.find(' > .fr-command').not($btn).removeClass('fr-disabled').attr('aria-disabled', false);
+      $btn.removeClass('fr-active').attr('aria-pressed', false);
 
       editor.events.focus(true);
       editor.placeholder.refresh();
@@ -159,6 +160,8 @@
       var html = editor.html.get(false, true);
       editor.$el.find('span.fr-tmp').remove();
 
+      editor.$box.toggleClass('fr-code-view', true);
+
       if (editor.core.hasFocus()) editor.$el.blur();
 
       html = html.replace(/<span class="fr-tmp fr-sm">F<\/span>/, 'FROALA-SM');
@@ -225,8 +228,10 @@
       }
 
       // Disable buttons.
-      editor.$tb.find(' > .fr-command').not($btn).addClass('fr-disabled');
-      $btn.addClass('fr-active');
+      editor.$tb.find(' > .fr-command').not($btn).filter(function () {
+        return editor.opts.codeViewKeepActiveButtons.indexOf($(this).data('cmd')) < 0;
+      }).addClass('fr-disabled').attr('aria-disabled', true);
+      $btn.addClass('fr-active').attr('aria-pressed', true);
 
       if (!editor.helpers.isMobile() && editor.opts.toolbarInline) {
         editor.toolbar.hide();
@@ -246,7 +251,6 @@
         _showText($btn);
       } else {
         editor.popups.hideAll();
-        editor.$box.toggleClass('fr-code-view', true);
         _showHTML($btn);
       }
     }
@@ -271,14 +275,14 @@
 
     function _initArea () {
       // Add the coding textarea to the wrapper.
-      $html_area = $('<textarea class="fr-code" tabindex="-1">');
+      $html_area = $('<textarea class="fr-code" tabIndex="-1">');
       editor.$wp.append($html_area);
 
       $html_area.attr('dir', editor.opts.direction);
 
       // Exit code view button for inline toolbar.
       if (!editor.$box.hasClass('fr-basic')) {
-        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabindex="-1"><i class="fa fa-code"></i></button>');
+        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabIndex="-1"><i class="fa fa-code"></i></button>');
         editor.$box.append($back_button);
 
         editor.events.bindClick(editor.$box, 'a.html-switch', function () {
@@ -333,6 +337,7 @@
     undo: false,
     focus: false,
     forcedRefresh: true,
+    toggle: true,
     callback: function () {
       this.codeView.toggle();
     },
