@@ -496,7 +496,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox',
                     'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
                 ],
-                'data'     => empty($options['data']['mailer_sandbox']) ? false : true,
+                'data'     => empty($options['data']['mailer_mailjet_sandbox']) ? false : true,
                 'required' => false,
             ]
         );
