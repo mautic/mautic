@@ -299,6 +299,9 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
+                    '',
+                    '',
+                    '',
                     '%mautic.mailer_mailjet_sandbox%',
                     '%mautic.mailer_mailjet_sandbox_default_mail%',
                 ],

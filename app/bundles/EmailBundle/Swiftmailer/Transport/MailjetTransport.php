@@ -27,7 +27,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     /**
      * {@inheritdoc}
      */
-    public function __construct($sandboxMode = false, $sandboxMail = '', $host = 'localhost', $port = 25, $security = null)
+    public function __construct($host = 'localhost', $port = 25, $security = null, $sandboxMode = false, $sandboxMail = '')
     {
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
