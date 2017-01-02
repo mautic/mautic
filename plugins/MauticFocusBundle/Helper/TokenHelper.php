@@ -14,13 +14,11 @@ namespace MauticPlugin\MauticFocusBundle\Helper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Routing\RouterInterface;
 
-
 /**
  * Class TokenHelper.
  */
 class TokenHelper
 {
-
     private $regex = '{focus=(.*?)}';
 
     /**
@@ -50,7 +48,7 @@ class TokenHelper
      */
     public function findFocusTokens($content)
     {
-        $regex   = '/'.$this->regex.'/i';
+        $regex = '/'.$this->regex.'/i';
 
         preg_match_all($regex, $content, $matches);
 
@@ -78,6 +76,7 @@ class TokenHelper
                 }
             }
         }
+
         return $tokens;
     }
 }

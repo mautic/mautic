@@ -151,7 +151,6 @@ class CampaignSubscriber extends CommonSubscriber
             $content = $tokenEvent->getContent();
             $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
 
-
             $event->stopPropagation();
 
             $result = $event->setResult($content);

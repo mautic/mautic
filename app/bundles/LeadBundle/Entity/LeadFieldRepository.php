@@ -207,4 +207,63 @@ class LeadFieldRepository extends CommonRepository
             return !empty($result['id']);
         }
     }
+
+    /**
+     * Compare a form result value with defined date value for defined lead.
+     *
+     * @param int    $lead  ID
+     * @param int    $field alias
+     * @param string $value to compare with
+     *
+     * @return bool
+     */
+    public function compareDateValue($lead, $field, $value)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $q->expr()->eq('l.'.$field, ':value')
+                )
+            )
+            ->setParameter('lead', (int) $lead)
+            ->setParameter('value', $value);
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
+    }
+
+    /**
+     * Compare a form result value with defined date value ( only day and month compare for
+     * events such as anniversary) for defined lead.
+     *
+     * @param int    $lead  ID
+     * @param int    $field alias
+     * @param object $value Date object to compare with
+     *
+     * @return bool
+     */
+    public function compareDateMonthValue($lead, $field, $value)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead'),
+                    $q->expr()->eq("MONTH(l. $field)", ':month'),
+                    $q->expr()->eq("DAY(l. $field)", ':day')
+                )
+            )
+            ->setParameter('lead', (int) $lead)
+            ->setParameter('month', $value->format('m'))
+            ->setParameter('day', $value->format('d'));
+
+        $result = $q->execute()->fetch();
+
+        return !empty($result['id']);
+    }
 }

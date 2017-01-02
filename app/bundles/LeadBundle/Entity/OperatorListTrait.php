@@ -105,6 +105,12 @@ trait OperatorListTrait
                 'expr'        => 'notRegexp', //special case
                 'negate_expr' => 'regexp',
             ],
+            'date' => [
+                'label'       => 'mautic.lead.list.form.operator.date',
+                'expr'        => 'date', //special case
+                'negate_expr' => 'date',
+                'hide'        => true,
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
