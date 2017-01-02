@@ -28,11 +28,21 @@ class LeadDeviceRepository extends CommonRepository
     public function getEntities($args = [])
     {
         $q = $this
-            ->createQueryBuilder('d')
-            ->select('d');
+            ->createQueryBuilder($this->getTableAlias())
+            ->select($this->getTableAlias());
         $args['qb'] = $q;
 
         return parent::getEntities($args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'd';
     }
 
     /**

@@ -155,7 +155,7 @@ class LeadDevice
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('stat')
+        $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
                 [
                     'id',

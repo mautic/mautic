@@ -1895,6 +1895,8 @@ class LeadModel extends FormModel
                     $this->logger->debug('CONTACT: Removed '.$tag);
                 }
             } else {
+                $tagToBeAdded = null;
+
                 if (!array_key_exists($tag, $foundTags)) {
                     $tagToBeAdded = new Tag();
                     $tagToBeAdded->setTag($tag);
@@ -1902,10 +1904,11 @@ class LeadModel extends FormModel
                     $tagToBeAdded = $foundTags[$tag];
                 }
 
-                $lead->addTag($tagToBeAdded);
-                $tagsModified = true;
-
-                $this->logger->debug('CONTACT: Added '.$tag);
+                if ($tagToBeAdded) {
+                    $lead->addTag($tagToBeAdded);
+                    $tagsModified = true;
+                    $this->logger->debug('CONTACT: Added '.$tag);
+                }
             }
         }
 
