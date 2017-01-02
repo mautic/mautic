@@ -31,12 +31,14 @@ class AjaxController extends CommonAjaxController
     {
         $dates = [
             'start_date' => $request->query->get('start'),
-            'end_date'   => $request->query->get('end'),
+            'end_date' => $request->query->get('end'),
         ];
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
-        $model  = $this->getModel('calendar');
+        $model = $this->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
+
+        $this->checkEventPermissions($events);
 
         // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then.
         $response = new Response();
@@ -55,17 +57,17 @@ class AjaxController extends CommonAjaxController
      */
     public function updateEventAction(Request $request)
     {
-        $entityId  = $request->request->get('entityId');
-        $source    = $request->request->get('entityType');
-        $setter    = 'set'.$request->request->get('setter');
+        $entityId = $request->request->get('entityId');
+        $source = $request->request->get('entityType');
+        $setter = 'set'.$request->request->get('setter');
         $dateValue = new \DateTime($request->request->get('startDate'));
-        $response  = ['success' => false];
+        $response = ['success' => false];
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
         $calendarModel = $this->getModel('calendar');
-        $event         = $calendarModel->editCalendarEvent($source, $entityId);
+        $event = $calendarModel->editCalendarEvent($source, $entityId);
 
-        $model  = $event->getModel();
+        $model = $event->getModel();
         $entity = $event->getEntity();
 
         //not found
@@ -74,27 +76,39 @@ class AjaxController extends CommonAjaxController
         } elseif (!$event->hasAccess()) {
             $this->addFlash('mautic.core.error.accessdenied', 'error');
         } elseif ($model->isLocked($entity)) {
-            $this->addFlash('mautic.core.error.locked', [
-                '%name%'      => $entity->getTitle(),
-                '%menu_link%' => 'mautic_'.$source.'_index',
-                '%url%'       => $this->generateUrl('mautic_'.$source.'_action', [
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(),
-                ]),
-            ]);
+            $this->addFlash(
+                'mautic.core.error.locked',
+                [
+                    '%name%' => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_'.$source.'_index',
+                    '%url%' => $this->generateUrl(
+                        'mautic_'.$source.'_action',
+                        [
+                            'objectAction' => 'edit',
+                            'objectId' => $entity->getId(),
+                        ]
+                    ),
+                ]
+            );
         } elseif ($this->request->getMethod() == 'POST') {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
 
-            $this->addFlash('mautic.core.notice.updated', [
-                '%name%'      => $entity->getTitle(),
-                '%menu_link%' => 'mautic_'.$source.'_index',
-                '%url%'       => $this->generateUrl('mautic_'.$source.'_action', [
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(),
-                ]),
-            ]);
+            $this->addFlash(
+                'mautic.core.notice.updated',
+                [
+                    '%name%' => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_'.$source.'_index',
+                    '%url%' => $this->generateUrl(
+                        'mautic_'.$source.'_action',
+                        [
+                            'objectAction' => 'edit',
+                            'objectId' => $entity->getId(),
+                        ]
+                    ),
+                ]
+            );
         }
 
         //render flashes
@@ -102,4 +116,29 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($response);
     }
+
+    /**
+     * @param $events
+     */
+    public function checkEventPermissions(&$events)
+    {
+        $security = $this->get('mautic.security');
+        foreach ($events as $key => $event) {
+            //make sure the user has view access to the entities
+            foreach (array('email', 'lead', 'campaign', 'form') as $model) {
+                if (array_key_exists($model.'_id', $event) && $event[$model.'_id']) {
+                    if (!$security->isGranted(
+                        array(
+                            $model.':'.$model.'s:viewown',
+                            $model.':'.$model.'s:viewother',
+                        )
+                    )) {
+                        array_splice($events, $key, 1);
+                    } else {
+                        break; // necessary for viewing email events
+                    }
+                }
+            }
+        } // foreach
+    } // function
 }
