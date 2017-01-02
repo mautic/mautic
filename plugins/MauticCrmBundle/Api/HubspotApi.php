@@ -13,18 +13,22 @@ class HubspotApi extends CrmApi
         'encode_parameters' => 'json',
     ];
 
-    protected function request($operation, $parameters = [], $method = 'GET')
+    protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
         $hapikey = $this->integration->getHubSpotApiKey();
-        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $this->module, $operation, $hapikey);
+        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
-
         if (isset($request['status']) && $request['status'] == 'error') {
             $message = $request['message'];
             if (isset($request['validationResults'])) {
                 $message .= " \n ".print_r($request['validationResults'], true);
             }
-            throw new ApiErrorException($message);
+            if (isset($request['validationResults'][0]['error']) && $request['validationResults'][0]['error'] == 'PROPERTY_DOESNT_EXIST') {
+                $this->createProperty($request['validationResults'][0]['name']);
+                $this->request($operation, $parameters, $method, $object);
+            } else {
+                throw new ApiErrorException($message);
+            }
         }
 
         return $request;
@@ -33,9 +37,13 @@ class HubspotApi extends CrmApi
     /**
      * @return mixed
      */
-    public function getLeadFields()
+    public function getLeadFields($object = 'contacts')
     {
-        return $this->request('v2/properties');
+        if ($object == 'company') {
+            $object = 'companies'; //hubspot company object name
+        }
+
+        return $this->request('v2/properties', [], 'GET', $object);
     }
 
     /**
@@ -45,18 +53,55 @@ class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data)
+    public function createLead(array $data, $lead, $updateLink = false)
     {
         /*
          * As Hubspot integration requires a valid email
          * If the email is not valid we don't proceed with the request
          */
-        $email = $data['email'];
+        $email  = $data['email'];
+        $result = [];
         //Check if the is a valid email
         MailHelper::validateEmail($email);
         //Format data for request
-        $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data);
+        $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
+        if ($formattedLeadData) {
+            $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
+        }
 
-        return $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
+        return $result;
+    }
+
+    /**
+     * gets Hubspot contact.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getContacts($params = [])
+    {
+        return $this->request('v1/lists/recently_updated/contacts/recent?', $params, 'GET', 'contacts');
+    }
+
+    /**
+     * gets Hubspot company.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getCompanies($params, $id)
+    {
+        if ($id) {
+            return $this->request('v2/companies/'.$id, $params, 'GET', 'companies');
+        }
+
+        return $this->request('v2/companies/recent/modified', $params, 'GET', 'companies');
+    }
+
+    public function createProperty($propertyName, $object = 'properties')
+    {
+        return $this->request('v1/contacts/properties', ['name' => $propertyName,  'groupName' => 'contactinformation', 'type' => 'string'], 'POST', $object);
     }
 }

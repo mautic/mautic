@@ -542,14 +542,14 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        if ($action != 'create') {
+        if ($action != 'create' && method_exists($entity, 'getCreatedBy')) {
             $ownPerm   = "{$this->permissionBase}:{$action}own";
             $otherPerm = "{$this->permissionBase}:{$action}other";
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
         }
 
-        return $this->security->isGranted("{$this->permissionBase}:create");
+        return $this->security->isGranted("{$this->permissionBase}:{$action}");
     }
 
     /**
@@ -735,6 +735,8 @@ class CommonApiController extends FOSRestController implements MauticController
             // Get iterator out of Paginator class so that the entities are properly serialized by the serializer
             $data = $data->getIterator()->getArrayCopy();
         }
+
+        $headers['Mautic-Version'] = $this->get('kernel')->getVersion();
 
         return parent::view($data, $statusCode, $headers);
     }

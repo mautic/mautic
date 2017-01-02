@@ -145,6 +145,7 @@ class CampaignSubscriber extends CommonSubscriber
             );
         }
 
+        /** @var TokenReplacementEvent $tokenEvent */
         $tokenEvent = $this->dispatcher->dispatch(
             NotificationEvents::TOKEN_REPLACEMENT,
             new TokenReplacementEvent(
@@ -154,6 +155,7 @@ class CampaignSubscriber extends CommonSubscriber
             )
         );
 
+        /** @var NotificationSendEvent $sendEvent */
         $sendEvent = $this->dispatcher->dispatch(
             NotificationEvents::NOTIFICATION_ON_SEND,
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
@@ -163,7 +165,8 @@ class CampaignSubscriber extends CommonSubscriber
             $playerID,
             $sendEvent->getMessage(),
             $sendEvent->getHeading(),
-            $url
+            $url,
+            $notification->getButton()
         );
 
         $event->setChannel('notification', $notification->getId());
@@ -181,8 +184,8 @@ class CampaignSubscriber extends CommonSubscriber
             'type'    => 'mautic.notification.notification',
             'id'      => $notification->getId(),
             'name'    => $notification->getName(),
-            'heading' => $event->getHeading(),
-            'content' => $event->getMessage(),
+            'heading' => $sendEvent->getHeading(),
+            'content' => $sendEvent->getMessage(),
         ];
 
         $event->setResult($result);

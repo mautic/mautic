@@ -70,9 +70,11 @@ class OneSignalApi extends AbstractNotificationApi
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, $message, $title = null, $url = null)
+    public function sendNotification($playerId, $message, $title = null, $url = null, $button = null)
     {
         $data = [];
+
+        $buttonId = $title;
 
         if (!is_array($playerId)) {
             $playerId = [$playerId];
@@ -96,6 +98,10 @@ class OneSignalApi extends AbstractNotificationApi
 
         if ($url) {
             $data['url'] = $url;
+        }
+
+        if ($button && $url) {
+            $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
         }
 
         return $this->send('/notifications', $data);

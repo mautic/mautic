@@ -160,15 +160,48 @@ class LeadFieldRepository extends CommonRepository
             }
         } else {
             // Standard field
-            $q->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->$operatorExpr('l.'.$field, ':value')
+            if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        ($operatorExpr === 'empty') ?
+                            $q->expr()->orX(
+                                $q->expr()->isNull('l.'.$field),
+                                $q->expr()->eq('l.'.$field, $q->expr()->literal(''))
+                            )
+                        :
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.'.$field),
+                            $q->expr()->neq('l.'.$field, $q->expr()->literal(''))
+                        )
+                    )
                 )
-            )
-            ->setParameter('lead', (int) $lead)
-            ->setParameter('value', $value);
+                  ->setParameter('lead', (int) $lead);
+            } elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
+                if ($operatorExpr === 'regexp') {
+                    $where = 'l.'.$field.' REGEXP  :value';
+                } else {
+                    $where = 'l.'.$field.' NOT REGEXP  :value';
+                }
 
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->andX($where)
+                    )
+                )
+                  ->setParameter('lead', (int) $lead)
+                  ->setParameter('value', $value);
+            } else {
+                $q->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->$operatorExpr('l.'.$field, ':value')
+                    )
+                )
+                  ->setParameter('lead', (int) $lead)
+                  ->setParameter('value', $value);
+            }
             $result = $q->execute()->fetch();
 
             return !empty($result['id']);
@@ -178,21 +211,21 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined date value for defined lead.
      *
-     * @param  integer $lead ID
-     * @param  integer $field alias
-     * @param  string  $value to compare with
+     * @param int    $lead  ID
+     * @param int    $field alias
+     * @param string $value to compare with
      *
-     * @return boolean
+     * @return bool
      */
     public function compareDateValue($lead, $field, $value)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq('l.' . $field, ':value')
+                    $q->expr()->eq('l.'.$field, ':value')
                 )
             )
             ->setParameter('lead', (int) $lead)
@@ -207,17 +240,17 @@ class LeadFieldRepository extends CommonRepository
      * Compare a form result value with defined date value ( only day and month compare for
      * events such as anniversary) for defined lead.
      *
-     * @param  integer $lead ID
-     * @param  integer $field alias
-     * @param  object  $value Date object to compare with
+     * @param int    $lead  ID
+     * @param int    $field alias
+     * @param object $value Date object to compare with
      *
-     * @return boolean
+     * @return bool
      */
     public function compareDateMonthValue($lead, $field, $value)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),

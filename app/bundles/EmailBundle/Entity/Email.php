@@ -1055,4 +1055,18 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             }
         }
     }
+
+    /**
+     * Calculate Read Percentage for each Email.
+     *
+     * @return int
+     */
+    public function getReadPercentage($includevariants = false)
+    {
+        if ($this->getSentCount($includevariants) > 0) {
+            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+        } else {
+            return 0;
+        }
+    }
 }
