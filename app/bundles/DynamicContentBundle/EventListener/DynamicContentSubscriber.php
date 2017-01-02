@@ -17,11 +17,13 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
+use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 
 /**
  * Class DynamicContentSubscriber.
@@ -44,6 +46,16 @@ class DynamicContentSubscriber extends CommonSubscriber
     protected $assetTokenHelper;
 
     /**
+     * @var FormTokenHelper
+     */
+    protected $formTokenHelper;
+
+    /**
+     * @var FocusTokenHelper
+     */
+    protected $focusTokenHelper;
+
+    /**
      * @var AuditLogModel
      */
     protected $auditLogModel;
@@ -54,17 +66,22 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
+     * @param FormTokenHelper  $formTokenHelper
      * @param AuditLogModel    $auditLogModel
      */
     public function __construct(
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
+        FormTokenHelper $formTokenHelper,
+        FocusTokenHelper $focusTokenHelper,
         AuditLogModel $auditLogModel
     ) {
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
+        $this->formTokenHelper  = $formTokenHelper;
+        $this->focusTokenHelper = $focusTokenHelper;
         $this->auditLogModel    = $auditLogModel;
     }
 
@@ -129,7 +146,9 @@ class DynamicContentSubscriber extends CommonSubscriber
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
-                $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
+                $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
+                $this->formTokenHelper->findFormTokens($content),
+                $this->focusTokenHelper->findFocusTokens($content)
             );
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
