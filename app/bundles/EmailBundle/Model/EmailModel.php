@@ -477,7 +477,7 @@ class EmailModel extends FormModel
         $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
         $dd->parse();
         $deviceRepo      = $this->leadModel->getDeviceRepository();
-        $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+        $emailOpenDevice = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
         if (empty($emailOpenDevice)) {
             $emailOpenDevice = new LeadDevice();
@@ -503,7 +503,7 @@ class EmailModel extends FormModel
                 }
             }
         } else {
-            $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+            $emailOpenDevice = $this->em->getReference(LeadDevice::class, $emailOpenDevice['id']);
         }
 
         if ($email) {

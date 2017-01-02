@@ -597,15 +597,12 @@ class PageModel extends FormModel
 
         //device granularity
         $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
-
         $dd->parse();
 
         $deviceRepo = $this->leadModel->getDeviceRepository();
-        $device     = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
+        $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
         if (empty($device)) {
             $device = new LeadDevice();
-
             $device->setClientInfo($dd->getClient());
             $device->setDevice($dd->getDeviceName());
             $device->setDeviceBrand($dd->getBrand());
@@ -614,24 +611,19 @@ class PageModel extends FormModel
             $device->setDateOpen($hit->getDateHit());
             $device->setLead($lead);
         } else {
-            $device = $deviceRepo->getEntity($device['id']);
+            $fingerprint = $device['device_fingerprint'];
+            /** @var LeadDevice $device */
+            $device = $this->em->getReference(LeadDevice::class, $device['id']);
+            $device->setDeviceFingerprint($fingerprint);
         }
 
         // Append the fingerprint string to this device
         if (!empty($query['fingerprint']) && $query['fingerprint'] != $device->getDeviceFingerprint()) {
             // The device fingerprint has changed, or it was not set previously.
             $device->setDeviceFingerprint($query['fingerprint']);
-            // The device is already in DB
-            if ($this->em->contains($device)) {
-                $this->em->persist($device);
-                $this->em->flush();
-            }
         }
-        // This is a new device
-        if (!$this->em->contains($device)) {
-            $this->em->persist($device);
-        }
-
+        $this->em->persist($device);
+        $this->em->flush($device);
         $hit->setDeviceStat($device);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
