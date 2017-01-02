@@ -11,7 +11,7 @@ $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
         <?php echo $view['form']->label($form, $label) ?>
         <a  data-prototype="<?php echo $datePrototype; ?>"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="<?php echo $form->vars['id']; ?>_additem">
-            <?php echo $view['translator']->trans('mautic.core.form.list.additem'); ?>
+            <?php echo $view['translator']->trans($addValueButton); ?>
         </a>
         <?php if ($isSortable): ?>
         <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) {

@@ -652,3 +652,5 @@ Mautic.convertDynamicContentFilterInput = function(el) {
         Mautic.activateChosenSelect(filterEl);
     }
 };
+
+
