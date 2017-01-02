@@ -37,7 +37,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-
         $builder->add(
             'notification_landing_page_enabled',
             'yesno_button_group',
