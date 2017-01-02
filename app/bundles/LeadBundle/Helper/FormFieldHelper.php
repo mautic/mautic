@@ -230,7 +230,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Get date field choices
+     * Get date field choices.
      *
      * @return array
      */
@@ -238,57 +238,25 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $options = [
             'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
-            '+P0D' => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
-            '-P1D' => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
-            '+P1D' => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
+            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
         ];
 
         $daysOptions = [];
-        for ($dayInterval = 2; $dayInterval <= 31; $dayInterval++) {
+        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
             $daysOptions['+P'.$dayInterval.'D'] = '+ '.$dayInterval.' days';
         }
 
         $options = array_merge($options, $daysOptions);
 
         $beforeDaysOptions = [];
-        for ($dayInterval = 2; $dayInterval <= 31; $dayInterval++) {
+        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
             $beforeDaysOptions['-P'.$dayInterval.'D'] = $dayInterval.' days before';
         }
 
         $options = array_merge($options, $beforeDaysOptions);
 
         return $options;
-    }
-
-    /**
-     * @param $list
-     *
-     * @return array
-     */
-    static function parseListStringIntoArray($list)
-    {
-        if (!is_array($list) && strpos($list, '|') !== false) {
-            $parts = explode('||', $list);
-            if (count($parts) > 1) {
-                $labels = explode('|', $parts[0]);
-                $values = explode('|', $parts[1]);
-                $list   = array_combine($values, $labels);
-            } else {
-                $labels = explode('|', $list);
-                $values = $labels;
-                $list   = array_combine($values, $labels);
-            }
-        }
-        if (!empty($list) && !is_array($list)) {
-            $list = [$list => $list];
-        }
-
-        // Handle special chars so that validation doesn't fail
-        $choices =  [];
-        foreach ($list as $val => $label) {
-            $choices[html_entity_decode($val, ENT_QUOTES)] = $label;
-        }
-
-        return $choices;
     }
 }
