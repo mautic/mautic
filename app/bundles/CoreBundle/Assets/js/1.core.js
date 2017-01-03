@@ -375,13 +375,7 @@ var Mautic = {
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
-            var link = mQuery(this).attr('href');
-
-            //initialize download links
-            var iframe = mQuery("<iframe/>").attr({
-                src: link,
-                style: "visibility:hidden;display:none"
-            }).appendTo(mQuery('body'));
+            Mautic.initiateFileDownload(mQuery(this).attr('href'));
         });
 
         mQuery(container + " a[data-toggle='confirmation']").off('click.confirmation');
@@ -589,7 +583,7 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                 if (textarea.hasClass('editor-email')) {
@@ -601,7 +595,7 @@ var Mautic = {
                 }
 
                 if (textarea.hasClass('editor-dynamic-content')) {
-                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                    minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
                 }
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
@@ -1992,6 +1986,11 @@ var Mautic = {
             return false;
         }
 
+        if (route.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(route);
+            return true;
+        }
+
         if (event.ctrlKey || event.metaKey) {
             //open the link in a new window
             route = route.split("?")[0];
@@ -2419,11 +2418,24 @@ var Mautic = {
     },
 
     /**
+     * Download a link via iframe
+     *
+     * @param link
+     */
+    initiateFileDownload: function (link) {
+        //initialize download links
+        var iframe = mQuery("<iframe/>").attr({
+            src: link,
+            style: "visibility:hidden;display:none"
+        }).appendTo(mQuery('body'));
+    },
+
+    /**
      * Executes an object action
      *
      * @param action
      */
-    executeAction: function (action) {
+    executeAction: function (action, callback) {
         if (typeof Mautic.activeActions == 'undefined') {
             Mautic.activeActions = {};
         } else if (typeof Mautic.activeActions[action] != 'undefined') {
@@ -2435,6 +2447,12 @@ var Mautic = {
 
         //dismiss modal if activated
         Mautic.dismissConfirmation();
+
+        if (action.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(action);
+            return;
+        }
+
         mQuery.ajax({
             showLoadingBar: true,
             url: action,
@@ -2442,6 +2460,10 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 Mautic.processPageContent(response);
+
+                if (typeof callback == 'function') {
+                    callback(response);
+                }
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);

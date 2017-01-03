@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -145,7 +146,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Text',
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
-                'slot',
+                SlotTextType::class,
                 1000
             );
             $event->addSlotType(

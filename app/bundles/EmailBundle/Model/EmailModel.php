@@ -477,7 +477,7 @@ class EmailModel extends FormModel
         $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
         $dd->parse();
         $deviceRepo      = $this->leadModel->getDeviceRepository();
-        $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+        $emailOpenDevice = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
         if (empty($emailOpenDevice)) {
             $emailOpenDevice = new LeadDevice();
@@ -503,7 +503,7 @@ class EmailModel extends FormModel
                 }
             }
         } else {
-            $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+            $emailOpenDevice = $this->em->getReference(LeadDevice::class, $emailOpenDevice['id']);
         }
 
         if ($email) {
@@ -2059,5 +2059,94 @@ class EmailModel extends FormModel
                 $sendTo[$key]['companies'] = $contactCompanies;
             }
         }
+    }
+
+    /**
+     * Send an email to lead(s).
+     *
+     * @param       $email
+     * @param       $users
+     * @param mixed $leadFields
+     * @param array $tokens
+     * @param array $assetAttachments
+     * @param bool  $saveStat
+     *
+     * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function sendSampleEmailToUser($email, $users, $leadFields = null, $tokens = [], $assetAttachments = [], $saveStat = true)
+    {
+        if (!$emailId = $email->getId()) {
+            return false;
+        }
+
+        if (!is_array($users)) {
+            $user  = ['id' => $users];
+            $users = [$user];
+        }
+
+        //get email settings
+        $emailSettings = &$this->getEmailSettings($email, false);
+
+        //noone to send to so bail
+        if (empty($users)) {
+            return false;
+        }
+
+        $mailer = $this->mailHelper->getSampleMailer();
+        $mailer->setLead($leadFields, true);
+        $mailer->setTokens($tokens);
+        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
+
+        $errors = [];
+        foreach ($users as $user) {
+            $idHash = uniqid();
+            $mailer->setIdHash($idHash);
+
+            if (!is_array($user)) {
+                $id   = $user;
+                $user = ['id' => $id];
+            } else {
+                $id = $user['id'];
+            }
+
+            if (!isset($user['email'])) {
+                $userEntity        = $this->userModel->getEntity($id);
+                $user['email']     = $userEntity->getEmail();
+                $user['firstname'] = $userEntity->getFirstName();
+                $user['lastname']  = $userEntity->getLastName();
+            }
+
+            if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
+                $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
+            } else {
+                if (!$mailer->queue(true)) {
+                    $errorArray = $mailer->getErrors();
+                    unset($errorArray['failures']);
+                    $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
+                }
+
+                if ($saveStat) {
+                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                }
+            }
+        }
+
+        //flush the message
+        if (!$mailer->flushQueue()) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+            $errors[] = implode('; ', $errorArray);
+        }
+
+        if (isset($saveEntities)) {
+            $this->getStatRepository()->saveEntities($saveEntities);
+        }
+
+        //save some memory
+        unset($mailer);
+
+        return $errors;
     }
 }

@@ -510,7 +510,7 @@ class SmsController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'email');
+            return $this->isLocked($postActionVars, $entity, 'sms');
         }
 
         //Create the form

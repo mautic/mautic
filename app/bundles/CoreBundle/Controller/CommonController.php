@@ -11,6 +11,10 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Exporter\Handler;
+use Exporter\Source\ArraySourceIterator;
+use Exporter\Writer\CsvWriter;
+use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,6 +27,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -749,5 +754,74 @@ class CommonController extends Controller implements MauticController
 
             $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
         }
+    }
+
+    /**
+     * Export a.
+     *
+     * @param AbstractCommonModel $model
+     * @param array               $args
+     * @param callable|null       $resultsCallback
+     *
+     * @return StreamedResponse
+     */
+    public function exportResultsAs(AbstractCommonModel $model, array $args, callable $resultsCallback = null)
+    {
+        $type     = $args['type'];
+        $filename = $args['filename'];
+        unset($args['type'], $args['filename']);
+
+        if (!in_array($type, ['csv', 'xlsx'])) {
+            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        }
+
+        $args['limit'] = $args['limit'] < 200 ? 200 : $args['limit'];
+        $args['start'] = 0;
+
+        $results    = $model->getEntities($args);
+        $count      = $results['count'];
+        $items      = $results['results'];
+        $iterations = ceil($count / $args['limit']);
+        $loop       = 1;
+
+        // Max of 50 iterations for 10K result export
+        if ($iterations > 50) {
+            $iterations = 50;
+        }
+
+        $toExport = [];
+
+        unset($args['withTotalCount']);
+
+        while ($loop <= $iterations) {
+            if (is_callable($resultsCallback)) {
+                foreach ($items as $item) {
+                    $toExport[] = $resultsCallback($item);
+                }
+            } else {
+                foreach ($items as $item) {
+                    $toExport[] = (array) $item;
+                }
+            }
+
+            $args['start'] = $loop * $args['limit'];
+
+            $items = $model->getEntities($args);
+
+            $this->getDoctrine()->getManager()->clear();
+
+            ++$loop;
+        }
+
+        $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $sourceIterator = new ArraySourceIterator($toExport);
+        $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+
+        return new StreamedResponse(function () use ($sourceIterator, $writer) {
+            Handler::create($sourceIterator, $writer)->export();
+        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
     }
 }

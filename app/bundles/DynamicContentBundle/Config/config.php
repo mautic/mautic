@@ -63,7 +63,11 @@ return [
                 ],
             ],
             'mautic.dynamicContent.js.subscriber' => [
-                'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'templating.helper.assets',
+                ],
             ],
             'mautic.dynamicContent.subscriber' => [
                 'class'     => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
@@ -71,6 +75,8 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.form.helper.token',
+                    'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
                 ],
             ],

@@ -10,4 +10,4 @@
  */
 ?>
 
-Insert text here
+<span>Insert text here</span>

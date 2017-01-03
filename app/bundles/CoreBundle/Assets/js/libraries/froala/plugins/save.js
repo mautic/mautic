@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -94,11 +94,13 @@
           data: $.extend(dt, params),
           crossDomain: editor.opts.requestWithCORS,
           xhrFields: {
-            withCredentials: editor.opts.requestWithCORS
+            withCredentials: editor.opts.requestWithCredentials
           },
           headers: editor.opts.requestHeaders
         })
         .done(function (data) {
+          _last_html = html;
+
           // data
           editor.events.trigger('save.after', [data]);
         })
@@ -147,9 +149,9 @@
       if (editor.opts.saveInterval) {
         _last_html = editor.html.get();
         editor.events.on('contentChanged', _mightSave);
-        editor.events.on('keydown', function () {
+        editor.events.on('keydown destroy', function () {
           clearTimeout(_timeout);
-        })
+        });
       }
     }
 
