@@ -2360,7 +2360,7 @@ class LeadController extends FormController
         $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $mine       = $translator->trans('mautic.core.searchcommand.ismine');
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-        $dataType   = $this->request->get('downloadAsList', 'csv');
+        $dataType   = $this->request->get('filetype', 'csv');
 
         if (!empty($ids)) {
             $filter['force'] = [
@@ -2388,8 +2388,14 @@ class LeadController extends FormController
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
             'withTotalCount' => true,
+            'type'           => $dataType,
+            'filename'       => 'contacts',
         ];
 
-        return $this->exportResultsAs($dataType, 'contacts', $model, $args);
+        $resultsCallback = function ($contact) {
+            return $contact->getProfileFields();
+        };
+
+        return $this->exportResultsAs($model, $args, $resultsCallback);
     }
 }

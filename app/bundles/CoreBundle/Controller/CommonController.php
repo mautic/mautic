@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -757,8 +756,21 @@ class CommonController extends Controller implements MauticController
         }
     }
 
-    public function exportResultsAs($type, $filename, AbstractCommonModel $model, array $args)
+    /**
+     * Export a.
+     *
+     * @param AbstractCommonModel $model
+     * @param array               $args
+     * @param callable|null       $resultsCallback
+     *
+     * @return StreamedResponse
+     */
+    public function exportResultsAs(AbstractCommonModel $model, array $args, callable $resultsCallback = null)
     {
+        $type     = $args['type'];
+        $filename = $args['filename'];
+        unset($args['type'], $args['filename']);
+
         if (!in_array($type, ['csv', 'xlsx'])) {
             throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
@@ -768,7 +780,7 @@ class CommonController extends Controller implements MauticController
 
         $results    = $model->getEntities($args);
         $count      = $results['count'];
-        $contacts   = $results['results'];
+        $items      = $results['results'];
         $iterations = ceil($count / $args['limit']);
         $loop       = 1;
 
@@ -779,34 +791,34 @@ class CommonController extends Controller implements MauticController
 
         $toExport = [];
 
-        /** @var Lead $contact */
-        foreach ($contacts as $contact) {
-            $toExport[] = $contact->getProfileFields();
-        }
-
-        $this->getDoctrine()->getManager()->clear(Lead::class);
-
         unset($args['withTotalCount']);
 
-        while ($loop < $iterations) {
-            /** @var Lead $contact */
-            foreach ($contacts as $contact) {
-                $toExport[] = $contact->getProfileFields();
+        while ($loop <= $iterations) {
+            if (is_callable($resultsCallback)) {
+                foreach ($items as $item) {
+                    $toExport[] = $resultsCallback($item);
+                }
+            } else {
+                foreach ($items as $item) {
+                    $toExport[] = (array) $item;
+                }
             }
 
             $args['start'] = $loop * $args['limit'];
 
-            $contacts = $model->getEntities($args);
+            $items = $model->getEntities($args);
 
-            $this->getDoctrine()->getManager()->clear(Lead::class);
+            $this->getDoctrine()->getManager()->clear();
 
             ++$loop;
         }
 
+        $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
         $sourceIterator = new ArraySourceIterator($toExport);
         $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
         $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
-        $filename       = $filename.'_'.((new \DateTime())->format('U')).'.'.$type;
+        $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
 
         return new StreamedResponse(function () use ($sourceIterator, $writer) {
             Handler::create($sourceIterator, $writer)->export();
