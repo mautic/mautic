@@ -25,7 +25,7 @@
         "symfony/process": "~2.8",
         "symfony/security": "~2.8",
         "symfony/security-acl": "~2.7",
-        "symfony/translation": "~2.8",
+        "symfony/translation": "2.8.11",
         "symfony/validator": "~2.8",
         "symfony/yaml": "~2.8",
         "symfony/property-access": "~2.8",
@@ -102,6 +102,7 @@
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.0.3",
         "doctrine/data-fixtures": "1.2.1",
+        "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8"
     },

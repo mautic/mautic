@@ -294,18 +294,18 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($event->getConfig()['operator'] === 'date') {
             $triggerDate = new \DateTime();
-            $interval = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+            $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-            if (strpos($event->getConfig()['value'], '+P') !== FALSE) { //add date
+            if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
                 $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
                 $result = $this->compareDateValue($lead, $event, $triggerDate);
-            } else if (strpos($event->getConfig()['value'], '-P') !== FALSE) { //subtract date
+            } elseif (strpos($event->getConfig()['value'], '-P') !== false) { //subtract date
                 $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
                 $result = $this->compareDateValue($lead, $event, $triggerDate);
-            } else if ($event->getConfig()['value'] === 'anniversary') {
+            } elseif ($event->getConfig()['value'] === 'anniversary') {
                 /**
                  * note: currently mautic campaign only one time execution
-                 * ( to integrate with: recursive campaign (future))
+                 * ( to integrate with: recursive campaign (future)).
                  */
                 $result = $this->leadFieldModel->getRepository()->compareDateMonthValue(
                         $lead->getId(), $event->getConfig()['field'], $triggerDate);

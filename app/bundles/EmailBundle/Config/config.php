@@ -123,7 +123,7 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
             ],
             'mautic.email.reportbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],

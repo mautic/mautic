@@ -375,13 +375,7 @@ var Mautic = {
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
-            var link = mQuery(this).attr('href');
-
-            //initialize download links
-            var iframe = mQuery("<iframe/>").attr({
-                src: link,
-                style: "visibility:hidden;display:none"
-            }).appendTo(mQuery('body'));
+            Mautic.initiateFileDownload(mQuery(this).attr('href'));
         });
 
         mQuery(container + " a[data-toggle='confirmation']").off('click.confirmation');
@@ -1992,6 +1986,11 @@ var Mautic = {
             return false;
         }
 
+        if (route.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(route);
+            return true;
+        }
+
         if (event.ctrlKey || event.metaKey) {
             //open the link in a new window
             route = route.split("?")[0];
@@ -2419,6 +2418,19 @@ var Mautic = {
     },
 
     /**
+     * Download a link via iframe
+     *
+     * @param link
+     */
+    initiateFileDownload: function (link) {
+        //initialize download links
+        var iframe = mQuery("<iframe/>").attr({
+            src: link,
+            style: "visibility:hidden;display:none"
+        }).appendTo(mQuery('body'));
+    },
+
+    /**
      * Executes an object action
      *
      * @param action
@@ -2435,6 +2447,12 @@ var Mautic = {
 
         //dismiss modal if activated
         Mautic.dismissConfirmation();
+
+        if (action.indexOf('batchExport') >= 0) {
+            Mautic.initiateFileDownload(action);
+            return;
+        }
+
         mQuery.ajax({
             showLoadingBar: true,
             url: action,
