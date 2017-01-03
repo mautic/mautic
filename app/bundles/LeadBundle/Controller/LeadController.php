@@ -2388,14 +2388,14 @@ class LeadController extends FormController
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
             'withTotalCount' => true,
-            'type'           => $dataType,
-            'filename'       => 'contacts',
         ];
 
         $resultsCallback = function ($contact) {
             return $contact->getProfileFields();
         };
 
-        return $this->exportResultsAs($model, $args, $resultsCallback);
+        $toExport = $this->getDataForExport($model, $args, $resultsCallback);
+
+        return $this->exportResultsAs($toExport, $dataType, 'contacts');
     }
 }
