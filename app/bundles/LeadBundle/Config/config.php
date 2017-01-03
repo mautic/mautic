@@ -75,6 +75,13 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            'mautic_contact_timeline_export_action' => [
+                'path'         => '/contacts/timeline/batchExport/{leadId}',
+                'controller'   => 'MauticLeadBundle:Timeline:batchExport',
+                'requirements' => [
+                    'leadId' => '\d+',
+                ],
+            ],
             'mautic_contact_action' => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute',
