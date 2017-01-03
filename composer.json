@@ -25,7 +25,7 @@
         "symfony/process": "~2.8",
         "symfony/security": "~2.8",
         "symfony/security-acl": "~2.7",
-        "symfony/translation": "~2.8",
+        "symfony/translation": "2.8.11",
         "symfony/validator": "~2.8",
         "symfony/yaml": "~2.8",
         "symfony/property-access": "~2.8",

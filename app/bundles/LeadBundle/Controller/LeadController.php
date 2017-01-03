@@ -2383,7 +2383,7 @@ class LeadController extends FormController
 
         $args = [
             'start'          => 0,
-            'limit'          => 100,
+            'limit'          => 200,
             'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,

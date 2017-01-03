@@ -375,13 +375,7 @@ var Mautic = {
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
-            var link = mQuery(this).attr('href');
-
-            //initialize download links
-            var iframe = mQuery("<iframe/>").attr({
-                src: link,
-                style: "visibility:hidden;display:none"
-            }).appendTo(mQuery('body'));
+            Mautic.initiateFileDownload(mQuery(this).attr('href'));
         });
 
         mQuery(container + " a[data-toggle='confirmation']").off('click.confirmation');
@@ -2423,11 +2417,17 @@ var Mautic = {
         Mautic.loadContent(route, '', 'POST', target);
     },
 
-    initiateFileDownload: function (action) {
-        var downloadFrame = mQuery('<iframe>');
-
-        downloadFrame.hide().prop('src', action);
-        downloadFrame.appendTo('body');
+    /**
+     * Download a link via iframe
+     *
+     * @param link
+     */
+    initiateFileDownload: function (link) {
+        //initialize download links
+        var iframe = mQuery("<iframe/>").attr({
+            src: link,
+            style: "visibility:hidden;display:none"
+        }).appendTo(mQuery('body'));
     },
 
     /**

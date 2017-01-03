@@ -763,7 +763,7 @@ class CommonController extends Controller implements MauticController
             throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
-        $args['limit'] = $args['limit'] < 100 ? 100 : $args['limit'];
+        $args['limit'] = $args['limit'] < 200 ? 200 : $args['limit'];
         $args['start'] = 0;
 
         $results    = $model->getEntities($args);
@@ -771,6 +771,11 @@ class CommonController extends Controller implements MauticController
         $contacts   = $results['results'];
         $iterations = ceil($count / $args['limit']);
         $loop       = 1;
+
+        // Max of 50 iterations for 10K result export
+        if ($iterations > 50) {
+            $iterations = 50;
+        }
 
         $toExport = [];
 
@@ -781,6 +786,8 @@ class CommonController extends Controller implements MauticController
 
         $this->getDoctrine()->getManager()->clear(Lead::class);
 
+        unset($args['withTotalCount']);
+
         while ($loop < $iterations) {
             /** @var Lead $contact */
             foreach ($contacts as $contact) {
@@ -789,8 +796,7 @@ class CommonController extends Controller implements MauticController
 
             $args['start'] = $loop * $args['limit'];
 
-            $results  = $model->getEntities($args);
-            $contacts = $results['results'];
+            $contacts = $model->getEntities($args);
 
             $this->getDoctrine()->getManager()->clear(Lead::class);
 
