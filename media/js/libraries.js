@@ -2255,7 +2255,7 @@ for(j=0;j<list.length;j++){if(list[j]===m[i].element[0]){m[i].proportions().heig
 m[i].visible=m[i].element.css("display")!=="none";if(!m[i].visible){continue;}
 if(type==="mousedown"){m[i]._activate.call(m[i],event);}
 m[i].offset=m[i].element.offset();if(t.options.iframeId){var scrollOffset=$('#'+t.options.iframeId).contents().scrollTop();var newTop=m[i].offset.top-scrollOffset;m[i].offset={top:newTop,left:m[i].offset.left};}
-m[i].proportions({width:m[i].element[0].offsetWidth,height:m[i].element[0].offsetHeight});}}})(jQuery);;
+m[i].proportions({width:m[i].element[0].offsetWidth,height:m[i].element[0].offsetHeight});}};})(jQuery);;
 /*!
  * jQuery Form Plugin
  * version: 3.51.0-2014.06.20

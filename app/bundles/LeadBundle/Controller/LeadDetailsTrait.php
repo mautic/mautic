@@ -186,10 +186,11 @@ trait LeadDetailsTrait
      * @param array|null $filters
      * @param array|null $orderBy
      * @param int        $page
+     * @param int        $limit
      *
      * @return array
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1)
+    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
         $session = $this->get('session');
 
@@ -218,7 +219,7 @@ trait LeadDetailsTrait
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        return $model->getEngagements($lead, $filters, $orderBy, $page);
+        return $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
     }
 
     /**

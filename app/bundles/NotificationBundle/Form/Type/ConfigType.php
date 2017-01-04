@@ -38,6 +38,18 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'notification_landing_page_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.landingpage.enabled',
+                'data'  => (bool) $options['data']['notification_landing_page_enabled'],
+                'attr'  => [
+                    'tooltip' => 'mautic.notification.config.form.notification.landingpage.enabled.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'notification_app_id',
             'text',
             [

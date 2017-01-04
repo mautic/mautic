@@ -253,14 +253,12 @@ return [
                 'alias'     => 'builder_section',
             ],
             'mautic.form.type.slot' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotType',
+                'alias' => 'slot',
             ],
             'mautic.form.type.slot.button' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot_button',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
+                'alias' => 'slot_button',
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
@@ -304,8 +302,14 @@ return [
             ],
             'mautic.helper.template.date' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'date',
+                'arguments' => [
+                    '%mautic.date_format_full%',
+                    '%mautic.date_format_short%',
+                    '%mautic.date_format_dateonly%',
+                    '%mautic.date_format_timeonly%',
+                    'translator',
+                ],
+                'alias' => 'date',
             ],
             'mautic.helper.template.exception' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
@@ -458,8 +462,11 @@ return [
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'routing.loader',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+                'tag' => 'routing.loader',
             ],
             'mautic.security' => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
@@ -485,6 +492,7 @@ return [
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
+                    'router',
                     '"MauticCoreBundle:Exception:show"',
                     'monolog.logger.mautic',
                 ],

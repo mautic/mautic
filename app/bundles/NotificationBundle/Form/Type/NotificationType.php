@@ -104,6 +104,20 @@ class NotificationType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'button',
+            'text',
+            [
+                'label'      => 'mautic.notification.form.button',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.button.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
         $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add(
