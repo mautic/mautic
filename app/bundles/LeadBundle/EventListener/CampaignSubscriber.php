@@ -293,7 +293,8 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($event->getConfig()['operator'] === 'date') {
-            $triggerDate = new \DateTime();
+            // Set the date in system timezone since this is triggered by cron
+            $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
             $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
             if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
