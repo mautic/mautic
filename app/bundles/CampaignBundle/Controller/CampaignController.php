@@ -854,29 +854,49 @@ class CampaignController extends FormController
             // Update canvas settings with new event ids
             $canvasSettings = $campaign->getCanvasSettings();
             if (isset($canvasSettings['nodes'])) {
-                foreach ($canvasSettings['nodes'] as &$node) {
+                foreach ($canvasSettings['nodes'] as $key => $node) {
                     // Only events and not lead sources
                     if (is_numeric($node['id'])) {
-                        $node['id'] = 'new'.$node['id'];
+                        $canvasSettings['nodes'][$key]['id'] = 'new'.$node['id'];
                     }
                 }
             }
 
+            $connections = [];
             if (isset($canvasSettings['connections'])) {
-                foreach ($canvasSettings['connections'] as &$c) {
+                foreach ($canvasSettings['connections'] as $key => $c) {
                     // Only events and not lead sources
                     if (is_numeric($c['sourceId'])) {
-                        $c['sourceId'] = 'new'.$c['sourceId'];
+                        $canvasSettings['connections'][$key]['sourceId'] = 'new'.$c['sourceId'];
                     }
 
                     // Only events and not lead sources
                     if (is_numeric($c['targetId'])) {
-                        $c['targetId'] = 'new'.$c['targetId'];
+                        $canvasSettings['connections'][$key]['targetId'] = 'new'.$c['targetId'];
                     }
                 }
+                $connections = $canvasSettings['connections'];
             }
 
             $campaign->setCanvasSettings($canvasSettings);
+
+            if ($connections) {
+                // Format the way it's submitted from the builder
+                foreach ($connections as $key => $c) {
+                    $anchors                      = $c['anchors'];
+                    $connections[$key]['anchors'] = [
+                        [
+                            'endpoint' => $anchors['source'],
+                            'eventId'  => $c['sourceId'],
+                        ],
+                        [
+                            'endpoint' => $anchors['target'],
+                            'eventId'  => $c['targetId'],
+                        ],
+                    ];
+                }
+                $canvasSettings['connections'] = $connections;
+            }
 
             // Set the canvas settings into session to simulate edit
             $this->get('session')->set('mautic.campaign.'.$tempId.'.events.canvassettings', $canvasSettings);
