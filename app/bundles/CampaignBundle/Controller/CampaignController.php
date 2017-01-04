@@ -711,6 +711,7 @@ class CampaignController extends FormController
                     // Rebuild the form with new action so that apply doesn't keep creating a clone
                     $action = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
                     $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                    $form->get('sessionId')->setData($objectId);
                 }
             }
         } else {
