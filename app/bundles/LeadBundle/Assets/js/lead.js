@@ -252,7 +252,7 @@ Mautic.leadlistPopulateChoices = function(el) {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operator = mQuery(el).val();
-    console.log(el);
+
     // Extract the filter number
     var regExp    = /leadlist_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
@@ -457,18 +457,12 @@ Mautic.addLeadListFilter = function (elId) {
         mQuery(filter).attr('type', fieldType);
     }
 
-    // Remove inapplicable operator types
     var operators = mQuery(filterId).data('field-operators');
-
-    if (typeof operators.include != 'undefined') {
-        mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
-        }).remove();
-    } else if (typeof operators.exclude != 'undefined') {
-        mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
-        }).remove();
-    }
+    mQuery('#' + filterIdBase + 'operator').html('');
+    mQuery.each(operators, function (value, label) {
+        var newOption = mQuery('<option/>').val(value).text(label);
+        newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
+    });
 
     // Convert based on first option in list
     Mautic.convertLeadFilterInput('#' + filterIdBase + 'operator');
@@ -1036,55 +1030,7 @@ Mautic.leadBatchSubmit = function() {
 };
 
 Mautic.updateLeadFieldValues = function (field) {
-    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
-
-    field = mQuery(field);
-    var fieldAlias = field.val();
-    Mautic.ajaxActionRequest('lead:updateLeadFieldValues', {'alias': fieldAlias}, function(response) {
-        if (typeof response.options != 'undefined') {
-            var valueField = mQuery('#campaignevent_properties_value');
-            var valueFieldAttrs = {
-                'class': valueField.attr('class'),
-                'id': valueField.attr('id'),
-                'name': valueField.attr('name'),
-                'autocomplete': valueField.attr('autocomplete'),
-                'value': valueField.attr('value')
-            };
-
-            if (mQuery('#campaignevent_properties_value_chosen').length) {
-                mQuery('#campaignevent_properties_value').chosen('destroy');
-            }
-
-            if (!mQuery.isEmptyObject(response.options)) {
-                var newValueField = mQuery('<select/>')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
-                mQuery.each(response.options, function(optionKey, optionVal) {
-                    var option = mQuery("<option/>")
-                        .attr('value', optionKey)
-                        .text(optionVal);
-                    newValueField.append(option);
-                });
-                valueField.replaceWith(newValueField);
-
-                Mautic.activateChosenSelect(newValueField);
-            } else {
-                var newValueField = mQuery('<input/>')
-                    .attr('type', 'text')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
-
-                valueField.replaceWith(newValueField);
-            }
-        }
-        Mautic.removeLabelLoadingIndicator();
-    });
+    Mautic.updateFieldOperatorValue(field, 'lead:updateLeadFieldValues');
 };
 
 Mautic.toggleTimelineMoreVisiblity = function (el) {

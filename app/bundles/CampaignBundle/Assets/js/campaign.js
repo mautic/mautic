@@ -854,7 +854,6 @@ Mautic.submitCampaignEvent = function(e) {
 
     mQuery('#campaignevent_canvasSettings_droppedX').val(mQuery('#droppedX').val());
     mQuery('#campaignevent_canvasSettings_droppedY').val(mQuery('#droppedY').val());
-    mQuery('#campaignevent_canvasSettings_decisionPath').val(mQuery('#decisionPath').val());
 
     mQuery('form[name="campaignevent"]').submit();
 };
