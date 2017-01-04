@@ -156,6 +156,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $frequencyRules;
 
     /**
+     * @var
+     */
+    private $primaryCompany;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -1321,5 +1326,25 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 $this->changes['dateIdentified'] = ['', $this->dateIdentified];
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPrimaryCompany()
+    {
+        return $this->primaryCompany;
+    }
+
+    /**
+     * @param mixed $primaryCompany
+     *
+     * @return Lead
+     */
+    public function setPrimaryCompany($primaryCompany)
+    {
+        $this->primaryCompany = $primaryCompany;
+
+        return $this;
     }
 }

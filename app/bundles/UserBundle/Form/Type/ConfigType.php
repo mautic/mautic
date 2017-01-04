@@ -119,11 +119,11 @@ class ConfigType extends AbstractType
             'saml_idp_own_password',
             PasswordType::class,
             [
-                'label'      => 'mautic.user.config.form.saml.idp.own_private_key',
+                'label'      => 'mautic.user.config.form.saml.idp.own_password',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.user.config.form.saml.idp.own_private_key.tooltip',
+                    'tooltip' => 'mautic.user.config.form.saml.idp.own_password.tooltip',
                 ],
                 'required' => false,
             ]
