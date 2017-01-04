@@ -14,6 +14,9 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -252,6 +255,33 @@ class LeadImportFieldType extends AbstractType
                 'cancel_icon' => 'fa fa-times',
             ]
         );
+        $used_import_fields  = [];
+        $import_check_fields = array_merge(array_keys($options['lead_fields']), ['dateAdded', 'createdByUser', 'dateModified',
+            'modifiedByUser', 'lastActive', 'dateIdentified', 'ip', 'points', 'stage', 'doNotEmail', ]);
+        $hasDuplication = function ($form) use (&$hasDuplication, $used_import_fields, $import_check_fields) {
+            foreach ($form->getIterator() as $formChildren) {
+                if ($formChildren->all()) {
+                    $hasDuplication($formChildren);
+                    continue;
+                }
+                if (!in_array($formChildren->getName(), $import_check_fields)) {
+                    continue;
+                }
+                if (!$formChildren->getData()) {
+                    continue;
+                }
+                if (in_array($formChildren->getData(), $used_import_fields)) {
+                    $formChildren->addError(
+                            new FormError($this->factory->getTranslator()->trans('mautic.lead.import.error.columnAlredyMatched'))
+                    );
+                }
+                $used_import_fields[] = $formChildren->getData();
+            }
+        };
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($hasDuplication) {
+            $form = $event->getForm();
+            $hasDuplication($form);
+        });
     }
 
     /**
