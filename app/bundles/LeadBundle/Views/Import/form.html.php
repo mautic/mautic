@@ -128,8 +128,8 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
         <?php echo $view['form']->end($form); ?>
     </div>
     <script type="text/javascript">
-        mQuery('select').on('chosen:showing_dropdown', function(e){
-            mQuery("select").each(function(t,v){
+        mQuery('select.matched-column-filter').on('chosen:showing_dropdown', function(e){
+            mQuery("select.matched-column-filter").each(function(t,v){
                 var index = mQuery(v).prop('selectedIndex');
                 mQuery(".chosen-results").find("[data-option-array-index="+index+"]").hide();
             });

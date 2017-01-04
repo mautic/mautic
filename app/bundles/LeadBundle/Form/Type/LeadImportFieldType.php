@@ -49,7 +49,7 @@ class LeadImportFieldType extends AbstractType
                     'label'      => $label,
                     'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => ['class' => 'form-control matched-column-filter'],
                     'data'       => $this->getDefaultValue($field, $options['import_fields']),
                 ]
             );
@@ -65,7 +65,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.dateAdded',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('dateAdded', $options['import_fields']),
             ]
         );
@@ -78,7 +78,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.createdByUser',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('createdByUser', $options['import_fields']),
             ]
         );
@@ -91,7 +91,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.dateModified',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('dateModified', $options['import_fields']),
             ]
         );
@@ -104,7 +104,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.modifiedByUser',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('modifiedByUser', $options['import_fields']),
             ]
         );
@@ -117,7 +117,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.lastActive',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('lastActive', $options['import_fields']),
             ]
         );
@@ -130,7 +130,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.dateIdentified',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('dateIdentified', $options['import_fields']),
             ]
         );
@@ -143,7 +143,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.ip',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('ip', $options['import_fields']),
             ]
         );
@@ -156,7 +156,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.points',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('points', $options['import_fields']),
             ]
         );
@@ -169,7 +169,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.stage',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('stage', $options['import_fields']),
             ]
         );
@@ -182,7 +182,7 @@ class LeadImportFieldType extends AbstractType
                 'label'      => 'mautic.lead.import.label.doNotEmail',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control matched-column-filter'],
                 'data'       => $this->getDefaultValue('doNotEmail', $options['import_fields']),
             ]
         );
