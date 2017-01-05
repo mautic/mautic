@@ -168,6 +168,8 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
+                    'mautic.user.model.user',
+                    'mautic.core.model.notification',
                     'mautic.factory',
                 ],
             ],

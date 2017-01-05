@@ -201,11 +201,16 @@ class LeadSubscriber extends CommonSubscriber
                 $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                     ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 
+                $label = $log['event_name'].' / '.$log['campaign_name'];
+
+                if (!empty($log['metadata']['errors']) && !empty($log['isScheduled'])) {
+                    $label .= ' <i class="fa fa-warning text-danger"></i>';
+                }
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
                         'eventLabel' => [
-                            'label' => $log['event_name'].' / '.$log['campaign_name'],
+                            'label' => $label,
                             'href'  => $this->router->generate(
                                 'mautic_campaign_action',
                                 ['objectAction' => 'view', 'objectId' => $log['campaign_id']]

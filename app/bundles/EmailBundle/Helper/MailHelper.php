@@ -1301,11 +1301,11 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                /*$addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
-
+*/
                 $this->addBcc($bccAddress);
             }
         }
