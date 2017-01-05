@@ -1,7 +1,25 @@
+## Introduction
+
+This project is a fork of the official Mautic project.
+
+## API Integration
+
+The first step to do the Api integration is, in the global configuration of the Mautic's panel,  enabled the Api, after this, the menu called "API Credentials"  will appears in the settings menu.
+
+In the API Credentials menu, we must create a new Oauth integration type clicking in the "new button" on the right and top of the screen, so, we must choose an Oauth type (it is recommendable to choose the Oauth2), name and Uri of callback.
+
+This steps will generate the client id and client secret that are tokens and it will be necessaries to complete the integration.
+
+### Warnings
+1. The Oauth2 must be used with https.
+2. Using the Oauth2 the login and the permission steps will be done automatically
+
+
 Mautic Introduction
 ===========
 <img src="https://www.mautic.org/media/images/github_readme.png" />
 <br /><br />
+
 ## Getting Started
 <p>
 	This is a simple 3 step installation process. You'll want to make sure you already have <a href="http://getcomposer.org">Composer</a> available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
