@@ -330,6 +330,11 @@ class CoreSubscriber extends CommonSubscriber
                         $pathBase   = $details['path'];
                         $controller = $details['controller'];
                         foreach ($standards as $standardName => $standardDetails) {
+                            if (!empty($details['supported_endpoints']) && !in_array($standardName, $details['supported_endpoints'])) {
+                                // Not supported so ignore
+                                continue;
+                            }
+
                             $details = array_merge(
                                 $standardDetails,
                                 [
