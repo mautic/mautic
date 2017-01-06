@@ -75,7 +75,6 @@ class BuildJsSubscriber extends CommonSubscriber
         $js = <<<JS
 (function(m, l, n, d) {
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
-    console.log(m.pageTrackingUrl);
     m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
     m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
     m.fingerprint = null;
