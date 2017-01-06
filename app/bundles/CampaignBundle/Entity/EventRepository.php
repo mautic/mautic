@@ -499,4 +499,48 @@ class EventRepository extends CommonRepository
             )
             ->execute();
     }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'e';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    public function getSearchCommands()
+    {
+        return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addCatchAllWhereClause(&$q, $filter)
+    {
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                $this->getTableAlias().'.name',
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addSearchCommandWhereClause(&$q, $filter)
+    {
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
+    }
 }
