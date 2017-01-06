@@ -55,22 +55,29 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $pageTrackingUrl = str_replace(
-            ['http://', 'https://'],
-            '',
-            $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
-        );
+        $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        // Determine if this is https
+        $parts           = parse_url($pageTrackingUrl);
+        $scheme          = $parts['scheme'];
+        $pageTrackingUrl = str_replace(['http://', 'https'], '', $pageTrackingUrl);
+
         $pageTrackingCORSUrl = str_replace(
-            ['http://', 'https://'],
+            ['http://', 'https'],
             '',
             $this->router->generate('mautic_page_tracker_cors', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
-        $contactIdUrl = $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $contactIdUrl = str_replace(
+            ['http://', 'https'],
+            '',
+            $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         $js = <<<JS
 (function(m, l, n, d) {
-    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
-    m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingCORSUrl}';
+    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
+    console.log(m.pageTrackingUrl);
+    m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
+    m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
     m.fingerprint = null;
     m.fingerprintComponents = null;
 
@@ -199,8 +206,7 @@ class BuildJsSubscriber extends CommonSubscriber
 })(MauticJS, location, navigator, document);
 
 MauticJS.getTrackedContact = function () {
-    var url = '$contactIdUrl';
-    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
+    MauticJS.makeCORSRequest('GET', MauticJS.contactIdUrl, {}, function(response, xhr) {
         if (response.id) {
             MauticJS.setCookie('mtc_id', response.id);
         }
