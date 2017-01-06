@@ -1683,16 +1683,18 @@ class LeadModel extends FormModel
         if (null === $leadFields) {
             $leadFields = $this->leadFieldModel->getEntities(
                 [
-                    'force' => [
-                        [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'eq',
-                            'value'  => 'lead',
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'f.isPublished',
+                                'expr'   => 'eq',
+                                'value'  => true,
+                            ],
+                            [
+                                'column' => 'f.object',
+                                'expr'   => 'eq',
+                                'value'  => 'lead',
+                            ],
                         ],
                     ],
                     'hydration_mode' => 'HYDRATE_ARRAY',
@@ -1732,6 +1734,11 @@ class LeadModel extends FormModel
                                 }
                             }
                             break;
+                        case 'multiselect':
+                            if (!is_array($fieldData[$leadField['alias']])) {
+                                $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
+                            }
+                            break;
                     }
                 } catch (\Exception $exception) {
                     // We tried; let the form handle the mal-formed data
@@ -1746,7 +1753,7 @@ class LeadModel extends FormModel
             }
         }
 
-        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
+        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false, 'allow_extra_fields' => true]);
 
         // Unset stage and owner from the form because it's already been handled
         unset($form['stage'], $form['owner'], $form['tags']);
@@ -1755,6 +1762,12 @@ class LeadModel extends FormModel
 
         if (!$form->isValid()) {
             $fieldErrors = [];
+            $formErrors  = $form->getErrors();
+            if (count($formErrors)) {
+                foreach ($formErrors as $error) {
+                    $fieldErrors[] = $error->getMessage();
+                }
+            }
             foreach ($form as $formField) {
                 $errors = $formField->getErrors(true);
                 if (count($errors)) {
@@ -1765,12 +1778,16 @@ class LeadModel extends FormModel
                     $fieldErrors[] = $errorString;
                 }
             }
+
             $fieldErrors = implode("\n", $fieldErrors);
             throw new \Exception($fieldErrors);
         } else {
             // All clear
             foreach ($fieldData as $field => $value) {
-                $lead->addUpdatedField($field, $value);
+                if (isset($form[$field])) {
+                    $value = $form[$field]->getData();
+                    $lead->addUpdatedField($field, $value);
+                }
             }
         }
 

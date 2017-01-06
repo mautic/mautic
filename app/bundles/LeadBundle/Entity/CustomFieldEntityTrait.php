@@ -115,6 +115,9 @@ trait CustomFieldEntityTrait
                 // Ensure value is null for consistency
                 $value = null;
             }
+        } elseif (is_array($value)) {
+            // Flatten the array
+            $value = implode('|', $value);
         }
 
         $this->addChange('fields', [$alias => [$oldValue, $value]]);
