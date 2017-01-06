@@ -118,7 +118,10 @@ class ApiMetadataDriver extends PhpDriver
      */
     public function createProperty($name)
     {
-        $this->properties[$name]   = new PropertyMetadata($this->metadata->name, $name);
+        if (!isset($this->properties[$name])) {
+            $this->properties[$name] = new PropertyMetadata($this->metadata->name, $name);
+        }
+
         $this->currentPropertyName = $name;
 
         return $this;

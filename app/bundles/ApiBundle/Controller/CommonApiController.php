@@ -15,7 +15,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
+use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
+use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -119,6 +121,20 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var array
      */
     protected $routeParams = [];
+
+    /**
+     * The level parent/children should stop loading if applicable.
+     *
+     * @var int
+     */
+    protected $parentChildrenLevelDepth = 3;
+
+    /**
+     * Custom JMS strategies to add to the view's context.
+     *
+     * @var array
+     */
+    protected $exclusionStrategies = [];
 
     /**
      * Initialize some variables.
@@ -597,10 +613,22 @@ class CommonApiController extends FOSRestController implements MauticController
             $context->setGroups($this->serializerGroups);
         }
 
-        //Only include FormEntity properties for the top level entity and not the associated entities
+        // Only include FormEntity properties for the top level entity and not the associated entities
         $context->addExclusionStrategy(
             new PublishDetailsExclusionStrategy()
         );
+
+        // Only include first level of children/parents
+        if ($this->parentChildrenLevelDepth) {
+            $context->addExclusionStrategy(
+                new ParentChildrenExclusionStrategy($this->parentChildrenLevelDepth)
+            );
+        }
+
+        // Add custom exclusion strategies
+        foreach ($this->exclusionStrategies as $strategy) {
+            $context->addExclusionStrategy($strategy);
+        }
 
         //include null values
         $context->setSerializeNull(true);
@@ -821,5 +849,13 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         throw new \InvalidArgumentException($containerKey.' is not a registered container key.');
+    }
+
+    /**
+     * @param ExclusionStrategyInterface $strategy
+     */
+    protected function addExclusionStrategy(ExclusionStrategyInterface $strategy)
+    {
+        $this->exclusionStrategies[] = $strategy;
     }
 }
