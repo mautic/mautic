@@ -108,6 +108,7 @@ class ApiSubscriber extends CommonSubscriber
         if ($this->isApiRequest($event) && strpos($content, 'error') !== false) {
             // Override api messages with something useful
             if ($data = json_decode($content, true)) {
+                $type = null;
                 if (isset($data['error'])) {
                     $error   = $data['error'];
                     $message = false;
@@ -123,12 +124,15 @@ class ApiSubscriber extends CommonSubscriber
                     switch ($error) {
                         case 'access_denied':
                             $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
+                            $type    = $error;
                             break;
                         default:
                             if (isset($data['error_description'])) {
                                 $message = $data['error_description'];
+                                $type    = $error;
                             } elseif ($this->translator->hasId('mautic.api.auth.error.'.$error)) {
                                 $message = $this->translator->trans('mautic.api.auth.error.'.$error);
+                                $type    = $error;
                             }
                     }
 
@@ -136,10 +140,16 @@ class ApiSubscriber extends CommonSubscriber
                         $event->setResponse(
                             new JsonResponse(
                                 [
-                                    'error' => [
-                                        'message' => $message,
-                                        'code'    => $event->getResponse()->getStatusCode(),
+                                    'errors' => [
+                                        [
+                                            'message' => $message,
+                                            'code'    => $response->getStatusCode(),
+                                            'type'    => $type,
+                                        ],
                                     ],
+                                    // @deprecated 2.6.0 to be removed in 3.0
+                                    'error'             => $data['error'],
+                                    'error_description' => $message.' (`error` and `error_description` are deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
                                 ]
                             )
                         );
