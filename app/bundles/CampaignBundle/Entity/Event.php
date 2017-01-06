@@ -220,7 +220,7 @@ class Event
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('campaign')
+        $metadata->setGroupPrefix('campaignEvent')
             ->addProperties(
                 [
                     'id',
@@ -240,7 +240,34 @@ class Event
                 ]
             )
             ->setMaxDepth(1, 'parent')
-            ->build();
+            ->setMaxDepth(1, 'children')
+
+            // Add standalone groups
+            ->setGroupPrefix('campaignEventStandalone')
+             ->addListProperties(
+                 [
+                     'id',
+                     'name',
+                     'description',
+                     'type',
+                     'eventType',
+                 ]
+             )
+             ->addProperties(
+                 [
+                     'campaign',
+                     'order',
+                     'properties',
+                     'triggerDate',
+                     'triggerInterval',
+                     'triggerIntervalUnit',
+                     'triggerMode',
+                     'children',
+                     'parent',
+                     'decisionPath',
+                 ]
+             )
+             ->build();
     }
 
     /**

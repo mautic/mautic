@@ -40,6 +40,16 @@ return [
                 'path'            => '/campaigns',
                 'controller'      => 'MauticCampaignBundle:Api\CampaignApi',
             ],
+            'mautic_api_campaigneventsstandard' => [
+                'standard_entity'     => true,
+                'supported_endpoints' => [
+                    'getone',
+                    'getall',
+                ],
+                'name'       => 'events',
+                'path'       => '/campaigns/events',
+                'controller' => 'MauticCampaignBundle:Api\EventApi',
+            ],
             'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',

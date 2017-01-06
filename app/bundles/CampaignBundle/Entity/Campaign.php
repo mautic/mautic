@@ -184,7 +184,6 @@ class Campaign extends FormEntity
                     'publishUp',
                     'publishDown',
                     'events',
-                    'leads', // @deprecated, will be renamed to 'contacts' in 3.0.0
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
                     'canvasSettings',
