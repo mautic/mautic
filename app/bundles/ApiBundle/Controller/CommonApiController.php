@@ -702,11 +702,20 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $view = $this->view(
             [
-                'error' => [
-                    'code'    => $code,
-                    'message' => $this->get('translator')->trans($msg, [], 'flashes'),
-                    'details' => $details,
+                'errors' => [
+                    [
+                        'message' => $this->get('translator')->trans($msg, [], 'flashes'),
+                        'code'    => $code,
+                        'type'    => null,
+                        'details' => $details,
+                    ],
                 ],
+                // @deprecated 2.6.0 to be removed in 3.0
+                'error' => [
+                    'message' => $this->get('translator')->trans($msg, [], 'flashes').' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',,
+                    'code'    => $code,
+                    'details' => $details,
+                ]
             ],
             $code
         );
