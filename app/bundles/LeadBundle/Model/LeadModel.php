@@ -1749,7 +1749,7 @@ class LeadModel extends FormModel
             } elseif ($leadField['defaultValue']) {
 
                 // Fill in the default value if any
-                $fieldData[$leadField['alias']] = $leadField['defaultValue'];
+                $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
         }
 
