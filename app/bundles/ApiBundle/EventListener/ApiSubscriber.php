@@ -17,6 +17,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -62,6 +64,7 @@ class ApiSubscriber extends CommonSubscriber
     {
         return [
             KernelEvents::REQUEST         => ['onKernelRequest', 255],
+            KernelEvents::RESPONSE        => ['onKernelResponse', 0],
             ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
             ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
         ];
@@ -78,13 +81,9 @@ class ApiSubscriber extends CommonSubscriber
             return;
         }
 
-        $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
-        $request    = $event->getRequest();
-        $requestUrl = $request->getRequestUri();
-
-        // Check if /oauth or /api
-        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
-        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
+        $apiEnabled   = $this->coreParametersHelper->getParameter('api_enabled');
+        $request      = $event->getRequest();
+        $isApiRequest = $this->isApiRequest($event);
 
         if ($isApiRequest && !$apiEnabled) {
             throw new AccessDeniedHttpException(
@@ -92,6 +91,27 @@ class ApiSubscriber extends CommonSubscriber
                     'mautic.core.url.error.401',
                     [
                         '%url%' => $request->getRequestUri(),
+                    ]
+                )
+            );
+        }
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     */
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        if ($this->isApiRequest($event) && 401 === $event->getResponse()->getStatusCode()) {
+            // Override the oauth2 message with something more generic since oauth2 may not be used
+
+            $event->setResponse(
+                new JsonResponse(
+                    [
+                        'error' => [
+                            'message' => $this->translator->trans('mautic.api.auth.error.accessdenied'),
+                            'code'    => $event->getResponse()->getStatusCode(),
+                        ],
                     ]
                 )
             );
@@ -136,5 +156,23 @@ class ApiSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param $event
+     *
+     * @return bool
+     */
+    private function isApiRequest($event)
+    {
+        $request    = $event->getRequest();
+        $requestUrl = $request->getRequestUri();
+
+        // Check if /oauth or /api
+        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
+
+        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
+
+        return $isApiRequest;
     }
 }
