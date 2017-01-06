@@ -675,6 +675,7 @@ class PageModel extends FormModel
                 // Tracking pixel is used
                 if ($request->server->get('QUERY_STRING')) {
                     parse_str($request->server->get('QUERY_STRING'), $query);
+                    $isPageEvent = true;
                 }
             } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
                 $query       = $request->request->all();
