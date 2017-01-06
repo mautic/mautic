@@ -60,12 +60,17 @@ class BuildJsSubscriber extends CommonSubscriber
             '',
             $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
-
+        $pageTrackingCORSUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_page_tracker_cors', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
         $contactIdUrl = $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
 (function(m, l, n, d) {
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
+    m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingCORSUrl}';
     m.fingerprint = null;
     m.fingerprintComponents = null;
 
@@ -89,6 +94,17 @@ class BuildJsSubscriber extends CommonSubscriber
         params.fingerprint = m.fingerprint;
     }
 
+    m.deliverPageEvent = function(event, params) {
+        MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
+        function(response) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
+        },
+        function() {
+            // CORS failed so load an image
+            m.buildTrackingImage(event, params);
+        });
+    }
+    
     m.buildTrackingImage = function(pageview, params) {
         m.addFingerprint(params);
         delete m.trackingPixel;
@@ -103,42 +119,73 @@ class BuildJsSubscriber extends CommonSubscriber
                 }
             }
         }
+        
+        m.trackingPixel.onload = function(e) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': pageview, 'params': params, 'image': true});
+        };
 
         m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
     }
 
+    m.fingerprintIsLoading = false;
+    m.pageViewCounter = 0;
     m.sendPageview = function(pageview) {
+        var queue = [];
 
         if (!pageview) {
             if (typeof m.getInput === 'function') {
-                var pageview = m.getInput('send', 'pageview');
+                queue = m.getInput('send', 'pageview');
             } else {
                 return false;
             }
+        } else {
+            queue.push(pageview);
         }
 
-        var params = {
-            page_title: d.title,
-            page_language: n.language,
-            page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
-            page_url: l.href
-        };
+        if (queue) {
+            for (var i in queue) {
+                var event = queue[i];
+                var params = {
+                    page_title: d.title,
+                    page_language: n.language,
+                    page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
+                    page_url: l.href,
+                    counter: m.pageViewCounter
+                };
 
-        // Merge user defined tracking pixel parameters.
-        if (typeof pageview[2] === 'object') {
-            for (var attr in pageview[2]) {
-                params[attr] = pageview[2][attr];
+                // Merge user defined tracking pixel parameters.
+                if (typeof event[2] === 'object') {
+                    for (var attr in event[2]) {
+                        params[attr] = event[2][attr];
+                    }
+                }
+
+                m.handleFingerprintInit(event, params);
+                
+                m.pageViewCounter++;
             }
         }
+    }
 
-        if (!m.fingerprint) {
+    m.handleFingerprintInit = function(event, params) {
+        if (!m.fingerprint && m.fingerprintIsLoading === false) {
+            m.fingerprintIsLoading = true;
             new Fingerprint2().get(function(result, components) {
+                m.fingerprintIsLoading = false;
                 m.fingerprint = result;
                 m.fingerprintComponents = components;
-                m.buildTrackingImage(pageview, params);
+                m.deliverPageEvent(event, params);
             });
+        } else if (m.fingerprintIsLoading === true) {
+            var fingerprintLoop;
+            fingerprintLoop = window.setInterval(function() {
+                if (m.fingerprintIsLoading === false) {
+                    m.deliverPageEvent(event, params);
+                    clearInterval(fingerprintLoop);
+                }
+            }, 5);
         } else {
-            m.buildTrackingImage(pageview, params);
+            m.deliverPageEvent(event, params);
         }
     }
 
@@ -149,24 +196,24 @@ class BuildJsSubscriber extends CommonSubscriber
     document.addEventListener('eventAddedToMauticQueue', function(e) {
         m.sendPageview(e.detail);
     });
-
 })(MauticJS, location, navigator, document);
 
 MauticJS.getTrackedContact = function () {
     var url = '$contactIdUrl';
     MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
         if (response.id) {
-            document.cookie = "mtc_id="+response.id+";";
+            MauticJS.setCookie('mtc_id', response.id);
         }
     });
 };
-
-MauticJS.pixelLoaded(MauticJS.getTrackedContact);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
+    /**
+     * @param BuildJsEvent $event
+     */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
         $formSubmitUrl   = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);

@@ -348,12 +348,26 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function trackingAction()
+    {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model = $this->getModel('page');
+        $model->hitPage(null, $this->request);
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+
+        return new JsonResponse(['success' => 1, 'id' => $leadModel->getCurrentLead()->getId()]);
     }
 
     /**

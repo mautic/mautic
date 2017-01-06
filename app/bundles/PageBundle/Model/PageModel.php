@@ -670,13 +670,22 @@ class PageModel extends FormModel
         } else {
             //use current URL
 
-            // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif') !== false) {
+            $isPageEvent = false;
+            if (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker')) !== false) {
+                // Tracking pixel is used
+                if ($request->server->get('QUERY_STRING')) {
+                    parse_str($request->server->get('QUERY_STRING'), $query);
+                }
+            } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
+                $query       = $request->request->all();
+                $isPageEvent = true;
+            }
+
+            if ($isPageEvent) {
                 $pageURL = $request->server->get('HTTP_REFERER');
 
                 // if additional data were sent with the tracking pixel
-                if ($request->server->get('QUERY_STRING')) {
-                    parse_str($request->server->get('QUERY_STRING'), $query);
+                if (isset($query)) {
 
                     // URL attr 'd' is encoded so let's decode it first.
                     $decoded = false;

@@ -30,6 +30,10 @@ return [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage',
             ],
+            'mautic_page_tracker_cors' => [
+                'path'       => '/mtc/event',
+                'controller' => 'MauticPageBundle:Public:tracking',
+            ],
             'mautic_page_tracker_getcontact' => [
                 'path'       => '/mtc',
                 'controller' => 'MauticPageBundle:Public:getContactId',
