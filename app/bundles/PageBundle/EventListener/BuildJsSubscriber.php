@@ -59,15 +59,15 @@ class BuildJsSubscriber extends CommonSubscriber
         // Determine if this is https
         $parts           = parse_url($pageTrackingUrl);
         $scheme          = $parts['scheme'];
-        $pageTrackingUrl = str_replace(['http://', 'https'], '', $pageTrackingUrl);
+        $pageTrackingUrl = str_replace(['http://', 'https://'], '', $pageTrackingUrl);
 
         $pageTrackingCORSUrl = str_replace(
-            ['http://', 'https'],
+            ['http://', 'https://'],
             '',
             $this->router->generate('mautic_page_tracker_cors', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
         $contactIdUrl = str_replace(
-            ['http://', 'https'],
+            ['http://', 'https://'],
             '',
             $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
