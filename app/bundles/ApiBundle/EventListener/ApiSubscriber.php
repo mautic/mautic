@@ -102,19 +102,50 @@ class ApiSubscriber extends CommonSubscriber
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if ($this->isApiRequest($event) && 401 === $event->getResponse()->getStatusCode()) {
-            // Override the oauth2 message with something more generic since oauth2 may not be used
+        $response = $event->getResponse();
+        $content  = $response->getContent();
 
-            $event->setResponse(
-                new JsonResponse(
-                    [
-                        'error' => [
-                            'message' => $this->translator->trans('mautic.api.auth.error.accessdenied'),
-                            'code'    => $event->getResponse()->getStatusCode(),
-                        ],
-                    ]
-                )
-            );
+        if ($this->isApiRequest($event) && strpos($content, 'error') !== false) {
+            // Override api messages with something useful
+            if ($data = json_decode($content, true)) {
+                if (isset($data['error'])) {
+                    $error   = $data['error'];
+                    $message = false;
+                    if (is_array($error)) {
+                        if (!isset($error['message'])) {
+                            return;
+                        }
+
+                        // Catch useless oauth1a errors
+                        $error = $error['message'];
+                    }
+
+                    switch ($error) {
+                        case 'access_denied':
+                            $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
+                            break;
+                        default:
+                            if (isset($data['error_description'])) {
+                                $message = $data['error_description'];
+                            } elseif ($this->translator->hasId('mautic.api.auth.error.'.$error)) {
+                                $message = $this->translator->trans('mautic.api.auth.error.'.$error);
+                            }
+                    }
+
+                    if ($message) {
+                        $event->setResponse(
+                            new JsonResponse(
+                                [
+                                    'error' => [
+                                        'message' => $message,
+                                        'code'    => $event->getResponse()->getStatusCode(),
+                                    ],
+                                ]
+                            )
+                        );
+                    }
+                }
+            }
         }
     }
 
