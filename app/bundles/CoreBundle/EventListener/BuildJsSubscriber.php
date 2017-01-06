@@ -110,19 +110,25 @@ MauticJS.createCORSRequest = function(method, url) {
     
     return xhr;
 };
-
+MauticJS.CORSRequestsAllowed = true;
 MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
     var xhr = MauticJS.createCORSRequest(method, url);
     var response;
     
-    callbackSuccess = callbackSuccess || function(response, xhr) { MauticJS.log(response); };
-    callbackError = callbackError || function(response, xhr) { MauticJS.log(response); };
+    callbackSuccess = callbackSuccess || function(response, xhr) { };
+    callbackError = callbackError || function(response, xhr) { };
 
     if (!xhr) {
         MauticJS.log('MauticJS.debug: Could not create an XMLHttpRequest instance.');
         return false;
     }
 
+    if (!MauticJS.CORSRequestsAllowed) {
+        callbackError({}, xhr);
+        
+        return false;
+    }
+    
     xhr.onreadystatechange = function (e) {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             response = MauticJS.parseTextToJSON(xhr.responseText);
@@ -131,6 +137,11 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
                 callbackSuccess(response, xhr);
             } else {
                 callbackError(response, xhr);
+               
+                if (xhr.status === XMLHttpRequest.UNSENT) {
+                    // Don't bother with further attempts
+                    MauticJS.CORSRequestsAllowed = false;
+                }
             }
         }
     };
