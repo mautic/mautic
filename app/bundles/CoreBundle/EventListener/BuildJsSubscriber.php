@@ -277,16 +277,16 @@ MauticJS.onFirstEventDelivery = function(f) {
 };
 
 document.addEventListener('mauticPageEventDelivered', function(e) {
-    for (var i in MauticJS.postEventDeliveryQueue) {
-        MauticJS.postEventDeliveryQueue[i](e.detail);
-        delete MauticJS.postEventDeliveryQueue[i];
-    }
-    
     var detail = e.detail;
     if (detail.image && !MauticJS.mtcSet) {
         MauticJS.getTrackedContact();
     } else if (detail.response && detail.response.id) {
         MauticJS.setTrackedContact(detail.response);
+    }
+    
+    for (var i in MauticJS.postEventDeliveryQueue) {
+        MauticJS.postEventDeliveryQueue[i](e.detail);
+        delete MauticJS.postEventDeliveryQueue[i];
     }
 });
 // @deprecated 2.6.0; to be removed in 3.0
