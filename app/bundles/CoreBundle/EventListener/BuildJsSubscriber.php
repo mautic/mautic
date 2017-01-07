@@ -113,10 +113,7 @@ MauticJS.createCORSRequest = function(method, url) {
 MauticJS.CORSRequestsAllowed = true;
 MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
     // Check for stored contact in localStorage
-    if (window.localStorage) {
-        data['mtc_id']  = localStorage.getItem('mtc_id');
-        data['mtc_sid'] = localStorage.getItem('mtc_sid');
-    }
+    data = MauticJS.appendTrackedContact(data);
     
     var query = MauticJS.serialize(data);
     if (method.toUpperCase() === 'GET') {
@@ -228,7 +225,24 @@ function s4() {
     .substring(1);
 }
 
+MauticJS.mtcSet = false;
+MauticJS.appendTrackedContact = function(data) {
+    if (window.localStorage && MauticJS.mtcSet) {
+        data['mtc_id']  = localStorage.getItem('mtc_id');
+        data['mtc_sid'] = localStorage.getItem('mtc_sid');                       
+    }
+    
+    return data;
+};
+
 MauticJS.getTrackedContact = function () {
+    // Check to ensure it's not already in local storage
+    if (window.localStorage) {
+        if (localStorage.getItem('mtc_id')) {
+            return;
+        }
+    }
+    
     MauticJS.makeCORSRequest('GET', MauticJS.contactIdUrl, {}, function(response, xhr) {
         MauticJS.setTrackedContact(response);
     });
@@ -254,7 +268,7 @@ MauticJS.postEventDeliveryQueue = []
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
-MauticJS.mtcSet = false;
+
 document.addEventListener('mauticPageEventDelivered', function(e) {
     for (var i in MauticJS.postEventDeliveryQueue) {
         MauticJS.postEventDeliveryQueue[i](e.detail);

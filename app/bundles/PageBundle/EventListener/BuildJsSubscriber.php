@@ -160,11 +160,8 @@ class BuildJsSubscriber extends CommonSubscriber
                     counter: m.pageViewCounter
                 };
                 
-                if (window.localStorage) {
-                    params['mtc_id']  = localStorage.getItem('mtc_id');
-                    params['mtc_sid'] = localStorage.getItem('mtc_sid');
-                }
-
+                params = MauticJS.appendTrackedContact(params);
+                
                 // Merge user defined tracking pixel parameters.
                 if (typeof event[2] === 'object') {
                     for (var attr in event[2]) {
