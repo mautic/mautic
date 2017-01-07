@@ -149,8 +149,9 @@ class BuildJsSubscriber extends CommonSubscriber
         }
 
         if (queue) {
-            for (var i in queue) {
+            for (var i=0; i<queue.length; i++) {
                 var event = queue[i];
+
                 var params = {
                     page_title: d.title,
                     page_language: n.language,
@@ -183,11 +184,10 @@ class BuildJsSubscriber extends CommonSubscriber
                 m.deliverPageEvent(event, params);
             });
         } else if (m.fingerprintIsLoading === true) {
-            var fingerprintLoop;
-            fingerprintLoop = window.setInterval(function() {
+            m.fingerprintLoop = window.setInterval(function() {
                 if (m.fingerprintIsLoading === false) {
                     m.deliverPageEvent(event, params);
-                    clearInterval(fingerprintLoop);
+                    clearInterval(m.fingerprintLoop);
                 }
             }, 5);
         } else {
