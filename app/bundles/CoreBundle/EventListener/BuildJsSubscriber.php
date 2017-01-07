@@ -236,11 +236,9 @@ MauticJS.appendTrackedContact = function(data) {
 };
 
 MauticJS.getTrackedContact = function () {
-    // Check to ensure it's not already in local storage
-    if (window.localStorage) {
-        if (localStorage.getItem('mtc_id')) {
-            return;
-        }
+    if (MauticJS.mtcSet) {
+        // Already set
+        return;
     }
     
     MauticJS.makeCORSRequest('GET', MauticJS.contactIdUrl, {}, function(response, xhr) {
@@ -264,7 +262,16 @@ MauticJS.setTrackedContact = function(response) {
 };
 
 // Register events that should happen after the first event is delivered
-MauticJS.postEventDeliveryQueue = []
+MauticJS.postEventDeliveryQueue = [
+    function() {
+        // Check if tracking info is already in localStorage
+        if (window.localStorage) {
+            if (localStorage.getItem('mtc_id')) {
+                MauticJS.mtcSet = true;
+            }
+        }
+    }
+];
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
@@ -276,12 +283,10 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
     }
     
     var detail = e.detail;
-    if (!MauticJS.mtcSet) {
-        if (detail.image) {
-            MauticJS.getTrackedContact();
-        } else if (detail.response && detail.response.id) {
-            MauticJS.setTrackedContact(detail.response);
-        }
+    if (detail.image && !MauticJS.mtcSet) {
+        MauticJS.getTrackedContact();
+    } else if (detail.response && detail.response.id) {
+        MauticJS.setTrackedContact(detail.response);
     }
 });
 // @deprecated 2.6.0; to be removed in 3.0
