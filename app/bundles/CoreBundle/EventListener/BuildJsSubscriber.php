@@ -227,9 +227,11 @@ function s4() {
 
 MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
-    if (window.localStorage && MauticJS.mtcSet) {
-        data['mtc_id']  = localStorage.getItem('mtc_id');
-        data['mtc_sid'] = localStorage.getItem('mtc_sid');                       
+    if (window.localStorage) {
+        if (mtcId  = localStorage.getItem('mtc_id')) {
+            data['mtc_id']  = mtcId;
+            data['mtc_sid'] = localStorage.getItem('mtc_sid');
+        }              
     }
     
     return data;
@@ -262,16 +264,7 @@ MauticJS.setTrackedContact = function(response) {
 };
 
 // Register events that should happen after the first event is delivered
-MauticJS.postEventDeliveryQueue = [
-    function() {
-        // Check if tracking info is already in localStorage
-        if (window.localStorage) {
-            if (localStorage.getItem('mtc_id')) {
-                MauticJS.mtcSet = true;
-            }
-        }
-    }
-];
+MauticJS.postEventDeliveryQueue = [];
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
