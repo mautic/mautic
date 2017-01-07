@@ -731,8 +731,14 @@ class LeadModel extends FormModel
         $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId} (".(int) $generated.')');
 
         if (empty($this->currentLead)) {
-            $leadId = $this->request->cookies->get($trackingId);
-            $ip     = $this->ipLookupHelper->getIpAddress();
+            $ip = $this->ipLookupHelper->getIpAddress();
+            if (!$leadId = $this->request->cookies->get($trackingId)) {
+                $leadId = ('GET' == $this->request->getMethod())
+                    ?
+                    $this->request->query->get('mtc_id')
+                    :
+                    $this->request->request->get('mtc_id');
+            }
 
             // if no trackingId cookie set the lead is not tracked yet so create a new one
             if (empty($leadId)) {
