@@ -145,7 +145,11 @@ class IpLookupHelper
                 $this->doNotTrackInternalIps = [];
             }
 
-            $doNotTrack = array_merge(['127.0.0.1', '::1'], $this->doNotTrackIps, $this->doNotTrackInternalIps);
+            $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
+            if ('prod' === MAUTIC_ENV) {
+                // Do not track internal IPs
+                $doNotTrack = array_merge($doNotTrack, ['127.0.0.1', '::1']);
+            }
             $ipAddress->setDoNotTrackList($doNotTrack);
 
             $details = $ipAddress->getIpDetails();

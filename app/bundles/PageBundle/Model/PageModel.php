@@ -450,6 +450,12 @@ class PageModel extends FormModel
         if (null == $lead) {
             $lead = $this->leadModel->getContactFromRequest($query);
         }
+
+        if ($lead && !$lead->getId()) {
+            // Lead came from a non-trackable IP so ignore
+            return;
+        }
+
         $this->leadModel->saveEntity($lead);
 
         // Set info from request

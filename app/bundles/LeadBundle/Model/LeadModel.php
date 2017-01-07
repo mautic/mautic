@@ -114,6 +114,11 @@ class LeadModel extends FormModel
     protected $formFactory;
 
     /**
+     * @var bool
+     */
+    protected $trackByIp = false;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack      $requestStack
@@ -126,6 +131,7 @@ class LeadModel extends FormModel
      * @param FormFactory       $formFactory
      * @param CompanyModel      $companyModel
      * @param CategoryModel     $categoryModel
+     * @param                   $trackByIp
      */
     public function __construct(
         RequestStack $requestStack,
@@ -137,7 +143,8 @@ class LeadModel extends FormModel
         ListModel $leadListModel,
         FormFactory $formFactory,
         CompanyModel $companyModel,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        $trackByIp
     ) {
         $this->request           = $requestStack->getCurrentRequest();
         $this->cookieHelper      = $cookieHelper;
@@ -149,6 +156,7 @@ class LeadModel extends FormModel
         $this->companyModel      = $companyModel;
         $this->formFactory       = $formFactory;
         $this->categoryModel     = $categoryModel;
+        $this->trackByIp         = $trackByIp;
     }
 
     /**
@@ -726,48 +734,42 @@ class LeadModel extends FormModel
             $leadId = $this->request->cookies->get($trackingId);
             $ip     = $this->ipLookupHelper->getIpAddress();
 
-            // if no trackingId cookkie set the lead is not tracked yet so create a new one
+            // if no trackingId cookie set the lead is not tracked yet so create a new one
             if (empty($leadId)) {
+                if (!$ip->isTrackable()) {
+                    // Don't save leads that are from a non-trackable IP by default
+                    $lead = $this->createNewContact($ip, false);
+                } else {
+                    $lead = null;
+                    if ($this->trackByIp) {
+                        // Try looking up the contact by it's IP address
+                        $leads = $this->getLeadsByIp($ip->getIpAddress());
 
-                //let's create a lead
-                $lead = new Lead();
-                $lead->addIpAddress($ip);
-                $lead->setNewlyCreated(true);
+                        if (count($leads)) {
+                            $lead = $leads[0];
+                            $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
+                        }
+                    }
 
-                // Set to prevent loops
-                $this->currentLead = $lead;
-
-                $this->saveEntity($lead, false);
-                $leadId = $lead->getId();
-                $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
-
-                $fields = $this->getLeadDetails($lead);
-                $lead->setFields($fields);
+                    if (!$lead) {
+                        //let's create a lead
+                        $lead = $this->createNewContact($ip);
+                    }
+                }
             } else {
                 $lead = $this->getEntity($leadId);
 
                 if ($lead === null) {
-                    //let's create a lead
-                    $lead = new Lead();
-                    $lead->addIpAddress($ip);
-                    $lead->setNewlyCreated(true);
-
-                    // Set to prevent loops
-                    $this->currentLead = $lead;
-
-                    $this->saveEntity($lead, false);
-                    $leadId = $lead->getId();
-
-                    $fields = $this->getLeadDetails($lead);
-                    $lead->setFields($fields);
-
-                    $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+                    $lead = $this->createNewContact($ip);
                 } else {
                     $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
                 }
             }
+
             $this->currentLead = $lead;
-            $this->setLeadCookie($leadId);
+            if ($leadId = $lead->getId()) {
+                $this->setLeadCookie($leadId);
+            }
         }
 
         // Log last active
@@ -803,6 +805,8 @@ class LeadModel extends FormModel
     public function getContactFromRequest($queryFields = [])
     {
         $lead = null;
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Check for a lead requested through clickthrough query parameter
         if (isset($queryFields['ct'])) {
@@ -866,7 +870,6 @@ class LeadModel extends FormModel
         }
 
         $leadIpAddresses = $lead->getIpAddresses();
-        $ipAddress       = $this->ipLookupHelper->getIpAddress();
         if (!$leadIpAddresses->contains($ipAddress)) {
             $lead->addIpAddress($ipAddress);
         }
@@ -910,23 +913,27 @@ class LeadModel extends FormModel
         // Set last active
         $this->currentLead->setLastActive(new \DateTime());
 
-        // Update tracking cookies if the lead is different
-        if ($oldLead && $oldLead->getId() != $lead->getId()) {
-            list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
-            $this->logger->addDebug("LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}");
+        if ($lead->getId()) {
+            // Update tracking cookies if the lead is different
+            if ($oldLead && $oldLead->getId() != $lead->getId()) {
+                list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
+                $this->logger->addDebug(
+                    "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
+                );
 
-            //set the tracking cookies
-            $this->setLeadCookie($lead->getId());
+                //set the tracking cookies
+                $this->setLeadCookie($lead->getId());
 
-            if ($oldTrackingId && $oldLead) {
-                if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
-                    $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
-                    $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                if ($oldTrackingId && $oldLead) {
+                    if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+                        $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
+                        $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                    }
                 }
+            } elseif (!$oldLead) {
+                // New lead, set the tracking cookie
+                $this->setLeadCookie($lead->getId(), true);
             }
-        } elseif (!$oldLead) {
-            // New lead, set the tracking cookie
-            $this->setLeadCookie($lead->getId(), true);
         }
     }
 
@@ -2453,5 +2460,34 @@ class LeadModel extends FormModel
         }
 
         return $success;
+    }
+
+    /**
+     * @param IpAddress $ip
+     * @param bool      $persist
+     *
+     * @return Lead
+     */
+    protected function createNewContact(IpAddress $ip, $persist = true)
+    {
+        //let's create a lead
+        $lead = new Lead();
+        $lead->addIpAddress($ip);
+        $lead->setNewlyCreated(true);
+
+        if ($persist) {
+            // Set to prevent loops
+            $this->currentLead = $lead;
+            $this->saveEntity($lead, false);
+
+            $fields = $this->getLeadDetails($lead);
+            $lead->setFields($fields);
+        }
+
+        if ($leadId = $lead->getId()) {
+            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+        }
+
+        return $lead;
     }
 }
