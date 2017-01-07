@@ -823,15 +823,16 @@ class LeadModel extends FormModel
         // First determine if this request is already tracked as a specific lead
         list($trackingId, $generated) = $this->getTrackingCookie();
 
-        if ($leadId = $this->request->cookies->get($trackingId, ('GET' == $this->request->getMethod())
-            ?
-            $this->request->query->get('mtc_id')
-            :
-            $this->request->request->get('mtc_id'))
-        ) {
-            if ($lead = $this->getEntity($leadId)) {
-                $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
-            }
+        if (!$leadId = $this->request->cookies->get($trackingId)) {
+            $leadId = ('GET' == $this->request->getMethod())
+                ?
+                $this->request->query->get('mtc_id')
+                :
+                $this->request->request->get('mtc_id');
+        }
+
+        if ($leadId && $lead = $this->getEntity($leadId)) {
+            $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
         }
 
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
@@ -1014,14 +1015,13 @@ class LeadModel extends FormModel
 
         if (empty($trackingId)) {
             //check for the tracking cookie or sid from query
-            $trackingId = $this->request->cookies->get(
-                'mautic_session_id',
-                ('GET' == $this->request->getMethod())
+            if (!$trackingId = $this->request->cookies->get('mautic_session_id')) {
+                $trackingId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_sid')
                     :
-                    $this->request->request->get('mtc_sid')
-            );
+                    $this->request->request->get('mtc_sid');
+            }
             $generated = false;
             if (empty($trackingId)) {
                 $trackingId = hash('sha1', uniqid(mt_rand()));

@@ -101,6 +101,15 @@ class BuildJsSubscriber extends CommonSubscriber
     }
 
     m.deliverPageEvent = function(event, params) {
+        if (!m.firstDeliveryMade && params['counter'] > 0) {
+            // Wait for the first delivery to complete so that the tracking information is set
+            setTimeout(function () {
+                m.deliverPageEvent(event, params);
+            }, 5);
+            
+            return;
+        }
+        
         MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
         function(response) {
             MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
@@ -108,6 +117,7 @@ class BuildJsSubscriber extends CommonSubscriber
         function() {
             // CORS failed so load an image
             m.buildTrackingImage(event, params);
+            m.firstDeliveryMade = true;
         });
     }
     
@@ -186,10 +196,10 @@ class BuildJsSubscriber extends CommonSubscriber
                 m.deliverPageEvent(event, params);
             });
         } else if (m.fingerprintIsLoading === true) {
-            m.fingerprintLoop = window.setInterval(function() {
+            var fingerprintLoop = window.setInterval(function() {
                 if (m.fingerprintIsLoading === false) {
                     m.deliverPageEvent(event, params);
-                    clearInterval(m.fingerprintLoop);
+                    clearInterval(fingerprintLoop);
                 }
             }, 5);
         } else {

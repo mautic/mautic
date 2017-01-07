@@ -265,10 +265,10 @@ MauticJS.setTrackedContact = function(response) {
 
 // Register events that should happen after the first event is delivered
 MauticJS.postEventDeliveryQueue = [];
+MauticJS.firstDeliveryMade      = false;
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
-
 document.addEventListener('mauticPageEventDelivered', function(e) {
     var detail = e.detail;
     if (detail.image && !MauticJS.mtcSet) {
@@ -277,11 +277,15 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
         MauticJS.setTrackedContact(detail.response);
     }
     
-    for (var i in MauticJS.postEventDeliveryQueue) {
-        MauticJS.postEventDeliveryQueue[i](e.detail);
-        delete MauticJS.postEventDeliveryQueue[i];
+    if (!MauticJS.firstDeliveryMade) {
+        MauticJS.firstDeliveryMade = true;
+        for (var i in MauticJS.postEventDeliveryQueue) {
+            MauticJS.postEventDeliveryQueue[i](e.detail);
+            delete MauticJS.postEventDeliveryQueue[i];
+        }
     }
 });
+
 // @deprecated 2.6.0; to be removed in 3.0
 MauticJS.pixelLoaded = function(f) {
     MauticJS.onFirstEventDelivery(f);
