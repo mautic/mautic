@@ -822,7 +822,8 @@ class LeadModel extends FormModel
 
         // First determine if this request is already tracked as a specific lead
         list($trackingId, $generated) = $this->getTrackingCookie();
-        if ($leadId = $this->request->cookies->get($trackingId)) {
+
+        if ($leadId = $this->request->cookies->get($trackingId, $this->request->get('mtc_id'))) {
             if ($lead = $this->getEntity($leadId)) {
                 $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
             }
@@ -1007,8 +1008,8 @@ class LeadModel extends FormModel
         }
 
         if (empty($trackingId)) {
-            //check for the tracking cookie
-            $trackingId = $this->request->cookies->get('mautic_session_id');
+            //check for the tracking cookie or sid from query
+            $trackingId = $this->request->cookies->get('mautic_session_id', $this->request->get('mtc_sid'));
             $generated  = false;
             if (empty($trackingId)) {
                 $trackingId = hash('sha1', uniqid(mt_rand()));

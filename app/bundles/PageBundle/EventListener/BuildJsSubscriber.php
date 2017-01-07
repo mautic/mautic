@@ -159,6 +159,11 @@ class BuildJsSubscriber extends CommonSubscriber
                     page_url: l.href,
                     counter: m.pageViewCounter
                 };
+                
+                if (window.localStorage) {
+                    params['mtc_id']  = localStorage.getItem('mtc_id');
+                    params['mtc_sid'] = localStorage.getItem('mtc_sid');
+                }
 
                 // Merge user defined tracking pixel parameters.
                 if (typeof event[2] === 'object') {
@@ -203,14 +208,6 @@ class BuildJsSubscriber extends CommonSubscriber
         m.sendPageview(e.detail);
     });
 })(MauticJS, location, navigator, document);
-
-MauticJS.getTrackedContact = function () {
-    MauticJS.makeCORSRequest('GET', MauticJS.contactIdUrl, {}, function(response, xhr) {
-        if (response.id) {
-            MauticJS.setCookie('mtc_id', response.id);
-        }
-    });
-};
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');

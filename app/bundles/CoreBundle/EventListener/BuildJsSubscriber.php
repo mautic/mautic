@@ -112,6 +112,18 @@ MauticJS.createCORSRequest = function(method, url) {
 };
 MauticJS.CORSRequestsAllowed = true;
 MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
+    // Check for stored contact in localStorage
+    if (window.localStorage) {
+        data['mtc_id']  = localStorage.getItem('mtc_id');
+        data['mtc_sid'] = localStorage.getItem('mtc_sid');
+    }
+    
+    var query = MauticJS.serialize(data);
+    if (method.toUpperCase() === 'GET') {
+        url = url + '?' + query;
+        var query = '';
+    }
+    
     var xhr = MauticJS.createCORSRequest(method, url);
     var response;
     
@@ -132,7 +144,6 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
     xhr.onreadystatechange = function (e) {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             response = MauticJS.parseTextToJSON(xhr.responseText);
-
             if (xhr.status === 200) {
                 callbackSuccess(response, xhr);
             } else {
@@ -152,7 +163,8 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
 
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.withCredentials = true;
-    xhr.send(MauticJS.serialize(data));
+ 
+    xhr.send(query);
 };
 
 MauticJS.parseTextToJSON = function(maybeJSON) {
@@ -216,6 +228,27 @@ function s4() {
     .substring(1);
 }
 
+MauticJS.getTrackedContact = function () {
+    MauticJS.makeCORSRequest('GET', MauticJS.contactIdUrl, {}, function(response, xhr) {
+        MauticJS.setTrackedContact(response);
+    });
+};
+
+MauticJS.setTrackedContact = function(response) {
+    if (response.id) {
+        MauticJS.setCookie('mtc_id', response.id);
+        MauticJS.setCookie('mtc_sid', response.sid);
+        MauticJS.mtcSet = true;
+            
+        // Set the id in local storage in case cookies are only allowed for sites visited and Mautic is on a different domain
+        // than the current page
+        if (window.localStorage) {
+            localStorage.setItem('mtc_id', response.id);
+            localStorage.setItem('mtc_sid', response.sid);
+        }
+    }
+};
+
 // Register events that should happen after the first event is delivered
 MauticJS.postEventDeliveryQueue = []
 MauticJS.onFirstEventDelivery = function(f) {
@@ -232,10 +265,8 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
     if (!MauticJS.mtcSet) {
         if (detail.image) {
             MauticJS.getTrackedContact();
-            MauticJS.mtcSet = true;
         } else if (detail.response && detail.response.id) {
-            MauticJS.setCookie('mtc_id', detail.response.id);
-            MauticJS.mtcSet = true;
+            MauticJS.setTrackedContact(detail.response);
         }
     }
 });
