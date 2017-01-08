@@ -32,7 +32,7 @@ trait LeadAccessTrait
         $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getEntity($leadId);
 
-        if ($lead === null) {
+        if ($lead === null || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
                 //set the return URL
                 $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);

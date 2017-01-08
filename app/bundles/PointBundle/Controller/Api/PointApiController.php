@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -26,18 +27,23 @@ class PointApiController extends CommonApiController
     use LeadAccessTrait;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * {@inheritdoc}
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('point');
         $this->leadModel        = $this->getModel('lead');
         $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
-        $this->permissionBase   = 'point:points';
         $this->serializerGroups = ['pointDetails', 'categoryList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**

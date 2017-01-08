@@ -27,13 +27,13 @@ class UserApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('user.user');
         $this->entityClass      = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
-        $this->permissionBase   = 'user:users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**

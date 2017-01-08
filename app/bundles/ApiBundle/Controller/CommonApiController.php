@@ -151,6 +151,10 @@ class CommonApiController extends FOSRestController implements MauticController
     public function initialize(FilterControllerEvent $event)
     {
         $this->security = $this->get('mautic.security');
+
+        if ($this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
+            $this->permissionBase = $this->model->getPermissionBase();
+        }
     }
 
     /**

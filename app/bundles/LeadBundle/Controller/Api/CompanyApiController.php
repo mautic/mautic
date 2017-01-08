@@ -31,12 +31,12 @@ class CompanyApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('lead.company');
         $this->entityClass     = Company::class;
         $this->entityNameOne   = 'company';
         $this->entityNameMulti = 'companies';
-        $this->permissionBase  = 'lead:leads';
+
+        parent::initialize($event);
     }
 
     /**

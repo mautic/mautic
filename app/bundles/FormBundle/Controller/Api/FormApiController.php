@@ -24,13 +24,13 @@ class FormApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('form');
         $this->entityClass      = 'Mautic\FormBundle\Entity\Form';
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
-        $this->permissionBase   = 'form:forms';
         $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**

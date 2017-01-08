@@ -27,13 +27,13 @@ class EmailApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('email');
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
-        $this->permissionBase   = 'email:emails';
         $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
+
+        parent::initialize($event);
     }
 
     /**

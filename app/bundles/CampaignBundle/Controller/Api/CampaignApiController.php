@@ -26,13 +26,13 @@ class CampaignApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('campaign');
         $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
         $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList'];
+
+        parent::initialize($event);
     }
 
     /**

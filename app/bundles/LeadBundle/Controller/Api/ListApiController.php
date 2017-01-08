@@ -27,13 +27,13 @@ class ListApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('lead.list');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\LeadList';
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
-        $this->permissionBase   = 'lead:lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress'];
+
+        parent::initialize($event);
     }
 
     /**

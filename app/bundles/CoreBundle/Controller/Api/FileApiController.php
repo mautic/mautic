@@ -33,10 +33,11 @@ class FileApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
         $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
+
+        parent::initialize($event);
     }
 
     /**

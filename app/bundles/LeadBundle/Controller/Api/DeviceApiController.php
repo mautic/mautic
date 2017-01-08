@@ -27,12 +27,12 @@ class DeviceApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('lead.device');
         $this->entityClass     = LeadDevice::class;
         $this->entityNameOne   = 'device';
         $this->entityNameMulti = 'devices';
-        $this->permissionBase  = 'lead:leads';
+
+        parent::initialize($event);
     }
 
     /**

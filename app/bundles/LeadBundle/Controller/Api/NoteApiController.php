@@ -27,13 +27,13 @@ class NoteApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('lead.note');
         $this->entityClass      = LeadNote::class;
         $this->entityNameOne    = 'note';
         $this->entityNameMulti  = 'notes';
-        $this->permissionBase   = 'lead:leads';
         $this->serializerGroups = ['leadNoteDetails', 'leadList'];
+
+        parent::initialize($event);
     }
 
     /**
