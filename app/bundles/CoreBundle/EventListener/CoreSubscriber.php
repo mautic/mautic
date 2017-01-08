@@ -303,6 +303,11 @@ class CoreSubscriber extends CommonSubscriber
                                 'method' => 'POST',
                                 'path'   => '/new',
                             ],
+                            'newbatch' => [
+                                'action' => 'newEntities',
+                                'method' => 'POST',
+                                'path'   => '/batch/new',
+                            ],
                             'editput' => [
                                 'action' => 'editEntity',
                                 'method' => 'PUT',
@@ -313,10 +318,20 @@ class CoreSubscriber extends CommonSubscriber
                                 'method' => 'PATCH',
                                 'path'   => '/{id}/edit',
                             ],
+                            'editbatch' => [
+                                'action' => 'editEntities',
+                                'method' => ['PUT', 'PATCH'],
+                                'path'   => '/batch/edit',
+                            ],
                             'delete' => [
                                 'action' => 'deleteEntity',
                                 'method' => 'DELETE',
                                 'path'   => '/{id}/delete',
+                            ],
+                            'deletebatch' => [
+                                'action' => 'deleteEntities',
+                                'method' => 'DELETE',
+                                'path'   => '/batch/delete',
                             ],
                         ];
 

@@ -62,10 +62,7 @@ class DynamicContentLeadData extends CommonEntity
 
         $builder->addDateAdded(true);
 
-        $builder->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead')
-            ->inversedBy('id')
-            ->addJoinColumn('lead_id', 'id')
-            ->build();
+        $builder->addLead();
 
         $builder->createManyToOne('dynamicContent', 'DynamicContent')
             ->inversedBy('id')

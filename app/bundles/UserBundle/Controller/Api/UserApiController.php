@@ -52,22 +52,6 @@ class UserApiController extends CommonApiController
     }
 
     /**
-     * Deletes a user.
-     *
-     * @param int $id User ID
-     *
-     * @return Response
-     */
-    public function deleteEntityAction($id)
-    {
-        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
-            return $this->accessDenied();
-        }
-
-        return parent::deleteEntityAction($id);
-    }
-
-    /**
      * Creates a new user.
      */
     public function newEntityAction()
@@ -147,6 +131,25 @@ class UserApiController extends CommonApiController
         }
 
         return $this->processForm($entity, $parameters, $method);
+    }
+
+    public function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        switch ($action) {
+            case 'new':
+                $submittedPassword = null;
+                if (isset($parameters['plainPassword'])) {
+                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                        $submittedPassword = $parameters['plainPassword']['password'];
+                    } else {
+                        $submittedPassword = $parameters['plainPassword'];
+                    }
+                }
+
+                $encoder = $this->get('security.encoder_factory')->getEncoder($entity);
+                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
+                break;
+        }
     }
 
     /**

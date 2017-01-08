@@ -28,6 +28,9 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
+    /**
+     * @param FilterControllerEvent $event
+     */
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);

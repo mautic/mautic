@@ -53,7 +53,6 @@ class TriggerApiController extends CommonApiController
             $this->model->getRepository()->saveEntity($entity);
         }
 
-        $triggerId         = $entity->getId();
         $requestTriggerIds = [];
         $currentEvents     = $entity->getEvents();
 
