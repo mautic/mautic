@@ -36,6 +36,17 @@ class EventApiController extends CommonApiController
         $this->addExclusionStrategy(new FieldExclusionStrategy(['campaign'], 1));
     }
 
+    public function getContactEventsAction($contactId, $campaignId = null)
+    {
+        //campaigns/{campaignId}/events/contact/{contactId}
+        //campaigns/events/contact/{contactId}
+    }
+
+    public function editContactEventAction($id, $contactId)
+    {
+        //campaigns/events/contact/{contactId}/event/{eventId}/edit
+    }
+
     /**
      * @param Event  $entity
      * @param string $action
