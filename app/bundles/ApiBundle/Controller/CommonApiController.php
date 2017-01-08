@@ -213,6 +213,19 @@ class CommonApiController extends FOSRestController implements MauticController
         $publishedOnly = $this->request->get('published', 0);
         $minimal       = $this->request->get('minimal', 0);
 
+        if (!$this->security->isGranted($this->permissionBase.':view')) {
+            return $this->accessDenied();
+        }
+
+        if ($this->security->checkPermissionExists($this->permissionBase.':viewother') &&
+            !$this->security->isGranted($this->permissionBase.':viewother')) {
+            $this->listFilters = [
+                'column' => $tableAlias.'.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
+            ];
+        }
+
         if ($publishedOnly) {
             $this->listFilters[] = [
                 'column' => $tableAlias.'.isPublished',
@@ -756,7 +769,9 @@ class CommonApiController extends FOSRestController implements MauticController
             $ownPerm   = "{$this->permissionBase}:{$action}own";
             $otherPerm = "{$this->permissionBase}:{$action}other";
 
-            return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
+            $owner = (method_exists('getPermissionUser')) ? $entity->getPermissionUser() : $entity->getCreatedBy();
+
+            return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);
         }
 
         return $this->security->isGranted("{$this->permissionBase}:{$action}");

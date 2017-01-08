@@ -14,6 +14,8 @@ namespace Mautic\EmailBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -21,6 +23,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class EmailApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
@@ -39,15 +43,6 @@ class EmailApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->security->isGranted('email:emails:viewother')) {
-            $this->listFilters[] =
-                [
-                    'column' => 'e.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->user->getId(),
-                ];
-        }
-
         //get parent level only
         $this->listFilters[] = [
             'column' => 'e.variantParent',
@@ -112,13 +107,9 @@ class EmailApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
-
-            if ($lead == null) {
-                return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $lead->getOwner())) {
-                return $this->accessDenied();
+            $lead = $this->checkLeadAccess($leadId, 'edit');
+            if ($lead instanceof Response) {
+                return $lead;
             }
 
             $post   = $this->request->request->all();
@@ -131,7 +122,7 @@ class EmailApiController extends CommonApiController
                 $tokens
             );
 
-            $leadFields = array_merge(['id' => $leadId], $leadModel->flattenFields($lead->getFields()));
+            $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
 
             if ($this->get('mautic.helper.mailer')->applyFrequencyRules($lead)) {
                 $this->model->sendEmail(

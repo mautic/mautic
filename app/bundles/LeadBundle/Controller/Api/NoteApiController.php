@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -46,7 +47,7 @@ class NoteApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         if (!empty($parameters['lead'])) {
-            $lead = $this->checkLeadAccess($parameters['lead'], 'view');
+            $lead = $this->checkLeadAccess($parameters['lead'], $action);
 
             if ($lead instanceof Response) {
                 return $lead;

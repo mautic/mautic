@@ -52,7 +52,7 @@ class DeviceApiController extends CommonApiController
             $lead = $parameters['contact'];
         }
         if ($lead) {
-            $lead = $this->checkLeadAccess($lead, 'view');
+            $lead = $this->checkLeadAccess($lead, $action);
 
             if ($lead instanceof Response) {
                 return $lead;

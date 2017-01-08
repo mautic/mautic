@@ -35,24 +35,6 @@ class ReportApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of reports.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction()
-    {
-        if (!$this->security->isGranted('report:reports:viewother')) {
-            $this->listFilters = [
-                'column' => 'r.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
-        return parent::getEntitiesAction();
-    }
-
-    /**
      * Obtains a compiled report.
      *
      * @param int $id Report ID

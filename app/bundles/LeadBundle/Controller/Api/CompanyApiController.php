@@ -13,8 +13,10 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -22,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class CompanyApiController extends CommonApiController
 {
-    use CustomFieldsApiControllerTrait;
+    use CustomFieldsApiControllerTrait, LeadAccessTrait;
 
     /**
      * @param FilterControllerEvent $event
@@ -90,14 +92,9 @@ class CompanyApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $contactModel = $this->getModel('lead');
-        $contact      = $contactModel->getEntity($contactId);
-
-        // Does the contact exist and the user has permission to edit
-        if ($contact === null) {
-            return $this->notFound();
-        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-            return $this->accessDenied();
+        $contact = $this->checkLeadAccess($contactId, 'edit');
+        if ($contact instanceof Response) {
+            return $contact;
         }
 
         $this->model->addLeadToCompany($company, $contact);

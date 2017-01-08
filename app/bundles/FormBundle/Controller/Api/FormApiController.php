@@ -34,24 +34,6 @@ class FormApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of forms.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction()
-    {
-        if (!$this->security->isGranted('form:forms:viewother')) {
-            $this->listFilters = [
-                'column' => 'f.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
-        return parent::getEntitiesAction();
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function preSerializeEntity(&$entity, $action = 'view')

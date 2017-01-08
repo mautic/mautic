@@ -14,6 +14,8 @@ namespace Mautic\PointBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -21,6 +23,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class PointApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -62,14 +66,9 @@ class PointApiController extends CommonApiController
      */
     public function adjustPointsAction($leadId, $operator, $delta)
     {
-        $lead = $this->leadModel->getEntity($leadId);
-
-        if ($lead === null) {
-            return $this->notFound();
-        }
-
-        if (!$this->checkEntityAccess($lead, 'edit')) {
-            return $this->accessDenied();
+        $lead = $this->checkLeadAccess($leadId, 'edit');
+        if ($lead instanceof Response) {
+            return $lead;
         }
 
         try {

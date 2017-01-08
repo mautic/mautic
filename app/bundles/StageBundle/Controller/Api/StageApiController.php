@@ -13,6 +13,8 @@ namespace Mautic\StageBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -20,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class StageApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -52,11 +56,9 @@ class StageApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $leadModel = $this->getModel('lead');
-        $contact   = $leadModel->getEntity($contactId);
-
-        if ($contact == null) {
-            return $this->notFound();
+        $contact = $this->checkLeadAccess($contactId, 'edit');
+        if ($contact instanceof Response) {
+            return $contact;
         }
 
         // Does the lead exist and the user has permission to edit
@@ -67,7 +69,7 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel->addToStages($contact, $stage);
+        $this->getMode('lead')->addToStages($contact, $stage);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
