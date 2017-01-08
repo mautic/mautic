@@ -459,7 +459,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function deleteEntitiesAction()
     {
-        $parameters = $this->request->request->all();
+        $parameters = $this->request->query->all();
 
         if (count($parameters) > 200) {
             return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
@@ -1117,14 +1117,20 @@ class CommonApiController extends FOSRestController implements MauticController
     protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false)
     {
         $ids = [];
-        foreach ($parameters as $key => $params) {
-            if (is_array($params) && !isset($params['id'])) {
-                $this->setBatchError($key, 'mautic.api.call.id_missing', Codes::HTTP_BAD_REQUEST, $errors);
-                continue;
+        if (isset($parameters['ids'])) {
+            foreach ($parameters['ids'] as $key => $id) {
+                $ids[(int) $id] = $key;
             }
+        } else {
+            foreach ($parameters as $key => $params) {
+                if (is_array($params) && !isset($params['id'])) {
+                    $this->setBatchError($key, 'mautic.api.call.id_missing', Codes::HTTP_BAD_REQUEST, $errors);
+                    continue;
+                }
 
-            $id       = (is_array($params)) ? (int) $params['id'] : (int) $params;
-            $ids[$id] = $key;
+                $id       = (is_array($params)) ? (int) $params['id'] : (int) $params;
+                $ids[$id] = $key;
+            }
         }
         $return = [];
         if (!empty($ids)) {
