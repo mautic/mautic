@@ -60,6 +60,11 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:editContactEvent',
                 'method'     => 'PUT',
             ],
+            'mautic_api_campaigns_batchedit_events' => [
+                'path'       => '/campaigns/events/batch/edit',
+                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editEventsEvents',
+                'method'     => 'PUT',
+            ],
             'mautic_api_campaign_contact_events' => [
                 'path'       => '/campaigns/{campaignId}/contact/{contactId}/events',
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',

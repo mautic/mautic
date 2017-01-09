@@ -1163,13 +1163,16 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
-     * @param      $parameters
-     * @param      $errors
-     * @param bool $prepareForSerialization
+     * @param        $parameters
+     * @param        $errors
+     * @param bool   $prepareForSerialization
+     * @param string $requestIdColumn
+     * @param null   $model
+     * @param bool   $returnWithOriginalKey
      *
-     * @return array
+     * @return array|mixed
      */
-    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false)
+    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
     {
         $ids = [];
         if (isset($parameters['ids'])) {
@@ -1178,23 +1181,24 @@ class CommonApiController extends FOSRestController implements MauticController
             }
         } else {
             foreach ($parameters as $key => $params) {
-                if (is_array($params) && !isset($params['id'])) {
+                if (is_array($params) && !isset($params[$requestIdColumn])) {
                     $this->setBatchError($key, 'mautic.api.call.id_missing', Codes::HTTP_BAD_REQUEST, $errors);
                     continue;
                 }
 
-                $id       = (is_array($params)) ? (int) $params['id'] : (int) $params;
+                $id       = (is_array($params)) ? (int) $params[$requestIdColumn] : (int) $params;
                 $ids[$id] = $key;
             }
         }
         $return = [];
         if (!empty($ids)) {
-            $entities = $this->model->getEntities(
+            $model    = ($model) ? $model : $this->model;
+            $entities = $model->getEntities(
                 [
                     'filter' => [
                         'force' => [
                             [
-                                'column' => $this->model->getRepository()->getTableAlias().'.id',
+                                'column' => $model->getRepository()->getTableAlias().'.id',
                                 'expr'   => 'in',
                                 'value'  => array_keys($ids),
                             ],
@@ -1210,9 +1214,13 @@ class CommonApiController extends FOSRestController implements MauticController
                 :
                 $this->prepareEntityResultsToArray($entities);
 
-            // Ensure same keys as params
             foreach ($entities as $entity) {
-                $return[$ids[$entity->getId()]] = $entity;
+                if ($returnWithOriginalKeys) {
+                    // Ensure same keys as params
+                    $return[$ids[$entity->getId()]] = $entity;
+                } else {
+                    $return[$entity->getId()] = $entity;
+                }
             }
         }
 

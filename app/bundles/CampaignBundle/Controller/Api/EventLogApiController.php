@@ -162,6 +162,73 @@ class EventLogApiController extends CommonApiController
     }
 
     /**
+     * @return array|Response
+     */
+    public function editEventsAction()
+    {
+        $parameters = $this->request->request->all();
+
+        if (count($parameters) > 200) {
+            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
+        }
+
+        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
+        $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->getModel('lead'), false);
+
+        $this->inBatchMode = true;
+        $errors            = [];
+        foreach ($parameters as $key => $params) {
+            if (!isset($params['eventId']) || !isset($params['contactId']) || !isset($events[$params['eventId']]) || !isset($contacts[$params['contactId']])) {
+                $errors[$key] = $this->notFound();
+
+                continue;
+            }
+
+            $event = $events[$params['eventId']];
+
+            // Ensure contact exists and user has access
+            $contact = $this->checkLeadAccess($contacts[$params['contactId']], 'edit');
+            if ($contact instanceof Response) {
+                $errors[$key] = $contact->getContent();
+
+                continue;
+            }
+
+            // Ensure campaign edit access
+            $campaign = $event->getCampaign();
+            if (!$this->checkEntityAccess($campaign, 'edit')) {
+                $errors[$key] = $this->accessDenied();
+
+                continue;
+            }
+
+            $result = $this->model->updateContactEvent($event, $contact, $params);
+
+            if (is_string($result)) {
+                $errors[$key] = $this->returnError($result, Codes::HTTP_CONFLICT);
+            } else {
+                list($log, $created) = $result;
+            }
+
+            $event->addContactLog($log);
+        }
+
+        $payload = [
+            $this->entityNameMulti => $events,
+        ];
+
+        if (!empty($errors)) {
+            $payload['errors'] = $errors;
+        }
+
+        $view                     = $this->view($payload, Codes::HTTP_OK);
+        $this->serializerGroups[] = 'campaignEventWithLogsList';
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    /**
      * @param null  $data
      * @param null  $statusCode
      * @param array $headers

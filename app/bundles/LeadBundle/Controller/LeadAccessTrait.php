@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class LeadAccessTrait.
  */
@@ -19,7 +21,7 @@ trait LeadAccessTrait
     /**
      * Determines if the user has access to the lead the note is for.
      *
-     * @param $leadId
+     * @param $lead
      * @param $action
      * @param bool   $isPlugin
      * @param string $intgegration
@@ -28,9 +30,14 @@ trait LeadAccessTrait
      */
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
-        //make sure the user has view access to this lead
-        $leadModel = $this->getModel('lead');
-        $lead      = $leadModel->getEntity($leadId);
+        if (!$leadId instanceof Lead) {
+            //make sure the user has view access to this lead
+            $leadModel = $this->getModel('lead');
+            $lead      = $leadModel->getEntity((int) $leadId);
+        } else {
+            $lead   = $leadId;
+            $leadId = $lead->getId();
+        }
 
         if ($lead === null || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
