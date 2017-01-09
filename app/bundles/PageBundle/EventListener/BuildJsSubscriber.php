@@ -98,6 +98,8 @@ class BuildJsSubscriber extends CommonSubscriber
             }
         }
         params.fingerprint = m.fingerprint;
+        
+        return params;
     }
 
     m.deliverPageEvent = function(event, params) {
@@ -108,6 +110,10 @@ class BuildJsSubscriber extends CommonSubscriber
             }, 5);
             
             return;
+        }
+        
+        if (m.fingerprintComponents) {
+            params = m.addFingerprint(params);
         }
         
         MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
@@ -122,7 +128,6 @@ class BuildJsSubscriber extends CommonSubscriber
     }
     
     m.buildTrackingImage = function(pageview, params) {
-        m.addFingerprint(params);
         delete m.trackingPixel;
         m.trackingPixel = new Image();
 
