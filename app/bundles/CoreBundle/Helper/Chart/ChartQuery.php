@@ -105,8 +105,7 @@ class ChartQuery extends AbstractChart
                     }
                 } else {
                     if (is_array($value)) {
-                        $query->andWhere('t.'.$column.' IN(:'.$valId.')');
-                        $query->setParameter($valId, implode(',', $value));
+                        $query->andWhere($query->expr()->in('t.'.$column, $value));
                     } else {
                         $query->andWhere('t.'.$column.' = :'.$valId);
                         $query->setParameter($valId, $value);
