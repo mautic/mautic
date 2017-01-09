@@ -79,7 +79,8 @@ class BuildJsSubscriber extends CommonSubscriber
     m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
     m.fingerprint = null;
     m.fingerprintComponents = null;
-
+    m.fingerprintIsLoading = false;
+    
     m.addFingerprint = function(params) {
         for (var componentId in m.fingerprintComponents) {
             var component = m.fingerprintComponents[componentId];
@@ -148,7 +149,6 @@ class BuildJsSubscriber extends CommonSubscriber
         m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
     }
 
-    m.fingerprintIsLoading = false;
     m.pageViewCounter = 0;
     m.sendPageview = function(pageview) {
         var queue = [];
@@ -192,7 +192,10 @@ class BuildJsSubscriber extends CommonSubscriber
     }
 
     m.handleFingerprintInit = function(event, params) {
-        if (!m.fingerprint && m.fingerprintIsLoading === false) {
+        if (m.fingerprintComponents) {
+            // Already loaded
+            m.deliverPageEvent(event, params);
+        } else if (!m.fingerprint && m.fingerprintIsLoading === false) {
             m.fingerprintIsLoading = true;
             new Fingerprint2().get(function(result, components) {
                 m.fingerprintIsLoading = false;
