@@ -58,7 +58,7 @@ class PublicController extends CommonController
             $focus = $model->getEntity($id);
 
             if ($focus && $focus->isPublished()) {
-                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request);
+                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $this->getModel('lead')->getCurrentLead());
             }
         }
 
