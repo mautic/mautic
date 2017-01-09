@@ -208,9 +208,11 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Obtains a list of entities as defined by the API URL.
      *
+     * @param array $args
+     *
      * @return Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction($args = [])
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
@@ -221,8 +223,9 @@ class CommonApiController extends FOSRestController implements MauticController
             return $this->accessDenied();
         }
 
-        if ($this->security->checkPermissionExists($this->permissionBase.':viewother') &&
-            !$this->security->isGranted($this->permissionBase.':viewother')) {
+        if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
+            && !$this->security->isGranted($this->permissionBase.':viewother')
+        ) {
             $this->listFilters = [
                 'column' => $tableAlias.'.createdBy',
                 'expr'   => 'eq',
@@ -244,17 +247,20 @@ class CommonApiController extends FOSRestController implements MauticController
             }
         }
 
-        $args = [
-            'start'  => $this->request->query->get('start', 0),
-            'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
-            'filter' => [
-                'string' => $this->request->query->get('search', ''),
-                'force'  => $this->listFilters,
+        $args = array_merge(
+            [
+                'start'  => $this->request->query->get('start', 0),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'filter' => [
+                    'string' => $this->request->query->get('search', ''),
+                    'force'  => $this->listFilters,
+                ],
+                'orderBy'        => $this->request->query->get('orderBy', ''),
+                'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
+                'withTotalCount' => true, //for repositories that break free of Paginator
             ],
-            'orderBy'        => $this->request->query->get('orderBy', ''),
-            'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
-            'withTotalCount' => true, //for repositories that break free of Paginator
-        ];
+            $args
+        );
         $results = $this->model->getEntities($args);
 
         list($entities, $totalCount) = $this->prepareEntitiesForView($results);
@@ -551,6 +557,25 @@ class CommonApiController extends FOSRestController implements MauticController
             // Bug reported https://github.com/symfony/symfony/issues/19788
             $defaultProperties = $this->getEntityDefaultProperties($entity);
             $parameters        = array_merge($defaultProperties, $parameters);
+        }
+
+        // Check if user has access to publish
+        if (
+            (
+                array_key_exists('isPublished', $parameters) ||
+                array_key_exists('publishUp', $parameters) ||
+                array_key_exists('publishDown', $parameters)
+            ) &&
+            $this->security->checkPermissionExists($this->permissionBase.':publish')) {
+            if ($this->security->checkPermissionExists($this->permissionBase.':publishown')) {
+                if (!$this->checkEntityAccess($entity, 'publish')) {
+                    if ('new' === $action) {
+                        $parameters['isPublished'] = 0;
+                    } else {
+                        unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
+                    }
+                }
+            }
         }
 
         $form         = $this->createEntityForm($entity);

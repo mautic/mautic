@@ -31,12 +31,19 @@ class StatsApiController extends CommonApiController
     public function listAction($table = null)
     {
         $response = [];
-        $where    = InputHelper::clean($this->request->query->get('where', []));
-        $order    = InputHelper::clean($this->request->query->get('order', []));
+        $where    = InputHelper::cleanArray($this->request->query->get('where', []));
+        $order    = InputHelper::cleanArray($this->request->query->get('order', []));
         $start    = (int) $this->request->query->get('start', 0);
         $limit    = (int) $this->request->query->get('limit', 100);
 
-        $event = new StatsEvent($table, $start, $limit, $order, $where);
+        // Ensure internal flag is not spoofed
+        foreach ($where as $key => $statement) {
+            if (isset($statement['internal'])) {
+                unset($where[$key]);
+            }
+        }
+
+        $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
         $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
 
         // Return available tables if no result was set

@@ -148,17 +148,22 @@ class CommonRepository extends EntityRepository
      * @param array $order
      * @param array $where
      * @param array $select
+     * @param array $allowedJoins
      *
      * @return array
      */
-    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null)
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null, array $allowedJoins = [])
     {
-        $alias = $this->getTableAlias();
-        $table = $this->getClassMetadata()->getTableName();
-        $q     = $this->_em->getConnection()->createQueryBuilder();
+        $alias    = $this->getTableAlias();
+        $metadata = $this->getClassMetadata();
+        $table    = $metadata->getTableName();
+        $q        = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(*)')
           ->from($table, $alias);
+
+        // Join associations for permission filtering
+        $this->buildDbalJoinsFromAssociations($q, $metadata->getAssociationMappings(), $alias, $allowedJoins);
 
         $this->buildDbalWhere($q, $where);
 
@@ -206,6 +211,12 @@ class CommonRepository extends EntityRepository
 
         if ($args && is_array($args)) {
             foreach ($args as $argument) {
+                if (!empty($argument['internal']) && 'formula' === $argument['expr']) {
+                    $query->andWhere(array_key_exists('value', $argument) ? $argument['value'] : $argument['val']);
+
+                    continue;
+                }
+
                 $argument = $this->validateDbalWhereArray($argument);
                 if (method_exists($query->expr(), $argument['expr'])) {
                     if (in_array($argument['expr'], $columnValue)) {
@@ -255,16 +266,21 @@ class CommonRepository extends EntityRepository
             throw new \InvalidArgumentException(sprintf($msg, 'expr'));
         }
 
-        if (empty($args['col'])) {
+        if (empty($args['col']) && empty($args['column'])) {
             throw new \InvalidArgumentException(sprintf($msg, 'col'));
         }
 
-        if (!isset($args['val'])) {
+        if (!array_key_exists('val', $args) && !array_key_exists('value', $args)) {
             $args['val'] = '';
         }
 
         $args['expr'] = $this->sanitize($args['expr']);
-        $args['col']  = $this->sanitize($args['col'], ['_']);
+        $args['col']  = $this->sanitize((isset($args['column']) ? $args['column'] : $args['col']), ['_']);
+        if (isset($args['value'])) {
+            $args['val'] = $args['value'];
+        }
+        unset($args['value'], $args['column']);
+
         // Value will be santitized by Doctrine
 
         return $args;
@@ -1366,5 +1382,48 @@ class CommonRepository extends EntityRepository
         }
 
         return $entity;
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                   $associations
+     * @param                                   $alias
+     * @param array                             $allowed
+     */
+    protected function buildDbalJoinsFromAssociations(\Doctrine\DBAL\Query\QueryBuilder $q, $associations, $alias, array $allowed)
+    {
+        $joinAdded = false;
+        foreach ($associations as $property => $association) {
+            $subJoinAdded  = false;
+            $targetMetdata = $this->_em->getRepository($association['targetEntity'])->getClassMetadata();
+            if ($propertyAllowedJoins = preg_grep('/^'.$property.'\..*/', $allowed)) {
+                foreach ($propertyAllowedJoins as $key => $join) {
+                    $propertyAllowedJoins[$key] = str_replace($property.'.', '', $join);
+                }
+
+                $subJoinAdded = $this->buildDbalJoinsFromAssociations($q, $targetMetdata->getAssociationMappings(), $property, $propertyAllowedJoins);
+            }
+
+            if ($subJoinAdded || in_array($property, $allowed)) {
+                // Unset the property so that it's not used again in other the next level
+                unset($allowed[$property]);
+                $targetTable = $targetMetdata->getTableName();
+                $hasNullable = false;
+                $joinColumns = [];
+                foreach ($association['joinColumns'] as $join) {
+                    if (!empty($join['nullable'])) {
+                        $hasNullable = true;
+                    }
+
+                    $joinColumns[] = $alias.'.'.$join['name'].' = '.$property.'.'.$join['referencedColumnName'];
+                }
+
+                $joinType = ($hasNullable) ? 'leftJoin' : 'join';
+                $q->$joinType($alias, $targetTable, $property, implode(' AND ', $joinColumns));
+                $joinAdded = true;
+            }
+        }
+
+        return $joinAdded;
     }
 }

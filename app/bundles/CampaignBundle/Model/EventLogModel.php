@@ -23,7 +23,7 @@ class EventLogModel extends AbstractCommonModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\CampaignBundle\Entity\EventRepository
+     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
      */
     public function getRepository()
     {
@@ -38,5 +38,12 @@ class EventLogModel extends AbstractCommonModel
     public function getPermissionBase()
     {
         return 'campaign:campaigns';
+    }
+
+    /**
+     * @param array $args
+     */
+    public function getEntities($args = [])
+    {
     }
 }

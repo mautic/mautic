@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -91,6 +92,11 @@ class StatsEvent extends Event
     protected $repository;
 
     /**
+     * @var User
+     */
+    protected $user;
+
+    /**
      * StatsEvent constructor.
      *
      * @param       $table
@@ -98,14 +104,16 @@ class StatsEvent extends Event
      * @param int   $limit
      * @param array $order
      * @param array $where
+     * @param User  $user
      */
-    public function __construct($table, $start = 0, $limit = 100, array $order = [], array $where = [])
+    public function __construct($table, $start, $limit, array $order, array $where, User $user)
     {
         $this->table = strtolower(trim(strip_tags($table)));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
         $this->order = $order;
         $this->where = $where;
+        $this->user  = $user;
     }
 
     /**
@@ -117,7 +125,7 @@ class StatsEvent extends Event
      */
     public function isLookingForTable($table)
     {
-        $this->tables[] = $table;
+        $this->tables[] = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
 
         $testTable = $this->table;
         if ($testTable && MAUTIC_TABLE_PREFIX && strpos($testTable, MAUTIC_TABLE_PREFIX) !== 0) {
@@ -131,10 +139,11 @@ class StatsEvent extends Event
      * Set the source repository to fetch the results from.
      *
      * @param CommonRepository $repository
+     * @param array            $permissions
      *
      * @return string
      */
-    public function setRepository(CommonRepository $repository)
+    public function setRepository(CommonRepository $repository, array $permissions = [])
     {
         $this->repository = $repository;
         $this->setResults(
@@ -143,7 +152,8 @@ class StatsEvent extends Event
                 $this->getLimit(),
                 $this->getOrder(),
                 $this->getWhere(),
-                $this->getSelect()
+                $this->getSelect(),
+                $permissions
             )
         );
 
@@ -211,6 +221,18 @@ class StatsEvent extends Event
     }
 
     /**
+     * @param array $where
+     *
+     * @return $this
+     */
+    public function addWhere(array $where)
+    {
+        $this->where[] = $where;
+
+        return $this;
+    }
+
+    /**
      * Add an array of results and if so, stop propagation.
      *
      * @param array $results
@@ -253,5 +275,13 @@ class StatsEvent extends Event
     public function hasResults()
     {
         return $this->hasResults;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }
