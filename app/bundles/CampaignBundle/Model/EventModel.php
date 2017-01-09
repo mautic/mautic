@@ -797,7 +797,6 @@ class EventModel extends CommonFormModel
         if ($eventTriggerDate instanceof \DateTime) {
             ++$executedEventCount;
 
-            $log->setIsScheduled(true);
             $log->setTriggerDate($eventTriggerDate);
             $repo->saveEntity($log);
 
@@ -876,7 +875,6 @@ class EventModel extends CommonFormModel
                     $date->add(new \DateInterval($this->scheduleTimeForFailedEvents));
 
                     // Reschedule
-                    $log->setIsScheduled(true);
                     $log->setTriggerDate($date);
                     $log->setDateTriggered(null);
 

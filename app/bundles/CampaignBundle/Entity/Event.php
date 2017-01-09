@@ -12,9 +12,11 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead as Contact;
 
 /**
  * Class Event.
@@ -291,6 +293,11 @@ class Event
                     'triggerMode',
                     'order',
                     'parent',
+                ]
+            )
+            ->addProperties(
+                [
+                    'campaign',
                 ]
             )
              ->build();
@@ -712,11 +719,22 @@ class Event
     /**
      * Used by the API.
      *
-     * @return array
+     * @param Contact|null $contact
+     *
+     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
      */
-    public function getContactLog()
+    public function getContactLog(Contact $contact = null)
     {
-        return $this->contactLog;
+        if ($this->contactLog) {
+            return $this->contactLog;
+        }
+
+        return $this->log->matching(
+            Criteria::create()
+                    ->where(
+                        Criteria::expr()->eq('lead', $contact)
+                    )
+        );
     }
 
     /**

@@ -50,10 +50,15 @@ return [
                 'path'       => '/campaigns/events',
                 'controller' => 'MauticCampaignBundle:Api\EventApi',
             ],
-            'mautic_api_campaigns_contact_events' => [
-                'path'       => '/campaigns/events/contact/{contactId}',
+            'mautic_api_campaigns_events_contact' => [
+                'path'       => '/campaigns/contact/{contactId}/events',
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
                 'method'     => 'GET',
+            ],
+            'mautic_api_campaigns_edit_contact_event' => [
+                'path'       => '/campaigns/contact/{contactId}/events/{eventId}/edit',
+                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editContactEvent',
+                'method'     => 'PUT',
             ],
             'mautic_api_campaign_contact_events' => [
                 'path'       => '/campaigns/{campaignId}/contact/{contactId}/events',

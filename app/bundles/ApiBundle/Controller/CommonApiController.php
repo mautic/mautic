@@ -11,7 +11,6 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -942,11 +941,17 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return Response|array
      */
-    protected function returnError($msg, $code, $details = [])
+    protected function returnError($msg, $code = Codes::HTTP_OK, $details = [])
     {
+        if ($this->get('translator')->hasId($msg, 'flashes')) {
+            $msg = $this->get('translator')->trans($msg, [], 'flashes');
+        } elseif ($this->get('translator')->hasId($msg, 'messages')) {
+            $msg = $this->get('translator')->trans($msg, [], 'messages');
+        }
+
         $error = [
             'code'    => $code,
-            'message' => $this->get('translator')->trans($msg, [], 'flashes'),
+            'message' => $msg,
             'details' => $details,
             'type'    => null,
         ];
@@ -1055,9 +1060,6 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         if ($results instanceof Paginator) {
             $totalCount = count($results);
-        } elseif ($results instanceof Collection) {
-            $totalCount = $results->count();
-            $results    = $results->toArray();
         } elseif (isset($results['count'])) {
             $totalCount = $results['count'];
             $results    = $results['results'];

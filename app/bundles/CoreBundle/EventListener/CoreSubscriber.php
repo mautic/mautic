@@ -308,6 +308,16 @@ class CoreSubscriber extends CommonSubscriber
                                 'method' => 'POST',
                                 'path'   => '/batch/new',
                             ],
+                            'editbatchput' => [
+                                'action' => 'editEntities',
+                                'method' => 'PUT',
+                                'path'   => '/batch/edit',
+                            ],
+                            'editbatchpatch' => [
+                                'action' => 'editEntities',
+                                'method' => 'PATCH',
+                                'path'   => '/batch/edit',
+                            ],
                             'editput' => [
                                 'action' => 'editEntity',
                                 'method' => 'PUT',
@@ -318,20 +328,15 @@ class CoreSubscriber extends CommonSubscriber
                                 'method' => 'PATCH',
                                 'path'   => '/{id}/edit',
                             ],
-                            'editbatch' => [
-                                'action' => 'editEntities',
-                                'method' => ['PUT', 'PATCH'],
-                                'path'   => '/batch/edit',
+                            'deletebatch' => [
+                                'action' => 'deleteEntities',
+                                'method' => 'DELETE',
+                                'path'   => '/batch/delete',
                             ],
                             'delete' => [
                                 'action' => 'deleteEntity',
                                 'method' => 'DELETE',
                                 'path'   => '/{id}/delete',
-                            ],
-                            'deletebatch' => [
-                                'action' => 'deleteEntities',
-                                'method' => 'DELETE',
-                                'path'   => '/batch/delete',
                             ],
                         ];
 
@@ -408,9 +413,20 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['objectId'] = '[a-zA-Z0-9_]+';
             }
         }
-        if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
-            if (!isset($requirements['page'])) {
-                $requirements['id'] = '\d+';
+        if ($type == 'api') {
+            if (strpos($details['path'], '{id}') !== false) {
+                if (!isset($requirements['page'])) {
+                    $requirements['id'] = '\d+';
+                }
+            }
+
+            if (preg_match_all('/\{(.*?Id)\}/', $details['path'], $matches)) {
+                // Force digits for IDs
+                foreach ($matches[1] as $match) {
+                    if (!isset($requirements[$match])) {
+                        $requirements[$match] = '\d+';
+                    }
+                }
             }
         }
 

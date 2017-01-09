@@ -14,7 +14,9 @@ namespace Mautic\CampaignBundle\Model;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EventLogModel.
@@ -84,5 +86,91 @@ class EventLogModel extends AbstractCommonModel
         }
 
         return $logs;
+    }
+
+    /**
+     * @param Event $event
+     * @param Lead  $contact
+     * @param array $parameters
+     *
+     * @return string|LeadEventLog
+     */
+    public function updateContactEvent(Event $event, Lead $contact, array $parameters)
+    {
+        $campaign = $event->getCampaign();
+
+        // Check that contact is part of the campaign
+        $membership = $campaign->getContactMembership($contact);
+        if (count($membership) === 0) {
+            return 'mautic.campaign.error.contact_not_in_campaign';
+        }
+
+        /** @var \Mautic\CampaignBundle\Entity\Lead $m */
+        foreach ($membership as $m) {
+            if ($m->getManuallyRemoved()) {
+                return 'mautic.campaign.error.contact_not_in_campaign';
+            }
+        }
+
+        // Check that contact has not executed the event already
+        $logs    = $event->getContactLog($contact);
+        $created = false;
+        if (count($logs)) {
+            $log = $logs[0];
+            if ($log->getDateTriggered()) {
+                return 'mautic.campaign.error.event_already_executed';
+            }
+        } else {
+            if (!isset($parameters['triggerDate']) && !isset($parameters['dateTriggered'])) {
+                return 'mautic.campaign.error.event_must_be_scheduled';
+            }
+
+            $log = (new LeadEventLog())
+                ->setLead($contact)
+                ->setEvent($event);
+            $created = true;
+        }
+
+        foreach ($parameters as $property => $value) {
+            switch ($property) {
+                case 'dateTriggered':
+                case 'triggerDate':
+                    $log->{'set'.ucfirst($property)}(
+                        new \DateTime($value)
+                    );
+                    break;
+                case 'ipAddress':
+                    $log->setIpAddress(
+                        $this->get('mautic.helper.ip_lookup')->getIpAddress($value)
+                    );
+                    break;
+                case 'metadata':
+                    $metadata = $log->getMetadata();
+                    if (is_array($value)) {
+                        $newMetadata = $value;
+                    } elseif ($jsonDecoded = json_decode($value, true)) {
+                        $newMetadata = $jsonDecoded;
+                    } else {
+                        $newMetadata = (array) $value;
+                    }
+
+                    $newMetadata = InputHelper::cleanArray($newMetadata);
+                    $log->setMetadata(array_merge($metadata, $newMetadata));
+                    break;
+                case 'nonActionPathTaken':
+                    $log->setNonActionPathTaken((bool) $value);
+                    break;
+                case 'channel':
+                    $log->setChannel(InputHelper::clean($value));
+                    break;
+                case 'channelId':
+                    $log->setChannel(intval($value));
+                    break;
+            }
+        }
+
+        $this->getRepository()->saveEntity($log);
+
+        return [$log, $created];
     }
 }
