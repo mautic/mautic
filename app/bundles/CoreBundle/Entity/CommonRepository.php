@@ -323,6 +323,26 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * @return array
+     */
+    public function getTableColumns()
+    {
+        $columns = $this->getClassMetadata()->getColumnNames();
+
+        if ($associations = $this->getClassMetadata()->getAssociationMappings()) {
+            foreach ($associations as $property => $association) {
+                if (!empty($association['joinColumnFieldNames'])) {
+                    $columns = array_merge($columns, array_values($association['joinColumnFieldNames']));
+                }
+            }
+        }
+
+        natcasesort($columns);
+
+        return array_values($columns);
+    }
+
+    /**
      * @param string $alias
      * @param object $entity
      *

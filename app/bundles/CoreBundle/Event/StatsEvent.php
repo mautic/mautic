@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
@@ -55,6 +56,11 @@ class StatsEvent extends Event
      * @var array
      */
     protected $tables = [];
+
+    /**
+     * @var array
+     */
+    protected $tableColumns = [];
 
     /**
      * Array of order by statements.
@@ -108,7 +114,7 @@ class StatsEvent extends Event
      */
     public function __construct($table, $start, $limit, array $order, array $where, User $user)
     {
-        $this->table = strtolower(trim(strip_tags($table)));
+        $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
         $this->order = $order;
@@ -119,20 +125,19 @@ class StatsEvent extends Event
     /**
      * Returns if event is for this table.
      *
-     * @param $table
+     * @param                       $table
+     * @param EntityRepository|null $repository
      *
      * @return bool
      */
-    public function isLookingForTable($table)
+    public function isLookingForTable($table, CommonRepository $repository = null)
     {
-        $this->tables[] = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
-
-        $testTable = $this->table;
-        if ($testTable && MAUTIC_TABLE_PREFIX && strpos($testTable, MAUTIC_TABLE_PREFIX) !== 0) {
-            $testTable = MAUTIC_TABLE_PREFIX.$testTable;
+        $this->tables[] = $table = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
+        if ($repository) {
+            $this->tableColumns[$table] = $repository->getTableColumns();
         }
 
-        return $testTable === $table;
+        return $this->table === $table;
     }
 
     /**
@@ -265,6 +270,18 @@ class StatsEvent extends Event
         sort($this->tables);
 
         return $this->tables;
+    }
+
+    /**
+     * @param null $table
+     *
+     * @return mixed
+     */
+    public function getTableColumns($table = null)
+    {
+        ksort($this->tableColumns);
+
+        return ($table) ? $this->tableColumns[$table] : $this->tableColumns;
     }
 
     /**

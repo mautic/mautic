@@ -67,7 +67,7 @@ class StatsSubscriber extends CommonSubscriber
         /** @var CommonRepository $repository */
         foreach ($this->repositories as $repoName => $repository) {
             $table = $repository->getTableName();
-            if ($event->isLookingForTable($table)) {
+            if ($event->isLookingForTable($table, $repository)) {
                 $permissions = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
                 foreach ($permissions as $tableAlias => $permBase) {
                     if ('admin' === $permBase) {
