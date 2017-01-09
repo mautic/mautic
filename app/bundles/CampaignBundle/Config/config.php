@@ -62,7 +62,7 @@ return [
             ],
             'mautic_api_campaigns_batchedit_events' => [
                 'path'       => '/campaigns/events/batch/edit',
-                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editEventsEvents',
+                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editEvents',
                 'method'     => 'PUT',
             ],
             'mautic_api_campaign_contact_events' => [

@@ -53,6 +53,7 @@ class EventLogApiController extends CommonApiController
         $this->serializerGroups         = [
             'campaignList',
             'ipAddressList',
+
         ];
 
         // Only include the id of the parent
@@ -156,6 +157,7 @@ class EventLogApiController extends CommonApiController
             ($created) ? Codes::HTTP_CREATED : Codes::HTTP_OK
         );
         $this->serializerGroups[] = 'campaignEventWithLogsList';
+        $this->serializerGroups[] = 'campaignEventLogDetails';
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
@@ -179,7 +181,7 @@ class EventLogApiController extends CommonApiController
         $errors            = [];
         foreach ($parameters as $key => $params) {
             if (!isset($params['eventId']) || !isset($params['contactId']) || !isset($events[$params['eventId']]) || !isset($contacts[$params['contactId']])) {
-                $errors[$key] = $this->notFound();
+                $errors[$key] = $this->notFound('mautic.campaign.error.edit_events.request_invalid');
 
                 continue;
             }
@@ -223,6 +225,7 @@ class EventLogApiController extends CommonApiController
 
         $view                     = $this->view($payload, Codes::HTTP_OK);
         $this->serializerGroups[] = 'campaignEventWithLogsList';
+        $this->serializerGroups[] = 'campaignEventLogDetails';
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

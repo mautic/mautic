@@ -134,8 +134,15 @@ class EventLogModel extends AbstractCommonModel
         foreach ($parameters as $property => $value) {
             switch ($property) {
                 case 'dateTriggered':
+                    $log->setDateTriggered(
+                        new \DateTime($value)
+                    );
+                    break;
                 case 'triggerDate':
-                    $log->{'set'.ucfirst($property)}(
+                    if (Event::TYPE_DECISION === $event->getEventType()) {
+                        return 'mautic.campaign.error.decision_cannot_be_scheduled';
+                    }
+                    $log->setTriggerDate(
                         new \DateTime($value)
                     );
                     break;

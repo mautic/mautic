@@ -295,7 +295,7 @@ class FormModel extends AbstractCommonModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        throw new NotFoundHttpException('Form object not found.');
+        throw new NotFoundHttpException('Object does not support edits.');
     }
 
     /**

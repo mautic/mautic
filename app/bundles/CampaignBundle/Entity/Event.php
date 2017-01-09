@@ -23,6 +23,10 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
  */
 class Event
 {
+    const TYPE_DECISION  = 'decision';
+    const TYPE_ACTION    = 'action';
+    const TYPE_CONDITION = 'condition';
+
     /**
      * @var int
      */
@@ -291,6 +295,7 @@ class Event
                     'triggerInterval',
                     'triggerIntervalUnit',
                     'triggerMode',
+                    'decisionPath',
                     'order',
                     'parent',
                 ]

@@ -355,7 +355,7 @@ class CoreSubscriber extends CommonSubscriber
                                 continue;
                             }
 
-                            $details = array_merge(
+                            $routeDetails = array_merge(
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
@@ -363,7 +363,7 @@ class CoreSubscriber extends CommonSubscriber
                                     'method'     => $standardDetails['method'],
                                 ]
                             );
-                            $this->addRouteToCollection($collection, $type, $routeName.$standardName, $details);
+                            $this->addRouteToCollection($collection, $type, $routeName.$standardName, $routeDetails);
                         }
                     } else {
                         $this->addRouteToCollection($collection, $type, $name, $details);
