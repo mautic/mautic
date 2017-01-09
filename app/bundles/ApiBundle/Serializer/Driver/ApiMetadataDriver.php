@@ -23,7 +23,7 @@ class ApiMetadataDriver extends PhpDriver
     private $metadata = null;
 
     /**
-     * @var array
+     * @var PropertyMetadata[]
      */
     private $properties = [];
 
@@ -130,13 +130,23 @@ class ApiMetadataDriver extends PhpDriver
     /**
      * Add property and set default version and Details group.
      *
-     * @param $name
+     * @param      $name
+     * @param null $serializedName
+     * @param bool $useGetter
      *
      * @return $this
      */
-    public function addProperty($name)
+    public function addProperty($name, $serializedName = null, $useGetter = false)
     {
         $this->createProperty($name);
+
+        if ($useGetter && !$this->properties[$name]->getter) {
+            $this->properties[$name]->getter = 'get'.ucfirst($name);
+        }
+
+        if ($serializedName) {
+            $this->properties[$name]->serializedName = $serializedName;
+        }
 
         if ($this->defaultVersion !== null) {
             // Set the default version
@@ -156,13 +166,18 @@ class ApiMetadataDriver extends PhpDriver
      *
      * @param array      $properties
      * @param bool|false $addToListGroup
+     * @param bool|false $useGetter
      *
      * @return $this
      */
-    public function addProperties(array $properties, $addToListGroup = false)
+    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false)
     {
         foreach ($properties as $prop) {
-            $this->addProperty($prop);
+            $serializedName = null;
+            if (is_array($prop)) {
+                list($prop, $serializedName) = $prop;
+            }
+            $this->addProperty($prop, $serializedName, $useGetter);
 
             if ($addToListGroup) {
                 $this->inListGroup();
@@ -264,17 +279,23 @@ class ApiMetadataDriver extends PhpDriver
      * Add a group the property belongs to.
      *
      * @param      $group
-     * @param null $property
+     * @param null $property True to apply to all current properties
      *
      * @return $this
      */
     public function addGroup($group, $property = null)
     {
-        if ($property === null) {
-            $property = $this->currentPropertyName;
-        }
+        if (true === $property) {
+            foreach ($this->properties as $prop => $metadata) {
+                $this->addGroup($group, $prop);
+            }
+        } else {
+            if ($property === null) {
+                $property = $this->currentPropertyName;
+            }
 
-        $this->properties[$property]->groups[] = $group;
+            $this->properties[$property]->groups[] = $group;
+        }
 
         return $this;
     }

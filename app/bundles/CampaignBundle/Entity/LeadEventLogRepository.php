@@ -22,6 +22,41 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
+    public function getEntities($args = [])
+    {
+        $alias = $this->getTableAlias();
+        $q     = $this
+            ->createQueryBuilder($alias)
+            ->join($alias.'.ipAddress', 'i');
+
+        if (empty($args['campaign_id'])) {
+            $q->join($alias.'.event', 'e')
+                ->join($alias.'.campaign', 'c');
+        } else {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY('.$this->getTableAlias().'.campaign)', (int) $args['campaign_id'])
+            );
+        }
+
+        if (!empty($args['contact_id'])) {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY('.$this->getTableAlias().'.lead)', (int) $args['contact_id'])
+            );
+        }
+
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'll';
+    }
+
     /**
      * Get a lead's page event log.
      *

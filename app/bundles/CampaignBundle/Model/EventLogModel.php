@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
@@ -20,6 +21,21 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
  */
 class EventLogModel extends AbstractCommonModel
 {
+    /**
+     * @var EventModel
+     */
+    protected $eventModel;
+
+    /**
+     * EventLogModel constructor.
+     *
+     * @param EventModel $eventModel
+     */
+    public function __construct(EventModel $eventModel)
+    {
+        $this->eventModel = $eventModel;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -43,7 +59,30 @@ class EventLogModel extends AbstractCommonModel
     /**
      * @param array $args
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
+        /** @var LeadEventLog[] $logs */
+        $logs = parent::getEntities($args);
+
+        if (!empty($args['campaign_id']) && !empty($args['contact_id'])) {
+            /** @var Event[] $events */
+            $events = $this->eventModel->getEntities(
+                [
+                    'campaign_id'      => $args['campaign_id'],
+                    'ignore_children'  => true,
+                    'index_by'         => 'id',
+                    'ignore_paginator' => true,
+                ]
+            );
+
+            foreach ($logs as $log) {
+                $event = $log->getEvent()->getId();
+                $events[$event]->addContactLog($log);
+            }
+
+            return array_values($events);
+        }
+
+        return $logs;
     }
 }

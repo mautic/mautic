@@ -50,6 +50,16 @@ return [
                 'path'       => '/campaigns/events',
                 'controller' => 'MauticCampaignBundle:Api\EventApi',
             ],
+            'mautic_api_campaigns_contact_events' => [
+                'path'       => '/campaigns/events/contact/{contactId}',
+                'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
+                'method'     => 'GET',
+            ],
+            'mautic_api_campaign_contact_events' => [
+                'path'       => '/campaigns/{campaignId}/contact/{contactId}/events',
+                'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
+                'method'     => 'GET',
+            ],
             'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/{leadId}/add',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
@@ -191,6 +201,12 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
                     'mautic.factory',
+                ],
+            ],
+            'mautic.campaign.model.event_log' => [
+                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'arguments' => [
+                    'mautic.campaign.model.event',
                 ],
             ],
         ],

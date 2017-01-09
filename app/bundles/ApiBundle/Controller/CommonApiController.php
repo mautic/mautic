@@ -115,6 +115,13 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $listFilters = [];
 
     /**
+     * Pass to the model's getEntities() method.
+     *
+     * @var array
+     */
+    protected $extraGetEntitiesArguments = [];
+
+    /**
      * @var array
      */
     protected $serializerGroups = [];
@@ -208,11 +215,9 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Obtains a list of entities as defined by the API URL.
      *
-     * @param array $args
-     *
      * @return Response
      */
-    public function getEntitiesAction($args = [])
+    public function getEntitiesAction()
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
@@ -259,7 +264,7 @@ class CommonApiController extends FOSRestController implements MauticController
                 'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
                 'withTotalCount' => true, //for repositories that break free of Paginator
             ],
-            $args
+            $this->extraGetEntitiesArguments
         );
         $results = $this->model->getEntities($args);
 
@@ -798,7 +803,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $ownPerm   = "{$this->permissionBase}:{$action}own";
             $otherPerm = "{$this->permissionBase}:{$action}other";
 
-            $owner = (method_exists('getPermissionUser')) ? $entity->getPermissionUser() : $entity->getCreatedBy();
+            $owner = (method_exists($entity, 'getPermissionUser')) ? $entity->getPermissionUser() : $entity->getCreatedBy();
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);
         }

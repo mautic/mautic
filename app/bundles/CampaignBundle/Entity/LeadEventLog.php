@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -135,6 +136,47 @@ class LeadEventLog
     }
 
     /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaignEventLog')
+                 ->addProperties(
+                     [
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                     ]
+                 )
+
+                // Add standalone groups
+                 ->setGroupPrefix('campaignEventStandaloneLog')
+                 ->addProperties(
+                     [
+                         'event',
+                         'lead',
+                         'campaign',
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                     ]
+                 )
+                 ->build();
+    }
+
+    /**
      * @return \DateTime
      */
     public function getDateTriggered()
@@ -183,7 +225,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return Event
      */
     public function getEvent()
     {

@@ -107,6 +107,13 @@ class Event
     private $log;
 
     /**
+     * Used by API to house contact specific logs.
+     *
+     * @var array
+     */
+    private $contactLog = [];
+
+    /**
      * @var
      */
     private $changes;
@@ -267,6 +274,25 @@ class Event
                      'decisionPath',
                  ]
              )
+
+            // Include logs
+            ->setGroupPrefix('campaignEventWithLogs')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'eventType',
+                    'contactLog',
+                    'triggerDate',
+                    'triggerInterval',
+                    'triggerIntervalUnit',
+                    'triggerMode',
+                    'order',
+                    'parent',
+                ]
+            )
              ->build();
     }
 
@@ -681,5 +707,41 @@ class Event
     public function setTempId($tempId)
     {
         $this->tempId = $tempId;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @return array
+     */
+    public function getContactLog()
+    {
+        return $this->contactLog;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @param array $contactLog
+     *
+     * @return Event
+     */
+    public function setContactLog($contactLog)
+    {
+        $this->contactLog = $contactLog;
+
+        return $this;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @return Event
+     */
+    public function addContactLog($contactLog)
+    {
+        $this->contactLog[] = $contactLog;
+
+        return $this;
     }
 }

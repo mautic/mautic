@@ -27,12 +27,24 @@ class EventRepository extends CommonRepository
      */
     public function getEntities($args = [])
     {
-        $q = $this
+        $select = 'e';
+        $q      = $this
             ->createQueryBuilder('e')
-            ->select('e, ec, ep')
-            ->join('e.campaign', 'c')
-            ->leftJoin('e.children', 'ec')
-            ->leftJoin('e.parent', 'ep');
+            ->join('e.campaign', 'c');
+
+        if (!empty($args['campaign_id'])) {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY(e.campaign)', (int) $args['campaign_id'])
+            );
+        }
+
+        if (empty($args['ignore_children'])) {
+            $select .= ', ec, ep';
+            $q->leftJoin('e.children', 'ec')
+                ->leftJoin('e.parent', 'ep');
+        }
+
+        $q->select($select);
 
         $args['qb'] = $q;
 

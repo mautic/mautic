@@ -17,11 +17,11 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldExclusionStrategy.
+ * Class FieldInclusionStrategy.
  *
- * Exclude specific fields at a specific level
+ * Include specific fields at a specific level
  */
-class FieldExclusionStrategy implements ExclusionStrategyInterface
+class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
     /**
      * @var array
@@ -39,7 +39,7 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     private $path;
 
     /**
-     * FieldExclusionStrategy constructor.
+     * FieldInclusionStrategy constructor.
      *
      * @param array $fields
      * @param int   $level
@@ -73,7 +73,7 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
         }
 
         $name = $property->serializedName ?: $property->name;
-        if (!in_array($name, $this->fields)) {
+        if (in_array($name, $this->fields)) {
             return false;
         }
 

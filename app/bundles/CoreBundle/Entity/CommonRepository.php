@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -81,6 +82,18 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * @return ExpressionBuilder
+     */
+    public function getExpressionBuilder()
+    {
+        if (self::$expressionBuilder === null) {
+            self::$expressionBuilder = new ExpressionBuilder();
+        }
+
+        return self::$expressionBuilder;
+    }
+
+    /**
      * Get a single entity.
      *
      * @param int $id
@@ -116,6 +129,19 @@ class CommonRepository extends EntityRepository
                 ->createQueryBuilder()
                 ->select($alias)
                 ->from($this->_entityName, $alias, "{$alias}.id");
+        }
+
+        if (!empty($args['index_by'])) {
+            if (is_array($args['index_by'])) {
+                list($indexAlias, $indexBy) = $args['index_by'];
+            } else {
+                $indexAlias = $alias;
+                $indexBy    = $args['index_by'];
+            }
+            if (strpos($indexBy, $indexAlias) !== 0) {
+                $indexBy = $indexAlias.'.'.$indexBy;
+            }
+            $q->indexBy($indexAlias, $indexBy);
         }
 
         $this->buildClauses($q, $args);
@@ -471,31 +497,32 @@ class CommonRepository extends EntityRepository
 
         if (!empty($filter)) {
             if (is_array($filter)) {
-                if (!empty($filter['force'])) {
-                    if (is_array($filter['force'])) {
+                if (!empty($filter['criteria']) || !empty($filter['force'])) {
+                    $criteria = !empty($filter['criteria']) ? $filter['criteria'] : $filter['force'];
+                    if (is_array($criteria)) {
                         //defined columns with keys of column, expr, value
-                        foreach ($filter['force'] as $f) {
-                            if ($f instanceof Query\Expr || $f instanceof CompositeExpression) {
-                                $queryExpression->add($f);
+                        foreach ($criteria as $criterion) {
+                            if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
+                                $queryExpression->add($criterion);
 
-                                if (isset($f->parameters) && is_array($f->parameters)) {
-                                    $queryParameters = array_merge($queryParameters, $f->parameters);
-                                    unset($f->parameters);
+                                if (isset($criterion->parameters) && is_array($criterion->parameters)) {
+                                    $queryParameters = array_merge($queryParameters, $criterion->parameters);
+                                    unset($criterion->parameters);
                                 }
-                            } elseif (is_array($f)) {
-                                list($expr, $parameters) = $this->getFilterExpr($q, $f);
+                            } elseif (is_array($criterion)) {
+                                list($expr, $parameters) = $this->getFilterExpr($q, $criterion);
                                 $queryExpression->add($expr);
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
                                 }
                             } else {
                                 //string so parse as advanced search
-                                $advancedFilterStrings[] = $f;
+                                $advancedFilterStrings[] = $criterion;
                             }
                         }
                     } else {
                         //string so parse as advanced search
-                        $advancedFilterStrings[] = $filter['force'];
+                        $advancedFilterStrings[] = $criteria;
                     }
                 }
 
