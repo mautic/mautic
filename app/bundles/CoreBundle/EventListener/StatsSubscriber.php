@@ -122,6 +122,16 @@ class StatsSubscriber extends CommonSubscriber
      */
     protected function addContactRestrictedRepositories(EntityManager $em, $repoNames)
     {
+        return $this->addRestrictedRepostories($em, $repoNames, ['lead' => 'lead:leads']);
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param               $repoNames
+     * @param array         $permissions
+     */
+    protected function addRestrictedRepostories(EntityManager $em, $repoNames, array $permissions)
+    {
         if (!is_array($repoNames)) {
             $repoNames = [$repoNames];
         }
@@ -129,9 +139,7 @@ class StatsSubscriber extends CommonSubscriber
         foreach ($repoNames as $repoName) {
             $this->repositories[]      = $repo      = $em->getRepository($repoName);
             $table                     = $repo->getTableName();
-            $this->permissions[$table] = [
-                'lead' => 'lead:leads',
-            ];
+            $this->permissions[$table] = $permissions;
         }
 
         return $this;
