@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -1054,6 +1055,9 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         if ($results instanceof Paginator) {
             $totalCount = count($results);
+        } elseif ($results instanceof Collection) {
+            $totalCount = $results->count();
+            $results    = $results->toArray();
         } elseif (isset($results['count'])) {
             $totalCount = $results['count'];
             $results    = $results['results'];

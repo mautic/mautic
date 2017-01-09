@@ -13,7 +13,9 @@ namespace Mautic\CampaignBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -25,9 +27,14 @@ class EventLogApiController extends CommonApiController
     use LeadAccessTrait;
 
     /**
-     * @var
+     * @var Campaign
      */
     protected $campaign;
+
+    /**
+     * @var Lead
+     */
+    protected $contact;
 
     public function initialize(FilterControllerEvent $event)
     {
@@ -36,7 +43,11 @@ class EventLogApiController extends CommonApiController
         $this->entityNameOne            = 'event';
         $this->entityNameMulti          = 'events';
         $this->parentChildrenLevelDepth = 1;
-        $this->serializerGroups         = ['campaignEventLogDetails', 'campaignEventDetails', 'campaignList'];
+        $this->serializerGroups         = [
+            'campaignEventLogDetails',
+            'campaignEventDetails',
+            'campaignList',
+        ];
 
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
@@ -70,9 +81,16 @@ class EventLogApiController extends CommonApiController
         }
 
         if (!empty($contactId) && !empty($campaignId)) {
-            $this->serializerGroups = ['campaignEventWithLogsList', 'campaignEventLogDetails', 'campaignList', 'ipAddressList'];
+            $this->serializerGroups = [
+                'campaignLeadList',
+                'campaignEventWithLogsList',
+                'campaignEventLogDetails',
+                'campaignList',
+                'ipAddressList',
+            ];
         }
         $this->campaign                  = $campaign;
+        $this->contact                   = $contact;
         $this->extraGetEntitiesArguments = [
             'contact_id'  => $contactId,
             'campaign_id' => $campaignId,
@@ -102,6 +120,10 @@ class EventLogApiController extends CommonApiController
     {
         if ($this->campaign) {
             $data['campaign'] = $this->campaign;
+
+            if ($this->contact) {
+                list($data['membership'], $ignore) = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
+            }
         }
 
         return parent::view($data, $statusCode, $headers);
