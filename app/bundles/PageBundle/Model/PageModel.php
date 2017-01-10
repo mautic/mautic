@@ -459,6 +459,7 @@ class PageModel extends FormModel
             $timezone = $this->dateTimeHelper->guessTimezoneFromOffset(-1 * $query['timezone_offset'] * 60);
             $lead->setTimezone($timezone);
         }
+
         $this->leadModel->saveEntity($lead);
 
         // Set info from request

@@ -1357,4 +1357,24 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     *
+     * @return Lead
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
 }
