@@ -96,6 +96,13 @@
                     <div class="clearfix"></div>
                 </td>
                 <td class="text-center">
+                    <?php foreach ($item->getTags()->toArray() as $data) {
+                        ?>
+                    <span class="label label-success">  <?php echo $data->getTag(); ?></span>
+                    <?php 
+                    } ?>
+                </td>
+                <td class="text-center">
                     <?php
                     $color = $item->getColor();
                     $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';

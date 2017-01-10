@@ -102,6 +102,11 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 ]);
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'lead',
+                    'text'       => 'mautic.lead.tags.label',
+                    'class'      => 'col-lead-tags',
+                ]);
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'lead',
                     'orderBy'    => 'l.stage_id',
                     'text'       => 'mautic.lead.stage.label',
                     'class'      => 'col-lead-stage',
