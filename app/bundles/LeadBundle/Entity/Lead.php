@@ -161,6 +161,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $primaryCompany;
 
     /**
+     * @var string
+     */
+    private $timezone;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -188,7 +193,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['timezone'], 'lead_timezone');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -313,6 +319,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('timezone', 'string')
+            ->nullable()
             ->build();
     }
 

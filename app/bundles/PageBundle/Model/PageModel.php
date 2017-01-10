@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
@@ -104,6 +105,7 @@ class PageModel extends FormModel
         $this->leadFieldModel     = $leadFieldModel;
         $this->pageRedirectModel  = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
+        $this->dateTimeHelper     = new DateTimeHelper();
     }
 
     /**
@@ -449,6 +451,13 @@ class PageModel extends FormModel
         // Get lead if required
         if (null == $lead) {
             $lead = $this->leadModel->getContactFromRequest($query);
+        }
+
+        if (isset($query['timezone_offset'])) {
+            // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
+            // Multiply by -1 because Firgerprint2 seems to have it the other way around.
+            $timezone = $this->dateTimeHelper->guessTimezoneFromOffset(-1 * $query['timezone_offset'] * 60);
+            $lead->setTimezone($timezone);
         }
         $this->leadModel->saveEntity($lead);
 
