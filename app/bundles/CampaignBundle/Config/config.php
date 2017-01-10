@@ -51,12 +51,12 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\EventApi',
             ],
             'mautic_api_campaigns_events_contact' => [
-                'path'       => '/campaigns/contact/{contactId}/events',
+                'path'       => '/campaigns/events/contact/{contactId}',
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
                 'method'     => 'GET',
             ],
             'mautic_api_campaigns_edit_contact_event' => [
-                'path'       => '/campaigns/contact/{contactId}/events/{eventId}/edit',
+                'path'       => '/campaigns/events/{eventId}/contact/{contactId}/edit',
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:editContactEvent',
                 'method'     => 'PUT',
             ],
@@ -66,7 +66,7 @@ return [
                 'method'     => 'PUT',
             ],
             'mautic_api_campaign_contact_events' => [
-                'path'       => '/campaigns/{campaignId}/contact/{contactId}/events',
+                'path'       => '/campaigns/{campaignId}/events/contact/{contactId}',
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
                 'method'     => 'GET',
             ],

@@ -69,7 +69,7 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getMode('lead')->addToStages($contact, $stage);
+        $this->getModel('lead')->addToStages($contact, $stage);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
