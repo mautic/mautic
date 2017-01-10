@@ -422,14 +422,14 @@ class LeadApiController extends CommonApiController
         }
 
         $channelId = (int) $this->request->request->get('channelId');
-        $reason    = (int) $this->request->request->get('reason');
-        $comments  = InputHelper::clean($this->request->request->get('comments'));
-        $result    = $this->model->addDncForLead($entity, $channel, $comments, $reason);
-        $view      = $this->view([$this->entityNameOne => $entity]);
-
-        if ($result === false) {
-            return $this->badRequest();
+        if ($channelId) {
+            $channel = [$channel, $channelId];
         }
+        $reason   = (int) $this->request->request->get('reason');
+        $comments = InputHelper::clean($this->request->request->get('comments'));
+
+        $this->model->addDncForLead($entity, $channel, $comments, $reason);
+        $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
     }
