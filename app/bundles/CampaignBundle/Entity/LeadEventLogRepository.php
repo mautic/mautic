@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -128,7 +127,6 @@ class LeadEventLogRepository extends CommonRepository
         $leadIps = [];
 
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $today = new DateTimeHelper();
         $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
             ->select('ll.event_id,
                     ll.campaign_id,
@@ -138,12 +136,12 @@ class LeadEventLogRepository extends CommonRepository
                     e.description AS event_description,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
+                    ll.metadata,
                     CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
-            ->where($query->expr()->gte('ll.trigger_date', ':today'))
-            ->setParameter('today', $today->toUtcString());
+            ->where($query->expr()->eq('ll.is_scheduled', 1));
 
         if (isset($options['lead'])) {
             /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
