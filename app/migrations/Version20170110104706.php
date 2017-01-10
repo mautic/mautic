@@ -41,7 +41,7 @@ class Version20170110104706 extends AbstractMauticMigration
         $curDateTime = date('Y-m-d H:i:s');
         // Check if a timezone custom field exists. If so, just make it fixed, update type
         if ($schema->getTable(MAUTIC_TABLE_PREFIX.'leads')->hasColumn('timezone')) {
-            $sql = "UPDATE `{$this->prefix}lead_fields` SET is_fixed = 1, type = 'timezone', date_modified = '{$curDateTime}'";
+            $sql = "UPDATE `{$this->prefix}lead_fields` SET is_fixed = 1, type = 'timezone', date_modified = '{$curDateTime}' WHERE alias = 'timezone'";
         } else {
             $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN timezone VARCHAR(255) DEFAULT NULL");
             $sql = <<<SQL
