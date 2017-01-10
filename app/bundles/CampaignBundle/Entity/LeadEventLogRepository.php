@@ -70,9 +70,9 @@ class LeadEventLogRepository extends CommonRepository
     public function getLeadLogs($leadId, array $options = [])
     {
         $query = $this->getEntityManager()
-            ->getConnection()
-            ->createQueryBuilder()
-            ->select('ll.event_id,
+                      ->getConnection()
+                      ->createQueryBuilder()
+                      ->select('ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
@@ -83,30 +83,45 @@ class LeadEventLogRepository extends CommonRepository
                     e.type,
                     ll.is_scheduled as isScheduled,
                     ll.trigger_date as triggerDate
-                    '
-            )
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-            ->where('ll.lead_id = '.(int) $leadId)
-            ->andWhere('e.event_type = :eventType')
-            ->andWhere('ll.metadata NOT LIKE \'%{s:6:"failed";i:1%\'')
-            ->setParameter('eventType', 'action');
+            '
+                      )
+                      ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+                      ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+                      ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+                      ->where('ll.lead_id = '.(int) $leadId)
+                      ->andWhere('e.event_type = :eventType')
+                      ->andWhere('ll.metadata NOT LIKE \'%{s:6:"failed";i:1%\'')
+                      ->setParameter('eventType', 'action');
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
-                $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
-                $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
-                $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
-                $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
-            ));
+            $query->andWhere(
+                $query->expr()->orX(
+                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
+                )
+            );
         }
 
         if (isset($options['scheduledState'])) {
-            $query->andWhere(
-                $query->expr()->eq('ll.is_scheduled', ':scheduled')
-            )
-                ->setParameter('scheduled', $options['scheduledState'], 'boolean');
+            if ($options['scheduledState']) {
+                // Include cancelled as well
+                $query->andWhere(
+                    $query->expr()->orX(
+                        $query->expr()->eq('ll.is_scheduled', ':scheduled'),
+                        $query->expr()->andX(
+                            $query->expr()->eq('ll.is_scheduled', 0),
+                            $query->expr()->isNull('ll.date_triggered', 0)
+                        )
+                    )
+                );
+            } else {
+                $query->andWhere(
+                    $query->expr()->eq('ll.is_scheduled', ':scheduled')
+                );
+            }
+            $query->setParameter('scheduled', $options['scheduledState'], 'boolean');
         }
 
         return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);

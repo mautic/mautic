@@ -169,9 +169,24 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        // Set available event types
-        $eventTypeKey  = 'campaign.event';
-        $eventTypeName = $this->translator->trans('mautic.campaign.triggered');
+        $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
+        $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
+    }
+
+    /**
+     * Update records after lead merge.
+     *
+     * @param LeadMergeEvent $event
+     */
+    public function onLeadMerge(LeadMergeEvent $event)
+    {
+        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+
+        $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+    }
+
+    protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
@@ -182,9 +197,11 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
-        $logRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $logs          = $logRepository->getLeadLogs($lead->getId(), $event->getQueryOptions());
-        $eventSettings = $this->campaignModel->getEvents();
+        $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $options                   = $event->getQueryOptions();
+        $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
+        $logs                      = $logRepository->getLeadLogs($lead->getId(), $options);
+        $eventSettings             = $this->campaignModel->getEvents();
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -203,9 +220,15 @@ class LeadSubscriber extends CommonSubscriber
 
                 $label = $log['event_name'].' / '.$log['campaign_name'];
 
-                if (!empty($log['metadata']['errors']) && !empty($log['isScheduled'])) {
-                    $label .= ' <i class="fa fa-warning text-danger"></i>';
+                if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
+                    // Note as cancelled
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled').'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
+
+                if (!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) {
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error').'" class="fa fa-warning text-danger"></i>';
+                }
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
@@ -227,17 +250,5 @@ class LeadSubscriber extends CommonSubscriber
                 );
             }
         }
-    }
-
-    /**
-     * Update records after lead merge.
-     *
-     * @param LeadMergeEvent $event
-     */
-    public function onLeadMerge(LeadMergeEvent $event)
-    {
-        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
-
-        $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

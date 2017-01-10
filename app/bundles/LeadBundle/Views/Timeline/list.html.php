@@ -74,7 +74,7 @@ $baseUrl = $view['router']->path(
 
             $details = '';
             if (isset($event['contentTemplate']) && $view->exists($event['contentTemplate'])):
-                $details = trim($view->render($event['contentTemplate'], ['event' => $event]));
+                $details = trim($view->render($event['contentTemplate'], ['event' => $event, 'lead' => $lead]));
             endif;
 
             $rowStripe = ($counter % 2 === 0) ? ' timeline-row-highlighted' : '';

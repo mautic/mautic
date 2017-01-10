@@ -455,7 +455,9 @@ class CampaignModel extends CommonFormModel
      */
     public function getEvents()
     {
-        static $events;
+        if (!isset(self::$events)) {
+            self::$events = [];
+        }
 
         if (empty($events)) {
             //build them
@@ -502,9 +504,11 @@ class CampaignModel extends CommonFormModel
 
             $events['connectionResrictions'] = $associationRestrictions;
             $events['anchorRestrictions']    = $anchorRestrictions;
+
+            self::$events = $events;
         }
 
-        return $events;
+        return self::$events;
     }
 
     /**

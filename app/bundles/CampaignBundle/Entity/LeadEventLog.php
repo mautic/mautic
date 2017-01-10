@@ -81,6 +81,11 @@ class LeadEventLog
     private $channelId;
 
     /**
+     * @var
+     */
+    private $previousScheduledState;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -190,6 +195,7 @@ class LeadEventLog
     public function setDateTriggered($dateTriggered)
     {
         $this->dateTriggered = $dateTriggered;
+        $this->setIsScheduled(false);
     }
 
     /**
@@ -267,9 +273,23 @@ class LeadEventLog
      */
     public function setIsScheduled($isScheduled)
     {
+        if (null === $this->previousScheduledState) {
+            $this->previousScheduledState = $this->isScheduled;
+        }
+
         $this->isScheduled = $isScheduled;
 
         return $this;
+    }
+
+    /**
+     * If isScheduled was changed, this will have the previous state.
+     *
+     * @return mixed
+     */
+    public function getPreviousScheduledState()
+    {
+        return $this->previousScheduledState;
     }
 
     /**
@@ -288,7 +308,7 @@ class LeadEventLog
     public function setTriggerDate($triggerDate)
     {
         $this->triggerDate = $triggerDate;
-        $this->isScheduled = true;
+        $this->setIsScheduled(true);
 
         return $this;
     }

@@ -11,9 +11,10 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,13 +30,20 @@ class EventLogModel extends AbstractCommonModel
     protected $eventModel;
 
     /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
      * EventLogModel constructor.
      *
-     * @param EventModel $eventModel
+     * @param EventModel    $eventModel
+     * @param CampaignModel $campaignModel
      */
-    public function __construct(EventModel $eventModel)
+    public function __construct(EventModel $eventModel, CampaignModel $campaignModel)
     {
-        $this->eventModel = $eventModel;
+        $this->eventModel    = $eventModel;
+        $this->campaignModel = $campaignModel;
     }
 
     /**
@@ -176,8 +184,32 @@ class EventLogModel extends AbstractCommonModel
             }
         }
 
-        $this->getRepository()->saveEntity($log);
+        $this->saveEntity($log);
 
         return [$log, $created];
+    }
+
+    /**
+     * @param $entity
+     */
+    public function saveEntity(LeadEventLog $entity)
+    {
+        $eventSettings = $this->campaignModel->getEvents();
+        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_SCHEDULED)) {
+            $event = $entity->getEvent();
+            $args  = [
+                'eventSettings'   => $eventSettings[$event->getEventType()][$event->getType()],
+                'eventDetails'    => null,
+                'event'           => $event->convertToArray(),
+                'lead'            => $entity->getLead(),
+                'systemTriggered' => false,
+                'dateScheduled'   => $entity->getTriggerDate(),
+            ];
+
+            $scheduledEvent = new CampaignScheduledEvent($args, $entity);
+            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_SCHEDULED, $scheduledEvent);
+        }
+
+        $this->getRepository()->saveEntity($entity);
     }
 }
