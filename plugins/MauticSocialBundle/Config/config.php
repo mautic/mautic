@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -53,6 +54,7 @@ return [
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.form.model.form',
+                    'mautic.helper.core_parameters',
                     ],
                 'alias' => 'sociallogin',
             ],

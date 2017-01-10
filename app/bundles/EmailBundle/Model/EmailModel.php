@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,6 +13,7 @@ namespace Mautic\EmailBundle\Model;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -219,6 +221,9 @@ class EmailModel extends FormModel
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
+        } else {
+            // Ensure that all lists are been removed in case of a clone
+            $entity->setLists([]);
         }
 
         if (!$this->updatingTranslationChildren) {
@@ -472,7 +477,7 @@ class EmailModel extends FormModel
         $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
         $dd->parse();
         $deviceRepo      = $this->leadModel->getDeviceRepository();
-        $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+        $emailOpenDevice = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
         if (empty($emailOpenDevice)) {
             $emailOpenDevice = new LeadDevice();
@@ -498,7 +503,7 @@ class EmailModel extends FormModel
                 }
             }
         } else {
-            $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+            $emailOpenDevice = $this->em->getReference(LeadDevice::class, $emailOpenDevice['id']);
         }
 
         if ($email) {
@@ -873,6 +878,11 @@ class EmailModel extends FormModel
             $lists = $email->getLists();
         }
 
+        // Safety check
+        if ('list' !== $email->getEmailType()) {
+            return [0, 0, []];
+        }
+
         $options = [
             'source'        => ['email', $email->getId()],
             'allowResends'  => false,
@@ -1140,8 +1150,8 @@ class EmailModel extends FormModel
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
         $isMarketing      = (in_array($emailType, ['marketing']) || !empty($listId));
-        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
-        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : 3;
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
         if (!$email->getId()) {
@@ -1188,7 +1198,6 @@ class EmailModel extends FormModel
             $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
                 'email',
                 $leadIds,
-                $listId,
                 $defaultFrequencyNumber,
                 $defaultFrequencyTime
             );
@@ -1724,7 +1733,7 @@ class EmailModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**
@@ -1902,6 +1911,14 @@ class EmailModel extends FormModel
             $dateTo
         );
 
+        if (empty($deviceStats)) {
+            $deviceStats[] = [
+                'count'   => 0,
+                'device'  => $this->translator->trans('mautic.report.report.noresults'),
+                'list_id' => 0,
+            ];
+        }
+
         foreach ($deviceStats as $device) {
             $chart->setDataset($device['device'], $device['count']);
         }
@@ -1932,7 +1949,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1971,7 +1988,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
+                ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1995,7 +2012,7 @@ class EmailModel extends FormModel
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $leadEventLogRepository->setCurrentUser($this->user);
+        $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',
@@ -2042,5 +2059,94 @@ class EmailModel extends FormModel
                 $sendTo[$key]['companies'] = $contactCompanies;
             }
         }
+    }
+
+    /**
+     * Send an email to lead(s).
+     *
+     * @param       $email
+     * @param       $users
+     * @param mixed $leadFields
+     * @param array $tokens
+     * @param array $assetAttachments
+     * @param bool  $saveStat
+     *
+     * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function sendSampleEmailToUser($email, $users, $leadFields = null, $tokens = [], $assetAttachments = [], $saveStat = true)
+    {
+        if (!$emailId = $email->getId()) {
+            return false;
+        }
+
+        if (!is_array($users)) {
+            $user  = ['id' => $users];
+            $users = [$user];
+        }
+
+        //get email settings
+        $emailSettings = &$this->getEmailSettings($email, false);
+
+        //noone to send to so bail
+        if (empty($users)) {
+            return false;
+        }
+
+        $mailer = $this->mailHelper->getSampleMailer();
+        $mailer->setLead($leadFields, true);
+        $mailer->setTokens($tokens);
+        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
+
+        $errors = [];
+        foreach ($users as $user) {
+            $idHash = uniqid();
+            $mailer->setIdHash($idHash);
+
+            if (!is_array($user)) {
+                $id   = $user;
+                $user = ['id' => $id];
+            } else {
+                $id = $user['id'];
+            }
+
+            if (!isset($user['email'])) {
+                $userEntity        = $this->userModel->getEntity($id);
+                $user['email']     = $userEntity->getEmail();
+                $user['firstname'] = $userEntity->getFirstName();
+                $user['lastname']  = $userEntity->getLastName();
+            }
+
+            if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
+                $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
+            } else {
+                if (!$mailer->queue(true)) {
+                    $errorArray = $mailer->getErrors();
+                    unset($errorArray['failures']);
+                    $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
+                }
+
+                if ($saveStat) {
+                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                }
+            }
+        }
+
+        //flush the message
+        if (!$mailer->flushQueue()) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+            $errors[] = implode('; ', $errorArray);
+        }
+
+        if (isset($saveEntities)) {
+            $this->getStatRepository()->saveEntities($saveEntities);
+        }
+
+        //save some memory
+        unset($mailer);
+
+        return $errors;
     }
 }

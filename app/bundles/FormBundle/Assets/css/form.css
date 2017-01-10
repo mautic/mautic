@@ -8,6 +8,10 @@
     position: relative;
 }
 
+.form-field-wrapper img {
+    max-width: 100%;
+}
+
 #mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
     padding: 10px;
 }
@@ -86,4 +90,7 @@ textarea.form-html {
 #mauticforms_fields input[type="datetime-local"],
 #mauticforms_fields input[type="month"] {
     line-height: inherit;
+}
+#mauticforms_fields input.mauticform-radiogrp-radio {
+    width: auto;
 }

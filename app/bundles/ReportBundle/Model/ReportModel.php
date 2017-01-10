@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -372,9 +373,9 @@ class ReportModel extends FormModel
                             if ($count === 0) {
                                 //write the row
                                 fputcsv($handle, $header);
-                            } else {
-                                fputcsv($handle, $row);
                             }
+
+                            fputcsv($handle, $row);
 
                             //free memory
                             unset($row, $reportData['data'][$count]);
@@ -662,7 +663,7 @@ class ReportModel extends FormModel
      */
     public function getReportsWithGraphs()
     {
-        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->user->getId();
+        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
         return $this->getRepository()->findReportsWithGraphs($ownedBy);
     }

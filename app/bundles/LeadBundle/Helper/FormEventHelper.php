@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -72,6 +73,20 @@ class FormEventHelper
 
         if (!empty($removeFrom)) {
             $leadModel->removeFromLists($lead, $removeFrom);
+        }
+    }
+
+    public static function scoreContactsCompanies($action, $factory)
+    {
+        $properties = $action->getProperties();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $factory->getModel('lead');
+        $lead      = $leadModel->getCurrentLead();
+        $score     = $properties['score'];
+
+        if (!empty($score)) {
+            $leadModel->scoreContactsCompany($lead, $score);
         }
     }
 }

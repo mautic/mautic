@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -67,7 +68,7 @@ class DynamicContentFilterEntryType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-basic',
+                    'class' => 'form-control editor editor-dynamic-content',
                 ],
             ]
         );
@@ -88,6 +89,7 @@ class DynamicContentFilterEntryType extends AbstractType
                         'timezones' => $this->timezoneChoices,
                         'stages'    => $this->stageChoices,
                         'locales'   => $this->localeChoices,
+                        'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

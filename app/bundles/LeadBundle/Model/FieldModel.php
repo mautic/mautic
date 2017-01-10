@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -351,7 +352,7 @@ class FieldModel extends FormModel
             // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
-            $aliases   = $repo->getAliases($entity->getId());
+            $aliases   = $repo->getAliases($entity->getId(), false, true, $entity->getObject());
             $count     = (int) in_array($testAlias, $aliases);
             $aliasTag  = $count;
 
@@ -544,9 +545,12 @@ class FieldModel extends FormModel
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('leadfield', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('leadfield', $entity, $options);
     }
 
     /**
@@ -685,9 +689,16 @@ class FieldModel extends FormModel
      */
     public function getFieldListWithProperties($object = 'lead')
     {
+        $forceFilters[] = [
+            'column' => 'f.object',
+            'expr'   => 'eq',
+            'value'  => $object,
+        ];
         $contactFields = $this->getEntities(
             [
-                'object'           => $object,
+                'filter' => [
+                    'force' => $forceFilters,
+                ],
                 'ignore_paginator' => true,
                 'hydration_mode'   => 'hydrate_array',
             ]
@@ -756,9 +767,11 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getUniqueIdentiferFields()
+    public function getUniqueIdentiferFields($filters = [])
     {
-        $filters = ['isPublished' => true, 'isUniqueIdentifer' => true];
+        $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
+        $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
+        $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
 
         $fields = $this->getFieldList(false, true, $filters);
 
@@ -770,9 +783,9 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getUniqueIdentifierFields()
+    public function getUniqueIdentifierFields($filters = [])
     {
-        return $this->getUniqueIdentiferFields();
+        return $this->getUniqueIdentiferFields($filters);
     }
 
     /**
@@ -811,6 +824,8 @@ class FieldModel extends FormModel
             case 'country':
             case 'email':
             case 'lookup':
+            case 'select':
+            case 'multiselect':
             case 'region':
             case 'tel':
             case 'text':

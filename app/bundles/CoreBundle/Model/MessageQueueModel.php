@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -152,15 +153,18 @@ class MessageQueueModel extends FormModel
         // get a list of leads to fetch details all at once along with company details for dynamic email content, etc
         /** @var MessageQueue $message */
         foreach ($queue as $message) {
-            $contacts[$message->getId()] = $message->getLead()->getId();
+            if ($message->getLead()) {
+                $contacts[$message->getId()] = $message->getLead()->getId();
+            }
         }
-        $contactData = $this->leadModel->getRepository()->getContacts($contacts);
-        $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
-        foreach ($contacts as $messageId => $contactId) {
-            $contactData[$contactId]['companies'] = $companyData[$contactId];
-            $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
+        if (!empty($contacts)) {
+            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+            $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
+            foreach ($contacts as $messageId => $contactId) {
+                $contactData[$contactId]['companies'] = isset($companyData[$contactId]) ? $companyData[$contactId] : null;
+                $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
+            }
         }
-
         // Group queue by channel and channel ID - this make it possible for processing listeners to batch process such as
         // sending emails in batches to 3rd party transactional services via HTTP APIs
         foreach ($queue as $key => $message) {

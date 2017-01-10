@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -85,6 +86,10 @@ class DynamicContentModel extends FormModel
      */
     public function getEntity($id = null)
     {
+        if ($id === null) {
+            return new DynamicContent();
+        }
+
         return parent::getEntity($id);
     }
 
@@ -234,7 +239,7 @@ class DynamicContentModel extends FormModel
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')
-            ->setParameter('userId', $this->user->getId());
+            ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
     /**

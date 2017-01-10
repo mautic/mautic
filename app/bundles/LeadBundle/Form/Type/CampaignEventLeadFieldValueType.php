@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -84,7 +85,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             $fieldValues = null;
             $fieldType   = null;
-            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
+            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date'];
 
             if (isset($data['field'])) {
                 $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
@@ -114,6 +115,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 break;
                             case 'locale':
                                 $fieldValues = FormFieldHelper::getLocaleChoices();
+                                break;
+                            case 'date':
+                                $fieldHelper = new FormFieldHelper();
+                                $fieldHelper->setTranslator($this->factory->getTranslator());
+                                $fieldValues = $fieldHelper->getDateChoices();
                                 break;
                             default:
                                 if (!empty($properties)) {
@@ -153,12 +159,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control',
-                        ],
-                        'required'    => true,
-                        'constraints' => [
-                            new NotBlank(
-                                ['message' => 'mautic.core.value.required']
-                            ),
                         ],
                     ]
                 );

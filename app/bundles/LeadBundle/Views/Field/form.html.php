@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,7 @@ if (!empty($userId)) {
 $view['slots']->set('headerTitle', $header);
 
 $selectTemplate      = $view['form']->row($form['properties_select_template']);
+$lookupTemplate      = $view['form']->row($form['properties_lookup_template']);
 $defaultTemplate     = $view['form']->widget($form['default_template']);
 $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
 ?>
@@ -80,12 +82,17 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                             break;
                         case 'select':
                         case 'multiselect':
-                        case 'lookup':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $selectTemplate,
                             ]);
                             break;
+                        case 'lookup':
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+                                'form'           => $form['properties'],
+                                'selectTemplate' => $lookupTemplate,
+                                'isLookup'       => 'lookup',
+                            ]);
                         endswitch;
                         ?>
                     </div>
@@ -152,6 +159,10 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
         'selectTemplate' => $selectTemplate,
+    ]);
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+        'selectTemplate' => $lookupTemplate,
+        'isLookup'       => 'lookup',
     ]);
 ?>
 </div>

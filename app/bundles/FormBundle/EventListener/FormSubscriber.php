@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -233,9 +234,15 @@ class FormSubscriber extends CommonSubscriber
         $matchedFields = [];
         $payload       = [
             'mautic_contact' => $lead->getProfileFields(),
+            'mautic_form'    => [
+                'id'   => $post['formId'],
+                'name' => $post['formName'],
+                'url'  => $post['return'],
+            ],
         ];
-
+        $fieldTypes = [];
         foreach ($fields as $field) {
+            $fieldTypes[$field['alias']] = $field['type'];
             if (!isset($post[$field['alias']]) || 'button' == $field['type']) {
                 continue;
             }
@@ -287,10 +294,21 @@ class FormSubscriber extends CommonSubscriber
             $email = $config['failure_email'];
             // Failed so send email if applicable
             if (!empty($email)) {
-                $post['array'] = $post;
-                $results       = $this->postToHtml($post);
-                $submission    = $event->getSubmission();
-                $emails        = $emails        = $this->getEmailsFromString($email);
+                // Remove Mautic values and password fields
+                foreach ($post as $key => $value) {
+                    if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
+                        unset($post[$key]);
+                    }
+                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                        $post[$key] = '*********';
+                    }
+                }
+                $post['mautic_contact'] = array_filter($payload['mautic_contact']);
+                $post['mautic_form']    = $payload['mautic_form'];
+
+                $results    = $this->postToHtml($post);
+                $submission = $event->getSubmission();
+                $emails     = $emails     = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])

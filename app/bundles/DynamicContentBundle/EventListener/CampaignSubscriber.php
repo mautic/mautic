@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -148,6 +149,7 @@ class CampaignSubscriber extends CommonSubscriber
             $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
             $content = $tokenEvent->getContent();
+            $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
 
             $event->stopPropagation();
 

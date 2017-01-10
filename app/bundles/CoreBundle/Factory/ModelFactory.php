@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,7 +32,7 @@ class ModelFactory
     /**
      * @param $modelNameKey
      *
-     * @return mixed
+     * @return AbstractCommonModel
      */
     public function getModel($modelNameKey)
     {

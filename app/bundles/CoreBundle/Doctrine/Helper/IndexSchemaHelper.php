@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,7 +14,7 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 class IndexSchemaHelper
@@ -115,7 +116,7 @@ class IndexSchemaHelper
                 $columnSchema = $this->table->getColumn($column);
 
                 $type = $columnSchema->getType();
-                if ($type instanceof StringType) {
+                if (!$type instanceof TextType) {
                     $this->allowedColumns[] = $columnSchema->getName();
                 }
             }

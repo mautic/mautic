@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -97,6 +99,39 @@ class DoNotContact
 
         $builder->createField('comments', 'text')
             ->nullable()
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('lead')
+            ->setRoot('lead')
+            ->addListProperties(
+                [
+                    'id',
+                    'dateAdded',
+                    'reason',
+                    'comments',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
+                    'id',
+                    'dateAdded',
+                    'reason',
+                    'comments',
+                    'channel',
+                    'channelId',
+                    'lead',
+                ]
+            )
             ->build();
     }
 

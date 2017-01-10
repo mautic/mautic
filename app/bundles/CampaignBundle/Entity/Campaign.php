@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -183,9 +184,9 @@ class Campaign extends FormEntity
                     'publishUp',
                     'publishDown',
                     'events',
-                    'leads',
+                    'leads', // @deprecated, will be renamed to 'contacts' in 3.0.0
                     'forms',
-                    'lists',
+                    'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
                     'canvasSettings',
                 ]
             )
@@ -444,7 +445,7 @@ class Campaign extends FormEntity
      */
     public function addList(LeadList $list)
     {
-        $this->lists[] = $list;
+        $this->lists[$list->getId()] = $list;
 
         $this->changes['lists']['added'][$list->getId()] = $list->getName();
 

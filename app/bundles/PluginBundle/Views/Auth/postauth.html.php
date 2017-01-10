@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,9 +14,9 @@ $data = json_encode($data);
 $js   = <<<JS
 function postFormHandler() {
     var opener = window.opener;
-    if(opener && typeof opener.postAuthCallback == 'function') {
-            opener.postAuthCallback({$data});
-    }else {
+    if (opener && typeof opener.postAuthCallback == 'function') {
+        opener.postAuthCallback({$data});
+    } else {
         Mautic.refreshIntegrationForm();
     }
     window.close()

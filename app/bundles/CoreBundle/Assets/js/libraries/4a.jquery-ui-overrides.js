@@ -44,5 +44,5 @@
             m[ i ].proportions({width: m[ i ].element[ 0 ].offsetWidth, height: m[ i ].element[ 0 ].offsetHeight});
         }
 
-    }
+    };
 }) (jQuery);

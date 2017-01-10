@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -60,14 +61,18 @@ class CategoryController extends FormController
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted([
-            $bundle.':categories:view',
-            $bundle.':categories:create',
-            $bundle.':categories:edit',
-            $bundle.':categories:delete',
-        ], 'RETURN_ARRAY');
+        $permissionBase = $this->getModel('category')->getPermissionBase($bundle);
+        $permissions    = $this->get('mautic.security')->isGranted(
+            [
+                $permissionBase.':view',
+                $permissionBase.':create',
+                $permissionBase.':edit',
+                $permissionBase.':delete',
+            ],
+            'RETURN_ARRAY'
+        );
 
-        if (!$permissions[$bundle.':categories:view']) {
+        if (!$permissions[$permissionBase.':view']) {
             return $this->accessDenied();
         }
 
@@ -87,17 +92,17 @@ class CategoryController extends FormController
             $start = 0;
         }
 
-        if ($bundle == 'category') {
-            $bundleFilter = null;
-        } else {
-            $bundleFilter = [
-                'column' => 'c.bundle',
-                'expr'   => 'eq',
-                'value'  => $bundle,
+        $filter = ['string' => $search];
+
+        if ($bundle != 'category') {
+            $filter['force'] = [
+                [
+                    'column' => 'c.bundle',
+                    'expr'   => 'eq',
+                    'value'  => $bundle,
+                ],
             ];
         }
-
-        $filter = ['string' => $search, 'force' => [$bundleFilter]];
 
         $orderBy    = $this->get('session')->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->get('session')->get('mautic.category.orderbydir', 'DESC');
@@ -124,15 +129,17 @@ class CategoryController extends FormController
             $session->set('mautic.category.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_category_index', $viewParams);
 
-            return $this->postActionRedirect([
-                'returnUrl'       => $returnUrl,
-                'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticCategoryBundle:Category:index',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_'.$bundle.'category_index',
-                    'mauticContent' => 'category',
-                ],
-            ]);
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $lastPage],
+                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_'.$bundle.'category_index',
+                        'mauticContent' => 'category',
+                    ],
+                ]
+            );
         }
 
         $categoryTypes = ['category' => $this->get('translator')->trans('mautic.core.select')];
@@ -149,25 +156,28 @@ class CategoryController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        return $this->delegateView([
-            'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
-            'viewParameters' => [
-                'bundle'        => $bundle,
-                'searchValue'   => $search,
-                'items'         => $entities,
-                'page'          => $page,
-                'limit'         => $limit,
-                'permissions'   => $permissions,
-                'tmpl'          => $tmpl,
-                'categoryTypes' => $categoryTypes,
-            ],
-            'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_'.$bundle.'category_index',
-                'mauticContent' => 'category',
-                'route'         => $this->generateUrl('mautic_category_index', $viewParams),
-            ],
-        ]);
+        return $this->delegateView(
+            [
+                'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
+                'viewParameters' => [
+                    'bundle'         => $bundle,
+                    'permissionBase' => $permissionBase,
+                    'searchValue'    => $search,
+                    'items'          => $entities,
+                    'page'           => $page,
+                    'limit'          => $limit,
+                    'permissions'    => $permissions,
+                    'tmpl'           => $tmpl,
+                    'categoryTypes'  => $categoryTypes,
+                ],
+                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'route'         => $this->generateUrl('mautic_category_index', $viewParams),
+                ],
+            ]
+        );
     }
 
     /**
@@ -187,7 +197,7 @@ class CategoryController extends FormController
         $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
-        if (!$this->get('mautic.security')->isGranted($bundle.':categories:create')) {
+        if (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':create')) {
             return $this->modalAccessDenied();
         }
         //Create the form
@@ -280,11 +290,10 @@ class CategoryController extends FormController
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
         $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
-
         //not found
         if ($entity === null) {
             $closeModal = true;
-        } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:view')) {
+        } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':view')) {
             return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
             return $this->modalAccessDenied();
@@ -432,7 +441,7 @@ class CategoryController extends FormController
                     'msg'     => 'mautic.category.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:delete')) {
+            } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
@@ -500,7 +509,7 @@ class CategoryController extends FormController
                         'msg'     => 'mautic.category.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);

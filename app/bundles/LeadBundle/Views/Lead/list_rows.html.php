@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,9 +12,7 @@
         <?php foreach ($items as $item): ?>
             <?php /** @var \Mautic\LeadBundle\Entity\Lead $item */ ?>
             <?php $fields = $item->getFields(); ?>
-            <tr<?php if (!empty($highlight)) {
-    echo ' class="warning"';
-} ?>>
+            <tr<?php if (!empty($highlight)): echo ' class="warning"'; endif; ?>>
                 <td>
                     <?php
                     $hasEditAccess = $security->hasEntityAccess(

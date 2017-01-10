@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -333,7 +334,7 @@ EOT
     /*
      * handles splitting a string handle into first / last name based on a space
      *
-     * return array($first, $last)
+     * @return array($first, $last)
      */
     private function splitName($name)
     {
@@ -346,7 +347,7 @@ EOT
         // push the rest of the name into first name
         $firstName = implode(' ', $nameParts);
 
-        return [$lastName, $firstName];
+        return [$firstName, $lastName];
     }
 
     /*

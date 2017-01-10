@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -25,8 +26,11 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderFieldsAction(Request $request, $name = 'fields')
+    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
+        if ('form' === $name) {
+            $name = 'fields';
+        }
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';

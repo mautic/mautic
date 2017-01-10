@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,7 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class DynamicContentFilterType.
@@ -42,7 +43,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-basic',
+                    'class' => 'form-control editor editor-dynamic-content',
                 ],
             ]
         );
@@ -67,9 +68,9 @@ class DynamicContentFilterType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,8 +27,9 @@ class ThemeUploadType extends AbstractType
     {
         $builder->add('file', 'file', [
             'attr' => [
-                'accept' => '.zip',
-                'class'  => 'form-control',
+                'accept'   => '.zip',
+                'class'    => 'form-control',
+                'required' => true,
             ],
         ]);
         $constraints = [

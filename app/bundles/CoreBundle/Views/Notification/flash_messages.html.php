@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,7 +20,7 @@ $alertClasses = ($alertType == 'growl') ?
     ['notice' => 'alert-growl',   'warning' => 'alert-growl',   'error' => 'alert-growl'] :
     ['notice' => 'alert-success', 'warning' => 'alert-warning', 'error' => 'alert-danger'];
 
-$flashes = $view['session']->getFlashes();
+$flashes = $app->getSession() ? $view['session']->getFlashes() : [];
 ?>
 <?php foreach ($flashes as $type => $messages): ?>
 <?php $message = (is_array($messages)) ? $messages[0] : $messages; ?>

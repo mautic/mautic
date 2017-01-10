@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -140,9 +141,7 @@ class StageType extends AbstractType
             'data_class' => 'Mautic\StageBundle\Entity\Stage',
         ]);
 
-        $resolver->setRequired(['stageActions']);
-
-        $resolver->setOptional(['actionType']);
+        $resolver->setOptional(['stageActions', 'actionType']);
     }
 
     /**

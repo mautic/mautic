@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,7 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $halfSize = (empty($embedded)) ? 4 : 6;
 $fullSize = (empty($embedded)) ? 8 : 12;
 ?>
@@ -19,8 +19,8 @@ foreach ($groups as $key => $group):
         $groupFields = $fields[$group];
         if (!empty($groupFields)): ?>
             <div class="tab-pane fade<?php if ($key === 0) {
-                echo ' in active';
-            } ?> bdr-rds-0 bdr-w-0" id="company-<?php echo $group; ?>">
+            echo ' in active';
+        } ?> bdr-rds-0 bdr-w-0" id="company-<?php echo $group; ?>">
                 <?php if (empty($embedded)): ?>
                     <div class="pa-md bg-auto bg-light-xs bdr-b">
                         <h4 class="fw-sb">

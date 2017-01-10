@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -68,6 +69,29 @@ return [
                     'url' => '.*/$',
                 ],
             ],
+        ],
+        'api' => [
+            'mautic_core_api_file_list' => [
+                'path'       => '/files/{dir}',
+                'controller' => 'MauticCoreBundle:Api\FileApi:list',
+            ],
+            'mautic_core_api_file_create' => [
+                'path'       => '/files/{dir}/new',
+                'controller' => 'MauticCoreBundle:Api\FileApi:create',
+                'method'     => 'POST',
+            ],
+            'mautic_core_api_file_delete' => [
+                'path'       => '/files/{dir}/{file}/delete',
+                'controller' => 'MauticCoreBundle:Api\FileApi:delete',
+                'method'     => 'DELETE',
+            ],
+            'mautic_core_api_stats' => [
+               'path'       => '/stats/{table}',
+               'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+               'defaults'   => [
+                    'table' => '',
+                ],
+           ],
         ],
     ],
     'menu' => [
@@ -148,6 +172,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.core.stats.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.spacer' => [
@@ -223,14 +253,12 @@ return [
                 'alias'     => 'builder_section',
             ],
             'mautic.form.type.slot' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotType',
+                'alias' => 'slot',
             ],
             'mautic.form.type.slot.button' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'slot_button',
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
+                'alias' => 'slot_button',
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
@@ -240,7 +268,7 @@ return [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
                 'alias' => 'dynamic_content_filter',
             ],
-            'mautic.form.type.dynamic_content_filter_entry'         => [
+            'mautic.form.type.dynamic_content_filter_entry' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
                 'alias'     => 'dynamic_content_filter_entry',
                 'arguments' => [
@@ -256,7 +284,7 @@ return [
                     'mautic.lead.model.list',
                 ],
             ],
-            'mautic.form.type.entity_lookup'                        => [
+            'mautic.form.type.entity_lookup' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
                 'arguments' => [
                     'mautic.model.factory',
@@ -274,8 +302,14 @@ return [
             ],
             'mautic.helper.template.date' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'date',
+                'arguments' => [
+                    '%mautic.date_format_full%',
+                    '%mautic.date_format_short%',
+                    '%mautic.date_format_dateonly%',
+                    '%mautic.date_format_timeonly%',
+                    'translator',
+                ],
+                'alias' => 'date',
             ],
             'mautic.helper.template.exception' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
@@ -303,8 +337,12 @@ return [
             ],
             'mautic.helper.template.button' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'buttons',
+                'arguments' => [
+                    'templating',
+                    'translator',
+                    'event_dispatcher',
+                ],
+                'alias' => 'buttons',
             ],
             'mautic.helper.template.formatter' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
@@ -359,17 +397,17 @@ return [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
             'mautic.rabbitMQ' => [
-              'class' => 'Mautic\CoreBundle\Queue\RabbitMq',
+              'class'     => 'Mautic\CoreBundle\Queue\RabbitMq',
               'arguments' => [
-                'old_sound_rabbit_mq.task_email_producer'
-              ]
+                'old_sound_rabbit_mq.task_email_producer',
+              ],
             ],
             'mautic.queue_service' => [
-                'class' => 'Mautic\CoreBundle\Queue\QueueService',
+                'class'     => 'Mautic\CoreBundle\Queue\QueueService',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.rabbitMQ',
-                ]
+                ],
             ],
         ],
         'menus' => [
@@ -437,8 +475,11 @@ return [
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'routing.loader',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.core_parameters',
+                ],
+                'tag' => 'routing.loader',
             ],
             'mautic.security' => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
@@ -464,6 +505,7 @@ return [
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
+                    'router',
                     '"MauticCoreBundle:Exception:show"',
                     'monolog.logger.mautic',
                 ],
@@ -723,59 +765,60 @@ return [
     ],
 
     'parameters' => [
-        'site_url'                       => '',
-        'webroot'                        => '',
-        'cache_path'                     => '%kernel.root_dir%/cache',
-        'log_path'                       => '%kernel.root_dir%/logs',
-        'image_path'                     => 'media/images',
-        'theme'                          => 'Mauve',
-        'db_driver'                      => 'pdo_mysql',
-        'db_host'                        => '127.0.0.1',
-        'db_port'                        => 3306,
-        'db_name'                        => '',
-        'db_user'                        => '',
-        'db_password'                    => '',
-        'db_table_prefix'                => '',
-        'db_server_version'              => '5.5',
-        'locale'                         => 'en_US',
-        'secret_key'                     => '',
-        'dev_hosts'                      => null,
-        'trusted_hosts'                  => null,
-        'trusted_proxies'                => null,
-        'rememberme_key'                 => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'            => 31536000, //365 days in seconds
-        'rememberme_path'                => '/',
-        'rememberme_domain'              => '',
-        'default_pagelimit'              => 30,
-        'default_timezone'               => 'UTC',
-        'date_format_full'               => 'F j, Y g:i a T',
-        'date_format_short'              => 'D, M d',
-        'date_format_dateonly'           => 'F j, Y',
-        'date_format_timeonly'           => 'g:i a',
-        'ip_lookup_service'              => 'maxmind_download',
-        'ip_lookup_auth'                 => '',
-        'ip_lookup_config'               => [],
-        'transifex_username'             => '',
-        'transifex_password'             => '',
-        'update_stability'               => 'stable',
-        'cookie_path'                    => '/',
-        'cookie_domain'                  => '',
-        'cookie_secure'                  => null,
-        'cookie_httponly'                => false,
-        'do_not_track_ips'               => [],
-        'do_not_track_internal_ips'      => [],
-        'link_shortener_url'             => null,
-        'cached_data_timeout'            => 10,
-        'batch_sleep_time'               => 1,
-        'batch_campaign_sleep_time'      => false,
-        'cors_restrict_domains'          => true,
-        'cors_valid_domains'             => [],
-        'rss_notification_url'           => 'https://mautic.com/?feed=rss2&tag=notification',
-        'rabbitmq_host'                  => 'localhost',
-        'rabbitmq_port'                  => '5672',
-        'rabbitmq_vhost'                 => '/',
-        'rabbitmq_user'                  => 'guest',
-        'rabbitmq_password'              => 'guest',
-        'queue_protocol'                 => 0,
-    ]
+        'site_url'                  => '',
+        'webroot'                   => '',
+        'cache_path'                => '%kernel.root_dir%/cache',
+        'log_path'                  => '%kernel.root_dir%/logs',
+        'image_path'                => 'media/images',
+        'tmp_path'                  => '%kernel.root_dir%/cache',
+        'theme'                     => 'Mauve',
+        'db_driver'                 => 'pdo_mysql',
+        'db_host'                   => '127.0.0.1',
+        'db_port'                   => 3306,
+        'db_name'                   => '',
+        'db_user'                   => '',
+        'db_password'               => '',
+        'db_table_prefix'           => '',
+        'db_server_version'         => '5.5',
+        'locale'                    => 'en_US',
+        'secret_key'                => '',
+        'dev_hosts'                 => null,
+        'trusted_hosts'             => null,
+        'trusted_proxies'           => null,
+        'rememberme_key'            => hash('sha1', uniqid(mt_rand())),
+        'rememberme_lifetime'       => 31536000, //365 days in seconds
+        'rememberme_path'           => '/',
+        'rememberme_domain'         => '',
+        'default_pagelimit'         => 30,
+        'default_timezone'          => 'UTC',
+        'date_format_full'          => 'F j, Y g:i a T',
+        'date_format_short'         => 'D, M d',
+        'date_format_dateonly'      => 'F j, Y',
+        'date_format_timeonly'      => 'g:i a',
+        'ip_lookup_service'         => 'maxmind_download',
+        'ip_lookup_auth'            => '',
+        'ip_lookup_config'          => [],
+        'transifex_username'        => '',
+        'transifex_password'        => '',
+        'update_stability'          => 'stable',
+        'cookie_path'               => '/',
+        'cookie_domain'             => '',
+        'cookie_secure'             => null,
+        'cookie_httponly'           => false,
+        'do_not_track_ips'          => [],
+        'do_not_track_internal_ips' => [],
+        'link_shortener_url'        => null,
+        'cached_data_timeout'       => 10,
+        'batch_sleep_time'          => 1,
+        'batch_campaign_sleep_time' => false,
+        'cors_restrict_domains'     => true,
+        'cors_valid_domains'        => [],
+        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rabbitmq_host'             => 'localhost',
+        'rabbitmq_port'             => '5672',
+        'rabbitmq_vhost'            => '/',
+        'rabbitmq_user'             => 'guest',
+        'rabbitmq_password'         => 'guest',
+        'queue_protocol'            => 0,
+    ],
 ];

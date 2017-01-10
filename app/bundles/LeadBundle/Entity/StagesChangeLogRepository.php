@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -31,7 +32,7 @@ class StagesChangeLogRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
-            ->select('ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded')
+            ->select('ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded')
             ->where('ls.lead_id = '.(int) $leadId);
 
         if (isset($options['search']) && $options['search']) {
@@ -120,5 +121,27 @@ class StagesChangeLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
+    }
+
+    /**
+     * Get the current stage assigned to a lead.
+     *
+     * @param $leadId
+     *
+     * @return mixed
+     */
+    public function getCurrentLeadStage($leadId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $query->select('stage_id as stage')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
+            ->where($query->expr()->eq('lead_id', ':value'))
+            ->setParameter('value', $leadId)
+            ->orderBy('date_added', 'DESC');
+
+        $result = $query->execute()->fetch();
+
+        return (isset($result['stage'])) ? $result['stage'] : null;
     }
 }

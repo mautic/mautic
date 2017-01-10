@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -43,8 +44,11 @@ class EnvironmentSubscriber extends CommonSubscriber
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequestSetTimezone', 9999],
-                ['onKernelRequestSetLocale', 15], // Must be 15 to load after Symfony's default Locale listener
+                // Cannot be called earlier than priority 128 or the session is not populated leading to Doctrine's UTCDateTimeType leaving
+                // entity DateTime values in UTC
+                ['onKernelRequestSetTimezone', 128],
+                // Must be 15 to load after Symfony's default Locale listener
+                ['onKernelRequestSetLocale', 15],
             ],
         ];
     }

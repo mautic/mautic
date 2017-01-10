@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -135,10 +136,10 @@ class LeadType extends AbstractType
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],
-                'multiple' => true,
-                'required' => false,
-                'mapped'   => false,
-                'data'     => $leadCompanies,
+                'multiple'   => true,
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => $leadCompanies,
             ]
         );
 

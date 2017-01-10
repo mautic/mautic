@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,8 +22,12 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall' => 'true',
-                        'target'   => '#pointTable',
+                        'checkall'        => 'true',
+                        'target'          => '#pointTable',
+                        'routeBase'       => 'point',
+                        'templateButtons' => [
+                            'delete' => $permissions['point:points:delete'],
+                        ],
                     ]
                 );
 

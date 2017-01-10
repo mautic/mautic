@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -17,6 +18,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -40,6 +42,13 @@ class CommonRepository extends EntityRepository
      * @var User
      */
     protected $currentUser;
+
+    /**
+     * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
+     *
+     * @var array
+     */
+    protected $advancedFilterCommands = [];
 
     /**
      * @param TranslatorInterface $translator
@@ -129,6 +138,172 @@ class CommonRepository extends EntityRepository
             // All results
             return $query->getResult($hydrationMode);
         }
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param int   $start
+     * @param int   $limit
+     * @param array $order
+     * @param array $where
+     * @param array $select
+     *
+     * @return array
+     */
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null)
+    {
+        $alias = $this->getTableAlias();
+        $table = $this->getClassMetadata()->getTableName();
+        $q     = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(*)')
+          ->from($table, $alias);
+
+        $this->buildDbalWhere($q, $where);
+
+        $count = $q->execute()->fetchColumn();
+
+        if ($select) {
+            foreach ($select as &$column) {
+                if (strpos($column, '.') === false) {
+                    $column = $alias.'.'.$column;
+                }
+            }
+            $selectString = implode(', ', $select);
+        } else {
+            $selectString = $alias.'.*';
+        }
+
+        $q->resetQueryPart('select')
+            ->select($selectString)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        $this->buildDbalOrderBy($q, $order);
+
+        $results = $q->execute()->fetchAll();
+
+        return [
+            'total'   => $count,
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param QueryBuilder $query
+     * @param array        $args  [['expr' => 'DBAL expression', 'col' => 'DB clumn', 'val' => 'value to search for']]
+     *
+     * @return array
+     */
+    public function buildDbalWhere($query, $args)
+    {
+        $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn'];
+        $justColumn  = ['isNull', 'isNotNull'];
+        $andOr       = ['andX', 'orX'];
+
+        if ($args && is_array($args)) {
+            foreach ($args as $argument) {
+                $argument = $this->validateDbalWhereArray($argument);
+                if (method_exists($query->expr(), $argument['expr'])) {
+                    if (in_array($argument['expr'], $columnValue)) {
+                        $param = $query->createNamedParameter($argument['val']);
+                        $query->andWhere($query->expr()->{$argument['expr']}($this->getTableAlias().'.'.$argument['col'], $param));
+                    } elseif (in_array($argument['expr'], $justColumn)) {
+                        $query->andWhere($query->expr()->{$argument['expr']}($this->getTableAlias().'.'.$argument['col']));
+                    } elseif (in_array($argument['expr'], $andOr)) {
+                        $query->{$argument['expr']}($this->buildDbalWhere($query, $argument['val']));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param QueryBuilder $query
+     * @param array        $args  [['col' => 'column_a', 'dir' => 'ASC']]
+     *
+     * @return array
+     */
+    public function buildDbalOrderBy($query, $args)
+    {
+        if ($args && is_array($args)) {
+            foreach ($args as $argument) {
+                $argument = $this->validateDbalOrderByArray($argument);
+                $query->addOrderBy($argument['col'], $argument['dir']);
+            }
+        }
+    }
+
+    /**
+     * Validate the array for one where condition.
+     *
+     * @param array $args ['expr' => 'DBAL expression', 'col' => 'DB clumn', 'val' => 'value to search for']
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    public function validateDbalWhereArray(array $args)
+    {
+        $msg = '"%s" is missing in the where clause array.';
+        if (empty($args['expr'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'expr'));
+        }
+
+        if (empty($args['col'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'col'));
+        }
+
+        if (!isset($args['val'])) {
+            $args['val'] = '';
+        }
+
+        $args['expr'] = $this->sanitize($args['expr']);
+        $args['col']  = $this->sanitize($args['col'], ['_']);
+        // Value will be santitized by Doctrine
+
+        return $args;
+    }
+
+    /**
+     * Validate array for one order by condition.
+     *
+     * @param array $args ['col' => 'column_a', 'dir' => 'ASC']
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    public function validateDbalOrderByArray(array $args)
+    {
+        $msg = '"%s" is missing in the order by clause array.';
+        if (empty($args['col'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'col'));
+        }
+
+        if (empty($args['dir'])) {
+            $args['dir'] = 'ASC';
+        }
+
+        $args['dir'] = $this->sanitize(strtoupper($args['dir']));
+        $args['col'] = $this->sanitize($args['col'], ['_']);
+
+        return $args;
+    }
+
+    /**
+     * Returns entity table name.
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->getClassMetadata()->getTableName();
     }
 
     /**
@@ -247,85 +422,83 @@ class CommonRepository extends EntityRepository
      */
     protected function buildWhereClause(&$q, array $args)
     {
-        $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
-        $filterHelper = new SearchStringHelper();
-        $string       = '';
+        $filter                    = array_key_exists('filter', $args) ? $args['filter'] : '';
+        $filterHelper              = new SearchStringHelper();
+        $advancedFilters           = new \stdClass();
+        $advancedFilters->root     = [];
+        $advancedFilters->commands = [];
+        // Reset advanced filter commands to be used in search query building
+        $this->advancedFilterCommands = [];
+        $advancedFilterStrings        = [];
+        $queryParameters              = [];
+        $queryExpression              = $q->expr()->andX();
 
         if (!empty($filter)) {
             if (is_array($filter)) {
                 if (!empty($filter['force'])) {
                     if (is_array($filter['force'])) {
                         //defined columns with keys of column, expr, value
-                        $forceParameters  = [];
-                        $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
                             if ($f instanceof Query\Expr || $f instanceof CompositeExpression) {
-                                $expr = $f;
+                                $queryExpression->add($f);
 
-                                if (isset($expr->parameters)) {
-                                    $forceParameters = $expr->parameters;
-                                    unset($expr->parameters);
+                                if (isset($f->parameters) && is_array($f->parameters)) {
+                                    $queryParameters = array_merge($queryParameters, $f->parameters);
+                                    unset($f->parameters);
                                 }
                             } elseif (is_array($f)) {
                                 list($expr, $parameters) = $this->getFilterExpr($q, $f);
-                                $forceExpressions->add($expr);
-                                if (!empty($parameters) && is_array($parameters)) {
-                                    $forceParameters = array_merge($forceParameters, $parameters);
+                                $queryExpression->add($expr);
+                                if (is_array($parameters)) {
+                                    $queryParameters = array_merge($queryParameters, $parameters);
                                 }
                             } else {
                                 //string so parse as advanced search
-                                $parsed                  = $filterHelper->parseSearchString($f);
-                                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
-                                $forceExpressions->add($expr);
-                                if (!empty($parameters) && is_array($parameters)) {
-                                    $forceParameters = array_merge($forceParameters, $parameters);
-                                }
+                                $advancedFilterStrings[] = $f;
                             }
                         }
                     } else {
                         //string so parse as advanced search
-                        $parsed                                   = $filterHelper->parseSearchString($filter['force']);
-                        list($forceExpressions, $forceParameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
+                        $advancedFilterStrings[] = $filter['force'];
                     }
                 }
 
                 if (!empty($filter['string'])) {
-                    $string = $filter['string'];
+                    $advancedFilterStrings[] = $filter['string'];
                 }
             } else {
-                $string = $filter;
+                $advancedFilterStrings[] = $filter;
+            }
+
+            if (!empty($advancedFilterStrings)) {
+                foreach ($advancedFilterStrings as $parseString) {
+                    $parsed = $filterHelper->parseString($parseString);
+
+                    $advancedFilters->root = array_merge($advancedFilters->root, $parsed->root);
+                    $filterHelper->mergeCommands($advancedFilters, $parsed->commands);
+                }
+                $this->advancedFilterCommands = $advancedFilters->commands;
+
+                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
+                $this->appendExpression($queryExpression, $expr);
+
+                if (is_array($parameters)) {
+                    $queryParameters = array_merge($queryParameters, $parameters);
+                }
             }
 
             //parse the filter if set
-            if (!empty($string) || !empty($forceExpressions)) {
-                if (!empty($string)) {
-                    $filter                         = $filterHelper->parseSearchString($string);
-                    list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
+            if ($queryExpression->count()) {
+                $q->andWhere($queryExpression);
+            }
 
-                    if (!empty($forceExpressions)) {
-                        $parameters = array_merge($parameters, $forceParameters);
-                    }
-                } elseif (!empty($forceExpressions)) {
-                    $parameters = $forceParameters;
-                }
-
-                $filterCount = 0;
-                if (!empty($expressions) && $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts())) {
-                    $q->andWhere($expressions);
-                }
-
-                if (!empty($forceExpressions) && $forcedFilterCount = ($forceExpressions instanceof \Countable) ? count($forceExpressions) : count($forceExpressions->getParts())) {
-                    $q->andWhere($forceExpressions);
-                }
-
-                if (!empty($filterCount) || !empty($forceExpressions)) {
-                    foreach ($parameters as $k => $v) {
-                        if ($v === true || $v === false) {
-                            $q->setParameter($k, $v, 'boolean');
-                        } else {
-                            $q->setParameter($k, $v);
-                        }
-                    }
+            // Parameters have to be set even if there are no expressions just in case a search command
+            // passed back a parameter it used
+            foreach ($queryParameters as $k => $v) {
+                if ($v === true || $v === false) {
+                    $q->setParameter($k, $v, 'boolean');
+                } else {
+                    $q->setParameter($k, $v);
                 }
             }
         }
@@ -410,6 +583,16 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Array of search commands supported by the repository.
+     *
+     * @return array
+     */
+    public function getSearchCommands()
+    {
+        return ['mautic.core.searchcommand.ids'];
+    }
+
+    /**
      * @param \Doctrine\ORM\QueryBuilder $qb
      * @param array                      $filter
      *
@@ -431,21 +614,40 @@ class CommonRepository extends EntityRepository
      */
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
-        if (isset($filters->root)) {
-            //function is determined by the second clause type
+        $parseFilters = [];
+        if (isset($filters->root[0])) {
+            // Function is determined by the second clause type
             $type         = (isset($filters->root[1])) ? $filters->root[1]->type : $filters->root[0]->type;
             $parseFilters = &$filters->root;
-        } elseif (isset($filters->children)) {
+        } elseif (isset($filters->children[0])) {
             $type         = (isset($filters->children[1])) ? $filters->children[1]->type : $filters->children[0]->type;
             $parseFilters = &$filters->children;
-        } else {
+        } elseif (is_array($filters)) {
             $type         = (isset($filters[1])) ? $filters[1]->type : $filters[0]->type;
             $parseFilters = &$filters;
+        }
+
+        if (empty($type)) {
+            $type = 'and';
         }
 
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
+        if ($parseFilters) {
+            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+        }
+
+        return [$expressions, $parameters];
+    }
+
+    /**
+     * @param $parseFilters
+     * @param $expr
+     * @param $parameters
+     */
+    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
+    {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
                 list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
@@ -468,22 +670,74 @@ class CommonRepository extends EntityRepository
                 $parameters = array_merge($parameters, $params);
             }
 
-            if (!empty($expr)) {
-                $expressions->add($expr);
-            }
+            $this->appendExpression($expressions, $expr);
         }
-
-        return [$expressions, $parameters];
     }
 
     /**
-     * Array of search commands supported by the repository.
+     * @param $appendTo
+     * @param $expr
+     */
+    protected function appendExpression($appendTo, $expr)
+    {
+        if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
+            if ($expr->count()) {
+                $appendTo->add($expr);
+            }
+        } elseif (!empty($expr)) {
+            $appendTo->add($expr);
+        }
+    }
+
+    /**
+     * @deprecated 2.5 to be removed in 3.0; BC for mispelled method
+     *
+     * @param $parseFilters
+     * @param $qb
+     * @param $expressions
+     * @param $parameters
+     */
+    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    {
+        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+    }
+
+    /**
+     * @param $qb
+     * @param $filter
+     *
+     * @return mixed
+     */
+    protected function getIdsExpr(&$q, $filter)
+    {
+        if ($ids = array_map('intval', explode(',', $filter->string))) {
+            return $q->expr()->in($this->getTableAlias().'.id', $ids);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $qb
+     * @param $filter
      *
      * @return array
      */
-    public function getSearchCommands()
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        return [];
+        $command = $filter->command;
+        $expr    = false;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr = $this->getIdsExpr($q, $filter);
+                break;
+        }
+
+        return [
+            $expr,
+            [],
+        ];
     }
 
     /**
@@ -521,13 +775,29 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Sanitizes a string to alphanum plus characters in the second argument.
+     *
+     * @param string $sqlAttr
+     * @param array  $allowedCharacters
+     *
+     * @return string
+     */
+    protected function sanitize($sqlAttr, $allowedCharacters = [])
+    {
+        return InputHelper::alphanum($sqlAttr, false, false, $allowedCharacters);
+    }
+
+    /**
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param array                      $args
      */
     protected function buildOrderByClause(&$q, array $args)
     {
         $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
-        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : '';
+        $orderByDir = $this->sanitize(
+            array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
+        );
+
         if (empty($orderBy)) {
             $defaultOrder = $this->getDefaultOrder();
 
@@ -538,6 +808,8 @@ class CommonRepository extends EntityRepository
             //add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
+                $order = $this->sanitize($order, ['_', '.']);
+
                 $q->addOrderBy($order, $orderByDir);
             }
         }
@@ -589,6 +861,7 @@ class CommonRepository extends EntityRepository
     {
         $unique = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string = $filter->string;
+
         if (!$filter->strict) {
             if (strpos($string, '%') === false) {
                 $string = "$string%";
@@ -599,7 +872,7 @@ class CommonRepository extends EntityRepository
 
         if ($q instanceof QueryBuilder) {
             $xFunc    = 'orX';
-            $exprFunc = 'notLike';
+            $exprFunc = 'like';
         } else {
             $ormQb = false;
             if ($filter->not) {
@@ -718,6 +991,10 @@ class CommonRepository extends EntityRepository
                 $expr           = $q->expr()->like("{$catPrefix}.alias", ":$unique");
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr            = $this->getIdsExpr($q, $filter);
+                $returnParameter = false;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -729,7 +1006,13 @@ class CommonRepository extends EntityRepository
         } elseif (!$returnParameter) {
             $parameters = [];
         } else {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $string = $filter->string;
+            if (!$filter->strict) {
+                if (strpos($string, '%') === false) {
+                    $string = "$string%";
+                }
+            }
+
             $parameters = ["$unique" => $string];
         }
 
@@ -747,6 +1030,7 @@ class CommonRepository extends EntityRepository
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.core.searchcommand.ids',
         ];
     }
 

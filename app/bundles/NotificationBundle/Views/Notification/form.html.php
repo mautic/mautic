@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,6 +34,7 @@ $view['slots']->set('headerTitle', $header);
                                 <?php echo $view['form']->row($form['name']); ?>
                                 <?php echo $view['form']->row($form['heading']); ?>
                                 <?php echo $view['form']->row($form['url']); ?>
+                                <?php echo $view['form']->row($form['button']); ?>
                             </div>
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['message']); ?>

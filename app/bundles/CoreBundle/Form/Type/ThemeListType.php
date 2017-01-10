@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -38,7 +39,10 @@ class ThemeListType extends AbstractType
         $factory = $this->factory;
         $resolver->setDefaults([
             'choices' => function (Options $options) use ($factory) {
-                return $factory->getInstalledThemes($options['feature']);
+                $themes = $factory->getInstalledThemes($options['feature']);
+                $themes['mautic_code_mode'] = 'Code Mode';
+
+                return $themes;
             },
             'expanded'    => false,
             'multiple'    => false,

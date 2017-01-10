@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,7 +16,6 @@ use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Matcher\MatcherInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -44,9 +44,12 @@ class MenuBuilder
     private $menuHelper;
 
     /**
-     * @param FactoryInterface $knpFactory
-     * @param MatcherInterface $matcher
-     * @param MauticFactory    $factory
+     * MenuBuilder constructor.
+     *
+     * @param FactoryInterface         $knpFactory
+     * @param MatcherInterface         $matcher
+     * @param EventDispatcherInterface $dispatcher
+     * @param MenuHelper               $menuHelper
      */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -60,26 +61,9 @@ if (!empty($fields['core']['email']['value'])) {
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
         'iconClass' => 'fa fa-send',
+        'primary'   => true,
     ];
 }
-//View Lead List button
-$buttons[] = [
-    'attr' => [
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans(
-            'mautic.lead.lead.header.lists',
-            ['%name%' => $lead->getPrimaryIdentifier()]
-        ),
-        'data-footer' => 'false',
-        'href'        => $view['router']->path(
-            'mautic_contact_action',
-            ['objectId' => $lead->getId(), 'objectAction' => 'list']
-        ),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-pie-chart',
-];
 
 //View Contact Frequency button
 
@@ -188,8 +172,8 @@ $view['slots']->set(
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
                             <li class="<?php if ($step === 0) {
-                                echo 'active';
-                            } ?>">
+    echo 'active';
+} ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                                 </a>
@@ -218,7 +202,7 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                     <?php else: ?>
-                                                        <?php if ('multiselect' === $field['type']): ?>
+                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
                                                             <?php echo $field['value']; ?>
@@ -516,12 +500,12 @@ $view['slots']->set(
             <?php endforeach; ?>
             <div class="clearfix"></div>
         </div>
-        <div class="pa-sm">
+        <div class="pa-sm panel-companies">
             <div class="panel-title">  <?php echo $view['translator']->trans(
                     'mautic.lead.lead.companies'); ?></div>
             <?php foreach ($companies as $key => $company): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label <?php if ($key == 0): ?>label-primary <?php else: ?>label-success<?php endif?>" >
-                        <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success" >
+                       <i id="company-<?php echo $company['id']; ?>" class="fa fa-check <?php if ($company['is_primary'] == 1): ?>primary<?php endif?>" onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);" title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>"></i> <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
                     </span>
                 </h5>
             <?php endforeach; ?>
