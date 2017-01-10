@@ -494,7 +494,7 @@ $view['slots']->set(
                                     <?php if (!empty($errors)): ?>
                                     <i class="fa fa-warning text-danger" data-toggle="tooltip" title="<?php echo $errors; ?>"></i>
                                     <?php endif; ?>
-                                    <p class="fs-12 dark-sm timeline-campaign-event-schedule-<?php echo $event['event_id']; ?>"><?php echo $view['date']->toFull($event['trigger_date'], 'utc'); ?></p>
+                                    <p class="fs-12 dark-sm timeline-campaign-event-date-<?php echo $event['event_id']; ?>"><?php echo $view['date']->toFull($event['trigger_date'], 'utc'); ?></p>
                                 </div>
                             </li>
                         <?php endforeach; ?>

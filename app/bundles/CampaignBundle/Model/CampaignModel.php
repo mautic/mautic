@@ -65,7 +65,7 @@ class CampaignModel extends CommonFormModel
     /**
      * @var
      */
-    protected $events;
+    protected static $events;
 
     /**
      * CampaignModel constructor.

@@ -15,7 +15,7 @@ if (!empty($item['metadata']['errors'])) {
 }
 
 $cancelled = (empty($item['isScheduled']) && empty($item['dateTriggered']));
-$dateSpan  = '<span class="timeline-campaign-event-schedule-'.$item['event_id'].'" style="'.($cancelled ? 'text-decoration: line-through;' : '').'" data-date="'.$item['triggerDate']->format('Y-m-d H:i:s').'">'.$view['date']->toFull($item['triggerDate']).'</span>';
+$dateSpan  = '<span class="timeline-campaign-event-date-'.$item['event_id'].'" data-date="'.$item['triggerDate']->format('Y-m-d H:i:s').'">'.$view['date']->toFull($item['triggerDate']).'</span>';
 
 if ($cancelled) {
     // Note is scheduled
@@ -29,7 +29,16 @@ if ($cancelled) {
     echo ' class="text-warning"';
 } ?>>
             <i class="fa fa-clock-o"></i>
-            <?php echo $view['translator']->trans('mautic.core.timeline.event.scheduled.time', ['%date%' => $dateSpan, '%event%' => $event['eventLabel']]); ?>
+            <span class="timeline-campaign-event-scheduled-<?php echo $item['event_id']; ?><?php if ($cancelled) {
+    echo ' hide';
+} ?>">
+                <?php echo $view['translator']->trans('mautic.core.timeline.event.scheduled.time', ['%date%' => $dateSpan, '%event%' => $event['eventLabel']]); ?>
+            </span>
+            <span class="timeline-campaign-event-cancelled-<?php echo $item['event_id']; ?><?php if (!$cancelled) {
+    echo ' hide';
+} ?>">
+                <?php echo $view['translator']->trans('mautic.campaign.event.cancelled.time', ['%date%' => $dateSpan, '%event%' => $event['eventLabel']]); ?>
+            </span>
         </span>
         <?php if ($view['security']->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())): ?>
         <span class="form-buttons btn-group btn-group-xs mb-3" role="group" aria-label="Field options">
