@@ -11,8 +11,8 @@
 
 namespace Mautic\AssetBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\AssetBundle\Entity\Asset;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
