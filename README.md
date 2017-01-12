@@ -9,13 +9,13 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 <table width="100%" border="0">
 	<tr>
 		<td>
-			<center>**Step 1**</center>
+			<center><b>Step 1</b></center>
 		</td>
 		<td>
-			<center>**Step 2**</center>
+			<center><b>Step 2</b></center>
 		</td>
 		<td>
-			<center>**Step 3**</center>
+			<center><b>Step 3</b></center>
 		</td>
 	</tr>
 	<tr>
