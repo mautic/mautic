@@ -197,6 +197,15 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->setSubject($config['subject']);
 
             $this->mailer->addTokens($tokens);
+
+            if (isset($config['templates'])) {
+                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                $model = $this->mailer->getFactory()->getModel('email');
+                /** @var \Mautic\EmailBundle\Entity\Email $email */
+                $email             = $model->getEntity($config['templates']);
+                $config['message'] = $email->getCustomHtml();
+            }
+
             $this->mailer->setBody($config['message']);
             $this->mailer->parsePlainText($config['message']);
 
