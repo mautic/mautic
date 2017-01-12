@@ -61,24 +61,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
         $leadModel  = $this->factory->getModel('lead.lead');
         $fieldModel = $this->factory->getModel('lead.field');
-        $operators  = $leadModel->getFilterExpressionFunctions();
-        $choices    = [];
-
-        foreach ($operators as $key => $operator) {
-            $choices[$key] = $operator['label'];
-        }
-        $builder->add(
-            'operator',
-            'choice',
-            [
-                'choices' => $choices,
-            ]
-        );
 
         $ff = $builder->getFormFactory();
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) use ($ff, $fieldModel) {
+        $func = function (FormEvent $e) use ($ff, $fieldModel, $leadModel) {
             $data = $e->getData();
             $form = $e->getForm();
             $fieldValues = null;
@@ -86,7 +73,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date', 'notifications'];
 
             if (isset($data['field'])) {
-
 
                     $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
 
@@ -129,14 +115,31 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     }
                 }
 
-
+                $disabled = false;
                 if ($data['field'] == 'notifications') {
+                    $disabled = true;
                     $fieldType = $data['field'];
                     $fieldValues['options'] = [
                         0 => $this->factory->getTranslator()->trans('mautic.core.form.no'),
                         1 => $this->factory->getTranslator()->trans('mautic.core.form.yes'),
                     ];
                 }
+
+                $operators  = $leadModel->getFilterExpressionFunctions();
+                $choices    = [];
+
+                foreach ($operators as $key => $operator) {
+                    $choices[$key] = $operator['label'];
+                }
+                $form->add(
+                    'operator',
+                    'choice',
+                    [
+                        'choices' => $choices,
+                        'disabled' => $disabled,
+                    ]
+                );
+
             }
 
             // Display selectbox for a field with choices, textbox for others

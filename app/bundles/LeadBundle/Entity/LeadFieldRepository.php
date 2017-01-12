@@ -174,7 +174,7 @@ class LeadFieldRepository extends CommonRepository
             if($value){
                 return !empty($result['id']);
             }else{
-                return !empty($result['id']);
+                return empty($result['id']);
             }
 
         } else {

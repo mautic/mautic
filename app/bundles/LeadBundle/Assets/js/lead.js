@@ -1055,6 +1055,12 @@ Mautic.updateLeadFieldValues = function (field) {
                 mQuery('#campaignevent_properties_value').chosen('destroy');
             }
 
+            if(fieldAlias == 'notifications'){
+                mQuery('#campaignevent_properties_operator').prop("disabled" , true).trigger("chosen:updated");
+            }else{
+                mQuery('#campaignevent_properties_operator').prop("disabled" , false).trigger("chosen:updated");
+            }
+
             if (!mQuery.isEmptyObject(response.options)) {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
