@@ -67,7 +67,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
         }
-
         $builder->add(
             'operator',
             'choice',
@@ -82,13 +81,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $func = function (FormEvent $e) use ($ff, $fieldModel) {
             $data = $e->getData();
             $form = $e->getForm();
-
             $fieldValues = null;
             $fieldType   = null;
-            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date'];
+            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date', 'notifications'];
 
             if (isset($data['field'])) {
-                $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+
+
+                    $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
 
                 if ($field) {
                     $properties = $field->getProperties();
@@ -127,6 +127,15 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 }
                         }
                     }
+                }
+
+
+                if ($data['field'] == 'notifications') {
+                    $fieldType = $data['field'];
+                    $fieldValues['options'] = [
+                        0 => $this->factory->getTranslator()->trans('mautic.core.form.no'),
+                        1 => $this->factory->getTranslator()->trans('mautic.core.form.yes'),
+                    ];
                 }
             }
 
