@@ -55,6 +55,11 @@ abstract class AbstractIntegration
     protected $cache;
 
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
      * @param MauticFactory $factory
      *
      * @todo divorce from MauticFactory
@@ -64,6 +69,7 @@ abstract class AbstractIntegration
         $this->factory    = $factory;
         $this->dispatcher = $factory->getDispatcher();
         $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em         = $factory->getEntityManager();
 
         $this->init();
     }
@@ -1249,7 +1255,8 @@ abstract class AbstractIntegration
     public function getAvailableLeadFields($settings = [])
     {
         if (empty($settings['ignore_field_cache'])) {
-            if ($fields = $this->cache->get('leadFields')) {
+            $prefix = (isset($settings['cache_suffix'])) ? '.'.$settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$prefix)) {
                 return $fields;
             }
         }
