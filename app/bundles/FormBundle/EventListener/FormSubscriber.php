@@ -47,19 +47,24 @@ class FormSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
      * FormSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param MailHelper     $mailer
-     * @param EmailModel     $mailModel
+     * @param EmailModel     $emailModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, EmailModel $mailModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, EmailModel $emailModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->mailer         = $mailer->getMailer();
-        $this->mailModel      = $mailModel;
+        $this->emailModel     = $emailModel;
     }
 
     /**
