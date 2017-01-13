@@ -538,7 +538,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
-                if (isset($createdLeadData['Id'])) {
+                if (isset($createdLeadData['id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
@@ -548,7 +548,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setDateAdded(new \DateTime());
                         $integrationEntity->setIntegration('Salesforce');
                         $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($createdLeadData['Id']);
+                        $integrationEntity->setIntegrationEntityId($createdLeadData['id']);
                         $integrationEntity->setInternalEntity('Lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
                     } else {
