@@ -112,7 +112,7 @@ class CacheStorageHelper
         $cacheItem = $this->cacheAdaptor->getItem($name);
 
         if (null !== $expiration) {
-            $cacheItem->expiresAfter($expiration);
+            $cacheItem->expiresAfter((int) $expiration);
         } elseif (isset($this->expirations[$name])) {
             // @deprecated BC support to be removed in 3.0
             $cacheItem->expiresAfter($this->expirations[$name]);
@@ -120,7 +120,7 @@ class CacheStorageHelper
 
         $cacheItem->set($data);
 
-        return $this->cacheAdaptor->save($cacheItem);
+        $this->cacheAdaptor->save($cacheItem);
     }
 
     /**
@@ -134,7 +134,7 @@ class CacheStorageHelper
         if (0 === $maxAge) {
             return false;
         } elseif (null !== $maxAge) {
-            $this->expirations[$name] = $maxAge;
+            $this->expirations[$name] = (int) $maxAge;
         }
 
         $cacheItem = $this->cacheAdaptor->getItem($name);
@@ -175,7 +175,7 @@ class CacheStorageHelper
      * @param null $namespace
      * @param null $defaultExpiration
      *
-     * @return $this;
+     * @return CacheStorageHelper;
      */
     public function getCache($namespace = null, $defaultExpiration = 0)
     {
@@ -188,7 +188,7 @@ class CacheStorageHelper
         }
 
         if (!isset($this->cache[$namespace])) {
-            $this->cache[$namespace] = new self($this->adaptor, $namespace, $this->connection, $this->cacheDir, $defaultExpiration);
+            $this->cache[$namespace] = new self($this->adaptor, $namespace, $this->connection, $this->cacheDir, (int) $defaultExpiration);
         }
 
         return $this->cache[$namespace];
