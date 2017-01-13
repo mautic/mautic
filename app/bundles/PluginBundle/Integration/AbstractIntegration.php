@@ -1255,8 +1255,8 @@ abstract class AbstractIntegration
     public function getAvailableLeadFields($settings = [])
     {
         if (empty($settings['ignore_field_cache'])) {
-            $prefix = (isset($settings['cache_suffix'])) ? '.'.$settings['cache_suffix'] : '';
-            if ($fields = $this->cache->get('leadFields'.$prefix)) {
+            $cacheSuffix = (isset($settings['cache_suffix'])) ? $settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$cacheSuffix)) {
                 return $fields;
             }
         }

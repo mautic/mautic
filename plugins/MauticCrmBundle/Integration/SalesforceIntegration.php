@@ -213,7 +213,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
 
                         // Check the cache first
-                        $settings['cache_suffix'] = $sfObject;
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
                             $salesFields[$sfObject] = $fields;
 
@@ -254,6 +254,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     ];
                                 }
                             }
+
+                            $this->cache->set('leadFields'.$cacheSuffix, $salesFields);
                         }
                     }
                 }
@@ -285,8 +287,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
-        $this->cache->set('leadFields', $salesFields);
 
         return $salesFields;
     }
