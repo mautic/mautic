@@ -116,6 +116,10 @@ class CacheStorageHelper
         } elseif (isset($this->expirations[$name])) {
             // @deprecated BC support to be removed in 3.0
             $cacheItem->expiresAfter($this->expirations[$name]);
+        } elseif ($data === $cacheItem->get()) {
+            // Exact same data so don't update the cache unless expiration is set
+
+            return false;
         }
 
         $cacheItem->set($data);
