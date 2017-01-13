@@ -38,10 +38,10 @@ class CacheHelper
     public function __construct(\AppKernel $kernel)
     {
         $this->kernel        = $kernel;
-        $this->cacheDir      = $this->container()->get('mautic.helper.paths')->getSystemPath('cache', true);
+        $this->container     = $kernel->getContainer();
+        $this->cacheDir      = $this->container->get('mautic.helper.paths')->getSystemPath('cache', true);
         $this->configFile    = $kernel->getLocalConfigFile(false);
         $this->containerFile = $kernel->getContainerFile();
-        $this->container     = $kernel->getContainer();
     }
 
     /**

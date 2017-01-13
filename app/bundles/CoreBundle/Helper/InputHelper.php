@@ -220,7 +220,7 @@ class InputHelper
         }
 
         if (!empty($allowedCharacters)) {
-            $regex = '/[^0-9a-z'.implode('', $allowedCharacters).']+/i';
+            $regex = '/[^0-9a-z'.preg_quote(implode('', $allowedCharacters)).']+/i';
         } else {
             $regex = '/[^0-9a-z]+/i';
         }
