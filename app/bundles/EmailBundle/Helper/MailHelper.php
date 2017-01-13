@@ -250,14 +250,6 @@ class MailHelper
     }
 
     /**
-     * @return MauticFactory
-     */
-    public function getFactory()
-    {
-        return $this->factory;
-    }
-
-    /**
      * Mirrors previous MauticFactory functionality.
      *
      * @param bool $cleanSlate
