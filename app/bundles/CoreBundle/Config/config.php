@@ -527,13 +527,24 @@ return [
                     'request_stack',
                 ],
             ],
+            'mautic.helper.cache_storage' => [
+                'class'     => 'Mautic\CoreBundle\Helper\CacheStorageHelper',
+                'arguments' => [
+                    '"db"',
+                    '%mautic.db_table_prefix%',
+                    'doctrine.dbal.default_connection',
+                    '%kernel.cache_dir%',
+                ],
+            ],
             'mautic.helper.update' => [
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
                 'arguments' => 'mautic.factory',
             ],
             'mautic.helper.cache' => [
                 'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'kernel',
+                ],
             ],
             'mautic.helper.templating' => [
                 'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
