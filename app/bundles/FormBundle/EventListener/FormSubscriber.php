@@ -208,7 +208,7 @@ class FormSubscriber extends CommonSubscriber
 
             if (isset($config['templates'])) {
                 /** @var \Mautic\EmailBundle\Entity\Email $email */
-                $email             = $this->mailModel->getEntity($config['templates']);
+                $email             = $this->emailModel->getEntity($config['templates']);
                 $config['message'] = $email->getCustomHtml();
             }
 
