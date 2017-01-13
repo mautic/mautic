@@ -323,9 +323,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         // Update the owner if it matches (needs to be set by the integration) when fetching the data
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
-            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
-                                        ->findOneBy(['email' => $data['owner_email']]);
-            if ($mauticUser instanceof User) {
+            if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
         }
