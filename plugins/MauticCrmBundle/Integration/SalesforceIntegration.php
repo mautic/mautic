@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -188,6 +187,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields()) {
+            return $fields;
+        }
+
         static $leadObject = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $salesForceObjects = [];
@@ -213,7 +216,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
                         if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
                             foreach ($leadObject[$sfObject]['fields'] as $fieldInfo) {
-                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id')) || !isset($fieldInfo['name'])
+                                if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
+                                    || !isset($fieldInfo['name'])
                                     || in_array(
                                         $fieldInfo['type'],
                                         ['reference']
@@ -251,10 +255,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             }
 
                             $salesFields[$fieldInfo['name']] = [
-                                    'type'     => 'string',
-                                    'label'    => $fieldInfo['label'],
-                                    'required' => $isRequired($fieldInfo),
-                                ];
+                                'type'     => 'string',
+                                'label'    => $fieldInfo['label'],
+                                'required' => $isRequired($fieldInfo),
+                            ];
                         }
                     }
                 }
@@ -266,6 +270,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
+        $this->cache->set('leadFields', $salesFields);
 
         return $salesFields;
     }
@@ -286,6 +292,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
     public function getFetchQuery($params)
     {
         $dateRange = $params;
@@ -332,7 +343,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if ($entity) {
                         $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
-                        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, $mauticObjectReference, $entity->getId());
+                        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
+                            'Salesforce',
+                            $object,
+                            $mauticObjectReference,
+                            $entity->getId()
+                        );
 
                         if ($integrationId == null) {
                             $integrationEntity = new IntegrationEntity();
@@ -588,6 +604,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $executed;
     }
+
     /**
      * @param $query
      * @param $object
@@ -836,17 +853,5 @@ class SalesforceIntegration extends CrmAbstractIntegration
         unset($pointChangeLog, $emailStats, $formSubmissions);
 
         return $leadActivity;
-    }
-
-    /**
-     * @return FilesystemAdapter
-     *
-     * @TODO This should probably be moved to a service and system-wide
-     */
-    public function getCache()
-    {
-        $cacheDir = $this->dispatcher->getContainer()->get('mautic.helper.paths')->getSystemPath('cache');
-
-        return new FilesystemAdapter('integration.salesforce', 0, $cacheDir);
     }
 }

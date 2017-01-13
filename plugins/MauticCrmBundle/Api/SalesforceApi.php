@@ -87,14 +87,7 @@ class SalesforceApi extends CrmApi
             $object = 'Account'; //salesforce object name
         }
 
-        $leadFields = $this->integration->getCache()->getItem('leadFields.'.$object);
-
-        if (!$leadFields->isHit()) {
-            $leadFields->set($this->request('describe', [], 'GET', false, $object));
-            $this->integration->getCache()->save($leadFields);
-        }
-
-        return $leadFields->get();
+        return $this->request('describe', [], 'GET', false, $object);
     }
 
     /**
@@ -248,19 +241,20 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @return mixed
+     */
     public function getOrganizationCreatedDate()
     {
         $cache = $this->integration->getCache();
 
-        $organizationCreatedDate = $cache->getItem('organization.created_date');
-
-        if (!$organizationCreatedDate->isHit()) {
-            $queryUrl     = $this->integration->getQueryUrl();
-            $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
-            $organizationCreatedDate->set($organization['records'][0]['CreatedDate']);
-            $cache->save($organizationCreatedDate);
+        if (!$organizationCreatedDate = $cache->get('organization.created_date')) {
+            $queryUrl                = $this->integration->getQueryUrl();
+            $organization            = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            $organizationCreatedDate = $organization['records'][0]['CreatedDate'];
+            $cache->set('organization.created_date', $organizationCreatedDate);
         }
 
-        return $organizationCreatedDate->get();
+        return $organizationCreatedDate;
     }
 }

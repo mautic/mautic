@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
@@ -49,14 +50,30 @@ abstract class AbstractIntegration
     protected $keys;
 
     /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
+
+    /**
      * @param MauticFactory $factory
+     *
+     * @todo divorce from MauticFactory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory    = $factory;
         $this->dispatcher = $factory->getDispatcher();
+        $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
 
         $this->init();
+    }
+
+    /**
+     * @return CacheStorageHelper
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     /**
@@ -1231,6 +1248,12 @@ abstract class AbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if (empty($settings['ignore_field_cache'])) {
+            if ($fields = $this->cache->get('leadFields')) {
+                return $fields;
+            }
+        }
+
         return [];
     }
 
