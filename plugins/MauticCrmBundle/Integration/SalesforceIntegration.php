@@ -15,7 +15,9 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -181,7 +183,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array $settings
+     *
      * @return array|mixed
+     *
+     * @throws \Exception
      */
     public function getAvailableLeadFields($settings = [])
     {
@@ -316,7 +322,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Amend mapped lead data before creating to Mautic.
      *
-     * @param $data
+     * @param array  $data
+     * @param string $object
+     *
+     * @return int
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
@@ -341,7 +350,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if ($dataObject) {
+                if (isset($dataObject) && $dataObject) {
                     if ($object == 'Lead' or $object == 'Contact') {
                         // Set owner so that it maps if configured to do so
                         if (!empty($dataObject['Owner__Lead']['Email'])) {
@@ -354,9 +363,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     } elseif ($object == 'Account') {
                         $entity                = $this->getMauticCompany($dataObject, true, null);
                         $mauticObjectReference = 'company';
+                    } else {
+                        $this->logIntegrationError(new \Exception(
+                            sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)));
+                        continue;
                     }
 
                     if ($entity) {
+                        /** @var IntegrationEntityRepository $integrationEntityRepo */
                         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
                         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
                             'Salesforce',
@@ -396,9 +410,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param FormBuilder $builder
+     * @param array       $data
+     * @param string      $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
@@ -477,6 +491,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array  $fields
      * @param array  $keys
      * @param string $object
+     *
+     * @return array
      */
     public function cleanSalesForceData($fields, $keys, $object)
     {
@@ -493,7 +509,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param array                          $config
+     *
+     * @return array|bool
      */
     public function pushLead($lead, $config = [])
     {
@@ -520,6 +539,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 if (isset($createdLeadData['Id'])) {
+                    /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
 
@@ -549,7 +569,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param array      $params
+     * @param null|array $query
+     *
+     * @return int|null
      */
     public function getLeads($params = [], $query = null)
     {
@@ -590,7 +613,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param array      $params
+     * @param null|array $query
+     *
+     * @return int|null
      */
     public function getCompanies($params = [], $query = null)
     {
@@ -621,8 +647,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $query
-     * @param $object
+     * @param array $fields
+     *
+     * @return array
      */
     public function amendToSfFields($fields)
     {
@@ -657,12 +684,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
-        $integrationEntityRepo = $this->em->getRepository(
-            'MauticPluginBundle:IntegrationEntity'
-        );
-        $startDate = new \DateTime($query['start']);
-        $endDate   = new \DateTime($query['end']);
-        $limit     = 100;
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $startDate             = new \DateTime($query['start']);
+        $endDate               = new \DateTime($query['end']);
+        $limit                 = 100;
 
         foreach ($salesForceObjects as $object) {
             try {

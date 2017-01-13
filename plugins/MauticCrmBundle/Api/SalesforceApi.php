@@ -44,13 +44,13 @@ class SalesforceApi extends CrmApi
         }
 
         if (!$queryUrl) {
-            $queryUrl    = $this->integration->getApiUrl();
-            $request_url = sprintf($queryUrl.'/%s/%s', $object, $operation);
+            $queryUrl   = $this->integration->getApiUrl();
+            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
         } else {
-            $request_url = sprintf($queryUrl.'/%s', $operation);
+            $requestUrl = sprintf($queryUrl.'/%s', $operation);
         }
 
-        $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
@@ -79,6 +79,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param null|string $object
+     *
      * @return mixed
      */
     public function getLeadFields($object = null)
@@ -199,7 +201,8 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param string $query
+     * @param array  $query
+     * @param string $object
      *
      * @return mixed
      */
