@@ -511,8 +511,12 @@ class LeadModel extends FormModel
             $form->submit($data);
 
             if (!$form->isValid()) {
+                if ($form->getErrors()->count()) {
+                    $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+                }
                 foreach ($form as $field => $formField) {
-                    if ($formField->getErrors()) {
+                    if (isset($data[$field]) && $formField->getErrors()->count()) {
+                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     }
