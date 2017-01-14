@@ -275,7 +275,7 @@ class EventModel extends CommonFormModel
         $this->triggeredResponses = [];
         foreach ($events as $campaignId => $campaignEvents) {
             if (empty($campaigns[$campaignId])) {
-                $this->logger->debug('CAMPAIGN: Campaign entity for ID# '.$campaignId.' not found');
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Campaign entity for ID# ".$campaignId.' not found');
 
                 continue;
             }
@@ -284,7 +284,7 @@ class EventModel extends CommonFormModel
                 //has this event already been examined via a parent's children?
                 //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
                 if (in_array($event['id'], $examinedEvents[$leadId])) {
-                    $this->logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' already processed this round');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' already processed this round');
                     continue;
                 }
                 $examinedEvents[$leadId][] = $event['id'];
@@ -294,7 +294,7 @@ class EventModel extends CommonFormModel
                     if (!isset($leadsEvents[$leadId][$event['parent']['id']])) {
                         //this event has a parent that has not been triggered for this lead so break out
                         $this->logger->debug(
-                            'CAMPAIGN: parent (ID# '.$event['parent']['id'].') for ID# '.$event['id']
+                            "CAMPAIGN #{$campaignId}: parent (ID# ".$event['parent']['id'].') for ID# '.$event['id']
                             .' has not been triggered yet or was triggered with this batch'
                         );
                         continue;
@@ -304,7 +304,7 @@ class EventModel extends CommonFormModel
                     if ($parentLog['isScheduled']) {
                         //this event has a parent that is scheduled and thus not triggered
                         $this->logger->debug(
-                            'CAMPAIGN: parent (ID# '.$event['parent']['id'].') for ID# '.$event['id']
+                            "CAMPAIGN #{$campaignId}: parent (ID# ".$event['parent']['id'].') for ID# '.$event['id']
                             .' has not been triggered yet because it\'s scheduled'
                         );
                         continue;
@@ -319,37 +319,37 @@ class EventModel extends CommonFormModel
                     $decisionEventSettings = $availableEventSettings[$event['eventType']][$type];
                 } else {
                     // Not found maybe it's no longer available?
-                    $this->logger->debug('CAMPAIGN: '.$type.' does not exist. (#'.$event['id'].')');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: ".$type.' does not exist. (#'.$event['id'].')');
 
                     continue;
                 }
 
                 //check the callback function for the event to make sure it even applies based on its settings
                 if (!$response = $this->invokeEventCallback($event, $decisionEventSettings, $lead, $eventDetails, $systemTriggered)) {
-                    $this->logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' callback check failed with a response of '.var_export($response, true));
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' callback check failed with a response of '.var_export($response, true));
 
                     continue;
                 }
 
                 if (!empty($event['children'])) {
-                    $this->logger->debug('CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' has children');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' has children');
 
                     $childrenTriggered = false;
                     foreach ($event['children'] as $child) {
                         if (isset($leadsEvents[$leadId][$child['id']])) {
                             //this child event has already been fired for this lead so move on to the next event
-                            $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' already triggered');
+                            $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($child['eventType']).' ID# '.$child['id'].' already triggered');
                             continue;
                         } elseif ($child['eventType'] == 'decision') {
                             //hit a triggering type event so move on
-                            $this->logger->debug('CAMPAIGN: ID# '.$child['id'].' is a decision');
+                            $this->logger->debug("CAMPAIGN #{$campaignId}: ID# ".$child['id'].' is a decision');
 
                             continue;
                         } elseif ($child['decisionPath'] == 'no') {
                             // non-action paths should not be processed by this because the contact already took action in order to get here
                             $childrenTriggered = true;
                         } else {
-                            $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
+                            $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
                         }
 
                         //store in case a child was pulled with events
@@ -361,7 +361,7 @@ class EventModel extends CommonFormModel
                     }
 
                     if ($childrenTriggered) {
-                        $this->logger->debug('CAMPAIGN: Decision ID# '.$event['id'].' successfully executed and logged.');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Decision ID# ".$event['id'].' successfully executed and logged.');
 
                         //a child of this event was triggered or scheduled so make not of the triggering event in the log
                         $log = $this->getLogEntity($event['id'], $campaigns[$campaignId], $lead, null, $systemTriggered);
@@ -369,10 +369,10 @@ class EventModel extends CommonFormModel
                             ->setChannelId($channelId);
                         $this->getRepository()->saveEntity($log);
                     } else {
-                        $this->logger->debug('CAMPAIGN: Decision not logged');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Decision not logged");
                     }
                 } else {
-                    $this->logger->debug('CAMPAIGN: No children for this event.');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: No children for this event.");
                 }
             }
         }
@@ -420,7 +420,7 @@ class EventModel extends CommonFormModel
 
         $campaignId = $campaign->getId();
 
-        $this->logger->debug('CAMPAIGN: Triggering starting events');
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Triggering starting events");
 
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
@@ -443,7 +443,7 @@ class EventModel extends CommonFormModel
         $rootEventCount = count($events);
 
         if (empty($rootEventCount)) {
-            $this->logger->debug('CAMPAIGN: No events to trigger');
+            $this->logger->debug("CAMPAIGN #{$campaignId}: No events to trigger");
 
             return ($returnCounts) ? [
                 'events'         => 0,
@@ -473,7 +473,7 @@ class EventModel extends CommonFormModel
         }
 
         if (empty($leadCount)) {
-            $this->logger->debug('CAMPAIGN: No contacts to process');
+            $this->logger->debug("CAMPAIGN #{$campaignId}: No contacts to process");
 
             unset($events);
 
@@ -503,17 +503,17 @@ class EventModel extends CommonFormModel
         $sleepBatchCount   = 0;
         $batchDebugCounter = 1;
 
-        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the following events: ".implode(', ', array_keys($events)));
 
         while ($continue) {
-            $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+            $this->logger->debug("CAMPAIGN #{$campaignId}: Batch #".$batchDebugCounter);
 
             // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
             $campaignLeads = ($leadId) ? [$leadId] : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
 
             if (empty($campaignLeads)) {
                 // No leads found
-                $this->logger->debug('CAMPAIGN: No campaign contacts found.');
+                $this->logger->debug("CAMPAIGN #{$campaignId}: No campaign contacts found.");
 
                 break;
             }
@@ -535,11 +535,11 @@ class EventModel extends CommonFormModel
                 ]
             );
 
-            $this->logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', array_keys($leads)));
+            $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the following contacts: ".implode(', ', array_keys($leads)));
 
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                $this->logger->debug('CAMPAIGN: No contact entities found.');
+                $this->logger->debug("CAMPAIGN #{$campaignId}: No contact entities found.");
 
                 break;
             }
@@ -547,12 +547,12 @@ class EventModel extends CommonFormModel
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             $leadDebugCounter = 1;
             foreach ($leads as $lead) {
-                $this->logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Current Lead ID# ".$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                 if ($rootEvaluatedCount >= $maxCount || ($max && ($rootEvaluatedCount + $rootEventCount) >= $max)) {
                     // Hit the max or will hit the max mid-progress for a lead
                     $continue = false;
-                    $this->logger->debug('CAMPAIGN: Hit max so aborting.');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: Hit max so aborting.");
 
                     break;
                 }
@@ -598,7 +598,7 @@ class EventModel extends CommonFormModel
                             ++$rootExecutedCount;
 
                             $this->logger->debug(
-                                'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                                "CAMPAIGN #{$campaignId}: Decision ID# ".$event['id'].' for contact ID# '.$lead->getId()
                                 .' noted as completed by event listener thus executing children.'
                             );
 
@@ -689,7 +689,7 @@ class EventModel extends CommonFormModel
             'totalEvaluated' => $evaluatedEventCount,
             'totalExecuted'  => $executedEventCount,
         ];
-        $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Counts - ".var_export($counts, true));
 
         return ($returnCounts) ? $counts : $executedEventCount;
     }
@@ -738,13 +738,14 @@ class EventModel extends CommonFormModel
             $parentTriggeredDate = new \DateTime();
         }
 
-        $repo = $this->getRepository();
+        $repo       = $this->getRepository();
+        $campaignId = $campaign->getId();
 
         if (isset($eventSettings[$event['eventType']][$event['type']])) {
             $thisEventSettings = $eventSettings[$event['eventType']][$event['type']];
         } else {
             $this->logger->debug(
-                'CAMPAIGN: Settings not found for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                "CAMPAIGN #{$campaignId}: Settings not found for ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
             );
             unset($event);
 
@@ -803,7 +804,7 @@ class EventModel extends CommonFormModel
 
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 .' has timing that is not appropriate and thus scheduled for '.$eventTriggerDate->format('Y-m-d H:m:i T')
             );
 
@@ -833,20 +834,20 @@ class EventModel extends CommonFormModel
                 // Save before executing event to ensure it's not picked up again
                 $repo->saveEntity($log);
                 $this->logger->debug(
-                    'CAMPAIGN: Created log for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    "CAMPAIGN #{$campaignId}: Created log for ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' prior to execution.'
                 );
             } catch (EntityNotFoundException $exception) {
                 // The lead has been likely removed from this lead/list
                 $this->logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' wasn\'t found: '.$exception->getMessage()
                 );
 
                 return false;
             } catch (DBALException $exception) {
                 $this->logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' failed with DB error: '.$exception->getMessage()
                 );
 
@@ -864,11 +865,11 @@ class EventModel extends CommonFormModel
                 ++$executedEventCount;
 
                 $this->logger->debug(
-                    'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    "CAMPAIGN #{$campaignId}: Listener handled event for ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 );
             } elseif ($response === false && $event['eventType'] == 'action') {
                 $result = false;
-                $debug  = 'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '.var_export($response, true);
+                $debug  = "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '.var_export($response, true);
 
                 // Something failed
                 if ($wasScheduled || !empty($this->scheduleTimeForFailedEvents)) {
@@ -913,7 +914,7 @@ class EventModel extends CommonFormModel
                 }
 
                 $this->logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' successfully executed and logged with a response of '.var_export($response, true)
                 );
             }
@@ -923,7 +924,7 @@ class EventModel extends CommonFormModel
             //else do nothing
             $result = false;
             $this->logger->debug(
-                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '
+                "CAMPAIGN #{$campaignId}: Timing failed (".gettype($eventTriggerDate).') for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '
                 .$lead->getId()
             );
         }
@@ -970,9 +971,10 @@ class EventModel extends CommonFormModel
         $repo         = $this->getRepository();
         $decisionPath = ($response === true) ? 'yes' : 'no';
         $childEvents  = $repo->getEventsByParent($event['id'], $decisionPath);
+        $campaignId   = $campaign->getId();
 
         $this->logger->debug(
-            'CAMPAIGN: Condition ID# '.$event['id'].' triggered with '.$decisionPath.' decision path. Has '.count($childEvents).' child event(s).'
+            "CAMPAIGN #{$campaignId}: Condition ID# ".$event['id'].' triggered with '.$decisionPath.' decision path. Has '.count($childEvents).' child event(s).'
         );
 
         $childExecuted = false;
@@ -1024,13 +1026,13 @@ class EventModel extends CommonFormModel
         $campaignId   = $campaign->getId();
         $campaignName = $campaign->getName();
 
-        $this->logger->debug('CAMPAIGN: Triggering scheduled events');
+        $this->logger->debug("CAMPAIGN {$campaignId}: Triggering scheduled events");
 
         $repo = $this->getRepository();
 
         // Get a count
         $totalScheduledCount = $repo->getScheduledEvents($campaignId, true);
-        $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
+        $this->logger->debug("CAMPAIGN #{$campaignId}: ".$totalScheduledCount.' events scheduled to execute.');
 
         if ($output) {
             $output->writeln(
@@ -1042,7 +1044,7 @@ class EventModel extends CommonFormModel
         }
 
         if (empty($totalScheduledCount)) {
-            $this->logger->debug('CAMPAIGN: No events to trigger');
+            $this->logger->debug("CAMPAIGN #{$campaignId}: No events to trigger");
 
             return ($returnCounts) ? [
                 'events'         => 0,
@@ -1076,7 +1078,7 @@ class EventModel extends CommonFormModel
         $sleepBatchCount   = 0;
         $batchDebugCounter = 1;
         while ($scheduledEvaluatedCount < $totalScheduledCount) {
-            $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+            $this->logger->debug("CAMPAIGN #{$campaignId}: Batch #".$batchDebugCounter);
 
             // Get a count
             $events = $repo->getScheduledEvents($campaignId, false, $limit);
@@ -1091,7 +1093,7 @@ class EventModel extends CommonFormModel
                     'totalEvaluated' => $evaluatedEventCount,
                     'totalExecuted'  => $executedEventCount,
                 ];
-                $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Counts - ".var_export($counts, true));
 
                 return ($returnCounts) ? $counts : $executedEventCount;
             }
@@ -1115,16 +1117,16 @@ class EventModel extends CommonFormModel
 
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                $this->logger->debug('CAMPAIGN: No contacts entities found');
+                $this->logger->debug("CAMPAIGN #{$campaignId}: No contacts entities found");
 
                 break;
             }
 
-            $this->logger->debug('CAMPAIGN: Processing the following contacts '.implode(', ', array_keys($events)));
+            $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the following contacts ".implode(', ', array_keys($events)));
             $leadDebugCounter = 1;
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
-                    $this->logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: Lead ID# ".$leadId.' not found');
 
                     continue;
                 }
@@ -1132,12 +1134,12 @@ class EventModel extends CommonFormModel
                 /** @var \Mautic\LeadBundle\Entity\Lead $lead */
                 $lead = $leads[$leadId];
 
-                $this->logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Current Lead ID# ".$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                 // Set lead in case this is triggered by the system
                 $this->leadModel->setSystemCurrentLead($lead);
 
-                $this->logger->debug('CAMPAIGN: Processing the following events for contact ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the following events for contact ID ".$leadId.': '.implode(', ', array_keys($leadEvents)));
 
                 foreach ($leadEvents as $log) {
                     ++$scheduledEvaluatedCount;
@@ -1183,7 +1185,7 @@ class EventModel extends CommonFormModel
                             $output->writeln('');
                         }
 
-                        $this->logger->debug('CAMPAIGN: Max count hit so aborting.');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Max count hit so aborting.");
 
                         // Hit the max, bye bye
 
@@ -1194,7 +1196,7 @@ class EventModel extends CommonFormModel
                             'totalEvaluated' => $evaluatedEventCount,
                             'totalExecuted'  => $executedEventCount,
                         ];
-                        $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Counts - ".var_export($counts, true));
 
                         return ($returnCounts) ? $counts : $executedEventCount;
                     } elseif ($output) {
@@ -1229,7 +1231,7 @@ class EventModel extends CommonFormModel
             'totalEvaluated' => $evaluatedEventCount,
             'totalExecuted'  => $executedEventCount,
         ];
-        $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Counts - ".var_export($counts, true));
 
         return ($returnCounts) ? $counts : $executedEventCount;
     }
@@ -1256,10 +1258,10 @@ class EventModel extends CommonFormModel
     ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $this->logger->debug('CAMPAIGN: Triggering negative events');
-
         $campaignId   = $campaign->getId();
         $campaignName = $campaign->getName();
+
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Triggering negative events");
 
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
@@ -1280,7 +1282,7 @@ class EventModel extends CommonFormModel
             }
         }
 
-        $this->logger->debug('CAMPAIGN: Processing the children of the following events: '.implode(', ', array_keys($nonActionEvents)));
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the children of the following events: ".implode(', ', array_keys($nonActionEvents)));
 
         if (empty($nonActionEvents)) {
             // No non-action events associated with this campaign
@@ -1321,7 +1323,7 @@ class EventModel extends CommonFormModel
             $sleepBatchCount   = 0;
             $batchDebugCounter = 1;
             while ($start <= $leadCount) {
-                $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Batch #".$batchDebugCounter);
 
                 // Get batched campaign ids
                 $campaignLeads = $campaignRepo->getCampaignLeads($campaignId, $start, $limit, ['cl.lead_id, cl.date_added']);
@@ -1335,12 +1337,12 @@ class EventModel extends CommonFormModel
 
                 unset($campaignLeads);
 
-                $this->logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', $campaignLeadIds));
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Processing the following contacts: ".implode(', ', $campaignLeadIds));
 
                 foreach ($nonActionEvents as $parentId => $events) {
                     // Just a check to ensure this is an appropriate action
                     if ($campaignEvents[$parentId]['eventType'] == 'action') {
-                        $this->logger->debug('CAMPAIGN: Parent event ID #'.$parentId.' is an action.');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Parent event ID #".$parentId.' is an action.');
 
                         continue;
                     }
@@ -1351,12 +1353,12 @@ class EventModel extends CommonFormModel
                     // Get the lead log for this batch of leads limiting to those that have already triggered
                     // the decision's parent and haven't executed this level in the path yet
                     if ($grandParentId) {
-                        $this->logger->debug('CAMPAIGN: Checking for contacts based on grand parent execution.');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Checking for contacts based on grand parent execution.");
 
                         $leadLog         = $repo->getEventLog($campaignId, $campaignLeadIds, [$grandParentId], array_keys($events), true);
                         $applicableLeads = array_keys($leadLog);
                     } else {
-                        $this->logger->debug('CAMPAIGN: Checking for contacts based on exclusion due to being at root level');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: Checking for contacts based on exclusion due to being at root level");
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the events in the root level and exclude them
@@ -1375,12 +1377,12 @@ class EventModel extends CommonFormModel
                     }
 
                     if (empty($applicableLeads)) {
-                        $this->logger->debug('CAMPAIGN: No events are applicable');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: No events are applicable");
 
                         continue;
                     }
 
-                    $this->logger->debug('CAMPAIGN: These contacts have have not gone down the positive path: '.implode(', ', $applicableLeads));
+                    $this->logger->debug("CAMPAIGN #{$campaignId}: These contacts have have not gone down the positive path: ".implode(', ', $applicableLeads));
 
                     // Get the leads
                     $leads = $this->leadModel->getEntities(
@@ -1402,7 +1404,7 @@ class EventModel extends CommonFormModel
 
                     if (!count($leads)) {
                         // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                        $this->logger->debug('CAMPAIGN: No contact entities found.');
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: No contact entities found.");
 
                         continue;
                     }
@@ -1417,7 +1419,7 @@ class EventModel extends CommonFormModel
                         // Set lead for listeners
                         $this->leadModel->setSystemCurrentLead($lead);
 
-                        $this->logger->debug('CAMPAIGN: contact ID #'.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
+                        $this->logger->debug("CAMPAIGN #{$campaignId}: contact ID #".$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                         // Prevent path if lead has already gone down this path
                         if (!isset($leadLog[$lead->getId()]) || !array_key_exists($parentId, $leadLog[$lead->getId()])) {
@@ -1442,14 +1444,14 @@ class EventModel extends CommonFormModel
                                 }
 
                                 if (isset($leadLog[$lead->getId()]) && array_key_exists($id, $leadLog[$lead->getId()])) {
-                                    $this->logger->debug('CAMPAIGN: Event (ID #'.$id.') has already been executed');
+                                    $this->logger->debug("CAMPAIGN #{$campaignId}: Event (ID #".$id.') has already been executed');
                                     unset($e);
 
                                     continue;
                                 }
 
                                 if (!isset($eventSettings[$e['eventType']][$e['type']])) {
-                                    $this->logger->debug('CAMPAIGN: Event (ID #'.$id.') no longer exists');
+                                    $this->logger->debug("CAMPAIGN #{$campaignId}: Event (ID #".$id.') no longer exists');
                                     unset($e);
 
                                     continue;
@@ -1489,7 +1491,7 @@ class EventModel extends CommonFormModel
                                     'totalEvaluated' => $evaluatedEventCount,
                                     'totalExecuted'  => $executedEventCount,
                                 ];
-                                $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+                                $this->logger->debug("CAMPAIGN #{$campaignId}: Counts - ".var_export($counts, true));
 
                                 return ($returnCounts) ? $counts : $executedEventCount;
                             }
@@ -1498,7 +1500,7 @@ class EventModel extends CommonFormModel
 
                             // Execute or schedule events
                             $this->logger->debug(
-                                'CAMPAIGN: Processing the following events for contact ID# '.$lead->getId().': '.implode(', ', array_keys($eventTiming))
+                                "CAMPAIGN #{$campaignId}: Processing the following events for contact ID# ".$lead->getId().': '.implode(', ', array_keys($eventTiming))
                             );
 
                             foreach ($eventTiming as $id => $eventTriggerDate) {
@@ -1544,7 +1546,7 @@ class EventModel extends CommonFormModel
                                 unset($utcDateString, $grandParentDate);
                             }
                         } else {
-                            $this->logger->debug('CAMPAIGN: Decision has already been executed.');
+                            $this->logger->debug("CAMPAIGN #{$campaignId}: Decision has already been executed.");
                         }
 
                         $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
