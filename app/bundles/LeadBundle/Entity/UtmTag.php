@@ -126,7 +126,7 @@ class UtmTag
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('tmutmtag')
+        $metadata->setGroupPrefix('utmtags')
             ->addListProperties(
                 [
                     'id',
