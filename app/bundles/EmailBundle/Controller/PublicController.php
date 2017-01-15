@@ -679,7 +679,7 @@ class PublicController extends CommonFormController
 	            if ($lead['email'] === null) {
 		            $logger->log('error', $integration.': email not available for stat.');
 	            }
-                $this->addStat($lead, $email, $query, $idHash);
+                $this->addStat($lead, $email, $query, $idHash, $myIntegration->getIntegrationSettings()->getId());
             }
 
             if ($stat === null) {
@@ -732,6 +732,7 @@ class PublicController extends CommonFormController
             // Set lead
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
+            $mailer->setSource(['email.client', $sourceId]);
 
             $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
             $mailer->setSubject($subject);
