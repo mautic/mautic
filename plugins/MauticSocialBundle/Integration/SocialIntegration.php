@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -115,6 +116,11 @@ abstract class SocialIntegration extends AbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects'] = ['Company'];
     }
 
     /**

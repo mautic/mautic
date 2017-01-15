@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -97,9 +98,8 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($stageChange) {
-            $parsed = explode('.', $stageToChangeTo->getName());
             $lead->stageChangeLogEntry(
-                $parsed[0],
+                $stageToChangeTo,
                 $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
                 $event->getName()
             );

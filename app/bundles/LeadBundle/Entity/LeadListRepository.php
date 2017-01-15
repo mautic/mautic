@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,10 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * LeadListRepository.
@@ -34,6 +39,11 @@ class LeadListRepository extends CommonRepository
      * @var bool
      */
     protected $listFiltersInnerJoinCompany = false;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * {@inheritdoc}
@@ -122,7 +132,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false)
+    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false)
     {
         if (is_array($lead)) {
             $q = $this->_em->createQueryBuilder()
@@ -145,7 +155,10 @@ class LeadListRepository extends CommonRepository
             )
                 ->setParameter('leads', $lead)
                 ->setParameter('false', false, 'boolean');
-
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
             $result = $q->getQuery()->getArrayResult();
 
             $return = [];
@@ -175,6 +188,11 @@ class LeadListRepository extends CommonRepository
                 )
             )
                 ->setParameter('false', false, 'boolean');
+
+            if ($isPublic) {
+                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                    ->setParameter('isPublic', true, 'boolean');
+            }
 
             return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
@@ -342,14 +360,15 @@ class LeadListRepository extends CommonRepository
                 $q->select($select)
                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
+                $batchExpr = $q->expr()->andX();
                 // Only leads that existed at the time of count
                 if ($batchLimiters) {
                     if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
-                        $expr->add(
+                        $batchExpr->add(
                             $q->expr()->comparison('l.id', 'BETWEEN', "{$batchLimiters['minId']} and {$batchLimiters['maxId']}")
                         );
                     } elseif (!empty($batchLimiters['maxId'])) {
-                        $expr->add(
+                        $batchExpr->add(
                             $q->expr()->lte('l.id', $batchLimiters['maxId'])
                         );
                     }
@@ -363,16 +382,29 @@ class LeadListRepository extends CommonRepository
                     // Leads that do not have any record in the lead_lists_leads table for this lead list
                     // For non null fields - it's apparently better to use left join over not exists due to not using nullable
                     // fields - https://explainextended.com/2009/09/18/not-in-vs-not-exists-vs-left-join-is-null-mysql/
+                    $listOnExpr = $q->expr()->andX(
+                        $q->expr()->eq('ll.leadlist_id', $id),
+                        $q->expr()->eq('ll.lead_id', 'l.id')
+                    );
+
+                    if (!empty($batchLimiters['dateTime'])) {
+                        // Only leads in the list at the time of count
+                        $listOnExpr->add(
+                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                        );
+                    }
+
                     $q->leftJoin(
                         'l',
                         MAUTIC_TABLE_PREFIX.'lead_lists_leads',
                         'll',
-                        $q->expr()->andX(
-                            $q->expr()->eq('ll.leadlist_id', $id),
-                            $q->expr()->eq('ll.lead_id', 'l.id')
-                        )
+                        $listOnExpr
                     );
                     $expr->add($q->expr()->isNull('ll.lead_id'));
+
+                    if ($batchExpr->count()) {
+                        $expr->add($batchExpr);
+                    }
 
                     $q->andWhere($expr);
                 } elseif ($nonMembersOnly) {
@@ -412,6 +444,11 @@ class LeadListRepository extends CommonRepository
                     $mainExpr->add(
                         sprintf('l.id NOT IN (%s)', $sq->getSQL())
                     );
+
+                    if ($batchExpr->count()) {
+                        $mainExpr->add($batchExpr);
+                    }
+
                     $q->andWhere($mainExpr);
                 }
 
@@ -553,7 +590,15 @@ class LeadListRepository extends CommonRepository
         if (null === $companyTable) {
             $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'companies');
         }
-        $options   = $this->getFilterExpressionFunctions();
+        $options = $this->getFilterExpressionFunctions();
+
+        // Add custom filters operators
+        if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE)) {
+            $event = new LeadListFiltersOperatorsEvent($options, $this->translator);
+            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
+            $options = $event->getOperators();
+        }
+
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
@@ -578,8 +623,10 @@ class LeadListRepository extends CommonRepository
             } elseif ($object == 'company') {
                 $field = "comp.{$details['field']}";
             }
-            // Format the field based on platform specific functions that DBAL doesn't support natively
+
+            $columnType = false;
             if ($column) {
+                // Format the field based on platform specific functions that DBAL doesn't support natively
                 $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
                 $columnType = $column->getType();
 
@@ -822,18 +869,33 @@ class LeadListRepository extends CommonRepository
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->eq($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
                             break;
                         case 'like':
                         case '!like':
                             $details['filter'] = '%'.$details['filter'].'%';
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->like($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->like($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
+                            break;
+                        case 'regexp':
+                        case 'notRegexp':
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                    $alias.'.url'.$not.' REGEXP '.$exprParameter
+                                )
+                            );
                             break;
                     }
                     // Specific lead
@@ -893,6 +955,7 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
+                case 'globalcategory':
                 case 'lead_email_received':
 
                     // Special handling of lead lists and tags
@@ -929,6 +992,10 @@ class LeadListRepository extends CommonRepository
                         case 'tags':
                             $table  = 'lead_tags_xref';
                             $column = 'tag_id';
+                            break;
+                        case 'globalcategory':
+                            $table  = 'lead_categories';
+                            $column = 'category_id';
                             break;
                         case 'lead_email_received':
                             $table  = 'email_stats';
@@ -979,6 +1046,11 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 default:
+                    if (!$column) {
+                        // Column no longer exists so continue
+                        continue;
+                    }
+
                     if ($isCompany) {
                         // Must tell getLeadsByList how to best handle the relationship with the companies table
                         if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
@@ -1060,7 +1132,15 @@ class LeadListRepository extends CommonRepository
                                 $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
                             );
                             break;
-
+                        case 'regexp':
+                        case 'notRegexp':
+                            $ignoreAutoFilter       = true;
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $groupExpr->add(
+                                $field.$not.' REGEXP '.$exprParameter
+                            );
+                            break;
                         default:
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }
@@ -1080,6 +1160,14 @@ class LeadListRepository extends CommonRepository
                 }
 
                 $parameters[$parameter] = $details['filter'];
+            }
+
+            if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+                $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->_em);
+                $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+                if ($event->isFilteringDone()) {
+                    $groupExpr = $q->expr()->andX($event->getSubQuery());
+                }
             }
         }
 
@@ -1101,6 +1189,14 @@ class LeadListRepository extends CommonRepository
         }
 
         return $expr;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -1129,15 +1225,14 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
-                $returnParameter = false;
+                $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
@@ -1152,11 +1247,11 @@ class LeadListRepository extends CommonRepository
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like('l.name', ':'.$unique);
+                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
-        $parameters = [];
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
@@ -1175,13 +1270,15 @@ class LeadListRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.lead.list.searchcommand.isglobal',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isinactive',
             'mautic.core.searchcommand.name',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

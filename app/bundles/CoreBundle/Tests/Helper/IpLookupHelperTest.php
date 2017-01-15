@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -54,10 +55,10 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testClientIpIsReturnedFromRequest()
     {
-        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.52', $ip->getIpAddress());
+        $this->assertEquals('73.77.245.53', $ip->getIpAddress());
     }
 
     /**
@@ -98,7 +99,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $mockEm->expects($this->once())
+        $mockEm->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($mockRepository));
 

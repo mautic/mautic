@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -120,7 +121,7 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     public function addId()
     {
         $this->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
     }

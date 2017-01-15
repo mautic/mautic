@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -31,15 +32,11 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.form.form.help.searchcommands',
-            'searchId'        => 'form-search',
-            'action'          => $currentRoute,
-            'routeBase'       => 'form',
-            'templateButtons' => [
-                'delete' => $permissions['form:forms:deleteown'] || $permissions['form:forms:deleteother'],
-            ],
-            'preCustomButtons' => [
+            'searchValue'   => $searchValue,
+            'searchHelp'    => 'mautic.form.form.help.searchcommands',
+            'searchId'      => 'form-search',
+            'action'        => $currentRoute,
+            'customButtons' => [
                 [
                     'confirm' => [
                         'message'       => $view['translator']->trans('mautic.form.confirm_batch_rebuild'),
@@ -55,6 +52,7 @@ $view['slots']->set(
                         'precheck'        => 'batchActionPrecheck',
                         'confirmCallback' => 'executeBatchAction',
                     ],
+                    'primary' => true,
                 ],
             ],
         ]

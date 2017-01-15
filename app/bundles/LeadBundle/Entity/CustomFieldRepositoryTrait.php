@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -93,7 +94,8 @@ trait CustomFieldRepositoryTrait
 
         //DBAL
         /** @var QueryBuilder $dq */
-        $dq = $this->getEntitiesDbalQueryBuilder();
+        $dq = isset($args['qb']) ? $args['qb'] : $this->getEntitiesDbalQueryBuilder();
+
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
@@ -266,7 +268,9 @@ trait CustomFieldRepositoryTrait
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
             ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
             ->where($fq->expr()->eq('f.object', ':object'))
+            ->andWhere('f.is_published = :published')
             ->setParameter('object', $object)
+            ->setParameter('published', true, 'boolean')
             ->orderBy('f.field_order', 'asc');
         $results = $fq->execute()->fetchAll();
 

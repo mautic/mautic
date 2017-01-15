@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -90,7 +91,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('fr.id, fr.frequency_time, fr.frequency_number, fr.channel')
+        $q->select('fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.pause_from_date, fr.pause_to_date')
             ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
 
         if ($channel) {
@@ -98,6 +99,24 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('channel', $channel);
         }
 
+        if ($leadId) {
+            $q->andWhere('fr.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    public function getPreferredChannel($leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.pause_from_date, fr.pause_to_date')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
+        $q->where('fr.preferred_channel = :preferredChannel')
+            ->setParameter('preferredChannel', true, 'boolean');
         if ($leadId) {
             $q->andWhere('fr.lead_id = :leadId')
                 ->setParameter('leadId', $leadId);

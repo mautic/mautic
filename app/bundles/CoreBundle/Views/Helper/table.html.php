@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,8 +34,8 @@ if (!isset($shortenLinkText)) {
                         <?php foreach ($row as $item) : ?>
                             <td>
                                 <?php if (isset($item['type']) && $item['type'] == 'link') : ?>
-                                    <a href="<?php echo $item['link']; ?>" 
-                                        title="<?php echo $item['value']; ?>" 
+                                    <a href="<?php echo $item['link']; ?>"
+                                        title="<?php echo $item['value']; ?>"
                                         <?php if (!empty($item['external'])) : ?>
                                         target="_blank"
                                         <?php else : ?>

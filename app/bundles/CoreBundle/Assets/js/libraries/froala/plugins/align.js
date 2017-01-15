@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.align = function (editor) {
     function apply (val) {
@@ -44,8 +44,16 @@
       var blocks = editor.selection.blocks();
 
       for (var i = 0; i < blocks.length; i++) {
-        $(blocks[i]).css('text-align', val).removeClass('fr-temp-div');
+        // Check if we should reset to default value.
+        if (editor.helpers.getAlignment($(blocks[i].parentNode)) == val) {
+          $(blocks[i]).css('text-align', '').removeClass('fr-temp-div');
+        }
+        else {
+          $(blocks[i]).css('text-align', val).removeClass('fr-temp-div');
+        }
+
         if ($(blocks[i]).attr('class') === '') $(blocks[i]).removeAttr('class');
+        if ($(blocks[i]).attr('style') === '') $(blocks[i]).removeAttr('style');
       }
 
       editor.selection.save();
@@ -67,7 +75,7 @@
       if (blocks.length) {
         var alignment = editor.helpers.getAlignment($(blocks[0]));
 
-        $dropdown.find('a.fr-command[data-param1="' + alignment + '"]').addClass('fr-active');
+        $dropdown.find('a.fr-command[data-param1="' + alignment + '"]').addClass('fr-active').attr('aria-selected', true);
       }
     }
 
@@ -93,11 +101,11 @@
       justify: 'Align Justify'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.align.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command fr-title" data-cmd="align" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="align" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
         }
       }
       c += '</ul>';

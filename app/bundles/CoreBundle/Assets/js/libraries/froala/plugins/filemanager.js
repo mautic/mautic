@@ -8,7 +8,12 @@ var FroalaEditorForFileManager = null;
 var FroalaEditorForFileManagerCurrentImage = null;
 
 // This method is called by the Filemanager after an image is selected
-function SetUrl( url, width, height, alt ) {
+function SetUrl(url, width, height, alt) {
+    if (!FroalaEditorForFileManager) {
+        // This is not called from Froala, let's handle it elsewhere:
+        Mautic.setFileUrl(url, width, height, alt);
+        return;
+    }
     if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined' && 
         FroalaEditorForFileManagerCurrentImage !== null && 
         FroalaEditorForFileManagerCurrentImage.length && 
@@ -73,22 +78,7 @@ function SetUrl( url, width, height, alt ) {
     function show () {
       FroalaEditorForFileManagerCurrentImage = editor.image.get();
       FroalaEditorForFileManager = editor;
-      openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
-        screen.width * 0.7,
-        screen.height * 0.7
-      );
-    }
-
-    function openServerBrowser( url, width, height ) {
-      var iLeft = (screen.width - width) / 2 ;
-      var iTop = (screen.height - height) / 2 ;
-      var sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
-      sOptions += ",width=" + width ;
-      sOptions += ",height=" + height ;
-      sOptions += ",left=" + iLeft ;
-      sOptions += ",top=" + iTop ;
-      var oWindow = window.open( url, "BrowseWindow", sOptions ) ;
+      Mautic.openMediaManager();
     }
 
     return {

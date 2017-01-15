@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -163,6 +164,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'sentCount',
                 'variantParent',
                 'variantChildren',
+                'content',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')

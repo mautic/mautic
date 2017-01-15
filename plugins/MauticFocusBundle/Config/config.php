@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -70,6 +71,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.focus.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.focus.form.type.color' => [
@@ -101,6 +108,15 @@ return [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
                     'mautic.helper.templating',
+                ],
+            ],
+        ],
+        'other' => [
+            'mautic.focus.helper.token' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Helper\TokenHelper',
+                'arguments' => [
+                    'mautic.focus.model.focus',
+                    'router',
                 ],
             ],
         ],

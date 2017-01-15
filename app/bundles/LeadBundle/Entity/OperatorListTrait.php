@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -93,6 +94,22 @@ trait OperatorListTrait
                 'label'       => 'mautic.lead.list.form.operator.notin',
                 'expr'        => 'notIn',
                 'negate_expr' => 'in',
+            ],
+            'regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.regexp',
+                'expr'        => 'regexp', //special case
+                'negate_expr' => 'notRegexp',
+            ],
+            '!regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.notregexp',
+                'expr'        => 'notRegexp', //special case
+                'negate_expr' => 'regexp',
+            ],
+            'date' => [
+                'label'       => 'mautic.lead.list.form.operator.date',
+                'expr'        => 'date', //special case
+                'negate_expr' => 'date',
+                'hide'        => true,
             ],
         ];
 

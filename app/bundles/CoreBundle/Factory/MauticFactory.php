@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -506,5 +507,19 @@ class MauticFactory
     public function serviceExists($service)
     {
         return $this->container->has($service);
+    }
+
+    /**
+     * @param $service
+     *
+     * @return bool
+     */
+    public function get($service)
+    {
+        if ($this->serviceExists($service)) {
+            return $this->container->get($service);
+        }
+
+        return false;
     }
 }

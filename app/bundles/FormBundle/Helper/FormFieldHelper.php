@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -219,9 +220,12 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'checkboxgrp':
-                if (!is_array($value)) {
+                if (is_string($value) && strrpos($value, '|') > 0) {
+                    $value = explode('|', $value);
+                } elseif (!is_array($value)) {
                     $value = [$value];
                 }
+
                 foreach ($value as $val) {
                     $val = urldecode($val);
                     if (preg_match(

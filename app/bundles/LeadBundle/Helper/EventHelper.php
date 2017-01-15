@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -75,7 +76,7 @@ class EventHelper
         if (key_exists('utm_medium', $query)) {
             $utmValues->setUtmCampaign($query['utm_medium']);
         } elseif (key_exists('utm_medium', $queryReferer)) {
-            $utmValues['utm_medium'] = $queryReferer['utm_medium'];
+            $utmValues->setUtmMedium($queryReferer['utm_medium']);
         }
 
         if (key_exists('utm_source', $query)) {

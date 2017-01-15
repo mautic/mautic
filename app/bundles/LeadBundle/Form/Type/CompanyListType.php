@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,6 +34,7 @@ class CompanyListType extends AbstractType
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
                 'multiple'            => true,
+                'main_entity'         => null,
             ]
         );
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -137,6 +138,172 @@ class CommonRepository extends EntityRepository
             // All results
             return $query->getResult($hydrationMode);
         }
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param int   $start
+     * @param int   $limit
+     * @param array $order
+     * @param array $where
+     * @param array $select
+     *
+     * @return array
+     */
+    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null)
+    {
+        $alias = $this->getTableAlias();
+        $table = $this->getClassMetadata()->getTableName();
+        $q     = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(*)')
+          ->from($table, $alias);
+
+        $this->buildDbalWhere($q, $where);
+
+        $count = $q->execute()->fetchColumn();
+
+        if ($select) {
+            foreach ($select as &$column) {
+                if (strpos($column, '.') === false) {
+                    $column = $alias.'.'.$column;
+                }
+            }
+            $selectString = implode(', ', $select);
+        } else {
+            $selectString = $alias.'.*';
+        }
+
+        $q->resetQueryPart('select')
+            ->select($selectString)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        $this->buildDbalOrderBy($q, $order);
+
+        $results = $q->execute()->fetchAll();
+
+        return [
+            'total'   => $count,
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param QueryBuilder $query
+     * @param array        $args  [['expr' => 'DBAL expression', 'col' => 'DB clumn', 'val' => 'value to search for']]
+     *
+     * @return array
+     */
+    public function buildDbalWhere($query, $args)
+    {
+        $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn'];
+        $justColumn  = ['isNull', 'isNotNull'];
+        $andOr       = ['andX', 'orX'];
+
+        if ($args && is_array($args)) {
+            foreach ($args as $argument) {
+                $argument = $this->validateDbalWhereArray($argument);
+                if (method_exists($query->expr(), $argument['expr'])) {
+                    if (in_array($argument['expr'], $columnValue)) {
+                        $param = $query->createNamedParameter($argument['val']);
+                        $query->andWhere($query->expr()->{$argument['expr']}($this->getTableAlias().'.'.$argument['col'], $param));
+                    } elseif (in_array($argument['expr'], $justColumn)) {
+                        $query->andWhere($query->expr()->{$argument['expr']}($this->getTableAlias().'.'.$argument['col']));
+                    } elseif (in_array($argument['expr'], $andOr)) {
+                        $query->{$argument['expr']}($this->buildDbalWhere($query, $argument['val']));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get an array of rows from one table using DBAL.
+     *
+     * @param QueryBuilder $query
+     * @param array        $args  [['col' => 'column_a', 'dir' => 'ASC']]
+     *
+     * @return array
+     */
+    public function buildDbalOrderBy($query, $args)
+    {
+        if ($args && is_array($args)) {
+            foreach ($args as $argument) {
+                $argument = $this->validateDbalOrderByArray($argument);
+                $query->addOrderBy($argument['col'], $argument['dir']);
+            }
+        }
+    }
+
+    /**
+     * Validate the array for one where condition.
+     *
+     * @param array $args ['expr' => 'DBAL expression', 'col' => 'DB clumn', 'val' => 'value to search for']
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    public function validateDbalWhereArray(array $args)
+    {
+        $msg = '"%s" is missing in the where clause array.';
+        if (empty($args['expr'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'expr'));
+        }
+
+        if (empty($args['col'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'col'));
+        }
+
+        if (!isset($args['val'])) {
+            $args['val'] = '';
+        }
+
+        $args['expr'] = $this->sanitize($args['expr']);
+        $args['col']  = $this->sanitize($args['col'], ['_']);
+        // Value will be santitized by Doctrine
+
+        return $args;
+    }
+
+    /**
+     * Validate array for one order by condition.
+     *
+     * @param array $args ['col' => 'column_a', 'dir' => 'ASC']
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    public function validateDbalOrderByArray(array $args)
+    {
+        $msg = '"%s" is missing in the order by clause array.';
+        if (empty($args['col'])) {
+            throw new \InvalidArgumentException(sprintf($msg, 'col'));
+        }
+
+        if (empty($args['dir'])) {
+            $args['dir'] = 'ASC';
+        }
+
+        $args['dir'] = $this->sanitize(strtoupper($args['dir']));
+        $args['col'] = $this->sanitize($args['col'], ['_']);
+
+        return $args;
+    }
+
+    /**
+     * Returns entity table name.
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->getClassMetadata()->getTableName();
     }
 
     /**
@@ -313,7 +480,8 @@ class CommonRepository extends EntityRepository
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
                 list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $queryExpression->add($expr);
+                $this->appendExpression($queryExpression, $expr);
+
                 if (is_array($parameters)) {
                     $queryParameters = array_merge($queryParameters, $parameters);
                 }
@@ -322,12 +490,15 @@ class CommonRepository extends EntityRepository
             //parse the filter if set
             if ($queryExpression->count()) {
                 $q->andWhere($queryExpression);
-                foreach ($queryParameters as $k => $v) {
-                    if ($v === true || $v === false) {
-                        $q->setParameter($k, $v, 'boolean');
-                    } else {
-                        $q->setParameter($k, $v);
-                    }
+            }
+
+            // Parameters have to be set even if there are no expressions just in case a search command
+            // passed back a parameter it used
+            foreach ($queryParameters as $k => $v) {
+                if ($v === true || $v === false) {
+                    $q->setParameter($k, $v, 'boolean');
+                } else {
+                    $q->setParameter($k, $v);
                 }
             }
         }
@@ -418,7 +589,7 @@ class CommonRepository extends EntityRepository
      */
     public function getSearchCommands()
     {
-        return [];
+        return ['mautic.core.searchcommand.ids'];
     }
 
     /**
@@ -444,11 +615,11 @@ class CommonRepository extends EntityRepository
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
         $parseFilters = [];
-        if (isset($filters->root)) {
+        if (isset($filters->root[0])) {
             // Function is determined by the second clause type
             $type         = (isset($filters->root[1])) ? $filters->root[1]->type : $filters->root[0]->type;
             $parseFilters = &$filters->root;
-        } elseif (isset($filters->children)) {
+        } elseif (isset($filters->children[0])) {
             $type         = (isset($filters->children[1])) ? $filters->children[1]->type : $filters->children[0]->type;
             $parseFilters = &$filters->children;
         } elseif (is_array($filters)) {
@@ -456,11 +627,15 @@ class CommonRepository extends EntityRepository
             $parseFilters = &$filters;
         }
 
+        if (empty($type)) {
+            $type = 'and';
+        }
+
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-            $this->parseSearchFitlers($parseFilters, $qb, $expressions, $parameters);
+            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
         }
 
         return [$expressions, $parameters];
@@ -471,7 +646,7 @@ class CommonRepository extends EntityRepository
      * @param $expr
      * @param $parameters
      */
-    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
@@ -495,10 +670,51 @@ class CommonRepository extends EntityRepository
                 $parameters = array_merge($parameters, $params);
             }
 
-            if (!empty($expr)) {
-                $expressions->add($expr);
-            }
+            $this->appendExpression($expressions, $expr);
         }
+    }
+
+    /**
+     * @param $appendTo
+     * @param $expr
+     */
+    protected function appendExpression($appendTo, $expr)
+    {
+        if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
+            if ($expr->count()) {
+                $appendTo->add($expr);
+            }
+        } elseif (!empty($expr)) {
+            $appendTo->add($expr);
+        }
+    }
+
+    /**
+     * @deprecated 2.5 to be removed in 3.0; BC for mispelled method
+     *
+     * @param $parseFilters
+     * @param $qb
+     * @param $expressions
+     * @param $parameters
+     */
+    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
+    {
+        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+    }
+
+    /**
+     * @param $qb
+     * @param $filter
+     *
+     * @return mixed
+     */
+    protected function getIdsExpr(&$q, $filter)
+    {
+        if ($ids = array_map('intval', explode(',', $filter->string))) {
+            return $q->expr()->in($this->getTableAlias().'.id', $ids);
+        }
+
+        return false;
     }
 
     /**
@@ -507,9 +723,21 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$qb, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        return [false, false];
+        $command = $filter->command;
+        $expr    = false;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr = $this->getIdsExpr($q, $filter);
+                break;
+        }
+
+        return [
+            $expr,
+            [],
+        ];
     }
 
     /**
@@ -547,13 +775,26 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Sanitizes a string to alphanum plus characters in the second argument.
+     *
+     * @param string $sqlAttr
+     * @param array  $allowedCharacters
+     *
+     * @return string
+     */
+    protected function sanitize($sqlAttr, $allowedCharacters = [])
+    {
+        return InputHelper::alphanum($sqlAttr, false, false, $allowedCharacters);
+    }
+
+    /**
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param array                      $args
      */
     protected function buildOrderByClause(&$q, array $args)
     {
         $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
-        $orderByDir = InputHelper::alphanum(
+        $orderByDir = $this->sanitize(
             array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
         );
 
@@ -567,7 +808,7 @@ class CommonRepository extends EntityRepository
             //add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
-                $order = InputHelper::alphanum($order, false, false, ['_', '.']);
+                $order = $this->sanitize($order, ['_', '.']);
 
                 $q->addOrderBy($order, $orderByDir);
             }
@@ -750,6 +991,10 @@ class CommonRepository extends EntityRepository
                 $expr           = $q->expr()->like("{$catPrefix}.alias", ":$unique");
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ids'):
+                $expr            = $this->getIdsExpr($q, $filter);
+                $returnParameter = false;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -785,6 +1030,7 @@ class CommonRepository extends EntityRepository
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
+            'mautic.core.searchcommand.ids',
         ];
     }
 

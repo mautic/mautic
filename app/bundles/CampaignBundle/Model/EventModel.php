@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -528,8 +529,9 @@ class EventModel extends CommonFormModel
                             ],
                         ],
                     ],
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc',
+                    'orderBy'            => 'l.id',
+                    'orderByDir'         => 'asc',
+                    'withPrimaryCompany' => true,
                 ]
             );
 
@@ -1105,8 +1107,9 @@ class EventModel extends CommonFormModel
                             ],
                         ],
                     ],
-                    'orderBy'    => 'l.id',
-                    'orderByDir' => 'asc',
+                    'orderBy'            => 'l.id',
+                    'orderByDir'         => 'asc',
+                    'withPrimaryCompany' => true,
                 ]
             );
 
@@ -1391,8 +1394,9 @@ class EventModel extends CommonFormModel
                                     ],
                                 ],
                             ],
-                            'orderBy'    => 'l.id',
-                            'orderByDir' => 'asc',
+                            'orderBy'            => 'l.id',
+                            'orderByDir'         => 'asc',
+                            'withPrimaryCompany' => true,
                         ]
                     );
 

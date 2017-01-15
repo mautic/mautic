@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -81,10 +82,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Set the QueryBuilder object.
      *
      * @param QueryBuilder $queryBuilder
+     *
+     * @return $this
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
+
+        return $this;
     }
 
     /**
@@ -108,10 +113,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Set the ContentTemplate path.
      *
      * @param string $contentTemplate
+     *
+     * @return $this
      */
     public function setContentTemplate($contentTemplate)
     {
         $this->contentTemplate = $contentTemplate;
+
+        return $this;
     }
 
     /**
@@ -127,11 +136,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param array $selectColumns
      *
-     * @return ReportGeneratorEvent
+     * @return $this
      */
     public function setSelectColumns(array $selectColumns)
     {
         $this->selectColumns = $selectColumns;
+
+        return $this;
     }
 
     /**
@@ -145,11 +156,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * @param array $options
      *
-     * @return ReportGeneratorEvent
+     * @return $this
      */
     public function setOptions(array $options)
     {
         $this->options = array_merge($this->options, $options);
+
+        return $this;
     }
 
     /**
@@ -163,11 +176,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * @param ExpressionBuilder $filterExpression
      *
-     * @return ReportGeneratorEvent
+     * @return $this
      */
     public function setFilterExpression(ExpressionBuilder $filterExpression)
     {
         $this->filterExpression = $filterExpression;
+
+        return $this;
     }
 
     /**
@@ -175,10 +190,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
+     *
+     * @return $this
      */
     public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = 'c')
     {
         $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, 'c.id = '.$prefix.'.category_id');
+
+        return $this;
     }
 
     /**
@@ -187,10 +206,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      * @param string       $leadPrefix
+     *
+     * @return $this
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = 'l')
     {
         $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, 'l.id = '.$prefix.'.lead_id');
+
+        return $this;
     }
 
     /**
@@ -199,10 +222,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param QueryBuilder $queryBuilder
      * @param              $prefix
      * @param string       $ipPrefix
+     *
+     * @return $this
      */
     public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = 'i')
     {
         $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, 'i.id = '.$prefix.'.ip_id');
+
+        return $this;
     }
 
     /**
@@ -211,6 +238,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * @param QueryBuilder $query
      * @param string       $dateColumn
      * @param string       $tablePrefix
+     *
+     * @return $this
      */
     public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
     {
@@ -236,6 +265,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
+
+        return $this;
     }
 
     /**

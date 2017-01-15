@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -77,8 +78,9 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             $form    = $event->getForm();
             $options = $form->getConfig()->getOptions();
 
-            $fieldType = $data['type'];
-            $fieldName = $data['field'];
+            $fieldType   = $data['type'];
+            $fieldName   = $data['field'];
+            $fieldObject = $data['object'];
 
             $type = 'text';
             $attr = [
@@ -148,12 +150,13 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                    if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
                         $displayAttr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
                     $type = 'choice';
                     $attr = array_merge(
@@ -172,8 +175,8 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         }
                     }
 
-                    $list    = $options['fields'][$fieldName]['properties']['list'];
-                    $choices = FormFieldHelper::parseListStringIntoArray($list);
+                    $list    = $options['fields'][$fieldObject][$fieldName]['properties']['list'];
+                    $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys
@@ -196,16 +199,16 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                         ]
                     );
 
-                    if (isset($options['fields'][$fieldName]['properties']['list'])) {
+                    if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
                         $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
                     }
 
                     break;
             }
 
-            if (in_array($data['operator'], ['empty', '!empty'])) {
+            if ($data['operator'] === null || in_array($data['operator'], ['empty', '!empty'])) {
                 $attr['disabled'] = 'disabled';
-            } else {
+            } elseif (null !== $data['filter']) {
                 $customOptions['constraints'] = [
                     new NotBlank(
                         [
@@ -251,18 +254,18 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 [
                     'label'          => false,
                     'attr'           => $displayAttr,
-                    'data'           => $data['display'],
+                    'data'           => isset($data['display']) ? $data['display'] : '',
                     'error_bubbling' => false,
                 ]
             );
 
             $choices = $operatorChoices;
-            if (isset($options['fields'][$fieldName]['operators']['include'])) {
+            if (isset($options['fields'][$fieldObject][$fieldName]['operators']['include'])) {
                 // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldName]['operators']['include']));
-            } elseif (isset($options['fields'][$fieldName]['operators']['exclude'])) {
+                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['include']));
+            } elseif (isset($options['fields'][$fieldObject][$fieldName]['operators']['exclude'])) {
                 // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldName]['operators']['exclude']));
+                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['exclude']));
             }
 
             $form->add(
@@ -273,7 +276,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     'choices' => $choices,
                     'attr'    => [
                         'class'    => 'form-control not-chosen',
-                        'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                        'onchange' => 'Mautic.convertDynamicContentFilterInput(this)',
                     ],
                 ]
             );
@@ -314,6 +317,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 'timezones',
                 'stages',
                 'locales',
+                'fields',
             ]
         );
 

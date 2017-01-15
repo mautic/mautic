@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -41,6 +42,15 @@ class PluginController extends FormController
         // List of plugins for filter and to show as a single integration
         $plugins = $pluginModel->getEntities(
             [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'p.isMissing',
+                            'expr'   => 'eq',
+                            'value'  => 0,
+                        ],
+                    ],
+                ],
                 'hydration_mode' => 'hydrate_array',
             ]
         );
@@ -56,17 +66,20 @@ class PluginController extends FormController
         $integrations       = $foundPlugins       = [];
 
         foreach ($integrationObjects as $name => $object) {
-            $settings            = $object->getIntegrationSettings();
-            $integrations[$name] = [
-                'name'     => $object->getName(),
-                'display'  => $object->getDisplayName(),
-                'icon'     => $integrationHelper->getIconPath($object),
-                'enabled'  => $settings->isPublished(),
-                'plugin'   => $settings->getPlugin()->getId(),
-                'isBundle' => false,
-            ];
+            $settings = $object->getIntegrationSettings();
+            $pluginId = $settings->getPlugin()->getId();
+            if (isset($plugins[$pluginId])) {
+                $integrations[$name] = [
+                    'name'     => $object->getName(),
+                    'display'  => $object->getDisplayName(),
+                    'icon'     => $integrationHelper->getIconPath($object),
+                    'enabled'  => $settings->isPublished(),
+                    'plugin'   => $settings->getPlugin()->getId(),
+                    'isBundle' => false,
+                ];
+            }
 
-            $foundPlugins[$settings->getPlugin()->getId()] = true;
+            $foundPlugins[$pluginId] = true;
         }
 
         $nonIntegrationPlugins = array_diff_key($plugins, $foundPlugins);
@@ -142,7 +155,10 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $leadFields = $this->getModel('plugin')->getLeadFields();
+        $pluginModel = $this->getModel('plugin');
+
+        $leadFields    = $pluginModel->getLeadFields();
+        $companyFields = $pluginModel->getCompanyFields();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
@@ -153,6 +169,7 @@ class PluginController extends FormController
             [
                 'integration'        => $entity->getName(),
                 'lead_fields'        => $leadFields,
+                'company_fields'     => $companyFields,
                 'integration_object' => $integrationObject,
                 'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name]),
             ]
@@ -403,6 +420,7 @@ class PluginController extends FormController
                 if (!$plugin->getIsMissing()) {
                     //files are no longer found
                     $plugin->setIsMissing(true);
+                    $persistUpdate = true;
                     ++$disabled;
                 }
             } else {

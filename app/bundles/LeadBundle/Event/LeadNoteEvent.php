@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -43,7 +44,7 @@ class LeadNoteEvent extends CommonEvent
      *
      * @param LeadNote $note
      */
-    public function setLeadNote(getNote $note)
+    public function setLeadNote(LeadNote $note)
     {
         $this->entity = $note;
     }

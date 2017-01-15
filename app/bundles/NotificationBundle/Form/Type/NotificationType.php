@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -98,6 +99,20 @@ class NotificationType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.url.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'button',
+            'text',
+            [
+                'label'      => 'mautic.notification.form.button',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.button.tooltip',
                 ],
                 'required' => false,
             ]

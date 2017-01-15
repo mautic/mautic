@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,4 +14,22 @@ return [
     'description' => 'Enables integration with Mautic supported CRMs.',
     'version'     => '1.0',
     'author'      => 'Mautic',
+    'routes'      => [
+        'public' => [
+            'mautic_integration_contacts' => [
+                'path'         => '/plugin/{integration}/contact_data',
+                'controller'   => 'MauticCrmBundle:Public:contactData',
+                'requirements' => [
+                    'integration' => '.+',
+                ],
+            ],
+            'mautic_integration_companies' => [
+                'path'         => '/plugin/{integration}/company_data',
+                'controller'   => 'MauticCrmBundle:Public:companyData',
+                'requirements' => [
+                    'integration' => '.+',
+                ],
+            ],
+        ],
+    ],
 ];

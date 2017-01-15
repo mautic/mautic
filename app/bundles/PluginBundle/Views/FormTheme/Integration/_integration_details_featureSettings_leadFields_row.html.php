@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,5 +31,9 @@
         <?php endif; ?>
         <?php ++$rowCount; ?>
         <?php endforeach; ?>
+        <?php
+        if ($rowCount % 2 == 0):?>
+    </div>
+        <?php endif; ?>
     </div>
 </div>

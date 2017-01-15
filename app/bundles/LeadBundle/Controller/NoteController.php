@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -326,10 +327,13 @@ class NoteController extends FormController
         $model = $this->getModel('lead.note');
         $note  = $model->getEntity($objectId);
 
+        if ($note === null) {
+            return $this->notFound();
+        }
+
         if (
-            $note === null || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
+            !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
             || $model->isLocked($note)
-            || $this->request->getMethod() != 'POST'
         ) {
             return $this->accessDenied();
         }

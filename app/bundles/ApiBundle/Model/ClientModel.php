@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -165,6 +166,8 @@ class ClientModel extends FormModel
 
     /**
      * @param $entity
+     *
+     * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
     {

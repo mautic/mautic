@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -44,8 +45,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of events to process per campaign for this script execution. Defaults to all.',
                 0
-            )
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+            );
 
         parent::configure();
     }
@@ -57,22 +57,19 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
-        $model = $factory->getModel('campaign.event');
+        $model = $container->get('mautic.campaign.model.event');
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $factory->getModel('campaign');
-        $translator    = $factory->getTranslator();
-        $em            = $factory->getEntityManager();
+        $campaignModel = $container->get('mautic.campaign.model.campaign');
+        $translator    = $container->get('translator');
+        $em            = $container->get('doctrine')->getManager();
         $id            = $input->getOption('campaign-id');
         $scheduleOnly  = $input->getOption('scheduled-only');
         $negativeOnly  = $input->getOption('negative-only');
         $batch         = $input->getOption('batch-limit');
         $max           = $input->getOption('max-events');
 
-        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
+        if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 

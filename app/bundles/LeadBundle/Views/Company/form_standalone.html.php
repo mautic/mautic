@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,6 +21,17 @@ $header = ($entity->getId())
     $view['translator']->trans('mautic.company.menu.new');
 $view['slots']->set('headerTitle', $header);
 
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'item'      => $entity,
+            'routeBase' => 'company',
+            'langVar'   => 'lead.company',
+        ]
+    )
+);
 echo $view['form']->start($form);
 ?>
     <div class="box-layout">
@@ -40,6 +52,10 @@ echo $view['form']->start($form);
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
+                <hr/>
+                <div>
+                    <?php echo $view['form']->row($form['score']); ?>
+                </div>
                 <hr/>
                 <div>
                     <?php echo $view['form']->row($form['owner']); ?>

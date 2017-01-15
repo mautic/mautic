@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -99,7 +100,7 @@ class UtmTag
 
         $builder->addNullableField('query', 'array');
 
-        $builder->addNullableField('referer', 'string');
+        $builder->addNullableField('referer', 'text');
 
         $builder->addNullableField('remoteHost', 'string', 'remote_host');
 

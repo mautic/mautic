@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -37,7 +38,7 @@ foreach ($chartItems as $key => $chartData) :
                     <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5><?php echo $view['translator']->trans('mautic.lead.lifecycle.graph.stage.cycle'); ?></h5></div>
                     <div class="clearfix"></div>
                     <div style="height:<?php echo $chartHeight / 2.3; ?>px;">
-                     <canvas class="chart simple-bar-chart" style="font-size: 9px!important;"><?php echo json_encode($stages[$key]); ?></canvas>
+                     <canvas class="chart liefechart-bar-chart" style="font-size: 9px!important;"><?php echo json_encode($stages[$key]); ?></canvas>
                     </div>
                     <div class="legend" style="font-size: 9px;"></div>
                 </div>

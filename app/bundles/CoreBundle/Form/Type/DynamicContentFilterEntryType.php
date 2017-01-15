@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -88,6 +89,7 @@ class DynamicContentFilterEntryType extends AbstractType
                         'timezones' => $this->timezoneChoices,
                         'stages'    => $this->stageChoices,
                         'locales'   => $this->localeChoices,
+                        'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,

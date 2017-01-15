@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -43,30 +43,42 @@
 
   $.FE.PLUGINS.url = function (editor) {
 
-    function _convertURLS (contents) {
-      // All content zones.
-      contents.each (function () {
-        if (this.tagName == 'IFRAME') return;
+    function _ignore (node) {
+      while (node.parentNode) {
+        node = node.parentNode;
 
-        // Text node.
-        if (this.nodeType == 3) {
-          var text = this.textContent.replace(/&nbsp;/gi, '');
+        if (['A', 'BUTTON', 'TEXTAREA'].indexOf(node.tagName) >= 0) {
+          return true;
+        }
+      }
 
-          // Check if text is URL.
-          if ($.FE.URLRegEx.test(text)) {
-            // Convert it to A.
-            $(this).before(text.replace($.FE.URLRegEx, '$1<a href="$2">$2</a>$7'));
+      return false;
+    }
 
-            $(this).remove();
-          }
+    function _convertURLS () {
+      var walker = editor.doc.createTreeWalker(editor.el, NodeFilter.SHOW_TEXT, editor.node.filter(function (node) {
+          return $.FE.URLRegEx.test(node.textContent.replace(/&nbsp;/gi, '')) && !_ignore(node);
+        }), false);
+
+      while (walker.nextNode()) {
+        var node = walker.currentNode;
+
+        var rel = null;
+        if (editor.opts.linkAlwaysNoFollow) {
+          rel = 'nofollow';
         }
 
-        // Other type of node.
-        else if (this.nodeType == 1 && ['A', 'BUTTON', 'TEXTAREA'].indexOf(this.tagName) < 0) {
-          // Convert urls inside it.
-          _convertURLS(editor.node.contents(this));
+        // https://github.com/froala/wysiwyg-editor/issues/1576.
+        if (editor.opts.linkAlwaysBlank) {
+          if (!rel) rel = 'noopener noreferrer';
+          else rel += ' noopener noreferrer';
         }
-      })
+
+        // Convert it to A.
+        $(node).before(node.textContent.replace($.FE.URLRegEx, '$1<a' + (editor.opts.linkAlwaysBlank ? ' target="_blank"' : '') + (rel ? (' rel="' + rel + '"') : '') + ' href="$2">$2</a>$7'));
+
+        node.parentNode.removeChild(node);
+      }
     }
 
     /*
@@ -75,14 +87,14 @@
     function _init () {
       editor.events.on('paste.afterCleanup', function (html) {
         if ($.FE.URLRegEx.test(html)) {
-          return html.replace($.FE.URLRegEx, '$1<a href="$2">$2</a>$7')
+          return html.replace($.FE.URLRegEx, '$1<a' + (editor.opts.linkAlwaysBlank ? ' target="_blank"' : '') + (editor.opts.linkAlwaysNoFollow ? ' rel="nofollow"' : '') + ' href="$2">$2</a>$7')
         }
       });
 
       editor.events.on('keyup', function (e) {
         var keycode = e.which;
         if (keycode == $.FE.KEYCODE.ENTER || keycode == $.FE.KEYCODE.SPACE) {
-          _convertURLS(editor.node.contents(editor.$el.get(0)));
+          _convertURLS(editor.node.contents(editor.el));
         }
       });
 

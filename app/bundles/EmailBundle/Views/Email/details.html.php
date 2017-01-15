@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -52,19 +53,21 @@ if ($emailType == 'list') {
         ],
         'iconClass' => 'fa fa-send-o',
         'btnText'   => 'mautic.email.send',
+        'primary'   => true,
     ];
 }
 
 $customButtons[] = [
     'attr' => [
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->path(
-            'mautic_email_action',
-            ['objectAction' => 'example', 'objectId' => $email->getId()]
-        ),
+        'class'       => 'btn btn-default btn-nospin',
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
+        'href'        => $view['router']->path('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $email->getId()]),
+        'data-header' => $view['translator']->trans('mautic.email.send.example'),
     ],
     'iconClass' => 'fa fa-send',
     'btnText'   => 'mautic.email.send.example',
+    'primary'   => true,
 ];
 
 // Only show A/B test button if not already a translation of an a/b test
@@ -95,8 +98,8 @@ $view['slots']->set(
                     $email->getCreatedBy()
                 ),
             ],
-            'routeBase'        => 'email',
-            'preCustomButtons' => $customButtons,
+            'routeBase'     => 'email',
+            'customButtons' => $customButtons,
         ]
     )
 );

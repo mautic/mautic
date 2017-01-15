@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *

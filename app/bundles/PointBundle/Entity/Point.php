@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -132,6 +133,10 @@ class Point extends FormEntity
 
         $metadata->addPropertyConstraint('type', new Assert\NotBlank([
             'message' => 'mautic.point.type.notblank',
+        ]));
+
+        $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
+            'message' => 'mautic.point.delta.notblank',
         ]));
     }
 

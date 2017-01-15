@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,14 +31,10 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.email.help.searchcommands',
-            'action'          => $currentRoute,
-            'routeBase'       => 'email',
-            'templateButtons' => [
-                'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother'],
-            ],
-            'filters' => $filters,
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.email.help.searchcommands',
+            'action'      => $currentRoute,
+            'filters'     => $filters,
         ]
     ); ?>
 

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -18,7 +19,6 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface;
 
 class FormAuthenticator implements SimpleFormAuthenticatorInterface
 {
@@ -45,9 +46,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     protected $integrationHelper;
 
     /**
-     * @var null|Request
+     * @var null|RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @param IntegrationHelper            $integrationHelper
@@ -64,7 +65,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         $this->encoder           = $encoder;
         $this->dispatcher        = $dispatcher;
         $this->integrationHelper = $integrationHelper;
-        $this->request           = $requestStack->getCurrentRequest();
+        $this->requestStack      = $requestStack;
     }
 
     /**
@@ -94,7 +95,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
             // Try authenticating with a plugin first
             if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
                 $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_form'], false, null, true);
-                $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->request, false, $authenticatingService, $integrations);
+                $authEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->requestStack->getCurrentRequest(), false, $authenticatingService, $integrations);
                 $this->dispatcher->dispatch(UserEvents::USER_FORM_AUTHENTICATION, $authEvent);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
