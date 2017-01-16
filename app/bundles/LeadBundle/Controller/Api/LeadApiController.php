@@ -485,6 +485,63 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Adds a UTM Tagset to the contact.
+     *
+     * @param int $id
+     */
+    public function addUtmTagsAction($id)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
+
+        $result = $this->model->addUTMTags($entity, $parameters);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Remove a UTM Tagset for the contact.
+     *
+     * @param int $id
+     * @param int $utmid
+     */
+    public function removeUtmTagsAction($id, $utmid)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $result = $this->model->removeUtmTags($entity, (int) $utmid);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity

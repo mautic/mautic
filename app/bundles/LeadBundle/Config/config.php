@@ -115,6 +115,16 @@ return [
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
             ],
+            'mautic_api_utmcreateevent' => [
+                'path'       => '/contacts/{id}/utm/add',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addUtmTags',
+                'method'     => 'POST',
+            ],
+            'mautic_api_utmremoveevent' => [
+                'path'       => '/contacts/{id}/utm/{utmid}/remove',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeUtmTags',
+                'method'     => 'POST',
+            ],
             'mautic_api_getcontactevents' => [
                 'path'       => '/contacts/{id}/events',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',

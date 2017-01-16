@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use DeviceDetector\DeviceDetector;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -29,6 +30,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -1839,7 +1841,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Update a leads tags.
+     * Update a leads UTM tags.
      *
      * @param Lead   $lead
      * @param UtmTag $utmTags
@@ -1849,6 +1851,112 @@ class LeadModel extends FormModel
         $lead->setUtmTags($utmTags);
 
         $this->saveEntity($lead);
+    }
+
+    /**
+     * Add leads UTM tags via API.
+     *
+     * @param Lead  $lead
+     * @param array $query
+     */
+    public function addUTMTags(Lead $lead, $query)
+    {
+        // available fields and it's setter.
+        $fields = ['utm_campaign' => 'UtmCampaign',
+                   'utm_source'   => 'UtmSource',
+                   'utm_medium'   => 'UtmMedium',
+                   'utm_content'  => 'UtmContent',
+                   'utm_term'     => 'UtmTerm',
+                   'useragent'    => 'UserAgent',
+                   'url'          => 'Url',
+                   'referer'      => 'Referer',
+                   'query'        => 'Query',
+                   'remotehost'   => 'RemoteHost',
+                   'lastActive'   => 'DateAdded',
+        ];
+
+        // 'query' must be an array
+        if (isset($query['query']) && !is_array($query['query'])) {
+            parse_str($query['query'], $queryResult);
+            if (!empty($queryResult)) {
+                $query['query'] = $queryResult;
+            } else {
+                // Something wrong with it
+                unset($query['query']);
+            }
+        }
+
+        // see if active date set, so we can use it
+        $updateLastActive = false;
+        $lastActive       = new \DateTime();
+        // should be: yyyy-mm-ddT00:00:00+00:00
+        if (isset($query['lastActive'])) {
+            $lastActive       = new \DateTime($query['lastActive']);
+            $updateLastActive = true;
+        }
+        $query['lastActive'] = $lastActive;
+
+        // New utmTag
+        $utmTags = new UtmTag();
+
+        // cycle through calling appropriate setter
+        foreach ($fields as $q => $prop) {
+            if (isset($query[$q])) {
+                $setter = 'set'.$prop;
+                $utmTags->$setter($query[$q]);
+            }
+        }
+
+        // create device
+        if (key_exists('useragent', $query) && !empty($query['useragent'])) {
+            //device granularity
+            $dd = new DeviceDetector($query['useragent']);
+            $dd->parse();
+
+            $deviceRepo = $this->getDeviceRepository();
+            $device     = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+            if (empty($device)) {
+                $device = new LeadDevice();
+                $device->setClientInfo($dd->getClient());
+                $device->setDevice($dd->getDeviceName());
+                $device->setDeviceBrand($dd->getBrand());
+                $device->setDeviceModel($dd->getModel());
+                $device->setDeviceOs($dd->getOs());
+                $device->setDateAdded($lastActive);
+                $device->setLead($lead);
+                $this->getDeviceRepository()->saveEntity($device);
+            }
+        }
+
+        // add the lead
+        $utmTags->setLead($lead);
+        if ($updateLastActive) {
+            $lead->setLastActive($lastActive);
+        }
+
+        $this->setUtmTags($lead, $utmTags);
+    }
+
+    /**
+     * Removes a UtmTag set from a Lead.
+     *
+     * @param Lead $lead
+     * @param int  $utmId
+     */
+    public function removeUtmTags(Lead $lead, $utmId)
+    {
+        /** @var UtmTag $utmTag */
+        foreach ($lead->getUtmTags() as $utmTag) {
+            if ($utmTag->getId() === $utmId) {
+                $lead->removeUtmTagEntry($utmTag);
+                $this->saveEntity($lead);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

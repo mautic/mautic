@@ -349,7 +349,7 @@ class UtmTag
      *
      * @return Hit
      */
-    public function setUtmConent($utmContent)
+    public function setUtmContent($utmContent)
     {
         $this->utmContent = $utmContent;
 
