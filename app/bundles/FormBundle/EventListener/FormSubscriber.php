@@ -18,7 +18,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
@@ -47,24 +46,17 @@ class FormSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    /**
      * FormSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param MailHelper     $mailer
-     * @param EmailModel     $emailModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, EmailModel $emailModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->mailer         = $mailer->getMailer();
-        $this->emailModel     = $emailModel;
     }
 
     /**
@@ -205,12 +197,6 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->setSubject($config['subject']);
 
             $this->mailer->addTokens($tokens);
-
-            if (isset($config['templates'])) {
-                /** @var \Mautic\EmailBundle\Entity\Email $email */
-                $email             = $this->emailModel->getEntity($config['templates']);
-                $config['message'] = $email->getCustomHtml();
-            }
 
             $this->mailer->setBody($config['message']);
             $this->mailer->parsePlainText($config['message']);

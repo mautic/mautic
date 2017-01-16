@@ -125,7 +125,6 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
-                    'mautic.email.model.email',
                 ],
             ],
             'mautic.form.pagebundle.subscriber' => [
