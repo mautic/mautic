@@ -453,11 +453,12 @@ class LeadApiController extends CommonApiController
         }
 
         $result = $this->model->removeDncForLead($entity, $channel);
-        $view   = $this->view([$this->entityNameOne => $entity]);
-
-        if ($result === false) {
-            return $this->badRequest();
-        }
+        $view   = $this->view(
+            [
+                'recordFound'        => $result,
+                $this->entityNameOne => $entity,
+            ]
+        );
 
         return $this->handleView($view);
     }

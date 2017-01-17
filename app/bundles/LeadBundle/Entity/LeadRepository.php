@@ -296,16 +296,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getEntity($id = 0)
     {
         try {
-            /** @var Lead $entity */
-            $entity = $this
-                ->createQueryBuilder('l')
-                ->select('l, u, i')
+            $q = $this->createQueryBuilder($this->getTableAlias());
+            if (is_array($id)) {
+                $this->buildSelectClause($q, $id);
+                $contactId = (int) $id['id'];
+            } else {
+                $q->select('l, u, i')
                 ->leftJoin('l.ipAddresses', 'i')
-                ->leftJoin('l.owner', 'u')
-                ->where('l.id = :leadId')
-                ->setParameter('leadId', $id)
-                ->getQuery()
-                ->getSingleResult();
+                ->leftJoin('l.owner', 'u');
+                $contactId = $id;
+            }
+            $q->andWhere($this->getTableAlias().'.id = '.(int) $contactId);
+            $entity = $q->getQuery()->getSingleResult();
         } catch (\Exception $e) {
             $entity = null;
         }
@@ -570,18 +572,22 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
                 $expr = $q->expr()->$nullExpr('l.date_identified');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $expr = $q->expr()->$eqExpr('l.owner_id', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$eqExpr('l.owner_id', 0),
                     $q->expr()->$nullExpr('l.owner_id')
                 );
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('u.first_name', ':'.$unique),
                     $q->expr()->$likeExpr('u.last_name', ':'.$unique)
@@ -589,6 +595,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('l.firstname', ":$unique"),
                     $q->expr()->$likeExpr('l.lastname', ":$unique")
@@ -596,10 +603,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
+            case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
                 $expr            = $q->expr()->$likeExpr('l.email', ":$unique");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
                     [
@@ -628,6 +637,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ip'):
+            case $this->translator->trans('mautic.core.searchcommand.ip', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
                     [
@@ -651,6 +661,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate', [], null, 'en_US'):
                 $prateek  = explode('+', $string);
                 $imploder = [];
 
@@ -659,7 +670,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 
-                //logic. In query, Sum(manuall_removed) should be less than the current)
+                //logic. In query, Sum(manually_removed) should be less than the current)
                 $pluck    = count($imploder);
                 $imploder = (string) (implode(',', $imploder));
 
@@ -680,6 +691,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.tag', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
                     [
@@ -702,6 +714,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
                     [
