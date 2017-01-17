@@ -1914,8 +1914,9 @@ class LeadModel extends FormModel
             $dd->parse();
 
             $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+            $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
+            // Only if it does not exist already
             if (empty($device)) {
                 $device = new LeadDevice();
                 $device->setClientInfo($dd->getClient());
