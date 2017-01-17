@@ -125,35 +125,18 @@ class PageRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command                 = $filter->command;
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('p.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('p.isPublished', ":$unique");
-                $forceParameters = [$unique => false];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('p.category'),
-                    $q->expr()->eq('p.category', $q->expr()->literal(''))
-                );
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq('IDENTITY(p.createdBy)', $this->currentUser->getId());
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr            = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict  = true;
-                $returnParameter = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
+            case $this->translator->trans('mautic.core.searchcommand.lang', [], null, 'en_US'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
                 $forceParameters = [

@@ -31,10 +31,11 @@ class CompanyApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->getModel('lead.company');
-        $this->entityClass     = Company::class;
-        $this->entityNameOne   = 'company';
-        $this->entityNameMulti = 'companies';
+        $this->model              = $this->getModel('lead.company');
+        $this->entityClass        = Company::class;
+        $this->entityNameOne      = 'company';
+        $this->entityNameMulti    = 'companies';
+        $this->serializerGroups[] = 'companyDetails';
 
         parent::initialize($event);
     }
