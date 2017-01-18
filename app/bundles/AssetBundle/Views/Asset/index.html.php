@@ -31,6 +31,7 @@ $view['slots']->set(
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
+        'searchHelp'  => 'mautic.asset.asset.help.searchcommands',
     ]); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

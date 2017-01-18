@@ -29,5 +29,12 @@ class StatsSubscriber extends CommonStatsSubscriber
         $this->repositories[] = $em->getRepository('MauticLeadBundle:CompanyChangeLog');
         $this->repositories[] = $em->getRepository('MauticLeadBundle:PointsChangeLog');
         $this->repositories[] = $em->getRepository('MauticLeadBundle:StagesChangeLog');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:CompanyLead');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadCategory');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadDevice');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadList');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:DoNotContact');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:FrequencyRule');
+        $this->repositories[] = $em->getRepository('MauticLeadBundle:UtmTag');
     }
 }

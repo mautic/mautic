@@ -223,4 +223,4 @@ Marketing automation has historically been a difficult tool to implement in a bu
 
 ### Developers
 We love testing our user interface on as many platforms as possible (even those browsers we prefer to not mention). In order to help us do this we use and recommend BrowserStack.
-<img src="https://www.mautic.org/media/browserstack_small.png" />
+[<img src="https://www.mautic.org/media/browserstack_small.png" />](https://www.browserstack.com/)

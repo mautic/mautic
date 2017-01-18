@@ -196,6 +196,12 @@ class TokenSubscriber extends CommonSubscriber
                 case '!in':
                     $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
                     break;
+                case 'regexp':
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) === 1;
+                    break;
+                case '!regexp':
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) !== 1;
+                    break;
             }
         }
 

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'video.insert': '[_BUTTONS_][_BY_URL_LAYER_][_EMBED_LAYER_]',
@@ -132,14 +132,16 @@
       var $popup = editor.popups.get('video.edit');
       if (!$popup) $popup = _initEditPopup();
 
-      editor.popups.setContainer('video.edit', $(editor.opts.scrollableContainer));
-      editor.popups.refresh('video.edit');
+      if ($popup) {
+        editor.popups.setContainer('video.edit', $(editor.opts.scrollableContainer));
+        editor.popups.refresh('video.edit');
 
-      var $video_obj = $current_video.find('iframe, embed, video');
-      var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
-      var top = $video_obj.offset().top + $video_obj.outerHeight();
+        var $video_obj = $current_video.find('iframe, embed, video');
+        var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
+        var top = $video_obj.offset().top + $video_obj.outerHeight();
 
-      editor.popups.show('video.edit', left, top, $video_obj.outerHeight());
+        editor.popups.show('video.edit', left, top, $video_obj.outerHeight());
+      }
     }
 
     function _initInsertPopup (delayed) {
@@ -158,13 +160,13 @@
       // Video by url layer.
       var by_url_layer = '';
       if (editor.opts.videoInsertButtons.indexOf('videoByURL') >= 0) {
-        by_url_layer = '<div class="fr-video-by-url-layer fr-layer fr-active" id="fr-video-by-url-layer-' + editor.id + '"><div class="fr-input-line"><input type="text" placeholder="http://" tabIndex="1"></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertByURL" tabIndex="2">' + editor.language.translate('Insert') + '</button></div></div>'
+        by_url_layer = '<div class="fr-video-by-url-layer fr-layer fr-active" id="fr-video-by-url-layer-' + editor.id + '"><div class="fr-input-line"><input id="fr-video-by-url-layer-text-' + editor.id + '" type="text" placeholder="http://" tabIndex="1" aria-required="true"></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertByURL" tabIndex="2" role="button">' + editor.language.translate('Insert') + '</button></div></div>'
       }
 
       // Video embed layer.
       var embed_layer = '';
       if (editor.opts.videoInsertButtons.indexOf('videoEmbed') >= 0) {
-        embed_layer = '<div class="fr-video-embed-layer fr-layer" id="fr-video-embed-layer-' + editor.id + '"><div class="fr-input-line"><textarea type="text" placeholder="' + editor.language.translate('Embedded Code') + '" tabIndex="1" rows="5"></textarea></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertEmbed" tabIndex="2">' + editor.language.translate('Insert') + '</button></div></div>'
+        embed_layer = '<div class="fr-video-embed-layer fr-layer" id="fr-video-embed-layer-' + editor.id + '"><div class="fr-input-line"><textarea id="fr-video-embed-layer-text' + editor.id + '" type="text" placeholder="' + editor.language.translate('Embedded Code') + '" tabIndex="1" aria-required="true" rows="5"></textarea></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertEmbed" tabIndex="2" role="button">' + editor.language.translate('Insert') + '</button></div></div>'
       }
 
       var template = {
@@ -208,6 +210,7 @@
       $popup.find('.fr-' + name + '-layer').addClass('fr-active');
 
       editor.popups.show('video.insert', left, top, 0);
+      editor.accessibility.focusPopup($popup);
     }
 
     /**
@@ -216,7 +219,7 @@
     function refreshByURLButton ($btn) {
       var $popup = editor.popups.get('video.insert');
       if ($popup.find('.fr-video-by-url-layer').hasClass('fr-active')) {
-        $btn.addClass('fr-active');
+        $btn.addClass('fr-active').attr('aria-pressed', true);
       }
     }
 
@@ -226,7 +229,7 @@
     function refreshEmbedButton ($btn) {
       var $popup = editor.popups.get('video.insert');
       if ($popup.find('.fr-video-embed-layer').hasClass('fr-active')) {
-        $btn.addClass('fr-active');
+        $btn.addClass('fr-active').attr('aria-pressed', true);
       }
     }
 
@@ -396,6 +399,18 @@
       return '<div class="fr-handler fr-h' + pos + '"></div>';
     }
 
+    function _resizeVideo (e, initPageX, direction, step) {
+      e.pageX = initPageX;
+      e.pageY = initPageX;
+      _handlerMousedown.call(this, e);
+      e.pageX = e.pageX + direction * Math.floor(Math.pow(1.1, step));
+      e.pageY = e.pageY + direction * Math.floor(Math.pow(1.1, step));
+      _handlerMousemove.call(this, e);
+      _handlerMouseup.call(this, e);
+
+      return step++;
+    }
+
     /**
      * Init video resizer.
      */
@@ -459,6 +474,46 @@
         editor.events.$on($(doc.defaultView || doc.parentWindow), editor._mouseup, _handlerMouseup);
 
         editor.events.$on($overlay, 'mouseleave', _handlerMouseup);
+
+
+        // Accessibility.
+
+        // Used for keys holing.
+        var step = 1;
+        var prevKey = null;
+        var prevTimestamp = 0;
+
+        // Keydown event.
+        editor.events.on('keydown', function (e) {
+          if ($current_video) {
+            var ctrlKey = navigator.userAgent.indexOf('Mac OS X') != -1 ? e.metaKey : e.ctrlKey;
+            var keycode = e.which;
+
+            if (keycode !== prevKey || e.timeStamp - prevTimestamp > 200) {
+              step = 1; // Reset step. Known browser issue: Keyup does not trigger when ctrl is pressed.
+            }
+
+            // Increase video size.
+            if ((keycode == $.FE.KEYCODE.EQUALS || (editor.browser.mozilla && keycode == $.FE.KEYCODE.FF_EQUALS)) && ctrlKey && !e.altKey) {
+              step = _resizeVideo.call(this, e, 1, 1);
+            }
+            // Decrease video size.
+            else if ((keycode == $.FE.KEYCODE.HYPHEN || (editor.browser.mozilla && keycode == $.FE.KEYCODE.FF_HYPHEN)) && ctrlKey && !e.altKey) {
+              step = _resizeVideo.call(this, e, 2, -1);
+            }
+
+            // Save key code.
+            prevKey = keycode;
+
+            // Save timestamp.
+            prevTimestamp = e.timeStamp;
+          }
+        });
+
+        // Reset the step on key up event.
+        editor.events.on('keyup', function () {
+          step = 1;
+        });
       }
     }
 
@@ -478,7 +533,7 @@
         .css('left', (editor.opts.iframe ? $video_obj.offset().left - 1 : $video_obj.offset().left - editor.$wp.offset().left - 1) + editor.$wp.scrollLeft())
         .css('width', $video_obj.outerWidth())
         .css('height', $video_obj.height())
-        .addClass('fr-active')
+        .addClass('fr-active');
     }
 
     /**
@@ -583,25 +638,27 @@
     function _initEditPopup () {
       // Image buttons.
       var video_buttons = '';
-      if (editor.opts.videoEditButtons.length >= 1) {
+      if (editor.opts.videoEditButtons.length > 0) {
         video_buttons += '<div class="fr-buttons">';
         video_buttons += editor.button.buildList(editor.opts.videoEditButtons);
         video_buttons += '</div>';
-      }
 
-      var template = {
-        buttons: video_buttons
-      }
-
-      var $popup = editor.popups.create('video.edit', template);
-
-      editor.events.$on(editor.$wp, 'scroll.video-edit', function () {
-        if ($current_video && editor.popups.isVisible('video.edit')) {
-          _showEditPopup();
+        var template = {
+          buttons: video_buttons
         }
-      });
 
-      return $popup;
+        var $popup = editor.popups.create('video.edit', template);
+
+        editor.events.$on(editor.$wp, 'scroll.video-edit', function () {
+          if ($current_video && editor.popups.isVisible('video.edit')) {
+            _showEditPopup();
+          }
+        });
+
+        return $popup;
+      }
+
+      return false;
     }
 
     /**
@@ -648,7 +705,7 @@
 
       // Size layer.
       var size_layer = '';
-      size_layer = '<div class="fr-video-size-layer fr-layer fr-active" id="fr-video-size-layer-' + editor.id + '"><div class="fr-video-group"><div class="fr-input-line"><input type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoSetSize" tabIndex="2">' + editor.language.translate('Update') + '</button></div></div>';
+      size_layer = '<div class="fr-video-size-layer fr-layer fr-active" id="fr-video-size-layer-' + editor.id + '"><div class="fr-video-group"><div class="fr-input-line"><input id="fr-video-size-layer-width-' + editor.id + '" type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input id="fr-video-size-layer-height-' + editor.id + '" type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoSetSize" tabIndex="2" role="button">' + editor.language.translate('Update') + '</button></div></div>';
 
       var template = {
         buttons: video_buttons,
@@ -712,7 +769,7 @@
         alignment = 'right';
       }
 
-      $dropdown.find('.fr-command[data-param1="' + alignment + '"]').addClass('fr-active');
+      $dropdown.find('.fr-command[data-param1="' + alignment + '"]').addClass('fr-active').attr('aria-selected', true);
     }
 
     /**
@@ -740,7 +797,7 @@
         d = 'inline';
       }
 
-      $dropdown.find('.fr-command[data-param1="' + d + '"]').addClass('fr-active');
+      $dropdown.find('.fr-command[data-param1="' + d + '"]').addClass('fr-active').attr('aria-selected', true);
     }
 
     /**
@@ -879,8 +936,17 @@
           return false;
         }
 
-        if ($current_video && !editor.keys.ctrlKey(e)) {
+        if ($current_video && key_code != $.FE.KEYCODE.F10 && !editor.keys.isBrowserAction(e)) {
           e.preventDefault();
+          return false;
+        }
+      }, true);
+
+      // ESC from accessibility.
+      editor.events.on('toolbar.esc', function () {
+        if ($current_video) {
+          editor.events.disableBlur();
+          editor.events.focus();
           return false;
         }
       }, true);
@@ -899,6 +965,7 @@
      */
     function back () {
       if ($current_video) {
+        editor.events.disableBlur();
         $current_video.trigger('click');
       }
       else {
@@ -924,7 +991,7 @@
         if ($video_obj.get(0).style.width) $video_obj.removeAttr('width');
         if ($video_obj.get(0).style.height) $video_obj.removeAttr('height');
 
-        $popup.find('input').blur();
+        $popup.find('input:focus').blur();
         setTimeout(function () {
           $current_video.trigger('click');
         }, editor.helpers.isAndroid() ? 50 : 0);
@@ -969,7 +1036,7 @@
         this.video.showInsertPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }
@@ -990,6 +1057,7 @@
     title: 'By URL',
     undo: false,
     focus: false,
+    toggle: true,
     callback: function () {
       this.video.showLayer('video-by-url');
     },
@@ -1004,6 +1072,7 @@
     title: 'Embedded Code',
     undo: false,
     focus: false,
+    toggle: true,
     callback: function () {
       this.video.showLayer('video-embed');
     },
@@ -1059,11 +1128,11 @@
       right: 'Align Right'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.videoAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command fr-title" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
         }
       }
       c += '</ul>';
@@ -1095,6 +1164,7 @@
   $.FE.RegisterCommand('videoSize', {
     undo: false,
     focus: false,
+    popup: true,
     title: 'Change Size',
     callback: function () {
       this.video.showSizePopup();
@@ -1127,6 +1197,8 @@
   $.FE.RegisterCommand('videoSetSize', {
     undo: true,
     focus: false,
+    title: 'Update',
+    refreshAfterCallback: false,
     callback: function () {
       this.video.setSize();
     }

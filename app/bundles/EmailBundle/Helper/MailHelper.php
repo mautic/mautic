@@ -264,6 +264,29 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality.
+     *
+     * @param bool $cleanSlate
+     *
+     * @return $this
+     */
+    public function getSampleMailer($cleanSlate = true)
+    {
+        $queueMode = $this->factory->getParameter('mailer_spool_type');
+        if ($queueMode != 'file') {
+            return $this->getMailer($cleanSlate);
+        }
+        // @todo - need a creative way to pass this service to this helper when factory use is removed
+        // the service is only available when queue mode is enabled so likely we'll need to use a cache compiler
+        // pass to ensure it is set regardless
+        $transport  = $this->factory->get('swiftmailer.transport.real');
+        $mailer     = new \Swift_Mailer($transport);
+        $mailHelper = new self($this->factory, $mailer, $this->from);
+
+        return $mailHelper->getMailer($cleanSlate);
+    }
+
+    /**
      * Send the message.
      *
      * @param bool $dispatchSendEvent
@@ -401,7 +424,6 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
-
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
