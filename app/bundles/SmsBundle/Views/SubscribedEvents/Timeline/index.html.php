@@ -8,9 +8,20 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$data = $event['extra']['log']['metadata'];
-
+$data   = $event['extra']['log']['metadata'];
+$errors = false;
+if (!empty($data['errors'])) {
+    $errors = (is_array($data['errors'])) ? implode('<br />', $data['errors']) : $data['errors'];
+} elseif (!empty($data['failed'])) {
+    $errors = ($data['reason']) ? $data['reason'] : $view['translator']->trans('mautic.campaign.event.failed.timeline');
+}
 ?>
+
+<?php if ($errors): ?>
+<p class="text-danger mt-0 mb-10">
+    <i class="fa fa-warning"></i> <?php echo $view['translator']->trans('mautic.campaign.event.last_error').': '.$errors; ?>
+</p>
+<?php else: ?>
 <dl class="dl-horizontal">
     <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
     <dd><?php echo $view['translator']->trans($data['status']); ?></dd>
@@ -23,3 +34,4 @@ $data = $event['extra']['log']['metadata'];
     <br />
     <?php echo $data['content']; ?>
 </div>
+<?php endif; ?>

@@ -73,7 +73,7 @@ class TwilioApi extends AbstractSmsApi
      * @param string $number
      * @param string $content
      *
-     * @return bool
+     * @return bool|string
      */
     public function sendSms($number, $content)
     {
@@ -95,14 +95,14 @@ class TwilioApi extends AbstractSmsApi
                 ['exception' => $e]
             );
 
-            return false;
+            return $e->getMessage();
         } catch (NumberParseException $e) {
             $this->logger->addError(
                 $e->getMessage(),
                 ['exception' => $e]
             );
 
-            return false;
+            return $e->getMessage();
         }
     }
 }
