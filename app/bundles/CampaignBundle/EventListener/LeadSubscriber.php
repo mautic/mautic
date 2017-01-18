@@ -209,12 +209,6 @@ class LeadSubscriber extends CommonSubscriber
         if (!$event->isEngagementCount()) {
             foreach ($logs['results'] as $log) {
                 // Hide this from the time line all together
-                if (!empty($log['metadata']['failed'])) {
-                    $event->subtractFromCounter($eventTypeKey);
-
-                    continue;
-                }
-
                 $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                     ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 

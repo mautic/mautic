@@ -37,11 +37,7 @@ class StatsApiController extends CommonApiController
         $limit    = (int) $this->request->query->get('limit', 100);
 
         // Ensure internal flag is not spoofed
-        foreach ($where as $key => $statement) {
-            if (isset($statement['internal'])) {
-                unset($where[$key]);
-            }
-        }
+        $this->sanitizeWhereClauseArrayFromRequest($where);
 
         $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
         $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);

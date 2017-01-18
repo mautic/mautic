@@ -67,14 +67,14 @@ class StatsEvent extends Event
      *
      * @var array
      */
-    protected $order;
+    protected $order = [];
 
     /**
      * Array of where filters.
      *
      * @var array
      */
-    protected $where;
+    protected $where = [];
 
     /**
      * Array of the result data.
