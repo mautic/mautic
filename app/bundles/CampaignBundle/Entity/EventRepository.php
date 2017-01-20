@@ -118,10 +118,11 @@ class EventRepository extends CommonRepository
      *
      * @param      $parentId
      * @param null $decisionPath
+     * @param null $eventType
      *
      * @return array
      */
-    public function getEventsByParent($parentId, $decisionPath = null)
+    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -131,11 +132,18 @@ class EventRepository extends CommonRepository
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
 
-        if ($decisionPath != null) {
+        if (null !== $decisionPath) {
             $q->andWhere(
                 $q->expr()->eq('e.decisionPath', ':decisionPath')
             )
                 ->setParameter('decisionPath', $decisionPath);
+        }
+
+        if (null !== $eventType) {
+            $q->andWhere(
+                $q->expr()->eq('e.eventType', ':eventType')
+            )
+              ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getArrayResult();

@@ -257,8 +257,6 @@ class CampaignSubscriber extends CommonSubscriber
         if (!empty($company)) {
             $somethingHappened = $this->leadModel->addToCompany($lead, $company);
         }
-
-        return $event->setResult($somethingHappened);
     }
 
     /**
@@ -270,15 +268,14 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $score             = $event->getConfig()['score'];
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $score = $event->getConfig()['score'];
+        $lead  = $event->getLead();
 
-        if (!empty($score)) {
-            $somethingHappened = $this->leadModel->scoreContactsCompany($lead, $score);
+        if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
+            return $event->setFailed('mautic.lead.no_company');
+        } else {
+            return $event->setResult(true);
         }
-
-        return $event->setResult($somethingHappened);
     }
 
     /**
