@@ -131,6 +131,12 @@ class NotificationHelper
     }]);
 
     var postUserIdToMautic = function(userId) {
+        MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}?osid=' + userId, {}, function(response, xhr) {
+        if (response.osid) {
+            document.cookie = "mtc_osid="+response.osid+";";
+        }
+    });
+        
         var xhr = new XMLHttpRequest();
 
         xhr.open('post', '{$leadAssociationUrl}', true);
@@ -165,17 +171,26 @@ JS;
     }
 
     private function hasScript(){
-        $server = $this->request->getCurrentRequest()->server;
+
         $landingPage = true;
+        $server = $this->request->getCurrentRequest()->server;
+
+        // already exist
+        if($this->request->cookies->get('mtc_osid')){
+            return false;
+        }
+
         if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
             $landingPage = false;
         }
 
+        // disable on Landing pages
         if($landingPage == true && !$this->coreParametersHelper->getParameter('notification_landing_page_enabled'))
         {
             return false;
         }
 
+        // disable on tracking pages
         if($landingPage == false && !$this->coreParametersHelper->getParameter('notification_tracking_page_enabled'))
         {
             return false;

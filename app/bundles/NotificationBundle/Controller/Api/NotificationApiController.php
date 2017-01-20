@@ -41,7 +41,6 @@ class NotificationApiController extends CommonApiController
     public function subscribeAction()
     {
         $osid = $this->request->get('osid');
-
         if ($osid) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
@@ -52,7 +51,7 @@ class NotificationApiController extends CommonApiController
 
             $leadModel->saveEntity($currentLead);
 
-            return new JsonResponse(['success' => true], 200, ['Access-Control-Allow-Origin' => '*']);
+            return new JsonResponse(['success' => true, 'osid' => $osid], 200, ['Access-Control-Allow-Origin' => '*']);
         }
 
         return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
