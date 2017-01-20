@@ -168,9 +168,10 @@ JS;
 
         $landingPage = true;
         $server = $this->request->getCurrentRequest()->server;
+        $cookies = $this->request->getCurrentRequest()->cookies;
 
         // already exist
-        if($this->request->cookies->get('mtc_osid')){
+        if($cookies->get('mtc_osid')){
             return false;
         }
 
