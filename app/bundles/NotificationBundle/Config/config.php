@@ -28,11 +28,14 @@ return [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters',
+                    'mautic.helper.core_parameters'
                 ],
             ],
             'mautic.core.js.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.helper.notification',
+                ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
@@ -74,8 +77,13 @@ return [
         'helpers' => [
             'mautic.helper.notification' => [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'notification_helper',
+                'arguments' => [
+                    'mautic.factory',
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters',
+                    'router',
+                ],
             ],
         ],
         'other' => [
@@ -172,6 +180,7 @@ return [
     'parameters' => [
         'notification_enabled'              => false,
         'notification_landing_page_enabled' => true,
+        'notification_tracking_page_enabled' => false,
         'notification_app_id'               => null,
         'notification_rest_api_key'         => null,
         'notification_safari_web_id'        => null,

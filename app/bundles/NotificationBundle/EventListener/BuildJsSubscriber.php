@@ -15,12 +15,30 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\NotificationBundle\Helper\NotificationHelper;
+
 
 /**
  * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var NotificationHelper
+     */
+    protected $notificationHelper;
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param NotificationHelper $notificationHelper
+     */
+    public function __construct(NotificationHelper $notificationHelper)
+    {
+        $this->notificationHelper = $notificationHelper;
+    }
+
+
     /**
      * @return array
      */
@@ -44,6 +62,16 @@ class BuildJsSubscriber extends CommonSubscriber
         $js = <<<JS
 MauticJS.notification = {
     init: function () {
+        MauticJS.insertScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js');
+         var scrpt = document.createElement('link');
+         scrpt.rel ='manifest';
+         scrpt.href ='/manifest.json';
+         var head = document.getElementsByTagName('head')[0];
+         head.appendChild(scrpt);
+         
+         {$this->notificationHelper->getScript()}
+         
+                            
         var subscribeButton = document.getElementById('mautic-notification-subscribe');
 
         if (subscribeButton) {
