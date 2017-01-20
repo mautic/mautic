@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
@@ -45,18 +46,25 @@ class NotificationHelper
     protected $router;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+
+    /**
      * PageSubscriber constructor.
      *
      * @param AssetsHelper         $assetsHelper
      * @param CoreParametersHelper $coreParametersHelper
      * @param Router $router
      */
-    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, Router $router)
+    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, Router $router, RequestStack $requestStack)
     {
         $this->factory = $factory;
         $this->assetsHelper         = $assetsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->router = $router;
+        $this->request = $requestStack;
     }
 
     /**
@@ -77,16 +85,23 @@ class NotificationHelper
         return $leadModel->addDncForLead($lead, 'notification', null, DoNotContact::UNSUBSCRIBED);
     }
 
-    /**
-     * @param string $email
-     *
-     * @return bool
-     */
+
+    public function getHeaderScript(){
+        if(!$this->hasScript()) {
+            return;
+        }
+
+        return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
+        var OneSignal = OneSignal || [];';
+    }
+
     public function getScript()
     {
-//        if (!$this->coreParametersHelper->getParameter('notification_landing_page_enabled')) {
-//            return;
-//        }
+
+        if(!$this->hasScript()) {
+            return;
+        }
+
         $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
         $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
@@ -99,9 +114,12 @@ class NotificationHelper
         }
 
         $oneSignalInit = <<<JS
-
-    var OneSignal = OneSignal || [];
-    
+         var scrpt = document.createElement('link');
+         scrpt.rel ='manifest';
+         scrpt.href ='/manifest.json';
+         var head = document.getElementsByTagName('head')[0];
+         head.appendChild(scrpt);
+         
     OneSignal.push(["init", {
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
@@ -144,6 +162,26 @@ class NotificationHelper
     };
 JS;
         return $oneSignalInit;
+    }
+
+    private function hasScript(){
+        $server = $this->request->getCurrentRequest()->server;
+        $landingPage = true;
+        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+            $landingPage = false;
+        }
+
+        if($landingPage == true && !$this->coreParametersHelper->getParameter('notification_landing_page_enabled'))
+        {
+            return false;
+        }
+
+        if($landingPage == false && !$this->coreParametersHelper->getParameter('notification_tracking_page_enabled'))
+        {
+            return false;
+        }
+
+        return true;
     }
 
 }

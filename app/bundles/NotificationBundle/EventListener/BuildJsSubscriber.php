@@ -23,6 +23,7 @@ use Mautic\NotificationBundle\Helper\NotificationHelper;
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+
     /**
      * @var NotificationHelper
      */
@@ -33,8 +34,9 @@ class BuildJsSubscriber extends CommonSubscriber
      *
      * @param NotificationHelper $notificationHelper
      */
-    public function __construct(NotificationHelper $notificationHelper)
-    {
+    public function __construct(
+        NotificationHelper $notificationHelper
+    ) {
         $this->notificationHelper = $notificationHelper;
     }
 
@@ -54,24 +56,20 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $subscribeUrl   = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $subscribeUrl = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $subscribeTitle = 'Subscribe To Notifications';
-        $width          = 450;
-        $height         = 450;
+        $width = 450;
+        $height = 450;
 
         $js = <<<JS
+        
+       {$this->notificationHelper->getHeaderScript()}
+       
 MauticJS.notification = {
     init: function () {
-        MauticJS.insertScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js');
-         var scrpt = document.createElement('link');
-         scrpt.rel ='manifest';
-         scrpt.href ='/manifest.json';
-         var head = document.getElementsByTagName('head')[0];
-         head.appendChild(scrpt);
-         
+        
          {$this->notificationHelper->getScript()}
          
-                            
         var subscribeButton = document.getElementById('mautic-notification-subscribe');
 
         if (subscribeButton) {
@@ -114,4 +112,4 @@ JS;
 
         $event->appendJs($js, 'Mautic Notification JS');
     }
-}
+    }

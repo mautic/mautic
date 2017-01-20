@@ -83,6 +83,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
                     'router',
+                    'request_stack',
                 ],
             ],
         ],
