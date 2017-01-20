@@ -136,12 +136,6 @@ class NotificationHelper
             document.cookie = "mtc_osid="+response.osid+";";
         }
     });
-        
-        var xhr = new XMLHttpRequest();
-
-        xhr.open('post', '{$leadAssociationUrl}', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('osid=' + userId);
     };
 
     OneSignal.getUserId(function(userId) {

@@ -28,7 +28,7 @@ return [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters'
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.js.subscriber' => [
