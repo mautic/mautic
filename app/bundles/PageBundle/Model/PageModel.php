@@ -51,6 +51,11 @@ class PageModel extends FormModel
     protected $catInUrl;
 
     /**
+     * @var bool
+     */
+    protected $trackByFingerprint;
+
+    /**
      * @var CookieHelper
      */
     protected $cookieHelper;
@@ -112,6 +117,14 @@ class PageModel extends FormModel
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
+    }
+
+    /**
+     * @param $trackByFingerprint
+     */
+    public function setTrackByFingerprint($trackByFingerprint)
+    {
+        $this->trackByFingerprint = $trackByFingerprint;
     }
 
     /**
@@ -448,7 +461,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
         $this->leadModel->saveEntity($lead);
 

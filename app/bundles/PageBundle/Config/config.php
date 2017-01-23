@@ -252,6 +252,9 @@ return [
                     'setCatInUrl' => [
                         '%mautic.cat_in_page_url%',
                     ],
+                    'setTrackByFingerprint' => [
+                        '%mautic.track_by_fingerprint%',
+                    ],
                 ],
             ],
             'mautic.page.model.redirect' => [
@@ -283,8 +286,9 @@ return [
     ],
 
     'parameters' => [
-        'cat_in_page_url'  => false,
-        'google_analytics' => false,
+        'cat_in_page_url'      => false,
+        'track_by_fingerprint' => false,
+        'google_analytics'     => false,
 
         'redirect_list_types' => [
             '301' => 'mautic.page.form.redirecttype.permanent',
