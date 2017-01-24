@@ -186,7 +186,7 @@ trait OperatorListTrait
 
         if ($type == 'boolean') {
             $type = 'bool';
-        } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
+        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
             $type = 'select';
         } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
             $type = 'text';

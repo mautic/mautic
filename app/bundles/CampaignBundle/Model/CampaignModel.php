@@ -500,8 +500,8 @@ class CampaignModel extends CommonFormModel
                 }
             }
 
-            $events['connectionResrictions'] = $associationRestrictions;
-            $events['anchorRestrictions']    = $anchorRestrictions;
+            $events['connectionRestrictions'] = $associationRestrictions;
+            $events['anchorRestrictions']     = $anchorRestrictions;
         }
 
         return $events;
