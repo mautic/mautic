@@ -166,7 +166,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (true !== $metadata) {
-            return $event->setResult($metadata);
+            return $event->setFailed($metadata);
         }
 
         $this->smsModel->createStatEntry($sms, $lead);
