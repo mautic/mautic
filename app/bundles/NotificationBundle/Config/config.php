@@ -186,6 +186,7 @@ return [
         'notification_rest_api_key'         => null,
         'notification_safari_web_id'        => null,
         'gcm_sender_id'                     => '482941778795',
+        'notification_subdomain_name'       => null,
         'welcomenotification_enabled'       => true,
     ],
 ];

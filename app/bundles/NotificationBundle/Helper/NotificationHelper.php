@@ -105,6 +105,7 @@ class NotificationHelper
         $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
         $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
+        $notificationSubdomainName = $this->coreParametersHelper->getParameter('notification_subdomain_name');
 
         $leadAssociationUrl = $this->router->generate('mautic_subscribe_notification', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -124,6 +125,7 @@ class NotificationHelper
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
         autoRegister: true,
+        subdomainName: "{$notificationSubdomainName}",
         {$welcomenotificationText}
         notifyButton: {
             enable: false // Set to false to hide
