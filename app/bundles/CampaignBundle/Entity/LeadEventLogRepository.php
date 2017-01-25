@@ -90,7 +90,6 @@ class LeadEventLogRepository extends CommonRepository
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                       ->where('ll.lead_id = '.(int) $leadId)
                       ->andWhere('e.event_type = :eventType')
-                      ->andWhere('ll.metadata NOT LIKE \'%{s:6:"failed";i:1%\'')
                       ->setParameter('eventType', 'action');
 
         if (isset($options['search']) && $options['search']) {
