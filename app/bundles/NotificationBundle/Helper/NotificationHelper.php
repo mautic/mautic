@@ -97,22 +97,33 @@ class NotificationHelper
 
     public function getScript()
     {
-
         if(!$this->hasScript()) {
             return;
         }
+
 
         $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
         $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
         $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
         $notificationSubdomainName = $this->coreParametersHelper->getParameter('notification_subdomain_name');
-
         $leadAssociationUrl = $this->router->generate('mautic_subscribe_notification', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $welcomenotificationText = '';
         if (!$welcomenotificationEnabled) {
             $welcomenotificationText = 'welcomeNotification: { "disable": true },';
         }
+
+        $server = $this->request->getCurrentRequest()->server;
+        $https = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true :false;
+
+        $subdomainName = '';
+        if(!$https){
+            $subdomainName =  'subdomainName: "'.$notificationSubdomainName.'",
+             httpPermissionRequest: {
+                enable: true,
+                useCustomModal: true
+            },';
+         }
 
         $oneSignalInit = <<<JS
          var scrpt = document.createElement('link');
@@ -125,8 +136,8 @@ class NotificationHelper
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
         autoRegister: true,
-        subdomainName: "{$notificationSubdomainName}",
         {$welcomenotificationText}
+        {$subdomainName}
         notifyButton: {
             enable: false // Set to false to hide
         }
@@ -135,34 +146,51 @@ class NotificationHelper
     var postUserIdToMautic = function(userId) {
         MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}?osid=' + userId, {}, function(response, xhr) {
         if (response.osid) {
-            document.cookie = "mtc_osid="+response.osid+";";
+            document.cookie = "mtc_osid="+response.osid+"; max-age=" + 60 * 60 * 24; 
         }
     });
     };
 
-    OneSignal.getUserId(function(userId) {
-        if (! userId) {
-            OneSignal.on('subscriptionChange', function(isSubscribed) {
-                if (isSubscribed) {
-                    OneSignal.getUserId(function(newUserId) {
-                        postUserIdToMautic(newUserId);
-                    });
+    OneSignal.push(function() {
+        OneSignal.getUserId(function(userId) {
+            if (! userId) {
+                OneSignal.on('subscriptionChange', function(isSubscribed) {
+                    if (isSubscribed) {
+                        OneSignal.getUserId(function(newUserId) {
+                            postUserIdToMautic(newUserId);
+                        });
+                    }
+                });
+            } else {
+                postUserIdToMautic(userId);
+            }
+        });
+        // Just to be sure we've grabbed the ID
+        window.onbeforeunload = function() {
+            OneSignal.getUserId(function(userId) {
+                if (userId) {
+                    postUserIdToMautic(userId);
+                }        
+            });    
+        };
+    });
+JS;
+
+        $oneSignalInit .= <<<JS
+  OneSignal.push(function() {
+            OneSignal.on('notificationPermissionChange', function(permissionChange) {
+                var currentPermission = permissionChange.to;
+                console.log('New permission state:', currentPermission);
+                if(currentPermission == 'granted'){
+                setTimeout(function(){
+                    OneSignal.registerForPushNotifications({httpPermissionRequest: true});
+                }, 100);
                 }
             });
-        } else {
-            postUserIdToMautic(userId);
-        }
-    });
-    
-    // Just to be sure we've grabbed the ID
-    window.onbeforeunload = function() {
-        OneSignal.getUserId(function(userId) {
-            if (userId) {
-                postUserIdToMautic(userId);
-            }        
-        });    
-    };
+        });
 JS;
+
+
         return $oneSignalInit;
     }
 
