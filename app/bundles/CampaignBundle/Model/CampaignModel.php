@@ -460,11 +460,9 @@ class CampaignModel extends CommonFormModel
      */
     public function getEvents()
     {
-        if (!isset(self::$events)) {
+        if (null === self::$events) {
             self::$events = [];
-        }
 
-        if (empty($events)) {
             //build them
             $events = [];
             $event  = new Events\CampaignBuilderEvent($this->translator);
@@ -492,6 +490,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
             }
+
             foreach ($events['action'] as $key => $action) {
                 if (isset($action['associatedDecisions'])) {
                     $associationRestrictions['decision'][$key] = $action['associatedDecisions'];
