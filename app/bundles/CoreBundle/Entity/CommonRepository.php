@@ -1483,11 +1483,13 @@ class CommonRepository extends EntityRepository
                 }
 
                 if (in_array($clause['expr'], $andOr)) {
-                    $composite = $query->expr()->{$clause['expr']};
+                    $composite = $query->expr()->{$clause['expr']}();
                     $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
 
                     if (null === $expr) {
                         $query->andWhere($composite);
+                    } else {
+                        $expr->add($composite);
                     }
                 } else {
                     $clause      = $this->validateWhereClause($clause);
