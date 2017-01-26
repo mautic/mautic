@@ -1482,65 +1482,70 @@ class CommonRepository extends EntityRepository
                     continue;
                 }
 
-                $clause      = $this->validateWhereClause($clause);
-                $whereClause = null;
-                switch ($clause['expr']) {
-                    case 'between':
-                    case 'notBetween':
-                        if (is_array($clause['val']) && count($clause['val']) === 2) {
-                            $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
-                            $param = $this->generateRandomParameterName();
-                            $query->setParameter($param, $clause['val'][0]);
-                            $param2 = $this->generateRandomParameterName();
-                            $query->setParameter($param2, $clause['val'][1]);
+                if (in_array($clause['expr'], $andOr)) {
+                    $composite = $query->expr()->{$clause['expr']};
+                    $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
 
-                            $whereClause = $this->getTableAlias().'.'.$clause['col'].$not.' BETWEEN :'.$param.' AND :'.$param2;
-                        }
-                        break;
-                    case 'isEmpty':
-                    case 'isNotEmpty':
-                        if ('empty' === $clause['expr']) {
-                            $whereClause = $query->expr()->orX(
-                                $query->expr()->eq($this->getTableAlias().'.'.$clause['col'], $query->expr()->literal('')),
-                                $query->expr()->isNull($this->getTableAlias().'.'.$clause['col'])
-                            );
-                        } else {
-                            $whereClause = $query->expr()->andX(
-                                $query->expr()->neq($this->getTableAlias().'.'.$clause['col'], $query->expr()->literal('')),
-                                $query->expr()->isNotNull($this->getTableAlias().'.'.$clause['col'])
-                            );
-                        }
-                        break;
-                    case 'in':
-                    case 'notIn':
-                        if (!$isOrm) {
-                            $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col'], (array) $clause['val']);
-                        } else {
-                            $param       = $this->generateRandomParameterName();
-                            $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col'], ':'.$param);
-                            $query->setParameter($param, $clause['val']);
-                        }
-                    default:
-                        if (method_exists($query->expr(), $clause['expr'])) {
-                            if (in_array($clause['expr'], $columnValue)) {
+                    if (null === $expr) {
+                        $query->andWhere($composite);
+                    }
+                } else {
+                    $clause      = $this->validateWhereClause($clause);
+                    $whereClause = null;
+                    switch ($clause['expr']) {
+                        case 'between':
+                        case 'notBetween':
+                            if (is_array($clause['val']) && count($clause['val']) === 2) {
+                                $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
+                                $param = $this->generateRandomParameterName();
+                                $query->setParameter($param, $clause['val'][0]);
+                                $param2 = $this->generateRandomParameterName();
+                                $query->setParameter($param2, $clause['val'][1]);
+
+                                $whereClause = $this->getTableAlias().'.'.$clause['col'].$not.' BETWEEN :'.$param.' AND :'.$param2;
+                            }
+                            break;
+                        case 'isEmpty':
+                        case 'isNotEmpty':
+                            if ('empty' === $clause['expr']) {
+                                $whereClause = $query->expr()->orX(
+                                    $query->expr()->eq($this->getTableAlias().'.'.$clause['col'], $query->expr()->literal('')),
+                                    $query->expr()->isNull($this->getTableAlias().'.'.$clause['col'])
+                                );
+                            } else {
+                                $whereClause = $query->expr()->andX(
+                                    $query->expr()->neq($this->getTableAlias().'.'.$clause['col'], $query->expr()->literal('')),
+                                    $query->expr()->isNotNull($this->getTableAlias().'.'.$clause['col'])
+                                );
+                            }
+                            break;
+                        case 'in':
+                        case 'notIn':
+                            if (!$isOrm) {
+                                $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col'], (array) $clause['val']);
+                            } else {
                                 $param       = $this->generateRandomParameterName();
                                 $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col'], ':'.$param);
                                 $query->setParameter($param, $clause['val']);
-                            } elseif (in_array($clause['expr'], $justColumn)) {
-                                $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col']);
-                            } elseif (in_array($clause['expr'], $andOr)) {
-                                $composite = $query->expr()->{$clause['expr']};
-                                $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
-                                $query->andWhere($composite);
                             }
-                        }
-                }
+                        default:
+                            if (method_exists($query->expr(), $clause['expr'])) {
+                                if (in_array($clause['expr'], $columnValue)) {
+                                    $param       = $this->generateRandomParameterName();
+                                    $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col'], ':'.$param);
+                                    $query->setParameter($param, $clause['val']);
+                                } elseif (in_array($clause['expr'], $justColumn)) {
+                                    $whereClause = $query->expr()->{$clause['expr']}($this->getTableAlias().'.'.$clause['col']);
+                                }
+                            }
+                    }
 
-                if ($whereClause) {
-                    if ($expr) {
-                        $expr->add($whereClause);
-                    } else {
-                        $query->andWhere($whereClause);
+                    if ($whereClause) {
+                        if ($expr) {
+                            $expr->add($whereClause);
+                        } else {
+                            $query->andWhere($whereClause);
+                        }
                     }
                 }
             }
