@@ -87,45 +87,44 @@ class NotificationHelper
 
 
     public function getHeaderScript(){
-        if(!$this->hasScript()) {
-            return;
-        }
-
-        return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
+        if($this->hasScript()) {
+            return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
         var OneSignal = OneSignal || [];';
+        }
     }
 
     public function getScript()
     {
-        if(!$this->hasScript()) {
-            return;
-        }
+        if($this->hasScript()) {
 
+            $appId = $this->coreParametersHelper->getParameter('notification_app_id');
+            $safariWebId = $this->coreParametersHelper->getParameter('notification_safari_web_id');
+            $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
+            $notificationSubdomainName = $this->coreParametersHelper->getParameter('notification_subdomain_name');
+            $leadAssociationUrl = $this->router->generate(
+                'mautic_subscribe_notification',
+                [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
 
-        $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
-        $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
-        $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
-        $notificationSubdomainName = $this->coreParametersHelper->getParameter('notification_subdomain_name');
-        $leadAssociationUrl = $this->router->generate('mautic_subscribe_notification', [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $welcomenotificationText = '';
+            if (!$welcomenotificationEnabled) {
+                $welcomenotificationText = 'welcomeNotification: { "disable": true },';
+            }
 
-        $welcomenotificationText = '';
-        if (!$welcomenotificationEnabled) {
-            $welcomenotificationText = 'welcomeNotification: { "disable": true },';
-        }
+            $server = $this->request->getCurrentRequest()->server;
+            $https = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;
 
-        $server = $this->request->getCurrentRequest()->server;
-        $https = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true :false;
-
-        $subdomainName = '';
-        if(!$https){
-            $subdomainName =  'subdomainName: "'.$notificationSubdomainName.'",
+            $subdomainName = '';
+            if (!$https && $notificationSubdomainName) {
+                $subdomainName = 'subdomainName: "'.$notificationSubdomainName.'",
              httpPermissionRequest: {
                 enable: true,
                 useCustomModal: true
             },';
-         }
+            }
 
-        $oneSignalInit = <<<JS
+            $oneSignalInit = <<<JS
          var scrpt = document.createElement('link');
          scrpt.rel ='manifest';
          scrpt.href ='/manifest.json';
@@ -176,11 +175,10 @@ class NotificationHelper
     });
 JS;
 
-        $oneSignalInit .= <<<JS
+            if (!$https && $notificationSubdomainName) {
+                $oneSignalInit .= <<<JS
   OneSignal.push(function() {
             OneSignal.on('notificationPermissionChange', function(permissionChange) {
-                var currentPermission = permissionChange.to;
-                console.log('New permission state:', currentPermission);
                 if(currentPermission == 'granted'){
                 setTimeout(function(){
                     OneSignal.registerForPushNotifications({httpPermissionRequest: true});
@@ -189,9 +187,11 @@ JS;
             });
         });
 JS;
+            }
 
 
-        return $oneSignalInit;
+            return $oneSignalInit;
+        }
     }
 
     private function hasScript(){
