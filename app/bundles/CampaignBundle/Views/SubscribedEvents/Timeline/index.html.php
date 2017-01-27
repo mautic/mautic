@@ -13,7 +13,8 @@ $errors = false;
 if (!empty($item['metadata']['errors'])) {
     $errors = (is_array($item['metadata']['errors'])) ? implode('<br />', $item['metadata']['errors']) : $item['metadata']['errors'];
 } elseif (!empty($item['metadata']['failed'])) {
-    $errors = (!empty($item['metadata']['reason'])) ? $item['metadata']['reason'] : $view['translator']->trans('mautic.campaign.event.failed.timeline');
+    $errors = (!empty($item['metadata']['reason'])) ? $item['metadata']['reason'] : 'mautic.campaign.event.failed.timeline';
+    $errors = $view['translator']->trans($errors);
 }
 
 $cancelled = (empty($item['isScheduled']) && empty($item['dateTriggered']));
