@@ -17,7 +17,7 @@ if (!empty($item['metadata']['errors'])) {
 }
 
 $cancelled = (empty($item['isScheduled']) && empty($item['dateTriggered']));
-$dateSpan  = '<span class="timeline-campaign-event-date-'.$item['event_id'].'" data-date="'.$item['triggerDate']->format('Y-m-d H:i:s').'">'.$view['date']->toFull($item['triggerDate']).'</span>';
+$dateSpan  = ($item['triggerDate']) ? '<span class="timeline-campaign-event-date-'.$item['event_id'].'" data-date="'.$item['triggerDate']->format('Y-m-d H:i:s').'">'.$view['date']->toFull($item['triggerDate']).'</span>' : '';
 
 if ($cancelled) {
     // Note is scheduled
