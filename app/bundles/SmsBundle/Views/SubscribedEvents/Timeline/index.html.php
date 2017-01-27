@@ -13,7 +13,8 @@ $errors = false;
 if (!empty($data['errors'])) {
     $errors = (is_array($data['errors'])) ? implode('<br />', $data['errors']) : $data['errors'];
 } elseif (!empty($data['failed'])) {
-    $errors = ($data['reason']) ? $data['reason'] : $view['translator']->trans('mautic.campaign.event.failed.timeline');
+    $errors = (!empty($item['metadata']['reason'])) ? $item['metadata']['reason'] : 'mautic.campaign.event.failed.timeline';
+    $errors = $view['translator']->trans($errors);
 }
 ?>
 
