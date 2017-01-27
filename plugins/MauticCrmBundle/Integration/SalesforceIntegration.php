@@ -212,15 +212,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             continue;
                         }
 
+                        $sfObject = trim($sfObject);
+
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $salesFields[$sfObject] = $fields;
+                            if ($sfObject !== 'company') {
+                                $salesFields = $fields;
+                            } else {
+                                $salesFields[$sfObject] = $fields;
+                            }
 
                             continue;
                         }
 
-                        $sfObject = trim($sfObject);
                         if (!isset($leadObject[$sfObject])) {
                             $leadObject[$sfObject] = $this->getApiHelper()->getLeadFields($sfObject);
                         }
