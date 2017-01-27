@@ -218,7 +218,7 @@ class LeadSubscriber extends CommonSubscriber
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled').'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
 
-                if (!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) {
+                if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed'])) {
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error').'" class="fa fa-warning text-danger"></i>';
                 }
 
