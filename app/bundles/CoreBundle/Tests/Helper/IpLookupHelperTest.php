@@ -92,8 +92,9 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mockRepository->expects($this->any())
-            ->method('findOneByIpAddress')
-            ->will($this->returnValue(null));
+            ->method('__call')
+            ->with($this->equalTo('findOneByIpAddress'))
+            ->willReturn(null);
 
         $mockEm = $this
             ->getMockBuilder(EntityManager::class)
