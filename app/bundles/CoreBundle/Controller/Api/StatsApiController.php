@@ -24,15 +24,18 @@ class StatsApiController extends CommonApiController
     /**
      * Lists stats for a database table.
      *
-     * @param null $table
+     * @param string $table
+     * @param string $itemsName
+     * @param array  $order
+     * @param array  $where
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($table = null, $itemsName = 'stats', $where = [])
+    public function listAction($table = null, $itemsName = 'stats', $order = [], $where = [])
     {
         $response = [];
         $where    = empty($where) ? InputHelper::clean($this->request->query->get('where', [])) : $where;
-        $order    = InputHelper::clean($this->request->query->get('order', []));
+        $order    = empty($order) ? InputHelper::clean($this->request->query->get('order', [])) : $order;
         $start    = (int) $this->request->query->get('start', 0);
         $limit    = (int) $this->request->query->get('limit', 100);
 

@@ -220,6 +220,7 @@ class CampaignApiController extends CommonApiController
         }
 
         $where = InputHelper::clean($this->request->query->get('where', []));
+        $order = InputHelper::clean($this->request->query->get('order', []));
 
         $where[] = [
             'col'  => 'campaign_id',
@@ -230,6 +231,7 @@ class CampaignApiController extends CommonApiController
         return $this->forward('MauticCoreBundle:Api\StatsApi:list', [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',
+                'order'     => $order,
                 'where'     => $where,
             ]
         );
