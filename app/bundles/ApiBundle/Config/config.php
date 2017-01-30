@@ -182,5 +182,6 @@ return [
         'api_enable_basic_auth'             => false,
         'api_oauth2_access_token_lifetime'  => 60,
         'api_oauth2_refresh_token_lifetime' => 14,
+        'api_batch_max_limit'               => 200,
     ],
 ];

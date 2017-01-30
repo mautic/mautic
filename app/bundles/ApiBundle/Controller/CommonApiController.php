@@ -166,8 +166,9 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $parameters = $this->request->query->all();
 
-        if (count($parameters) > 200) {
-            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
         }
 
         $errors            = [];
@@ -242,8 +243,9 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $parameters = $this->request->request->all();
 
-        if (count($parameters) > 200) {
-            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
         }
 
         $errors   = [];
@@ -529,8 +531,9 @@ class CommonApiController extends FOSRestController implements MauticController
 
         $parameters = $this->request->request->all();
 
-        if (count($parameters) > 200) {
-            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
         }
 
         $this->inBatchMode = true;
@@ -1257,6 +1260,21 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         $view->setSerializationContext($context);
+    }
+
+    /**
+     * @param $parameters
+     *
+     * @return array|bool|Response
+     */
+    protected function validateBatchPayload($parameters)
+    {
+        $batchLimit = (int) $this->get('mautic.config')->getParameter('api_batch_max_limit', 200);
+        if (count($parameters) > $batchLimit) {
+            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
+        }
+
+        return true;
     }
 
     /**

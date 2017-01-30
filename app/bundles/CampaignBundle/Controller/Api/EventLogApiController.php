@@ -181,8 +181,9 @@ class EventLogApiController extends CommonApiController
     {
         $parameters = $this->request->request->all();
 
-        if (count($parameters) > 200) {
-            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception'));
+        $valid = $this->validateBatchPayload($parameters);
+        if ($valid instanceof Response) {
+            return $valid;
         }
 
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
