@@ -529,8 +529,8 @@ class LeadApiController extends CommonApiController
         }
 
         // Check for lastActive date
-        if (isset($parameters['lastActive'])) {
-            $lastActive = new DateTimeHelper($parameters['lastActive']);
+        if (isset($originalParams['lastActive'])) {
+            $lastActive = new DateTimeHelper($originalParams['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
         }
 
