@@ -45,9 +45,9 @@ class Version20170127205928 extends AbstractMauticMigration
         } else {
             $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN timezone VARCHAR(255) DEFAULT NULL");
             $sql = <<<SQL
-INSERT INTO `{$this->prefix}lead_fields` (`date_added`, `is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`) 
+INSERT INTO `{$this->prefix}lead_fields` (`date_added`, `is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`, `object`) 
 VALUES 
-  ('{$curDateTime}', 1,'Timezone', 'timezone', 'timezone', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 26, 'a:0:{}')
+  ('{$curDateTime}', 1,'Timezone', 'timezone', 'timezone', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 26, 'a:0:{}', 'lead')
 SQL;
         }
 
