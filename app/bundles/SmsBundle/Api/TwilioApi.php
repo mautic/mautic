@@ -90,14 +90,14 @@ class TwilioApi extends AbstractSmsApi
 
             return true;
         } catch (\Services_Twilio_RestException $e) {
-            $this->logger->addError(
+            $this->logger->addWarning(
                 $e->getMessage(),
                 ['exception' => $e]
             );
 
             return $e->getMessage();
         } catch (NumberParseException $e) {
-            $this->logger->addError(
+            $this->logger->addWarning(
                 $e->getMessage(),
                 ['exception' => $e]
             );
