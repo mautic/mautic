@@ -357,7 +357,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $primary = $companies[$id][0];
                 }
 
-                $entity->primaryCompany = $primary;
+                $entity->setPrimaryCompany($primary);
             }
         }
 
@@ -405,7 +405,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (is_array($tmpContacts[$id])) {
                         $tmpContacts[$id]['primaryCompany'] = $primary;
                     } elseif ($tmpContacts[$id] instanceof Lead) {
-                        $tmpContacts[$id]->primaryCompany = $primary;
+                        $tmpContacts[$id]->setPrimaryCompany($primary);
                     }
                 }
             }

@@ -757,24 +757,43 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * Export a.
+     * @param array $toExport
+     * @param       $type
+     * @param       $filename
+     *
+     * @return StreamedResponse
+     */
+    public function exportResultsAs(array $toExport, $type, $filename)
+    {
+        if (!in_array($type, ['csv', 'xlsx'])) {
+            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        }
+
+        $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $sourceIterator = new ArraySourceIterator($toExport);
+        $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+
+        return new StreamedResponse(function () use ($sourceIterator, $writer) {
+            Handler::create($sourceIterator, $writer)->export();
+        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
+    }
+
+    /**
+     * Standard function to generate an array of data via any model's "getEntities" method.
+     *
+     * Overwrite in your controller if required.
      *
      * @param AbstractCommonModel $model
      * @param array               $args
      * @param callable|null       $resultsCallback
      *
-     * @return StreamedResponse
+     * @return array
      */
-    public function exportResultsAs(AbstractCommonModel $model, array $args, callable $resultsCallback = null)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null)
     {
-        $type     = $args['type'];
-        $filename = $args['filename'];
-        unset($args['type'], $args['filename']);
-
-        if (!in_array($type, ['csv', 'xlsx'])) {
-            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
-        }
-
         $args['limit'] = $args['limit'] < 200 ? 200 : $args['limit'];
         $args['start'] = 0;
 
@@ -813,15 +832,6 @@ class CommonController extends Controller implements MauticController
             ++$loop;
         }
 
-        $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
-        $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $sourceIterator = new ArraySourceIterator($toExport);
-        $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
-        $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
-
-        return new StreamedResponse(function () use ($sourceIterator, $writer) {
-            Handler::create($sourceIterator, $writer)->export();
-        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
+        return $toExport;
     }
 }

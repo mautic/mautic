@@ -88,4 +88,39 @@ $container->loadFromExtension('security', [
 
 $container->setParameter('mautic.security.disableUpdates', false);
 
+$entityId = 'mautic';
+if ($container->hasParameter('mautic.site_url')) {
+    $parts = parse_url($container->getParameter('mautic.site_url'));
+
+    if (!empty($parts['host'])) {
+        $scheme   = (!empty($parts['scheme']) ? $parts['scheme'] : 'http');
+        $entityId = $scheme.'://'.$parts['host'];
+    }
+}
+$container->setParameter('mautic.saml_idp_entity_id', $entityId);
+$container->loadFromExtension(
+    'light_saml_symfony_bridge',
+    [
+        'own' => [
+            'entity_id' => $entityId,
+        ],
+        'store' => [
+            'id_state' => 'mautic.security.saml.id_store',
+        ],
+    ]
+);
+
+$container->loadFromExtension(
+    'light_saml_sp',
+    [
+        'username_mapper' => [
+            'email'     => '%mautic.saml_idp_email_attribute%',
+            'username'  => '%mautic.saml_idp_username_attribute%',
+            'firstname' => '%mautic.saml_idp_firstname_attribute%',
+            'lastname'  => '%mautic.saml_idp_lastname_attribute%',
+            'nameId'    => \Mautic\UserBundle\Security\User\UserMapper::NAME_ID,
+        ],
+    ]
+);
+
 $this->import('security_api.php');

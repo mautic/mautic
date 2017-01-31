@@ -9,13 +9,13 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 <table width="100%" border="0">
 	<tr>
 		<td>
-			<center>**Step 1**</center>
+			<center><b>Step 1</b></center>
 		</td>
 		<td>
-			<center>**Step 2**</center>
+			<center><b>Step 2</b></center>
 		</td>
 		<td>
-			<center>**Step 3**</center>
+			<center><b>Step 3</b></center>
 		</td>
 	</tr>
 	<tr>
@@ -214,13 +214,13 @@ Marketing automation has historically been a difficult tool to implement in a bu
 **Ready to get started with the community?** You can get <a href="https://www.mautic.org/get-involved">more involved</a> on the <a href="https://www.mautic.org">Mautic</a> website. Or follow Mautic on social media just to stay current with what's happening!
 
 ### Contact Info
-<ul>
-	*<a href="https://www.mautic.org">https://www.mautic.org</a>
-	*<a href="https://twitter.com/mautic">@mautic</a> [Twitter]
-	*<a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]
-	*<a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
-</ul>
+
+* <a href="https://www.mautic.org">https://www.mautic.org</a>
+* <a href="https://twitter.com/mautic">@mautic</a> [Twitter]
+* <a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]
+* <a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
 
 ### Developers
+
 We love testing our user interface on as many platforms as possible (even those browsers we prefer to not mention). In order to help us do this we use and recommend BrowserStack.
-<img src="https://www.mautic.org/media/browserstack_small.png" />
+[<img src="https://www.mautic.org/media/browserstack_small.png" />](https://www.browserstack.com/)

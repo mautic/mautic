@@ -85,7 +85,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -307,7 +307,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -523,7 +523,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -660,7 +660,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -800,7 +800,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
@@ -913,7 +913,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
