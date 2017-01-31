@@ -106,7 +106,7 @@ $formId = $form->getId();
                     <?php $isTextarea = $r['type'] === 'textarea'; ?>
                     <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
                         <?php if ($isTextarea) : ?>
-                            <?php echo nl2br(html_entity_decode($r['value'])); ?>
+                            <?php echo nl2br($r['value']); ?>
                         <?php else : ?>
                             <?php echo $r['value']; ?>
                         <?php endif; ?>
