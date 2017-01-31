@@ -937,13 +937,24 @@ Mautic.toggleAnonymousLeads = function() {
 };
 
 Mautic.getLeadEmailContent = function (el) {
-    Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
-    mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
+    var id = (mQuery.type( el ) === "string") ? el : mQuery(el).attr('id');
+    Mautic.activateLabelLoadingIndicator(id);
+
+    var inModal = mQuery('#'+id).closest('modal').length;
+    if (inModal) {
+        mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
+    }
+
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
-        mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
-        mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
-        mQuery('#lead_quickemail_body').val(response.body);
-        mQuery('#lead_quickemail_subject').val(response.subject);
+        if (inModal) {
+            mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
+        }
+        var idPrefix = id.replace('templates', '');
+        var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
+        mQuery(bodyEl).froalaEditor('html.set', response.body);
+        mQuery(bodyEl).val(response.body);
+        mQuery('#'+idPrefix+'subject').val(response.subject);
+
         Mautic.removeLabelLoadingIndicator();
     });
 };
