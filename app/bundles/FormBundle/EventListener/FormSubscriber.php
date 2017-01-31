@@ -197,6 +197,7 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->setSubject($config['subject']);
 
             $this->mailer->addTokens($tokens);
+
             $this->mailer->setBody($config['message']);
             $this->mailer->parsePlainText($config['message']);
 
