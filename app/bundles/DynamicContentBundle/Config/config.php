@@ -15,7 +15,7 @@ return [
             'items' => [
                 'mautic.dynamicContent.dynamicContent' => [
                     'route'    => 'mautic_dynamicContent_index',
-                    'access'   => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
+                    'access'   => ['dynamiccontent:dynamiccontents:viewown', 'dynamiccontent:dynamiccontents:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 90,
                 ],
