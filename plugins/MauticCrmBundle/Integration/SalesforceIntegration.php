@@ -253,8 +253,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             } else {
                 if ($this->isAuthorized()) {
+                    $settings['cache_suffix'] = 'Lead';
                     if (!$salesFields = parent::getAvailableLeadFields($settings)) {
-                        // BC support for prior to company support added
                         $leadObject = $this->getApiHelper()->getLeadFields('Lead');
                         if (!empty($leadObject) && isset($leadObject['fields'])) {
                             foreach ($leadObject['fields'] as $fieldInfo) {

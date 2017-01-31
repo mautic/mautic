@@ -1726,6 +1726,9 @@ abstract class AbstractIntegration
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getFormDisplaySettings()
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
