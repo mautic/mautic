@@ -36,19 +36,19 @@ $view['slots']->set(
             'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'templateButtons' => [
                 'edit' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:editown'],
-                    $permissions['dynamicContent:dynamicContents:editother'],
+                    $permissions['dynamiccontent:dynamiccontents:editown'],
+                    $permissions['dynamiccontent:dynamiccontents:editother'],
                     $entity->getCreatedBy()
                 ),
-                'clone'  => $permissions['dynamicContent:dynamicContents:create'],
+                'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
                 'delete' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:deleteown'],
-                    $permissions['dynamicContent:dynamicContents:deleteother'],
+                    $permissions['dynamiccontent:dynamiccontents:deleteown'],
+                    $permissions['dynamiccontent:dynamiccontents:deleteother'],
                     $entity->getCreatedBy()
                 ),
                 'close' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:viewown'],
-                    $permissions['dynamicContent:dynamicContents:viewother'],
+                    $permissions['dynamiccontent:dynamiccontents:viewown'],
+                    $permissions['dynamiccontent:dynamiccontents:viewother'],
                     $entity->getCreatedBy()
                 ),
             ],

@@ -106,6 +106,7 @@ if (count($items)):
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
+                                    'edit'   => $edit,
                                     'delete' => $view['security']->hasEntityAccess(
                                         $permissions['notification:notifications:deleteown'],
                                         $permissions['notification:notifications:deleteother'],
