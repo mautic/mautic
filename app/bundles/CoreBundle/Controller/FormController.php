@@ -925,4 +925,23 @@ class FormController extends CommonController
             )
         );
     }
+
+    /**
+     * @param Form $copyFrom
+     * @param Form $copyTo
+     */
+    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    {
+        /** @var $error FormError */
+        foreach ($copyFrom->getErrors() as $error) {
+            $copyTo->addError($error);
+        }
+
+        foreach ($copyFrom->all() as $key => $child) {
+            if ($child instanceof Form && $copyTo->has($key)) {
+                $childTo = $copyTo->get($key);
+                $this->copyErrorsRecursively($child, $childTo);
+            }
+        }
+    }
 }
