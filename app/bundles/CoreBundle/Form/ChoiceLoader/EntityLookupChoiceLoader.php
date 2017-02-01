@@ -189,6 +189,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // must be [$label => $id]
         $prepped = $this->prepareChoices($this->choices[$modelName]);
+        natcasesort($prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
@@ -209,11 +210,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         foreach ($prepped as $key => &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
-                $choice    = $this->prepareChoices($choice);
+                natcasesort($choice);
+                $choice = $this->prepareChoices($choice);
             }
         }
-
-        array_multisort($prepped, SORT_NATURAL);
 
         return $isGrouped ? $prepped : array_flip($prepped);
     }
