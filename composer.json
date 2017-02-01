@@ -94,14 +94,13 @@
         "guzzlehttp/guzzle": "^6.2",
         "twilio/sdk": "^4.10",
         "debril/rss-atom-bundle": "~2.4.1",
-
         "stack/run": "^1.0",
         "stack/builder": "^1.0",
-
         "piwik/device-detector": "~3.7.0",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.0.3",
         "doctrine/data-fixtures": "1.2.1",
+        "php-amqplib/rabbitmq-bundle": "^1.10",
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8"
