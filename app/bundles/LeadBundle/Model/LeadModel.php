@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -58,7 +59,7 @@ use Symfony\Component\Intl\Intl;
  */
 class LeadModel extends FormModel
 {
-    use DefaultValueTrait, OperatorListTrait;
+    use DefaultValueTrait, OperatorListTrait, RequestTrait;
 
     private $currentLead       = null;
     private $systemCurrentLead = null;
@@ -444,10 +445,11 @@ class LeadModel extends FormModel
      * @param array      $data
      * @param bool|false $overwriteWithBlank
      * @param bool|true  $fetchSocialProfiles
+     * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true)
+    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
         if ($fetchSocialProfiles) {
             //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -482,19 +484,52 @@ class LeadModel extends FormModel
         //save the field values
         $fieldValues = $lead->getFields();
 
-        if (empty($fieldValues)) {
+        if (empty($fieldValues) || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
-            static $fields;
-            if (empty($fields)) {
-                $fields = $this->leadFieldModel->getEntities(
+            static $flatFields, $fields;
+            if (empty($flatFields)) {
+                $flatFields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
-                $fields = $this->organizeFieldsByGroup($fields);
+                $fields = $this->organizeFieldsByGroup($flatFields);
             }
-            $fieldValues = $fields;
+
+            if (empty($fieldValues)) {
+                $fieldValues = $fields;
+            }
+        }
+
+        if ($bindWithForm) {
+            // Cleanup the field values
+            $form = $this->createForm(
+                $lead,
+                $this->formFactory,
+                null,
+                ['fields' => $flatFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
+            );
+
+            // Unset stage and owner from the form because it's already been handled
+            unset($data['stage'], $data['owner'], $data['tags']);
+            // Prepare special fields
+            $this->prepareParametersFromRequest($form, $data, $lead);
+            // Submit the data
+            $form->submit($data);
+
+            if (!$form->isValid()) {
+                if ($form->getErrors()->count()) {
+                    $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+                }
+                foreach ($form as $field => $formField) {
+                    if (isset($data[$field]) && $formField->getErrors()->count()) {
+                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
+                        // Don't save bad data
+                        unset($data[$field]);
+                    }
+                }
+            }
         }
 
         //update existing values
@@ -887,7 +922,7 @@ class LeadModel extends FormModel
             $lead->addIpAddress($ipAddress);
         }
 
-        $this->setFieldValues($lead, $inQuery);
+        $this->setFieldValues($lead, $inQuery, false, true, true);
 
         if (isset($queryFields['tags'])) {
             $this->modifyTags($lead, $queryFields['tags']);

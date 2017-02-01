@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
@@ -468,6 +469,8 @@ class PageModel extends FormModel
         $this->leadModel->saveEntity($lead);
 
         // Set info from request
+        $query = InputHelper::cleanArray($query);
+
         $hit->setQuery($query);
         $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
         if (isset($query['page_referrer'])) {
