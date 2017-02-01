@@ -37,14 +37,11 @@ class TemplatingPass implements CompilerPassInterface
         }
 
         if ($container->hasDefinition('templating.helper.assets')) {
-            //Add a addMethodCall to set factory
-            $container->getDefinition('templating.helper.assets')->addMethodCall(
-                'setFactory', [new Reference('mautic.factory')]
-            )->addMethodCall(
-                'setAssetHelper', [new Reference('mautic.helper.assetgeneration')]
-            )->addMethodCall(
-                'setParamsHelper', [new Reference('mautic.helper.core_parameters')]
-            );
+            $container->getDefinition('templating.helper.assets')
+                ->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')])
+                ->addMethodCall('setAssetHelper', [new Reference('mautic.helper.assetgeneration')])
+                ->addMethodCall('setSiteUrl', ['%mautic.site_url%'])
+                ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
         }
     }
 }

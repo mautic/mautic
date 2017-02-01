@@ -820,6 +820,7 @@ class FieldModel extends FormModel
             case 'number':
                 $schemaType = 'float';
                 break;
+            case 'timezone':
             case 'locale':
             case 'country':
             case 'email':

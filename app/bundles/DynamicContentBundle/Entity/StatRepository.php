@@ -101,7 +101,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.dynamic_content_id');
 
-        //get a total number of sent emails first
+        //get a total number of sent DC stats first
         $results = $q->execute()->fetchAll();
 
         $counts = [];

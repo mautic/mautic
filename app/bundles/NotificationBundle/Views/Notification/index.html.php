@@ -34,7 +34,6 @@ $view['slots']->set(
             'searchHelp'  => 'mautic.notification.help.searchcommands',
             'searchId'    => 'notification-search',
             'action'      => $currentRoute,
-            //'filters'     => $filters //@todo
         ]
     ); ?>
 
