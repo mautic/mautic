@@ -95,6 +95,25 @@ MauticJS.log = function() {
 MauticJS.setCookie = function(name, value) {
     document.cookie = name+"="+value+";";
 };
+        
+MauticJS.getCookie = function(name) {
+    var dc = document.cookie;
+    var prefix = name + "=";
+    var begin = dc.indexOf("; " + prefix);
+    if (begin == -1) {
+        begin = dc.indexOf(prefix);
+        if (begin != 0) return null;
+    }
+    else
+    {
+        begin += 2;
+        var end = document.cookie.indexOf(";", begin);
+        if (end == -1) {
+        end = dc.length;
+        }
+    }
+    return decodeURI(dc.substring(begin + prefix.length, end));
+}
 
 MauticJS.createCORSRequest = function(method, url) {
     var xhr = new XMLHttpRequest();
@@ -249,14 +268,14 @@ MauticJS.getTrackedContact = function () {
 };
 
 MauticJS.setTrackedContact = function(response) {
-    if (response.id) {
+    if (response.id && MauticJS.getCookie('mtc_id') === null) {
         MauticJS.setCookie('mtc_id', response.id);
         MauticJS.setCookie('mtc_sid', response.sid);
         MauticJS.mtcSet = true;
             
         // Set the id in local storage in case cookies are only allowed for sites visited and Mautic is on a different domain
         // than the current page
-        if (window.localStorage) {
+        if (window.localStorage && localStorage.getItem('mtc_id') === null) {
             localStorage.setItem('mtc_id', response.id);
             localStorage.setItem('mtc_sid', response.sid);
         }
