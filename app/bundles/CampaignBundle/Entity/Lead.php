@@ -118,30 +118,6 @@ class Lead
     }
 
     /**
-     * Prepares the metadata for API usage.
-     *
-     * @param $metadata
-     */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
-    {
-        $metadata->setGroupPrefix('campaignLead')
-                 ->addListProperties(
-                     [
-                         'dateAdded',
-                         'manuallyRemoved',
-                         'manuallyAdded',
-                     ]
-                 )
-                ->addProperties(
-                    [
-                        'lead',
-                        'campaign',
-                    ]
-                )
-                 ->build();
-    }
-
-    /**
      * @return \DateTime
      */
     public function getDateAdded()

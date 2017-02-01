@@ -91,11 +91,6 @@ class LeadEventLog
     private $previousScheduledState;
 
     /**
-     * @var
-     */
-    private $previousScheduledState;
-
-    /**
      * @var int
      */
     private $rotation = 1;
