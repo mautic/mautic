@@ -41,21 +41,6 @@ class CommonApiController extends FOSRestController implements MauticController
     use RequestTrait;
 
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -94,6 +79,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $entityNameOne;
 
     /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
      * Custom JMS strategies to add to the view's context.
      *
      * @var array
@@ -106,11 +96,6 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var array
      */
     protected $extraGetEntitiesArguments = [];
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     /**
      * @var bool
