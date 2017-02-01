@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -80,6 +81,11 @@ class LeadEventLog
     private $channelId;
 
     /**
+     * @var
+     */
+    private $previousScheduledState;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -135,6 +141,47 @@ class LeadEventLog
     }
 
     /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaignEventLog')
+                 ->addProperties(
+                     [
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                     ]
+                 )
+
+                // Add standalone groups
+                 ->setGroupPrefix('campaignEventStandaloneLog')
+                 ->addProperties(
+                     [
+                         'event',
+                         'lead',
+                         'campaign',
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                     ]
+                 )
+                 ->build();
+    }
+
+    /**
      * @return \DateTime
      */
     public function getDateTriggered()
@@ -148,6 +195,7 @@ class LeadEventLog
     public function setDateTriggered($dateTriggered)
     {
         $this->dateTriggered = $dateTriggered;
+        $this->setIsScheduled(false);
     }
 
     /**
@@ -175,27 +223,39 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $lead
+     * @param $lead
+     *
+     * @return $this
      */
     public function setLead($lead)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return Event
      */
     public function getEvent()
     {
         return $this->event;
     }
 
-    /**
-     * @param mixed $event
+    /***
+     * @param $event
+     *
+     * @return $this
      */
     public function setEvent($event)
     {
         $this->event = $event;
+
+        if (!$this->campaign) {
+            $this->setCampaign($event->getCampaign());
+        }
+
+        return $this;
     }
 
     /**
@@ -207,11 +267,29 @@ class LeadEventLog
     }
 
     /**
-     * @param bool $isScheduled
+     * @param $isScheduled
+     *
+     * @return $this
      */
     public function setIsScheduled($isScheduled)
     {
+        if (null === $this->previousScheduledState) {
+            $this->previousScheduledState = $this->isScheduled;
+        }
+
         $this->isScheduled = $isScheduled;
+
+        return $this;
+    }
+
+    /**
+     * If isScheduled was changed, this will have the previous state.
+     *
+     * @return mixed
+     */
+    public function getPreviousScheduledState()
+    {
+        return $this->previousScheduledState;
     }
 
     /**
@@ -223,11 +301,16 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $triggerDate
+     * @param $triggerDate
+     *
+     * @return $this
      */
     public function setTriggerDate($triggerDate)
     {
         $this->triggerDate = $triggerDate;
+        $this->setIsScheduled(true);
+
+        return $this;
     }
 
     /**
@@ -239,11 +322,15 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $campaign
+     * @param $campaign
+     *
+     * @return $this
      */
     public function setCampaign($campaign)
     {
         $this->campaign = $campaign;
+
+        return $this;
     }
 
     /**
@@ -255,11 +342,15 @@ class LeadEventLog
     }
 
     /**
-     * @param bool $systemTriggered
+     * @param $systemTriggered
+     *
+     * @return $this
      */
     public function setSystemTriggered($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
+
+        return $this;
     }
 
     /**
@@ -271,11 +362,15 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $nonActionPathTaken
+     * @param $nonActionPathTaken
+     *
+     * @return $this
      */
     public function setNonActionPathTaken($nonActionPathTaken)
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
+
+        return $this;
     }
 
     /**
@@ -287,7 +382,9 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $metatdata
+     * @param $metadata
+     *
+     * @return $this
      */
     public function setMetadata($metadata)
     {
@@ -297,6 +394,8 @@ class LeadEventLog
         }
 
         $this->metadata = $metadata;
+
+        return $this;
     }
 
     /**

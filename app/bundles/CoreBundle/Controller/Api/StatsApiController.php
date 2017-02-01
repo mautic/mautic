@@ -34,17 +34,21 @@ class StatsApiController extends CommonApiController
     public function listAction($table = null, $itemsName = 'stats', $order = [], $where = [])
     {
         $response = [];
-        $where    = empty($where) ? InputHelper::clean($this->request->query->get('where', [])) : $where;
-        $order    = empty($order) ? InputHelper::clean($this->request->query->get('order', [])) : $order;
+        $where    = InputHelper::cleanArray(empty($where) ? $this->request->query->get('where', []) : $where);
+        $order    = InputHelper::cleanArray(empty($order) ? $this->request->query->get('order', []) : $order);
         $start    = (int) $this->request->query->get('start', 0);
         $limit    = (int) $this->request->query->get('limit', 100);
 
-        $event = new StatsEvent($table, $start, $limit, $order, $where);
+        // Ensure internal flag is not spoofed
+        $this->sanitizeWhereClauseArrayFromRequest($where);
+
+        $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
         $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
 
         // Return available tables if no result was set
         if (!$event->hasResults()) {
             $response['availableTables'] = $event->getTables();
+            $response['tableColumns']    = $event->getTableColumns();
         } else {
             $results              = $event->getResults();
             $response['total']    = $results['total'];

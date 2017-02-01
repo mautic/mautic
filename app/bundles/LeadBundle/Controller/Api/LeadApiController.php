@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -26,15 +25,20 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class LeadApiController extends CommonApiController
 {
+    use CustomFieldsApiControllerTrait;
+
+    /**
+     * @param FilterControllerEvent $event
+     */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('lead.lead');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->permissionBase   = 'lead:leads';
         $this->serializerGroups = ['leadDetails', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -61,38 +65,12 @@ class LeadApiController extends CommonApiController
                 if (!empty($existingLeads)) {
                     // Lead found so edit rather than create a new one
 
-                    return parent::editEntityAction($existingLeads[0]->getId());
+                    return $this->editEntityAction($existingLeads[0]->getId());
                 }
             }
         }
 
         return parent::newEntityAction();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getEntityFormOptions()
-    {
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                'force' => [
-                    [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true,
-                    ],
-                    [
-                        'column' => 'f.object',
-                        'expr'   => 'eq',
-                        'value'  => 'lead',
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
-
-        return ['fields' => $fields];
     }
 
     /**
@@ -444,14 +422,14 @@ class LeadApiController extends CommonApiController
         }
 
         $channelId = (int) $this->request->request->get('channelId');
-        $reason    = (int) $this->request->request->get('reason');
-        $comments  = InputHelper::clean($this->request->request->get('comments'));
-        $result    = $this->model->addDncForLead($entity, $channel, $comments, $reason);
-        $view      = $this->view([$this->entityNameOne => $entity]);
-
-        if ($result === false) {
-            return $this->badRequest();
+        if ($channelId) {
+            $channel = [$channel, $channelId];
         }
+        $reason   = (int) $this->request->request->get('reason');
+        $comments = InputHelper::clean($this->request->request->get('comments'));
+
+        $this->model->addDncForLead($entity, $channel, $comments, $reason);
+        $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
     }
@@ -475,11 +453,12 @@ class LeadApiController extends CommonApiController
         }
 
         $result = $this->model->removeDncForLead($entity, $channel);
-        $view   = $this->view([$this->entityNameOne => $entity]);
-
-        if ($result === false) {
-            return $this->badRequest();
-        }
+        $view   = $this->view(
+            [
+                'recordFound'        => $result,
+                $this->entityNameOne => $entity,
+            ]
+        );
 
         return $this->handleView($view);
     }
@@ -543,61 +522,6 @@ class LeadApiController extends CommonApiController
             }
         }
 
-        //set the custom field values
-
-        //pull the data from the form in order to apply the form's formatting
-        foreach ($form as $f) {
-            $parameters[$f->getName()] = $f->getData();
-        }
-
-        $this->model->setFieldValues($entity, $parameters, true);
-    }
-
-    /**
-     * Remove IpAddress and lastActive as it'll be handled outside the form.
-     *
-     * @param $parameters
-     * @param Lead $entity
-     * @param $action
-     *
-     * @return mixed|void
-     */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
-    {
-        unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
-
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
-            // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
-            // is not defined in the request
-
-            /** @var FieldModel $fieldModel */
-            $fieldModel = $this->getModel('lead.field');
-            $fields     = $fieldModel->getFieldListWithProperties();
-
-            foreach ($fields as $alias => $field) {
-                // Set the default value if the parameter is not included in the request, there is no value for the given entity, and a default is defined
-                $currentValue = $entity->getFieldValue($alias);
-                if (!isset($parameters[$alias]) && ('' === $currentValue || null == $currentValue) && '' !== $field['defaultValue'] && null !== $field['defaultValue']) {
-                    $parameters[$alias] = $field['defaultValue'];
-                }
-            }
-        }
-
-        return $parameters;
-    }
-
-    /**
-     * Flatten fields into an 'all' key for dev convenience.
-     *
-     * @param        $entity
-     * @param string $action
-     */
-    protected function preSerializeEntity(&$entity, $action = 'view')
-    {
-        if ($entity instanceof Lead) {
-            $fields        = $entity->getFields();
-            $fields['all'] = $entity->getProfileFields();
-            $entity->setFields($fields);
-        }
+        $this->setCustomFieldValues($entity, $form, $parameters);
     }
 }

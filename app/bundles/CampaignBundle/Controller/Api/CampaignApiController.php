@@ -13,6 +13,8 @@ namespace Mautic\CampaignBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -21,15 +23,17 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class CampaignApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('campaign');
         $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
-        $this->serializerGroups = ['campaignDetails', 'categoryList', 'publishDetails', 'leadListList'];
+        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -79,13 +83,9 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
-
-            if ($lead == null) {
-                return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
-                return $this->accessDenied();
+            $lead = $this->checkLeadAccess($leadId, 'edit');
+            if ($lead instanceof Response) {
+                return $lead;
             }
 
             $this->model->removeLead($entity, $leadId);

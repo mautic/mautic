@@ -99,7 +99,7 @@ final class CampaignEvents
     const ON_EVENT_DECISION_TRIGGER = 'matuic.campaign_on_event_decision_trigger';
 
     /**
-     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled.
+     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignScheduledEvent instance.

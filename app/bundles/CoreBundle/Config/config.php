@@ -384,6 +384,7 @@ return [
                 'arguments' => [
                     'kernel',
                 ],
+                'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
                 'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',

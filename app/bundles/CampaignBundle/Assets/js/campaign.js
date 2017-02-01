@@ -1401,3 +1401,97 @@ Mautic.campaignBuilderValidateConnection = function (epDetails, checkEvent) {
 
     return valid;
 }
+
+/**
+ *
+ * @param eventId
+ * @param contactId
+ */
+Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
+    // Convert scheduled date/time to an input
+    mQuery('#timeline-campaign-event-'+eventId+' .btn-edit').prop('disabled', true).addClass('disabled');
+
+    var converting = false;
+    var eventWrapper = '#timeline-campaign-event-'+eventId;
+    var eventSpan = '.timeline-campaign-event-date-'+eventId;
+    var eventText = '#timeline-campaign-event-text-'+eventId;
+    var originalDate = mQuery(eventWrapper+' '+eventSpan).first().text();
+    var revertInput = function(input) {
+        converting = true;
+        mQuery(input).datetimepicker('destroy');
+        mQuery(eventSpan).text(originalDate);
+        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+    };
+
+    var date = mQuery(eventSpan).attr('data-date');
+    var input = mQuery('<input type="text" id="timeline-reschedule"/>')
+        .css('height', '20px')
+        .css('color', '#000000')
+        .val(date)
+        .on('keyup', function(e) {
+            var code = e.keyCode || e.which;
+            if (code == 13) {
+                e.preventDefault();
+                converting = true
+                mQuery(input).prop('readonly', true);
+                mQuery(input).datetimepicker('destroy');
+                Mautic.ajaxActionRequest('campaign:updateScheduledCampaignEvent',
+                    {
+                        eventId: eventId,
+                        contactId: contactId,
+                        date: mQuery(this).val(),
+                        originalDate: date
+                    }, function (response) {
+                        mQuery(eventSpan).text(response.formattedDate);
+                        mQuery(eventSpan).attr('data-data', response.date);
+                        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+
+                        if (response.success) {
+                            mQuery(eventText).removeClass('text-warning').addClass('text-info');
+                            mQuery(eventSpan).css('textDecoration', 'inherit');
+                            mQuery('.fa.timeline-campaign-event-cancelled-'+eventId).remove();
+                            mQuery('.timeline-campaign-event-scheduled-'+eventId).removeClass('hide');
+                            mQuery('.timeline-campaign-event-cancelled-'+eventId).addClass('hide');
+                        }
+                    }, false
+                );
+            } else if (code == 27) {
+                e.preventDefault();
+                revertInput(input);
+            }
+        })
+        .on('blur', function (e) {
+            if (!converting) {
+                revertInput(input);
+            }
+        });
+    mQuery('#timeline-campaign-event-'+eventId+' '+eventSpan).html(input);
+    Mautic.activateDateTimeInputs('#timeline-reschedule');
+};
+
+/**
+ *
+ * @param eventId
+ * @param contactId
+ */
+Mautic.cancelScheduledCampaignEvent = function(eventId, contactId) {
+    mQuery('#timeline-campaign-event-'+eventId+' .btn').prop('disabled', true).addClass('disabled');
+    var eventWrapper = '#timeline-campaign-event-'+eventId;
+    var eventSpan = '.timeline-campaign-event-date-' + eventId;
+    var eventText = '#timeline-campaign-event-text-' + eventId;
+    Mautic.ajaxActionRequest('campaign:cancelScheduledCampaignEvent',
+        {
+            eventId: eventId,
+            contactId: contactId,
+        }, function (response) {
+            if (response.success) {
+                mQuery(eventText).removeClass('text-info').addClass('text-warning');
+                mQuery(eventWrapper+' .btn-edit').prop('disabled', false).removeClass('disabled');
+                mQuery('.timeline-campaign-event-scheduled-'+eventId).addClass('hide');
+                mQuery('.timeline-campaign-event-cancelled-'+eventId).removeClass('hide');
+            } else {
+                mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+            }
+        }, false
+    );
+};

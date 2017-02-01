@@ -29,11 +29,23 @@ return [
                 'controller'      => 'MauticStageBundle:Api\StageApi',
             ],
             'mautic_api_stageddcontact' => [
-                'path'       => '/stages/{id}/contact/add/{contactId}',
+                'path'       => '/stages/{id}/contact/{contactId}/add',
                 'controller' => 'MauticStageBundle:Api\StageApi:addContact',
                 'method'     => 'POST',
             ],
             'mautic_api_stageremovecontact' => [
+                'path'       => '/stages/{id}/contact/{contactId}/remove',
+                'controller' => 'MauticStageBundle:Api\StageApi:removeContact',
+                'method'     => 'POST',
+            ],
+
+            // @deprecated 2.6.0 to be removed in 3.0
+            'bc_mautic_api_stageddcontact' => [
+                'path'       => '/stages/{id}/contact/add/{contactId}',
+                'controller' => 'MauticStageBundle:Api\StageApi:addContact',
+                'method'     => 'POST',
+            ],
+            'bc_mautic_api_stageremovecontact' => [
                 'path'       => '/stages/{id}/contact/remove/{contactId}',
                 'controller' => 'MauticStageBundle:Api\StageApi:removeContact',
                 'method'     => 'POST',

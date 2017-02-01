@@ -27,12 +27,24 @@ class EventRepository extends CommonRepository
      */
     public function getEntities($args = [])
     {
-        $q = $this
+        $select = 'e';
+        $q      = $this
             ->createQueryBuilder('e')
-            ->select('e, ec, ep')
-            ->join('e.campaign', 'c')
-            ->leftJoin('e.children', 'ec')
-            ->leftJoin('e.parent', 'ep');
+            ->join('e.campaign', 'c');
+
+        if (!empty($args['campaign_id'])) {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY(e.campaign)', (int) $args['campaign_id'])
+            );
+        }
+
+        if (empty($args['ignore_children'])) {
+            $select .= ', ec, ep';
+            $q->leftJoin('e.children', 'ec')
+                ->leftJoin('e.parent', 'ep');
+        }
+
+        $q->select($select);
 
         $args['qb'] = $q;
 
@@ -506,5 +518,49 @@ class EventRepository extends CommonRepository
                 $qb->expr()->in('parent_id', $events)
             )
             ->execute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'e';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    public function getSearchCommands()
+    {
+        return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addCatchAllWhereClause(&$q, $filter)
+    {
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                $this->getTableAlias().'.name',
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addSearchCommandWhereClause(&$q, $filter)
+    {
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 }

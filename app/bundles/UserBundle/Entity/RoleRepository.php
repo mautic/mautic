@@ -93,9 +93,11 @@ class RoleRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
                 $expr = $q->expr()->eq('r.isAdmin', 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('r.name', ':'.$unique);
                 $returnParameter = true;
                 break;

@@ -336,7 +336,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $lead;
     }
 
-
     /**
      * @param $object
      *

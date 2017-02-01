@@ -63,6 +63,11 @@ class CampaignModel extends CommonFormModel
     protected $formModel;
 
     /**
+     * @var
+     */
+    protected static $events;
+
+    /**
      * CampaignModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -455,9 +460,9 @@ class CampaignModel extends CommonFormModel
      */
     public function getEvents()
     {
-        static $events;
+        if (null === self::$events) {
+            self::$events = [];
 
-        if (empty($events)) {
             //build them
             $events = [];
             $event  = new Events\CampaignBuilderEvent($this->translator);
@@ -485,6 +490,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
             }
+
             foreach ($events['action'] as $key => $action) {
                 if (isset($action['associatedDecisions'])) {
                     $associationRestrictions['decision'][$key] = $action['associatedDecisions'];
@@ -500,11 +506,13 @@ class CampaignModel extends CommonFormModel
                 }
             }
 
-            $events['connectionRestrictions'] = $associationRestrictions;
-            $events['anchorRestrictions']     = $anchorRestrictions;
+            $events['connectionResrictions'] = $associationRestrictions;
+            $events['anchorRestrictions']    = $anchorRestrictions;
+
+            self::$events = $events;
         }
 
-        return $events;
+        return self::$events;
     }
 
     /**

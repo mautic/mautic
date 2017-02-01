@@ -221,7 +221,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
                 foreach ($salesForceObjects as $key => $sfObject) {
-                    if ('Account' ===  $sfObject) {
+                    if ('Account' === $sfObject) {
                         // Match SF object to Mautic's
                         $sfObject = 'company';
                     }

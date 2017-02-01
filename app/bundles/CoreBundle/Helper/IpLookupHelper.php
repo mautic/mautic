@@ -121,7 +121,7 @@ class IpLookupHelper
             $ip = $this->getIpAddressFromRequest();
         }
 
-        if (empty($ip)) {
+        if (empty($ip) || !$this->ipIsValid($ip)) {
             //assume local as the ip is empty
             $ip = '127.0.0.1';
         }

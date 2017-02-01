@@ -226,7 +226,7 @@ class SalesforceApi extends CrmApi
                 break;
             default:
                 $mixedFields = array_filter($fields['leadFields']);
-                $fields = [];
+                $fields      = [];
                 foreach ($mixedFields as $sfField => $mField) {
                     if (strpos($sfField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sfField);

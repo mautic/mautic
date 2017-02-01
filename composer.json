@@ -114,7 +114,8 @@
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "phpunit/phpunit": "4.5",
-        "friendsofphp/php-cs-fixer": "^1.12"
+        "friendsofphp/php-cs-fixer": "^1.12",
+        "symfony/var-dumper": "^3.2"
     },
     "repositories": [
         {

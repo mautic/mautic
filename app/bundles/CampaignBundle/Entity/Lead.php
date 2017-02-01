@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -73,6 +74,30 @@ class Lead
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
             ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaignLead')
+                 ->addListProperties(
+                     [
+                         'dateAdded',
+                         'manuallyRemoved',
+                         'manuallyAdded',
+                     ]
+                 )
+                ->addProperties(
+                    [
+                        'lead',
+                        'campaign',
+                    ]
+                )
+                 ->build();
     }
 
     /**

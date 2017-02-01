@@ -303,6 +303,21 @@ class CoreSubscriber extends CommonSubscriber
                                 'method' => 'POST',
                                 'path'   => '/new',
                             ],
+                            'newbatch' => [
+                                'action' => 'newEntities',
+                                'method' => 'POST',
+                                'path'   => '/batch/new',
+                            ],
+                            'editbatchput' => [
+                                'action' => 'editEntities',
+                                'method' => 'PUT',
+                                'path'   => '/batch/edit',
+                            ],
+                            'editbatchpatch' => [
+                                'action' => 'editEntities',
+                                'method' => 'PATCH',
+                                'path'   => '/batch/edit',
+                            ],
                             'editput' => [
                                 'action' => 'editEntity',
                                 'method' => 'PUT',
@@ -312,6 +327,11 @@ class CoreSubscriber extends CommonSubscriber
                                 'action' => 'editEntity',
                                 'method' => 'PATCH',
                                 'path'   => '/{id}/edit',
+                            ],
+                            'deletebatch' => [
+                                'action' => 'deleteEntities',
+                                'method' => 'DELETE',
+                                'path'   => '/batch/delete',
                             ],
                             'delete' => [
                                 'action' => 'deleteEntity',
@@ -330,7 +350,12 @@ class CoreSubscriber extends CommonSubscriber
                         $pathBase   = $details['path'];
                         $controller = $details['controller'];
                         foreach ($standards as $standardName => $standardDetails) {
-                            $details = array_merge(
+                            if (!empty($details['supported_endpoints']) && !in_array($standardName, $details['supported_endpoints'])) {
+                                // Not supported so ignore
+                                continue;
+                            }
+
+                            $routeDetails = array_merge(
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
@@ -338,7 +363,7 @@ class CoreSubscriber extends CommonSubscriber
                                     'method'     => $standardDetails['method'],
                                 ]
                             );
-                            $this->addRouteToCollection($collection, $type, $routeName.$standardName, $details);
+                            $this->addRouteToCollection($collection, $type, $routeName.$standardName, $routeDetails);
                         }
                     } else {
                         $this->addRouteToCollection($collection, $type, $name, $details);
@@ -388,9 +413,20 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['objectId'] = '[a-zA-Z0-9_]+';
             }
         }
-        if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
-            if (!isset($requirements['page'])) {
-                $requirements['id'] = '\d+';
+        if ($type == 'api') {
+            if (strpos($details['path'], '{id}') !== false) {
+                if (!isset($requirements['page'])) {
+                    $requirements['id'] = '\d+';
+                }
+            }
+
+            if (preg_match_all('/\{(.*?Id)\}/', $details['path'], $matches)) {
+                // Force digits for IDs
+                foreach ($matches[1] as $match) {
+                    if (!isset($requirements[$match])) {
+                        $requirements[$match] = '\d+';
+                    }
+                }
             }
         }
 

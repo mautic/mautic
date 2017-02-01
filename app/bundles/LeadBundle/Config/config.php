@@ -103,7 +103,7 @@ return [
                 'controller'      => 'MauticLeadBundle:Api\LeadApi',
             ],
             'mautic_api_dncaddcontact' => [
-                'path'       => '/contacts/{id}/dnc/add/{channel}',
+                'path'       => '/contacts/{id}/dnc/{channel}/add',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:addDnc',
                 'method'     => 'POST',
                 'defaults'   => [
@@ -111,7 +111,7 @@ return [
                 ],
             ],
             'mautic_api_dncremovecontact' => [
-                'path'       => '/contacts/{id}/dnc/remove/{channel}',
+                'path'       => '/contacts/{id}/dnc/{channel}/remove',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
             ],
@@ -158,12 +158,12 @@ return [
                 'controller'      => 'MauticLeadBundle:Api\ListApi',
             ],
             'mautic_api_segmentaddcontact' => [
-                'path'       => '/segments/{id}/contact/add/{leadId}',
+                'path'       => '/segments/{id}/contact/{leadId}/add',
                 'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
                 'method'     => 'POST',
             ],
             'mautic_api_segmentremovecontact' => [
-                'path'       => '/segments/{id}/contact/remove/{leadId}',
+                'path'       => '/segments/{id}/contact/{leadId}/remove',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST',
             ],
@@ -174,12 +174,12 @@ return [
                 'controller'      => 'MauticLeadBundle:Api\CompanyApi',
             ],
             'mautic_api_companyaddcontact' => [
-                'path'       => '/companies/{companyId}/contact/add/{contactId}',
+                'path'       => '/companies/{companyId}/contact/{contactId}/add',
                 'controller' => 'MauticLeadBundle:Api\CompanyApi:addContact',
                 'method'     => 'POST',
             ],
             'mautic_api_companyremovecontact' => [
-                'path'       => '/companies/{companyId}/contact/remove/{contactId}',
+                'path'       => '/companies/{companyId}/contact/{contactId}/remove',
                 'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
                 'method'     => 'POST',
             ],
@@ -203,6 +203,41 @@ return [
                 'name'            => 'devices',
                 'path'            => '/devices',
                 'controller'      => 'MauticLeadBundle:Api\DeviceApi',
+            ],
+
+            // @deprecated 2.6.0 to be removed in 3.0
+            'bc_mautic_api_segmentaddcontact' => [
+                'path'       => '/segments/{id}/contact/add/{leadId}',
+                'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
+                'method'     => 'POST',
+            ],
+            'bc_mautic_api_segmentremovecontact' => [
+                'path'       => '/segments/{id}/contact/remove/{leadId}',
+                'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
+                'method'     => 'POST',
+            ],
+            'bc_mautic_api_companyaddcontact' => [
+                'path'       => '/companies/{companyId}/contact/add/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:addContact',
+                'method'     => 'POST',
+            ],
+            'bc_mautic_api_companyremovecontact' => [
+                'path'       => '/companies/{companyId}/contact/remove/{contactId}',
+                'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
+                'method'     => 'POST',
+            ],
+            'bc_mautic_api_dncaddcontact' => [
+                'path'       => '/contacts/{id}/dnc/add/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addDnc',
+                'method'     => 'POST',
+                'defaults'   => [
+                    'channel' => 'email',
+                ],
+            ],
+            'bc_mautic_api_dncremovecontact' => [
+                'path'       => '/contacts/{id}/dnc/remove/{channel}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
+                'method'     => 'POST',
             ],
         ],
     ],

@@ -149,7 +149,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                                 $hubsFields[$object][$fieldInfo['name']] = [
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['label'],
-                                    'required' => ('email' === $fieldInfo['name'])
+                                    'required' => ('email' === $fieldInfo['name']),
                                 ];
                             }
                         }

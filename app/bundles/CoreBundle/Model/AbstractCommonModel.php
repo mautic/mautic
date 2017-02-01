@@ -213,7 +213,7 @@ abstract class AbstractCommonModel
     /**
      * Get a specific entity.
      *
-     * @param $id
+     * @param int|array id
      *
      * @return null|object
      */
@@ -225,7 +225,7 @@ abstract class AbstractCommonModel
                 return $repo->getEntity($id);
             }
 
-            return $repo->find($id);
+            return $repo->find((int) $id);
         }
 
         return null;

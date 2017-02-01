@@ -12,15 +12,21 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead as Contact;
 
 /**
  * Class Event.
  */
 class Event
 {
+    const TYPE_DECISION  = 'decision';
+    const TYPE_ACTION    = 'action';
+    const TYPE_CONDITION = 'condition';
+
     /**
      * @var int
      */
@@ -105,6 +111,13 @@ class Event
      * @var ArrayCollection
      */
     private $log;
+
+    /**
+     * Used by API to house contact specific logs.
+     *
+     * @var array
+     */
+    private $contactLog = [];
 
     /**
      * @var
@@ -220,7 +233,7 @@ class Event
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('campaign')
+        $metadata->setGroupPrefix('campaignEvent')
             ->addProperties(
                 [
                     'id',
@@ -240,7 +253,59 @@ class Event
                 ]
             )
             ->setMaxDepth(1, 'parent')
-            ->build();
+            ->setMaxDepth(1, 'children')
+
+            // Add standalone groups
+            ->setGroupPrefix('campaignEventStandalone')
+             ->addListProperties(
+                 [
+                     'id',
+                     'name',
+                     'description',
+                     'type',
+                     'eventType',
+                 ]
+             )
+             ->addProperties(
+                 [
+                     'campaign',
+                     'order',
+                     'properties',
+                     'triggerDate',
+                     'triggerInterval',
+                     'triggerIntervalUnit',
+                     'triggerMode',
+                     'children',
+                     'parent',
+                     'decisionPath',
+                 ]
+             )
+
+            // Include logs
+            ->setGroupPrefix('campaignEventWithLogs')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'eventType',
+                    'contactLog',
+                    'triggerDate',
+                    'triggerInterval',
+                    'triggerIntervalUnit',
+                    'triggerMode',
+                    'decisionPath',
+                    'order',
+                    'parent',
+                ]
+            )
+            ->addProperties(
+                [
+                    'campaign',
+                ]
+            )
+             ->build();
     }
 
     /**
@@ -654,5 +719,52 @@ class Event
     public function setTempId($tempId)
     {
         $this->tempId = $tempId;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @param Contact|null $contact
+     *
+     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     */
+    public function getContactLog(Contact $contact = null)
+    {
+        if ($this->contactLog) {
+            return $this->contactLog;
+        }
+
+        return $this->log->matching(
+            Criteria::create()
+                    ->where(
+                        Criteria::expr()->eq('lead', $contact)
+                    )
+        );
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @param array $contactLog
+     *
+     * @return Event
+     */
+    public function setContactLog($contactLog)
+    {
+        $this->contactLog = $contactLog;
+
+        return $this;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @return Event
+     */
+    public function addContactLog($contactLog)
+    {
+        $this->contactLog[] = $contactLog;
+
+        return $this;
     }
 }
