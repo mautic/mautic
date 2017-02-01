@@ -38,7 +38,7 @@ class DynamicContentModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'dynamicContent:dynamicContents';
+        return 'dynamiccontent:dynamiccontents';
     }
 
     /**

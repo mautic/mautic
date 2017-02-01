@@ -546,6 +546,7 @@ return [
                     'form.factory',
                     'mautic.lead.model.company',
                     'mautic.category.model.category',
+                    '%mautic.track_contact_by_ip%',
                 ],
             ],
             'mautic.lead.model.field' => [

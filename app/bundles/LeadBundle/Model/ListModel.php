@@ -310,6 +310,12 @@ class ListModel extends FormModel
                 'operators'  => 'default',
                 'object'     => 'lead',
             ],
+            'date_modified' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.date_modified'),
+                'properties' => ['type' => 'date'],
+                'operators'  => 'default',
+                'object'     => 'lead',
+            ],
             'owner_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
                 'properties' => [

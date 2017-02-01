@@ -151,25 +151,22 @@ class CampaignSubscriber extends CommonSubscriber
             )
         );
 
-        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
-
         $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('sms_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->getParameter('sms_frequency_time');
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();
 
-        $leadIds = $lead->getId();
-
+        $leadIds    = $lead->getId();
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime);
 
-        if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
+        $metadata = 'mautic.sms.campaign.failed.not_contactable';
+        if (empty($dontSendTo) || (!empty($dontSendTo) && $dontSendTo[0]['lead_id'] != $lead->getId())) {
             $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
         }
 
-        // If there was a problem sending at this point, it's an API problem and should be requeued
-        if ($metadata === false) {
-            return $event->setResult(false);
+        if (true !== $metadata) {
+            return $event->setFailed($metadata);
         }
 
         $this->smsModel->createStatEntry($sms, $lead);
