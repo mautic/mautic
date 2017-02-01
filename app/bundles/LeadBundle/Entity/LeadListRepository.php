@@ -129,6 +129,7 @@ class LeadListRepository extends CommonRepository
      * @param      $lead
      * @param bool $forList
      * @param bool $singleArrayHydration
+     * @param bool $isPublic
      *
      * @return mixed
      */

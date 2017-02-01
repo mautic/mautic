@@ -184,18 +184,20 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     break;
                 case 'lookup':
                 default:
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-action' => 'lead:fieldList',
-                            'data-target' => $data['field'],
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                    if ('number' !== $fieldType) {
+                        $attr = array_merge(
+                            $attr,
+                            [
+                                'data-toggle' => 'field-lookup',
+                                'data-action' => 'lead:fieldList',
+                                'data-target' => $data['field'],
+                                'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                            ]
+                        );
 
-                    if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
-                        $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                        if (isset($options['fields'][$fieldObject][$fieldName]['properties']['list'])) {
+                            $attr['data-options'] = $options['fields'][$fieldName]['properties']['list'];
+                        }
                     }
 
                     break;

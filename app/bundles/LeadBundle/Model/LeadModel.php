@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -38,7 +39,6 @@ use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
-use Mautic\LeadBundle\Event\ChannelEvent;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -63,6 +63,8 @@ class LeadModel extends FormModel
 
     private $currentLead       = null;
     private $systemCurrentLead = null;
+
+    const CHANNEL_FEATURE = 'contact_preference';
 
     /**
      * @var null|\Symfony\Component\HttpFoundation\Request
@@ -115,6 +117,11 @@ class LeadModel extends FormModel
     protected $formFactory;
 
     /**
+     * @var ChannelListHelper
+     */
+    protected $channelListHelper;
+
+    /**
      * @var bool
      */
     protected $trackByIp = false;
@@ -132,6 +139,7 @@ class LeadModel extends FormModel
      * @param FormFactory       $formFactory
      * @param CompanyModel      $companyModel
      * @param CategoryModel     $categoryModel
+     * @param ChannelListHelper $channelListHelper
      * @param                   $trackByIp
      */
     public function __construct(
@@ -145,6 +153,7 @@ class LeadModel extends FormModel
         FormFactory $formFactory,
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
+        ChannelListHelper $channelListHelper,
         $trackByIp
     ) {
         $this->request           = $requestStack->getCurrentRequest();
@@ -157,6 +166,7 @@ class LeadModel extends FormModel
         $this->companyModel      = $companyModel;
         $this->formFactory       = $formFactory;
         $this->categoryModel     = $categoryModel;
+        $this->channelListHelper = $channelListHelper;
         $this->trackByIp         = $trackByIp;
     }
 
@@ -1398,12 +1408,25 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
+     *
+     * @param Lead $lead
+     * @param null $channel
+     *
+     * @return mixed
+     */
+    public function getFrequencyRule(Lead $lead, $channel = null)
+    {
+        return $this->getFrequencyRules($lead, $channel);
+    }
+
+    /**
      * @param Lead   $lead
      * @param string $channel
      *
      * @return mixed
      */
-    public function getFrequencyRule(Lead $lead, $channel = null)
+    public function getFrequencyRules(Lead $lead, $channel = null)
     {
         if (is_array($channel)) {
             $channel = key($channel);
@@ -1429,38 +1452,41 @@ class LeadModel extends FormModel
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null)
+    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null, $persist = true)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
         $entities       = [];
-        $channels       = $this->getDoNotContactChannels($lead);
+        $channels       = $this->getPreferenceChannels();
 
         foreach ($channels as $ch) {
-            if (!empty($data['preferred_channel']) or (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) or (!empty($data['contact_pause_start_date_'.$ch]) and !empty($data['contact_pause_end_date_'.$ch]))) {
-                $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
-                $frequencyRule->setChannel($ch);
-                $frequencyRule->setLead($lead);
-                $frequencyRule->setDateAdded(new \DateTime());
+            if (empty($data['preferred_channel'])) {
+                $data['preferred_channel'] = $ch;
+            }
 
-                if (!empty($data['frequency_number_'.$ch]) and !empty($data['frequency_time_'.$ch])) {
-                    $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
-                    $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
-                } else {
-                    $frequencyRule->setFrequencyNumber(null);
-                    $frequencyRule->setFrequencyTime(null);
-                }
+            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
+            $frequencyRule->setChannel($ch);
+            $frequencyRule->setLead($lead);
+            $frequencyRule->setDateAdded(new \DateTime());
 
-                $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
-                $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+            if (!empty($data['frequency_number_'.$ch]) && !empty($data['frequency_time_'.$ch])) {
+                $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
+                $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+            } else {
+                $frequencyRule->setFrequencyNumber(null);
+                $frequencyRule->setFrequencyTime(null);
+            }
 
-                $frequencyRule->setLead($lead);
-                if ($data['preferred_channel'] == $ch) {
-                    $frequencyRule->setPreferredChannel(true);
-                } else {
-                    $frequencyRule->setPreferredChannel(false);
-                }
+            $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
+            $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+
+            $frequencyRule->setLead($lead);
+            $frequencyRule->setPreferredChannel($data['preferred_channel'] === $ch);
+
+            if ($persist) {
                 $entities[$ch] = $frequencyRule;
+            } else {
+                $lead->addFrequencyRule($frequencyRule);
             }
         }
 
@@ -2402,15 +2428,17 @@ class LeadModel extends FormModel
     /**
      * Get contact channels.
      *
+     * @param Lead $lead
+     *
      * @return array
      */
-    public function getDoNotContactChannels(Lead $lead)
+    public function getContactChannels(Lead $lead)
     {
-        $allChannels = $this->getAllChannels();
+        $allChannels = $this->getPreferenceChannels();
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if (!$this->isContactable($lead, $channel)) {
+            if ($this->isContactable($lead, $channel) === DoNotContact::IS_CONTACTABLE) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2421,23 +2449,43 @@ class LeadModel extends FormModel
     /**
      * Get contact channels.
      *
+     * @param Lead $lead
+     *
+     * @return array
+     */
+    public function getDoNotContactChannels(Lead $lead)
+    {
+        $allChannels = $this->getPreferenceChannels();
+
+        $channels = [];
+        foreach ($allChannels as $channel) {
+            if ($this->isContactable($lead, $channel) !== DoNotContact::IS_CONTACTABLE) {
+                $channels[$channel] = $channel;
+            }
+        }
+
+        return $channels;
+    }
+
+    /**
+     * @deprecatd 2.4; to be removed in 3.0
+     * use mautic.channel.helper.channel_list service (Mautic\ChannelBundle\Helper\ChannelListHelper) to obtain the desired channels
+     *
+     * Get contact channels.
+     *
      * @return array
      */
     public function getAllChannels()
     {
-        $event = new ChannelEvent();
+        return $this->channelListHelper->getChannelList();
+    }
 
-        $this->dispatcher->dispatch(LeadEvents::ADD_CHANNEL, $event);
-        $allChannels = $event->getChannels();
-
-        $channels = [];
-        foreach ($allChannels as $channel) {
-            $channelName = $this->translator->hasId('mautic.channel.'.$channel) ?
-                $this->translator->trans('mautic.channel.'.$channel) : ucfirst($channel);
-            $channels[$channelName] = $channel;
-        }
-
-        return $channels;
+    /**
+     * @return array
+     */
+    public function getPreferenceChannels()
+    {
+        return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }
 
     /**

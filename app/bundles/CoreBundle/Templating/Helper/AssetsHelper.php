@@ -173,7 +173,7 @@ class AssetsHelper
      */
     public function addScript($script, $location = 'head', $async = false, $name = null)
     {
-        $assets     = &$this->assets;
+        $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {
             $name = $name ?: 'script_'.hash('sha1', uniqid(mt_rand()));
 
@@ -383,6 +383,7 @@ class AssetsHelper
         $headOutput = $this->getStyles();
         if (!empty($this->assets[$this->context]['headDeclarations'])) {
             $scriptOpen = false;
+
             foreach ($this->assets[$this->context]['headDeclarations'] as $declaration) {
                 $type   = key($declaration);
                 $output = $declaration[$type];

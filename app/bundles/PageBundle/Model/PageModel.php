@@ -781,7 +781,7 @@ class PageModel extends FormModel
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param null|Page    $page
-     * @param array|string $requestedComponents all | tokens | tokenSections | abTestWinnerCriteria
+     * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
      * @param null|string  $tokenFilter
      *
      * @return array
@@ -802,12 +802,6 @@ class PageModel extends FormModel
                 case 'tokens':
                     $components[$requested] = $event->getTokens();
                     break;
-                case 'visualTokens':
-                    $components[$requested] = $event->getVisualTokens();
-                    break;
-                case 'tokenSections':
-                    $components[$requested] = $event->getTokenSections();
-                    break;
                 case 'abTestWinnerCriteria':
                     $components[$requested] = $event->getAbTestWinnerCriteria();
                     break;
@@ -816,7 +810,6 @@ class PageModel extends FormModel
                     break;
                 default:
                     $components['tokens']               = $event->getTokens();
-                    $components['tokenSections']        = $event->getTokenSections();
                     $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
                     $components['slotTypes']            = $event->getSlotTypes();
                     break;

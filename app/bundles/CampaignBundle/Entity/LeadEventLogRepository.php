@@ -82,8 +82,10 @@ class LeadEventLogRepository extends CommonRepository
                     ll.metadata,
                     e.type,
                     ll.is_scheduled as isScheduled,
-                    ll.trigger_date as triggerDate
-            '
+                    ll.trigger_date as triggerDate,
+                    ll.channel,
+                    ll.channel_id as channel_id
+                    '
                       )
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
@@ -91,17 +93,6 @@ class LeadEventLogRepository extends CommonRepository
                       ->where('ll.lead_id = '.(int) $leadId)
                       ->andWhere('e.event_type = :eventType')
                       ->setParameter('eventType', 'action');
-
-        if (isset($options['search']) && $options['search']) {
-            $query->andWhere(
-                $query->expr()->orX(
-                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
-                    $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
-                )
-            );
-        }
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {
@@ -121,6 +112,17 @@ class LeadEventLogRepository extends CommonRepository
                 );
             }
             $query->setParameter('scheduled', $options['scheduledState'], 'boolean');
+        }
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere(
+                $query->expr()->orX(
+                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('c.description', $query->expr()->literal('%'.$options['search'].'%'))
+                )
+            );
         }
 
         return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
@@ -167,19 +169,14 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('leadId', $options['lead']->getId());
         }
 
-        if (isset($options['scheduled'])) {
-            $query->andWhere('ll.is_scheduled = :scheduled')
-                ->setParameter('scheduled', $options['scheduled'], 'boolean');
+        if (isset($options['type'])) {
+            $query->andwhere('e.type = :type')
+                  ->setParameter('type', $options['type']);
         }
 
         if (isset($options['eventType'])) {
             $query->andwhere('e.event_type = :eventType')
                 ->setParameter('eventType', $options['eventType']);
-        }
-
-        if (isset($options['type'])) {
-            $query->andwhere('e.type = :type')
-                ->setParameter('type', $options['type']);
         }
 
         if (isset($options['limit'])) {
@@ -211,9 +208,14 @@ class LeadEventLogRepository extends CommonRepository
     public function getCampaignLogCounts($campaignId, $excludeScheduled = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('o.event_id, count(o.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
-            ->innerJoin('o', MAUTIC_TABLE_PREFIX.'campaign_leads', 'l', 'o.lead_id = l.lead_id and l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0');
+                       ->select('o.event_id, count(o.lead_id) as lead_count')
+                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
+                       ->innerJoin(
+                           'o',
+                           MAUTIC_TABLE_PREFIX.'campaign_leads',
+                           'l',
+                           'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
+                       );
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId),
@@ -230,8 +232,8 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         $q->where($expr)
-            ->setParameter('false', false, 'boolean')
-            ->groupBy('o.event_id');
+          ->setParameter('false', false, 'boolean')
+          ->groupBy('o.event_id');
 
         $results = $q->execute()->fetchAll();
 

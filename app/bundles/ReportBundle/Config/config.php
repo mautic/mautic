@@ -126,6 +126,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.template.formatter',
                     'mautic.helper.templating',
+                    'mautic.channel.helper.channel_list',
                 ],
             ],
         ],

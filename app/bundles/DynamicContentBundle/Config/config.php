@@ -80,6 +80,9 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.dynamicContent.subscriber.channel' => [
+                'class' => \Mautic\DynamicContentBundle\EventListener\ChannelSubscriber::class,
+            ],
             'mautic.dynamicContent.stats.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
@@ -110,9 +113,8 @@ return [
                 'alias' => 'dwcdecision_list',
             ],
             'mautic.form.type.dwc_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dwc_list',
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
+                'alias' => 'dwc_list',
             ],
         ],
         'models' => [

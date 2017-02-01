@@ -9,7 +9,7 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.initSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
 };
 

@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_page_buildertoken_index' => [
-                'path'       => '/pages/buildertokens/{page}',
-                'controller' => 'MauticPageBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_page_index' => [
                 'path'       => '/pages/{page}',
                 'controller' => 'MauticPageBundle:Page:index',

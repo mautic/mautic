@@ -101,10 +101,9 @@ trait CustomFieldsApiControllerTrait
     }
 
     /**
-     * @param        $entity
-     * @param        $form
-     * @param        $parameters
-     * @param string $action
+     * @param   $entity
+     * @param   $form
+     * @param   $parameters
      */
     protected function setCustomFieldValues(&$entity, $form, $parameters)
     {

@@ -223,7 +223,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $utmtags;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\FrequencyRule
+     * @var \Mautic\LeadBundle\Entity\FrequencyRule[]
      */
     private $frequencyRules;
 
@@ -231,6 +231,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      * @var
      */
     private $primaryCompany;
+
+    /**
+     * Used to determine order of preferred channels.
+     *
+     * @var array
+     */
+    private $channelRules = [];
 
     /**
      * Constructor.
@@ -459,6 +466,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                          'dateIdentified',
                          'preferredProfileImage',
                          'doNotContact',
+                         'frequencyRules',
                      ]
                  )
                  ->build();
@@ -507,14 +515,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRules') {
+        } elseif ($prop == 'frequencyRule') {
+            if (!isset($this->changes['frequencyRules'])) {
+                $this->changes['frequencyRules'] = [];
+            }
+
             if ($val instanceof FrequencyRule) {
-                if ($val->getFrequencyTime()) {
-                    $this->changes['frequencyRules'] = ['frequency_time', $val->getFrequencyTime()];
-                }
-                if ($val->getFrequencyNumber()) {
-                    $this->changes['frequencyRules'] = ['frequency_number', $val->getFrequencyNumber()];
-                }
+                $channel = $val->getChannel();
+
+                $this->changes['frequencyRules'][$channel] = $val->getChanges();
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
@@ -526,8 +535,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
-        } elseif ($this->$getter() != $val) {
-            $this->changes[$prop] = [$this->$getter(), $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
@@ -1335,14 +1344,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Set frequency rules.
      *
-     * @param FrequencyRule $frequencyRules
+     * @param FrequencyRule[] $frequencyRules
      *
      * @return Lead
      */
-    public function setFrequencyRules(FrequencyRule $frequencyRules)
+    public function setFrequencyRules($frequencyRules)
     {
-        $this->isChanged('frequencyRules', $frequencyRules);
-        $this->frequencyRules[$frequencyRules->getId()] = $frequencyRules;
+        $this->frequencyRules = $frequencyRules;
 
         return $this;
     }
@@ -1350,7 +1358,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get frequency rules.
      *
-     * @return array
+     * @return ArrayCollection
      */
     public function getFrequencyRules()
     {
@@ -1364,8 +1372,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRule', $frequencyRule->getId());
+        $this->isChanged('frequencyRules', $frequencyRule->getId());
         $this->frequencyRules->removeElement($frequencyRule);
+    }
+
+    /**
+     * Add frequency rule.
+     *
+     * @param FrequencyRule $frequencyRule
+     */
+    public function addFrequencyRule(FrequencyRule $frequencyRule)
+    {
+        $this->isChanged('frequencyRule', $frequencyRule);
+        $this->frequencyRules[] = $frequencyRule;
     }
 
     /**
@@ -1705,5 +1724,430 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->email = $email;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param mixed $title
+     *
+     * @return Lead
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+
+    /**
+     * @param mixed $firstname
+     *
+     * @return Lead
+     */
+    public function setFirstname($firstname)
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
+
+    /**
+     * @param mixed $lastname
+     *
+     * @return Lead
+     */
+    public function setLastname($lastname)
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * @param mixed $position
+     *
+     * @return Lead
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param mixed $phone
+     *
+     * @return Lead
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param mixed $mobile
+     *
+     * @return Lead
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAddress1()
+    {
+        return $this->address1;
+    }
+
+    /**
+     * @param mixed $address1
+     *
+     * @return Lead
+     */
+    public function setAddress1($address1)
+    {
+        $this->address1 = $address1;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAddress2()
+    {
+        return $this->address2;
+    }
+
+    /**
+     * @param mixed $address2
+     *
+     * @return Lead
+     */
+    public function setAddress2($address2)
+    {
+        $this->address2 = $address2;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * @param mixed $city
+     *
+     * @return Lead
+     */
+    public function setCity($city)
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param mixed $state
+     *
+     * @return Lead
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getZipcode()
+    {
+        return $this->zipcode;
+    }
+
+    /**
+     * @param mixed $zipcode
+     *
+     * @return Lead
+     */
+    public function setZipcode($zipcode)
+    {
+        $this->zipcode = $zipcode;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param mixed $country
+     *
+     * @return Lead
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompany()
+    {
+        return $this->company;
+    }
+
+    /**
+     * @param mixed $company
+     *
+     * @return Lead
+     */
+    public function setCompany($company)
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     *
+     * @return Lead
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Returns array of rules with preferred channels first.
+     *
+     * @return mixed
+     */
+    public function getChannelRules()
+    {
+        if (null === $this->channelRules) {
+            $frequencyRules = $this->getFrequencyRules()->toArray();
+            $dnc            = $this->getDoNotContact();
+            $dncChannels    = [];
+            /** @var DoNotContact $record */
+            foreach ($dnc as $record) {
+                $dncChannels[$record->getChannel()] = $record->getReason();
+            }
+
+            $this->channelRules = self::generateChannelRules($frequencyRules, $dncChannels);
+        }
+
+        return $this->channelRules;
+    }
+
+    /**
+     * @param array $rules
+     *
+     * @return $this
+     */
+    public function setChannelRules(array $rules)
+    {
+        $this->channelRules = $rules;
+
+        return $this;
+    }
+
+    /**
+     * Used mostly when batching to generate preferred channels without hydrating associations one at a time.
+     *
+     * @param array $frequencyRules
+     * @param array $dncRules
+     */
+    public static function generateChannelRules(array $frequencyRules, array $dncRules)
+    {
+        $rules = [];
+        foreach ($frequencyRules as $rule) {
+            if ($rule instanceof FrequencyRule) {
+                $rules[$rule->getChannel] = [
+                    'channel'           => $rule->getChannel(),
+                    'pause_from_date'   => $rule->getPauseFromDate(),
+                    'pause_to_date'     => $rule->getPauseToDate(),
+                    'preferred_channel' => $rule->getPreferredChannel(),
+                    'frequency_time'    => $rule->getFrequencyTime(),
+                    'frequency_number'  => $rule->getFrequencyNumber(),
+                ];
+            } else {
+                // Already an array
+                break;
+            }
+        }
+        if (count($rules)) {
+            $frequencyRules = $rules;
+        }
+
+        /* @var FrequencyRule $rule */
+        usort(
+            $frequencyRules,
+            function ($a, $b) use ($dncRules) {
+                if (in_array($a['channel'], $dncRules)) {
+                    // Channel in DNC so give lower preference
+                    return 1;
+                }
+
+                if ($a['pause_from_date'] && $a['pause_to_date']) {
+                    $now = new \DateTime();
+                    if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {
+                        // A is paused so give lower preference
+                        return 1;
+                    }
+                }
+
+                if ($a['preferred_channel'] === $b['preferred_channel']) {
+                    if (!$a['frequency_time'] || !$b['frequency_time'] || !$a['frequency_number'] || !$b['frequency_number']) {
+                        return 0;
+                    }
+
+                    // Order by which ever can be sent more frequent
+                    if ($a['frequency_time'] === $b['frequency_time']) {
+                        if ($a['frequency_number'] === $b['frequency_number']) {
+                            return 0;
+                        }
+
+                        return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
+                    } else {
+                        $convertToMonth = function ($number, $unit) {
+                            switch ($unit) {
+                                case FrequencyRule::TIME_MONTH:
+                                    $number = (int) $number;
+                                    break;
+                                case FrequencyRule::TIME_WEEK:
+                                    $number = $number * 4;
+                                    break;
+                                case FrequencyRule::TIME_DAY:
+                                    $number = $number * 30;
+                                    break;
+                            }
+
+                            return $number;
+                        };
+
+                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
+                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+
+                        if ($aFrequency === $bFrequency) {
+                            return 0;
+                        }
+
+                        return ($aFrequency > $bFrequency) ? -1 : 1;
+                    }
+                }
+
+                return ($a['preferred_channel'] > $b['preferred_channel']) ? -1 : 1;
+            }
+        );
+
+        $rules = [];
+        foreach ($frequencyRules as $rule) {
+            $rules[$rule['channel']] =
+                [
+                    'frequency' => $rule,
+                    'dnc'       => array_key_exists($rule['channel'], $dncRules) ? $dncRules[$rule['channel']] : DoNotContact::IS_CONTACTABLE,
+                ];
+            unset($dncRules[$rule['channel']]);
+        }
+
+        if (count($dncRules)) {
+            foreach ($dncRules as $channel => $reason) {
+                $rules[$channel] = [
+                    'frequency' => null,
+                    'dnc'       => $reason,
+                ];
+            }
+        }
+
+        return $rules;
     }
 }

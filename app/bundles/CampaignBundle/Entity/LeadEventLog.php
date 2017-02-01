@@ -21,6 +21,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadEventLog
 {
     /**
+     * @var
+     */
+    private $id;
+
+    /**
      * @var Event
      */
     private $event;
@@ -86,6 +91,16 @@ class LeadEventLog
     private $previousScheduledState;
 
     /**
+     * @var
+     */
+    private $previousScheduledState;
+
+    /**
+     * @var int
+     */
+    private $rotation = 1;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -94,17 +109,22 @@ class LeadEventLog
 
         $builder->setTable('campaign_lead_event_log')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository')
-            ->addIndex(['is_scheduled'], 'event_upcoming_search')
+            ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['lead_id', 'campaign_id'], 'campaign_leads');
+            ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
+            ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
+            ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
+
+        $builder->addId();
 
         $builder->createManyToOne('event', 'Event')
-            ->isPrimaryKey()
             ->inversedBy('log')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(false, 'CASCADE', true);
+        $builder->addLead(false, 'CASCADE');
+
+        $builder->addField('rotation', 'integer');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->addJoinColumn('campaign_id', 'id')
@@ -134,7 +154,10 @@ class LeadEventLog
             ->nullable()
             ->build();
 
-        $builder->addNullableField('channel', 'string');
+        $builder->createField('channel', 'string')
+                ->length(60)
+                ->nullable()
+                ->build();
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
@@ -158,6 +181,7 @@ class LeadEventLog
                          'nonActionPathTaken',
                          'channel',
                          'channelId',
+                         'rotation',
                      ]
                  )
 
@@ -176,9 +200,18 @@ class LeadEventLog
                          'nonActionPathTaken',
                          'channel',
                          'channelId',
+                         'rotation',
                      ]
                  )
                  ->build();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
@@ -195,7 +228,9 @@ class LeadEventLog
     public function setDateTriggered($dateTriggered)
     {
         $this->dateTriggered = $dateTriggered;
-        $this->setIsScheduled(false);
+        if (null !== $dateTriggered) {
+            $this->setIsScheduled(false);
+        }
     }
 
     /**
@@ -434,6 +469,26 @@ class LeadEventLog
     public function setChannelId($channelId)
     {
         $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRotation()
+    {
+        return $this->rotation;
+    }
+
+    /**
+     * @param int $rotation
+     *
+     * @return LeadEventLog
+     */
+    public function setRotation($rotation)
+    {
+        $this->rotation = (int) $rotation;
 
         return $this;
     }

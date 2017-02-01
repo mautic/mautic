@@ -191,6 +191,17 @@ class Campaign extends FormEntity
                     'canvasSettings',
                 ]
             )
+            ->setGroupPrefix('campaignBasic')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'events',
+                    'publishUp',
+                    'publishDown',
+                ]
+            )
             ->build();
     }
 

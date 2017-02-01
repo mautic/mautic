@@ -31,7 +31,7 @@ class EmailApiController extends CommonApiController
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'leadListList'];
+        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',
             'dynamicContent' => [
@@ -133,18 +133,26 @@ class EmailApiController extends CommonApiController
 
             $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
 
-            if ($this->get('mautic.helper.mailer')->applyFrequencyRules($lead)) {
-                $this->model->sendEmail(
-                    $entity,
-                    $leadFields,
-                    [
-                        'source' => ['api', 0],
-                        'tokens' => $cleantokens,
-                    ]
-                );
+            $errors = $this->model->sendEmail(
+                $entity,
+                $leadFields,
+                [
+                    'source'        => ['api', 0],
+                    'tokens'        => $cleantokens,
+                    'return_errors' => true,
+                ]
+            );
+
+            $success  = empty($errors);
+            $response = [
+                'success' => $success,
+            ];
+
+            if (!$success) {
+                $response['failed'] = $errors;
             }
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view($response, Codes::HTTP_OK);
 
             return $this->handleView($view);
         }

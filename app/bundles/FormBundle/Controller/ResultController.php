@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class ResultController.
@@ -39,7 +40,7 @@ class ResultController extends CommonFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($objectId, $page)
+    public function indexAction($objectId, $page = 1)
     {
         /** @var FormModel $formModel */
         $formModel      = $this->getModel('form.form');
@@ -261,8 +262,8 @@ class ResultController extends CommonFormController
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('form.submission');
 
-            // Find the result
-            $entity = $model->getEntity($objectId);
+                // Find the result
+                $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [
@@ -273,13 +274,14 @@ class ResultController extends CommonFormController
             } elseif (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $entity->getCreatedBy())) {
                 return $this->accessDenied();
             } else {
+                $id = $entity->getId();
                 $model->deleteEntity($entity);
 
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => [
-                        '%name%' => '#'.$entity->getId(),
+                        '%name%' => '#'.$id,
                     ],
                 ];
             }
@@ -304,14 +306,90 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * Deletes a group of entities.
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction()
     {
-        $viewParameters = ['objectId' => $this->request->get('formId', 0)];
+        return $this->batchDeleteStandard();
+    }
 
-        return $this->batchDeleteStandard($viewParameters);
+    /**
+     * @return string
+     */
+    protected function getModelName()
+    {
+        return 'form.submission';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getIndexRoute()
+    {
+        return 'mautic_form_results';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getActionRoute()
+    {
+        return 'mautic_form_results_action';
+    }
+
+    /**
+     * Set the main form ID as the objectId.
+     *
+     * @param string $route
+     * @param array  $parameters
+     * @param int    $referenceType
+     */
+    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        $formId = $this->getFormIdFromRequest($parameters);
+        switch ($route) {
+            case 'mautic_form_results_action':
+                $parameters['formId'] = $formId;
+                break;
+            case 'mautic_form_results':
+                $parameters['objectId'] = $formId;
+                break;
+        }
+
+        return parent::generateUrl($route, $parameters, $referenceType);
+    }
+
+    /**
+     * @param array $args
+     * @param       $action
+     */
+    public function getPostActionRedirectArguments(array $args, $action)
+    {
+        switch ($action) {
+            case 'batchDelete':
+                $formId                             = $this->getFormIdFromRequest();
+                $args['viewParameters']['objectId'] = $formId;
+                break;
+        }
+
+        return $args;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return mixed
+     */
+    protected function getFormIdFromRequest($parameters = [])
+    {
+        if ($this->request->attributes->has('formId')) {
+            $formId = $this->request->attributes->get('formId');
+        } elseif ($this->request->request->has('formId')) {
+            $formId = $this->request->request->get('formId');
+        } else {
+            $formId = (isset($parameters['formId'])) ? $parameters['formId'] : $this->request->query->get('formId', 0);
+        }
+
+        return $formId;
     }
 }

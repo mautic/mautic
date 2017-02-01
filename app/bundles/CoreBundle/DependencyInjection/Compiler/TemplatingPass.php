@@ -42,6 +42,30 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall('setAssetHelper', [new Reference('mautic.helper.assetgeneration')])
                 ->addMethodCall('setSiteUrl', ['%mautic.site_url%'])
                 ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
+
+            if ($container->hasDefinition('templating.engine.php')) {
+                $container->getDefinition('templating.engine.php')
+                    ->addMethodCall(
+                        'setDispatcher',
+                        [new Reference('event_dispatcher')]
+                    )
+                    ->addMethodCall(
+                        'setRequestStack',
+                        [new Reference('request_stack')]
+                    );
+            }
+
+            if ($container->hasDefinition('debug.templating.engine.php')) {
+                $container->getDefinition('debug.templating.engine.php')
+                    ->addMethodCall(
+                        'setDispatcher',
+                        [new Reference('event_dispatcher')]
+                    )
+                    ->addMethodCall(
+                        'setRequestStack',
+                        [new Reference('request_stack')]
+                    );
+            }
         }
     }
 }

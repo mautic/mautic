@@ -716,7 +716,7 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
 
 Mautic.togglePreferredChannel = function(channel) {
     if (channel == 'all') {
-        var status = mQuery('#lead_contact_frequency_rules_doNotContactChannels_0')[0].checked;  //"select all" change
+        var status = mQuery('#lead_contact_frequency_rules_subscribed_channels_0')[0].checked;  //"select all" change
 
        // "select all" checked status
         mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
@@ -738,11 +738,15 @@ Mautic.setPreferredChannel = function(channel) {
         mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
         mQuery('#preferred_' + channel).prop("disabled" , false);
         mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
+        mQuery('#lead_contact_frequency_rules_contact_pause_start_date_' + channel).prop("disabled" , false);
+        mQuery('#lead_contact_frequency_rules_contact_pause_end_date_' + channel).prop("disabled" , false);
     } else {
         mQuery('#is-contactable-' + channel).addClass('text-muted');
         mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
         mQuery('#preferred_' + channel).prop("disabled" , true);
         mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
+        mQuery('#lead_contact_frequency_rules_contact_pause_start_date_' + channel).prop("disabled" , true);
+        mQuery('#lead_contact_frequency_rules_contact_pause_end_date_' + channel).prop("disabled" , true);
     }
 };
 

@@ -312,6 +312,10 @@ class CommonRepository extends EntityRepository
                 ->createQueryBuilder()
                 ->select($alias)
                 ->from($this->_entityName, $alias, "{$alias}.id");
+
+            if ($this->getClassMetadata()->hasAssociation('category')) {
+                $q->leftJoin($this->getTableAlias().'.category', 'cat');
+            }
         }
 
         $this->buildClauses($q, $args);
@@ -594,14 +598,16 @@ class CommonRepository extends EntityRepository
     /**
      * Gets a list of published entities as an array id => label.
      *
-     * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
-     * @param array               $parameters  Parameters used in $expr
-     * @param string              $labelColumn Column that houses the label
-     * @param string              $valueColumn Column that houses the value
+     * @param CompositeExpression $expr
+     * @param array               $parameters   Parameters used in $expr
+     * @param string              $labelColumn  Column that houses the label
+     * @param string              $valueColumn  Column that houses the value
+     * @param string              $extraColumns String of extra select columns
+     * @param int                 $limit        Limit for results
      *
      * @return array
      */
-    public function getSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    public function getSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -624,7 +630,7 @@ class CommonRepository extends EntityRepository
             }
         }
 
-        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label')
+        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
           ->from($tableName, $alias)
           ->orderBy($prefix.$labelColumn);
 
@@ -642,6 +648,10 @@ class CommonRepository extends EntityRepository
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
               ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit) {
+            $q->setMaxResults((int) $limit);
         }
 
         return $q->execute()->fetchAll();
@@ -1382,6 +1392,21 @@ class CommonRepository extends EntityRepository
         $queryParameters              = [];
         $queryExpression              = $q->expr()->andX();
 
+        if (isset($args['ids'])) {
+            $ids = array_map('intval', $args['ids']);
+            if ($q instanceof QueryBuilder) {
+                $param = $this->generateRandomParameterName();
+                $queryExpression->add(
+                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
+                );
+                $queryParameters[$param] = $ids;
+            } else {
+                $queryExpression->add(
+                    $q->expr()->in($this->getTableAlias().'.id', $ids)
+                );
+            }
+        }
+
         if (!empty($filter)) {
             if (is_array($filter)) {
                 if (!empty($filter['where'])) {
@@ -1439,20 +1464,20 @@ class CommonRepository extends EntityRepository
                     $queryParameters = array_merge($queryParameters, $parameters);
                 }
             }
+        }
 
-            //parse the filter if set
-            if ($queryExpression->count()) {
-                $q->andWhere($queryExpression);
-            }
+        //parse the filter if set
+        if ($queryExpression->count()) {
+            $q->andWhere($queryExpression);
+        }
 
-            // Parameters have to be set even if there are no expressions just in case a search command
-            // passed back a parameter it used
-            foreach ($queryParameters as $k => $v) {
-                if ($v === true || $v === false) {
-                    $q->setParameter($k, $v, 'boolean');
-                } else {
-                    $q->setParameter($k, $v);
-                }
+        // Parameters have to be set even if there are no expressions just in case a search command
+        // passed back a parameter it used
+        foreach ($queryParameters as $k => $v) {
+            if ($v === true || $v === false) {
+                $q->setParameter($k, $v, 'boolean');
+            } else {
+                $q->setParameter($k, $v);
             }
         }
     }

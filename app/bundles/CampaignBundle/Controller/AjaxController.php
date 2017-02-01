@@ -33,7 +33,6 @@ class AjaxController extends CommonAjaxController
         $session        = $this->get('session');
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
         $canvasSettings = $request->request->get('canvasSettings', [], true);
-
         if (empty($campaignId)) {
             $dataArray = ['success' => 0];
         } else {
@@ -62,8 +61,7 @@ class AjaxController extends CommonAjaxController
                 $newDate = new \DateTime($newDate);
 
                 if ($newDate >= new \DateTime()) {
-                    $log->setTriggerDate($newDate)
-                        ->setIsScheduled(true);
+                    $log->setTriggerDate($newDate);
 
                     /** @var EventLogModel $logModel */
                     $logModel = $this->getModel('campaign.event_log');

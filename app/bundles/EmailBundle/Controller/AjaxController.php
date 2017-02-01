@@ -12,8 +12,8 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
+    use AjaxLookupControllerTrait;
 
     /**
      * @param Request $request
@@ -118,9 +119,6 @@ class AjaxController extends CommonAjaxController
                 'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
             ]
         );
-
-        // Convert placeholders into raw tokens
-        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
 
         $dataArray = [
             'text' => $parser->setHtml($custom)->getText(),

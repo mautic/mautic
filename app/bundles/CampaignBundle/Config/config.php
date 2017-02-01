@@ -32,6 +32,10 @@ return [
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:contacts',
             ],
+            'mautic_campaign_preview' => [
+                'path'       => '/campaign/preview/{objectId}',
+                'controller' => 'MauticEmailBundle:Public:preview',
+            ],
         ],
         'api' => [
             'mautic_api_campaignsstandard' => [
@@ -157,6 +161,9 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
+            ],
+            'mautic.campaign.report.subscriber' => [
+                'class' => \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
             ],
         ],
         'forms' => [

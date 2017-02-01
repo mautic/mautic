@@ -16,6 +16,7 @@ use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
+    use FrequencyRuleTrait;
 
     /**
      * @param FilterControllerEvent $event
@@ -36,7 +38,7 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
 
         parent::initialize($event);
     }
@@ -406,8 +408,10 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @param int    $id
-     * @param string $channel
+     * @param $id
+     * @param $channel
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addDncAction($id, $channel)
     {
@@ -437,8 +441,10 @@ class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      *
-     * @param int $id
-     * @param int $channel
+     * @param $id
+     * @param $channel
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function removeDncAction($id, $channel)
     {
@@ -511,6 +517,7 @@ class LeadApiController extends CommonApiController
         if (isset($originalParams['lastActive'])) {
             $lastActive = new DateTimeHelper($originalParams['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
+            unset($parameters['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
@@ -520,6 +527,25 @@ class LeadApiController extends CommonApiController
                 $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
                 $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
             }
+            unset($parameters['doNotContact']);
+        }
+
+        if (!empty($parameters['frequencyRules'])) {
+            $viewParameters = [];
+            $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
+
+            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+                $formErrors = $this->getFormErrorMessages($frequencyForm);
+                $msg        = $this->getFormErrorMessage($formErrors);
+
+                if (!$msg) {
+                    $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
+                }
+
+                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
+            }
+
+            unset($parameters['frequencyRules']);
         }
 
         $this->setCustomFieldValues($entity, $form, $parameters);

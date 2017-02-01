@@ -159,6 +159,7 @@ class AppKernel extends Kernel
             new Mautic\CalendarBundle\MauticCalendarBundle(),
             new Mautic\CampaignBundle\MauticCampaignBundle(),
             new Mautic\CategoryBundle\MauticCategoryBundle(),
+            new Mautic\ChannelBundle\MauticChannelBundle(),
             new Mautic\ConfigBundle\MauticConfigBundle(),
             new Mautic\CoreBundle\MauticCoreBundle(),
             new Mautic\DashboardBundle\MauticDashboardBundle(),
@@ -198,6 +199,12 @@ class AppKernel extends Kernel
                 $plugin = new $class();
 
                 if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
+                        // Check if this version supports the plugin before loading it
+                        if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
+                            continue;
+                        }
+                    }
                     $bundles[] = $plugin;
                 }
 

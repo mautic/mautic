@@ -27,10 +27,6 @@ return [
                     'leadId'      => '\d+',
                 ],
             ],
-            'mautic_contact_emailtoken_index' => [
-                'path'       => '/contacts/emailtokens/{page}',
-                'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_segment_index' => [
                 'path'       => '/segments/{page}',
                 'controller' => 'MauticLeadBundle:List:index',
@@ -484,8 +480,10 @@ return [
             ],
             'mautic.form.type.lead_contact_frequency_rules' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ContactFrequencyType',
-                'arguments' => ['mautic.lead.model.lead'],
-                'alias'     => 'lead_contact_frequency_rules',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'alias' => 'lead_contact_frequency_rules',
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
@@ -581,6 +579,7 @@ return [
                     'form.factory',
                     'mautic.lead.model.company',
                     'mautic.category.model.category',
+                    'mautic.channel.helper.channel_list',
                     '%mautic.track_contact_by_ip%',
                 ],
             ],

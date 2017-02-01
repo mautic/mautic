@@ -122,6 +122,16 @@ class Event
     /**
      * @var
      */
+    private $channel;
+
+    /**
+     * @var
+     */
+    private $channelId;
+
+    /**
+     * @var
+     */
     private $changes;
 
     public function __construct()
@@ -135,9 +145,11 @@ class Event
      */
     public function __clone()
     {
-        $this->id       = null;
-        $this->tempId   = null;
-        $this->campaign = null;
+        $this->id        = null;
+        $this->tempId    = null;
+        $this->campaign  = null;
+        $this->channel   = null;
+        $this->channelId = null;
     }
 
     /**
@@ -149,8 +161,9 @@ class Event
 
         $builder->setTable('campaign_events')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
-            ->addIndex(['type', 'event_type'], 'campaign_event_type_search')
-            ->addIndex(['event_type'], 'event_type');
+            ->addIndex(['type', 'event_type'], 'campaign_event_search')
+            ->addIndex(['event_type'], 'campaign_event_type')
+            ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
 
         $builder->addIdColumns();
 
@@ -224,6 +237,16 @@ class Event
             ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('channel', 'string')
+            ->length(60)
+            ->nullable()
+            ->build();
+
+        $builder->createField('channelId', 'integer')
+            ->columnName('channel_id')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -234,22 +257,30 @@ class Event
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('campaignEvent')
-            ->addProperties(
+            ->addListProperties(
                 [
                     'id',
                     'name',
                     'description',
                     'type',
                     'eventType',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
                     'order',
                     'properties',
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
                     'triggerMode',
-                    'children',
-                    'parent',
                     'decisionPath',
+                    'channel',
+                    'channelId',
+                    'parent',
+                    'children',
                 ]
             )
             ->setMaxDepth(1, 'parent')
@@ -264,6 +295,8 @@ class Event
                      'description',
                      'type',
                      'eventType',
+                     'channel',
+                     'channelId',
                  ]
              )
              ->addProperties(
@@ -298,6 +331,8 @@ class Event
                     'decisionPath',
                     'order',
                     'parent',
+                    'channel',
+                    'channelId',
                 ]
             )
             ->addProperties(
@@ -545,7 +580,7 @@ class Event
      *
      * @return Event
      */
-    public function addChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function addChild(Event $children)
     {
         $this->children[] = $children;
 
@@ -557,7 +592,7 @@ class Event
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
      */
-    public function removeChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function removeChild(Event $children)
     {
         $this->children->removeElement($children);
     }
@@ -579,7 +614,7 @@ class Event
      *
      * @return Event
      */
-    public function setParent(\Mautic\CampaignBundle\Entity\Event $parent = null)
+    public function setParent(Event $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -719,6 +754,38 @@ class Event
     public function setTempId($tempId)
     {
         $this->tempId = $tempId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @param mixed $channel
+     */
+    public function setChannel($channel)
+    {
+        $this->channel = $channel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @param int $channelId
+     */
+    public function setChannelId($channelId)
+    {
+        $this->channelId = (int) $channelId;
     }
 
     /**

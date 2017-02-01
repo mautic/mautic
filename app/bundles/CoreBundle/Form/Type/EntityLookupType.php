@@ -15,7 +15,9 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\ChoiceLoader\EntityLookupChoiceLoader;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -38,9 +40,19 @@ class EntityLookupType extends AbstractType
     private $router;
 
     /**
-     * @var EntityLookupChoiceLoader
+     * @var ModelFactory
      */
-    private $choiceLoader;
+    private $modelFactory;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var EntityLookupChoiceLoader[]
+     */
+    private $choiceLoaders;
 
     /**
      * EntityLookupType constructor.
@@ -54,7 +66,8 @@ class EntityLookupType extends AbstractType
     {
         $this->translator   = $translator;
         $this->router       = $router;
-        $this->choiceLoader = new EntityLookupChoiceLoader($modelFactory, $translator, $connection);
+        $this->connection   = $connection;
+        $this->modelFactory = $modelFactory;
     }
 
     /**
@@ -64,14 +77,20 @@ class EntityLookupType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Let the form builder notify us about initial/submitted choices
+        $formModifier = function (FormEvent $event) {
+            $options = $event->getForm()->getConfig()->getOptions();
+            $this->choiceLoaders[$options['model']]->setOptions($options);
+            $this->choiceLoaders[$options['model']]->onFormPostSetData($event);
+        };
+
         $builder->addEventListener(
             FormEvents::POST_SET_DATA,
-            [$this->choiceLoader, 'onFormPostSetData']
+            $formModifier
         );
 
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            [$this->choiceLoader, 'onFormPostSetData']
+            $formModifier
         );
     }
 
@@ -81,27 +100,28 @@ class EntityLookupType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);
+        $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments']);
         $resolver->setDefaults(
             [
                 'modal_route'            => false,
+                'modal_route_parameters' => ['objectAction' => 'new'],
                 'modal_header'           => '',
+                'force_popup'            => false,
                 'entity_label_column'    => 'name',
                 'entity_id_column'       => 'id',
-                'modal_route_parameters' => ['objectAction' => 'new'],
                 'choice_loader'          => function (Options $options) {
-                    $this->choiceLoader->setOptions($options);
+                    if (!isset($this->choiceLoaders[$options['model']])) {
+                        // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
+                        $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader($this->modelFactory, $this->translator, $this->connection, $options);
+                    }
 
-                    return $this->choiceLoader;
+                    return $this->choiceLoaders[$options['model']];
                 },
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
                 'empty_value' => function (Options $options) {
-                    if (empty($options['modal_route'])) {
-                        return $this->translator->trans('mautic.core.lookup.search_options', [], 'javascript');
-                    }
-
-                    return false;
+                    return (!$options['required']) ? '' : false;
                 },
                 'attr' => function (Options $options) {
                     $attr =
@@ -115,14 +135,24 @@ class EntityLookupType extends AbstractType
                         $attr = array_merge(
                             $attr,
                             [
-                                'data-new-route' => $this->router->generate($options['modal_route'], $options['modal_route_parameters']),
-                                'data-header'    => $options['modal_header'] ? $this->translator->trans($options['modal_header']) : 'false',
+                                'data-new-route'          => $this->router->generate($options['modal_route'], $options['modal_route_parameters']),
+                                'data-header'             => $options['modal_header'] ? $this->translator->trans($options['modal_header']) : 'false',
+                                'data-chosen-placeholder' => $this->translator->trans('mautic.core.lookup.search_options', [], 'javascript'),
                             ]
                         );
                     }
 
+                    if ($options['force_popup']) {
+                        $attr['data-popup'] = 'true';
+                    }
+
+                    if (!empty($options['custom_attr'])) {
+                        $attr = array_merge($attr, $options['custom_attr']);
+                    }
+
                     return $attr;
                 },
+                'custom_attr' => [],
             ]
         );
     }
@@ -132,6 +162,6 @@ class EntityLookupType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

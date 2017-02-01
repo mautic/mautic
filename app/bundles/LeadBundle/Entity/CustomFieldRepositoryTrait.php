@@ -46,19 +46,6 @@ trait CustomFieldRepositoryTrait
         $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
         $dq->select($countSelect.' as count');
 
-        // Filter by an entity query
-        if (isset($args['entity_query'])) {
-            $dq->andWhere(
-                sprintf('EXISTS (%s)', $args['entity_query']->getSQL())
-            );
-
-            if (isset($args['entity_parameters'])) {
-                foreach ($args['entity_parameters'] as $name => $value) {
-                    $dq->setParameter($name, $value);
-                }
-            }
-        }
-
         // Advanced search filters may have set a group by and if so, let's remove it for the count.
         if ($groupBy = $dq->getQueryPart('groupBy')) {
             $dq->resetQueryPart('groupBy');

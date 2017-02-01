@@ -1871,43 +1871,6 @@ class MailHelper
     }
 
     /**
-     * @param Lead $lead
-     */
-    public function applyFrequencyRules(Lead $lead)
-    {
-        $frequencyRule = $lead->getFrequencyRules();
-
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
-
-        $statRepo = $emailModel->getStatRepository();
-
-        $now      = new \DateTime();
-        $channels = $frequencyRule['channels'];
-
-        if (!empty($frequencyRule) && !empty($channels) && in_array('email', $channels, true)) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
-            $frequencyNumber = $frequencyRule['frequency_number'];
-        } elseif ($this->factory->getParameter('frequency_number') > 0) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
-            $frequencyNumber = $this->factory->getParameter('frequency_number');
-        }
-
-        if (isset($frequencyTime)) {
-            $now->sub($frequencyTime);
-            $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
-        }
-
-        if (!empty($sentQuery) and count($sentQuery) < $frequencyNumber) {
-            return true;
-        } elseif (empty($sentQuery)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Clean the name - if empty, set as null to ensure pretty headers.
      *
      * @param $name

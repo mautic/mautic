@@ -161,8 +161,14 @@ class DynamicContentRepository extends CommonRepository
         $q->select('partial e.{id, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.name', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                  ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('e.name', ':search'))
+                  ->setParameter('search', "%{$search}%");
+            }
         }
 
         if (!$viewOther) {

@@ -227,8 +227,11 @@ class FilterType extends AbstractType
                         }
                     }
 
-                    $list    = $field['properties']['list'];
-                    $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
+                    $choices = [];
+                    if (!empty($field['properties']['list'])) {
+                        $list    = $field['properties']['list'];
+                        $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
+                    }
 
                     if ('select' == $fieldType) {
                         // array_unshift cannot be used because numeric values get lost as keys
@@ -241,18 +244,20 @@ class FilterType extends AbstractType
                     break;
                 case 'lookup':
                 default:
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                    if ('number' !== $fieldType) {
+                        $attr = array_merge(
+                            $attr,
+                            [
+                                'data-toggle' => 'field-lookup',
+                                'data-target' => $data['field'],
+                                'data-action' => 'lead:fieldList',
+                                'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                            ]
+                        );
 
-                    if (isset($field['properties']['list'])) {
-                        $attr['data-options'] = $field['properties']['list'];
+                        if (isset($field['properties']['list'])) {
+                            $attr['data-options'] = $field['properties']['list'];
+                        }
                     }
 
                     break;

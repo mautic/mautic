@@ -285,7 +285,7 @@ class EventRepository extends CommonRepository
             ->setParameter('true', true, 'boolean');
 
         if ($count) {
-            $q->select('COUNT(IDENTITY(o)) as event_count');
+            $q->select('COUNT(o) as event_count');
 
             $results = $results = $q->getQuery()->getArrayResult();
             $count   = $results[0]['event_count'];

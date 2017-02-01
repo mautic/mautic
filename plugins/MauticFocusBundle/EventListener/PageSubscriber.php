@@ -66,13 +66,8 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection('mautic.focustokens', 'mautic.focus.focus_items', $tokenHelper->getTokenContent());
-        }
-
         if ($event->tokensRequested($this->regex)) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
             $event->addTokensFromHelper($tokenHelper, $this->regex, 'name', 'id', true);
         }
     }

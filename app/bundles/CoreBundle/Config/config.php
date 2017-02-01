@@ -178,6 +178,12 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.core.assets.subscriber' => [
+                'class'     => 'Mautic\CoreBundle\EventListener\AssetsSubscriber',
+                'arguments' => [
+                    'templating.helper.assets',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.spacer' => [
@@ -331,8 +337,10 @@ return [
             ],
             'mautic.helper.template.canvas' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SidebarCanvasHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'canvas',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+                'alias' => 'canvas',
             ],
             'mautic.helper.template.button' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
@@ -342,6 +350,14 @@ return [
                     'event_dispatcher',
                 ],
                 'alias' => 'buttons',
+            ],
+            'mautic.helper.template.content' => [
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\ContentHelper',
+                'arguments' => [
+                    'templating',
+                    'event_dispatcher',
+                ],
+                'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
@@ -425,8 +441,9 @@ return [
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
                 'arguments' => [
-                    '%kernel.environment%',
                     'monolog.logger.mautic',
+                    'monolog.logger',
+                    "@=container.has('monolog.logger.chrome') ? container.get('monolog.logger.chrome') : null",
                 ],
                 'tag' => 'kernel.event_subscriber',
             ],
@@ -440,10 +457,12 @@ return [
             ],
 
             // Template helper overrides
-            'templating.helper.assets.class' => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
-            'templating.helper.slots.class'  => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
-            'templating.name_parser.class'   => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-            'templating.helper.form.class'   => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
+            'templating.helper.assets.class'    => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
+            'templating.helper.slots.class'     => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
+            'templating.name_parser.class'      => 'Mautic\CoreBundle\Templating\TemplateNameParser',
+            'templating.helper.form.class'      => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
+            'templating.engine.php.class'       => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
+            'debug.templating.engine.php.class' => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
             // Translator overrides
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
@@ -637,6 +656,18 @@ return [
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
+            // Form extensions
+            'mautic.form.extension.custom' => [
+                'class'     => 'Mautic\CoreBundle\Form\Extension\CustomFormExtension',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+                'tag'          => 'form.type_extension',
+                'tagArguments' => [
+                    'alias' => 'form',
+                ],
+            ],
+
             // Twig
             'templating.twig.extension.slot' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
@@ -705,11 +736,13 @@ return [
             'mautic.core.model.form' => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
             ],
+            /* @deprecated - 2.4 to be removed in 3.0; use mautic.channel.model.queue instead */
             'mautic.core.model.messagequeue' => [
                 'class'     => 'Mautic\CoreBundle\Model\MessageQueueModel',
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

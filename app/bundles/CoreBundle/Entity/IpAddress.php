@@ -77,7 +77,6 @@ class IpAddress
             ->addListProperties(
                 [
                     ['ipAddress', 'ip'],
-                    ['ipDetails', 'details'],
                 ]
             )
             ->addProperties(

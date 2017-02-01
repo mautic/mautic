@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_form_pagetoken_index' => [
-                'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_formaction_action' => [
                 'path'       => '/forms/action/{objectAction}/{objectId}',
                 'controller' => 'MauticFormBundle:Action:execute',

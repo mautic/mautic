@@ -168,7 +168,8 @@ class EventLogApiController extends CommonApiController
             ],
             ($created) ? Codes::HTTP_CREATED : Codes::HTTP_OK
         );
-        $this->serializerGroups[] = 'campaignEventWithLogsList';
+        $this->serializerGroups[] = 'campaignEventWithLogsDetails';
+        $this->serializerGroups[] = 'campaignBasicList';
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

@@ -25,6 +25,7 @@ use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -187,6 +188,9 @@ class CommonController extends Controller implements MauticController
      */
     public function delegateView($args)
     {
+        // Used for error handling
+        defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
+
         if (!is_array($args)) {
             $args = [
                 'contentTemplate' => $args,
@@ -198,6 +202,15 @@ class CommonController extends Controller implements MauticController
 
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
+        }
+
+        if (!isset($args['viewParameters']['mauticContent'])) {
+            if (isset($args['passthroughVars']['mauticContent'])) {
+                $mauticContent = $args['passthroughVars']['mauticContent'];
+            } else {
+                $mauticContent = strtolower($this->request->get('bundle'));
+            }
+            $args['viewParameters']['mauticContent'] = $mauticContent;
         }
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
@@ -301,6 +314,8 @@ class CommonController extends Controller implements MauticController
      */
     public function ajaxAction($args = [])
     {
+        defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
+
         $parameters      = array_key_exists('viewParameters', $args) ? $args['viewParameters'] : [];
         $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : [];
@@ -351,7 +366,12 @@ class CommonController extends Controller implements MauticController
                 //directly parsing the template
                 $query              = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
                 $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
-                $newContent         = $newContentResponse->getContent();
+                if ($newContentResponse instanceof RedirectResponse) {
+                    $passthrough['redirect'] = $newContentResponse->getTargetUrl();
+                    $passthrough['route']    = false;
+                } else {
+                    $newContent = $newContentResponse->getContent();
+                }
             } else {
                 $newContent = $this->renderView($contentTemplate, $parameters);
             }
@@ -435,7 +455,7 @@ class CommonController extends Controller implements MauticController
             return $this->{"{$objectAction}Action"}($objectId, $objectModel);
         }
 
-        return $this->accessDenied();
+        return $this->notFound();
     }
 
     /**
@@ -473,7 +493,9 @@ class CommonController extends Controller implements MauticController
     /**
      * Generate 404 not found message.
      *
-     * @param string $msg Message to log
+     * @param string $msg
+     *
+     * @return Response
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
@@ -504,30 +526,36 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Updates list filters, order, limit.
+     *
+     * @param null $name
      */
-    protected function setListFilters()
+    protected function setListFilters($name = null)
     {
         $session = $this->get('session');
-        $name    = InputHelper::clean($this->request->query->get('name'));
+
+        if (null === $name) {
+            $name = InputHelper::clean($this->request->query->get('name'));
+        }
+        $name = 'mautic.'.$name;
 
         if (!empty($name)) {
             if ($this->request->query->has('orderby')) {
                 $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
-                $dir     = $session->get("mautic.$name.orderbydir", 'ASC');
+                $dir     = $session->get("$name.orderbydir", 'ASC');
                 $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
-                $session->set("mautic.$name.orderby", $orderBy);
-                $session->set("mautic.$name.orderbydir", $dir);
+                $session->set("$name.orderby", $orderBy);
+                $session->set("$name.orderbydir", $dir);
             }
 
             if ($this->request->query->has('limit')) {
                 $limit = InputHelper::int($this->request->query->get('limit'));
-                $session->set("mautic.$name.limit", $limit);
+                $session->set("$name.limit", $limit);
             }
 
             if ($this->request->query->has('filterby')) {
                 $filter  = InputHelper::clean($this->request->query->get('filterby'), true);
                 $value   = InputHelper::clean($this->request->query->get('value'), true);
-                $filters = $session->get("mautic.$name.filters", []);
+                $filters = $session->get("$name.filters", []);
 
                 if ($value == '') {
                     if (isset($filters[$filter])) {
@@ -542,7 +570,7 @@ class CommonController extends Controller implements MauticController
                     ];
                 }
 
-                $session->set("mautic.$name.filters", $filters);
+                $session->set("$name.filters", $filters);
             }
         }
     }
@@ -552,25 +580,52 @@ class CommonController extends Controller implements MauticController
      *
      * @param Form   $form
      * @param string $template
-     * @param mixed  $theme
+     * @param mixed  $themes
      *
      * @return \Symfony\Component\Form\FormView
      */
-    protected function setFormTheme(Form $form, $template, $theme = null)
+    protected function setFormTheme(Form $form, $template, $themes = null)
     {
         $formView = $form->createView();
 
-        if (empty($theme)) {
+        // Extract form theme from options if applicable
+        $fieldThemes = [];
+        $findThemes  = function ($form, &$themes) use (&$findThemes) {
+            /** @var Form $field */
+            foreach ($form as $field) {
+                if ($theme = $field->getConfig()->getOption('default_theme')) {
+                    $themes[] = $theme;
+                }
+
+                if ($field->count()) {
+                    $findThemes($field, $themes);
+                }
+            }
+        };
+
+        $findThemes($form, $fieldThemes);
+        if (count($fieldThemes)) {
+            if (null === $themes) {
+                $themes = $fieldThemes;
+            } elseif (is_array($themes)) {
+                $themes = array_merge($fieldThemes, $themes);
+            } else {
+                $fieldThemes[] = $themes;
+                $themes        = $fieldThemes;
+            }
+            $themes = array_values(array_unique($themes));
+        }
+
+        if (empty($themes)) {
             return $formView;
         }
 
-        $templating = $this->factory->getTemplating();
-
+        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
         if ($templating instanceof DelegatingEngine) {
-            $templating->getEngine($template)->get('form')->setTheme($formView, $theme);
-        } else {
-            $templating->get('form')->setTheme($formView, $theme);
+            $templating = $templating->getEngine($template);
         }
+
+        $templating->get('form')->setTheme($formView, $themes);
 
         return $formView;
     }

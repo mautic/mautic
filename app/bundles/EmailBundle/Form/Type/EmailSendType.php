@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -153,14 +153,14 @@ class EmailSendType extends AbstractType
                     'choice',
                     [
                         'choices' => [
-                            MessageQueue::PRIORITY_NORMAL => 'mautic.core.message.send.priority.normal',
-                            MessageQueue::PRIORITY_HIGH   => 'mautic.core.message.send.priority.high',
+                            MessageQueue::PRIORITY_NORMAL => 'mautic.channel.message.send.priority.normal',
+                            MessageQueue::PRIORITY_HIGH   => 'mautic.channel.message.send.priority.high',
                         ],
-                        'label'    => 'mautic.core.message.send.priority',
+                        'label'    => 'mautic.channel.message.send.priority',
                         'required' => false,
                         'attr'     => [
                             'class'        => 'form-control',
-                            'tooltip'      => 'mautic.core.message.send.priority.tooltip',
+                            'tooltip'      => 'mautic.channel.message.send.priority.tooltip',
                             'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'        => $data,
@@ -173,10 +173,10 @@ class EmailSendType extends AbstractType
                     'attempts',
                     'number',
                     [
-                        'label' => 'mautic.core.message.send.attempts',
+                        'label' => 'mautic.channel.message.send.attempts',
                         'attr'  => [
                             'class'        => 'form-control',
-                            'tooltip'      => 'mautic.core.message.send.attempts.tooltip',
+                            'tooltip'      => 'mautic.channel.message.send.attempts.tooltip',
                             'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'       => $data,

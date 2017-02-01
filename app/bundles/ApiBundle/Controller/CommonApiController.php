@@ -53,6 +53,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $customSelectRequested = false;
 
     /**
+     * @var array
+     */
+    protected $dataInputMasks = [];
+
+    /**
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
@@ -79,11 +84,6 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $entityNameOne;
 
     /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
      * Custom JMS strategies to add to the view's context.
      *
      * @var array
@@ -96,6 +96,11 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var array
      */
     protected $extraGetEntitiesArguments = [];
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
 
     /**
      * @var bool
@@ -159,11 +164,6 @@ class CommonApiController extends FOSRestController implements MauticController
      * @var User
      */
     protected $user;
-
-    /**
-     * @var array
-     */
-    protected $dataInputMasks = [];
 
     /**
      * Delete a batch of entities.
@@ -495,7 +495,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return array
      */
-    public function getFormErrorMessages(\Symfony\Component\Form\Form $form)
+    public function getFormErrorMessages(Form $form)
     {
         $errors = [];
 
@@ -1114,7 +1114,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $msg        = $this->getFormErrorMessage($formErrors);
 
             if (!$msg) {
-                $msg = 'Request data are not valid';
+                $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
             }
 
             return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
@@ -1163,7 +1163,8 @@ class CommonApiController extends FOSRestController implements MauticController
                     'code'    => $code,
                     'details' => $details,
                 ],
-            ]
+            ],
+            $code
         );
 
         return $this->handleView($view);

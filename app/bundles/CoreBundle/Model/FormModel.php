@@ -144,6 +144,10 @@ class FormModel extends AbstractCommonModel
      */
     public function isNewEntity($entity)
     {
+        if (method_exists($entity, 'isNew')) {
+            return $entity->isNew();
+        }
+
         if (method_exists($entity, 'getId')) {
             $isNew = ($entity->getId()) ? false : true;
         } else {
