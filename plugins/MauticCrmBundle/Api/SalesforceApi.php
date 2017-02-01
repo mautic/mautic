@@ -44,13 +44,13 @@ class SalesforceApi extends CrmApi
         }
 
         if (!$queryUrl) {
-            $queryUrl    = $this->integration->getApiUrl();
-            $request_url = sprintf($queryUrl.'/%s/%s', $object, $operation);
+            $queryUrl   = $this->integration->getApiUrl();
+            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
         } else {
-            $request_url = sprintf($queryUrl.'/%s', $operation);
+            $requestUrl = sprintf($queryUrl.'/%s', $operation);
         }
 
-        $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
@@ -79,6 +79,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param null|string $object
+     *
      * @return mixed
      */
     public function getLeadFields($object = null)
@@ -199,7 +201,8 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param string $query
+     * @param array  $query
+     * @param string $object
      *
      * @return mixed
      */
@@ -215,17 +218,24 @@ class SalesforceApi extends CrmApi
             }
         }
 
-        if ($object == 'Account') {
-            $fields = $this->integration->getFormCompanyFields();
-            $fields = $fields['company'];
-        } else {
-            $settings['feature_settings']['objects'][] = $object;
-            $fields                                    = $this->integration->getAvailableLeadFields($settings);
-            $fields                                    = $this->integration->amendToSfFields($fields);
+        $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        switch ($object) {
+            case 'company':
+            case 'Account':
+                $fields = array_keys(array_filter($fields['companyFields']));
+                break;
+            default:
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                }
         }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields = implode(', ', array_keys($fields));
+            $fields = implode(', ', $fields);
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {

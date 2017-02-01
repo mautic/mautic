@@ -335,4 +335,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         return $lead;
     }
+
+
+    /**
+     * @param $object
+     *
+     * @return array|mixed
+     */
+    protected function getFormFieldsByObject($object)
+    {
+        $settings['feature_settings']['objects'] = [$object => $object];
+
+        $fields = ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+
+        return (isset($fields[$object])) ? $fields[$object] : [];
+    }
 }
