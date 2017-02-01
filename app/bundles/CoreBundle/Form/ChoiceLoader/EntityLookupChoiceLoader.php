@@ -210,12 +210,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             if (is_array($choice)) {
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);
-
-                natcasesort($choice);
             }
         }
 
-        natcasesort($prepped);
+        array_multisort($prepped, SORT_NATURAL);
 
         return $isGrouped ? $prepped : array_flip($prepped);
     }
