@@ -161,6 +161,11 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $user;
 
     /**
+     * @var array
+     */
+    protected $dataInputMasks = [];
+
+    /**
      * Delete a batch of entities.
      *
      * @return array|Response
@@ -1071,7 +1076,7 @@ class CommonApiController extends FOSRestController implements MauticController
             return $submitParams;
         }
 
-        $this->prepareParametersFromRequest($form, $submitParams, $entity);
+        $this->prepareParametersFromRequest($form, $submitParams, $entity, $this->dataInputMasks);
 
         $form->submit($submitParams, 'PATCH' !== $method);
 

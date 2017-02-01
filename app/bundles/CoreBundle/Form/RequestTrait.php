@@ -20,8 +20,9 @@ trait RequestTrait
      * @param Form  $form
      * @param array $params
      * @param null  $entity
+     * @param array $masks
      */
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null)
+    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
     {
         // Special handling of some fields
         foreach ($form as $name => $child) {
@@ -79,6 +80,11 @@ trait RequestTrait
             }
         }
 
-        $params = InputHelper::cleanArray($params);
+        if (!isset($masks['description'])) {
+            // Add description to support strict HTML
+            $masks['description'] = 'strict_html';
+        }
+
+        $params = InputHelper::_($params, $masks);
     }
 }

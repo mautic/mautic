@@ -517,6 +517,8 @@ class LeadModel extends FormModel
             $this->prepareParametersFromRequest($form, $data, $lead);
             // Submit the data
             $form->submit($data);
+            // Use form processed data
+            $formData = [];
 
             if (!$form->isValid()) {
                 if ($form->getErrors()->count()) {
@@ -527,9 +529,13 @@ class LeadModel extends FormModel
                         $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
+                    } else {
+                        $formData[$field] = $formField->getData();
                     }
                 }
             }
+
+            $data = $formData;
         }
 
         //update existing values
