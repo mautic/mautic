@@ -11,14 +11,13 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,26 +25,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class DynamicContentFilterEntryFiltersType extends AbstractType
 {
-    private $operatorChoices = [];
     private $translator;
 
     /**
      * DynamicContentFilterEntryFiltersType constructor.
      *
-     * @param MauticFactory $factory
-     * @param ListModel     $listModel
+     * @param TranslatorInterface $translator
      */
-    public function __construct(MauticFactory $factory, ListModel $listModel)
+    public function __construct(TranslatorInterface $translator)
     {
-        $operatorChoices = $listModel->getFilterExpressionFunctions();
-
-        foreach ($operatorChoices as $key => $value) {
-            if (empty($value['hide'])) {
-                $this->operatorChoices[$key] = $value['label'];
-            }
-        }
-
-        $this->translator = $factory->getTranslator();
+        $this->translator = $translator;
     }
 
     /**
@@ -70,10 +59,8 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             ]
         );
 
-        $translator      = $this->translator;
-        $operatorChoices = $this->operatorChoices;
-
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices) {
+        $translator   = $this->translator;
+        $formModifier = function (FormEvent $event, $eventName) use ($translator) {
             $data    = $event->getData();
             $form    = $event->getForm();
             $options = $form->getConfig()->getOptions();
@@ -88,6 +75,14 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             ];
             $displayType = 'hidden';
             $displayAttr = [];
+
+            $field = [];
+
+            if (isset($options['fields']['lead'][$fieldName])) {
+                $field = $options['fields']['lead'][$fieldName];
+            } elseif (isset($options['fields']['company'][$fieldName])) {
+                $field = $options['fields']['company'][$fieldName];
+            }
 
             $customOptions = [];
 
@@ -259,24 +254,15 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 ]
             );
 
-            $choices = $operatorChoices;
-            if (isset($options['fields'][$fieldObject][$fieldName]['operators']['include'])) {
-                // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['include']));
-            } elseif (isset($options['fields'][$fieldObject][$fieldName]['operators']['exclude'])) {
-                // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($options['fields'][$fieldObject][$fieldName]['operators']['exclude']));
-            }
-
             $form->add(
                 'operator',
                 'choice',
                 [
                     'label'   => false,
-                    'choices' => $choices,
+                    'choices' => isset($field['operators']) ? $field['operators'] : [],
                     'attr'    => [
                         'class'    => 'form-control not-chosen',
-                        'onchange' => 'Mautic.convertDynamicContentFilterInput(this)',
+                        'onchange' => 'Mautic.convertLeadFilterInput(this)',
                     ],
                 ]
             );

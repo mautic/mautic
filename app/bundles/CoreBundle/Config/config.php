@@ -280,8 +280,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'alias'     => 'dynamic_content_filter_entry_filters',
                 'arguments' => [
-                    'mautic.factory',
-                    'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
             'mautic.form.type.entity_lookup' => [

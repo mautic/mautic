@@ -4163,6 +4163,114 @@ var Mautic = {
             return id.val().match("^new_");
         }
         return null;
+    },
+
+    /**
+     * Updates operator select and value input format based on selected field and operator
+     *
+     * @param field
+     * @param action
+     */
+    updateFieldOperatorValue: function(field, action) {
+        var fieldId = mQuery(field).attr('id');
+        Mautic.activateLabelLoadingIndicator(fieldId);
+
+        if (fieldId.indexOf('_operator') !== -1) {
+            var fieldType = 'operator';
+        } else if (fieldId.indexOf('_field') !== -1) {
+            var fieldType = 'field';
+        } else {
+            return;
+        }
+
+        var fieldPrefix = fieldId.slice(0,-1 * fieldType.length);
+        var fieldAlias = mQuery('#'+fieldPrefix+'field').val();
+        var fieldOperator = mQuery('#'+fieldPrefix+'operator').val();
+
+        Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
+            if (typeof response.options != 'undefined') {
+                var valueField = mQuery('#'+fieldPrefix+'value');
+                var valueFieldAttrs = {
+                    'class': valueField.attr('class'),
+                    'id': valueField.attr('id'),
+                    'name': valueField.attr('name'),
+                    'autocomplete': valueField.attr('autocomplete'),
+                    'value': valueField.attr('value')
+                };
+
+                if (mQuery('#'+fieldPrefix+'value_chosen').length) {
+                    mQuery('#'+fieldPrefix+'value').chosen('destroy');
+                }
+
+                if (!mQuery.isEmptyObject(response.options)) {
+                    var newValueField = mQuery('<select/>')
+                        .attr('class', valueFieldAttrs['class'])
+                        .attr('id', valueFieldAttrs['id'])
+                        .attr('name', valueFieldAttrs['name'])
+                        .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                        .attr('value', valueFieldAttrs['value']);
+                    mQuery.each(response.options, function(optionKey, optionVal) {
+                        var option = mQuery("<option/>")
+                            .attr('value', optionKey)
+                            .text(optionVal);
+                        newValueField.append(option);
+                    });
+                    valueField.replaceWith(newValueField);
+
+                    Mautic.activateChosenSelect(newValueField);
+                } else {
+                    var newValueField = mQuery('<input/>')
+                        .attr('type', 'text')
+                        .attr('class', valueFieldAttrs['class'])
+                        .attr('id', valueFieldAttrs['id'])
+                        .attr('name', valueFieldAttrs['name'])
+                        .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                        .attr('value', valueFieldAttrs['value']);
+
+                    if (response.disabled) {
+                        newValueField.prop('disabled', true);
+                    }
+
+                    valueField.replaceWith(newValueField);
+
+                    if (response.fieldType == 'date' || response.fieldType == 'datetime') {
+                        Mautic.activateDateTimeInputs(newValueField, response.fieldType);
+                    }
+                }
+
+                if (!mQuery.isEmptyObject(response.operators)) {
+                    if (mQuery('#'+fieldPrefix+'operator_chosen').length) {
+                        mQuery('#'+fieldPrefix+'operator').chosen('destroy');
+                    }
+
+                    var operatorField = mQuery('#'+fieldPrefix+'operator');
+                    var operatorFieldAttrs = {
+                        'class': operatorField.attr('class'),
+                        'id': operatorField.attr('id'),
+                        'name': operatorField.attr('name'),
+                        'autocomplete': operatorField.attr('autocomplete'),
+                        'value': operatorField.attr('value')
+                    };
+
+                    var newOperatorField = mQuery('<select/>')
+                        .attr('class', operatorFieldAttrs['class'])
+                        .attr('id', operatorFieldAttrs['id'])
+                        .attr('name', operatorFieldAttrs['name'])
+                        .attr('autocomplete', operatorFieldAttrs['autocomplete'])
+                        .attr('value', operatorFieldAttrs['value'])
+                        .attr('onchange', 'Mautic.updateLeadFieldValues(this)');
+                    mQuery.each(response.operators, function(optionKey, optionVal) {
+                        var option = mQuery("<option/>")
+                            .attr('value', optionKey)
+                            .text(optionVal);
+                        newOperatorField.append(option);
+                    });
+                    operatorField.replaceWith(newOperatorField);
+                    Mautic.activateChosenSelect(newOperatorField);
+                }
+            }
+            Mautic.removeLabelLoadingIndicator();
+        });
     }
 };
 

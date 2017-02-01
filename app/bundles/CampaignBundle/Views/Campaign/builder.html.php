@@ -278,7 +278,7 @@
     };
 
     Mautic.campaignBuilderConnectionRestrictions = {
-        <?php foreach ($eventSettings['connectionResrictions'] as $group => $groupRestrictions): ?>
+        <?php foreach ($eventSettings['connectionRestrictions'] as $group => $groupRestrictions): ?>
 
         '<?php echo $group; ?>': {
 
