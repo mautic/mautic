@@ -36,7 +36,7 @@ class ErrorHandlingListener implements EventSubscriberInterface
      * @param LoggerInterface $mainLogger
      * @param LoggerInterface $debugLogger
      */
-    public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger)
+    public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger = null)
     {
         ErrorHandler::getHandler()
             ->setLogger($logger)
