@@ -1282,6 +1282,53 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Match lead data with integration fields.
+     *
+     * @param $lead
+     * @param $config
+     *
+     * @return array
+     */
+    public function populateCompanyData($lead, $config = [])
+    {
+        if (!isset($config['companyFields'])) {
+            $config = $this->mergeConfigToFeatureSettings($config);
+
+            if (empty($config['companyFields'])) {
+                return [];
+            }
+        }
+
+        if ($lead instanceof Lead) {
+            $fields = $lead->getPrimaryCompany();
+        } else {
+            $fields = $lead['primaryCompany'];
+        }
+
+        $companyFields   = $config['companyFields'];
+        $availableFields = $this->getAvailableLeadFields($config)['company'];
+        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched         = [];
+
+        foreach ($availableFields as $key => $field) {
+            $integrationKey = $this->convertLeadFieldKey($key, $field);
+
+            if (isset($companyFields[$key])) {
+                $mauticKey = $companyFields[$key];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
+                    $matched[$integrationKey] = $fields[$mauticKey];
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$integrationKey])) {
+                $matched[$integrationKey] = $unknown;
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
      * Takes profile data from an integration and maps it to Mautic's lead fields.
      *
      * @param       $data

@@ -52,20 +52,7 @@ class NotificationController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
         $session = $this->get('session');
-
-        $listFilters = [
-            'filters' => [
-                'multiple' => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
 
         //set limits
         $limit = $session->get('mautic.notification.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -75,90 +62,13 @@ class NotificationController extends FormController
         }
 
         $search = $this->request->get('search', $session->get('mautic.notification.filter', ''));
-        $session->set('mautic.email.filter', $search);
+        $session->set('mautic.notification.filter', $search);
 
         $filter = ['string' => $search];
 
         if (!$permissions['notification:notifications:viewother']) {
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
-
-        //retrieve a list of categories
-        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
-            'options' => $this->getModel('category')->getLookupResults('email', '', 0),
-            'prefix'  => 'category',
-        ];
-
-        //retrieve a list of Lead Lists
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $this->getModel('lead.list')->getUserLists(),
-            'prefix'  => 'list',
-        ];
-
-        //retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->factory->getInstalledThemes('email'),
-            'prefix'  => 'theme',
-        ];
-
-        $currentFilters = $session->get('mautic.notification.list_filters', []);
-        $updatedFilters = $this->request->get('filters', false);
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.notification.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $listIds = $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $listIds[] = (int) $fltr;
-                            break;
-                        case 'category':
-                            $catIds[] = (int) $fltr;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
         }
 
         $orderBy    = $session->get('mautic.notification.orderby', 'e.name');
@@ -204,7 +114,6 @@ class NotificationController extends FormController
             [
                 'viewParameters' => [
                     'searchValue' => $search,
-                    'filters'     => $listFilters,
                     'items'       => $notifications,
                     'totalItems'  => $count,
                     'page'        => $page,

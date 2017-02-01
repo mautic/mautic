@@ -28,8 +28,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -71,6 +73,16 @@ class EventModel extends CommonFormModel
     protected $campaignModel;
 
     /**
+     * @var UserModel
+     */
+    protected $userModel;
+
+    /**
+     * @var NotificationModel
+     */
+    protected $notificationModel;
+
+    /**
      * @var mixed
      */
     protected $scheduleTimeForFailedEvents;
@@ -94,13 +106,17 @@ class EventModel extends CommonFormModel
      * @param CoreParametersHelper $coreParametersHelper
      * @param LeadModel            $leadModel
      * @param CampaignModel        $campaignModel
+     * @param UserModel            $userModel
+     * @param NotificationModel    $notificationModel
      * @param MauticFactory        $factory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, CampaignModel $campaignModel, MauticFactory $factory)
+    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, CampaignModel $campaignModel, UserModel $userModel, NotificationModel $notificationModel, MauticFactory $factory)
     {
         $this->ipLookupHelper              = $ipLookupHelper;
         $this->leadModel                   = $leadModel;
         $this->campaignModel               = $campaignModel;
+        $this->userModel                   = $userModel;
+        $this->notificationModel           = $notificationModel;
         $this->batchSleepTime              = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
         $this->batchCampaignSleepTime      = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
         $this->scheduleTimeForFailedEvents = $coreParametersHelper->getParameter('campaign_time_wait_on_event_false');
@@ -1628,6 +1644,32 @@ class EventModel extends CommonFormModel
                     // Remove
                     $debug .= ' thus deleted';
                     $repo->deleteEntity($log);
+                }
+
+                // Notify the lead owner if there is one otherwise campaign creator that there was a failure
+                if (!$owner = $lead->getOwner()) {
+                    $ownerId = $campaign->getCreatedBy();
+                    $owner   = $this->userModel->getEntity($ownerId);
+                }
+
+                if ($owner && $owner->getId()) {
+                    $this->notificationModel->addNotification(
+                        $campaign->getName().' / '.$event['name'],
+                        'error',
+                        false,
+                        $this->translator->trans(
+                            'mautic.campaign.event.failed',
+                            [
+                                '%contact%' => '<a href="'.$this->router->generate(
+                                        'mautic_contact_action',
+                                        ['objectAction' => 'view', 'objectId' => $lead->getId()]
+                                    ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
+                            ]
+                        ),
+                        null,
+                        null,
+                        $owner
+                    );
                 }
 
                 $this->logger->debug($debug);

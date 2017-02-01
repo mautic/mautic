@@ -296,7 +296,7 @@ class FormEntity extends CommonEntity
     /**
      * Get createdBy.
      *
-     * @return User
+     * @return int
      */
     public function getCreatedBy()
     {

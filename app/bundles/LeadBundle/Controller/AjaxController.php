@@ -834,38 +834,6 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getLeadFieldsPerObjectAction(Request $request)
-    {
-        $dataArray = ['success' => 1];
-
-        //$object = $request->request->get('object');
-
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                 'filter' => [
-                     'force' => [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true,
-                    ],
-                    ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-          ]
-        );
-
-        if (is_object($fields)) {
-            $fields = $fields->getIterator()->getArrayCopy();
-        }
-
-        $dataArray['fields'] = json_encode($fields);
-
-        return $this->sendJsonResponse($fields);
-    }
 
     /**
      * @param Request $request

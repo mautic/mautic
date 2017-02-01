@@ -212,7 +212,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $name   = $parts[0];
                 }
 
-                $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
+                $timezones[$region][$timezone] = str_replace('_', ' ', $name);
             }
         }
 
