@@ -48,7 +48,8 @@ class GenerateMigrationsCommand extends AbstractCommand
 {
     private static $_template =
             '<?php
-/**
+
+/*
  * @package     Mautic
  * @copyright   <year> Mautic Contributors. All rights reserved.
  * @author      Mautic
