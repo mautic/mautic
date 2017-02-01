@@ -63,6 +63,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $mailHelper->method('queue')
             ->will($this->returnValue(true));
+        $mailHelper->method('setEmail')
+            ->will($this->returnValue(true));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
