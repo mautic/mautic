@@ -106,9 +106,9 @@ class FeatureSettingsType extends AbstractType
                     'companyFields',
                     'integration_company_fields',
                     [
-                        'label'                      => 'mautic.integration.comapanyfield_matches',
-                        'required'                   => false,
-                        'company_fields'             => $companyFields,
+                        'label'          => 'mautic.integration.comapanyfield_matches',
+                        'required'       => false,
+                        'company_fields' => $companyFields,
                         //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
                         'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,

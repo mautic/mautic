@@ -117,6 +117,10 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields()) {
+            return $fields;
+        }
+
         $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
@@ -161,6 +165,8 @@ class HubspotIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
+        $this->cache->set('leadFields', $hubsFields);
 
         return $hubsFields;
     }

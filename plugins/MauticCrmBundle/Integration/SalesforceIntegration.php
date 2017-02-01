@@ -184,6 +184,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array $settings
      *
      * @return array|mixed
+     *
+     * @throws \Exception
      */
     public function getFormLeadFields($settings = [])
     {
