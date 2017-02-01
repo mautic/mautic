@@ -144,7 +144,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
 
         if (filterType == 'multiselect') {
             valueName += '[]';
-            currentValue = currentValue.split(",");
+            currentValue = (typeof currentValue !== 'undefined') ? currentValue.split(",") : null;
         }
         var attr = {
             id: valueId,

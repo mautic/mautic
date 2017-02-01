@@ -298,6 +298,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $expr->in('lt.id', ":$paramName")
                         );
                         break;
+                    case 'notIn':
+                        if (!$filter['value']) {
+                            break;
+                        }
+                        $queryBuilder->setParameter($paramName, implode(',', $filter['value']));
+                        $filterExpr->add(
+                            $expr->notIn('lt.id', ":$paramName")
+                        );
+                        break;
                     default:
                         if (trim($filter['value']) == '') {
                             // Ignore empty
