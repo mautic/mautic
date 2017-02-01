@@ -40,6 +40,10 @@ return [
                 'path'            => '/campaigns',
                 'controller'      => 'MauticCampaignBundle:Api\CampaignApi',
             ],
+            'mautic_api_campaigngetcontacts' => [
+                'path'       => '/campaigns/{id}/contacts',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getContacts',
+            ],
             'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
