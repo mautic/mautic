@@ -211,7 +211,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);
 
-                natcasesort($prepped);
+                natcasesort($choice);
             }
         }
 
