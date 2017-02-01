@@ -70,6 +70,10 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
                 'method'     => 'GET',
             ],
+            'mautic_api_campaigngetcontacts' => [
+                'path'       => '/campaigns/{id}/contacts',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getContacts',
+            ],
             'mautic_api_campaignaddcontact' => [
                 'path'       => '/campaigns/{id}/contact/{leadId}/add',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',

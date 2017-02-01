@@ -56,8 +56,9 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($this->request->files) {
             foreach ($this->request->files as $file) {
-                if (in_array($file->guessExtension(), $this->allowedExtensions)) {
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                $extension = $file->guessExtension() ? $file->guessExtension() : $file->getClientOriginalExtension();
+                if (in_array($extension, $this->allowedExtensions)) {
+                    $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
                     if (substr($dir, 0, 6) === 'images') {

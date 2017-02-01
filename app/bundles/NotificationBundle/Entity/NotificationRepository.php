@@ -43,7 +43,7 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * Get amounts of sent and read emails.
+     * Get amounts of sent and read notifications.
      *
      * @return array
      */

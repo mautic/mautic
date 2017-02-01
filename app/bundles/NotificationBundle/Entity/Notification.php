@@ -261,6 +261,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(

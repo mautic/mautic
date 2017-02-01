@@ -21,6 +21,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
@@ -37,6 +38,23 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CommonApiController extends FOSRestController implements MauticController
 {
+    use RequestTrait;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var User
+     */
+    protected $user;
+
     /**
      * @var CoreParametersHelper
      */
@@ -1068,35 +1086,7 @@ class CommonApiController extends FOSRestController implements MauticController
             return $submitParams;
         }
 
-        // Special handling of some fields
-        foreach ($form as $name => $child) {
-            if (isset($submitParams[$name])) {
-                switch ($child->getConfig()->getType()->getName()) {
-                    case 'yesno_button_group':
-                        // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
-                        $setter = 'set'.ucfirst($name);
-                        $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
-
-                        try {
-                            $entity->$setter((int) $data);
-
-                            // Manually handled so remove from form processing
-                            unset($form[$name], $submitParams[$name]);
-                        } catch (\InvalidArgumentException $exception) {
-                            // Setter not found
-                        }
-                        break;
-                    case 'choice':
-                        if ($child->getConfig()->getOption('multiple')) {
-                            // Ensure the value is an array
-                            if (!is_array($submitParams[$name])) {
-                                $submitParams[$name] = [$submitParams[$name]];
-                            }
-                        }
-                        break;
-                }
-            }
-        }
+        $this->prepareParametersFromRequest($form, $submitParams, $entity);
 
         $form->submit($submitParams, 'PATCH' !== $method);
 

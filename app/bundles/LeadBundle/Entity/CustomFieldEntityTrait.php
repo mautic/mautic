@@ -138,6 +138,9 @@ trait CustomFieldEntityTrait
                     $oldValue = null;
                 }
             }
+        } elseif (is_array($value)) {
+            // Flatten the array
+            $value = implode('|', $value);
         }
 
         if ($oldValue !== $value) {
