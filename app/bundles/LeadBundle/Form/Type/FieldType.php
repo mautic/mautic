@@ -132,8 +132,31 @@ class FieldType extends AbstractType
             ]
         );
 
+        $listChoices = [
+            'country'  => FormFieldHelper::getCountryChoices(),
+            'region'   => FormFieldHelper::getRegionChoices(),
+            'timezone' => FormFieldHelper::getTimezonesChoices(),
+            'locale'   => FormFieldHelper::getLocaleChoices(),
+            'select'   => [],
+        ];
+
+        foreach ($listChoices as $listType => $choices) {
+            $builder->add(
+                'default_template_'.$listType,
+                'choice',
+                [
+                    'choices'    => $choices,
+                    'label'      => 'mautic.core.defaultvalue',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control not-chosen'],
+                    'required'   => false,
+                    'mapped'     => false,
+                ]
+            );
+        }
+
         $builder->add(
-            'default_template',
+            'default_template_text',
             'text',
             [
                 'label'      => 'mautic.core.defaultvalue',
@@ -145,7 +168,19 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
-            'default_bool_template',
+            'default_template_textarea',
+            'textarea',
+            [
+                'label'      => 'mautic.core.defaultvalue',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+                'mapped'     => false,
+            ]
+        );
+
+        $builder->add(
+            'default_template_boolean',
             'yesno_button_group',
             [
                 'label'       => 'mautic.core.defaultvalue',
@@ -179,7 +214,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event, $eventName) {
+        $formModifier = function (FormEvent $event) use ($listChoices) {
             $form = $event->getForm();
             $data = $event->getData();
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
@@ -188,8 +223,8 @@ class FieldType extends AbstractType
                 case 'multiselect':
                 case 'select':
                 case 'lookup':
-                    if (is_array($data) && isset($data['properties'])) {
-                        $properties = $data['properties'];
+                    if (is_array($data)) {
+                        $properties = isset($data['properties']) ? $data['properties'] : [];
                     } else {
                         $properties = $data->getProperties();
                     }
@@ -204,36 +239,33 @@ class FieldType extends AbstractType
                             'with_labels' => ('lookup' !== $type),
                         ]
                     );
+
+                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list']) : [];
+                    $form->add(
+                        'defaultValue',
+                        'choice',
+                        [
+                            'label'      => 'mautic.core.defaultvalue',
+                            'label_attr' => ['class' => 'control-label is-chosen'],
+                            'attr'       => ['class' => 'form-control'],
+                            'required'   => false,
+                            'choices'    => $list,
+                        ]
+                    );
                     break;
                 case 'country':
                 case 'locale':
                 case 'timezone':
                 case 'region':
-                    switch ($type) {
-                        case 'country':
-                            $choices = FormFieldHelper::getCountryChoices();
-                            break;
-                        case 'region':
-                            $choices = FormFieldHelper::getRegionChoices();
-                            break;
-                        case 'timezone':
-                            $choices = FormFieldHelper::getTimezonesChoices();
-                            break;
-                        case 'locale':
-                            $choices = FormFieldHelper::getLocaleChoices();
-                            break;
-                    }
-
                     $form->add(
                         'defaultValue',
                         'choice',
                         [
-                            'choices'    => $choices,
+                            'choices'    => $listChoices[$type],
                             'label'      => 'mautic.core.defaultvalue',
                             'label_attr' => ['class' => 'control-label'],
                             'attr'       => ['class' => 'form-control'],
                             'required'   => false,
-                            'data'       => !empty($value),
                         ]
                     );
                     break;
@@ -325,13 +357,35 @@ class FieldType extends AbstractType
                         'defaultValue',
                         'text',
                         [
-                            'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'attr'        => ['class' => 'form-control'],
+                            'label'      => 'mautic.core.defaultvalue',
+                            'label_attr' => ['class' => 'control-label'],
+                            'attr'       => [
+                                'class'       => 'form-control',
+                                'data-toggle' => $type,
+                            ],
                             'required'    => false,
                             'constraints' => $constraints,
                         ]
                     );
+                    break;
+                case 'number':
+                case 'tel':
+                case 'url':
+                case 'email':
+                    $form->add(
+                        'defaultValue',
+                        'text',
+                        [
+                            'label'      => 'mautic.core.defaultvalue',
+                            'label_attr' => ['class' => 'control-label'],
+                            'attr'       => [
+                                'class' => 'form-control',
+                                'type'  => $type,
+                            ],
+                            'required' => false,
+                        ]
+                    );
+
                 break;
             }
         };
@@ -339,14 +393,14 @@ class FieldType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SET_DATA);
+                $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SUBMIT);
+                $formModifier($event);
             }
         );
 
@@ -472,7 +526,7 @@ class FieldType extends AbstractType
                 'attr'              => [
                     'class' => 'form-control',
                 ],
-                'required' => true,
+                'required' => false,
                 'disabled' => ($disabled || !$new),
             ]
         );

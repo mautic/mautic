@@ -19,6 +19,20 @@ use Mautic\FormBundle\Model\FormModel;
  */
 class ResultController extends CommonFormController
 {
+    public function __construct()
+    {
+        $this->setStandardParameters(
+            'form.submission', // model name
+            'form:forms', // permission base
+            'mautic_form', // route base
+            'mautic.formresult', // session base
+            'mautic.form.result', // lang string base
+            'MauticFormBundle:Result', // template base
+            'mautic_form', // activeLink
+            'formresult' // mauticContent
+        );
+    }
+
     /**
      * @param int $objectId
      * @param int $page
@@ -234,70 +248,31 @@ class ResultController extends CommonFormController
     /**
      * Delete a form result.
      *
-     * @param     $formId
-     * @param int $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($formId, $objectId = 0)
+    public function deleteAction()
     {
-        $session = $this->get('session');
-        $page    = $session->get('mautic.formresult.page', 1);
-        $flashes = [];
+        $formId   = $this->request->get('formId', 0);
+        $objectId = $this->request->get('objectId', 0);
+        $session  = $this->get('session');
+        $page     = $session->get('mautic.formresult.page', 1);
+        $flashes  = [];
 
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('form.submission');
-            $ids   = json_decode($this->request->query->get('ids', ''));
 
-            if (!empty($ids)) {
-                $formModel = $this->getModel('form');
-                $form      = $formModel->getEntity($formId);
+            // Find the result
+            $entity = $model->getEntity($objectId);
 
-                if ($form === null) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $form->getCreatedBy())) {
-                    return $this->accessDenied();
-                } else {
-                    // Make sure IDs are part of this form
-                    $deleteIds = $model->getRepository()->validateSubmissions($ids, $formId);
-
-                    // Delete everything we are able to
-                    if (!empty($deleteIds)) {
-                        $entities = $model->deleteEntities($deleteIds);
-
-                        $flashes[] = [
-                            'type'    => 'notice',
-                            'msg'     => 'mautic.form.notice.batch_results_deleted',
-                            'msgVars' => [
-                                '%count%'     => count($entities),
-                                'pluralCount' => count($entities),
-                            ],
-                        ];
-                    }
-                }
+            if ($entity === null) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.form.error.notfound',
+                    'msgVars' => ['%id%' => $objectId],
+                ];
+            } elseif (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $entity->getCreatedBy())) {
+                return $this->accessDenied();
             } else {
-                // Find the result
-                $entity = $model->getEntity($objectId);
-
-                if ($entity === null) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } else {
-                    // Check to see if the user has form edit access
-                    $form = $entity->getForm();
-
-                    if (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $form->getCreatedBy())) {
-                        return $this->accessDenied();
-                    }
-                }
-
                 $model->deleteEntity($entity);
 
                 $flashes[] = [
@@ -311,7 +286,7 @@ class ResultController extends CommonFormController
         } //else don't do anything
 
         $viewParameters = [
-            'objectId' => $form->getId(),
+            'objectId' => $formId,
             'page'     => $page,
         ];
 
@@ -326,5 +301,17 @@ class ResultController extends CommonFormController
                 'flashes' => $flashes,
             ]
         );
+    }
+
+    /**
+     * Deletes a group of entities.
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction()
+    {
+        $viewParameters = ['objectId' => $this->request->get('formId', 0)];
+
+        return $this->batchDeleteStandard($viewParameters);
     }
 }

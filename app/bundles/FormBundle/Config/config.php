@@ -39,9 +39,9 @@ return [
                     'format' => 'csv',
                 ],
             ],
-            'mautic_form_results_delete' => [
-                'path'       => '/forms/results/{formId}/delete/{objectId}',
-                'controller' => 'MauticFormBundle:Result:delete',
+            'mautic_form_results_action' => [
+                'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
+                'controller' => 'MauticFormBundle:Result:execute',
                 'defaults'   => [
                     'objectId' => 0,
                 ],

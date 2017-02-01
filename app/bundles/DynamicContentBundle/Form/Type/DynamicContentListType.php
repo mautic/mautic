@@ -33,7 +33,7 @@ class DynamicContentListType extends AbstractType
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->viewOther = $factory->getSecurity()->isGranted('dynamicContent:dynamicContents:viewother');
+        $this->viewOther = $factory->getSecurity()->isGranted('dynamiccontent:dynamiccontents:viewother');
         $this->repo      = $factory->getModel('dynamicContent')->getRepository();
 
         $this->repo->setCurrentUser($factory->getUser());
