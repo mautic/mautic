@@ -453,6 +453,11 @@ class PageModel extends FormModel
             $lead = $this->leadModel->getContactFromRequest($query);
         }
 
+        if ($lead && !$lead->getId()) {
+            // Lead came from a non-trackable IP so ignore
+            return;
+        }
+
         if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
             // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
             // Multiply by -1 because Firgerprint2 seems to have it the other way around.
@@ -680,13 +685,23 @@ class PageModel extends FormModel
         } else {
             //use current URL
 
-            // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif') !== false) {
+            $isPageEvent = false;
+            if (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker')) !== false) {
+                // Tracking pixel is used
+                if ($request->server->get('QUERY_STRING')) {
+                    parse_str($request->server->get('QUERY_STRING'), $query);
+                    $isPageEvent = true;
+                }
+            } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
+                $query       = $request->request->all();
+                $isPageEvent = true;
+            }
+
+            if ($isPageEvent) {
                 $pageURL = $request->server->get('HTTP_REFERER');
 
                 // if additional data were sent with the tracking pixel
-                if ($request->server->get('QUERY_STRING')) {
-                    parse_str($request->server->get('QUERY_STRING'), $query);
+                if (isset($query)) {
 
                     // URL attr 'd' is encoded so let's decode it first.
                     $decoded = false;
