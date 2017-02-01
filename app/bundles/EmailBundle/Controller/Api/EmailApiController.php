@@ -32,7 +32,15 @@ class EmailApiController extends CommonApiController
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'leadListList'];
-        $this->dataInputMasks   = ['customHtml' => 'html'];
+        $this->dataInputMasks   = [
+            'customHtml'     => 'html',
+            'dynamicContent' => [
+                'content' => 'html',
+                'filters' => [
+                    'content' => 'html',
+                ],
+            ],
+        ];
 
         parent::initialize($event);
     }

@@ -85,6 +85,11 @@ trait RequestTrait
             $masks['description'] = 'strict_html';
         }
 
+        if (!isset($masks['content'])) {
+            // Assume HTML
+            $masks['description'] = 'html';
+        }
+
         $params = InputHelper::_($params, $masks);
     }
 }
