@@ -765,6 +765,12 @@ class AjaxController extends CommonAjaxController
         $leadField   = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
         $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date'];
 
+        if ($alias == 'notifications') {
+            $dataArray['options'] = [
+                0 => $this->translator->trans('mautic.core.form.no'),
+                1 => $this->translator->trans('mautic.core.form.yes'),
+            ];
+        }
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
             $properties    = $leadField->getProperties();
             $leadFieldType = $leadField->getType();

@@ -44,6 +44,7 @@ class LeadFieldsType extends AbstractType
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
+                $fieldList['Core']['notifications'] = 'mautic.lead.field.notifications';
 
                 return $fieldList;
             },
