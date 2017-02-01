@@ -857,7 +857,7 @@ class FormController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function batchDeleteStandard()
+    protected function batchDeleteStandard(array $viewParameters = [])
     {
         $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
         $returnUrl = $this->generateUrl($this->routeBase.'_index', ['page' => $page]);
@@ -865,7 +865,7 @@ class FormController extends CommonController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
+            'viewParameters'  => array_merge(['page' => $page], $viewParameters),
             'contentTemplate' => $this->templateBase.':index',
             'passthroughVars' => [
                 'activeLink'    => $this->activeLink,
@@ -924,5 +924,24 @@ class FormController extends CommonController
                 ]
             )
         );
+    }
+
+    /**
+     * @param Form $copyFrom
+     * @param Form $copyTo
+     */
+    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    {
+        /** @var $error FormError */
+        foreach ($copyFrom->getErrors() as $error) {
+            $copyTo->addError($error);
+        }
+
+        foreach ($copyFrom->all() as $key => $child) {
+            if ($child instanceof Form && $copyTo->has($key)) {
+                $childTo = $copyTo->get($key);
+                $this->copyErrorsRecursively($child, $childTo);
+            }
+        }
     }
 }
