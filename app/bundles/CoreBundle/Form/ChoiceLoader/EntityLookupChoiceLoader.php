@@ -159,6 +159,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             // Build choice list in case of different formats
             $choices = $this->fetchChoices($modelName, $data);
+
             if ($includeNew && !empty($data)) {
                 // Fetch some extra choices
                 $extraChoices = $this->fetchChoices($modelName);
@@ -170,7 +171,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                             if (!isset($choices[$k])) {
                                 $choices[$k] = $v;
                             } else {
-                                $choices[$k] = array_merge($choices[$k], $v);
+                                $choices[$k] = array_replace($choices[$k], $v);
                             }
                         } else {
                             $choices[$k] = $v;
@@ -189,7 +190,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // must be [$label => $id]
         $prepped = $this->prepareChoices($this->choices[$modelName]);
-        natcasesort($prepped);
+        array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
@@ -210,8 +211,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         foreach ($prepped as $key => &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
-                natcasesort($choice);
-                $choice = $this->prepareChoices($choice);
+                $choice    = $this->prepareChoices($choice);
             }
         }
 
