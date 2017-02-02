@@ -595,12 +595,13 @@ class EmailController extends FormController
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
+                    'updateSelect'  => $updateSelect,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'updateSelect'  => $updateSelect,
                     'route'         => $this->generateUrl(
                         'mautic_email_action',
                         [

@@ -19,6 +19,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Router;
@@ -120,39 +122,7 @@ class EntityLookupType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => function (Options $options) {
-                    return (!$options['required']) ? '' : false;
-                },
-                'attr' => function (Options $options) {
-                    $attr =
-                        [
-                            'class'              => "form-control {$options['model']}-select",
-                            'data-chosen-lookup' => $options['ajax_lookup_action'],
-                            'data-model'         => $options['model'],
-                        ];
-
-                    if (!empty($options['modal_route'])) {
-                        $attr = array_merge(
-                            $attr,
-                            [
-                                'data-new-route'          => $this->router->generate($options['modal_route'], $options['modal_route_parameters']),
-                                'data-header'             => $options['modal_header'] ? $this->translator->trans($options['modal_header']) : 'false',
-                                'data-chosen-placeholder' => $this->translator->trans('mautic.core.lookup.search_options', [], 'javascript'),
-                            ]
-                        );
-                    }
-
-                    if ($options['force_popup']) {
-                        $attr['data-popup'] = 'true';
-                    }
-
-                    if (!empty($options['custom_attr'])) {
-                        $attr = array_merge($attr, $options['custom_attr']);
-                    }
-
-                    return $attr;
-                },
-                'custom_attr' => [],
+                'empty_value' => '',
             ]
         );
     }
@@ -163,5 +133,32 @@ class EntityLookupType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $attr =
+            [
+                'class'              => "form-control {$options['model']}-select",
+                'data-chosen-lookup' => $options['ajax_lookup_action'],
+                'data-model'         => $options['model'],
+            ];
+
+        if (!empty($options['modal_route'])) {
+            $attr = array_merge(
+                $attr,
+                [
+                    'data-new-route'          => $this->router->generate($options['modal_route'], $options['modal_route_parameters']),
+                    'data-header'             => $options['modal_header'] ? $this->translator->trans($options['modal_header']) : 'false',
+                    'data-chosen-placeholder' => $this->translator->trans('mautic.core.lookup.search_options', [], 'javascript'),
+                ]
+            );
+        }
+
+        if ($options['force_popup']) {
+            $attr['data-popup'] = 'true';
+        }
+
+        $view->vars['attr'] = array_merge($view->vars['attr'], $attr);
     }
 }

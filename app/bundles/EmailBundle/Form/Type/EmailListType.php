@@ -60,6 +60,7 @@ class EmailListType extends AbstractType
                         ],
                     ];
                 },
+                //'modal_route_parameters' => 'template'
                 'email_type'     => 'template',
                 'top_level'      => 'variant',
                 'variant_parent' => null,

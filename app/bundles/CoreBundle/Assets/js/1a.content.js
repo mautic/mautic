@@ -833,12 +833,13 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal) {
                 // If the element is already in a modal then use a popup
                 if (mQuery(el).val() == 'new' && (mQuery(el).attr('data-popup') == "true" || mQuery(el).closest('.modal').length > 0)) {
                     var queryGlue = url.indexOf('?') >= 0 ? '&' : '?';
-                    Mautic.loadNewWindow({
-                        "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + mQuery(el).attr('id')
-                    });
                     // De-select the new select option
                     mQuery(el).find('option[value="new"]').prop('selected', false);
                     mQuery(el).trigger('chosen:updated');
+
+                    Mautic.loadNewWindow({
+                        "windowUrl": url + queryGlue + "contentOnly=1&updateSelect=" + mQuery(el).attr('id')
+                    });
                 } else {
                     Mautic.loadAjaxModalBySelectValue(this, 'new', url, mQuery(el).attr('data-header'));
                 }
