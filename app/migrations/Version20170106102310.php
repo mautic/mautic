@@ -41,7 +41,7 @@ class Version20170106102310 extends AbstractMauticMigration
     {
         $sql = <<<SQL
 ALTER TABLE {$this->prefix}campaign_events
-  ADD channel VARCHAR(60) DEFAULT NULL, 
+  ADD channel VARCHAR(255) DEFAULT NULL, 
   ADD channel_id INTEGER DEFAULT NULL,
   ADD INDEX {$this->prefix}campaign_event_channel (channel, channel_id),
   DROP INDEX {$this->prefix}campaign_event_type_search,
@@ -57,8 +57,6 @@ ALTER TABLE {$this->prefix}campaign_lead_event_log
   ADD id INT AUTO_INCREMENT NOT NULL,
   ADD PRIMARY KEY(id),
   ADD rotation INTEGER NOT NULL DEFAULT 1,
-  ADD channel VARCHAR(60) DEFAULT NULL, 
-  ADD channel_id INTEGER DEFAULT NULL,
   ADD INDEX {$this->prefix}campaign_log_channel (channel, channel_id, lead_id),
   ADD UNIQUE INDEX {$this->prefix}campaign_rotation (event_id, lead_id, rotation),
   DROP INDEX {$this->prefix}campaign_leads,

@@ -150,7 +150,6 @@ class LeadEventLog
             ->build();
 
         $builder->createField('channel', 'string')
-                ->length(60)
                 ->nullable()
                 ->build();
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
