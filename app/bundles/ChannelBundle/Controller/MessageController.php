@@ -140,7 +140,7 @@ class MessageController extends AbstractStandardFormController
     protected function getPostActionRedirectArguments(array $args, $action)
     {
         switch ($action) {
-            case 'edit':
+            default:
                 $args['contentTemplate'] = $this->getControllerBase().':index';
                 $args['returnUrl']       = $this->generateUrl($this->getIndexRoute());
                 break;

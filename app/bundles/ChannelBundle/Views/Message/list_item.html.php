@@ -11,6 +11,7 @@
 
 /** @var \Mautic\ChannelBundle\Entity\Message $item */
 $messageChannels = $item->getChannels();
+$channels        = [];
 if ($messageChannels) {
     foreach ($messageChannels as $channelName => $channel) {
         if (!$channel->getChannelId()) {
@@ -23,8 +24,6 @@ if ($messageChannels) {
                 $channelName
             );
     }
-} else {
-    $channels = [];
 }
 ?>
 

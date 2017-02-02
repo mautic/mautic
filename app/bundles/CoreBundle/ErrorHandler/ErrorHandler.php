@@ -261,7 +261,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         public static function prepareExceptionForOutput($exception)
         {
             $inline = null;
-            if (!$exception instanceof \Exception) {
+            if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
                     $exception = new FatalThrowableError($exception);
                     $inline    = false;
@@ -282,8 +282,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ($previous = $exception->getPrevious()) {
-                $previous               = self::prepareExceptionForOutput($previous);
-                $previous['isPrevious'] = true;
+                if ($previous = self::prepareExceptionForOutput($previous)) {
+                    $previous['isPrevious'] = true;
+                }
             }
 
             $handlingException = true;
@@ -475,7 +476,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ($this->environment == 'dev' || $this->displayErrors) {
-                $error['file'] = str_replace(self::$root, '', $error['file']);
+                if (!isset($error['message'])) {
+                    die(var_dump($error));
+                }
+                $error['file'] = (isset($error['file'])) ? str_replace(self::$root, '', $error['file']) : 'unknown';
                 $message       = "{$error['message']} - in file {$error['file']} - at line {$error['line']}";
             } else {
                 $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
