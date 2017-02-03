@@ -304,13 +304,13 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         // Organize by lead
-        $leads = [];
+        $logs = [];
         foreach ($results as $e) {
-            $leads[$e['lead_id']][$e['event_id']] = $e;
+            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
         }
         unset($results);
 
-        return $leads;
+        return $logs;
     }
 
     /**
