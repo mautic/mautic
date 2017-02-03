@@ -249,7 +249,7 @@ return [
                 'mautic.companies.menu.index' => [
                     'route'     => 'mautic_company_index',
                     'iconClass' => 'fa-building-o',
-                    'access'    => ['lead:leads:viewother'],
+                    'access'    => ['lead:companies:view'],
                     'priority'  => 75,
                 ],
                 'mautic.lead.list.menu.index' => [

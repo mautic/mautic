@@ -32,15 +32,17 @@ class CompanyController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editother',
-                'lead:leads:deleteother',
+                'lead:companies:view',
+                'lead:companies:edit',
+                'lead:companies:create',
+                'lead:companies:delete',
+                'lead:companies:publish',
+                'lead:companies:full',
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:companies:view']) {
             return $this->accessDenied();
         }
 
@@ -143,7 +145,7 @@ class CompanyController extends FormController
             $entity = $model->getEntity();
         }
 
-        if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
+        if (!$this->get('mautic.security')->isGranted(['lead:companies:create'])) {
             return $this->accessDenied();
         }
 
@@ -506,7 +508,15 @@ class CompanyController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
+            $permissions = $this->get('mautic.security')->isGranted(
+                [
+                    'lead:companies:create',
+                    'lead:companies:full',
+                ],
+                'RETURN_ARRAY'
+            );
+
+            if (!$this->get('mautic.security')->isGranted('lead:companies:view')) {
                 return $this->accessDenied();
             }
 
@@ -549,7 +559,7 @@ class CompanyController extends FormController
                     'msg'     => 'mautic.company.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
+            } elseif (!$this->get('mautic.security')->isGranted('lead:companies:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'lead.company');
@@ -613,7 +623,7 @@ class CompanyController extends FormController
                         'msg'     => 'mautic.company.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
+                } elseif (!$this->get('mautic.security')->isGranted('lead:companies:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.company', true);
@@ -658,10 +668,10 @@ class CompanyController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
-                'lead:leads:viewother',
+                'lead:companies:view',
                 'lead:leads:create',
-                'lead:leads:editother',
-                'lead:leads:deleteother',
+                'lead:leads:edit',
+                'lead:leads:delete',
             ],
             'RETURN_ARRAY'
         );
@@ -734,7 +744,7 @@ class CompanyController extends FormController
                                 ]
                             )
                         );
-                    } elseif (!$permissions['lead:leads:editother']) {
+                    } elseif (!$permissions['lead:company:edit']) {
                         return $this->accessDenied();
                     } elseif ($model->isLocked($secondaryCompany)) {
                         //deny access if the entity is locked

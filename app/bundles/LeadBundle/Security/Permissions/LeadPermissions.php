@@ -35,6 +35,8 @@ class LeadPermissions extends AbstractPermissions
             ],
         ];
         $this->addExtendedPermissions('leads', false);
+
+        $this->addStandardPermissions('companies');
     }
 
     /**
@@ -57,6 +59,8 @@ class LeadPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
+
+        $this->addStandardFormFields('company', 'companies', $builder, $data);
 
         $builder->add('lead:lists', 'permissionlist', [
             'choices' => [
@@ -93,7 +97,7 @@ class LeadPermissions extends AbstractPermissions
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
             (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
-            (isset($permissions['lists']) || isset($permission['fields']))
+            (isset($permissions['lists']) || isset($permissions['companies']) || isset($permission['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }
