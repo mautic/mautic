@@ -185,6 +185,11 @@ class LeadSubscriber extends CommonSubscriber
         $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
+    /**
+     * @param LeadTimelineEvent $event
+     * @param                   $eventTypeKey
+     * @param                   $eventTypeName
+     */
     protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
@@ -215,11 +220,13 @@ class LeadSubscriber extends CommonSubscriber
 
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled
-                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled').'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
+                        .'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
 
                 if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed'])) {
-                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error').'" class="fa fa-warning text-danger"></i>';
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
+                        .'" class="fa fa-warning text-danger"></i>';
                 }
 
                 $event->addEvent(
@@ -235,7 +242,8 @@ class LeadSubscriber extends CommonSubscriber
                         'eventType' => $eventTypeName,
                         'timestamp' => $log['dateTriggered'],
                         'extra'     => [
-                            'log' => $log,
+                            'log'                   => $log,
+                            'campaignEventSettings' => $eventSettings,
                         ],
                         'contentTemplate' => $template,
                         'icon'            => 'fa-clock-o',
