@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\Form;
 
 /**
@@ -222,5 +223,49 @@ abstract class AbstractFormController extends CommonController
                 $this->copyErrorsRecursively($child, $childTo);
             }
         }
+    }
+
+    /**
+     * Sets a specific theme for the form.
+     *
+     * @param Form   $form
+     * @param string $template
+     * @param mixed  $themes
+     *
+     * @return \Symfony\Component\Form\FormView
+     */
+    protected function setFormTheme(Form $form, $template, $themes = null)
+    {
+        $formView = $form->createView();
+
+        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
+        if ($templating instanceof DelegatingEngine) {
+            $templating = $templating->getEngine($template);
+        }
+
+        // Extract form theme from options if applicable
+        $fieldThemes = [];
+        $findThemes  = function ($form, $formView) use ($templating, &$findThemes, &$fieldThemes) {
+            /** @var Form $field */
+            foreach ($form as $name => $field) {
+                $fieldView = $formView[$name];
+                if ($theme = $field->getConfig()->getOption('default_theme')) {
+                    $fieldThemes[] = $theme;
+                    $templating->get('form')->setTheme($fieldView, $theme);
+                }
+
+                if ($field->count()) {
+                    $findThemes($field, $fieldView);
+                }
+            }
+        };
+
+        $findThemes($form, $formView);
+
+        $themes = array_unique(array_merge((array) $themes, $fieldThemes));
+
+        $templating->get('form')->setTheme($formView, $themes);
+
+        return $formView;
     }
 }

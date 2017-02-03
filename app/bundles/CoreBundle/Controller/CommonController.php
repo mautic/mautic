@@ -586,61 +586,6 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * Sets a specific theme for the form.
-     *
-     * @param Form   $form
-     * @param string $template
-     * @param mixed  $themes
-     *
-     * @return \Symfony\Component\Form\FormView
-     */
-    protected function setFormTheme(Form $form, $template, $themes = null)
-    {
-        $formView = $form->createView();
-
-        // Extract form theme from options if applicable
-        $fieldThemes = [];
-        $findThemes  = function ($form, &$themes) use (&$findThemes) {
-            /** @var Form $field */
-            foreach ($form as $field) {
-                if ($theme = $field->getConfig()->getOption('default_theme')) {
-                    $themes[] = $theme;
-                }
-
-                if ($field->count()) {
-                    $findThemes($field, $themes);
-                }
-            }
-        };
-
-        $findThemes($form, $fieldThemes);
-        if (count($fieldThemes)) {
-            if (null === $themes) {
-                $themes = $fieldThemes;
-            } elseif (is_array($themes)) {
-                $themes = array_merge($fieldThemes, $themes);
-            } else {
-                $fieldThemes[] = $themes;
-                $themes        = $fieldThemes;
-            }
-            $themes = array_values(array_unique($themes));
-        }
-
-        if (empty($themes)) {
-            return $formView;
-        }
-
-        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
-        if ($templating instanceof DelegatingEngine) {
-            $templating = $templating->getEngine($template);
-        }
-
-        $templating->get('form')->setTheme($formView, $themes);
-
-        return $formView;
-    }
-
-    /**
      * Renders flashes' HTML.
      *
      * @return string
@@ -898,5 +843,51 @@ class CommonController extends Controller implements MauticController
         }
 
         return $toExport;
+    }
+
+    /**
+     * Sets a specific theme for the form.
+     *
+     * @deprecated 2.6.0 to be removed 3.0; extend AbstractFormController instead
+     *
+     * @param Form   $form
+     * @param string $template
+     * @param mixed  $themes
+     *
+     * @return \Symfony\Component\Form\FormView
+     */
+    protected function setFormTheme(Form $form, $template, $themes = null)
+    {
+        $formView = $form->createView();
+
+        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
+        if ($templating instanceof DelegatingEngine) {
+            $templating = $templating->getEngine($template);
+        }
+
+        // Extract form theme from options if applicable
+        $fieldThemes = [];
+        $findThemes  = function ($form, $formView) use ($templating, &$findThemes, &$fieldThemes) {
+            /** @var Form $field */
+            foreach ($form as $name => $field) {
+                $fieldView = $formView[$name];
+                if ($theme = $field->getConfig()->getOption('default_theme')) {
+                    $fieldThemes[] = $theme;
+                    $templating->get('form')->setTheme($fieldView, $theme);
+                }
+
+                if ($field->count()) {
+                    $findThemes($field, $fieldView);
+                }
+            }
+        };
+
+        $findThemes($form, $formView);
+
+        $themes = array_unique(array_merge((array) $themes, $fieldThemes));
+
+        $templating->get('form')->setTheme($formView, $themes);
+
+        return $formView;
     }
 }
