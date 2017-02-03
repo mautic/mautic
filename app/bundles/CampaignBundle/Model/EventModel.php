@@ -916,7 +916,7 @@ class EventModel extends CommonFormModel
                         false,
                         null,
                         true,
-                        $event['id'],
+                        $log['id'],
                         $evaluatedEventCount,
                         $executedEventCount,
                         $totalEventCount
@@ -1576,7 +1576,7 @@ class EventModel extends CommonFormModel
                     ]
                 );
             } else {
-                $log = $this->em->getReference('MauticCampaignBundle:LeadEventLog', ['id' => $logExists]);
+                $log = $this->em->getReference('MauticCampaignBundle:LeadEventLog', $logExists);
             }
         }
 
