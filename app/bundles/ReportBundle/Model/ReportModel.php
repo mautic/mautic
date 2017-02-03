@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -37,6 +38,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ReportModel extends FormModel
 {
+    const CHANNEL_FEATURE = 'reporting';
+
     /**
      * @var mixed
      */
@@ -53,18 +56,33 @@ class ReportModel extends FormModel
     protected $templatingHelper;
 
     /**
+     * @var ChannelListHelper
+     */
+    protected $channelListHelper;
+
+    /**
      * @var Session
      */
     protected $session;
 
+    /**
+     * ReportModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param FormatterHelper      $formatterHelper
+     * @param TemplatingHelper     $templatingHelper
+     * @param ChannelListHelper    $channelListHelper
+     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         FormatterHelper $formatterHelper,
-        TemplatingHelper $templatingHelper
+        TemplatingHelper $templatingHelper,
+        ChannelListHelper $channelListHelper
     ) {
-        $this->defaultPageLimit = $coreParametersHelper->getParameter('default_pagelimit');
-        $this->formatterHelper  = $formatterHelper;
-        $this->templatingHelper = $templatingHelper;
+        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->formatterHelper   = $formatterHelper;
+        $this->templatingHelper  = $templatingHelper;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -111,7 +129,7 @@ class ReportModel extends FormModel
 
         $params['table_list'] = $this->getTableData();
 
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         return $reportGenerator->getForm($entity, $params);
     }
@@ -191,7 +209,7 @@ class ReportModel extends FormModel
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->translator, $eventContext);
+                $event        = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -507,7 +525,7 @@ class ReportModel extends FormModel
         $paginate        = !empty($options['paginate']);
         $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit    = 0;

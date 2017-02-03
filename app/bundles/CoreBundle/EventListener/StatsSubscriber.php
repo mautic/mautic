@@ -32,13 +32,21 @@ class StatsSubscriber extends CommonSubscriber
     protected $selects = null;
 
     /**
+     * @var array
+     */
+    protected $permissions = [];
+
+    /**
      * StatsSubscriber constructor.
      *
      * @param EntityManager $em
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticCoreBundle:AuditLog');
+        $this->repositories['MauticCoreBundle:AuditLog'] = $em->getRepository('MauticCoreBundle:AuditLog');
+        $this->permissions['MauticCoreBundle:AuditLog']  = ['admin'];
+
+        $this->repositories['MauticCoreBundle:IpAddress'] = $em->getRepository('MauticCoreBundle:IpAddress');
     }
 
     /**
@@ -57,13 +65,83 @@ class StatsSubscriber extends CommonSubscriber
     public function onStatsFetch(StatsEvent $event)
     {
         /** @var CommonRepository $repository */
-        foreach ($this->repositories as $repository) {
+        foreach ($this->repositories as $repoName => $repository) {
             $table = $repository->getTableName();
-            if ($event->isLookingForTable($table)) {
+            if ($event->isLookingForTable($table, $repository)) {
+                $permissions = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+                foreach ($permissions as $tableAlias => $permBase) {
+                    if ('admin' === $permBase) {
+                        if (!$this->security->isAdmin()) {
+                            continue;
+                        }
+                    } else {
+                        if ($this->security->checkPermissionExists($permBase.':view') && !$this->security->isGranted($permBase.':view')) {
+                            continue;
+                        }
+
+                        if ($this->security->checkPermissionExists($permBase.':viewother')
+                            && !$this->security->isGranted(
+                                $permBase.':viewother'
+                            )
+                        ) {
+                            $userId = $event->getUser()->getId();
+                            $where  = [
+                                'internal' => true,
+                                'expr'     => 'formula',
+                            ];
+
+                            // In case the table alias is defined as an association such as stat.email
+                            $aliasParts = explode('.', $tableAlias);
+                            $tableAlias = array_pop($aliasParts);
+
+                            if ('lead:leads' === $permBase) {
+                                // Acknowledge owner then created_by
+                                $where['value'] = "IF ($tableAlias.owner_id IS NOT NULL, $tableAlias.owner_id, $tableAlias.created_by) = $userId";
+                            } else {
+                                $where['value'] = "$tableAlias.created_by = $userId";
+                            }
+                            $event->addWhere($where);
+                        }
+                    }
+                }
+
                 $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
                 $event->setSelect($select)
-                      ->setRepository($repository);
+                      ->setRepository($repository, array_keys($permissions));
             }
         }
+    }
+
+    /**
+     * Restrict stats based on contact permissions.
+     *
+     * @param EntityManager $em
+     * @param               $repoNames
+     *
+     * @return $this
+     */
+    protected function addContactRestrictedRepositories(EntityManager $em, $repoNames)
+    {
+        return $this->addRestrictedRepostories($em, $repoNames, ['lead' => 'lead:leads']);
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param               $repoNames
+     * @param array         $permissions
+     */
+    protected function addRestrictedRepostories(EntityManager $em, $repoNames, array $permissions)
+    {
+        if (!is_array($repoNames)) {
+            $repoNames = [$repoNames];
+        }
+
+        foreach ($repoNames as $repoName) {
+            $this->repositories[]      = $repo      = $em->getRepository($repoName);
+            $table                     = $repo->getTableName();
+            $this->permissions[$table] = $permissions;
+        }
+
+        return $this;
     }
 }

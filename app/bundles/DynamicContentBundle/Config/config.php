@@ -15,7 +15,7 @@ return [
             'items' => [
                 'mautic.dynamicContent.dynamicContent' => [
                     'route'    => 'mautic_dynamicContent_index',
-                    'access'   => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
+                    'access'   => ['dynamiccontent:dynamiccontents:viewown', 'dynamiccontent:dynamiccontents:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 90,
                 ],
@@ -63,7 +63,11 @@ return [
                 ],
             ],
             'mautic.dynamicContent.js.subscriber' => [
-                'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'templating.helper.assets',
+                ],
             ],
             'mautic.dynamicContent.subscriber' => [
                 'class'     => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
@@ -71,8 +75,13 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.form.helper.token',
+                    'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
                 ],
+            ],
+            'mautic.dynamicContent.subscriber.channel' => [
+                'class' => \Mautic\DynamicContentBundle\EventListener\ChannelSubscriber::class,
             ],
             'mautic.dynamicContent.stats.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
@@ -104,9 +113,8 @@ return [
                 'alias' => 'dwcdecision_list',
             ],
             'mautic.form.type.dwc_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dwc_list',
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
+                'alias' => 'dwc_list',
             ],
         ],
         'models' => [

@@ -95,8 +95,156 @@ trait OperatorListTrait
                 'expr'        => 'notIn',
                 'negate_expr' => 'in',
             ],
+            'regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.regexp',
+                'expr'        => 'regexp', //special case
+                'negate_expr' => 'notRegexp',
+            ],
+            '!regexp' => [
+                'label'       => 'mautic.lead.list.form.operator.notregexp',
+                'expr'        => 'notRegexp', //special case
+                'negate_expr' => 'regexp',
+            ],
+            'date' => [
+                'label'       => 'mautic.lead.list.form.operator.date',
+                'expr'        => 'date', //special case
+                'negate_expr' => 'date',
+                'hide'        => true,
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * @param null $type
+     *
+     * @return array
+     */
+    public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
+    {
+        static $processedTypes = [];
+
+        if (is_array($type)) {
+            return $this->getOperatorChoiceList($type, $overrideHiddenTypes);
+        } elseif (array_key_exists($type, $processedTypes)) {
+            return $processedTypes[$type];
+        }
+
+        // Set operators allowed
+        $typeOperators = [
+            'text' => [
+                'include' => [
+                    '=',
+                    '!=',
+                    'empty',
+                    '!empty',
+                    'like',
+                    '!like',
+                    'regexp',
+                    '!regexp',
+                ],
+            ],
+            'select' => [
+                'include' => [
+                    '=',
+                    '!=',
+                    'empty',
+                    '!empty',
+                    'regexp',
+                    '!regexp',
+                    'in',
+                    '!in',
+                ],
+            ],
+            'bool' => [
+                'include' => [
+                    '=',
+                    '!=',
+                ],
+            ],
+            'default' => [
+                'exclude' => [
+                    'in',
+                    '!in',
+                    'date',
+                ],
+            ],
+            'multiselect' => [
+                'include' => [
+                    'in',
+                    '!in',
+                ],
+            ],
+            'date' => [
+                'exclude' => [
+                    'in',
+                    '!in',
+                ],
+            ],
+        ];
+
+        if ($type == 'boolean') {
+            $type = 'bool';
+        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
+            $type = 'select';
+        } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
+            $type = 'text';
+        } elseif ($type == 'datetime') {
+            $type = 'date';
+        } elseif (null !== $type && !array_key_exists($type, $typeOperators)) {
+            $type = 'default';
+        }
+
+        if (null === $type) {
+            foreach ($typeOperators as $type => $def) {
+                if (!array_key_exists($type, $processedTypes)) {
+                    $processedTypes[$type] = $this->getOperatorChoiceList($def, $overrideHiddenTypes);
+                }
+            }
+
+            return $processedTypes;
+        }
+
+        $processedTypes[$type] = $this->getOperatorChoiceList($typeOperators[$type], $overrideHiddenTypes);
+
+        return $processedTypes[$type];
+    }
+
+    /**
+     * @param       $definition
+     * @param array $overrideHiddenOperators
+     *
+     * @return array
+     */
+    public function getOperatorChoiceList($definition, $overrideHiddenOperators = [])
+    {
+        static $operatorChoices = [];
+        if (empty($operatorChoices)) {
+            $operatorList    = $this->getFilterExpressionFunctions();
+            $operatorChoices = [];
+            foreach ($operatorList as $operator => $def) {
+                if (empty($def['hide']) || in_array($operator, $overrideHiddenOperators)) {
+                    $operatorChoices[$operator] = $def['label'];
+                }
+            }
+        }
+
+        $choices = $operatorChoices;
+        if (isset($definition['include'])) {
+            // Inclusive operators
+            $choices = array_intersect_key($choices, array_flip($definition['include']));
+        } elseif (isset($definition['exclude'])) {
+            // Exclusive operators
+            $choices = array_diff_key($choices, array_flip($definition['exclude']));
+        }
+
+        if (isset($this->translator)) {
+            foreach ($choices as $value => $label) {
+                $choices[$value] = $this->translator->trans($label);
+            }
+        }
+
+        return $choices;
     }
 }

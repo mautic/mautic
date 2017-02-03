@@ -22,14 +22,13 @@ class CategoryApiController extends CommonApiController
 {
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
-
         $this->model            = $this->getModel('category');
         $this->entityClass      = 'Mautic\CategoryBundle\Entity\Category';
         $this->entityNameOne    = 'category';
         $this->entityNameMulti  = 'categories';
-        $this->permissionBase   = 'categories:category';
         $this->serializerGroups = ['categoryDetails'];
+
+        parent::initialize($event);
     }
 
     /**

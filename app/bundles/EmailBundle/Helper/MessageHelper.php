@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -916,7 +917,7 @@ class MessageHelper
         if (
             preg_match('/Original-Recipient: rfc822;(.*)/i', $dsn_report, $match)
             ||
-            preg_match('/Final-Recipient: rfc822;(.*)/i', $dsn_report, $match)
+            preg_match('/Final-Recipient:\s?rfc822;(.*)/i', $dsn_report, $match)
         ) {
             if ($parsedAddressList = self::parseAddressList($match[1])) {
                 $result['email'] = key($parsedAddressList);

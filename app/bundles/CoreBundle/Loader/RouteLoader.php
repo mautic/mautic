@@ -13,8 +13,9 @@ namespace Mautic\CoreBundle\Loader;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\RouteEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -28,16 +29,25 @@ class RouteLoader extends Loader
     private $loaded = false;
 
     /**
-     * @var MauticFactory
+     * @var EventDispatcherInterface
      */
-    private $factory;
+    private $dispatcher;
 
     /**
-     * @param MauticFactory $factory
+     * @var CoreParametersHelper
      */
-    public function __construct(MauticFactory $factory)
+    private $coreParameters;
+
+    /**
+     * RouteLoader constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @param CoreParametersHelper     $parametersHelper
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
     {
-        $this->factory = $factory;
+        $this->dispatcher     = $dispatcher;
+        $this->coreParameters = $parametersHelper;
     }
 
     /**
@@ -52,19 +62,13 @@ class RouteLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        if (true === $this->loaded) {
-            throw new \RuntimeException('Do not add the "mautic" loader twice');
-        }
-
-        $dispatcher = $this->factory->getDispatcher();
-
         // Public
         $event = new RouteEvent($this, 'public');
-        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $collection = $event->getCollection();
 
         // Force all links to be SSL if the site_url parameter is SSL
-        $siteUrl  = $this->factory->getParameter('site_url');
+        $siteUrl  = $this->coreParameters->getParameter('site_url');
         $forceSSL = false;
         if (!empty($siteUrl)) {
             $parts    = parse_url($siteUrl);
@@ -77,23 +81,25 @@ class RouteLoader extends Loader
 
         // Secured area - Default
         $event = new RouteEvent($this);
-        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $secureCollection = $event->getCollection();
 
         // OneupUploader (added behind our secure /s)
         $secureCollection->addCollection($this->import('.', 'uploader'));
 
         //API
-        $event = new RouteEvent($this, 'api');
-        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
-        $apiCollection = $event->getCollection();
-        $apiCollection->addPrefix('/api');
+        if ($this->coreParameters->getParameter('api_enabled')) {
+            $event = new RouteEvent($this, 'api');
+            $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+            $apiCollection = $event->getCollection();
+            $apiCollection->addPrefix('/api');
 
-        if ($forceSSL) {
-            $apiCollection->setSchemes('https');
+            if ($forceSSL) {
+                $apiCollection->setSchemes('https');
+            }
+
+            $collection->addCollection($apiCollection);
         }
-
-        $collection->addCollection($apiCollection);
 
         $secureCollection->addPrefix('/s');
         if ($forceSSL) {
@@ -103,7 +109,7 @@ class RouteLoader extends Loader
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');
-        $dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
         $lastCollection = $event->getCollection();
 
         if ($forceSSL) {

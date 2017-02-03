@@ -18,13 +18,15 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class User.
  */
-class User extends FormEntity implements AdvancedUserInterface, \Serializable
+class User extends FormEntity implements AdvancedUserInterface, \Serializable, EquatableInterface
 {
     /**
      * @var int
@@ -862,5 +864,18 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function getSignature()
     {
         return $this->signature;
+    }
+
+    /**
+     * @param UserInterface $user
+     *
+     * Needed for SAML to work correctly
+     */
+    public function isEqualTo(UserInterface $user)
+    {
+        $thisUser = $this->getId().$this->getUsername().$this->getPassword();
+        $thatUser = $user->getId().$user->getUsername().$user->getPassword();
+
+        return $thisUser === $thatUser;
     }
 }

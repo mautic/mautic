@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 /**
@@ -19,19 +18,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
  */
 class IdentifyCompanyHelper
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * @param array        $parameters
      * @param mixed        $lead
@@ -41,8 +27,46 @@ class IdentifyCompanyHelper
      */
     public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
     {
+        list($company, $companyEntities) = self::findCompany($parameters, $companyModel);
+
+        if (!empty($copmany)) {
+            if (!empty($companyEntities)) {
+                foreach ($companyEntities as $entity) {
+                    $companyEntity   = $entity;
+                    $companyLeadRepo = $companyModel->getCompanyLeadRepository();
+                    if ($lead) {
+                        $companyLead = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $entity->getId());
+                        if (empty($companyLead)) {
+                            $leadAdded = true;
+                        }
+                    }
+                }
+            } else {
+                //create new company
+                $companyEntity = $companyModel->getEntity();
+                $companyModel->setFieldValues($companyEntity, $company, true);
+                $companyModel->saveEntity($companyEntity);
+                $company['id'] = $companyEntity->getId();
+                if ($lead) {
+                    $leadAdded = true;
+                }
+            }
+
+            return [$company, $leadAdded, $companyEntity];
+        }
+
+        return [null, false, null];
+    }
+
+    /**
+     * @param              $parameters
+     * @param CompanyModel $companyModel
+     *
+     * @return array
+     */
+    public static function findCompany($parameters, CompanyModel $companyModel)
+    {
         $companyName   = $companyDomain   = null;
-        $leadAdded     = false;
         $companyEntity = null;
 
         if (isset($parameters['company'])) {
@@ -80,33 +104,16 @@ class IdentifyCompanyHelper
                 'companycountry' => $parameters['companycountry'],
             ];
 
-            if (!empty($companyEntities)) {
-                foreach ($companyEntities as $entity) {
-                    $companyEntity   = $entity;
-                    $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                    if ($lead) {
-                        $companyLead = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $entity->getId());
-                        if (empty($companyLead)) {
-                            $leadAdded = true;
-                        }
-                    }
-                    $company['id'] = $entity->getId();
-                }
-            } else {
-                //create new company
-                $companyEntity = $companyModel->getEntity();
-                $companyModel->setFieldValues($companyEntity, $company, true);
-                $companyModel->saveEntity($companyEntity);
-                $company['id'] = $companyEntity->getId();
-                if ($lead) {
-                    $leadAdded = true;
-                }
+            if (1 === count($companyEntities)) {
+                end($companyEntities);
+                $key           = key($companyEntities);
+                $company['id'] = $companyEntities[$key]->getId();
             }
 
-            return [$company, $leadAdded, $companyEntity];
+            return [$company, $companyEntities];
         }
 
-        return [null, false, null];
+        return [[], []];
     }
 
     /**

@@ -25,12 +25,12 @@ class NotificationApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('notification');
         $this->entityClass     = 'Mautic\NotificationBundle\Entity\Notification';
         $this->entityNameOne   = 'notification';
         $this->entityNameMulti = 'notifications';
-        $this->permissionBase  = 'notification:notifications';
+
+        parent::initialize($event);
     }
 
     /**

@@ -9,7 +9,7 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.initSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
 };
 
@@ -248,7 +248,7 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
                 heightMin: 100
             }));
 
@@ -556,20 +556,12 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
         mQuery(filter).attr('type', fieldType);
     }
 
-    // Remove inapplicable operator types
-    var operators = selectedOption.data('field-operators');
-
-    if (typeof operators != "undefined") {
-        if (typeof operators.include != 'undefined') {
-            mQuery('#' + filterIdBase + '_operator option').filter(function () {
-                return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
-            }).remove();
-        } else if (typeof operators.exclude != 'undefined') {
-            mQuery('#' + filterIdBase + '_operator option').filter(function () {
-                return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
-            }).remove();
-        }
-    }
+    var operators = mQuery(selectedOption).data('field-operators');
+    mQuery('#' + filterIdBase + '_operator').html('');
+    mQuery.each(operators, function (value, label) {
+        var newOption = mQuery('<option/>').val(value).text(label);
+        newOption.appendTo(mQuery('#' + filterIdBase + '_operator'));
+    });
 
     // Convert based on first option in list
     Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator');
@@ -652,3 +644,5 @@ Mautic.convertDynamicContentFilterInput = function(el) {
         Mautic.activateChosenSelect(filterEl);
     }
 };
+
+

@@ -32,7 +32,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         if (isset($columns[$key])):
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                 'sessionVar' => 'report.'.$report->getId(),
-                                'orderBy'    => $key,
+                                'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
                                 'text'       => $columns[$key]['label'],
                                 'class'      => 'col-report-'.$columns[$key]['type'],
                                 'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
@@ -51,6 +51,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         <tr>
                             <td><?php echo $startCount; ?></td>
                             <?php foreach ($columnOrder as $key): ?>
+                                <?php if (isset($columns[$key])): ?>
                                 <td>
                                     <?php $closeLink = false; ?>
                                     <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
@@ -66,7 +67,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                                     <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
                                     <?php if ($closeLink): ?></a><?php endif; ?>
                                 </td>
-
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </tr>
                         <?php ++$startCount; ?>

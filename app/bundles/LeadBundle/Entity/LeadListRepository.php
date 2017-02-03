@@ -129,6 +129,7 @@ class LeadListRepository extends CommonRepository
      * @param      $lead
      * @param bool $forList
      * @param bool $singleArrayHydration
+     * @param bool $isPublic
      *
      * @return mixed
      */
@@ -869,18 +870,33 @@ class LeadListRepository extends CommonRepository
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->eq($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
                             break;
                         case 'like':
                         case '!like':
                             $details['filter'] = '%'.$details['filter'].'%';
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->like($alias.'.url', $exprParameter), $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->like($alias.'.url', $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
+                            break;
+                        case 'regexp':
+                        case 'notRegexp':
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                    $alias.'.url'.$not.' REGEXP '.$exprParameter
+                                )
+                            );
                             break;
                     }
                     // Specific lead
@@ -1117,7 +1133,15 @@ class LeadListRepository extends CommonRepository
                                 $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
                             );
                             break;
-
+                        case 'regexp':
+                        case 'notRegexp':
+                            $ignoreAutoFilter       = true;
+                            $parameters[$parameter] = $details['filter'];
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $groupExpr->add(
+                                $field.$not.' REGEXP '.$exprParameter
+                            );
+                            break;
                         default:
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }
@@ -1202,34 +1226,42 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
-                $returnParameter = false;
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
+                $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like('l.name', ':'.$unique);
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
-        $parameters = [];
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
@@ -1248,13 +1280,15 @@ class LeadListRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.lead.list.searchcommand.isglobal',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isinactive',
             'mautic.core.searchcommand.name',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
@@ -49,14 +50,36 @@ abstract class AbstractIntegration
     protected $keys;
 
     /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
      * @param MauticFactory $factory
+     *
+     * @todo divorce from MauticFactory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory    = $factory;
         $this->dispatcher = $factory->getDispatcher();
+        $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em         = $factory->getEntityManager();
 
         $this->init();
+    }
+
+    /**
+     * @return CacheStorageHelper
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     /**
@@ -1231,6 +1254,13 @@ abstract class AbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if (empty($settings['ignore_field_cache'])) {
+            $cacheSuffix = (isset($settings['cache_suffix'])) ? $settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$cacheSuffix)) {
+                return $fields;
+            }
+        }
+
         return [];
     }
 
@@ -1270,6 +1300,53 @@ abstract class AbstractIntegration
                 $mauticKey = $leadFields[$key];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
                     $matched[$integrationKey] = $fields[$mauticKey]['value'];
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$integrationKey])) {
+                $matched[$integrationKey] = $unknown;
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Match lead data with integration fields.
+     *
+     * @param $lead
+     * @param $config
+     *
+     * @return array
+     */
+    public function populateCompanyData($lead, $config = [])
+    {
+        if (!isset($config['companyFields'])) {
+            $config = $this->mergeConfigToFeatureSettings($config);
+
+            if (empty($config['companyFields'])) {
+                return [];
+            }
+        }
+
+        if ($lead instanceof Lead) {
+            $fields = $lead->getPrimaryCompany();
+        } else {
+            $fields = $lead['primaryCompany'];
+        }
+
+        $companyFields   = $config['companyFields'];
+        $availableFields = $this->getAvailableLeadFields($config)['company'];
+        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched         = [];
+
+        foreach ($availableFields as $key => $field) {
+            $integrationKey = $this->convertLeadFieldKey($key, $field);
+
+            if (isset($companyFields[$key])) {
+                $mauticKey = $companyFields[$key];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
+                    $matched[$integrationKey] = $fields[$mauticKey];
                 }
             }
 
@@ -1649,6 +1726,9 @@ abstract class AbstractIntegration
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getFormDisplaySettings()
     {
         /** @var PluginIntegrationFormDisplayEvent $event */

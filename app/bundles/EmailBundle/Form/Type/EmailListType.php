@@ -11,8 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,72 +22,51 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class EmailListType extends AbstractType
 {
     /**
-     * @var EmailRepository
-     */
-    private $repo;
-
-    /**
-     * @var bool
-     */
-    private $viewOther;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->viewOther = $factory->getSecurity()->isGranted('email:emails:viewother');
-        $this->repo      = $factory->getModel('email')->getRepository();
-
-        $this->repo->setCurrentUser($factory->getUser());
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
-                    $choices = [];
-
-                    $emails = $this->repo->getEmailList(
-                        '',
-                        0,
-                        0,
-                        $this->viewOther,
-                        $options['top_level'],
-                        $options['email_type'],
-                        $options['ignore_ids'],
-                        $options['variant_parent']
-                    );
-                    foreach ($emails as $email) {
-                        $choices[$email['language']][$email['id']] = $email['name'];
-                    }
-
-                    //sort by language
-                    ksort($choices);
-
-                    return $choices;
-                },
-                'expanded'    => false,
                 'multiple'    => true,
                 'required'    => false,
-                'empty_value' => function (Options $options) {
-                    return (empty($options['choices'])) ? 'mautic.email.no.emails.note' : 'mautic.core.form.chooseone';
+                'modal_route' => 'mautic_email_action',
+                // Email form UI too complicated for a modal so force a popup
+                'force_popup'        => true,
+                'model'              => 'email',
+                'multiple'           => true,
+                'ajax_lookup_action' => function (Options $options) {
+                    $query = [
+                        'email_type'     => $options['email_type'],
+                        'top_level'      => $options['top_level'],
+                        'variant_parent' => $options['variant_parent'],
+                        'ignore_ids'     => $options['ignore_ids'],
+                    ];
+
+                    return 'email:getLookupChoiceList&'.http_build_query($query);
                 },
-                'email_type' => 'template',
-                'disabled'   => function (Options $options) {
-                    return empty($options['choices']);
+                'model_lookup_method' => 'getLookupResults',
+                'lookup_arguments'    => function (Options $options) {
+                    return [
+                        'type'    => 'email',
+                        'filter'  => '$data',
+                        'limit'   => 0,
+                        'start'   => 0,
+                        'options' => [
+                            'email_type'     => $options['email_type'],
+                            'top_level'      => $options['top_level'],
+                            'variant_parent' => $options['variant_parent'],
+                            'ignore_ids'     => $options['ignore_ids'],
+                        ],
+                    ];
                 },
+                //'modal_route_parameters' => 'template'
+                'email_type'     => 'template',
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],
             ]
         );
-
-        $resolver->setDefined(['email_type', 'top_level', 'top_level_parent', 'ignore_ids']);
     }
 
     /**
@@ -104,6 +82,6 @@ class EmailListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return EntityLookupType::class;
     }
 }

@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -91,12 +92,6 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        if ($event->tokenSectionsRequested()) {
-            //add email tokens
-            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
-            $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $openRate = [
@@ -145,7 +140,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Text',
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
-                'slot',
+                SlotTextType::class,
                 1000
             );
             $event->addSlotType(

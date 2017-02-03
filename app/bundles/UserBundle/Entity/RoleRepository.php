@@ -86,28 +86,35 @@ class RoleRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
-                $expr            = $q->expr()->eq('r.isAdmin', 1);
-                $returnParameter = false;
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
+                $expr = $q->expr()->eq('r.isAdmin', 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like('r.name', ':'.$unique);
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
+        if ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
         return [
             $expr,
-            ($returnParameter) ? ["$unique" => $string] : [],
+            $parameters,
         ];
     }
 
@@ -158,10 +165,12 @@ class RoleRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.user.user.searchcommand.isadmin',
             'mautic.core.searchcommand.name',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

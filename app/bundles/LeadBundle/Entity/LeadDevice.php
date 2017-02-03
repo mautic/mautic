@@ -71,6 +71,11 @@ class LeadDevice
     private $deviceModel;
 
     /**
+     * @var string
+     */
+    private $deviceFingerprint;
+
+    /**
      * @var \DateTime
      */
     private $dateAdded;
@@ -91,11 +96,12 @@ class LeadDevice
             ->addIndex(['device_os_version'], 'device_os_version_search')
             ->addIndex(['device_os_platform'], 'device_os_platform_search')
             ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search');
+            ->addIndex(['device_model'], 'device_model_search')
+            ->addIndex(['device_fingerprint'], 'device_fingerprint_search');
 
         $builder->addId();
 
-        $builder->addLead(false, 'CASCADE', false, 'devices');
+        $builder->addLead(false, 'CASCADE', false);
 
         $builder->addDateAdded();
 
@@ -135,6 +141,11 @@ class LeadDevice
             ->columnName('device_model')
             ->nullable()
             ->build();
+
+        $builder->createField('deviceFingerprint', 'string')
+            ->columnName('device_fingerprint')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -144,7 +155,7 @@ class LeadDevice
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('stat')
+        $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
                 [
                     'id',
@@ -339,6 +350,22 @@ class LeadDevice
         if (isset($deviceOs['platform'])) {
             $this->deviceOsPlatform = $deviceOs['platform'];
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceFingerprint()
+    {
+        return $this->deviceFingerprint;
+    }
+
+    /**
+     * @param string $deviceFingerprint
+     */
+    public function setDeviceFingerprint($deviceFingerprint)
+    {
+        $this->deviceFingerprint = $deviceFingerprint;
     }
 
     /**
