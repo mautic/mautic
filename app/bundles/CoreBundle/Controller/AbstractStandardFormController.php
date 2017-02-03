@@ -207,7 +207,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         $this->getPermissionBase().':viewown',
                         $this->getPermissionBase().':viewother',
                         $permissionUser
-                    ) : $security->isGranted($this->getPermissionBase());
+                    ) : $security->isGranted($this->getPermissionBase().':view');
                 case 'clone':
                     return
                         $security->isGranted($this->getPermissionBase().':create')
@@ -1030,7 +1030,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'view'
                 )
             );
-        } elseif ($this->checkActionPermission('view', $entity)) {
+        } elseif (!$this->checkActionPermission('view', $entity)) {
             return $this->accessDenied();
         }
 
