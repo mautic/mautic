@@ -313,7 +313,7 @@ trait CustomFieldRepositoryTrait
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
            ->where('f.is_published = :published')
-           ->where($fq->expr()->eq('object', ':object'))
+           ->andWhere($fq->expr()->eq('object', ':object'))
            ->setParameter('published', true, 'boolean')
            ->setParameter('object', $object);
         $results = $fq->execute()->fetchAll();
