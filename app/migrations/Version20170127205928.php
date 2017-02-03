@@ -27,8 +27,8 @@ class Version20170127205928 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $tagTable = $schema->getTable($this->prefix.'leads');
-        if ($tagTable->hasIndex(MAUTIC_TABLE_PREFIX.'lead_timezone')) {
+        $table = $schema->getTable($this->prefix.'leads');
+        if ($table->hasIndex(MAUTIC_TABLE_PREFIX.'timezone_search')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -52,6 +52,6 @@ SQL;
         }
 
         $this->addSql($sql);
-        $this->addSql("CREATE INDEX {$this->prefix}lead_timezone ON {$this->prefix}leads (timezone)");
+        $this->addSql("CREATE INDEX {$this->prefix}timezone_search ON {$this->prefix}leads (timezone)");
     }
 }
