@@ -51,7 +51,7 @@ class ChannelSubscriber extends CommonSubscriber
                         'lookupFormType' => 'notification_list',
                     ],
                     ReportModel::CHANNEL_FEATURE => [
-                        'table' => 'dynamic_content',
+                        'table' => 'push_notification_stats',
                     ],
                 ]
             );

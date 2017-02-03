@@ -34,6 +34,7 @@ class NotificationListType extends AbstractType
                 'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => function (Options $options) {
                     return [
+                        'type'    => 'notification',
                         'filter'  => '$data',
                         'limit'   => 0,
                         'start'   => 0,
