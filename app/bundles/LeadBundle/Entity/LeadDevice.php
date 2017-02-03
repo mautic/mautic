@@ -101,7 +101,7 @@ class LeadDevice
 
         $builder->addId();
 
-        $builder->addLead(false, 'CASCADE', false, 'devices');
+        $builder->addLead(false, 'CASCADE', false);
 
         $builder->addDateAdded();
 

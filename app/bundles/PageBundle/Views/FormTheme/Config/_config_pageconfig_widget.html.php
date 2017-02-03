@@ -15,8 +15,8 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.pageconfig'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php foreach ($form->children as $k => $f): ?>
-            <?php if ($k == 'track_by_fingerprint') {
+        <?php foreach ($form->children as $name => $f): ?>
+            <?php if ('track_contact_by_ip' == $name && 'track_by_fingerprint' == $name) {
     continue;
 } ?>
             <div class="row">
@@ -42,6 +42,9 @@
 &lt;/script&gt;</pre>
         </div>
         <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
+            </div>
             <div class="col-md-6">
                 <?php echo $view['form']->row($form->children['track_by_fingerprint']); ?>
             </div>

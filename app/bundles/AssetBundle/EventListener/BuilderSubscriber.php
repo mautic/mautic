@@ -72,13 +72,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onBuilderBuild(BuilderEvent $event)
     {
-        if ($event->tokenSectionsRequested()) {
-            $this->addTokenSections($event);
-        }
-
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
-
             $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', false, true);
         }
     }
@@ -109,16 +104,6 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
-    }
-
-    /**
-     * @param $event
-     */
-    private function addTokenSections($event)
-    {
-        //add email tokens
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
-        $event->addTokenSection('asset.emailtokens', 'mautic.asset.assets', $tokenHelper->getTokenContent(), -255);
     }
 
     /**

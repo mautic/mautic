@@ -99,9 +99,17 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects']['company'] = 'company';
+        return $this->getFormFieldsByObject('company');
+    }
 
-        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    /**
+     * @param array $settings
+     *
+     * @return array|mixed
+     */
+    public function getFormLeadFields($settings = [])
+    {
+        return $this->getFormFieldsByObject('contacts');
     }
 
     /**
@@ -109,6 +117,10 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields()) {
+            return $fields;
+        }
+
         $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
@@ -116,31 +128,33 @@ class HubspotIntegration extends CrmAbstractIntegration
             $hubspotObjects = $settings['feature_settings']['objects'];
         } else {
             $settings       = $this->settings->getFeatureSettings();
-            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : 'contacts';
+            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
 
         try {
             if ($this->isAuthorized()) {
                 if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
                     foreach ($hubspotObjects as $key => $object) {
+                        // Check the cache first
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                        if ($fields = parent::getAvailableLeadFields($settings)) {
+                            $hubsFields[$object] = $fields;
+
+                            continue;
+                        }
+
                         $leadFields = $this->getApiHelper()->getLeadFields($object);
                         if (isset($leadFields)) {
                             foreach ($leadFields as $fieldInfo) {
-                                if ($object != 'company') {
-                                    $hubsFields[$fieldInfo['name']] = [
-                                        'type'  => 'string',
-                                        'label' => $fieldInfo['label'],
-                                    ];
-                                } else {
-                                    $hubsFields[$object][$fieldInfo['name']] = [
-                                        'type'  => 'string',
-                                        'label' => $fieldInfo['label'],
-                                    ];
-                                }
+                                $hubsFields[$object][$fieldInfo['name']] = [
+                                    'type'     => 'string',
+                                    'label'    => $fieldInfo['label'],
+                                    'required' => ('email' === $fieldInfo['name']),
+                                ];
                             }
                         }
-                        // Email is Required for this kind of integration
-                        $hubsFields['email']['required'] = true;
+
+                        $this->cache->set('leadFields'.$cacheSuffix, $hubsFields[$object]);
                     }
                 }
             }
@@ -151,6 +165,8 @@ class HubspotIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
+        $this->cache->set('leadFields', $hubsFields);
 
         return $hubsFields;
     }

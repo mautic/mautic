@@ -11,6 +11,9 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -38,6 +41,16 @@ class ReportBuilderEvent extends AbstractReportEvent
     ];
 
     /**
+     * @var ChannelListHelper
+     */
+    private $channelListHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * Container with registered graphs.
      *
      * @var array
@@ -48,12 +61,14 @@ class ReportBuilderEvent extends AbstractReportEvent
      * ReportBuilderEvent constructor.
      *
      * @param TranslatorInterface $translator
+     * @param ChannelListHelper   $channelListHelper
      * @param string              $context
      */
-    public function __construct(TranslatorInterface $translator, $context = '')
+    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context = '')
     {
-        $this->context    = $context;
-        $this->translator = $translator;
+        $this->context           = $context;
+        $this->translator        = $translator;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -315,6 +330,71 @@ class ReportBuilderEvent extends AbstractReportEvent
                 'alias' => 'category_title',
             ],
         ];
+    }
+
+    public function getChannelColumns()
+    {
+        $channelColumns = [
+            MauticReportBuilder::CHANNEL_COLUMN_CATEGORY_ID => [
+                'label'       => 'mautic.report.campaign.channel.category_id',
+                'type'        => 'int',
+                'alias'       => 'channel_category_id',
+                'channelData' => [],
+            ],
+            MauticReportBuilder::CHANNEL_COLUMN_CREATED_BY => [
+                'label'       => 'mautic.report.campaign.channel.created_by',
+                'type'        => 'int',
+                'alias'       => 'channel_created_by',
+                'channelData' => [],
+            ],
+            MauticReportBuilder::CHANNEL_COLUMN_CREATED_BY_USER => [
+                'label'       => 'mautic.report.campaign.channel.created_by_user',
+                'type'        => 'string',
+                'alias'       => 'channel_created_by_user',
+                'channelData' => [],
+            ],
+            MauticReportBuilder::CHANNEL_COLUMN_DATE_ADDED => [
+                'label'       => 'mautic.report.campaign.channel.date_added',
+                'type'        => 'datetime',
+                'alias'       => 'channel_date_added',
+                'channelData' => [],
+            ],
+            MauticReportBuilder::CHANNEL_COLUMN_DESCRIPTION => [
+                'label'       => 'mautic.report.campaign.channel.description',
+                'type'        => 'string',
+                'alias'       => 'channel_description',
+                'channelData' => [],
+            ],
+            MauticReportBuilder::CHANNEL_COLUMN_NAME => [
+                'label'       => 'mautic.report.campaign.channel.name',
+                'type'        => 'string',
+                'alias'       => 'channel_name',
+                'channelData' => [],
+            ],
+        ];
+
+        foreach ($this->channelListHelper->getChannels() as $channel => $details) {
+            if (!array_key_exists(ReportModel::CHANNEL_FEATURE, $details)) {
+                continue;
+            }
+
+            $reportDetails = $details[ReportModel::CHANNEL_FEATURE];
+
+            $hasFields = array_key_exists('fields', $reportDetails) && is_array($reportDetails['fields']);
+
+            foreach ($channelColumns as $column => $definition) {
+                $channelColumnName = $hasFields && array_key_exists($column, $reportDetails['fields'])
+                    ? $reportDetails['fields'][$column]
+                    : str_replace('channel.', $channel.'.', $column);
+
+                $channelColumns[$column]['channelData'][$channel] = [
+                    'prefix' => $channel,
+                    'column' => $channelColumnName,
+                ];
+            }
+        }
+
+        return $channelColumns;
     }
 
     /**

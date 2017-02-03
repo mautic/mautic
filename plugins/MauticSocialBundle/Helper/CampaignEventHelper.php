@@ -67,9 +67,8 @@ class CampaignEventHelper
     }
 
     /**
-     * @param MauticFactory $factory
-     * @param               $lead
-     * @param               $event
+     * @param   $lead
+     * @param   $event
      *
      * @return bool
      */
@@ -103,7 +102,16 @@ class CampaignEventHelper
             $tweetSent = true;
         }
 
-        return ($tweetSent) ? ['timeline' => $tweetText, 'response' => $sendTweet] : ['failed' => 1, 'response' => $sendTweet];
+        if ($tweetSent) {
+            return ['timeline' => $tweetText, 'response' => $sendTweet];
+        }
+
+        $response = ['failed' => 1, 'response' => $sendTweet];
+        if (!empty($sendTweet['error']['message'])) {
+            $response['reason'] = $sendTweet['error']['message'];
+        }
+
+        return $response;
     }
 
     /**

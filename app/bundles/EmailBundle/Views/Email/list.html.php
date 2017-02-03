@@ -143,6 +143,7 @@ if (count($items)):
                                 <i class="fa fa-fw fa-pie-chart"></i>
                             </span>
                                 <?php endif; ?>
+                                <?php echo $view['content']->getCustomContent('email.name', $mauticTemplateVars); ?>
                             </a>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
@@ -173,6 +174,7 @@ if (count($items)):
                                 ['%count%' => $item->getReadCount(true)]
                             ); ?></span>
 			<span class="mt-xs label label-primary"><?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadPercentage(true)]); ?></span>
+                        <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

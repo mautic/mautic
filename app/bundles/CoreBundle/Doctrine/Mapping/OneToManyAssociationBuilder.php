@@ -32,4 +32,12 @@ class OneToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\OneToMan
 
         return $this;
     }
+
+    /**
+     * @return ClassMetadataBuilder
+     */
+    public function build()
+    {
+        return parent::build();
+    }
 }

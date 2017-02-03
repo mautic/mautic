@@ -26,11 +26,15 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticEmailBundle:StatDevice');
-        $this->repositories[] = $em->getRepository('MauticEmailBundle:Stat');
+        $this->repositories[]             = $repo             = $em->getRepository('MauticEmailBundle:StatDevice');
+        $devicesTable                     = $repo->getTableName();
+        $this->permissions[$devicesTable] = [
+            'stat.lead' => 'lead:leads',
+        ];
 
-        // Exclude copy and tokens as these can be quite large
-        $this->selects[$em->getRepository('MauticEmailBundle:Stat')->getTableName()] =
+        $this->repositories[]       = $repo       = $em->getRepository('MauticEmailBundle:Stat');
+        $statsTable                 = $repo->getTableName();
+        $this->selects[$statsTable] =
             [
                 'id',
                 'email_id',
@@ -51,5 +55,8 @@ class StatsSubscriber extends CommonStatsSubscriber
                 'last_opened',
                 'open_details',
             ];
+        $this->permissions[$statsTable] = [
+            'lead' => 'lead:leads',
+        ];
     }
 }

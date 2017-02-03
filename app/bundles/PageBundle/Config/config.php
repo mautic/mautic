@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_page_buildertoken_index' => [
-                'path'       => '/pages/buildertokens/{page}',
-                'controller' => 'MauticPageBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_page_index' => [
                 'path'       => '/pages/{page}',
                 'controller' => 'MauticPageBundle:Page:index',
@@ -29,6 +25,10 @@ return [
             'mautic_page_tracker' => [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage',
+            ],
+            'mautic_page_tracker_cors' => [
+                'path'       => '/mtc/event',
+                'controller' => 'MauticPageBundle:Public:tracking',
             ],
             'mautic_page_tracker_getcontact' => [
                 'path'       => '/mtc',
@@ -287,10 +287,10 @@ return [
 
     'parameters' => [
         'cat_in_page_url'      => false,
-        'track_by_fingerprint' => false,
         'google_analytics'     => false,
-
-        'redirect_list_types' => [
+        'track_contact_by_ip'  => false,
+        'track_by_fingerprint' => false,
+        'redirect_list_types'  => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
