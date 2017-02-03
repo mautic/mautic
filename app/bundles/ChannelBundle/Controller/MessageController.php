@@ -212,10 +212,12 @@ class MessageController extends AbstractStandardFormController
         return 'message';
     }
 
-    /**
-     * {@inheritdoc}
+    /***
+     * @param null $objectId
+     *
+     * @return string
      */
-    protected function getSessionBase()
+    protected function getSessionBase($objectId = null)
     {
         return 'message';
     }

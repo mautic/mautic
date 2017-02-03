@@ -608,11 +608,12 @@ Mautic.prepareCampaignCanvas = function() {
             var editButton         = mQuery('#'+targetElementId).find('a.btn-edit');
             var editUrl            = editButton.attr('href');
 
-            var anchorQueryParams  = '&anchor=' + epDetails.anchorName + "&anchorEventType=" + epDetails.eventType;
+            var anchorQueryParams  = 'anchor=' + epDetails.anchorName + "&anchorEventType=" + epDetails.eventType;
             if (editUrl.search('anchor=') !== -1) {
                 editUrl.replace(/anchor=(.*?)$/, anchorQueryParams);
             } else {
-                editUrl = editUrl + anchorQueryParams;
+                var delimiter = (editUrl.indexOf('?') === -1) ? '?' : '&';
+                editUrl = editUrl + delimiter + anchorQueryParams;
             }
             editButton.attr('data-href', editUrl);
 

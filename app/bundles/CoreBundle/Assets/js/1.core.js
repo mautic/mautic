@@ -585,9 +585,10 @@ var Mautic = {
                     mQuery('.modal.in  .loading-placeholder').addClass('hide');
                 }
             } else if (inDevMode) {
-                if (response.error) {
-                    var error = response.error.code + ': ' + errorThrown + '; ' + response.error.exception;
-                    alert(error);
+                console.log(response);
+
+                if (response.errors && response.errors[0] && response.errors[0].message) {
+                    alert(response.errors[0].message);
                 }
             }
         }

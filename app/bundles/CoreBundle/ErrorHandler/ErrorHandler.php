@@ -180,7 +180,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleException($exception, $returnContent = false, $inTemplate = false)
         {
-            $inline = false;
+            $inline = $inTemplate;
             if (!$exception instanceof FatalThrowableError && defined('MAUTIC_DELEGATE_VIEW')) {
                 $inline = true;
             }
@@ -192,12 +192,21 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $inline = $error['inline'];
             }
 
+            if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
+                $inline = true;
+            }
+
             $content = $this->generateResponse($error, $inline, $inTemplate);
 
             $this->log(LogLevel::ERROR, "{$error['message']} - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
                 return $content;
+            }
+
+            if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
+                header('Content-Type: application/json');
+                $content = json_encode(['newContent' => $content]);
             }
 
             echo $content;
@@ -446,9 +455,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $error['message'] = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator. System administrators, check server logs for errors.';
                 }
 
+                $error['message']    = strip_tags($error['message']);
                 $dataArray['errors'] = [
                     [
-                        'message' => strip_tags($error['message']),
+                        'message' => $error['message'],
                         'code'    => 500,
                         'type'    => null,
                     ],
@@ -476,10 +486,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ($this->environment == 'dev' || $this->displayErrors) {
-                if (!isset($error['message'])) {
-                    die(var_dump($error));
-                }
-                $error['file'] = (isset($error['file'])) ? str_replace(self::$root, '', $error['file']) : 'unknown';
+                $error['file'] = str_replace(self::$root, '', $error['file']);
                 $message       = "{$error['message']} - in file {$error['file']} - at line {$error['line']}";
             } else {
                 $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';

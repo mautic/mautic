@@ -100,9 +100,11 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
+     * @param null $objectId
+     *
      * @return mixed
      */
-    protected function getSessionBase()
+    protected function getSessionBase($objectId = null)
     {
         return $this->deprecatedSessionBase;
     }

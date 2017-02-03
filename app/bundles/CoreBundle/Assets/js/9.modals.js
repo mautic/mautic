@@ -176,7 +176,14 @@ Mautic.processModalContent = function (response, target) {
     if (response.error) {
         Mautic.stopIconSpinPostEvent();
 
-        alert(response.error);
+        if (response.errors) {
+            alert(response.errors[0].message);
+        } else if (response.error.message) {
+            alert(response.error.message);
+        } else {
+            alert(response.error);
+        }
+
         return;
     }
 

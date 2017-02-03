@@ -322,6 +322,13 @@ class CommonController extends Controller implements MauticController
         $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
         $code            = array_key_exists('responseCode', $args) ? $args['responseCode'] : 200;
 
+        /*
+         * Return json response if this is a modal
+         */
+        if (!empty($passthrough['closeModal'])) {
+            return new JsonResponse($passthrough);
+        }
+
         //set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
             $passthrough['route'] = $args['returnUrl'];
@@ -373,7 +380,10 @@ class CommonController extends Controller implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
-                $newContent = $this->renderView($contentTemplate, $parameters);
+                $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
+                $newContent                           = $this->renderView($contentTemplate, $parameters);
+
+                unset($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER']);
             }
         }
 

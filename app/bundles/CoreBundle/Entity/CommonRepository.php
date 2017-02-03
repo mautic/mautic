@@ -1405,6 +1405,10 @@ class CommonRepository extends EntityRepository
                     $q->expr()->in($this->getTableAlias().'.id', $ids)
                 );
             }
+        } elseif (!empty($args['ownedBy'])) {
+            $queryExpression->add(
+                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (int) $args['ownedBy'][1])
+            );
         }
 
         if (!empty($filter)) {
