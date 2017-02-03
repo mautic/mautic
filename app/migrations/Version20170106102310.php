@@ -51,8 +51,14 @@ ALTER TABLE {$this->prefix}campaign_events
 SQL;
         $this->addSql($sql);
 
+        $channel = '';
+        if (!$schema->getTable($this->prefix.'campaign_lead_event_log')->hasColumn('channel')) {
+            $channel = 'ADD channel VARCHAR(255) DEFAULT NULL, ADD channel_id INT DEFAULT NULL,';
+        }
+
         $sql = <<<SQL
 ALTER TABLE {$this->prefix}campaign_lead_event_log
+  $channel
   DROP PRIMARY KEY,
   ADD id INT AUTO_INCREMENT NOT NULL,
   ADD PRIMARY KEY(id),
