@@ -593,6 +593,7 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
+                    'plugins'       => $builderPlugins = $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -953,7 +954,11 @@ class EmailController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
-        $slots    = $this->factory->getTheme($template)->getSlots('email');
+        if (explode(':', $template)[0] === 'plugin') {
+            return new Response(explode(':', $template)[1]);
+        }
+
+        $slots = $this->factory->getTheme($template)->getSlots('email');
 
         //merge any existing changes
         $newContent = $this->get('session')->get('mautic.emailbuilder.'.$objectId.'.content', []);

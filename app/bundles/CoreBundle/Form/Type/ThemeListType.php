@@ -42,6 +42,12 @@ class ThemeListType extends AbstractType
                 $themes = $factory->getInstalledThemes($options['feature']);
                 $themes['mautic_code_mode'] = 'Code Mode';
 
+                $builderPlugins = $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+
+                foreach ($builderPlugins as $name => $config) {
+                    $themes[$name] = $config['name'];
+                }
+
                 return $themes;
             },
             'expanded'    => false,
