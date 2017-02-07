@@ -58,24 +58,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Message $entity
-     * @param bool    $unlock
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        parent::saveEntity($entity, $unlock);
-
-        // Persist channels to update changes
-        $channels = $entity->getChannels();
-        if ($channels->count()) {
-            foreach ($channels as $channel) {
-                $this->em->persist($channel);
-            }
-            $this->em->flush();
-        }
-    }
-
-    /**
      * @return string
      */
     public function getPermissionBase()

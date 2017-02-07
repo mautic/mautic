@@ -24,7 +24,7 @@ return [
         'api' => [
             'mautic_api_messagetandard' => [
                 'standard_entity' => true,
-                'name'            => 'message',
+                'name'            => 'messages',
                 'path'            => '/messages',
                 'controller'      => 'MauticChannelBundle:Api\MessageApi',
             ],
