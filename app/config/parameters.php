@@ -121,4 +121,6 @@ if (isset($mauticParams['site_url'])) {
     }
 }
 
+$loader->import('rabbitmq.php');
+
 unset($mauticParams, $replaceRootPlaceholder, $bundles);

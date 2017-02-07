@@ -7,11 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Queue;
+namespace Mautic\QueueBundle\Model;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Queue\RabbitMq;
-use Mautic\CoreBundle\Queue\QueueProtocol;
+use Mautic\QueueBundle\Helper\CoreParametersHelper;
+use Mautic\QueueBundle\Model\RabbitMq;
+use Mautic\QueueBundle\Model\QueueProtocol;
 
 
 // register here the different types of queue protocols
@@ -30,12 +30,12 @@ abstract class QueueName
     const Pixel = 1;
 }
 
-class QueueService
+class TaskEmailService
 {
 
-  public function __construct($coreParametersHelper, $rabbitmq)
+  public function __construct($queueParametersHelper, $rabbitmq)
   {
-    $this->coreParametersHelper = $coreParametersHelper;
+    $this->queueParametersHelper = $queueParametersHelper;
     $this->rabbitmq = $rabbitmq;
   }
 
@@ -47,7 +47,7 @@ class QueueService
   public function addMessageToQueue($msg, $queue_name)
   {
     // queue_name is not used right now
-    $queue_protocol = $this->coreParametersHelper->getParameter('queue_protocol');
+    $queue_protocol = $this->queueParametersHelper->getParameter('queue_protocol');
     switch ($queue_protocol) {
       case QueueProtocol::RabbitMq:
           $this->rabbitmq->addMessageToQueue($msg, $queue_name);

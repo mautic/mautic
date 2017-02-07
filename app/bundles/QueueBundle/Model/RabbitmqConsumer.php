@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\EmailBundle\Service\Rabbitmq;
+namespace Mautic\QueueBundle\Model;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
