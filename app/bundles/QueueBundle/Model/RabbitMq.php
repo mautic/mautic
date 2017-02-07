@@ -7,9 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Queue;
+namespace Mautic\QueueBundle\Model;
 
-use Mautic\CoreBundle\Queue\QueueName;
+use Mautic\QueueBundle\Model\QueueName;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 class RabbitMq
 {

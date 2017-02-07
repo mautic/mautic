@@ -285,10 +285,6 @@ return [
                     'mailer',
                 ],
             ],
-            'email_consumer' => [
-              'class' => 'Mautic\EmailBundle\Service\Rabbitmq\Consumer',
-              'arguments' => 'mautic.email.model.email'
-            ],
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -417,7 +413,5 @@ return [
         'show_contact_segments'               => false,
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
-        'track_mail_use_queue'                => false,
-
     ],
 ];

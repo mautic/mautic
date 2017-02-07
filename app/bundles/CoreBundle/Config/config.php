@@ -462,19 +462,6 @@ return [
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
-            'mautic.rabbitMQ' => [
-              'class' => 'Mautic\CoreBundle\Queue\RabbitMq',
-              'arguments' => [
-                'old_sound_rabbit_mq.task_email_producer'
-              ]
-            ],
-            'mautic.queue_service' => [
-                'class' => 'Mautic\CoreBundle\Queue\QueueService',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.rabbitMQ',
-                ]
-            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -911,11 +898,5 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
-        'rabbitmq_host'             => 'localhost',
-        'rabbitmq_port'             => '5672',
-        'rabbitmq_vhost'            => '/',
-        'rabbitmq_user'             => 'guest',
-        'rabbitmq_password'         => 'guest',
-        'queue_protocol'            => 0,
     ],
 ];
