@@ -32,7 +32,7 @@ class TweetType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.text.tooltip',
-                    'class'   => 'form-control',
+                    'class'   => 'form-control tweet-message',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -53,7 +53,7 @@ class TweetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'attr'        => [
-                    'class'   => 'form-control',
+                    'class'   => 'form-control tweet-insert-asset',
                     'tooltip' => 'mautic.social.monitoring.twitter.assets.descr',
                 ],
             ]
@@ -68,7 +68,7 @@ class TweetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'attr'        => [
-                    'class'   => 'form-control',
+                    'class'   => 'form-control tweet-insert-page',
                     'tooltip' => 'mautic.social.monitoring.twitter.pages.descr',
                 ],
             ]
@@ -80,7 +80,7 @@ class TweetType extends AbstractType
             [
                 'label' => '@',
                 'attr'  => [
-                    'class' => 'form-control btn-primary',
+                    'class' => 'form-control btn-primary tweet-insert-handle',
                 ],
             ]
         );

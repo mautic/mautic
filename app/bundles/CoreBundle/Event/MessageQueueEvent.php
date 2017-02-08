@@ -11,35 +11,13 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Entity\MessageQueue;
+@trigger_error('Mautic\CoreBundle\Event\MessageQueueEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\MessageQueueEvent instead', E_DEPRECATED);
 
-class MessageQueueEvent extends CommonEvent
+/**
+ * Class MessageQueueEvent.
+ *
+ * @deprecated 2.4 to be removed in 3.0; use \Mautic\ChannelBundle\Event\MessageQueueEvent instead
+ */
+class MessageQueueEvent extends \Mautic\ChannelBundle\Event\MessageQueueEvent
 {
-    /**
-     * MessageQueueEvent constructor.
-     *
-     * @param MessageQueue $entity
-     * @param bool         $isNew
-     */
-    public function __construct(MessageQueue $entity, $isNew = false)
-    {
-        $this->entity = $entity;
-        $this->isNew  = $isNew;
-    }
-
-    /**
-     * @return MessageQueue
-     */
-    public function getMessageQueue()
-    {
-        return $this->entity;
-    }
-
-    /**
-     * @param MessageQueue $entity
-     */
-    public function setMessageQueue($entity)
-    {
-        $this->entity = $entity;
-    }
 }

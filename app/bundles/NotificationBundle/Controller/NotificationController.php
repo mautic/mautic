@@ -316,7 +316,7 @@ class NotificationController extends FormController
                 $returnUrl      = $this->generateUrl('mautic_notification_index', $viewParameters);
                 $template       = 'MauticNotificationBundle:Notification:index';
                 //clear any modified content
-                $session->remove('mautic.notification.'.$entity->getSessionId().'.content');
+                $session->remove('mautic.notification.'.$entity->getId().'.content');
             }
 
             $passthrough = [
@@ -481,10 +481,10 @@ class NotificationController extends FormController
                 $passthrough = array_merge(
                     $passthrough,
                     [
-                        'updateSelect'      => $form['updateSelect']->getData(),
-                        'notificationId'    => $entity->getId(),
-                        'notificationTitle' => $entity->getName(),
-                        'notificationLang'  => $entity->getLanguage(),
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }
@@ -561,7 +561,7 @@ class NotificationController extends FormController
 
             $entity      = clone $entity;
             $session     = $this->get('session');
-            $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
+            $contentName = 'mautic.notification.'.$entity->getId().'.content';
 
             $session->set($contentName, $entity->getContent());
         }

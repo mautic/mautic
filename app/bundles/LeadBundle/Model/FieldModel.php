@@ -765,6 +765,8 @@ class FieldModel extends FormModel
     /**
      * Retrieves a list of published fields that are unique identifers.
      *
+     * @deprecated to be removed in 3.0
+     *
      * @return array
      */
     public function getUniqueIdentiferFields($filters = [])
@@ -793,7 +795,9 @@ class FieldModel extends FormModel
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
      *
-     * @param $fieldType
+     * @param      $alias
+     * @param      $type
+     * @param bool $isUnique
      *
      * @return array
      */
@@ -820,6 +824,7 @@ class FieldModel extends FormModel
             case 'number':
                 $schemaType = 'float';
                 break;
+            case 'timezone':
             case 'locale':
             case 'country':
             case 'email':
@@ -828,8 +833,10 @@ class FieldModel extends FormModel
             case 'multiselect':
             case 'region':
             case 'tel':
-            case 'text':
                 $schemaType = 'string';
+                break;
+            case 'text':
+                $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
                 break;
             default:
                 $schemaType = 'text';

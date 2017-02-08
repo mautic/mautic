@@ -16,6 +16,7 @@ use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -80,7 +81,7 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $params;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 

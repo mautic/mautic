@@ -12,12 +12,16 @@
 namespace Mautic\ChannelBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class MessageModel.
@@ -37,6 +41,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     protected $campaignModel;
 
     /**
+     * @var
+     */
+    protected static $channels;
+
+    /**
      * MessageModel constructor.
      *
      * @param ChannelListHelper $channelListHelper
@@ -46,24 +55,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     {
         $this->channelListHelper = $channelListHelper;
         $this->campaignModel     = $campaignModel;
-    }
-
-    /**
-     * @param Message $entity
-     * @param bool    $unlock
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        parent::saveEntity($entity, $unlock);
-
-        // Persist channels to update changes
-        $channels = $entity->getChannels();
-        if ($channels->count()) {
-            foreach ($channels as $channel) {
-                $this->em->persist($channel);
-            }
-            $this->em->flush();
-        }
     }
 
     /**
@@ -118,33 +109,37 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getChannels()
     {
-        $channels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE);
+        if (!self::$channels) {
+            $channels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE);
 
-        // Validate channel configs
-        foreach ($channels as $channel => $config) {
-            if (!isset($config['lookupFormType']) && !isset($config['propertiesFormType'])) {
-                throw new \InvalidArgumentException('lookupFormType and/or propertiesFormType are required for channel '.$channel);
+            // Validate channel configs
+            foreach ($channels as $channel => $config) {
+                if (!isset($config['lookupFormType']) && !isset($config['propertiesFormType'])) {
+                    throw new \InvalidArgumentException('lookupFormType and/or propertiesFormType are required for channel '.$channel);
+                }
+
+                switch (true) {
+                    case $this->translator->hasId('mautic.channel.'.$channel):
+                        $label = $this->translator->trans('mautic.channel.'.$channel);
+                        break;
+                    case $this->translator->hasId('mautic.'.$channel):
+                        $label = $this->translator->trans('mautic.'.$channel);
+                        break;
+                    case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
+                        $label = $this->translator->trans('mautic.'.$channel.'.'.$channel);
+                        break;
+                    default:
+                        $label = ucfirst($channel);
+                }
+                $config['label'] = $label;
+
+                $channels[$channel] = $config;
             }
 
-            switch (true) {
-                case $this->translator->hasId('mautic.channel.'.$channel):
-                    $label = $this->translator->trans('mautic.channel.'.$channel);
-                    break;
-                case $this->translator->hasId('mautic.'.$channel):
-                    $label = $this->translator->trans('mautic.'.$channel);
-                    break;
-                case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                    $label = $this->translator->trans('mautic.'.$channel.'.'.$channel);
-                    break;
-                default:
-                    $label = ucfirst($channel);
-            }
-            $config['label'] = $label;
-
-            $channels[$channel] = $config;
+            self::$channels = $channels;
         }
 
-        return $channels;
+        return self::$channels;
     }
 
     /**
@@ -191,6 +186,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         return $this->getRepository()->getMessageChannels($messageId);
     }
 
+    /**
+     * @param $channelId
+     *
+     * @return array
+     */
     public function getChannelMessageByChannelId($channelId)
     {
         return $this->getRepository()->getChannelMessageByChannelId($channelId);
@@ -220,5 +220,45 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
 
         return $eventLog->getEventLogs(['eventType' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof Message) {
+            throw new MethodNotAllowedHttpException(['Message']);
+        }
+
+        switch ($action) {
+            case 'pre_save':
+                $name = ChannelEvents::MESSAGE_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = ChannelEvents::MESSAGE_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = ChannelEvents::MESSAGE_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = ChannelEvents::MESSAGE_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new MessageEvent($entity, $isNew);
+            }
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        }
+
+        return null;
     }
 }

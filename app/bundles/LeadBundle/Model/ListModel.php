@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
@@ -36,6 +37,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ListModel extends FormModel
 {
+    use OperatorListTrait;
+
     /**
      * @var CoreParametersHelper
      */
@@ -231,81 +234,34 @@ class ListModel extends FormModel
     }
 
     /**
-     * @return mixed
-     */
-    public function getFilterExpressionFunctions()
-    {
-        return $this->em->getRepository('MauticLeadBundle:LeadList')->getFilterExpressionFunctions();
-    }
-
-    /**
      * Get a list of field choices for filters.
      *
      * @return array
      */
     public function getChoiceFields()
     {
-        $operators = [
-            'text' => [
-                'include' => [
-                    '=',
-                    '!=',
-                    'empty',
-                    '!empty',
-                    'like',
-                    '!like',
-                    'regexp',
-                    '!regexp',
-                ],
-            ],
-            'select' => [
-                'include' => [
-                    '=',
-                    '!=',
-                    'empty',
-                    '!empty',
-                    'regexp',
-                    '!regexp',
-                    'in',
-                    '!in',
-                ],
-            ],
-            'bool' => [
-                'include' => [
-                    '=',
-                    '!=',
-                ],
-            ],
-            'default' => [
-                'exclude' => [
-                    'in',
-                    '!in',
-                ],
-            ],
-            'multiselect' => [
-                'include' => [
-                    'in',
-                    '!in',
-                ],
-            ],
-        ];
-
         //field choices
         $choices['lead'] = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'date'],
-                'operators'  => 'default',
+                'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
                 'properties' => ['type' => 'date'],
-                'operators'  => 'default',
+                'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'last_active' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->getOperatorsForFieldType('default'),
+                'object'     => 'lead',
+            ],
+            'date_modified' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.date_modified'),
                 'properties' => ['type' => 'date'],
                 'operators'  => 'default',
                 'object'     => 'lead',
@@ -316,13 +272,13 @@ class ListModel extends FormModel
                     'type'     => 'lookup_id',
                     'callback' => 'activateLeadFieldTypeahead',
                 ],
-                'operators' => 'text',
+                'operators' => $this->getOperatorsForFieldType('text'),
                 'object'    => 'lead',
             ],
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
-                'operators'  => 'default',
+                'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'leadlist' => [
@@ -330,7 +286,7 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'leadlist',
                 ],
-                'operators' => 'multiselect',
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
             'lead_email_received' => [
@@ -338,12 +294,14 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'lead_email_received',
                 ],
-                'operators' => [
-                    'include' => [
-                        'in',
-                        '!in',
-                    ],
-                ],
+                'operators' => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            'in',
+                            '!in',
+                        ],
+                    ]
+                ),
                 'object' => 'lead',
             ],
             'tags' => [
@@ -351,7 +309,7 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'tags',
                 ],
-                'operators' => 'multiselect',
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
             'dnc_bounced' => [
@@ -363,7 +321,7 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'operators' => 'bool',
+                'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
             'dnc_unsubscribed' => [
@@ -375,7 +333,7 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'operators' => 'bool',
+                'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
             'dnc_bounced_sms' => [
@@ -387,7 +345,7 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'operators' => 'bool',
+                'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
             'dnc_unsubscribed_sms' => [
@@ -399,7 +357,7 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'operators' => 'bool',
+                'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
             'hit_url' => [
@@ -407,13 +365,15 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'text',
                 ],
-                'operators' => [
-                    'include' => [
-                        '=',
-                        'like',
-                        'regexp',
-                    ],
-                ],
+                'operators' => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            'like',
+                            'regexp',
+                        ],
+                    ]
+                ),
                 'object' => 'lead',
             ],
             'stage' => [
@@ -421,12 +381,14 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'stage',
                 ],
-                'operators' => [
-                    'include' => [
-                        '=',
-                        '!=',
-                    ],
-                ],
+                'operators' => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                        ],
+                    ]
+                ),
                 'object' => 'lead',
             ],
             'globalcategory' => [
@@ -434,14 +396,14 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'globalcategory',
                 ],
-                'operators' => 'multiselect',
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
         ];
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent($choices, $operators, $this->translator);
+            $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator);
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
@@ -469,7 +431,10 @@ class ListModel extends FormModel
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
-                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list'])) : '';
+                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
+                        FormFieldHelper::FORMAT_BAR,
+                        FormFieldHelper::parseList($properties['list'])
+                    ) : '';
                 }
             }
             $choices[$field->getObject()][$field->getAlias()] = [
@@ -478,16 +443,7 @@ class ListModel extends FormModel
                 'object'     => $field->getObject(),
             ];
 
-            // Set operators allowed
-            if ($type == 'boolean') {
-                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
-            } elseif (in_array($type, ['select', 'multiselect', 'country', 'timezone', 'region', 'locale'])) {
-                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
-            } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
-                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
-            } else {
-                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'default';
-            }
+            $choices[$field->getObject()][$field->getAlias()]['operators'] = $this->getOperatorsForFieldType($type);
         }
 
         foreach ($choices as $key => $choice) {
@@ -496,14 +452,6 @@ class ListModel extends FormModel
             };
             uasort($choice, $cmp);
             $choices[$key] = $choice;
-        }
-
-        foreach ($choices as $object => $choiceObject) {
-            foreach ($choiceObject as $key => $choice) {
-                if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
-                    $choices[$object][$key]['operators'] = $operators[$choice['operators']];
-                }
-            }
         }
 
         return $choices;
@@ -615,9 +563,10 @@ class ListModel extends FormModel
                     break;
                 }
 
+                $processedLeads = [];
                 foreach ($newLeadList[$id] as $l) {
                     $this->addLead($l, $entity, false, true, -1, $localDateTime);
-
+                    $processedLeads[] = $l;
                     unset($l);
 
                     ++$leadsProcessed;
@@ -633,11 +582,11 @@ class ListModel extends FormModel
                 $start += $limit;
 
                 // Dispatch batch event
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $event = new ListChangeEvent($newLeadList[$id], $entity, true);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
-
-                    unset($event);
+                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    $this->dispatcher->dispatch(
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
+                        new ListChangeEvent($processedLeads, $entity, true)
+                    );
                 }
 
                 unset($newLeadList);
@@ -715,9 +664,10 @@ class ListModel extends FormModel
                     break;
                 }
 
+                $processedLeads = [];
                 foreach ($removeLeadList[$id] as $l) {
                     $this->removeLead($l, $entity, false, true, true);
-
+                    $processedLeads[] = $l;
                     ++$leadsProcessed;
                     if ($output && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
@@ -729,11 +679,11 @@ class ListModel extends FormModel
                 }
 
                 // Dispatch batch event
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $event = new ListChangeEvent($removeLeadList[$id], $entity, false);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_BATCH_CHANGE, $event);
-
-                    unset($event);
+                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
+                    $this->dispatcher->dispatch(
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
+                        new ListChangeEvent($processedLeads, $entity, false)
+                    );
                 }
 
                 $start += $limit;
@@ -1160,6 +1110,17 @@ class ListModel extends FormModel
         return $results;
     }
 
+    /**
+     * @param           $unit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param           $dateFormat
+     * @param           $filter
+     * @param           $canViewOthers
+     * @param           $listName
+     *
+     * @return array
+     */
     public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName)
     {
         $chart = new PieChart();
@@ -1193,13 +1154,11 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits.
-     *
-     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
+     * @param           $unit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param null      $dateFormat
+     * @param array     $filter
      *
      * @return array
      */
@@ -1264,14 +1223,13 @@ class ListModel extends FormModel
 
         return $chartData;
     }
+
     /**
-     * Get bar chart data of hits.
-     *
-     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
+     * @param           $unit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param null      $dateFormat
+     * @param array     $filter
      *
      * @return array
      */

@@ -111,10 +111,12 @@ class CategoryRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $expr                = $q->expr()->eq('c.isPublished', ":$unique");
                 $parameters[$unique] = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr                = $q->expr()->eq('c.isPublished', ":$unique");
                 $parameters[$unique] = false;
                 break;

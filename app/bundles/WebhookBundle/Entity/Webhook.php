@@ -70,6 +70,11 @@ class Webhook extends FormEntity
      */
     private $removedEvents = [];
 
+    /**
+     * @var
+     */
+    private $payload;
+
     /*
      * Constructor
      */
@@ -412,6 +417,26 @@ class Webhook extends FormEntity
     public function removeLog(Log $log)
     {
         $this->logs->removeElement($log);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPayload()
+    {
+        return $this->payload;
+    }
+
+    /**
+     * @param mixed $payload
+     *
+     * @return Webhook
+     */
+    public function setPayload($payload)
+    {
+        $this->payload = $payload;
 
         return $this;
     }

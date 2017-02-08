@@ -42,10 +42,6 @@ return [
                 'path'       => '/plugins/integrations/authuser/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authUser',
             ],
-            'mautic_integration_auth_callback_bc' => [
-                'path'       => '/addon/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback',
-            ],
             'mautic_integration_auth_callback' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authCallback',

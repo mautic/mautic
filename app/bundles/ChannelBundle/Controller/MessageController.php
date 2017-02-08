@@ -21,17 +21,75 @@ use Symfony\Component\Form\Form;
 class MessageController extends AbstractStandardFormController
 {
     /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction()
+    {
+        return $this->batchDeleteStandard();
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function cloneAction($objectId)
+    {
+        return $this->cloneStandard($objectId);
+    }
+
+    /**
+     * @param      $objectId
+     * @param bool $ignorePost
+     *
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function editAction($objectId, $ignorePost = false)
+    {
+        return $this->editStandard($objectId, $ignorePost);
+    }
+
+    /**
+     * @param int $page
+     *
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function indexAction($page = 1)
+    {
+        return $this->indexStandard($page);
+    }
+
+    /**
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function newAction()
+    {
+        return $this->newStandard();
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        return $this->delegateRedirect($this->generateUrl('mautic_message_index'));
+        //return $this->viewStandard($objectId);
+    }
+
+    /**
      * @param $args
-     * @param $view
+     * @param $action
      *
      * @return mixed
      */
-    protected function customizeViewArguments($args, $view)
+    protected function getViewArguments(array $args, $action)
     {
         /** @var MessageModel $model */
-        $model          = $this->getModel($this->modelName);
+        $model          = $this->getModel($this->getModelName());
         $viewParameters = [];
-        switch ($view) {
+        switch ($action) {
             case 'index':
                 $viewParameters = [
                     'headerTitle' => $this->get('translator')->trans('mautic.channel.messages'),
@@ -43,6 +101,7 @@ class MessageController extends AbstractStandardFormController
                     ],
                     'listItemTemplate'  => 'MauticChannelBundle:Message:list_item.html.php',
                     'enableCloneButton' => true,
+                    'nameAction'        => 'edit',
                 ];
 
                 break;
@@ -72,6 +131,12 @@ class MessageController extends AbstractStandardFormController
                 break;
             case 'new':
             case 'edit':
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $this->template = false;
+            } else {
+                $this->template = true;
+            }
                 $viewParameters = [
                     'channels' => $model->getChannels(),
                 ];
@@ -85,73 +150,21 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param Form $form
-     * @param      $view
+     * @param array $args
+     * @param       $action
      *
-     * @return \Symfony\Component\Form\FormView
+     * @return array
      */
-    public function getStandardFormView(Form $form, $view)
+    protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $themes = ['MauticChannelBundle:FormTheme'];
-        /** @var MessageModel $model */
-        $model    = $this->getModel($this->modelName);
-        $channels = $model->getChannels();
-        foreach ($channels as $channel) {
-            if (isset($channel['formTheme'])) {
-                $themes[] = $channel['formTheme'];
-            }
+        switch ($action) {
+            default:
+                $args['contentTemplate'] = $this->getControllerBase().':index';
+                $args['returnUrl']       = $this->generateUrl($this->getIndexRoute());
+                break;
         }
 
-        return $this->setFormTheme($form, 'MauticChannelBundle:Message:form.html.php', $themes);
-    }
-
-    /**
-     * @param int $page
-     *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function indexAction($page = 1)
-    {
-        return $this->indexStandard($page);
-    }
-
-    /**
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function newAction()
-    {
-        return $this->newStandard();
-    }
-
-    /**
-     * @param      $objectId
-     * @param bool $ignorePost
-     *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function editAction($objectId, $ignorePost = false)
-    {
-        return $this->editStandard($objectId, $ignorePost);
-    }
-
-    /**
-     * @param $objectId
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function viewAction($objectId)
-    {
-        return $this->viewStandard($objectId);
-    }
-
-    /**
-     * @param $objectId
-     *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function cloneAction($objectId)
-    {
-        return $this->cloneStandard($objectId);
+        return $args;
     }
 
     /**
@@ -165,58 +178,73 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * {@inheritdoc}
      */
-    public function batchDeleteAction()
+    protected function getControllerBase()
     {
-        return $this->batchDeleteStandard();
+        return 'MauticChannelBundle:Message';
+    }
+
+    /**
+     * @param Form $form
+     * @param      $view
+     *
+     * @return \Symfony\Component\Form\FormView
+     */
+    protected function getFormView(Form $form, $view)
+    {
+        $themes = ['MauticChannelBundle:FormTheme'];
+        /** @var MessageModel $model */
+        $model    = $this->getModel($this->getModelName());
+        $channels = $model->getChannels();
+        foreach ($channels as $channel) {
+            if (isset($channel['formTheme'])) {
+                $themes[] = $channel['formTheme'];
+            }
+        }
+
+        return $this->setFormTheme($form, 'MauticChannelBundle:Message:form.html.php', $themes);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setStandardTemplateBases()
+    protected function getJsLoadMethodPrefix()
     {
-        $this->controllerBase = 'MauticChannelBundle:Message';
+        return 'messages';
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setStandardSessionBase()
+    protected function getModelName()
     {
-        $this->sessionBase = 'mautic.message';
+        return 'channel.message';
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setStandardRoutes()
+    protected function getRouteBase()
     {
-        $this->routeBase = 'message';
+        return 'message';
+    }
+
+    /***
+     * @param null $objectId
+     *
+     * @return string
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        return 'message';
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setStandardFrontendVariables()
+    protected function getTranslationBase()
     {
-        $this->mauticContent = 'messages';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setStandardModelName()
-    {
-        $this->modelName = 'channel.message';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setStandardTranslationBase()
-    {
-        $this->translationBase = 'mautic.channel.message';
+        return 'mautic.channel.message';
     }
 }

@@ -13,6 +13,7 @@ if ($tmpl == 'index'):
 endif;
 
 $formId = $form->getId();
+
 ?>
 <div class="table-responsive table-responsive-force">
     <table class="table table-hover table-striped table-bordered formresult-list" id="formResultTable">

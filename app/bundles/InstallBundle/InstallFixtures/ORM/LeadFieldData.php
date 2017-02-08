@@ -16,6 +16,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -51,10 +52,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $indexesToAdd = [];
         foreach ($fieldGroups as $object => $fields) {
             if ($object == 'company') {
-                /** @var ColumnSchemaHelper $companiesSchema */
+                /** @var ColumnSchemaHelper $schema */
                 $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
             } else {
-                /** @var ColumnSchemaHelper $companiesSchema */
+                /** @var ColumnSchemaHelper $schema */
                 $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
             }
 
@@ -79,9 +80,14 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $manager->persist($entity);
                 $manager->flush();
 
-                $schema->addColumn(
-                    FieldModel::getSchemaDefinition($alias, $type, $entity->getIsUniqueIdentifier())
-                );
+                try {
+                    $schema->addColumn(
+                        FieldModel::getSchemaDefinition($alias, $type, $entity->getIsUniqueIdentifier())
+                    );
+                } catch (SchemaException $e) {
+                    // Schema already has this custom field; likely defined as a property in the entity class itself
+                }
+
                 $indexesToAdd[$object][] = $alias;
 
                 $this->addReference('leadfield-'.$alias, $entity);
