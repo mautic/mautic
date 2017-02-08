@@ -1098,6 +1098,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setColor($color)
     {
+        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -1150,6 +1151,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setNewlyCreated($newlyCreated)
     {
+        $this->isChanged('newlyCreated', $newlyCreated);
         $this->newlyCreated = $newlyCreated;
     }
 
@@ -1190,6 +1192,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setDateIdentified($dateIdentified)
     {
+        $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
     }
 
@@ -1206,6 +1209,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setLastActive($lastActive)
     {
+        $this->isChanged('lastActive', $lastActive);
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
     }
@@ -1263,6 +1267,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setTags($tags)
     {
+        $this->isChanged('tags', $tags);
         $this->tags = $tags;
 
         return $this;
@@ -1435,6 +1440,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -1455,6 +1461,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setFirstname($firstname)
     {
+        $this->isChanged('firstname', $firstname);
         $this->firstname = $firstname;
 
         return $this;
@@ -1475,6 +1482,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setLastname($lastname)
     {
+        $this->isChanged('lastname', $lastname);
         $this->lastname = $lastname;
 
         return $this;
@@ -1495,6 +1503,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setPosition($position)
     {
+        $this->isChanged('position', $position);
         $this->position = $position;
 
         return $this;
@@ -1515,6 +1524,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setPhone($phone)
     {
+        $this->isChanged('phone', $phone);
         $this->phone = $phone;
 
         return $this;
@@ -1535,6 +1545,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setMobile($mobile)
     {
+        $this->isChanged('mobile', $mobile);
         $this->mobile = $mobile;
 
         return $this;
@@ -1555,6 +1566,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setAddress1($address1)
     {
+        $this->isChanged('address1', $address1);
         $this->address1 = $address1;
 
         return $this;
@@ -1575,6 +1587,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setAddress2($address2)
     {
+        $this->isChanged('address2', $address2);
         $this->address2 = $address2;
 
         return $this;
@@ -1595,6 +1608,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCity($city)
     {
+        $this->isChanged('city', $city);
         $this->city = $city;
 
         return $this;
@@ -1615,6 +1629,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setState($state)
     {
+        $this->isChanged('state', $state);
         $this->state = $state;
 
         return $this;
@@ -1635,6 +1650,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setZipcode($zipcode)
     {
+        $this->isChanged('zipcode', $zipcode);
         $this->zipcode = $zipcode;
 
         return $this;
@@ -1655,6 +1671,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCountry($country)
     {
+        $this->isChanged('country', $country);
         $this->country = $country;
 
         return $this;
@@ -1695,6 +1712,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setEmail($email)
     {
+        $this->isChanged('email', $email);
         $this->email = $email;
 
         return $this;
