@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -301,91 +302,34 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    public function getEventLogs($options)
+    public function getChartQuery($options)
     {
-        $leadIps = [];
+        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
 
+        // Load points for selected period
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->select('ll.event_id,
-                ll.campaign_id,
-                ll.trigger_date,
-                ll.lead_id,
-                e.name AS event_name,
-                e.description AS event_description,
-                c.name AS campaign_name,
-                c.description AS campaign_description,
-                ll.metadata,
-                CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id');
+        $query->select('event_id as id, date_triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
+
         if (!isset($options['is_scheduled'])) {
             $query->where($query->expr()->eq('ll.is_scheduled', 0));
         } else {
             $query->where($query->expr()->eq('ll.is_scheduled', 1));
         }
-        if (isset($options['lead'])) {
-            /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-            foreach ($options['lead']->getIpAddresses() as $ip) {
-                $leadIps[] = $ip->getId();
-            }
-            $query->andWhere('ll.lead_id = :leadId')
-                ->setParameter('leadId', $options['lead']->getId());
-        }
-
-        if (isset($options['scheduled'])) {
-            $query->andWhere('ll.is_scheduled = :scheduled')
-                ->setParameter('scheduled', $options['scheduled'], 'boolean');
-        }
-
-        if (isset($options['eventType'])) {
-            $query->andwhere('e.event_type = :eventType')
-                ->setParameter('eventType', $options['eventType']);
-        }
 
         if (isset($options['type'])) {
-            $query->andwhere('e.type = :type')
-                ->setParameter('type', $options['type']);
+            $query->andwhere("e.type = '".$options['type']."'");
         }
 
         if (isset($options['channel'])) {
-            $query->andwhere('e.channel = :channel')
-                ->setParameter('channel', $options['channel']);
+            $query->andwhere("e.channel = '".$options['channel']."'");
         }
 
         if (isset($options['channelId'])) {
-            $query->andwhere('e.channel_id = :channelId')
-                ->setParameter('channelId', $options['channelId']);
+            $query->andwhere('e.channel_id = '.$options['channelId']);
         }
 
-        if (isset($options['dateFrom'])) {
-            $query->andwhere($query->expr()->gte('ll.date_triggered', ':dateFrom'))
-                ->setParameter('dateFrom', $options['dateFrom']);
-        }
-
-        if (isset($options['dateTo'])) {
-            $query->andwhere($query->expr()->lte('ll.date_triggered', ':dateTo'))
-                ->setParameter('dateTo', $options['dateTo']);
-        }
-
-        if (isset($options['limit'])) {
-            $query->setMaxResults($options['limit']);
-        } else {
-            $query->setMaxResults(10);
-        }
-
-        $query->orderBy('ll.date_triggered');
-
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
-        if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
-            $query->andWhere('c.created_by = :userId')
-                ->setParameter('userId', $this->currentUser->getId());
-        }
-
-        return $query->execute()->fetchAll();
+        return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
     }
 }

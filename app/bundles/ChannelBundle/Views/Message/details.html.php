@@ -26,36 +26,11 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item])
 );
-// active, id, name, content
-$tabs   = [];
-$active = true;
-
-foreach ($channelContents as $channel => $details) {
-    if (isset($channels[$channel])) {
-        $config = $channels[$channel];
-        $tab    = [
-            'active'        => $active,
-            'id'            => 'channel_'.$channel,
-            'containerAttr' => isset($config['mauticContent']) ? ['data-onload' => $config['mauticContent']] : [],
-            'name'          => $config['label'],
-            'content'       => $view['actions']->render(
-                new \Symfony\Component\HttpKernel\Controller\ControllerReference(
-                    $config['detailView'],
-                    ['objectId'   => $details['channel_id'], 'isEmbedded' => true],
-                    ['ignoreAjax' => true]
-                )
-            ),
-        ];
-
-        $tabs[] = $tab;
-        $active = false;
-    }
-}
 ?>
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- left section -->
-        <div class="col-md-9 bg-white height-auto">
+        <div class="col-md-9 height-auto">
             <div class="bg-auto">
                 <!-- form detail header -->
                 <div class="pr-md pl-md pt-lg pb-lg">
@@ -67,7 +42,6 @@ foreach ($channelContents as $channel => $details) {
                     </div>
                 </div>
                 <!--/ form detail header -->
-
                 <!-- form detail collapseable -->
                 <div class="collapse" id="focus-details">
                     <div class="pr-md pl-md pb-md">
@@ -82,26 +56,27 @@ foreach ($channelContents as $channel => $details) {
                 </div>
                 <!--/ form detail collapseable -->
             </div>
-            <!-- form detail collapseable toggler -->
-            <div class="hr-expand nm">
+
+        <!--/ form detail collapseable toggler -->
+            <div class="bg-auto bg-dark-xs">
+                <!-- form detail collapseable toggler -->
+                <div class="hr-expand nm">
                         <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
                             <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span> <?php echo $view['translator']->trans(
                                     'mautic.core.details'
                                 ); ?></a>
                         </span>
-            </div>
-        <!--/ form detail collapseable toggler -->
-            <div class="bg-auto bg-dark-xs">
+                </div>
                 <!-- stats -->
                 <div class="pa-md">
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="panel">
                                 <div class="panel-body box-layout">
-                                    <div class="col-md-3 va-m">
+                                    <div class="col-md-6 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">
-                                            <span class="fa fa-twitter"></span>
-                                            <?php echo $view['translator']->trans('mautic.social.monitoring.popularity'); ?>
+                                            <div><i class="fa fa-line-chart pull-left"></i>
+                                                <span class="pull-left"> <?php echo $view['translator']->trans('mautic.messages.processed.messages'); ?></span></div>
                                         </h5>
                                     </div>
                                     <div class="col-md-9 va-m">
@@ -133,7 +108,7 @@ foreach ($channelContents as $channel => $details) {
                 <!-- #events-container -->
 
                 <div class="tab-pane active fade in bdr-w-0 page-list" id="leads-container">
-                    <?php //echo $monitorLeads;?>
+                    <?php echo $messagedLeads; ?>
                 </div>
             </div>
         </div>
@@ -144,7 +119,7 @@ foreach ($channelContents as $channel => $details) {
                 <div class="panel-heading">
                     <div class="panel-title">
                         <!-- recent activity -->
-                        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => []]);
+                        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);
                         $view['slots']->start('rightFormContent');
                         $view['slots']->stop();
                         ?>

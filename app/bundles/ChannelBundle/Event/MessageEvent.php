@@ -35,4 +35,14 @@ class MessageEvent extends CommonEvent
     {
         return $this->entity;
     }
+
+    /**
+     * Sets the Sms entity.
+     *
+     * @param Message $message
+     */
+    public function setSms(Message $message)
+    {
+        $this->entity = $message;
+    }
 }

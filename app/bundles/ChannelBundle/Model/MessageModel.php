@@ -205,21 +205,16 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null)
     {
-        //todo get stats for channel messages
-        $logs   = $this->getMarketingMessagesEventLogs($messageId, $dateFrom, $dateTo);
-        $counts = [];
-        foreach ($logs as $log) {
-            $counts = [$log['event_id'], $log['trigger_date']];
-        }
+        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
 
-        return $counts;
+        return $eventLog->getChartQuery(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
     }
 
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
     {
         $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
 
-        return $eventLog->getEventLogs(['eventType' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+        return $eventLog->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
     }
 
     /**
