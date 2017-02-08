@@ -34,19 +34,23 @@ class MessageApiController extends CommonApiController
 
     protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
     {
-        $channels = $this->getModel('channel.message')->getChannels();
-        if (!isset($params['channels'])) {
-            $params['channels'] = [];
-        }
+        parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
-        foreach ($channels as $channelType => $channel) {
-            if (!isset($params['channels'][$channelType])) {
-                $params['channels'][$channelType] = [
-                    'isEnabled' => 0,
-                    'channel'   => $channelType,
-                ];
-            } else {
-                $params['channels'][$channelType]['channel'] = $channelType;
+        if ($this->request->getMethod() != 'PATCH') {
+            $channels = $this->getModel('channel.message')->getChannels();
+            if (!isset($params['channels'])) {
+                $params['channels'] = [];
+            }
+
+            foreach ($channels as $channelType => $channel) {
+                if (!isset($params['channels'][$channelType])) {
+                    $params['channels'][$channelType] = [
+                        'isEnabled' => 0,
+                        'channel'   => $channelType,
+                    ];
+                } else {
+                    $params['channels'][$channelType]['channel'] = $channelType;
+                }
             }
         }
     }
