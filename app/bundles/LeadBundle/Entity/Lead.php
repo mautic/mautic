@@ -663,8 +663,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             $fullName = $firstName;
         } elseif ($lastName) {
             $fullName = $lastName;
-        } elseif ($this->getEmail()) {
-            $fullName = $this->getEmail();
         }
 
         return $fullName;
@@ -699,14 +697,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif (!$this->getCompany()) {
+        } elseif ($this->getCompany()) {
             return $this->getCompany();
-        } elseif (!$this->getEmail()) {
+        } elseif ($this->getEmail()) {
             return $this->getEmail();
-        } elseif (count($ips = $this->getIpAddresses())) {
-            return $ips->first()->getIpAddress();
         } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
+        } elseif (count($ips = $this->getIpAddresses())) {
+            return $ips->first()->getIpAddress();
         } else {
             return 'mautic.lead.lead.anonymous';
         }
