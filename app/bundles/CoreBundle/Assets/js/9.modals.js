@@ -1,4 +1,6 @@
 Mautic.modalContentXhr = {};
+Mautic.activeModal = '';
+Mautic.backgroundedModal = '';
 
 /**
  * Load a modal with ajax content
@@ -48,8 +50,6 @@ Mautic.ajaxifyModal = function (el, event) {
  * @param footer
  */
 Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal) {
-
-    //show the modal
     if (mQuery(target + ' .loading-placeholder').length) {
         mQuery(target + ' .loading-placeholder').removeClass('hide');
         mQuery(target + ' .modal-body-content').addClass('hide');
@@ -76,17 +76,17 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
 
     //clean slate upon close
     mQuery(target).on('hidden.bs.modal', function () {
+        if (typeof Mautic.modalContentXhr[target] != 'undefined') {
+            Mautic.modalContentXhr[target].abort();
+            delete Mautic.modalContentXhr[target];
+        }
+
         mQuery('body').removeClass('noscroll');
 
         //unload
         Mautic.onPageUnload(target);
 
         Mautic.resetModal(target);
-
-        if (typeof Mautic.modalContentXhr[target] != 'undefined') {
-            Mautic.modalContentXhr[target].abort();
-            delete Mautic.modalContentXhr[target];
-        }
     });
 
     // Check if dismissal is allowed
@@ -112,7 +112,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         }
     }
 
-    mQuery(target).modal('show');
+    Mautic.showModal(target);
 
     if (typeof Mautic.modalContentXhr == 'undefined') {
         Mautic.modalContentXhr = {};
@@ -173,9 +173,9 @@ Mautic.resetModal = function (target) {
  * @param target
  */
 Mautic.processModalContent = function (response, target) {
-    if (response.error) {
-        Mautic.stopIconSpinPostEvent();
+    Mautic.stopIconSpinPostEvent();
 
+    if (response.error) {
         if (response.errors) {
             alert(response.errors[0].message);
         } else if (response.error.message) {
@@ -187,7 +187,7 @@ Mautic.processModalContent = function (response, target) {
         return;
     }
 
-    if (response.sessionExpired || (response.closeModal && response.newContent)) {
+    if (response.sessionExpired || (response.closeModal && response.newContent && !response.updateModalContent)) {
         mQuery(target).modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
@@ -211,10 +211,32 @@ Mautic.processModalContent = function (response, target) {
             return;
         }
 
+        if (response.target) {
+            mQuery(response.target).html(response.newContent);
+
+            //activate content specific stuff
+            Mautic.onPageLoad(response.target, response, true);
+        } else if (response.newContent) {
+            //load the content
+            if (mQuery(target + ' .loading-placeholder').length) {
+                mQuery(target + ' .loading-placeholder').addClass('hide');
+                mQuery(target + ' .modal-body-content').html(response.newContent);
+                mQuery(target + ' .modal-body-content').removeClass('hide');
+            } else {
+                mQuery(target + ' .modal-body').html(response.newContent);
+            }
+        }
+
+        //activate content specific stuff
+        Mautic.onPageLoad(target, response, true);
+
         if (response.closeModal) {
             mQuery('body').removeClass('noscroll');
             mQuery(target).modal('hide');
-            Mautic.onPageUnload(target, response);
+
+            if (!response.updateModalContent) {
+                Mautic.onPageUnload(target, response);
+            }
 
             if (response.mauticContent) {
                 if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
@@ -224,23 +246,6 @@ Mautic.processModalContent = function (response, target) {
                     }
                 }
             }
-        } else if (response.target) {
-            mQuery(response.target).html(response.newContent);
-
-            //activate content specific stuff
-            Mautic.onPageLoad(response.target, response, true);
-        } else {
-            //load the content
-            if (mQuery(target + ' .loading-placeholder').length) {
-                mQuery(target + ' .loading-placeholder').addClass('hide');
-                mQuery(target + ' .modal-body-content').html(response.newContent);
-                mQuery(target + ' .modal-body-content').removeClass('hide');
-            } else {
-                mQuery(target + ' .modal-body').html(response.newContent);
-            }
-
-            //activate content specific stuff
-            Mautic.onPageLoad(target, response, true);
         }
     }
 };
@@ -361,6 +366,57 @@ Mautic.loadAjaxModalBySelectValue = function (el, value, route, header) {
         mQuery(el).trigger("chosen:updated");
         Mautic.loadAjaxModal('#MauticSharedModal', route, 'get', header);
     }
+};
+
+/**
+ * Push active modal to the background and bring it back once this one closes
+ *
+ * @param target
+ */
+Mautic.showModal = function(target) {
+    if (mQuery('.modal.in').length) {
+        // another modal is activated so let's stack
+
+        // is this modal within another modal?
+        if (mQuery(target).closest('.modal').length) {
+            // the modal has to be moved outside of it's parent for this to work so take note where it needs to
+            // moved back to
+            mQuery('<div />').attr('data-modal-placeholder', target).insertAfter(mQuery(target));
+
+            mQuery(target).attr('data-modal-moved', 1);
+
+            mQuery(target).appendTo('body');
+        }
+
+        var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
+            targetModal  = mQuery(target);
+
+        if (activeModal.length) {
+            targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
+            activeModal.find('.modal-dialog').addClass('aside');
+            var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;
+            if (stackedDialogCount <= 5) {
+                activeModal.find('.modal-dialog').addClass('aside-' + stackedDialogCount);
+            }
+
+            mQuery(target).on('hide.bs.modal', function () {
+                var modal = mQuery(this);
+                var previous = modal.attr('data-previous-modal');
+
+                if (previous) {
+                    mQuery(previous).find('.modal-dialog').removeClass('aside');
+                    mQuery(modal).attr('data-previous-modal', undefined);
+                }
+
+                if (mQuery(modal).attr('data-modal-moved')) {
+                    mQuery('[data-modal-placeholder').replaceWith(mQuery(modal));
+                    mQuery(modal).attr('data-modal-moved', undefined);
+                }
+            });
+        }
+    }
+
+    mQuery(target).modal('show');
 };
 
 

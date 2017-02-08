@@ -113,12 +113,6 @@ class MessageController extends AbstractStandardFormController
                 break;
             case 'new':
             case 'edit':
-                // Check to see if this is a popup
-                if (isset($form['updateSelect'])) {
-                    $this->template = false;
-                } else {
-                    $this->template = true;
-                }
                 $viewParameters = [
                     'channels' => $model->getChannels(),
                 ];

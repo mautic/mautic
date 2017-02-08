@@ -140,6 +140,16 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * Generates new form and processes post data.
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newAction()
+    {
+        return $this->newStandard();
+    }
+
+    /**
      * View a specific campaign.
      *
      * @param $objectId
@@ -343,16 +353,6 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return true;
-    }
-
-    /**
-     * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function newAction()
-    {
-        return $this->newStandard();
     }
 
     /**

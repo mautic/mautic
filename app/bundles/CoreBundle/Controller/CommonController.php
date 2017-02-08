@@ -23,7 +23,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +32,6 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -41,6 +39,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CommonController extends Controller implements MauticController
 {
+    use FormThemeTrait;
+
     /**
      * @var MauticFactory
      */
@@ -295,6 +295,10 @@ class CommonController extends Controller implements MauticController
             }
         }
 
+        if (isset($args['passthroughVars']['closeModal'])) {
+            $args['passthroughVars']['updateMainContent'] = true;
+        }
+
         if (!$this->request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
             $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
 
@@ -325,7 +329,7 @@ class CommonController extends Controller implements MauticController
         /*
          * Return json response if this is a modal
          */
-        if (!empty($passthrough['closeModal'])) {
+        if (!empty($passthrough['closeModal']) && empty($passthrough['updateModalContent']) && empty($passthrough['updateMainContent'])) {
             return new JsonResponse($passthrough);
         }
 
@@ -843,51 +847,5 @@ class CommonController extends Controller implements MauticController
         }
 
         return $toExport;
-    }
-
-    /**
-     * Sets a specific theme for the form.
-     *
-     * @deprecated 2.6.0 to be removed 3.0; extend AbstractFormController instead
-     *
-     * @param Form   $form
-     * @param string $template
-     * @param mixed  $themes
-     *
-     * @return \Symfony\Component\Form\FormView
-     */
-    protected function setFormTheme(Form $form, $template, $themes = null)
-    {
-        $formView = $form->createView();
-
-        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
-        if ($templating instanceof DelegatingEngine) {
-            $templating = $templating->getEngine($template);
-        }
-
-        // Extract form theme from options if applicable
-        $fieldThemes = [];
-        $findThemes  = function ($form, $formView) use ($templating, &$findThemes, &$fieldThemes) {
-            /** @var Form $field */
-            foreach ($form as $name => $field) {
-                $fieldView = $formView[$name];
-                if ($theme = $field->getConfig()->getOption('default_theme')) {
-                    $fieldThemes[] = $theme;
-                    $templating->get('form')->setTheme($fieldView, $theme);
-                }
-
-                if ($field->count()) {
-                    $findThemes($field, $fieldView);
-                }
-            }
-        };
-
-        $findThemes($form, $formView);
-
-        $themes = array_unique(array_merge((array) $themes, $fieldThemes));
-
-        $templating->get('form')->setTheme($formView, $themes);
-
-        return $formView;
     }
 }

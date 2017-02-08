@@ -16,6 +16,19 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class MessageRepository extends CommonRepository
 {
     /**
+     * @param array $args
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getEntities($args = [])
+    {
+        $args['qb'] = $this->createQueryBuilder($this->getTableAlias());
+        $args['qb']->join('MauticChannelBundle:Channel', 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+
+        return parent::getEntities($args);
+    }
+
+    /**
      * @return string
      */
     public function getTableAlias()

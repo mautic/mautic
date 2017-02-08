@@ -1,4 +1,3 @@
-
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -366,20 +365,15 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     // Initialize tab overflow
     mQuery(container + " .nav-overflow-tabs ul").each(function() {
-        var overflowNavOptions = {
-            "parent": ".nav-overflow-tabs",
-            "override_width": true,
-            "more": Mautic.translate('mautic.core.tabs.more')
-        };
-
-        mQuery(this).overflowNavs(overflowNavOptions);
-
-        var tabs = this;
-        mQuery(window).resize(function() {
-            // Adjust overflow tabs
-            mQuery(tabs).overflowNavs(overflowNavOptions);
-        });
+        Mautic.activateOverflowTabs(this);
     });
+
+    mQuery(container + " .nav.sortable").each(function() {
+        Mautic.activateSortableTabs(this);
+    });
+
+    // Initialize tab delete buttons
+    Mautic.activateTabDeleteButtons(container);
 
     //spin icons on button click
     mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function (event) {
@@ -395,15 +389,16 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //Copy form buttons to the toolbar
-    if (mQuery(container + " .bottom-form-buttons").length) {
-        if (inModal) {
-            if (mQuery(container + ' .modal-form-buttons').length) {
+    mQuery(container + " .bottom-form-buttons").each(function() {
+        if (inModal || mQuery(this).closest('.modal').length) {
+            var modal = (inModal) ? container : mQuery(this).closest('.modal');
+            if (mQuery(modal).find('.modal-form-buttons').length) {
                 //hide the bottom buttons
-                mQuery(container + ' .bottom-form-buttons').addClass('hide');
-                var buttons = mQuery(container + " .bottom-form-buttons").html();
+                mQuery(modal).find('.bottom-form-buttons').addClass('hide');
+                var buttons = mQuery(modal).find('.bottom-form-buttons').html();
 
                 //make sure working with a clean slate
-                mQuery(container + ' .modal-form-buttons').html('');
+                mQuery(modal).find('.modal-form-buttons').html('');
 
                 mQuery(buttons).filter("button").each(function (i, v) {
                     //get the ID
@@ -412,9 +407,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
                         .addClass(mQuery(this).attr('class'))
                         .addClass('btn-copy')
                         .html(mQuery(this).html())
-                        .appendTo(container + ' .modal-form-buttons')
+                        .appendTo(mQuery(modal).find('.modal-form-buttons'))
                         .on('click.ajaxform', function (event) {
                             if (mQuery(this).hasClass('disabled')) {
+
                                 return false;
                             }
 
@@ -424,7 +420,9 @@ Mautic.onPageLoad = function (container, response, inModal) {
                             }
 
                             event.preventDefault();
-                            Mautic.startIconSpinOnEvent(event);
+                            if (!mQuery(this).hasClass('btn-nospin')) {
+                                Mautic.startIconSpinOnEvent(event);
+                            }
                             mQuery('#' + id).click();
                         });
                 });
@@ -485,7 +483,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
                 mQuery('.toolbar-form-buttons').removeClass('hide');
             }
         }
-    }
+    });
 
     Mautic.activateGlobalFroalaOptions();
     if (mQuery(container + ' textarea.editor').length) {

@@ -228,7 +228,15 @@ class CampaignApiController extends CommonApiController
             'val'  => $id,
         ];
 
-        return $this->forward('MauticCoreBundle:Api\StatsApi:list', [
+        $where[] = [
+            'col'  => 'manually_removed',
+            'expr' => 'eq',
+            'val'  => 0,
+        ];
+
+        return $this->forward(
+            'MauticCoreBundle:Api\StatsApi:list',
+            [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',
                 'order'     => $order,

@@ -177,11 +177,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
                 if ($valid = $this->isFormValid($form)) {
                     if (!$this->processFormData($data, $form, $action, $objectId)) {
                         $valid = false;
-                    } elseif ($id = (is_array($data) && isset($data['id'])) ? $data['id'] : null) {
-                        $session          = $this->get('session');
-                        $sessionData      = $session->get($this->getSessionBase($id).'.data', []);
-                        $sessionData[$id] = $data;
-                        $session->set($this->getSessionBase().'.data', $sessionData);
                     }
                 }
 
@@ -190,11 +185,12 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         }
 
         $passthroughVars = [
-            'mauticContent' => $this->getJsLoadMethodPrefix(),
-            'success'       => $valid,
-            'route'         => false,
-            'closeModal'    => ($cancelled || $valid),
-            'data'          => $data,
+            'mauticContent'      => $this->getJsLoadMethodPrefix(),
+            'success'            => $valid,
+            'route'              => false,
+            'closeModal'         => ($cancelled || $valid),
+            'updateModalContent' => true,
+            'objectId'           => $objectId,
         ];
 
         return $this->ajaxAction(
@@ -202,8 +198,9 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
                 'contentTemplate' => $this->getTemplateName('form.html.php'),
                 'viewParameters'  => $this->getViewArguments(
                     [
-                        'form' => $this->getFormView($form, $action),
-                        'data' => $data,
+                        'form'     => $this->getFormView($form, $action),
+                        'data'     => $data,
+                        'objectId' => $objectId,
                     ],
                     $action
                 ),
@@ -222,18 +219,44 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     }
 
     /**
-     * @param      $isValid
-     * @param      $entity
-     * @param Form $form
-     * @param      $action
-     * @param bool $isClone
+     * @param      $objectId
+     * @param bool $includeDeleted
+     *
+     * @return array|mixed
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
+    protected function getSessionData($objectId, $includeDeleted = false)
     {
-        if ($isValid && is_array($entity) && isset($entity['id'])) {
-            $this->clearSessionFormData($entity['id']);
+        $data = $this->get('session')->get($this->getSessionBase($objectId).'.data', []);
+
+        if (!$includeDeleted) {
+            return $data;
         }
 
-        return parent::afterFormProcessed($isValid, $entity, $form, $action, $isClone);
+        $deleted = $this->get('session')->get($this->getSessionBase($objectId).'.data.deleted', []);
+
+        return [$data, $deleted];
+    }
+
+    /**
+     * @param      $isValid
+     * @param      $data
+     * @param Form $form
+     * @param      $action
+     * @param bool $objectId
+     */
+    protected function afterFormProcessed($isValid, $data, Form $form, $action, $objectId = false)
+    {
+        if ($id = (is_array($data) && isset($data['id'])) ? $data['id'] : $objectId) {
+            if (is_object($data) && method_exists($data, 'convertToArray')) {
+                $data = $data->convertToArray();
+            }
+
+            $session          = $this->get('session');
+            $sessionData      = $session->get($this->getSessionBase($id).'.data', []);
+            $sessionData[$id] = $data;
+            $session->set($this->getSessionBase().'.data', $sessionData);
+        }
+
+        parent::afterFormProcessed($isValid, $data, $form, $action);
     }
 }

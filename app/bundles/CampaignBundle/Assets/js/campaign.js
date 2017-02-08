@@ -389,6 +389,7 @@ Mautic.launchCampaignEditor = function() {
         Mautic.campaignBuilderReconnectEndpoints();
         Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
     }
+    Mautic.campaignBuilderInstance.repaintEverything();
 };
 
 /**
@@ -514,6 +515,30 @@ Mautic.campaignEndpointDefinitions = {
     }
 };
 
+/**
+ * Push callbacks to these events
+ *
+ * @type {{connection: Array, connectionDetached: Array, connectionMoved: Array, beforeDrop: Array}}
+ */
+Mautic.campaignConnectionCallbacks = {
+    // sourceEndpoint, targetEndpoint, connection
+    'beforeDetach': [],
+    // sourceEndpoint, targetEndpoint, endpoint, source, sourceId
+    'beforeDrag': [],
+    // sourceEndpoint, targetEndpoint, endpoint, source, sourceId
+    'beforeStartDetach': [],
+    // sourceEndpoint, targetEndpoint, endpoint, source, sourceId, connection
+    'beforeDrop': [],
+    //sourceEndpoint, endpoint, event
+    'onHover': [],
+    // no arguments
+    'beforeAnchorsRegistered': [],
+    'afterAnchorsRegistered': [],
+    'beforeEndpointsRegistered': [],
+    'beforeEndpointsReconnected': [],
+    'afterEndpointsReconnected': []
+};
+
 Mautic.campaignBuilderAnchorClicked = false;
 Mautic.campaignBuilderEventPositions = {};
 
@@ -522,24 +547,6 @@ Mautic.prepareCampaignCanvas = function() {
         Mautic.campaignBuilderInstance = jsPlumb.getInstance({
             Container: document.querySelector("#CampaignCanvas")
         });
-
-        /**
-         * Push callbacks to these events
-         *
-         * @type {{connection: Array, connectionDetached: Array, connectionMoved: Array, beforeDrop: Array}}
-         */
-        Mautic.campaignConnectionCallbacks = {
-            // sourceEndpoint, targetEndpoint, connection
-            'beforeDetach': [],
-            // sourceEndpoint, targetEndpoint, endpoint, source, sourceId
-            'beforeDrag': [],
-            // sourceEndpoint, targetEndpoint, endpoint, source, sourceId
-            'beforeStartDetach': [],
-            // sourceEndpoint, targetEndpoint, endpoint, source, sourceId, connection
-            'beforeDrop': [],
-            //sourceEndpoint, endpoint, event
-            'onHover': []
-        };
 
         Mautic.campaignEndpoints = {};
 
@@ -604,24 +611,27 @@ Mautic.prepareCampaignCanvas = function() {
             // If there is a switch between active/inactive anchors, reload the form
             var epDetails          = Mautic.campaignBuilderGetEndpointDetails(info.sourceEndpoint);
             var targetElementId    = info.targetEndpoint.elementId;
+
             var previousConnection = mQuery('#'+targetElementId).attr('data-connected');
             var editButton         = mQuery('#'+targetElementId).find('a.btn-edit');
             var editUrl            = editButton.attr('href');
 
-            var anchorQueryParams  = 'anchor=' + epDetails.anchorName + "&anchorEventType=" + epDetails.eventType;
-            if (editUrl.search('anchor=') !== -1) {
-                editUrl.replace(/anchor=(.*?)$/, anchorQueryParams);
-            } else {
-                var delimiter = (editUrl.indexOf('?') === -1) ? '?' : '&';
-                editUrl = editUrl + delimiter + anchorQueryParams;
-            }
-            editButton.attr('data-href', editUrl);
+            if (editUrl) {
+                var anchorQueryParams = 'anchor=' + epDetails.anchorName + "&anchorEventType=" + epDetails.eventType;
+                if (editUrl.search('anchor=') !== -1) {
+                    editUrl.replace(/anchor=(.*?)$/, anchorQueryParams);
+                } else {
+                    var delimiter = (editUrl.indexOf('?') === -1) ? '?' : '&';
+                    editUrl = editUrl + delimiter + anchorQueryParams;
+                }
+                editButton.attr('data-href', editUrl);
 
-            if (previousConnection && previousConnection != epDetails.anchorName && (previousConnection == 'no' || epDetails.anchorName == 'no')) {
-                editButton.attr('data-prevent-dismiss', true);
-                Mautic.campaignBuilderConnectionRequiresUpdate = true;
+                if (previousConnection && previousConnection != epDetails.anchorName && (previousConnection == 'no' || epDetails.anchorName == 'no')) {
+                    editButton.attr('data-prevent-dismiss', true);
+                    Mautic.campaignBuilderConnectionRequiresUpdate = true;
 
-                editButton.trigger('click');
+                    editButton.trigger('click');
+                }
             }
 
             mQuery('#'+targetElementId).attr('data-connected', epDetails.anchorName);
@@ -682,11 +692,18 @@ Mautic.prepareCampaignCanvas = function() {
             Mautic.campaignBuilderInstance.repaintEverything();
         });
 
+        mQuery.each(Mautic.campaignConnectionCallbacks.beforeEndpointsRegistered, function (index, callback) {
+            callback();
+        });
         mQuery.each(Mautic.campaignEndpointDefinitions, function (ep, definition) {
             Mautic.campaignBuilderRegisterEndpoint(ep, definition);
         });
 
         //manually loop through each so a UUID can be set for reconnecting connections
+        mQuery.each(Mautic.campaignConnectionCallbacks.beforeAnchorsRegistered, function (index, callback) {
+            callback();
+        });
+
         mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
             Mautic.campaignBuilderRegisterAnchors(['top'], this);
         });
@@ -701,6 +718,10 @@ Mautic.prepareCampaignCanvas = function() {
 
         mQuery("#CampaignCanvas div.list-campaign-leadsource").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
             Mautic.campaignBuilderRegisterAnchors(['leadSource', 'leadSourceLeft', 'leadSourceRight'], this);
+        });
+
+        mQuery.each(Mautic.campaignConnectionCallbacks.afterAnchorsRegistered, function (index, callback) {
+            callback();
         });
 
         //enable drag and drop
@@ -1027,6 +1048,10 @@ Mautic.submitCampaignSource = function(e) {
  */
 Mautic.campaignBuilderReconnectEndpoints = function () {
 
+    mQuery.each(Mautic.campaignConnectionCallbacks.beforeEndpointsReconnected, function (index, callback) {
+        callback();
+    });
+
     if (typeof Mautic.campaignBuilderCanvasSettings == 'undefined') {
         return;
     }
@@ -1082,6 +1107,10 @@ Mautic.campaignBuilderReconnectEndpoints = function () {
 
         topOffset += 45;
     }
+
+    mQuery.each(Mautic.campaignConnectionCallbacks.afterEndpointsReconnected, function (index, callback) {
+        callback();
+    });
 
     delete Mautic.campaignBuilderCanvasSettings;
 };

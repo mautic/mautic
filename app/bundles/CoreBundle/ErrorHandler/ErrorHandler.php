@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\ErrorHandler {
 
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
+    use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\Debug\Debug;
@@ -26,21 +27,25 @@ namespace Mautic\CoreBundle\ErrorHandler {
         public static $handler;
 
         /**
+         * @var
+         */
+        private static $environment;
+
+        /**
          * @var LoggerInterface
          */
         private $debugLogger;
+
         /**
          * @var LoggerInterface
          */
         private $displayErrors;
-        /**
-         * @var
-         */
-        private $environment;
+
         /**
          * @var LoggerInterface
          */
         private $logger;
+
         /**
          * @var
          */
@@ -138,7 +143,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleError($level, $message, $file = 'unknown', $line = 0, $context = [])
         {
-            $errorReporting = ('dev' === $this->environment) ? -1 : error_reporting();
+            $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
                 switch (true) {
                     case $level & E_STRICT:
@@ -198,7 +203,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             $content = $this->generateResponse($error, $inline, $inTemplate);
 
-            $this->log(LogLevel::ERROR, "{$error['message']} - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
+            $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
+            $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
                 return $content;
@@ -269,7 +275,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function prepareExceptionForOutput($exception)
         {
-            $inline = null;
+            $inline     = null;
+            $logMessage = null;
+
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
                     $exception = new FatalThrowableError($exception);
@@ -280,7 +288,19 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             $showExceptionMessage = false;
-            if ($exception instanceof DatabaseConnectionException) {
+            if ($exception instanceof ErrorHandlerException) {
+                $showExceptionMessage = $exception->showMessage();
+                $message              = $exception->getMessage();
+
+                if ($previous = $exception->getPrevious()) {
+                    $exception  = $previous;
+                    $logMessage = $exception->getMessage();
+
+                    if ('dev' === self::$environment) {
+                        $message = '<strong>'.get_class($exception).':</strong> '.$exception->getMessage();
+                    }
+                }
+            } elseif ($exception instanceof DatabaseConnectionException) {
                 $showExceptionMessage = true;
             }
 
@@ -290,6 +310,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $exception = FlattenException::create($exception);
             }
 
+            if (empty($message)) {
+                $message = ($showExceptionMessage && 'dev' !== self::$environment) ? $exception->getMessage()
+                    : '<strong>'.$exception->getClass().':</strong> '.$exception->getMessage();
+            }
+
             if ($previous = $exception->getPrevious()) {
                 if ($previous = self::prepareExceptionForOutput($previous)) {
                     $previous['isPrevious'] = true;
@@ -297,13 +322,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             $handlingException = true;
-            $message           = '<strong>'.$exception->getClass().':</strong> '.$exception->getMessage();
             $line              = $exception->getLine();
             $file              = $exception->getFile();
             $trace             = $exception->getTrace();
             $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'previous']);
+            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'previous']);
         }
 
         /**
@@ -327,7 +351,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             set_error_handler([self::$handler, 'handleError']);
 
             // Hide errors by default so we can format them
-            self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : ini_get('display_errors'));
+            self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
             ini_set('display_errors', 0);
 
             return self::$handler;
@@ -352,7 +376,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function setEnvironment($environment)
         {
-            $this->environment = $environment;
+            self::$environment = $environment;
 
             return $this;
         }
@@ -389,7 +413,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
-            if ('dev' !== $this->environment) {
+            if ('dev' !== self::$environment) {
                 // Don't clutter the logs
                 $context = [];
             }
@@ -424,7 +448,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         private function generateResponse($error, $inline = true, $inTemplate = false)
         {
             // Get a trace
-            if ($this->environment == 'dev') {
+            if (self::$environment == 'dev') {
                 if (empty($error['trace'])) {
                     ob_start();
                     debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -469,7 +493,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     'code'    => 500,
                 ];
 
-                if ($this->environment == 'dev') {
+                if (self::$environment == 'dev') {
                     $dataArray['trace'] = $error['trace'];
                     if (isset($error['context'])) {
                         $dataArray['context'] = $error['context'];
@@ -485,22 +509,31 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 return json_encode($dataArray);
             }
 
-            if ($this->environment == 'dev' || $this->displayErrors) {
+            if (self::$environment == 'dev' || $this->displayErrors) {
                 $error['file'] = str_replace(self::$root, '', $error['file']);
-                $message       = "{$error['message']} - in file {$error['file']} - at line {$error['line']}";
+                $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                $submessage = 'System administrators, check server logs for errors.';
+                if (!empty($error['showExceptionMessage'])) {
+                    $message = $error['message'];
+                } else {
+                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $submessage = 'System administrators, check server logs for errors.';
+                }
                 unset($error);
             }
 
             defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
 
-            ob_start();
-            include __DIR__.'/../../../../offline.php';
-            $content = ob_get_clean();
+            try {
+                ob_start();
+                include __DIR__.'/../../../../offline.php';
+                $content = ob_get_clean();
+            } catch (\Exception $exception) {
+                return $exception->getMessage();
+            }
 
-            if ($this->environment == 'dev' && !empty($error['previous'])) {
+            if (self::$environment == 'dev' && !empty($error['previous'])) {
                 $previousContent = '<div><h4>Previous Exceptions</h4>'.$this->generateResponse($error['previous'], true).'</div>';
                 $content         = str_replace('<div id="previous"></div>', $previousContent, $content);
             }

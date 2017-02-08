@@ -14,8 +14,9 @@ Mautic.activateSortablePanels = function (container) {
             // Replace periods with dashes as they can't be used as Symfony form field names
             selected = selected.replace('.', '-');
             var prototype = '#' + prefix + selected;
-
+console.log(prototype);
             if (mQuery(prototype).length) {
+                console.log('exists');
                 Mautic.appendSortablePanel(sortablesContainer, prototype);
             }
 
@@ -74,7 +75,7 @@ Mautic.activateSortablePanel = function (panel) {
         });
 
         mQuery(this).find('.btn-edit').on('click', function() {
-            mQuery(panel).find('.modal').modal('show');
+            Mautic.showModal('#'+mQuery(panel).find('.modal').attr('id'));
         });
     });
 
@@ -157,8 +158,7 @@ Mautic.appendSortablePanel = function(sortablesContainer, modal) {
 
     Mautic.activateModalEmbeddedForms('#'+mQuery(newModal).attr('id'));
 
-    // Show the modal
-    mQuery(newModal).modal('show');
+    Mautic.showModal(newModal);
 
     // Activate chosens in the new modal
     mQuery(newModal).find('select').not('.multiselect, .not-chosen').each(function() {
@@ -174,7 +174,6 @@ Mautic.appendSortablePanel = function(sortablesContainer, modal) {
  */
 Mautic.updateSortablePanel = function(modalBtn, modal) {
     var panel = mQuery(modal).closest('.panel');
-    var panelId = mQuery(panel).attr('id');
 
     // Get label
     var label = '';

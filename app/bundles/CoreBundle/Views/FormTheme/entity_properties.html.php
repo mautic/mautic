@@ -30,6 +30,10 @@ if (!empty($appendAsPanel)) {
     }
 }
 
+if (!isset($footerButtonClass)) {
+    $footerButtonClass = null;
+}
+
 if (!isset($modalAttr)) {
     $modalAttr = '';
 }
@@ -55,14 +59,18 @@ foreach ($properties as $property):
         $addAttr .= ' data-embedded-form-callback="'.$addCallback.'"';
     }
 
-    echo $view->render('MauticCoreBundle:Helper:modal.html.php',
+    echo $view->render(
+        'MauticCoreBundle:Helper:modal.html.php',
         [
             'id'             => $idPrefix.$property->vars['name'],
+            'dismissible'    => false,
             'containerClass' => $modalClass,
-            'containerAttr'  => $modalAttr.' data-name="'.$property->vars['name'].'" data-id-prefix="'.$idPrefix.'" data-name-prefix="'.$namePrefix.'"'.$view['form']->block($property, 'widget_attributes'),
-            'body'           => $view['form']->widget($property),
-            'header'         => (isset($header)) ? $header : $property->vars['label'],
-            'footerButtons'  => [
+            'containerAttr'  => $modalAttr.' data-name="'.$property->vars['name'].'" data-id-prefix="'.$idPrefix.'" data-name-prefix="'.$namePrefix
+                .'"'.$view['form']->block($property, 'widget_attributes'),
+            'body'              => $view['form']->widget($property),
+            'header'            => (isset($header)) ? $header : $property->vars['label'],
+            'footerButtonClass' => $footerButtonClass,
+            'footerButtons'     => [
                 [
                     'class'    => 'btn-default btn-cancel btn-nospin',
                     'textIcon' => (isset($closeButtonIcon) ? $closeButtonIcon : 'fa fa-times text-danger'),
