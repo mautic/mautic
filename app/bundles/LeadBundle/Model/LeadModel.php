@@ -527,25 +527,21 @@ class LeadModel extends FormModel
             $this->prepareParametersFromRequest($form, $data, $lead);
             // Submit the data
             $form->submit($data);
-            // Use form processed data
-            $formData = [];
 
-            if (!$form->isValid()) {
-                if ($form->getErrors()->count()) {
-                    $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
-                }
-                foreach ($form as $field => $formField) {
-                    if (isset($data[$field]) && $formField->getErrors()->count()) {
+            if ($form->getErrors()->count()) {
+                $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+            }
+            foreach ($form as $field => $formField) {
+                if (isset($data[$field])) {
+                    if ($formField->getErrors()->count()) {
                         $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     } else {
-                        $formData[$field] = $formField->getData();
+                        $data[$field] = $formField->getData();
                     }
                 }
             }
-
-            $data = $formData;
         }
 
         //update existing values
@@ -2217,9 +2213,9 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) as quantity, t.country')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->groupBy('t.country')
-          ->where($q->expr()->isNotNull('t.country'));
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->groupBy('t.country')
+            ->where($q->expr()->isNotNull('t.country'));
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2256,12 +2252,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
-          ->where($q->expr()->isNotNull('t.owner_id'))
-          ->orderBy('leads', 'DESC')
-          ->groupBy('t.owner_id, u.first_name, u.last_name')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+            ->where($q->expr()->isNotNull('t.owner_id'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.owner_id, u.first_name, u.last_name')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2286,12 +2282,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->where($q->expr()->isNotNull('t.created_by'))
-          ->andWhere($q->expr()->isNotNull('t.created_by_user'))
-          ->orderBy('leads', 'DESC')
-          ->groupBy('t.created_by, t.created_by_user')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->where($q->expr()->isNotNull('t.created_by'))
+            ->andWhere($q->expr()->isNotNull('t.created_by_user'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.created_by, t.created_by_user')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2321,8 +2317,8 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
