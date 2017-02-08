@@ -120,10 +120,6 @@ trait CustomFieldEntityTrait
             return $this->$setter($value);
         }
 
-        if (method_exists($this, 'isAnonymous') && $this->wasAnonymous == null) {
-            $this->wasAnonymous = $this->isAnonymous();
-        }
-
         if (null == $oldValue) {
             $oldValue = $this->getFieldValue($alias);
         }

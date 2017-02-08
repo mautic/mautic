@@ -191,13 +191,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $preferredProfileImage;
 
     /**
-     * Changed to true if the lead was anonymous before updating fields.
-     *
-     * @var null
-     */
-    private $wasAnonymous = null;
-
-    /**
      * @var bool
      */
     public $imported = false;
@@ -658,27 +651,20 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getName($lastFirst = false)
     {
-        if (isset($this->updatedFields['firstname'])) {
-            $firstName = $this->updatedFields['firstname'];
-        } else {
-            $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
-        }
-
-        if (isset($this->updatedFields['lastname'])) {
-            $lastName = $this->updatedFields['lastname'];
-        } else {
-            $lastName = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
-        }
+        $firstName = $this->getFirstname();
+        $lastName  = $this->getLastname();
 
         $fullName = '';
-        if ($lastFirst && !empty($firstName) && !empty($lastName)) {
+        if ($lastFirst && $firstName && $lastName) {
             $fullName = $lastName.', '.$firstName;
-        } elseif (!empty($firstName) && !empty($lastName)) {
+        } elseif ($firstName && $lastName) {
             $fullName = $firstName.' '.$lastName;
-        } elseif (!empty($firstName)) {
+        } elseif ($firstName) {
             $fullName = $firstName;
-        } elseif (!empty($lastName)) {
+        } elseif ($lastName) {
             $fullName = $lastName;
+        } elseif ($this->getEmail()) {
+            $fullName = $this->getEmail();
         }
 
         return $fullName;
@@ -713,10 +699,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif (!empty($this->fields['core']['company']['value'])) {
-            return $this->fields['core']['company']['value'];
-        } elseif (!empty($this->fields['core']['email']['value'])) {
-            return $this->fields['core']['email']['value'];
+        } elseif (!$this->getCompany()) {
+            return $this->getCompany();
+        } elseif (!$this->getEmail()) {
+            return $this->getEmail();
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
         } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
@@ -733,8 +719,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getSecondaryIdentifier()
     {
-        if (!empty($this->fields['core']['company']['value'])) {
-            return $this->fields['core']['company']['value'];
+        if (!$this->getCompany()) {
+            return $this->getCompany();
         }
 
         return '';
@@ -749,16 +735,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $location = '';
 
-        if (!empty($this->fields['core']['city']['value'])) {
-            $location .= $this->fields['core']['city']['value'].', ';
+        if ($this->getCity()) {
+            $location .= $this->getCity().', ';
         }
 
-        if (!empty($this->fields['core']['state']['value'])) {
-            $location .= $this->fields['core']['state']['value'].', ';
+        if ($this->getState()) {
+            $location .= $this->getState().', ';
         }
 
-        if (!empty($this->fields['core']['country']['value'])) {
-            $location .= $this->fields['core']['country']['value'].', ';
+        if ($this->getCountry()) {
+            $location .= $this->getCountry().', ';
         }
 
         return rtrim($location, ', ');
@@ -1122,20 +1108,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function isAnonymous()
     {
-        if (
-        $name = $this->getName()
-            || !empty($this->updatedFields['firstname'])
-            || !empty($this->updatedFields['lastname'])
-            || !empty($this->updatedFields['company'])
-            || !empty($this->updatedFields['email'])
-            || !empty($this->fields['core']['company']['value'])
-            || !empty($this->fields['core']['email']['value'])
-            || $socialIdentity = $this->getFirstSocialIdentity()
-        ) {
-            return false;
-        } else {
-            return true;
-        }
+        return !($this->getName()
+            || $this->getFirstname()
+            || $this->getLastname()
+            || $this->getCompany()
+            || $this->getEmail()
+            || $this->getFirstSocialIdentity()
+        );
     }
 
     /**
@@ -1417,12 +1396,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->wasAnonymous) {
-            //check the changes to see if the user is now known
-            if (!$this->isAnonymous()) {
-                $this->dateIdentified            = new \DateTime();
-                $this->changes['dateIdentified'] = ['', $this->dateIdentified];
-            }
+        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+            $this->dateIdentified            = new \DateTime();
+            $this->changes['dateIdentified'] = ['', $this->dateIdentified];
         }
     }
 
