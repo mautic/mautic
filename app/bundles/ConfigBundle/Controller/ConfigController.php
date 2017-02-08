@@ -278,6 +278,12 @@ class ConfigController extends FormController
 
         $localParams = $parameters;
 
+        //check for parameter overrides
+        if (file_exists($kernel->getRootDir().'/config/parameters_local.php')) {
+            include $kernel->getRootDir().'/config/parameters_local.php';
+            $localParams = array_merge($localParams, $parameters);
+        }
+
         foreach ($forms as &$form) {
 
             // Merge the bundle params with the local params
