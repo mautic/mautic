@@ -344,6 +344,8 @@ class CampaignModel extends CommonFormModel
                 // Remove decision so that it doesn't affect execution
                 $events[$id]->setDecisionPath(null);
             }
+
+            $entity->addEvent($id, $events[$id]);
         }
 
         //set event order used when querying the events
@@ -1292,14 +1294,14 @@ class CampaignModel extends CommonFormModel
     protected function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
     {
         $count = count($hierarchy);
-        if ($count && 'null' === array_unique(array_values($hierarchy))[0]) {
+        if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
             // no parents so leave order as is
+
             return;
         } else {
             foreach ($hierarchy as $eventId => $parent) {
                 if ($parent == $root || $count === 1) {
                     $events[$eventId]->setOrder($order);
-                    $entity->addEvent($eventId, $events[$eventId]);
                     unset($hierarchy[$eventId]);
                     if (count($hierarchy)) {
                         $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);

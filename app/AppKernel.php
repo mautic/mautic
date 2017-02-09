@@ -122,7 +122,9 @@ class AppKernel extends Kernel
                         [
                             '%code%' => $e->getCode(),
                         ]
-                    )
+                    ),
+                    0,
+                    $e
                 );
             }
         }
