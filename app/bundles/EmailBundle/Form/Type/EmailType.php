@@ -241,6 +241,21 @@ class EmailType extends AbstractType
             )->addModelTransformer($emojiTransformer)
         );
 
+        $builder->add(
+            $builder->create(
+                'customData',
+                'textarea',
+                [
+                    'label'      => 'mautic.email.form.data',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            )
+        );
+
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
         $builder->add(
             $builder->create(
@@ -476,21 +491,6 @@ class EmailType extends AbstractType
                 ]
             );
         }
-
-        $builder->add(
-            $builder->create(
-                 'customData',
-                 'textarea',
-                 [
-                      'label'      => 'mautic.email.form.data',
-                      'label_attr' => ['class' => 'control-label'],
-                      'required'   => false,
-                      'attr'       => [
-                          'class' => 'form-control builder-html editor-email',
-                      ],
-                 ]
-            )
-        );
 
         $this->addDynamicContentField($builder);
 
