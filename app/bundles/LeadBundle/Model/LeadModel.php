@@ -515,7 +515,7 @@ class LeadModel extends FormModel
         if ($bindWithForm) {
             // Cleanup the field values
             $form = $this->createForm(
-                $lead,
+                new Lead(), // use empty lead to prevent binding errors
                 $this->formFactory,
                 null,
                 ['fields' => $flatFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
