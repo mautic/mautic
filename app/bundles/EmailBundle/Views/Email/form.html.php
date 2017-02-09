@@ -50,7 +50,9 @@ $attr = $form->vars['attr'];
 $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 ?>
 
-<?php echo $pluginsAssets; ?>
+<?php foreach ($pluginsAssets as $pluginAsset) {
+    echo $pluginAsset;
+}?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
 <div class="box-layout">

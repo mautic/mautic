@@ -585,14 +585,12 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper  = $this->factory->getHelper('template.assets');
         $pluginsAssets = [];
         $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
 
         if ($plugins) {
             foreach ($plugins as $name => $config) {
-                $pluginsAssets[] = $assetsHelper->addScriptDeclaration('plugins/'.$name.'/Assets/js/index.js');
+                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
             }
         }
 
@@ -798,14 +796,12 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper  = $this->factory->getHelper('template.assets');
         $pluginsAssets = [];
         $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
 
         if ($plugins) {
             foreach ($plugins as $name => $config) {
-                $pluginsAssets[] = $assetsHelper->addScriptDeclaration('plugins/'.$name.'/Assets/js/index.js');
+                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
             }
         }
 
