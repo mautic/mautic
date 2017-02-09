@@ -34,6 +34,13 @@ trait BuilderControllerTrait
             ->addCustomDeclaration($assetsHelper->getSystemScripts(true, true))
             ->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
 
+        $plugins = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+        if ($plugins) {
+            foreach ($plugins as $name => $config) {
+                $assetsHelper->includeScript('plugins/'.$name.'/Assets/js/index.js');
+            }
+        }
+
         $builderAssets = $assetsHelper->getHeadDeclarations();
 
         // reset context to main
