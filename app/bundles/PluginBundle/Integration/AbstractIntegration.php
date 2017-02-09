@@ -1290,14 +1290,17 @@ abstract class AbstractIntegration
 
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
-        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
-        $matched         = [];
+        if (isset($config['object'])) {
+            $availableFields = $availableFields[$config['object']];
+        }
+        $unknown = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched = [];
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $this->convertLeadFieldKey($key, $field);
 
-            if (isset($leadFields[$key])) {
-                $mauticKey = $leadFields[$key];
+            if (isset($leadFields[$integrationKey])) {
+                $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
                     $matched[$integrationKey] = $fields[$mauticKey]['value'];
                 }

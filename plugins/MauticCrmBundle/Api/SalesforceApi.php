@@ -101,7 +101,25 @@ class SalesforceApi extends CrmApi
      */
     public function createLead(array $data, $lead)
     {
-        $createdLeadData = $this->request('', $data, 'POST');
+        //find lead
+        $update = false;
+        if (isset($data['Email'])) {
+            $findLead = 'select Id from Lead where email = \''.$data['Email'].'\'';
+            $queryUrl = $this->integration->getQueryUrl();
+            $sfLead   = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+
+            $lead = $sfLead['records'];
+            if (isset($lead[0]['Id'])) {
+                $update = true;
+            }
+        }
+
+        if ($update) {
+            $createdLeadData = $this->request('', $data, 'PATCH', false, 'Lead/'.$lead[0]['Id']);
+        } else {
+            $createdLeadData = $this->request('', $data, 'POST', false, 'Lead');
+        }
+
         //todo: check if push activities is selected in config
 
         return $createdLeadData;
@@ -235,7 +253,8 @@ class SalesforceApi extends CrmApi
         }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields = implode(', ', $fields);
+            $fields   = implode(', ', $fields);
+            $fields[] = 'Id';
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
