@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -299,5 +300,36 @@ class LeadEventLogRepository extends CommonRepository
         } else {
             $q->execute();
         }
+    }
+
+    public function getChartQuery($options)
+    {
+        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
+
+        // Load points for selected period
+        $query = $this->_em->getConnection()->createQueryBuilder();
+        $query->select('event_id as id, date_triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
+
+        if (!isset($options['is_scheduled'])) {
+            $query->where($query->expr()->eq('ll.is_scheduled', 0));
+        } else {
+            $query->where($query->expr()->eq('ll.is_scheduled', 1));
+        }
+
+        if (isset($options['type'])) {
+            $query->andwhere("e.type = '".$options['type']."'");
+        }
+
+        if (isset($options['channel'])) {
+            $query->andwhere("e.channel = '".$options['channel']."'");
+        }
+
+        if (isset($options['channelId'])) {
+            $query->andwhere('e.channel_id = '.$options['channelId']);
+        }
+
+        return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
     }
 }

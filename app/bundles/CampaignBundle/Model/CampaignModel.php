@@ -111,6 +111,14 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     */
+    public function getCampaignLeadEventLogRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string

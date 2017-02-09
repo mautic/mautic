@@ -197,6 +197,27 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param $dateFrom
+     * @param $dateTo
+     * @param $options
+     *
+     * @return array
+     */
+    public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null)
+    {
+        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+
+        return $eventLog->getChartQuery(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+    }
+
+    public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
+    {
+        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+
+        return $eventLog->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @throws MethodNotAllowedHttpException
