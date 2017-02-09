@@ -213,8 +213,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects[] = 'Lead';
         }
 
-        $isRequired = function (array $field) {
-            return $field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']);
+        $isRequired = function (array $field, $object) {
+            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) || ($object == 'Lead' && in_array($field['name'], ['Company']));
         };
 
         $salesFields = [];
@@ -243,6 +243,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                         if (!isset($salesFields[$sfObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
+
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
@@ -263,13 +264,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         $salesFields[$sfObject][$fieldInfo['name'].' - '.$sfObject] = [
                                             'type'     => $type,
                                             'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo),
+                                            'required' => $isRequired($fieldInfo, $sfObject),
                                         ];
                                     } else {
                                         $salesFields[$sfObject][$fieldInfo['name']] = [
                                             'type'     => $type,
                                             'label'    => $fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo),
+                                            'required' => $isRequired($fieldInfo, $sfObject),
                                         ];
                                     }
                                 }
@@ -528,7 +529,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $leadFields = $this->cleanSalesForceData($config, $fields, $object);
 
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields[$object]]);
+        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields[$object], 'object' => $object]);
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (empty($mappedData[$object])) {
@@ -651,15 +652,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function amendToSfFields($fields)
+    public function amendToSfFields($key)
     {
-        $newFields = [];
-        foreach ($fields as $key => $field) {
-            $key                      = explode('-', $key);
-            $newFields[trim($key[0])] = $field;
-        }
+        $key    = explode(' - ', $key);
+        $newKey = trim($key[0]);
 
-        return $newFields;
+        return $newKey;
     }
 
     /**
@@ -894,5 +892,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
         unset($pointChangeLog, $emailStats, $formSubmissions);
 
         return $leadActivity;
+    }
+
+    /**
+     * Return key recognized by integration.
+     *
+     * @param $key
+     * @param $field
+     *
+     * @return mixed
+     */
+    public function convertLeadFieldKey($key, $field)
+    {
+        $key    = explode(' - ', $key);
+        $newKey = trim($key[0]);
+
+        return $newKey;
     }
 }
