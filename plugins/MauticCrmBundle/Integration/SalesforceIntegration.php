@@ -651,13 +651,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array $fields
      *
      * @return array
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
      */
-    public function amendToSfFields($key)
+    public function amendToSfFields($fields)
     {
-        $key    = explode(' - ', $key);
-        $newKey = trim($key[0]);
+        $newFields = [];
+        foreach ($fields as $key => $field) {
+            $key                      = explode('-', $key);
+            $newFields[trim($key[0])] = $field;
+        }
 
-        return $newKey;
+        return $newFields;
     }
 
     /**
