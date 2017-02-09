@@ -593,7 +593,7 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
-                    'plugins'       => $builderPlugins = $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'plugins'       => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -793,6 +793,7 @@ class EmailController extends FormController
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
+                    'plugins'            => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
