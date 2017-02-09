@@ -585,6 +585,17 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper  = $this->factory->getHelper('template.assets');
+        $pluginsAssets = [];
+        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+
+        if ($plugins) {
+            foreach ($plugins as $name => $config) {
+                $pluginsAssets[] = $assetsHelper->addScriptDeclaration('plugins/'.$name.'/Assets/js/index.js');
+            }
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -594,6 +605,7 @@ class EmailController extends FormController
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'plugins'       => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'pluginsAssets' => $pluginsAssets,
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -786,6 +798,17 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper  = $this->factory->getHelper('template.assets');
+        $pluginsAssets = [];
+        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+
+        if ($plugins) {
+            foreach ($plugins as $name => $config) {
+                $pluginsAssets[] = $assetsHelper->addScriptDeclaration('plugins/'.$name.'/Assets/js/index.js');
+            }
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -794,6 +817,7 @@ class EmailController extends FormController
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
                     'plugins'            => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'pluginsAssets'      => $pluginsAssets,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
