@@ -96,6 +96,21 @@ class SubmitActionEmailType extends AbstractType
         );
 
         $builder->add(
+            'templates',
+            'email_list',
+            [
+                'label'      => 'mautic.lead.email.template',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.getLeadEmailContent(this)',
+                ],
+                'multiple' => false,
+            ]
+        );
+
+        $builder->add(
             'to',
             'text',
             [

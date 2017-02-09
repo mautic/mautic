@@ -257,8 +257,6 @@ class CampaignSubscriber extends CommonSubscriber
         if (!empty($company)) {
             $somethingHappened = $this->leadModel->addToCompany($lead, $company);
         }
-
-        return $event->setResult($somethingHappened);
     }
 
     /**
@@ -270,15 +268,14 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $score             = $event->getConfig()['score'];
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $score = $event->getConfig()['score'];
+        $lead  = $event->getLead();
 
-        if (!empty($score)) {
-            $somethingHappened = $this->leadModel->scoreContactsCompany($lead, $score);
+        if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
+            return $event->setFailed('mautic.lead.no_company');
+        } else {
+            return $event->setResult(true);
         }
-
-        return $event->setResult($somethingHappened);
     }
 
     /**
@@ -293,7 +290,8 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($event->getConfig()['operator'] === 'date') {
-            $triggerDate = new \DateTime();
+            // Set the date in system timezone since this is triggered by cron
+            $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
             $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
             if (strpos($event->getConfig()['value'], '+P') !== false) { //add date

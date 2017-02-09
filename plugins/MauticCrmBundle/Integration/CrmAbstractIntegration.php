@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class CrmAbstractIntegration.
@@ -320,11 +321,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $lead->setInternal($internalInfo);
         }
 
-        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
-            && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
-            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
-                ->findOneBy(['email' => $data['Owner__Lead']['Email']]);
-            if ($mauticUser instanceof User) {
+        // Update the owner if it matches (needs to be set by the integration) when fetching the data
+        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+            if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
         }
@@ -335,5 +334,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $lead;
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array|mixed
+     */
+    protected function getFormFieldsByObject($object)
+    {
+        $settings['feature_settings']['objects'] = [$object => $object];
+
+        $fields = ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+
+        return (isset($fields[$object])) ? $fields[$object] : [];
     }
 }

@@ -771,7 +771,7 @@ class SubmissionModel extends CommonFormModel
             // Default to currently tracked lead
             $lead          = $this->leadModel->getCurrentLead();
             $leadId        = $lead->getId();
-            $currentFields = $this->leadModel->flattenFields($lead->getFields());
+            $currentFields = $lead->getProfileFields();
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
         } else {
@@ -920,7 +920,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         //set the mapped fields
-        $this->leadModel->setFieldValues($lead, $data, false);
+        $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);

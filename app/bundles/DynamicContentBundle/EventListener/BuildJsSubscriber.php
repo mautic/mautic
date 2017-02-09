@@ -120,7 +120,7 @@ MauticJS.replaceDynamicContent = function () {
     }
 };
 
-MauticJS.pixelLoaded(MauticJS.replaceDynamicContent);
+MauticJS.onFirstEventDelivery(MauticJS.replaceDynamicContent);
 JS;
         $event->appendJs($js, 'Mautic Dynamic Content');
     }

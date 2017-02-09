@@ -11,9 +11,8 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Asset\Packages;
 
 /**
@@ -22,9 +21,14 @@ use Symfony\Component\Asset\Packages;
 class AssetsHelper
 {
     /**
-     * @var MauticFactory
+     * Used for Mautic app.
      */
-    protected $factory;
+    const CONTEXT_APP = 'app';
+
+    /**
+     * Used within the content iframe when building content with a theme.
+     */
+    const CONTEXT_BUILDER = 'builder';
 
     /**
      * @var AssetGenerationHelper
@@ -32,34 +36,45 @@ class AssetsHelper
     protected $assetHelper;
 
     /**
+     * @var
+     */
+    protected $context = self::CONTEXT_APP;
+
+    /**
      * @var array
      */
-    protected $assets;
+    protected $assets = [
+        self::CONTEXT_APP => [],
+    ];
 
     /**
      * @var
      */
     protected $version;
 
+    /**
+     * @var Packages
+     */
     protected $packages;
 
-    protected $coreParametersHelper;
+    /**
+     * @var
+     */
+    protected $siteUrl;
 
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * AssetsHelper constructor.
+     *
+     * @param Packages $packages
+     */
     public function __construct(Packages $packages)
     {
         $this->packages = $packages;
-    }
-
-    public function setCharset()
-    {
-    }
-
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function setParamsHelper(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -71,7 +86,7 @@ class AssetsHelper
      */
     public function getAssetPrefix($includeEndingSlash = false)
     {
-        $prefix = $this->factory->getSystemPath('asset_prefix');
+        $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
             if ($includeEndingSlash && substr($prefix, -1) != '/') {
                 $prefix .= '/';
@@ -94,18 +109,8 @@ class AssetsHelper
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null)
+    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
-        // Dirty hack to work around strict notices with parent::getUrl
-        $absolute = $ignorePrefix = false;
-        if (func_num_args() > 3) {
-            $args     = func_get_args();
-            $absolute = $args[3];
-            if (isset($args[4])) {
-                $ignorePrefix = $args[4];
-            }
-        }
-
         // if we have http in the url it is absolute and we can just return it
         if (strpos($path, 'http') === 0) {
             return $path;
@@ -133,7 +138,27 @@ class AssetsHelper
      */
     public function getBaseUrl()
     {
-        return $this->factory->getRequest()->getSchemeAndHttpHost();
+        return $this->siteUrl;
+    }
+
+    /**
+     * Define the context for which the assets will be injected and/or retrieved.
+     *
+     * If changing the context from app, it's important to reset the context back to app after
+     * injecting/fetching assets for a different context.
+     *
+     * @param $context
+     *
+     * @return $this
+     */
+    public function setContext($context = self::CONTEXT_APP)
+    {
+        $this->context = $context;
+        if (!isset($this->assets[$context])) {
+            $this->assets[$context] = [];
+        }
+
+        return $this;
     }
 
     /**
@@ -143,10 +168,12 @@ class AssetsHelper
      * @param string $location
      * @param bool   $async
      * @param string $name
+     *
+     * @return $this
      */
     public function addScript($script, $location = 'head', $async = false, $name = null)
     {
-        $assets     = &$this->assets;
+        $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {
             $name = $name ?: 'script_'.hash('sha1', uniqid(mt_rand()));
 
@@ -171,6 +198,8 @@ class AssetsHelper
         } else {
             $addScripts($script);
         }
+
+        return $this;
     }
 
     /**
@@ -178,38 +207,43 @@ class AssetsHelper
      *
      * @param string $script
      * @param string $location
+     *
+     * @return $this
      */
     public function addScriptDeclaration($script, $location = 'head')
     {
         if ($location == 'head') {
             //special place for these so that declarations and scripts can be mingled
-            $this->assets['headDeclarations'][] = ['declaration' => $script];
+            $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
-            if (!isset($this->assets['scriptDeclarations'][$location])) {
-                $this->assets['scriptDeclarations'][$location] = [];
+            if (!isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
+                $this->assets[$this->context]['scriptDeclarations'][$location] = [];
             }
 
-            if (!in_array($script, $this->assets['scriptDeclarations'][$location])) {
-                $this->assets['scriptDeclarations'][$location][] = $script;
+            if (!in_array($script, $this->assets[$this->context]['scriptDeclarations'][$location])) {
+                $this->assets[$this->context]['scriptDeclarations'][$location][] = $script;
             }
         }
+
+        return $this;
     }
 
     /**
      * Adds a stylesheet to be loaded in the template header.
      *
      * @param string $stylesheet
+     *
+     * @return $this
      */
     public function addStylesheet($stylesheet)
     {
-        $assets   = &$this->assets;
-        $addSheet = function ($s) use (&$assets) {
-            if (!isset($assets['stylesheets'])) {
-                $assets['stylesheets'] = [];
+        $addSheet = function ($s) {
+            if (!isset($this->assets[$this->context]['stylesheets'])) {
+                $this->assets[$this->context]['stylesheets'] = [];
             }
 
-            if (!in_array($s, $assets['stylesheets'])) {
-                $assets['stylesheets'][] = $s;
+            if (!in_array($s, $this->assets[$this->context]['stylesheets'])) {
+                $this->assets[$this->context]['stylesheets'][] = $s;
             }
         };
 
@@ -220,44 +254,28 @@ class AssetsHelper
         } else {
             $addSheet($stylesheet);
         }
-    }
 
-    /*
-     * Loads an addon script
-     *
-     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
-     * @param $onLoadCallback Mautic namespaced function to call for the script onload
-     * @param $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
-     */
-    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
-    {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
-    }
-
-    /*
-     * Include stylesheet
-     *
-     * @param $assetFilepath the path to the file location. Can use full path or relative to mautic web root
-     */
-    public function includeStylesheet($assetFilePath)
-    {
-        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
+        return $this;
     }
 
     /**
      * Add style tag to the header.
      *
      * @param string $styles
+     *
+     * @return $this
      */
     public function addStyleDeclaration($styles)
     {
-        if (!isset($this->assets['styleDeclarations'])) {
-            $this->assets['styleDeclarations'] = [];
+        if (!isset($this->assets[$this->context]['styleDeclarations'])) {
+            $this->assets[$this->context]['styleDeclarations'] = [];
         }
 
-        if (!in_array($styles, $this->assets['styleDeclarations'])) {
-            $this->assets['styleDeclarations'][] = $styles;
+        if (!in_array($styles, $this->assets[$this->context]['styleDeclarations'])) {
+            $this->assets[$this->context]['styleDeclarations'][] = $styles;
         }
+
+        return $this;
     }
 
     /**
@@ -265,20 +283,24 @@ class AssetsHelper
      *
      * @param string $declaration
      * @param string $location
+     *
+     * @return $this
      */
     public function addCustomDeclaration($declaration, $location = 'head')
     {
         if ($location == 'head') {
-            $this->assets['headDeclarations'][] = ['custom' => $declaration];
+            $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
         } else {
-            if (!isset($this->assets['customDeclarations'][$location])) {
-                $this->assets['customDeclarations'][$location] = [];
+            if (!isset($this->assets[$this->context]['customDeclarations'][$location])) {
+                $this->assets[$this->context]['customDeclarations'][$location] = [];
             }
 
-            if (!in_array($declaration, $this->assets['customDeclarations'][$location])) {
-                $this->assets['customDeclarations'][$location][] = $declaration;
+            if (!in_array($declaration, $this->assets[$this->context]['customDeclarations'][$location])) {
+                $this->assets[$this->context]['customDeclarations'][$location][] = $declaration;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -291,20 +313,21 @@ class AssetsHelper
 
     /**
      * Outputs the stylesheets and style declarations.
+     *
+     * @return string
      */
     public function getStyles()
     {
         $styles = '';
-
-        if (isset($this->assets['stylesheets'])) {
-            foreach (array_reverse($this->assets['stylesheets']) as $s) {
+        if (isset($this->assets[$this->context]['stylesheets'])) {
+            foreach (array_reverse($this->assets[$this->context]['stylesheets']) as $s) {
                 $styles .= '<link rel="stylesheet" href="'.$this->getUrl($s).'" data-source="mautic" />'."\n";
             }
         }
 
-        if (isset($this->assets['styleDeclarations'])) {
+        if (isset($this->assets[$this->context]['styleDeclarations'])) {
             $styles .= "<style data-source=\"mautic\">\n";
-            foreach (array_reverse($this->assets['styleDeclarations']) as $d) {
+            foreach (array_reverse($this->assets[$this->context]['styleDeclarations']) as $d) {
                 $styles .= "$d\n";
             }
             $styles .= "</style>\n";
@@ -320,23 +343,23 @@ class AssetsHelper
      */
     public function outputScripts($location)
     {
-        if (isset($this->assets['scripts'][$location])) {
-            foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
+        if (isset($this->assets[$this->context]['scripts'][$location])) {
+            foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
                 list($script, $async) = $s;
                 echo '<script src="'.$this->getUrl($script).'"'.($async ? ' async' : '').' data-source="mautic"></script>'."\n";
             }
         }
 
-        if (isset($this->assets['scriptDeclarations'][$location])) {
+        if (isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
             echo "<script data-source=\"mautic\">\n";
-            foreach (array_reverse($this->assets['scriptDeclarations'][$location]) as $d) {
+            foreach (array_reverse($this->assets[$this->context]['scriptDeclarations'][$location]) as $d) {
                 echo "$d\n";
             }
             echo "</script>\n";
         }
 
-        if (isset($this->assets['customDeclarations'][$location])) {
-            foreach (array_reverse($this->assets['customDeclarations'][$location]) as $d) {
+        if (isset($this->assets[$this->context]['customDeclarations'][$location])) {
+            foreach (array_reverse($this->assets[$this->context]['customDeclarations'][$location]) as $d) {
                 echo "$d\n";
             }
         }
@@ -352,13 +375,16 @@ class AssetsHelper
 
     /**
      * Returns head scripts, stylesheets, and custom declarations.
+     *
+     * @return string
      */
     public function getHeadDeclarations()
     {
         $headOutput = $this->getStyles();
-        if (!empty($this->assets['headDeclarations'])) {
+        if (!empty($this->assets[$this->context]['headDeclarations'])) {
             $scriptOpen = false;
-            foreach ($this->assets['headDeclarations'] as $declaration) {
+
+            foreach ($this->assets[$this->context]['headDeclarations'] as $declaration) {
                 $type   = key($declaration);
                 $output = $declaration[$type];
 
@@ -499,6 +525,32 @@ class AssetsHelper
     }
 
     /**
+     * Loads an addon script.
+     *
+     * @param string $assetFilePath         The path to the file location. Can use full path or relative to mautic web root
+     * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
+     * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
+     *
+     * @return string
+     */
+    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
+    {
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+    }
+
+    /**
+     * Include stylesheet.
+     *
+     * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
+     *
+     * @return string
+     */
+    public function includeStylesheet($assetFilePath)
+    {
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
+    }
+
+    /**
      * Turn all URLs in clickable links.
      *
      * @param string $text
@@ -585,23 +637,6 @@ class AssetsHelper
     }
 
     /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-        $this->version = substr(hash('sha1', $this->factory->getParameter('secret_key').$this->factory->getVersion()), 0, 8);
-    }
-
-    /**
-     * @param AssetGenerationHelper $helper
-     */
-    public function setAssetHelper(AssetGenerationHelper $helper)
-    {
-        $this->assetHelper = $helper;
-    }
-
-    /**
      * @param           $country
      * @param bool|true $urlOnly
      * @param string    $class
@@ -610,8 +645,8 @@ class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $flagPath = $this->factory->getSystemPath('assets', true).'/images/flags/';
-        $relpath  = $this->factory->getSystemPath('assets').'/images/flags/';
+        $flagPath = $this->pathsHelper->getSystemPath('assets', true).'/images/flags/';
+        $relpath  = $this->pathsHelper->getSystemPath('assets').'/images/flags/';
         $country  = ucwords(str_replace(' ', '-', $country));
         $flagImg  = '';
         if (file_exists($flagPath.$country.'.png')) {
@@ -628,26 +663,6 @@ class AssetsHelper
     }
 
     /**
-     * @return array
-     *
-     * @internal
-     */
-    public function getAssets()
-    {
-        return $this->assets;
-    }
-
-    /**
-     * @param $assets
-     *
-     * @internal
-     */
-    public function setAssets($assets)
-    {
-        $this->assets = $assets;
-    }
-
-    /**
      * Clear all the assets.
      */
     public function clear()
@@ -661,6 +676,50 @@ class AssetsHelper
     public function getName()
     {
         return 'assets';
+    }
+
+    /**
+     * Not used.
+     */
+    public function setCharset()
+    {
+    }
+
+    /**
+     * @param AssetGenerationHelper $helper
+     */
+    public function setAssetHelper(AssetGenerationHelper $helper)
+    {
+        $this->assetHelper = $helper;
+    }
+
+    /**
+     * @param $siteUrl
+     */
+    public function setSiteUrl($siteUrl)
+    {
+        if (substr($siteUrl, -1) === '/') {
+            $siteUrl = substr($siteUrl, 0, -1);
+        }
+
+        $this->siteUrl = $siteUrl;
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    public function setPathsHelper(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+    }
+
+    /**
+     * @param $secretKey
+     * @param $version
+     */
+    public function setVersion($secretKey, $version)
+    {
+        $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 
     /**

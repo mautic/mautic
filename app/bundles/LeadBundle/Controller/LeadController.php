@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -22,10 +21,11 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeadController extends FormController
 {
-    use LeadDetailsTrait;
+    use LeadDetailsTrait, FrequencyRuleTrait;
 
     /**
      * @param int $page
@@ -951,118 +951,69 @@ class LeadController extends FormController
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel = $this->getModel('category.category');
-        $categories    = $categoryModel->getLookupResults('global');
-        $data          = [];
 
-        if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            $frequencyRules = $model->getFrequencyRule($lead);
+        if ($lead === null
+            || !$this->get('mautic.security')->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
+            )
+        ) {
+            return $this->accessDenied();
+        }
 
-            $action                = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
-            $channels              = $model->getDoNotContactChannels($lead);
-            $allChannels           = $model->getAllChannels();
-            $data['channels']      = $allChannels;
-            $data['lead_channels'] = $channels;
-            $data['leadId']        = $lead->getId();
-            $data['categories']    = $categories;
-            $data['public_view']   = false;
+        $viewParameters = [
+            'objectId'     => $lead->getId(),
+            'objectAction' => 'view',
+        ];
 
-            foreach ($allChannels as $channel) {
-                foreach ($frequencyRules as $frequencyRule) {
-                    if ($channel == $frequencyRule['channel']) {
-                        $data['frequency_number_'.$channel] = $frequencyRule['frequency_number'];
-                        $data['frequency_time_'.$channel]   = $frequencyRule['frequency_time'];
-                        if ($frequencyRule['pause_from_date']) {
-                            $data['contact_pause_start_date_'.$channel] = new \DateTime($frequencyRule['pause_from_date']);
-                        }
-                        if ($frequencyRule['pause_to_date']) {
-                            $data['contact_pause_end_date_'.$channel] = new \DateTime($frequencyRule['pause_to_date']);
-                        }
-                    }
-                }
-            }
+        $form = $this->getFrequencyRuleForm(
+            $lead,
+            $viewParameters,
+            $data,
+            false,
+            $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()])
+        );
 
-            // Get a list of lists for the lead
-            $leadsLists = $model->getLists($lead, true, true);
-
-            $form = $this->get('form.factory')->create(
-                'lead_contact_frequency_rules',
-                [],
+        if (true === $form) {
+            return $this->postActionRedirect(
                 [
-                    'action' => $action,
-                    'data'   => $data,
+                    'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                    ],
                 ]
             );
+        }
 
-            if ($this->request->getMethod() == 'POST') {
-                if (!$this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $formData = $form->getData();
-                        foreach ($formData['doNotContactChannels'] as $contactChannel) {
-                            if (!isset($formData['lead_channels'][$contactChannel])) {
-                                $contactable = $model->isContactable($lead, $contactChannel);
-                                if ($contactable !== DoNotContact::UNSUBSCRIBED) {
-                                    // Only resubscribe if the contact did not opt out themselves
-                                    $model->removeDncForLead($lead, $contactChannel);
-                                }
-                            }
-                        }
-                        if (!empty($deletedChannels = array_diff_key($formData['lead_channels'], $formData['doNotContactChannels']))) {
-                            foreach ($deletedChannels as $deletedChannel) {
-                                $model->addDncForLead($lead, $deletedChannel, 'user', DoNotContact::MANUAL);
-                            }
-                        }
-                        $model->setFrequencyRules($lead, $formData, $leadsLists);
-                    }
-                }
+        $tmpl = $this->request->get('tmpl', 'index');
 
-                if ($valid) {
-                    $viewParameters = [
-                        'objectId'     => $lead->getId(),
-                        'objectAction' => 'view',
-                    ];
-
-                    return $this->postActionRedirect(
-                        [
-                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
-                            'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticLeadBundle:Lead:view',
-                            'passthroughVars' => [
-                                'closeModal' => 1,
-                            ],
-                        ]
-                    );
-                }
-            }
-            $tmpl = $this->request->get('tmpl', 'index');
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
+        return $this->delegateView(
+            [
+                'viewParameters' => array_merge(
+                    [
                         'tmpl'         => $tmpl,
-                        'action'       => $action,
                         'form'         => $form->createView(),
                         'currentRoute' => $this->generateUrl(
                             'mautic_contact_action',
                             [
                                 'objectAction' => 'contactFrequency',
                                 'objectId'     => $lead->getId(),
-                                'channels'     => $allChannels,
                             ]
                         ),
-                        'channels'     => $allChannels,
-                        'leadChannels' => $channels,
-                        'lead'         => $lead,
+                        'lead' => $lead,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
-                    'passthroughVars' => [
-                        'route'  => false,
-                        'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null,
-                    ],
-                ]
-            );
-        }
+                    $viewParameters
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1796,7 +1747,6 @@ class LeadController extends FormController
                         );
 
                         // Set Content
-                        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($email['body']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
 

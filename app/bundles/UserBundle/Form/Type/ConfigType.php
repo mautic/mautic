@@ -20,7 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class ConfigType.
@@ -138,13 +137,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
+                'empty_data' => 'EmailAddress',
             ]
         );
 
@@ -170,13 +163,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
+                'empty_data' => 'FirstName',
             ]
         );
 
@@ -189,13 +176,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
+                'empty_data' => 'LastName',
             ]
         );
 

@@ -13,6 +13,9 @@ namespace Mautic\CampaignBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -20,15 +23,17 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class CampaignApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('campaign');
         $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
         $this->entityNameOne    = 'campaign';
         $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
-        $this->serializerGroups = ['campaignDetails', 'categoryList', 'publishDetails', 'leadListList'];
+        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -78,13 +83,9 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
-
-            if ($lead == null) {
-                return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
-                return $this->accessDenied();
+            $lead = $this->checkLeadAccess($leadId, 'edit');
+            if ($lead instanceof Response) {
+                return $lead;
             }
 
             $this->model->removeLead($entity, $leadId);
@@ -197,5 +198,50 @@ class CampaignApiController extends CommonApiController
         if ($method === 'PUT' && !empty($deletedEvents)) {
             $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
+    }
+
+    /**
+     * Obtains a list of campaign contacts.
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getContactsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
+        }
+
+        $where = InputHelper::clean($this->request->query->get('where', []));
+        $order = InputHelper::clean($this->request->query->get('order', []));
+
+        $where[] = [
+            'col'  => 'campaign_id',
+            'expr' => 'eq',
+            'val'  => $id,
+        ];
+
+        $where[] = [
+            'col'  => 'manually_removed',
+            'expr' => 'eq',
+            'val'  => 0,
+        ];
+
+        return $this->forward(
+            'MauticCoreBundle:Api\StatsApi:list',
+            [
+                'table'     => 'campaign_leads',
+                'itemsName' => 'contacts',
+                'order'     => $order,
+                'where'     => $where,
+            ]
+        );
     }
 }

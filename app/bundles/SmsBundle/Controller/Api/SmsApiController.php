@@ -25,12 +25,12 @@ class SmsApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('sms');
         $this->entityClass     = 'Mautic\SmsBundle\Entity\Sms';
         $this->entityNameOne   = 'sms';
         $this->entityNameMulti = 'smses';
-        $this->permissionBase  = 'sms:smses';
+
+        parent::initialize($event);
     }
 
     /**

@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_form_pagetoken_index' => [
-                'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_formaction_action' => [
                 'path'       => '/forms/action/{objectAction}/{objectId}',
                 'controller' => 'MauticFormBundle:Action:execute',
@@ -39,9 +35,9 @@ return [
                     'format' => 'csv',
                 ],
             ],
-            'mautic_form_results_delete' => [
-                'path'       => '/forms/results/{formId}/delete/{objectId}',
-                'controller' => 'MauticFormBundle:Result:delete',
+            'mautic_form_results_action' => [
+                'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
+                'controller' => 'MauticFormBundle:Result:execute',
                 'defaults'   => [
                     'objectId' => 0,
                 ],

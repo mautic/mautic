@@ -16,10 +16,7 @@ return [
                 'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
-                    'mautic.sms.api',
-                    'mautic.helper.sms',
                 ],
             ],
             'mautic.sms.configbundle.subscriber' => [
@@ -36,6 +33,12 @@ return [
             ],
             'mautic.sms.channel.subscriber' => [
                 'class' => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
+            ],
+            'mautic.sms.message_queue.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\MessageQueueSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.model.sms',
+                ],
             ],
             'mautic.sms.stats.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
@@ -60,9 +63,8 @@ return [
                 'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sms_list',
+                'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
+                'alias' => 'sms_list',
             ],
         ],
         'helpers' => [
@@ -104,6 +106,9 @@ return [
                 'class'     => 'Mautic\SmsBundle\Model\SmsModel',
                 'arguments' => [
                     'mautic.page.model.trackable',
+                    'mautic.lead.model.lead',
+                    'mautic.channel.model.queue',
+                    'mautic.sms.api',
                 ],
             ],
         ],
@@ -150,6 +155,7 @@ return [
                             'sms_enabled' => true,
                         ],
                     ],
+                    'priority' => 70,
                 ],
             ],
         ],

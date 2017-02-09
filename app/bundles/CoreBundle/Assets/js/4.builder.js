@@ -160,6 +160,11 @@ Mautic.destroyCodeMirror = function() {
     mQuery('#customHtmlContainer').empty();
 };
 
+/**
+ * @param themeHtml
+ * @param id
+ * @param onLoadCallback
+ */
 Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
     if (mQuery('iframe#'+id).length) {
         var builder = mQuery('iframe#'+id);
@@ -185,6 +190,10 @@ Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
     Mautic.updateIframeContent(id, themeHtml);
 };
 
+/**
+ * @param encodedHtml
+ * @returns {*}
+ */
 Mautic.htmlspecialchars_decode = function(encodedHtml) {
     encodedHtml = encodedHtml.replace(/&quot;/g, '"');
     encodedHtml = encodedHtml.replace(/&#039;/g, "'");
@@ -192,6 +201,106 @@ Mautic.htmlspecialchars_decode = function(encodedHtml) {
     encodedHtml = encodedHtml.replace(/&lt;/g, '<');
     encodedHtml = encodedHtml.replace(/&gt;/g, '>');
     return encodedHtml;
+};
+
+/**
+ * Initialize theme selection
+ *
+ * @param themeField
+ */
+Mautic.initSelectTheme = function(themeField) {
+    var customHtml = mQuery('textarea.builder-html');
+    var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
+    Mautic.showChangeThemeWarning = true;
+    Mautic.builderTheme = themeField.val();
+
+    if (isNew) {
+        Mautic.showChangeThemeWarning = false;
+
+        // Populate default content
+        if (!customHtml.length || !customHtml.val().length) {
+            Mautic.setThemeHtml(Mautic.builderTheme);
+        }
+    }
+
+    if (customHtml.length) {
+        mQuery('[data-theme]').click(function(e) {
+            e.preventDefault();
+            var currentLink = mQuery(this);
+            var theme = currentLink.attr('data-theme');
+            var isCodeMode = (theme === 'mautic_code_mode');
+            Mautic.builderTheme = theme;
+
+            if (Mautic.showChangeThemeWarning && customHtml.val().length) {
+                if (!isCodeMode) {
+                    if (confirm(Mautic.translate('mautic.core.builder.theme_change_warning'))) {
+                        customHtml.val('');
+                        Mautic.showChangeThemeWarning = false;
+                    } else {
+                        return;
+                    }
+                } else {
+                    if (confirm(Mautic.translate('mautic.core.builder.code_mode_warning'))) {
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+            // Set the theme field value
+            themeField.val(theme);
+
+            // Code Mode
+            if (isCodeMode) {
+                mQuery('.builder').addClass('code-mode');
+                mQuery('.builder .code-editor').removeClass('hide');
+                mQuery('.builder .code-mode-toolbar').removeClass('hide');
+                mQuery('.builder .builder-toolbar').addClass('hide');
+            } else {
+                mQuery('.builder').removeClass('code-mode');
+                mQuery('.builder .code-editor').addClass('hide');
+                mQuery('.builder .code-mode-toolbar').addClass('hide');
+                mQuery('.builder .builder-toolbar').removeClass('hide');
+
+                // Load the theme HTML to the source textarea
+                Mautic.setThemeHtml(theme);
+            }
+
+            // Manipulate classes to achieve the theme selection illusion
+            mQuery('.theme-list .panel').removeClass('theme-selected');
+            currentLink.closest('.panel').addClass('theme-selected');
+            mQuery('.theme-list .select-theme-selected').addClass('hide');
+            mQuery('.theme-list .select-theme-link').removeClass('hide');
+            currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
+            currentLink.addClass('hide');
+        });
+    }
+};
+
+/**
+ * Updates content of an iframe
+ *
+ * @param iframe ID
+ * @param HTML content
+ */
+Mautic.updateIframeContent = function(iframeId, content) {
+    var iframe = document.getElementById(iframeId);
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(content);
+    doc.close();
+};
+
+/**
+ * Set theme's HTML
+ *
+ * @param theme
+ */
+Mautic.setThemeHtml = function(theme) {
+    mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
+        var textarea = mQuery('textarea.builder-html');
+        textarea.val(themeHtml);
+    });
 };
 
 /**
@@ -880,7 +989,18 @@ Mautic.getSlotStyle = function(slot, styleName, fallback) {
     };
 
     return findStyle(slot);
-}
+};
+
+/**
+ * @returns {string}
+ */
+Mautic.getBuilderTokensMethod = function() {
+    var method = 'page:getBuilderTokens';
+    if (parent.mQuery('.builder').hasClass('email-builder')) {
+        method = 'email:getBuilderTokens';
+    }
+    return method;
+};
 
 // Init inside the builder's iframe
 mQuery(function() {

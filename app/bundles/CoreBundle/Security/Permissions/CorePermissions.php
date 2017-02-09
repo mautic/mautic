@@ -184,10 +184,8 @@ class CorePermissions
         foreach ($bundlePermissions as $bundle => $permissions) {
             foreach ($permissions as $name => $perms) {
                 $entity = new Permission();
-
-                //strtolower to ensure consistency
-                $entity->setBundle(strtolower($bundle));
-                $entity->setName(strtolower($name));
+                $entity->setBundle($bundle);
+                $entity->setName($name);
 
                 $bit   = 0;
                 $class = $this->getPermissionObject($bundle, true);

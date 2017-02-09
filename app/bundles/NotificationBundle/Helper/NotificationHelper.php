@@ -31,16 +31,16 @@ class NotificationHelper
     }
 
     /**
-     * @param string $email
+     * @param string $notification
      *
      * @return bool
      */
-    public function unsubscribe($email)
+    public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
         $repo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
 
-        $lead = $repo->getLeadByEmail($email);
+        $lead = $repo->getLeadByEmail($notification);
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead.lead');

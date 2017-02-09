@@ -11,109 +11,13 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+@trigger_error('Mautic\CoreBundle\Event\ChannelBroadcastEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\ChannelBroadcastEvent instead', E_DEPRECATED);
 
 /**
  * Class ChannelBroadcastEvent.
+ *
+ * @deprecated 2.4 to be removed in 3.0; use \Mautic\ChannelBundle\Event\ChannelBroadcastEvent instead
  */
-class ChannelBroadcastEvent extends Event
+class ChannelBroadcastEvent extends \Mautic\ChannelBundle\Event\ChannelBroadcastEvent
 {
-    /**
-     * Specific channel.
-     *
-     * @var null
-     */
-    protected $channel;
-
-    /**
-     * Specific ID of a specific channel.
-     *
-     * @var null
-     */
-    protected $id;
-
-    /**
-     * Number of contacts successfully processed and/or failed per channel.
-     *
-     * @var int
-     */
-    protected $results = [];
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    /**
-     * MaintenanceEvent constructor.
-     *
-     * @param int  $daysOld
-     * @param bool $dryRun
-     */
-    public function __construct($channel, $channelId, OutputInterface $output)
-    {
-        $this->channel = $channel;
-        $this->id      = $channelId;
-        $this->output  = $output;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param     $channelLabel
-     * @param int $successCount
-     * @param int $failedCount
-     */
-    public function setResults($channelLabel, $successCount, $failedCount = 0)
-    {
-        $this->results[$channelLabel] = [
-            'success' => (int) $successCount,
-            'failed'  => (int) $failedCount,
-        ];
-    }
-
-    /**
-     * @return int
-     */
-    public function getResults()
-    {
-        return $this->results;
-    }
-
-    /**
-     * @param $channel
-     *
-     * @return bool
-     */
-    public function checkContext($channel)
-    {
-        if ($this->channel && $this->channel !== $channel) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return OutputInterface
-     */
-    public function getOutput()
-    {
-        return $this->output;
-    }
 }
