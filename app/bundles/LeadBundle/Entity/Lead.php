@@ -1098,7 +1098,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setColor($color)
     {
-        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -1151,7 +1150,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setNewlyCreated($newlyCreated)
     {
-        $this->isChanged('newlyCreated', $newlyCreated);
         $this->newlyCreated = $newlyCreated;
     }
 
@@ -1209,7 +1207,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setLastActive($lastActive)
     {
-        $this->isChanged('lastActive', $lastActive);
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
     }
@@ -1267,7 +1264,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setTags($tags)
     {
-        $this->isChanged('tags', $tags);
         $this->tags = $tags;
 
         return $this;
