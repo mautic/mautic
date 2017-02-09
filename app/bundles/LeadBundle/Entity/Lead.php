@@ -1146,7 +1146,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param bool $newlmpiagn yCreated
+     * @param bool $newlyCreated Created
      */
     public function setNewlyCreated($newlyCreated)
     {
