@@ -477,6 +477,21 @@ class EmailType extends AbstractType
             );
         }
 
+        $builder->add(
+            $builder->create(
+                 'customData',
+                 'textarea',
+                 [
+                      'label'      => 'mautic.email.form.data',
+                      'label_attr' => ['class' => 'control-label'],
+                      'required'   => false,
+                      'attr'       => [
+                          'class' => 'form-control builder-html editor-email',
+                      ],
+                 ]
+            )
+        );
+
         $this->addDynamicContentField($builder);
 
         if (!empty($options['action'])) {
