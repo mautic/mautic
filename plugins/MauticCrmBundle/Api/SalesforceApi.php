@@ -253,7 +253,8 @@ class SalesforceApi extends CrmApi
         }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields = implode(', ', $fields);
+            $fields   = implode(', ', $fields);
+            $fields[] = 'Id';
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
