@@ -754,6 +754,37 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * @param        $objectId
+     * @param        $returnUrl
+     * @param string $timezone
+     * @param null   $dateRangeForm
+     *
+     * @return array
+     */
+    protected function getViewDateRange($objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null)
+    {
+        $name            = $this->getSessionBase($objectId).'.view.daterange';
+        $method          = ('POST' === $this->request->getMethod()) ? 'request' : 'query';
+        $dateRangeValues = $this->request->$method->get('daterange', $this->get('session')->get($name, []));
+        $this->get('session')->set($name, $dateRangeValues);
+
+        $dateRangeForm = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $returnUrl]);
+        $dateFrom      = new \DateTime($dateRangeForm['date_from']->getData());
+        $dateFrom->setTime(0, 0, 0);
+        $dateTo = new \DateTime($dateRangeForm['date_to']->getData());
+        $dateTo->setTime(24, 59, 59);
+
+        if ('utc' === $timezone) {
+            $dateFrom = clone $dateFrom;
+            $dateFrom->setTimezone(new \DateTimeZone('utc'));
+            $dateTo = clone $dateTo;
+            $dateTo->setTimezone(new \DateTimeZone('utc'));
+        }
+
+        return [$dateFrom, $dateTo];
+    }
+
+    /**
      * @param int $page
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -989,7 +1020,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function setListFilters($name = null)
     {
-        return parent::setListFilters($this->getSessionBase());
+        return parent::setListFilters(($name) ? $name : $this->getSessionBase());
     }
 
     /**

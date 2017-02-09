@@ -501,30 +501,62 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param        $joinTable
      * @param        $entityId
      * @param array  $filters
-     * @param string $contactColumnName
+     * @param string $entityColumnName
+     * @param array  $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      *
      * @return array
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $contactColumnName = 'id')
+    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
     {
         $qb = $this->getEntitiesDbalQueryBuilder();
+
+        if (empty($contactColumnName)) {
+            $contactColumnName = 'lead_id';
+        }
+
+        $joinCondition = $qb->expr()->andX(
+            $qb->expr()->eq($this->getTableAlias().'.id', 'entity.'.$contactColumnName)
+        );
+
+        if ($entityId && $entityColumnName) {
+            $joinCondition->add(
+                $qb->expr()->eq("entity.{$entityColumnName}", (int) $entityId)
+            );
+        }
+
         $qb->join(
             $this->getTableAlias(),
             MAUTIC_TABLE_PREFIX.$joinTable,
             'entity',
-            $qb->expr()->andX(
-                $qb->expr()->eq('l.id', 'entity.lead_id'),
-                $qb->expr()->eq("entity.{$contactColumnName}", (int) $entityId)
-            )
+            $joinCondition
         );
+
+        if (is_array($additionalJoins)) {
+            foreach ($additionalJoins as $t) {
+                $qb->{$t['type']}(
+                    $t['from_alias'],
+                    MAUTIC_TABLE_PREFIX.$t['table'],
+                    $t['alias'],
+                    $t['condition']
+                );
+            }
+        }
 
         if ($filters) {
             $expr = $qb->expr()->andX();
             foreach ($filters as $column => $value) {
-                $expr->add(
-                    $qb->expr()->eq("entity.{$column}", $qb->createNamedParameter($value))
-                );
-                $qb->andWhere($expr);
+                if (is_array($value)) {
+                    $this->buildWhereClauseFromArray($qb, [$value]);
+                } else {
+                    if (strpos($column, '.') === false) {
+                        $column = "entity.$column";
+                    }
+
+                    $expr->add(
+                        $qb->expr()->eq($column, $qb->createNamedParameter($value))
+                    );
+                    $qb->andWhere($expr);
+                }
             }
         }
 
