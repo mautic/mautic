@@ -16,13 +16,13 @@ return [
                 'path'       => '/messages/{page}',
                 'controller' => 'MauticChannelBundle:Message:index',
             ],
+            'mautic_message_contacts' => [
+                'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
+                'controller' => 'MauticChannelBundle:Message:contacts',
+            ],
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
                 'controller' => 'MauticChannelBundle:Message:execute',
-            ],
-            'mautic_message_contacts' => [
-                'path'       => '/messages/view/{objectId}/contact/{page}',
-                'controller' => 'MauticChannelBundle:Message:contacts',
             ],
         ],
         'api' => [

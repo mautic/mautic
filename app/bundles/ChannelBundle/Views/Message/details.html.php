@@ -94,42 +94,41 @@ $view['slots']->set(
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
-                    <li class="active">
-                        <a href="#leads-container" role="tab" data-toggle="tab">
-                            <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
+                    <?php $active = 'active'; ?>
+                    <?php foreach ($messagedLeads as $channel => $contacts): ?>
+                    <li class="<?php echo $active; ?>">
+                        <a href="#contacts-<?php echo $channel; ?>" role="tab" data-toggle="tab">
+                            <?php echo ('all' !== $channel) ? $channels[$channel]['label'] : $view['translator']->trans('mautic.lead.leads'); ?>
                         </a>
                     </li>
+                    <?php $active = ''; ?>
+                    <?php endforeach; ?>
                 </ul>
                 <!--/ tabs controls -->
             </div>
 
             <!-- start: tab-content -->
             <div class="tab-content pa-md">
-                <!-- #events-container -->
-
-                <div class="tab-pane active fade in bdr-w-0 page-list" id="leads-container">
-                    <?php echo $messagedLeads; ?>
+                <?php $active = ' active in'; ?>
+                <?php foreach ($messagedLeads as $channel => $contacts): ?>
+                <div class="tab-pane bdr-w-0 page-list<?php echo $active; ?>" id="contacts-<?php echo $channel; ?>">
+                    <?php $message = ('all' === $channel) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts'; ?>
+                    <div class="alert alert-info"><strong><?php echo $view['translator']->trans($message); ?></strong></div>
+                    <div class="message-<?php echo $channel; ?>">
+                        <?php echo $contacts; ?>
+                    </div>
                 </div>
+                <?php $active = ''; ?>
+                <?php endforeach; ?>
             </div>
         </div>
         <!-- right section -->
         <div class="col-md-3 bg-white bdr-l height-auto">
-            <!-- preview URL -->
-            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <!-- recent activity -->
-                        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);
-                        $view['slots']->start('rightFormContent');
-                        $view['slots']->stop();
-                        ?>
-
-                    </div>
-                </div>
-                <div class="panel-body pt-xs">
-
-                </div>
-            </div>
+            <!-- recent activity -->
+            <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);
+            $view['slots']->start('rightFormContent');
+            $view['slots']->stop();
+            ?>
         </div>
     </div>
 <?php

@@ -302,32 +302,45 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
+    /**
+     * @param $options
+     *
+     * @return array
+     */
     public function getChartQuery($options)
     {
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
 
         // Load points for selected period
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->select('event_id as id, date_triggered')
+        $query->select('ll.id, ll.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
-
-        if (!isset($options['is_scheduled'])) {
-            $query->where($query->expr()->eq('ll.is_scheduled', 0));
-        } else {
-            $query->where($query->expr()->eq('ll.is_scheduled', 1));
-        }
-
-        if (isset($options['type'])) {
-            $query->andwhere("e.type = '".$options['type']."'");
-        }
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
 
         if (isset($options['channel'])) {
             $query->andwhere("e.channel = '".$options['channel']."'");
         }
 
         if (isset($options['channelId'])) {
-            $query->andwhere('e.channel_id = '.$options['channelId']);
+            $query->andwhere('e.channel_id = '.(int) $options['channelId']);
+        }
+
+        if (isset($options['type'])) {
+            $query->andwhere("e.type = '".$options['type']."'");
+        }
+
+        if (isset($options['logChannel'])) {
+            $query->andwhere("ll.channel = '".$options['logChannel']."'");
+        }
+
+        if (isset($options['logChannelId'])) {
+            $query->andwhere('ll.channel_id = '.(int) $options['logChannelId']);
+        }
+
+        if (!isset($options['is_scheduled'])) {
+            $query->andWhere($query->expr()->eq('ll.is_scheduled', 0));
+        } else {
+            $query->andWhere($query->expr()->eq('ll.is_scheduled', 1));
         }
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
