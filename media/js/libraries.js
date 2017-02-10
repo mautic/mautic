@@ -1647,16 +1647,20 @@ select.trigger("chosen:updated");setTimeout(function(){var e=$.Event("keyup.chos
 if(settings.success!=null){settings.success(data);}
 var returnVar=field.val(untrimmed_val);div=$('<div />');div.text(untrimmed_val);$('body').append(div);w=div.width()+25;f_width=field.closest('.chosen-choices').outerWidth();if(w>f_width-10){w=f_width;}
 div.remove();field.css({'width':w+'px'});return returnVar;};return this.timer=setTimeout(function(){if(chosenXhr){chosenXhr.abort();}
-return chosenXhr=$.ajax(options);},options.afterTypeDelay);});});};})(jQuery);;+function($){"use strict";$.fn.overflowNavs=function(options){var ul=$(this);var parent=options.parent?options.parent:ul.parents('.navbar');$(ul).css({'height':'42px','overflow-y':'hidden'});var collapse=$('div.nav-collapse').length;if(!collapse){var collapse=$('div.navbar-collapse').length;}
+return chosenXhr=$.ajax(options);},options.afterTypeDelay);});});};})(jQuery);;+function($){"use strict";$.fn.overflowNavs=function(options){var ul=$(this);var parent=$(this).closest(options.parent);var isVertical=$(this).hasClass('tabs-left')||$(this).hasClass('tabs-right');if(!options.offset){options.offset={};}
+if(!isVertical){$(ul).css({'height':'42px','overflow-y':'hidden'});}
+var collapse=$('div.nav-collapse').length;if(!collapse){var collapse=$('div.navbar-collapse').length;}
 if(collapse){var collapsed=$('.btn-navbar').is(":visible");if(!collapsed){var collapsed=$('.navbar-toggle').is(":visible");}}
 else{var collapsed=false;}
-if(collapsed===false){var parent_width=$(parent).width()-(options.offset?parseInt($(options.offset).width()):0);var dropdown=$('li.overflow-nav',ul);if(!dropdown.length){dropdown=$('<li class="overflow-nav dropdown pull-right"></li>');dropdown.append($('<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="overflow-count"></span><b class="caret"></b></a>'));dropdown.append($('<ul class="dropdown-menu"></ul>'));}
-var width=125;ul.children('li').each(function(){var $this=$(this);width+=$this.outerWidth();});if(width>=parent_width){$($('li',ul).not('.dropdown').not('.dropdown li').get().reverse()).each(function(){var width=125;ul.children('li').each(function(){var $this=$(this);width+=$this.outerWidth();});if(width>=parent_width){$(this).attr('data-original-width',$(this).outerWidth());dropdown.children('ul.dropdown-menu').prepend(this);}});}
-else{dropdown.children('ul.dropdown-menu').children().each(function(){width+=parseInt($(this).attr('data-original-width'));if(width<parent_width){dropdown.before(this);}
+if(collapsed===false){var parent_dimension=(isVertical)?$(parent).height()-(options.offset.height?parseInt(options.offset.height):0):$(parent).width()-(options.offset.width?parseInt(options.offset.width):0);var dropdown=$('li.overflow-nav',ul);if(!dropdown.length){dropdown=$('<li class="overflow-nav dropdown"></li>');if(!isVertical){dropdown.addClass('pull-right');}
+dropdown.append($('<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="overflow-count"></span><b class="caret"></b></a>'));dropdown.append($('<ul class="dropdown-menu"></ul>'));}
+var dimension=(isVertical)?42:100;ul.children('li').not('li.dropdown').each(function(){dimension+=(isVertical)?$(this).outerHeight(true):$(this).outerWidth(true);});if(dimension>=parent_dimension){$($('li',ul).not('.dropdown').get().reverse()).each(function(){var dimension=(isVertical)?42:100;ul.children('li').each(function(){var $this=$(this);dimension+=(isVertical)?$this.outerHeight(true):$this.outerWidth(true);});if(dimension>=parent_dimension){$(this).attr('data-original-dimension',(isVertical)?$(this).outerHeight(true):$(this).outerWidth(true));dropdown.children('ul.dropdown-menu').prepend(this);}});}
+else{dropdown.children('ul.dropdown-menu').children().each(function(){dimension+=parseInt($(this).attr('data-original-dimension'));if(dimension<parent_dimension){dropdown.before(this);}
 else{return false;}});}
 if(!dropdown.children('ul.dropdown-menu').children().length){dropdown.remove();}
 else{if(!ul.children('li.overflow-nav').length){ul.append(dropdown);}}}else{var dropdown=$('li.overflow-nav',ul);if(dropdown.length){dropdown.children('ul.dropdown-menu').children().each(function(){dropdown.before(this);});dropdown.remove();}}
-dropdown.find('.dropdown-toggle .overflow-count').text(dropdown.find('ul.dropdown-menu li').length+" "+options.more);$(ul).css({'height':'auto','overflow-y':'inherit'});};}(window.jQuery);;
+dropdown.find('.dropdown-toggle .overflow-count').text(dropdown.find('ul.dropdown-menu li').length+" "+options.more);if(isVertical){dropdown.find('ul.dropdown-menu').css('width','100%');}
+if(!isVertical){$(ul).css({'height':'auto','overflow-y':'inherit'});}};}(window.jQuery);;
 /*! jQuery UI - v1.11.4 - 2016-05-18
 * http://jqueryui.com
 * Includes: core.js, widget.js, mouse.js, position.js, draggable.js, droppable.js, selectable.js, sortable.js, effect.js, effect-drop.js, effect-fade.js, effect-size.js, effect-slide.js, effect-transfer.js
@@ -4195,7 +4199,7 @@ catch(e){}}},wrap:function(wrappedFunction,newFunction,returnOnThisValue){wrappe
 if(returnOnThisValue==null||(r!==returnOnThisValue)){try{r=wrappedFunction.apply(this,arguments);}catch(e){root.jsPlumbUtil.log("wrapped function failed : "+e);}}
 return r;};}};root.jsPlumbUtil.EventGenerator=function(){var _listeners={},eventsSuspended=false,eventsToDieOn={"ready":true};this.bind=function(event,listener,insertAtStart){var _one=function(evt){root.jsPlumbUtil.addToList(_listeners,evt,listener,insertAtStart);listener.__jsPlumb=listener.__jsPlumb||{};listener.__jsPlumb[root.jsPlumbUtil.uuid()]=evt;};if(typeof event==="string")_one(event);else if(event.length!=null){for(var i=0;i<event.length;i++){_one(event[i]);}}
 return this;};this.fire=function(event,value,originalEvent){if(!eventsSuspended&&_listeners[event]){var l=_listeners[event].length,i=0,_gone=false,ret=null;if(!this.shouldFireEvent||this.shouldFireEvent(event,value,originalEvent)){while(!_gone&&i<l&&ret!==false){if(eventsToDieOn[event])
-_listeners[event][i].apply(this,[value,originalEvent]);else{try{ret=_listeners[event][i].apply(this,[value,originalEvent]);}catch(e){root.jsPlumbUtil.log("jsPlumb: fire failed for event "+event+" : "+e);}}
+_listeners[event][i].apply(this,[value,originalEvent]);else{try{ret=_listeners[event][i].apply(this,[value,originalEvent]);}catch(e){root.jsPlumbUtil.log("jsPlumb: fire failed for event "+event+" : "+e);console.log(e);}}
 i++;if(_listeners==null||_listeners[event]==null)
 _gone=true;}}}
 return this;};this.unbind=function(eventOrListener,listener){if(arguments.length===0){_listeners={};}

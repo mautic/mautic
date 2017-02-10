@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 5;
+    const MINOR_VERSION = 6;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier.
@@ -122,7 +122,9 @@ class AppKernel extends Kernel
                         [
                             '%code%' => $e->getCode(),
                         ]
-                    )
+                    ),
+                    0,
+                    $e
                 );
             }
         }
