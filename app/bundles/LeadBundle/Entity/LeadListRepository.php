@@ -861,9 +861,6 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
-                case 'page_id':
-                case 'email_id':
-                case 'redirect_id':
                 case 'lead_email_received_date':
                 case 'notification':
                     $operand = (($func == 'notEmpty') || ($func == 'between') || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';
@@ -891,6 +888,13 @@ class LeadListRepository extends CommonRepository
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                 ->eq($alias.'.'.$column, $exprParameter), $q->expr()
+                                ->eq($alias.'.lead_id', 'l.id')));
+                            break;
+                        case 'empty':
+                        case 'notEmpty':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
                         case 'empty':
@@ -947,6 +951,35 @@ class LeadListRepository extends CommonRepository
                             }
                             break;
                     }
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere($subqb->expr()
+                            ->eq($alias.'.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
+                case 'page_id':
+                case 'email_id':
+                case 'redirect_id':
+                    $operand = ($func == 'eq') ? 'EXISTS' : 'NOT EXISTS';
+                    $column = $details['field'];
+                    $table = 'page_hits';
+                    $select = 'id';
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select($select)
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+                            if($details['filter'] == 1){
+                                $subqb->where($q->expr()
+                                    ->andX($q->expr()
+                                        ->isNotNull($alias.'.'.$column),  $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')));
+                            }else{
+                                $subqb->where($q->expr()
+                                    ->andX($q->expr()
+                                        ->isNull($alias.'.'.$column),  $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')));
+                            }
                     // Specific lead
                     if (!empty($leadId)) {
                         $subqb->andWhere($subqb->expr()

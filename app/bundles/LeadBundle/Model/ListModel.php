@@ -417,8 +417,8 @@ class ListModel extends FormModel
                     'type' => 'boolean',
                     'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes'),
-                    ],
+                    1 => $this->translator->trans('mautic.core.form.yes'),
+                ],
                 ],
                 'operators' => 'bool',
                 'object'    => 'lead',
@@ -503,41 +503,38 @@ class ListModel extends FormModel
             'page_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.page_id'),
                 'properties' => [
-                    'type' => 'text',
-                ],
-                'operators' => [
-                    'include' => [
-                        'empty',
-                        '!empty',
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'object' => 'lead',
+                'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'email_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
                 'properties' => [
-                    'type' => 'text',
-                ],
-                'operators' => [
-                    'include' => [
-                        'empty',
-                        '!empty',
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'object' => 'lead',
+                'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'redirect_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.redirect_id'),
                 'properties' => [
-                    'type' => 'text',
-                ],
-                'operators' => [
-                    'include' => [
-                        'empty',
-                        '!empty',
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'object' => 'lead',
+                'operators' => 'bool',
+                'object'    => 'lead',
             ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
