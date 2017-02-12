@@ -379,6 +379,18 @@ class ListModel extends FormModel
                 ],
                 'object'     => 'lead',
             ],
+            'sessions' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
+                'properties' => ['type' => 'number'],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        'gt',
+                        'lt',
+                    ],
+                ],
+                'object'     => 'lead',
+            ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => [

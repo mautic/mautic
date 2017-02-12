@@ -897,13 +897,6 @@ class LeadListRepository extends CommonRepository
                                 ->andX($q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
                             break;
-                        case 'empty':
-                        case 'notEmpty':
-                            $parameters[$parameter] = $details['filter'];
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
-                            break;
                         case 'like':
                             $details['filter'] = '%'.$details['filter'].'%';
                             $subqb->where($q->expr()
@@ -984,6 +977,55 @@ class LeadListRepository extends CommonRepository
                     if (!empty($leadId)) {
                         $subqb->andWhere($subqb->expr()
                             ->eq($alias.'.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
+                case 'sessions':
+                    $operand = 'EXISTS';
+                    $column = $details['field'];
+                    $table = 'page_hits';
+                    $select = 'COUNT(id)';
+
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select($select)
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+
+                    $alias2 = $this->generateRandomParameterName();
+                    $subqb2 = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select($alias2.'.id')
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
+
+
+                    $subqb2->where($q->expr()
+                        ->andX(
+                            $q->expr()->eq($alias2.'.lead_id', 'l.id'),
+                            $q->expr()->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'),
+                            $q->expr()->lt($alias2.'.date_hit', $alias.'.date_hit')
+                        ));
+
+                    $parameters[$parameter] = $details['filter'];
+                    $subqb->where($q->expr()
+                        ->andX($q->expr()
+                            ->eq($alias.'.lead_id', 'l.id'),$q->expr()
+                            ->isNull($alias.'.email_id'),$q->expr()
+                            ->isNull($alias.'.redirect_id'),
+                            sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())));
+
+                    switch ($func) {
+                        case 'eq':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->having($select .'='. $details['filter']);
+                            break;
+                        case 'gt':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->having($select .'>'. $details['filter']);
+                            break;
+                        case 'lt':
+                            $parameters[$parameter] = $details['filter'];
+                            $subqb->having($select .'<'. $details['filter']);
+                            break;
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
