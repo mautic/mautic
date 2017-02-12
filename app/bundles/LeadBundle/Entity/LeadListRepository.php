@@ -861,6 +861,9 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
+                case 'page_id':
+                case 'email_id':
+                case 'redirect_id':
                 case 'lead_email_received_date':
                 case 'notification':
                     $operand = (($func == 'notEmpty') || ($func == 'between') || ($func == 'eq') || ($func == 'like') || ($func == 'gt') || ($func == 'lt')) ? 'EXISTS' : 'NOT EXISTS';

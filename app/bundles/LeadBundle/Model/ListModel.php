@@ -500,6 +500,45 @@ class ListModel extends FormModel
                 ],
                 'object' => 'lead',
             ],
+            'page_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.page_id'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        'empty',
+                        '!empty',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'email_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        'empty',
+                        '!empty',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'redirect_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.redirect_id'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        'empty',
+                        '!empty',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
