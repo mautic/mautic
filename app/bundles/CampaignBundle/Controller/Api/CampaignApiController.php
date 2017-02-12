@@ -125,8 +125,8 @@ class CampaignApiController extends CommonApiController
         $deletedSources = ['lists' => [], 'forms' => []];
         $deletedEvents  = [];
         $currentSources = [
-            'lists' => isset($parameters['lists']) ? $parameters['lists'] : [],
-            'forms' => isset($parameters['forms']) ? $parameters['forms'] : [],
+            'lists' => isset($parameters['lists']) ? $this->modifyCampaignEventArray($parameters['lists']) : [],
+            'forms' => isset($parameters['forms']) ? $this->modifyCampaignEventArray($parameters['forms']) : [],
         ];
 
         // delete events and sources which does not exist in the PUT request
@@ -198,6 +198,28 @@ class CampaignApiController extends CommonApiController
         if ($method === 'PUT' && !empty($deletedEvents)) {
             $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
+    }
+
+    /**
+     * Change the array structure.
+     *
+     * @param array $events
+     *
+     * @return array
+     */
+    public function modifyCampaignEventArray($events)
+    {
+        $updatedEvents = [];
+
+        if ($events && is_array($events)) {
+            foreach ($events as $event) {
+                if (!empty($event['id'])) {
+                    $updatedEvents[$event['id']] = 'ignore';
+                }
+            }
+        }
+
+        return $updatedEvents;
     }
 
     /**
