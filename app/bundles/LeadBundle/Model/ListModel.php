@@ -461,6 +461,32 @@ class ListModel extends FormModel
                 ],
                 'object' => 'lead',
             ],
+            'url_title' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.url_title'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        'like',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
+            'source' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.source'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'include' => [
+                        '=',
+                        'like',
+                    ],
+                ],
+                'object' => 'lead',
+            ],
             'notification' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
                 'properties' => [
