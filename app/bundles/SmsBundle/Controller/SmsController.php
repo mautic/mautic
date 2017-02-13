@@ -290,6 +290,7 @@ class SmsController extends FormController
                 'sms'         => $sms,
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
+                'isEmbedded'  => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                 'permissions' => $security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
@@ -567,9 +568,9 @@ class SmsController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId'        => $entity->getId(),
-                        'smsName'      => $entity->getName(),
-                        'smsLang'      => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

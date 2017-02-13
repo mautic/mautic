@@ -26,6 +26,6 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticWebhookBundle:Log');
+        $this->addRestrictedRepostories($em, 'MauticWebhookBundle:Log', ['webhook' => 'webhook:webhooks']);
     }
 }

@@ -12,10 +12,10 @@
 namespace Mautic\EmailBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -63,6 +63,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $mailHelper->method('queue')
             ->will($this->returnValue(true));
+        $mailHelper->method('setEmail')
+            ->will($this->returnValue(true));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -85,7 +87,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -307,7 +309,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -523,7 +525,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -660,7 +662,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -800,7 +802,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
@@ -913,7 +915,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories

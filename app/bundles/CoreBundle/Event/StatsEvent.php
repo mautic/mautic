@@ -11,7 +11,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -56,18 +58,23 @@ class StatsEvent extends Event
     protected $tables = [];
 
     /**
+     * @var array
+     */
+    protected $tableColumns = [];
+
+    /**
      * Array of order by statements.
      *
      * @var array
      */
-    protected $order;
+    protected $order = [];
 
     /**
      * Array of where filters.
      *
      * @var array
      */
-    protected $where;
+    protected $where = [];
 
     /**
      * Array of the result data.
@@ -91,6 +98,11 @@ class StatsEvent extends Event
     protected $repository;
 
     /**
+     * @var User
+     */
+    protected $user;
+
+    /**
      * StatsEvent constructor.
      *
      * @param       $table
@@ -98,43 +110,45 @@ class StatsEvent extends Event
      * @param int   $limit
      * @param array $order
      * @param array $where
+     * @param User  $user
      */
-    public function __construct($table, $start = 0, $limit = 100, array $order = [], array $where = [])
+    public function __construct($table, $start, $limit, array $order, array $where, User $user)
     {
-        $this->table = strtolower(trim(strip_tags($table)));
+        $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
         $this->order = $order;
         $this->where = $where;
+        $this->user  = $user;
     }
 
     /**
      * Returns if event is for this table.
      *
-     * @param $table
+     * @param                       $table
+     * @param EntityRepository|null $repository
      *
      * @return bool
      */
-    public function isLookingForTable($table)
+    public function isLookingForTable($table, CommonRepository $repository = null)
     {
-        $this->tables[] = $table;
-
-        $testTable = $this->table;
-        if ($testTable && MAUTIC_TABLE_PREFIX && strpos($testTable, MAUTIC_TABLE_PREFIX) !== 0) {
-            $testTable = MAUTIC_TABLE_PREFIX.$testTable;
+        $this->tables[] = $table = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
+        if ($repository) {
+            $this->tableColumns[$table] = $repository->getTableColumns();
         }
 
-        return $testTable === $table;
+        return $this->table === $table;
     }
 
     /**
      * Set the source repository to fetch the results from.
      *
      * @param CommonRepository $repository
+     * @param array            $permissions
      *
      * @return string
      */
-    public function setRepository(CommonRepository $repository)
+    public function setRepository(CommonRepository $repository, array $permissions = [])
     {
         $this->repository = $repository;
         $this->setResults(
@@ -143,7 +157,8 @@ class StatsEvent extends Event
                 $this->getLimit(),
                 $this->getOrder(),
                 $this->getWhere(),
-                $this->getSelect()
+                $this->getSelect(),
+                $permissions
             )
         );
 
@@ -211,6 +226,18 @@ class StatsEvent extends Event
     }
 
     /**
+     * @param array $where
+     *
+     * @return $this
+     */
+    public function addWhere(array $where)
+    {
+        $this->where[] = $where;
+
+        return $this;
+    }
+
+    /**
      * Add an array of results and if so, stop propagation.
      *
      * @param array $results
@@ -246,6 +273,18 @@ class StatsEvent extends Event
     }
 
     /**
+     * @param null $table
+     *
+     * @return mixed
+     */
+    public function getTableColumns($table = null)
+    {
+        ksort($this->tableColumns);
+
+        return ($table) ? $this->tableColumns[$table] : $this->tableColumns;
+    }
+
+    /**
      * Returns boolean if the results were set or not.
      *
      * @return bool
@@ -253,5 +292,13 @@ class StatsEvent extends Event
     public function hasResults()
     {
         return $this->hasResults;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

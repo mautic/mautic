@@ -28,12 +28,16 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
+    /**
+     * @param FilterControllerEvent $event
+     */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
         $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
+
+        parent::initialize($event);
     }
 
     /**
@@ -52,8 +56,9 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($this->request->files) {
             foreach ($this->request->files as $file) {
-                if (in_array($file->guessExtension(), $this->allowedExtensions)) {
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                $extension = $file->guessExtension() ? $file->guessExtension() : $file->getClientOriginalExtension();
+                if (in_array($extension, $this->allowedExtensions)) {
+                    $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
                     if (substr($dir, 0, 6) === 'images') {
@@ -144,49 +149,58 @@ class FileApiController extends CommonApiController
      */
     protected function getAbsolutePath($dir, $createDir = false)
     {
-        $possibleDirs = ['assets', 'images'];
-        $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-        $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['\/']), '/');
+        try {
+            $possibleDirs = ['assets', 'images'];
+            $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
+            $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['/']));
 
-        // Dots in the dir name are slashes
-        if (strpos($dir, '.') !== false && !$subdir) {
-            $dirs = explode('.', $dir);
-            $dir  = $dirs[0];
-            unset($dirs[0]);
-            $subdir = implode('/', $dirs);
-        }
-
-        if (!in_array($dir, $possibleDirs)) {
-            throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
-        }
-
-        if ($dir === 'images') {
-            $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
-        } elseif ($dir === 'assets') {
-            $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
-        }
-
-        if ($absoluteDir === false) {
-            throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        if (is_writable($absoluteDir) === false) {
-            throw new \InvalidArgumentException($dir.' dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $path = $absoluteDir.'/'.$subdir;
-
-        if (!file_exists($path)) {
-            if ($createDir) {
-                if (mkdir($path) === false) {
-                    throw new \InvalidArgumentException($dir.'/'.$subdir.' subdirectory could not be created.', Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');
+            // Dots in the dir name are slashes
+            if (strpos($dir, '.') !== false && !$subdir) {
+                $dirs = explode('.', $dir);
+                $dir  = $dirs[0];
+                unset($dirs[0]);
+                $subdir = implode('/', $dirs);
             }
-        }
 
-        return $path;
+            if (!in_array($dir, $possibleDirs)) {
+                throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
+            }
+
+            if ($dir === 'images') {
+                $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+            } elseif ($dir === 'assets') {
+                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+            }
+
+            if ($absoluteDir === false) {
+                throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            if (is_writable($absoluteDir) === false) {
+                throw new \InvalidArgumentException($dir.' dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            $path = $absoluteDir.'/'.$subdir;
+
+            if (!file_exists($path)) {
+                if ($createDir) {
+                    if (mkdir($path) === false) {
+                        throw new \InvalidArgumentException(
+                            $dir.'/'.$subdir.' subdirectory could not be created.',
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                    }
+                } else {
+                    throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');
+                }
+            }
+
+            return $path;
+        } catch (\Exception $e) {
+            $this->get('monolog.logger.mautic')->error($e->getMessage(), ['exception' => $e]);
+
+            throw $e;
+        }
     }
 
     /**

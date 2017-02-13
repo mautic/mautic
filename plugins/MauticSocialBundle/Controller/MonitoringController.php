@@ -467,6 +467,7 @@ class MonitoringController extends FormController
                 'viewParameters' => [
                     'activeMonitoring' => $monitoringEntity,
                     'logs'             => $logs,
+                    'isEmbedded'       => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'tmpl'             => $tmpl,
                     'security'         => $security,
                     'leadStats'        => $chart->render(),

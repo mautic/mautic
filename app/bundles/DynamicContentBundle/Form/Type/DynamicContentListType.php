@@ -11,11 +11,10 @@
 
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
+use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class DynamicContentListType.
@@ -23,66 +22,42 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class DynamicContentListType extends AbstractType
 {
     /**
-     * @var DynamicContentRepository
-     */
-    private $repo;
-    private $viewOther;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->viewOther = $factory->getSecurity()->isGranted('dynamicContent:dynamicContents:viewother');
-        $this->repo      = $factory->getModel('dynamicContent')->getRepository();
-
-        $this->repo->setCurrentUser($factory->getUser());
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $viewOther = $this->viewOther;
-        $repo      = $this->repo;
-
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($repo, $viewOther) {
-                    static $choices;
-
-                    if (is_array($choices)) {
-                        return $choices;
-                    }
-
-                    $choices = [];
-
-                    $entities = $repo->getDynamicContentList('', 0, 0, $viewOther, $options['top_level'], $options['ignore_ids']);
-                    foreach ($entities as $entity) {
-                        $choices[$entity['language']][$entity['id']] = $entity['name'];
-                    }
-
-                    //sort by language
-                    ksort($choices);
-
-                    return $choices;
+                'modal_route'         => 'mautic_dynamicContent_action',
+                'modal_header'        => 'mautic.dynamicContent.header.new',
+                'model'               => 'dynamicContent',
+                'model_lookup_method' => 'getLookupResults',
+                'lookup_arguments'    => function (Options $options) {
+                    return [
+                        'type'    => 'dynamicContent',
+                        'filter'  => '$data',
+                        'limit'   => 0,
+                        'start'   => 0,
+                        'options' => [
+                            'top_level'  => $options['top_level'],
+                            'ignore_ids' => $options['ignore_ids'],
+                        ],
+                    ];
                 },
-                'expanded'    => false,
-                'multiple'    => false,
-                'required'    => false,
-                'top_level'   => 'translation',
-                'ignore_ids'  => [],
-                'empty_value' => function (Options $options) {
-                    return (empty($options['choices'])) ? 'mautic.dynamicContent.no.dynamicContent.note' : 'mautic.core.form.chooseone';
+                'ajax_lookup_action' => function (Options $options) {
+                    $query = [
+                        'top_level'  => $options['top_level'],
+                        'ignore_ids' => $options['ignore_ids'],
+                    ];
+
+                    return 'dynamicContent:getLookupChoiceList&'.http_build_query($query);
                 },
-                'disabled' => function (Options $options) {
-                    return empty($options['choices']);
-                },
+                'multiple'   => false,
+                'required'   => false,
+                'top_level'  => 'translation',
+                'ignore_ids' => [],
             ]
         );
-
-        $resolver->setOptional(['ignore_ids', 'top_level']);
     }
 
     /**
@@ -98,6 +73,6 @@ class DynamicContentListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return EntityLookupType::class;
     }
 }

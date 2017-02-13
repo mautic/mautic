@@ -145,7 +145,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's email stat.
+     * Get a contact's notifications stat.
      *
      * @param int   $leadId
      * @param array $options
@@ -213,7 +213,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for Sent, Read and Failed email count.
+     * Get pie graph data for Sent, Read and Failed notifications count.
      *
      * @param QueryBuilder $query
      *
@@ -234,19 +234,19 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get sent counts based grouped by email Id.
+     * Get sent counts based grouped by notification Id.
      *
-     * @param array $emailIds
+     * @param array $notificationIds
      *
      * @return array
      */
-    public function getSentCounts($emailIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 'e')
             ->where(
-                $q->expr()->in('e.notification_id', $emailIds)
+                $q->expr()->in('e.notification_id', $notificationIds)
             );
 
         if ($fromDate !== null) {
@@ -258,7 +258,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.notification_id');
 
-        //get a total number of sent emails first
+        //get a total number of sent notifications first
         $results = $q->execute()->fetchAll();
 
         $counts = [];
