@@ -159,7 +159,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getLists() as $currentSegment) {
                 if (!in_array($currentSegment->getId(), $requestSegmentIds)) {
-                    $deletedSources['lists'][] = $currentSegment->getId();
+                    $deletedSources['lists'][$currentSegment->getId()] = 'ignore';
                 }
             }
 
@@ -174,7 +174,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getForms() as $currentForm) {
                 if (!in_array($currentForm->getId(), $requestFormIds)) {
-                    $deletedSources['forms'][] = $currentForm->getId();
+                    $deletedSources['forms'][$currentForm->getId()] = 'ignore';
                 }
             }
         }
