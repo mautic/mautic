@@ -31,6 +31,7 @@ trait BuilderControllerTrait
             ->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';")
             ->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';")
             ->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';")
+            ->addScriptDeclaration("var mauticLang         = '".$this->get('templating.helper.translator')->getJsLang()."';")
             ->addCustomDeclaration($assetsHelper->getSystemScripts(true, true))
             ->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
 
