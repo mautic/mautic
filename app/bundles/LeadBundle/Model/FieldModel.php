@@ -687,6 +687,34 @@ class FieldModel extends FormModel
      *
      * @return array
      */
+    public function getPublishedFieldArrays($object = 'lead')
+    {
+        return $this->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'eq',
+                            'value'  => $object,
+                        ],
+                    ],
+                ],
+                'hydration_mode' => 'HYDRATE_ARRAY',
+            ]
+        );
+    }
+
+    /**
+     * @param string $object
+     *
+     * @return array
+     */
     public function getFieldListWithProperties($object = 'lead')
     {
         $forceFilters[] = [
