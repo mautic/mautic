@@ -35,6 +35,19 @@ return [
                 'path'       => '/focus/{id}/viewpixel.gif',
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
+            'api' => [
+                'mautic_api_focusstandard' => [
+                    'standard_entity' => true,
+                    'name'            => 'focus',
+                    'path'            => '/focus',
+                    'controller'      => 'MauticFocusBundle:Api\FocusApi',
+                ],
+                'mautic_api_focusjs' => [
+                    'path'       => '/focus/{id}/js',
+                    'controller'      => 'MauticFocusBundle:Api\FocusApi:generateJs',
+                    'method'     => 'POST',
+                ],
+            ],
         ],
     ],
 
