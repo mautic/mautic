@@ -166,12 +166,6 @@ class SubmissionModel extends CommonFormModel
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
-        // Create/update lead
-        if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
-            $submission->setLead($lead);
-        }
-
         // Get updated lead if applicable with tracking ID
         if ($form->isInKioskMode()) {
             $lead = $this->leadModel->getCurrentLead();
@@ -340,6 +334,12 @@ class SubmissionModel extends CommonFormModel
             if ($f->getSaveResult() !== false) {
                 $results[$alias] = $value;
             }
+        }
+
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            $submission->setLead($lead);
         }
 
         // Set the results
