@@ -796,7 +796,6 @@ class PageModel extends FormModel
         if (!is_array($requestedComponents)) {
             $requestedComponents = [$requestedComponents];
         }
-        $this->logger->error(print_r($requestedComponents, true));
         foreach ($requestedComponents as $requested) {
             switch ($requested) {
                 case 'tokens':
