@@ -16,12 +16,17 @@
             <?php echo $view['translator']->trans($specialInstructions); ?>
         </div>
     <?php endif; ?>
-    <div class="form-group col-xs-12">
+
+    <div class="field form-group col-xs-12">
         <?php echo $view['form']->errors($form); ?>
         <?php $rowCount = 1; ?>
         <?php foreach ($form->children as $child): ?>
         <?php if ($rowCount++ % 2 == 1): ?>
-        <div class="row">
+        <div class="row <?php if ($rowCount > 2) {
+    echo 'hide';
+} else {
+    echo 'active';
+}?>">
         <?php endif; ?>
             <div class="col-sm-6">
                 <?php echo $view['form']->row($child); ?>
@@ -34,6 +39,8 @@
         <?php
         if ($rowCount % 2 == 0):?>
     </div>
+
         <?php endif; ?>
+    <a href="#" class="add" onclick="Mautic.addNewPluginField();">Add a field</a>
     </div>
 </div>

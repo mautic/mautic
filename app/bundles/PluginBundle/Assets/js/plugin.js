@@ -1,5 +1,11 @@
 /* PluginBundle */
-
+Mautic.addNewPluginField = function () {
+    mQuery('.add').click(function(e){
+        e.preventDefault();
+        if (mQuery("div.field div.active").is(":last-child")) return;
+        mQuery('div.field').find('div.active').removeClass('active').next().removeClass('hide').addClass('active');
+    });
+};
 Mautic.initiateIntegrationAuthorization = function() {
     mQuery('#integration_details_in_auth').val(1);
 
