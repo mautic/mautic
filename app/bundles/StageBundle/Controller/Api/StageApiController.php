@@ -62,13 +62,11 @@ class StageApiController extends CommonApiController
             return $contact;
         }
 
-        $canViewStage = $this->security->isGranted('stage:stages:view');
-
-        if (!$canViewStage) {
+        if (!$this->security->isGranted('stage:stages:view')) {
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToStages($contact, $stage);
+        $this->getModel('lead')->addToStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
@@ -97,13 +95,11 @@ class StageApiController extends CommonApiController
             return $contact;
         }
 
-        $canViewStage = $this->security->isGranted('stage:stages:view');
-
-        if ($canViewStage) {
+        if (!$this->security->isGranted('stage:stages:view')) {
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->removeFromStages($contact, $stage);
+        $this->getModel('lead')->removeFromStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
