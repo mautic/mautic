@@ -801,9 +801,6 @@ class PageModel extends FormModel
                 case 'tokens':
                     $components[$requested] = $event->getTokens();
                     break;
-                case 'tokenSections':
-                    $components[$requested] = $event->getTokenSections();
-                    break;
                 case 'abTestWinnerCriteria':
                     $components[$requested] = $event->getAbTestWinnerCriteria();
                     break;
