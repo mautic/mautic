@@ -126,7 +126,7 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
-    <div class="collapse" id="report-filters">
+    <div class="collapse in" id="report-filters" style="height: auto;">
         <div class="pr-md pl-md pb-md">
             <div class="panel shd-none mb-0 pa-lg">
                 <div class="row">
@@ -155,7 +155,7 @@ if ($tmpl == 'index') {
             <a href="#report-details" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
             </a>
-            <a href="#report-filters" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+            <a href="#report-filters" class="arrow text-muted" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.filters'); ?>
             </a>
         </div>
