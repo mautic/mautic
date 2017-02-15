@@ -414,7 +414,7 @@ class PageController extends FormController
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'     => $entity->isVariant(true),
-                'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
+                'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
@@ -542,7 +542,7 @@ class PageController extends FormController
             }
 
             // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($entity, ['tokens', 'visualTokens', 'tokenSections']);
+            $tokens = $model->getBuilderComponents($entity, ['tokens', 'visualTokens']);
 
             // Set to view content
             $template = $entity->getTemplate();
@@ -559,7 +559,7 @@ class PageController extends FormController
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'     => $entity->isVariant(true),
-                'tokens'        => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
+                'tokens'        => (!empty($tokens)) ? $tokens['tokens'] : $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
