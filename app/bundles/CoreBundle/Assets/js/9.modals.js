@@ -391,7 +391,7 @@ Mautic.showModal = function(target) {
         var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
             targetModal  = mQuery(target);
 
-        if (activeModal.length) {
+        if (activeModal.length && activeModal.attr('id') !== targetModal.attr('id')) {
             targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
             activeModal.find('.modal-dialog').addClass('aside');
             var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;
