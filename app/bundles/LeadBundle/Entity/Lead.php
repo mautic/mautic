@@ -1716,6 +1716,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCompany($company)
     {
+        $this->isChanged('company', $company);
         $this->company = $company;
 
         return $this;

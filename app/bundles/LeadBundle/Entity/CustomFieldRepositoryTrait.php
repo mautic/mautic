@@ -279,6 +279,13 @@ trait CustomFieldRepositoryTrait
         // Includes prefix
         $table  = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $fields = $entity->getUpdatedFields();
+        if (method_exists($entity, 'getChanges')) {
+            $changes = $entity->getChanges();
+
+            // remove the fields that are part of changes as they were already saved via a setter
+            $fields = array_diff_key($fields, $changes);
+        }
+
         if (!empty($fields)) {
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }

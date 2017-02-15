@@ -78,10 +78,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -217,7 +213,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
             $messageModel
         );
 
