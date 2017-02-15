@@ -1136,6 +1136,8 @@ class LeadModel extends FormModel
      * @param array|Lead  $lead
      * @param array|Stage $stage
      * @param bool        $manuallyAdded
+     *
+     * @return $this
      */
     public function addToStages($lead, $stage, $manuallyAdded = true)
     {
@@ -1149,6 +1151,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.added.batch')
         );
+
+        return $this;
     }
 
     /**
@@ -1157,6 +1161,8 @@ class LeadModel extends FormModel
      * @param      $lead
      * @param      $stage
      * @param bool $manuallyRemoved
+     *
+     * @return $this
      */
     public function removeFromStages($lead, $stage, $manuallyRemoved = true)
     {
@@ -1166,6 +1172,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.removed.batch')
         );
+
+        return $this;
     }
 
     /**
