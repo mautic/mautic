@@ -81,28 +81,6 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
 
-        if ($event->tokenSectionsRequested()) {
-            //add extra tokens
-            $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
-            $event->addTokenSection('page.extratokens', 'mautic.page.builder.header.extra', $content, 2);
-
-            //add pagetokens
-            $event->addTokenSection(
-                'page.pagetokens',
-                'mautic.page.pages',
-                $tokenHelper->getTokenContent(
-                    [
-                        'filter' => [
-                            'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull'],
-                            ],
-                        ],
-                    ]
-                ),
-                -254
-            );
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $bounceRate = [
@@ -309,26 +287,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection(
-                'page.emailtokens',
-                'mautic.page.pages',
-                $tokenHelper->getTokenContent(
-                    [
-                        'filter' => [
-                            'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull'],
-                            ],
-                        ],
-                    ]
-                ),
-                -254
-            );
-        }
-
         if ($event->tokensRequested([$this->pageTokenRegex])) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
         }
     }

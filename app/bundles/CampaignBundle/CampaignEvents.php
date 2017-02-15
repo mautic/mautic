@@ -18,7 +18,7 @@ namespace Mautic\CampaignBundle;
 final class CampaignEvents
 {
     /**
-     * The mautic.campaign_pre_save event is thrown right before a form is persisted.
+     * The mautic.campaign_pre_save event is dispatched right before a form is persisted.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignEvent instance.
@@ -28,7 +28,7 @@ final class CampaignEvents
     const CAMPAIGN_PRE_SAVE = 'mautic.campaign_pre_save';
 
     /**
-     * The mautic.campaign_post_save event is thrown right after a form is persisted.
+     * The mautic.campaign_post_save event is dispatched right after a form is persisted.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignEvent instance.
@@ -38,7 +38,7 @@ final class CampaignEvents
     const CAMPAIGN_POST_SAVE = 'mautic.campaign_post_save';
 
     /**
-     * The mautic.campaign_pre_delete event is thrown before a form is deleted.
+     * The mautic.campaign_pre_delete event is dispatched before a form is deleted.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignEvent instance.
@@ -48,7 +48,7 @@ final class CampaignEvents
     const CAMPAIGN_PRE_DELETE = 'mautic.campaign_pre_delete';
 
     /**
-     * The mautic.campaign_post_delete event is thrown after a form is deleted.
+     * The mautic.campaign_post_delete event is dispatched after a form is deleted.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignEvent instance.
@@ -58,7 +58,7 @@ final class CampaignEvents
     const CAMPAIGN_POST_DELETE = 'mautic.campaign_post_delete';
 
     /**
-     * The mautic.campaign_on_build event is thrown before displaying the campaign builder form to allow adding of custom actions.
+     * The mautic.campaign_on_build event is dispatched before displaying the campaign builder form to allow adding of custom actions.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignBuilderEvent instance.
@@ -68,7 +68,17 @@ final class CampaignEvents
     const CAMPAIGN_ON_BUILD = 'mautic.campaign_on_build';
 
     /**
-     * The mautic.campaign_on_leadchange event is thrown when a lead was added or removed from the campaign.
+     * The mautic.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
+     *
+     * @var string
+     */
+    const CAMPAIGN_ON_TRIGGER = 'mautic.campaign_on_trigger';
+
+    /**
+     * The mautic.campaign_on_leadchange event is dispatched when a lead was added or removed from the campaign.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignLeadChangeEvent instance.
@@ -76,6 +86,16 @@ final class CampaignEvents
      * @var string
      */
     const CAMPAIGN_ON_LEADCHANGE = 'mautic.campaign_on_leadchange';
+
+    /**
+     * The mautic.campaign_on_leadchange event is dispatched if a batch of leads are changed from CampaignModel::rebuildCampaignLeads().
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignLeadChangeEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_CAMPAIGN_BATCH_CHANGE = 'mautic.lead_campaign_batch_change';
 
     /**
      * The mautic.campaign_on_event_execution event is dispatched when a campaign event is executed.
@@ -99,7 +119,7 @@ final class CampaignEvents
     const ON_EVENT_DECISION_TRIGGER = 'matuic.campaign_on_event_decision_trigger';
 
     /**
-     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled.
+     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignScheduledEvent instance.

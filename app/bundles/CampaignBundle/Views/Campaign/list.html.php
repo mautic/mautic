@@ -8,9 +8,12 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
 if ($tmpl == 'index') {
-    $view->extend('MauticCampaignBundle:Campaign:index.html.php');
+    $view->extend('MauticCoreBundle:Standard:index.html.php');
 }
+
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
@@ -65,6 +68,7 @@ if ($tmpl == 'index') {
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+            <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td>
                         <?php
@@ -96,6 +100,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
+                            <?php echo $view['content']->getCustomContent('campaign.name', $mauticTemplateVars); ?>
                             </a>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>

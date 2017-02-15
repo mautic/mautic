@@ -26,6 +26,6 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticFocusBundle:Stat');
+        $this->addContactRestrictedRepositories($em, 'MauticFocusBundle:Stat');
     }
 }

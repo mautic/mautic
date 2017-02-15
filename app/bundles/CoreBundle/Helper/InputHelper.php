@@ -219,10 +219,15 @@ class InputHelper
             $allowedCharacters[] = $convertSpacesTo;
         }
 
+        $delimiter = '~';
+        if (false && in_array($delimiter, $allowedCharacters)) {
+            $delimiter = '#';
+        }
+
         if (!empty($allowedCharacters)) {
-            $regex = '/[^0-9a-z'.implode('', $allowedCharacters).']+/i';
+            $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters)).']+'.$delimiter.'i';
         } else {
-            $regex = '/[^0-9a-z]+/i';
+            $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
         return trim(preg_replace($regex, '', $value));

@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
+
 class CommonEntity
 {
     /**
@@ -64,8 +66,37 @@ class CommonEntity
             if ($currentId != $newId) {
                 $this->addChange($prop, [$currentId, $newId]);
             }
-        } elseif ($current != $val) {
-            $this->addChange($prop, [$current, $val]);
+        } elseif ($current !== $val) {
+            if ($current instanceof Collection || $val instanceof Collection) {
+                if (!isset($this->changes[$prop])) {
+                    $this->changes[$prop] = [
+                        'added'   => [],
+                        'removed' => [],
+                    ];
+                }
+
+                if (is_object($val)) {
+                    // Entity is getting added to the collection
+                    $this->changes['added'][] = method_exists($val, 'getId') ? $val->getId() : (string) $val;
+                } else {
+                    // Entity is getting removed from the collection
+                    $this->changes['removed'][] = $val;
+                }
+            } else {
+                if ($current instanceof \DateTime) {
+                    $current = $current->format('c');
+                } elseif (is_object($current)) {
+                    $current = (method_exists($current, 'getId')) ? $current->getId() : (string) $current;
+                }
+
+                if ($val instanceof \DateTime) {
+                    $val = $val->format('c');
+                } elseif (is_object($val)) {
+                    $val = (method_exists($val, 'getId')) ? $val->getId() : (string) $val;
+                }
+
+                $this->addChange($prop, [$current, $val]);
+            }
         }
     }
 

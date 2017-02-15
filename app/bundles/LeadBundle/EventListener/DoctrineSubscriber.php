@@ -82,10 +82,12 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     if ($f['is_unique'] && $f['alias'] != 'email') {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
-                    $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    if (!$table->hasColumn($f['alias'])) {
+                        $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    }
+
                     if ('text' != $columnDef['type']) {
                         $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                     }

@@ -12,10 +12,9 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomButtonEvent extends Event
+class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
      * Button location requested.
@@ -23,21 +22,6 @@ class CustomButtonEvent extends Event
      * @var
      */
     protected $location;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var
-     */
-    protected $route;
-
-    /**
-     * @var array
-     */
-    protected $routeParams = [];
 
     /**
      * @var array
@@ -61,22 +45,10 @@ class CustomButtonEvent extends Event
      */
     public function __construct($location, Request $request, array $buttons = [], $item = null)
     {
+        parent::__construct($request);
+
         $this->location = $location;
         $this->item     = $item;
-
-        $this->request = ($request->isXmlHttpRequest() && $request->query->has('request')) ? $request->query->get('request') : $request;
-        if ($this->request->attributes->has('ajaxRoute')) {
-            $ajaxRoute         = $this->request->attributes->get('ajaxRoute');
-            $this->route       = $ajaxRoute['_route'];
-            $this->routeParams = $ajaxRoute['_route_params'];
-        } else {
-            $this->route       = $this->request->attributes->get('_route');
-            $this->routeParams = $this->request->attributes->get('_route_params');
-        }
-
-        if (null === $this->routeParams) {
-            $this->routeParams = [];
-        }
 
         foreach ($buttons as $button) {
             $this->buttons[$this->generateButtonKey($button)] = $button;
@@ -89,26 +61,6 @@ class CustomButtonEvent extends Event
     public function getLocation()
     {
         return $this->location;
-    }
-
-    /**
-     * @return request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Get Symfony route name for the current view.
-     *
-     * @param bool $withParams
-     *
-     * @return array|mixed
-     */
-    public function getRoute($withParams = false)
-    {
-        return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
     /**
@@ -198,35 +150,6 @@ class CustomButtonEvent extends Event
         if (null !== $location) {
             if ((is_array($location) && !in_array($this->location, $location)) || (is_string($location) && $location !== $this->location)) {
                 return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param $route
-     *
-     * @return bool
-     */
-    public function checkRouteContext($route)
-    {
-        if (null !== $route) {
-            list($currentRoute, $routeParams) = $this->getRoute(true);
-            $givenRoute                       = $route;
-            $givenRouteParams                 = [];
-            if (is_array($route)) {
-                list($givenRoute, $givenRouteParams) = $route;
-            }
-
-            if ($givenRoute !== $currentRoute) {
-                return false;
-            }
-
-            foreach ($givenRouteParams as $param => $value) {
-                if (!isset($routeParams[$param]) || $value !== $routeParams[$param]) {
-                    return false;
-                }
             }
         }
 
