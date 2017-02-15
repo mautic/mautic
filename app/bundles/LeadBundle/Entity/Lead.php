@@ -107,6 +107,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $zipcode;
 
     /**
+     * @var string
+     */
+    private $timezone;
+
+    /**
      * @var
      */
     private $country;
@@ -403,6 +408,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 'city',
                 'state',
                 'zipcode',
+                'timezone',
                 'country',
             ],
             FieldModel::$coreFields
@@ -436,6 +442,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'city',
                     'state',
                     'zipcode',
+                    'timezone',
                     'country',
                 ]
             )
@@ -1648,6 +1655,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $this->isChanged('zipcode', $zipcode);
         $this->zipcode = $zipcode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     *
+     * @return Lead
+     */
+    public function setTimezone($timezone)
+    {
+        $this->isChanged('timezone', $timezone);
+        $this->timezone = $timezone;
 
         return $this;
     }
