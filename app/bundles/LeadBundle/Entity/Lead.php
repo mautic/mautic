@@ -515,7 +515,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRule') {
+        } elseif ($prop == 'frequencyRules') {
             if (!isset($this->changes['frequencyRules'])) {
                 $this->changes['frequencyRules'] = [];
             }
@@ -1022,7 +1022,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
         $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
 
-        $this->doNotContact[] = $doNotContact;
+        $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
     }
@@ -1357,7 +1357,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRules', $frequencyRule->getId());
+        $this->isChanged('frequencyRules', $frequencyRule->getId(), false);
         $this->frequencyRules->removeElement($frequencyRule);
     }
 
@@ -1368,7 +1368,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRule', $frequencyRule);
+        $this->isChanged('frequencyRules', $frequencyRule, false);
         $this->frequencyRules[] = $frequencyRule;
     }
 
@@ -1785,10 +1785,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public static function generateChannelRules(array $frequencyRules, array $dncRules)
     {
-        $rules = [];
+        $rules             = [];
+        $dncFrequencyRules = [];
         foreach ($frequencyRules as $rule) {
             if ($rule instanceof FrequencyRule) {
-                $rules[$rule->getChannel] = [
+                $ruleArray = [
                     'channel'           => $rule->getChannel(),
                     'pause_from_date'   => $rule->getPauseFromDate(),
                     'pause_to_date'     => $rule->getPauseToDate(),
@@ -1796,11 +1797,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'frequency_time'    => $rule->getFrequencyTime(),
                     'frequency_number'  => $rule->getFrequencyNumber(),
                 ];
+
+                if (array_key_exists($rule->getChannel(), $dncRules)) {
+                    $dncFrequencyRules[$rule->getChannel()] = $ruleArray;
+                } else {
+                    $rules[$rule->getChannel()] = $ruleArray;
+                }
             } else {
                 // Already an array
                 break;
             }
         }
+
         if (count($rules)) {
             $frequencyRules = $rules;
         }
@@ -1808,12 +1816,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         /* @var FrequencyRule $rule */
         usort(
             $frequencyRules,
-            function ($a, $b) use ($dncRules) {
-                if (in_array($a['channel'], $dncRules)) {
-                    // Channel in DNC so give lower preference
-                    return 1;
-                }
-
+            function ($a, $b) {
                 if ($a['pause_from_date'] && $a['pause_to_date']) {
                     $now = new \DateTime();
                     if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {
@@ -1871,15 +1874,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             $rules[$rule['channel']] =
                 [
                     'frequency' => $rule,
-                    'dnc'       => array_key_exists($rule['channel'], $dncRules) ? $dncRules[$rule['channel']] : DoNotContact::IS_CONTACTABLE,
+                    'dnc'       => DoNotContact::IS_CONTACTABLE,
                 ];
-            unset($dncRules[$rule['channel']]);
         }
 
         if (count($dncRules)) {
             foreach ($dncRules as $channel => $reason) {
                 $rules[$channel] = [
-                    'frequency' => null,
+                    'frequency' => (isset($dncFrequencyRules[$channel])) ? $dncFrequencyRules[$channel] : null,
                     'dnc'       => $reason,
                 ];
             }
