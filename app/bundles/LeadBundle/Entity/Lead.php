@@ -515,7 +515,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRule') {
+        } elseif ($prop == 'frequencyRules') {
             if (!isset($this->changes['frequencyRules'])) {
                 $this->changes['frequencyRules'] = [];
             }
@@ -1022,7 +1022,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
         $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
 
-        $this->doNotContact[] = $doNotContact;
+        $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
     }
@@ -1357,7 +1357,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRules', $frequencyRule->getId());
+        $this->isChanged('frequencyRules', $frequencyRule->getId(), false);
         $this->frequencyRules->removeElement($frequencyRule);
     }
 
@@ -1368,7 +1368,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRule', $frequencyRule);
+        $this->isChanged('frequencyRules', $frequencyRule, false);
         $this->frequencyRules[] = $frequencyRule;
     }
 
@@ -1788,7 +1788,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $rules = [];
         foreach ($frequencyRules as $rule) {
             if ($rule instanceof FrequencyRule) {
-                $rules[$rule->getChannel] = [
+                $rules[$rule->getChannel()] = [
                     'channel'           => $rule->getChannel(),
                     'pause_from_date'   => $rule->getPauseFromDate(),
                     'pause_to_date'     => $rule->getPauseToDate(),
@@ -1809,7 +1809,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         usort(
             $frequencyRules,
             function ($a, $b) use ($dncRules) {
-                if (in_array($a['channel'], $dncRules)) {
+                if (array_key_exists($a['channel'], $dncRules)) {
                     // Channel in DNC so give lower preference
                     return 1;
                 }

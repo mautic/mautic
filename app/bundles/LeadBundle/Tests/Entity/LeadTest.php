@@ -80,8 +80,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $dnc = (new DoNotContact())->setChannel('channel4');
         $lead->addDoNotContactEntry($dnc);
 
-        $preferredChannels = $lead->getPreferredChannels();
-
-        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel4', 'channel1'], array_keys($preferredChannels));
+        $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
+        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel4', 'channel1'], array_keys($channelRules));
     }
 }
