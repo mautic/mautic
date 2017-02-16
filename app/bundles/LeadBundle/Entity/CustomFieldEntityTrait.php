@@ -117,7 +117,7 @@ trait CustomFieldEntityTrait
             // Fixed custom field so use the setter
             $setter = 'set'.ucfirst($property);
 
-            return $this->$setter($value);
+            $this->$setter($value);
         }
 
         if (null == $oldValue) {
