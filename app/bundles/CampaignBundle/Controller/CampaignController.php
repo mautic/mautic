@@ -294,6 +294,8 @@ class CampaignController extends AbstractStandardFormController
                 if ($entity->getId()) {
                     $campaignSources = $this->getCampaignModel()->getLeadSources($entity->getId());
                     $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources);
+
+                    $this->setSessionCanvasSettings($sessionId, $entity->getCanvasSettings());
                 }
             }
 
