@@ -912,8 +912,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $messageRepository = $this->getMockBuilder(MessageRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $messageRepository->method('findMessage')
-            ->will($this->returnValue(null));
 
         // Setup the EntityManager
         $entityManager = $this
