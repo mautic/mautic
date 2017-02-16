@@ -68,6 +68,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
 
         foreach ($frequencyRules as $channel => $rule) {
             $frequencyRule = (new FrequencyRule())
+                ->setPreferredChannel($rule['preferredChannel'])
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
                 ->setChannel($channel)
@@ -81,6 +82,6 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $lead->addDoNotContactEntry($dnc);
 
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
-        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel4', 'channel1'], array_keys($channelRules));
+        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 }
