@@ -1624,13 +1624,13 @@ class EventModel extends CommonFormModel
             try {
                 // Save before executing event to ensure it's not picked up again
                 $logRepo->saveEntity($log);
-                $this->logger->error(
+                $this->logger->debug(
                     "CAMPAIGN #{$campaignId}: Created log for ".ucfirst($event['eventType']).' ID#'.$event['id'].' for contact ID#'.$lead->getId()
                     .' prior to execution.'
                 );
             } catch (EntityNotFoundException $exception) {
                 // The lead has been likely removed from this lead/list
-                $this->logger->error(
+                $this->logger->warning(
                     "CAMPAIGN #{$campaignId}: ".ucfirst($event['eventType']).' ID#'.$event['id'].' for contact ID#'.$lead->getId()
                     .' wasn\'t found: '.$exception->getMessage()
                 );
@@ -1908,16 +1908,18 @@ class EventModel extends CommonFormModel
      */
     public function checkEventTiming($action, \DateTime $parentTriggeredDate = null, $allowNegative = false)
     {
-        $now = new \DateTime();
-
-        $this->logger->debug('CAMPAIGN: Check timing for '.ucfirst($action['eventType']).' ID#'.$action['id']);
-
         if ($action instanceof Event) {
             $action = $action->convertToArray();
         }
+        $campaign = (array)$action['campaign'];
+        $campaignId = $campaign['id'];
+
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Check timing for ".ucfirst($action['eventType']).' ID#'.$action['id']);
+
+        $now = new \DateTime();
 
         if ($action['decisionPath'] == 'no' && !$allowNegative) {
-            $this->logger->debug('CAMPAIGN: '.ucfirst($action['eventType']).' is attached to a negative path which is not allowed');
+            $this->logger->debug("CAMPAIGN #{$campaignId}: ".ucfirst($action['eventType']).' is attached to a negative path which is not allowed');
 
             return false;
         } else {
@@ -1933,7 +1935,7 @@ class EventModel extends CommonFormModel
                 $interval = $action['triggerInterval'];
                 $unit     = strtoupper($action['triggerIntervalUnit']);
 
-                $this->logger->debug('CAMPAIGN: Adding interval of '.$interval.$unit.' to '.$triggerOn->format('Y-m-d H:i:s T'));
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Adding interval of {$interval}{$unit} to ".$triggerOn->format('Y-m-d H:i:s T'));
 
                 switch ($unit) {
                     case 'Y':
@@ -1955,7 +1957,7 @@ class EventModel extends CommonFormModel
 
                 if ($triggerOn > $now) {
                     $this->logger->debug(
-                        'CAMPAIGN: Date to execute ('.$triggerOn->format('Y-m-d H:i:s T').') is later than now ('.$now->format('Y-m-d H:i:s T')
+                        "CAMPAIGN #{$campaignId}: Date to execute (".$triggerOn->format('Y-m-d H:i:s T').') is later than now ('.$now->format('Y-m-d H:i:s T')
                         .')'.(($action['decisionPath'] == 'no') ? ' so ignore' : ' so schedule')
                     );
 
@@ -1972,13 +1974,13 @@ class EventModel extends CommonFormModel
                     unset($triggerDate);
                 }
 
-                $this->logger->debug('CAMPAIGN: Date execution on '.$action['triggerDate']->format('Y-m-d H:i:s T'));
+                $this->logger->debug("CAMPAIGN #{$campaignId}: Date execution on ".$action['triggerDate']->format('Y-m-d H:i:s T'));
 
                 $pastDue = $now >= $action['triggerDate'];
 
                 if ($negate) {
                     $this->logger->debug(
-                        'CAMPAIGN: Negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        "CAMPAIGN #{$campaignId}: Negative comparison; Date to execute (".$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
                         .$now->format('Y-m-d H:i:s T').') and is thus '.(($pastDue) ? 'overdue' : 'not past due')
                     );
 
@@ -1992,7 +1994,7 @@ class EventModel extends CommonFormModel
                     return $return;
                 } elseif (!$pastDue) {
                     $this->logger->debug(
-                        'CAMPAIGN: Non-negative comparison; Date to execute ('.$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
+                        "CAMPAIGN #{$campaignId}: Non-negative comparison; Date to execute (".$action['triggerDate']->format('Y-m-d H:i:s T').') compared to now ('
                         .$now->format('Y-m-d H:i:s T').') and is thus not past due'
                     );
 
@@ -2002,7 +2004,7 @@ class EventModel extends CommonFormModel
             }
         }
 
-        $this->logger->debug('CAMPAIGN: Nothing stopped execution based on timing.');
+        $this->logger->debug("CAMPAIGN #{$campaignId}: Nothing stopped execution based on timing.");
 
         //default is to trigger the event
         return true;
