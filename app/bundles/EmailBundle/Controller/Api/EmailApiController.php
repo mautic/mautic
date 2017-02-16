@@ -121,8 +121,9 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post   = $this->request->request->all();
-            $tokens = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $post     = $this->request->request->all();
+            $tokens   = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $response = ['success' => false];
 
             $cleantokens = array_map(
                 function ($v) {
@@ -133,7 +134,7 @@ class EmailApiController extends CommonApiController
 
             $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
 
-            $errors = $this->model->sendEmail(
+            $result = $this->model->sendEmail(
                 $entity,
                 $leadFields,
                 [
@@ -143,13 +144,10 @@ class EmailApiController extends CommonApiController
                 ]
             );
 
-            $success  = empty($errors);
-            $response = [
-                'success' => $success,
-            ];
-
-            if (!$success) {
-                $response['failed'] = $errors;
+            if (is_bool($result)) {
+                $response['success'] = $result;
+            } else {
+                $response['failed'] = $result;
             }
 
             $view = $this->view($response, Codes::HTTP_OK);
