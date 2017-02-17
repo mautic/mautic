@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -21,6 +22,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Model\TrackableModel;
 
 /**
  * Class FocusSubscriber.
@@ -43,17 +51,50 @@ class FocusSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var TrackableModel
+     */
+    protected $trackableModel;
+
+    /**
+     * @var PageTokenHelper
+     */
+    protected $pageTokenHelper;
+
+    /**
+     * @var AssetTokenHelper
+     */
+    protected $assetTokenHelper;
+
+    /**
+     * @var FormTokenHelper
+     */
+    protected $formTokenHelper;
+
+
+    /**
      * FocusSubscriber constructor.
      *
      * @param RouterInterface $router
      * @param IpLookupHelper  $ipLookupHelper
      * @param AuditLogModel   $auditLogModel
      */
-    public function __construct(RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(
+        RouterInterface $router,
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        TrackableModel $trackableModel,
+        PageTokenHelper $pageTokenHelper,
+        AssetTokenHelper $assetTokenHelper,
+        FormTokenHelper $formTokenHelper
+    )
     {
         $this->router        = $router;
         $this->ipHelper      = $ipLookupHelper;
         $this->auditLogModel = $auditLogModel;
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
+        $this->assetTokenHelper = $assetTokenHelper;
+        $this->formTokenHelper  = $formTokenHelper;
     }
 
     /**
@@ -65,6 +106,7 @@ class FocusSubscriber extends CommonSubscriber
             KernelEvents::REQUEST    => ['onKernelRequest', 0],
             FocusEvents::POST_SAVE   => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE => ['onFocusDelete', 0],
+            FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
@@ -130,5 +172,41 @@ class FocusSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    {
+        /** @var Lead $lead */
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
+        $clickthrough = $event->getClickthrough();
+
+        if ($content) {
+            $tokens = array_merge(
+                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                $this->pageTokenHelper->findPageTokens($content, $clickthrough),
+                $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
+         //       $this->formTokenHelper->findFormTokens($content) maybe later
+            );
+
+            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+                $content,
+                $tokens,
+                'focusItems',
+                $clickthrough['focus_id']
+            );
+
+            /**
+             * @var string
+             * @var Trackable $trackable
+             */
+            foreach ($trackables as $token => $trackable) {
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+            }
+
+            $content = str_replace(array_keys($tokens), array_values($tokens), $content);
+
+            $event->setContent($content);
+        }
     }
 }
