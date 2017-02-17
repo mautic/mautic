@@ -168,6 +168,40 @@ class Focus extends FormEntity
     }
 
     /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'category',
+                ]
+            )
+            ->addProperties(
+                [
+                    'description',
+                    'type',
+                    'website',
+                    'style',
+                    'publishUp',
+                    'publishDown',
+                    'properties',
+                    'form',
+                    'htmlMode',
+                    'html',
+                    'css',
+                    'cache',
+                ]
+            )
+            ->build();
+    }
+
+    /**
      * @return array
      */
     public function toArray()
