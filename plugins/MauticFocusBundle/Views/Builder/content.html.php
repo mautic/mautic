@@ -8,7 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $templateBase = 'MauticFocusBundle:Builder\\'.ucfirst($focus['style']).':index.html.php';
 if (!isset($preview)) {
     $preview = false;
@@ -19,7 +18,6 @@ if (!isset($clickUrl)) {
 }
 
 $props = $focus['properties'];
-
 ?>
 
 <div>

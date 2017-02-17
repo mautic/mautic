@@ -396,12 +396,11 @@ echo $view['form']->start($form);
                         <div class="panel-body pa-xs">
                             <?php echo $view['form']->row($form['html_mode']); ?>
                             <?php echo $view['form']->row($form['html']); ?>
-                            <?php echo $view['form']->row($form['properties']['content']['font']); ?>
                             <?php echo $view['form']->row($form['properties']['content']['headline']); ?>
                             <div class="hidden-focus-style-bar">
                                 <?php echo $view['form']->row($form['properties']['content']['tagline']); ?>
                             </div>
-
+                            <?php echo $view['form']->row($form['properties']['content']['font']); ?>
 
                             <!-- form type properties -->
                             <div class="focus-hide visible-focus-type-form">
