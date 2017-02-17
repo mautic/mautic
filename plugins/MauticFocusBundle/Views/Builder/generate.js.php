@@ -108,6 +108,16 @@ switch ($style) {
                 <?php else: ?>
                 var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
                 var aTag = closer[0].getElementsByTagName('a');
+                var container = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>');
+
+                container.onclick = function(e) {
+                    if (e) { e.stopPropagation(); }
+                    else { window.event.cancelBubble = true; }
+                };
+                document.onclick = function() {
+                    aTag[0].click();
+                };
+
                 aTag[0].addEventListener('click', function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
