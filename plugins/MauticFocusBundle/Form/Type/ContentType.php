@@ -23,6 +23,7 @@ class ContentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder->add(
             'headline',
             'text',
@@ -31,7 +32,8 @@ class ContentType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'onkeyup' => 'Mautic.focusUpdatePreview()',
+                    'onblur' => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
                 'required' => false,
             ]
@@ -46,7 +48,8 @@ class ContentType extends AbstractType
                 'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
-                    'onkeyup'     => 'Mautic.focusUpdatePreview()',
+                    'onblur'     => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
                 'required' => false,
             ]
@@ -60,7 +63,8 @@ class ContentType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'onkeyup' => 'Mautic.focusUpdatePreview()',
+                    'onblur' => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
             ]
         );
@@ -73,7 +77,8 @@ class ContentType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'onkeyup' => 'Mautic.focusUpdatePreview()',
+                    'onblur' => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
             ]
         );
@@ -86,6 +91,7 @@ class ContentType extends AbstractType
                 'data'  => (isset($options['link_new_window'])) ? $options['link_new_window'] : true,
                 'attr'  => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
             ]
         );
@@ -116,6 +122,7 @@ class ContentType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
                 'required'    => false,
                 'empty_value' => false,

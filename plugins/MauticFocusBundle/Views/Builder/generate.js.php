@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$css            = $focus['css'];
+$htmlMode       = $focus['htmlMode'];
+$html           = $focus['html'];
 $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
@@ -33,22 +36,23 @@ if (!isset($preview)) {
 if (!isset($clickUrl)) {
     $clickUrl = $props['content']['link_url'];
 }
+    $cssContent = $view->render(
+        'MauticFocusBundle:Builder:style.less.php',
+        [
+            'preview' => $preview,
+        ]
+    );
+    $cssContent = $view->escape($cssContent, 'js');
 
-$cssContent = $view->render(
-    'MauticFocusBundle:Builder:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
-$cssContent = $view->escape($cssContent, 'js');
+    $parentCssContent = $view->render(
+        'MauticFocusBundle:Builder:parent.less.php',
+        [
+            'preview' => $preview,
+        ]
+    );
+    $parentCssContent = $view->escape($parentCssContent, 'js');
 
-$parentCssContent = $view->render(
-    'MauticFocusBundle:Builder:parent.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
-$parentCssContent = $view->escape($parentCssContent, 'js');
+
 
 switch ($style) {
     case 'bar':
@@ -69,7 +73,6 @@ switch ($style) {
         break;
 }
 ?>
-
 (function (window) {
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;

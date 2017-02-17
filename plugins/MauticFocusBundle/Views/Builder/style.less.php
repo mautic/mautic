@@ -11,8 +11,8 @@
 if (!isset($preview)) {
     $preview = false;
 }
-
 ob_start();
+echo $focus['css'];
 ?>
 .mf-bar-iframe {
     z-index: 19000;

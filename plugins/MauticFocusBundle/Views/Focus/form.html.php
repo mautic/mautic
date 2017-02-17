@@ -329,6 +329,7 @@ echo $view['form']->start($form);
                             <div class="hidden-focus-type-notice">
 
                                 <div class="row">
+
                                     <div class="form-group col-xs-12 ">
                                         <?php echo $view['form']->label($form['properties']['colors']['button']); ?>
                                         <div class="input-group">
@@ -361,6 +362,27 @@ echo $view['form']->start($form);
                 </div>
                 <!-- end focus colors -->
 
+                <!-- start css -->
+                <div class="panel panel-default" id="focusCss">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" href="#focusCssPanel" aria-expanded="true" aria-controls="focusCssPanel">
+                                <i class="fa fa-css3"></i> <?php echo $view['translator']->trans('mautic.focus.tab.focus_css'); ?>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="focusCssPanel" class="panel-collapse collapse" role="tabpanel">
+                        <div class="panel-body pa-xs">
+                            <div class="row">
+                                <div class="col-xs-12 ">
+                                    <?php echo $view['form']->row($form['css']); ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end focus colors -->
+
                 <!-- start focus content -->
                 <div class="panel panel-default" id="focusContent">
                     <div class="panel-heading">
@@ -372,11 +394,14 @@ echo $view['form']->start($form);
                     </div>
                     <div id="focusContentPanel" class="panel-collapse collapse" role="tabpanel">
                         <div class="panel-body pa-xs">
+                            <?php echo $view['form']->row($form['html_mode']); ?>
+                            <?php echo $view['form']->row($form['html']); ?>
+                            <?php echo $view['form']->row($form['properties']['content']['font']); ?>
                             <?php echo $view['form']->row($form['properties']['content']['headline']); ?>
                             <div class="hidden-focus-style-bar">
                                 <?php echo $view['form']->row($form['properties']['content']['tagline']); ?>
                             </div>
-                            <?php echo $view['form']->row($form['properties']['content']['font']); ?>
+
 
                             <!-- form type properties -->
                             <div class="focus-hide visible-focus-type-form">

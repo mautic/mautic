@@ -32,6 +32,21 @@ class Focus extends FormEntity
      * @var string
      */
     private $description;
+    
+    /**
+     * @var string
+     */
+    private $html;
+
+    /**
+     * @var string
+     */
+    private $htmlMode;
+    
+    /**
+     * @var string
+     */
+    private $css;
 
     /**
      * @var string
@@ -142,6 +157,14 @@ class Focus extends FormEntity
         $builder->addNamedField('form', 'integer', 'form_id', true);
 
         $builder->addNullableField('cache', 'text');
+
+        $builder->addNullableField('css', 'text');
+
+        $builder->createField('htmlMode', 'boolean')
+            ->columnName('html_mode')
+            ->build();
+
+        $builder->addNullableField('html', 'text');
     }
 
     /**
@@ -178,6 +201,72 @@ class Focus extends FormEntity
         $this->isChanged('description', $description);
 
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCss()
+    {
+        return $this->css;
+    }
+
+    /**
+     * @param mixed $css
+     *
+     * @return Focus
+     */
+    public function setCss($css)
+    {
+        $this->isChanged('css', $css);
+
+        $this->css = $css;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     * @param mixed $setHtml
+     *
+     * @return Focus
+     */
+    public function setHtml($html)
+    {
+        $this->isChanged('html', $html);
+
+        $this->html = $html;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHtmlMode()
+    {
+        return $this->htmlMode;
+    }
+
+    /**
+     * @param mixed $html
+     *
+     * @return Focus
+     */
+    public function setHtmlMode($htmlMode)
+    {
+        $this->isChanged('htmlMode', $htmlMode);
+
+        $this->htmlMode = $htmlMode;
 
         return $this;
     }

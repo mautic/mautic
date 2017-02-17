@@ -12,12 +12,14 @@ $props   = $focus['properties'];
 $color   = \MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor($props['colors']['primary']) ? '000000' : 'ffffff';
 $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 ?>
-
 <div class="mautic-focus mf-bar mf-bar-<?php echo $props['bar']['size']; ?> mf-bar-<?php echo $props['bar']['placement']; ?><?php if ($props['bar']['sticky']) {
     echo ' mf-bar-sticky';
 } ?><?php echo $animate; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>;">
 
     <div class="mf-content">
+        <?php if ($focus['html_mode']): ?>
+            <?php echo html_entity_decode($focus['html']); ?>
+        <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
         <?php if ($focus['type'] == 'form' && !empty($form)): ?>
             <?php echo $view->render(
@@ -29,6 +31,7 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
                 ? '_new' : '_parent'; ?>">
                 <?php echo $props['content']['link_text']; ?>
             </a>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 

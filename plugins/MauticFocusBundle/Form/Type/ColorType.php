@@ -18,6 +18,7 @@ class ColorType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder->add(
             'primary',
             'text',
@@ -77,6 +78,7 @@ class ColorType extends AbstractType
                 'required' => false,
             ]
         );
+
     }
 
     public function getName()
