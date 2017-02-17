@@ -168,6 +168,17 @@ class BuilderSubscriber extends CommonSubscriber
                 700
             );
         }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                'One Column',
+                'font',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+        }
     }
 
     /**

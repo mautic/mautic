@@ -446,11 +446,110 @@ Mautic.toggleBuilderButton = function (hide) {
 Mautic.initSections = function() {
     var sectionWrappers = Mautic.builderContents.find('[data-section-wrapper]');
 
+    // Make slots sortable
+    var bodyOverflow = {};
+    Mautic.sortActive = false;
+
+    mQuery('body').sortable({
+        helper: function(e, ui) {
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+            mQuery('body').css({
+                overflowX: 'visible',
+                overflowY: 'visible'
+            });
+
+            return ui;
+        },
+        axis: 'y',
+        items: '[data-section-wrapper]',
+        handle: '[data-section-focus="handle"]',
+        placeholder: 'slot-placeholder',
+        connectWith: 'body',
+        start: function(event, ui) {
+            Mautic.sortActive = true;
+            ui.placeholder.height(ui.helper.outerHeight());
+        },
+        stop: function(event, ui) {
+            if (ui.item.hasClass('section-type-handle')) {
+                // Restore original overflow
+                mQuery('body', parent.document).css(bodyOverflow);
+
+                var newSection = mQuery('<div/>')
+                    .attr('data-section-wrapper', ui.item.attr('data-section-type'))
+                    .html(ui.item.find('script').html())
+                ui.item.replaceWith(newSection);
+
+                // Mautic.builderContents.trigger('slot:init', newSection);
+            } else {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+            }
+
+            Mautic.sortActive = false;
+        },
+    });
+
+    // Allow to drag&drop new sections from the section type menu
+    var iframe = mQuery('#builder-template-content', parent.document).contents();
+    mQuery('#section-type-container .section-type-handle', parent.document).draggable({
+        iframeFix: true,
+        connectToSortable: 'body',
+        revert: 'invalid',
+        iframeOffset: iframe.offset(),
+        helper: function(e, ui) {
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body', parent.document).css('overflow-y');
+            mQuery('body', parent.document).css({
+                overflowX: 'hidden',
+                overflowY: 'hidden'
+            });
+
+            var helper = mQuery(this).clone()
+                .css('height', mQuery(this).height())
+                .css('width', mQuery(this).width());
+
+            return helper;
+        },
+        zIndex: 8000,
+        cursorAt: {top: 15, left: 15},
+        start: function(event, ui) {
+            mQuery('#builder-template-content', parent.document).css('overflow', 'hidden');
+            mQuery('#builder-template-content', parent.document).attr('scrolling', 'no');
+        },
+        stop: function(event, ui) {
+            // Restore original overflow
+            mQuery('body', parent.document).css(bodyOverflow);
+
+            mQuery('#builder-template-content', parent.document).css('overflow', 'visible');
+            mQuery('#builder-template-content', parent.document).attr('scrolling', 'yes');
+        },
+    }).disableSelection();
+
     sectionWrappers.on('click', function(e) {
         var previouslyFocused = Mautic.builderContents.find('[data-section-focus]');
         var sectionWrapper = mQuery(this);
         var section = sectionWrapper.find('[data-section]');
-        var focusParts = ['top', 'right', 'bottom', 'left'];
+        var focusParts = {
+            'top': {},
+            'right': {},
+            'bottom': {},
+            'left': {},
+            'handle': {
+                classes: 'fa fa-arrows-v'
+            },
+            'delete': {
+                classes: 'fa fa-remove',
+                onClick: function() {
+                    if (confirm(Mautic.translate('mautic.core.builder.section_delete_warning'))) {
+                        var deleteBtn = mQuery(this);
+                        var focusSeciton = deleteBtn.closest('[data-section-wrapper]').remove();
+                    }
+                }
+            }
+        };
         var sectionForm = mQuery(parent.mQuery('script[data-section-form]').html());
         var sectionFormContainer = parent.mQuery('#section-form-container');
 
@@ -472,8 +571,14 @@ Mautic.initSections = function() {
         });
 
         // Highlight the section
-        mQuery.each(focusParts, function (index, value) {
-            sectionWrapper.append(mQuery('<div/>').attr('data-section-focus', value));
+        mQuery.each(focusParts, function (key, config) {
+            var focusPart = mQuery('<div/>').attr('data-section-focus', key).addClass(config.classes);
+
+            if (config.onClick) {
+                focusPart.on('click', config.onClick);
+            }
+
+            sectionWrapper.append(focusPart);
         });
 
         // Open the section customize form

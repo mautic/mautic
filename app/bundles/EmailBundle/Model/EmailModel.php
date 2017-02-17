@@ -551,6 +551,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 case 'slotTypes':
                     $components[$requested] = $event->getSlotTypes();
                     break;
+                case 'sections':
+                    $components[$requested] = $event->getSections();
+                    break;
                 default:
                     $components['tokens']               = $event->getTokens($withBC);
                     $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
