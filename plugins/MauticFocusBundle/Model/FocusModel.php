@@ -175,7 +175,6 @@ class FocusModel extends FormModel
     public function getContent(Focus $focus)
     {
         $cached = $focus->getCache();
-
         if (empty($cached)) {
             $cached = $this->generateJavascript($focus);
             $focus->setCache($cached);
@@ -194,6 +193,7 @@ class FocusModel extends FormModel
      */
     public function generateJavascript($focus, $preview = false, $ignoreMinify = false)
     {
+
         if ($focus instanceof Focus) {
             $focus = $focus->toArray();
         }
@@ -203,10 +203,14 @@ class FocusModel extends FormModel
         } else {
             $form = null;
         }
-
-        if($focus['html_mode'] && $focus['html'] && $focus['unlockId']) {
+        if($focus['id'] != 'preview'){
+            $fid = $focus['id'];
+        }elseif(isset($focus['unlockId'])){
+            $fid = $focus['unlockId'];
+        }
+        if(isset($fid) && $focus['htmlMode'] && $focus['html']) {
             $lead = $this->leadModel->getCurrentLead();
-            $tokenEvent = new TokenReplacementEvent($focus['html'], $lead, ['focus_id' => $focus['unlockId']]);
+            $tokenEvent = new TokenReplacementEvent($focus['html'], $lead, ['focus_id' => $fid]);
             $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $focus['html'] = $tokenEvent->getContent();
         }
