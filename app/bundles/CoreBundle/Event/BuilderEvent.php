@@ -179,17 +179,12 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param      $key
-     * @param      $value
-     * @param bool $allowVisualPlaceholder
+     * @param   $key
+     * @param   $value
      */
-    public function addToken($key, $value, $allowVisualPlaceholder = false)
+    public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
-
-        if ($allowVisualPlaceholder) {
-            $this->visualTokens[] = $key;
-        }
     }
 
     /**
@@ -303,7 +298,7 @@ class BuilderEvent extends Event
      * @param                    $tokens
      * @param string             $labelColumn
      * @param string             $valueColumn
-     * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
+     * @param bool               $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool               $convertToLinks         If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(

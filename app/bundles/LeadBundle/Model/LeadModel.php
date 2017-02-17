@@ -384,12 +384,7 @@ class LeadModel extends FormModel
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
-        $updatedFields       = $entity->getUpdatedFields();
         $company             = null;
-
-        if (isset($updatedFields['company'])) {
-            $companyFieldMatches['company'] = $updatedFields['company'];
-        }
 
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
@@ -414,12 +409,13 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+        $updatedFields = $entity->getUpdatedFields();
+        if (isset($updatedFields['company'])) {
+            $companyFieldMatches['company'] = $updatedFields['company'];
+            list($company, $leadAdded)      = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
-            unset($updatedFields['company']);
         }
 
         $this->setEntityDefaultValues($entity);
@@ -1136,6 +1132,8 @@ class LeadModel extends FormModel
      * @param array|Lead  $lead
      * @param array|Stage $stage
      * @param bool        $manuallyAdded
+     *
+     * @return $this
      */
     public function addToStages($lead, $stage, $manuallyAdded = true)
     {
@@ -1149,6 +1147,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.added.batch')
         );
+
+        return $this;
     }
 
     /**
@@ -1157,6 +1157,8 @@ class LeadModel extends FormModel
      * @param      $lead
      * @param      $stage
      * @param bool $manuallyRemoved
+     *
+     * @return $this
      */
     public function removeFromStages($lead, $stage, $manuallyRemoved = true)
     {
@@ -1166,6 +1168,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.removed.batch')
         );
+
+        return $this;
     }
 
     /**

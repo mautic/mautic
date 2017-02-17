@@ -63,16 +63,27 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
+     * @param array $args
+     * @param       $action
+     *
+     * @return array
+     */
+    public function getViewArguments(array $args, $action)
+    {
+        return $this->customizeViewArguments($args, $action);
+    }
+
+    /**
      * @param $args
      * @param $action
      *
-     * @deprecated 2.6.0 to be removed in 3.0
+     * @deprecated 2.6.0 to be removed in 3.0; use getViewArguments instead
      *
      * @return array
      */
     public function customizeViewArguments($args, $action)
     {
-        return $this->getViewArguments($args, $action);
+        return $args;
     }
 
     /**
