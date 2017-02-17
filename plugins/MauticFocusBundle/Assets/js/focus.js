@@ -400,6 +400,16 @@ Mautic.focusUpdatePreview = function () {
         container.append(innerContainer);
 
         mQuery('.preview-body').html(container);
+
+        if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
+            mQuery('.builder-content').on('click', function () {
+                Mautic.closeFocusModal(mQuery('#focus_style').val());
+            });
+            mQuery('.mautic-focus').on('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+
     });
 };
 
