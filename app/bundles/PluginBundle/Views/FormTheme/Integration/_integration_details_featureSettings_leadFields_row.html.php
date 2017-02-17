@@ -18,21 +18,35 @@
     <?php endif; ?>
 
     <div class="field form-group col-xs-12">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-5"><?php echo $view['translator']->trans('mautic.plugins.integration.fields'); ?></div>
+        <div class="col-sm-5"><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></div>
         <?php echo $view['form']->errors($form); ?>
-        <?php $rowCount = 1; ?>
+
+        <?php $rowCount = 1; $indexCount = 1; ?>
         <?php foreach ($form->children as $child): ?>
         <?php if ($rowCount++ % 2 == 1): ?>
-        <div class="row <?php if ($rowCount > 2) {
+        <div id="<?php echo $rowCount; ?>" class="row <?php if ($rowCount > 2) {
     echo 'hide';
 } else {
     echo 'active';
 }?>">
-        <?php endif; ?>
-            <div class="col-sm-6">
+                <div class="col-sm-2">
+                <span class="btn btn-xs btn-default remove" onclick="Mautic.addNewPluginField();">
+                    <i class="fa fa-times"></i>
+                </span>
+                </div>
+
+            <?php endif; ?>
+
+
+            <div class="col-sm-5">
                 <?php echo $view['form']->row($child); ?>
             </div>
         <?php if ($rowCount++ % 2 == 1): ?>
-        </div>
+
+                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>"></div>
+                </div>
         <?php endif; ?>
         <?php ++$rowCount; ?>
         <?php endforeach; ?>
@@ -41,6 +55,6 @@
     </div>
 
         <?php endif; ?>
-    <a href="#" class="add" onclick="Mautic.addNewPluginField();">Add a field</a>
+    <a href="#" class="add btn btn-warning btn-xs btn-add-item" onclick="Mautic.addNewPluginField();">Add field</a>
     </div>
 </div>

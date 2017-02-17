@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -29,22 +28,24 @@ class FieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $index = 0;
+        $index             = 0;
+        $integrationFields = [0 => ''] + array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
         foreach ($options['integration_fields'] as $field => $details) {
             ++$index;
-            $label = (is_array($details)) ? $details['label'] : $details;
-            $field = InputHelper::alphanum($field, false, '_');
-
             $builder->add('i_'.$index, 'choice', [
-                'choices' => array_keys($options['integration_fields']),
-                'label'   => 'Integration',
+                'choices'  => $integrationFields,
+                'label'    => false,
+                'required' => true,
+                'attr'     => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
+                'disabled' => ($index > 1) ? true : false,
             ]);
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['lead_fields'],
-                'label'      => 'Mautic Lead Field',
-                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
+                'label'      => false,
+                'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' '],
+                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
+                'disabled'   => ($index > 1) ? true : false,
             ]);
         }
     }

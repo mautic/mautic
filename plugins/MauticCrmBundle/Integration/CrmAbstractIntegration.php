@@ -341,7 +341,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|mixed
      */
-    protected function getFormFieldsByObject($object)
+    public function getFormFieldsByObject($object)
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 

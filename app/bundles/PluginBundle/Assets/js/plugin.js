@@ -1,10 +1,39 @@
 /* PluginBundle */
 Mautic.addNewPluginField = function () {
-    mQuery('.add').click(function(e){
-        e.preventDefault();
-        if (mQuery("div.field div.active").is(":last-child")) return;
-        mQuery('div.field').find('div.active').removeClass('active').next().removeClass('hide').addClass('active');
+    var items = mQuery('div.field').find('div.active');
+    var currentItem = items.filter('.active');
+    var selectors;
+    mQuery('.add').on('click', function() {
+        var nextItem = currentItem.next();
+        currentItem.removeClass('active');
+        if ( nextItem.length ) {
+            currentItem = nextItem.addClass('active').removeClass('hide');
+            selectors = currentItem.find('select');
+            selectors.each(function( ) {
+                mQuery( this ).prop('disabled', false).trigger("chosen:updated");
+            });
+        }
     });
+    mQuery('.remove').on('click', function() {
+        var previousItem = currentItem.prev();
+        currentItem.removeClass('active');
+        if ( previousItem.length ) {
+            previousItem.addClass('active');
+            selectors = currentItem.find('select');
+            selectors.each(function( ) {
+                mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+            });
+            currentItem.addClass('hide');
+            currentItem = previousItem;
+        }
+    });
+};
+Mautic.matchFieldsType = function (index) {
+    var mauticField = mQuery('#integration_details_featureSettings_leadFields_m_' + index ).val();
+    var integrationField = mQuery('#integration_details_featureSettings_leadFields_i_' + index ).val();
+    var hiddenInput = mQuery('<input/>',{type:'hidden',id:'integration_details_featureSettings_leadFields_' + integrationField,name:'integration_details[featureSettings][leadFields][' + mauticField + ']', value:mauticField });
+
+    mQuery('#m_i_' + index ).empty().append( hiddenInput );
 };
 Mautic.initiateIntegrationAuthorization = function() {
     mQuery('#integration_details_in_auth').val(1);

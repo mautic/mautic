@@ -18,9 +18,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class SocialMediaServiceType.
+ * Class ObjectFieldsType.
  */
-class CompanyFieldsType extends AbstractType
+class ObjectFieldsType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -29,22 +29,21 @@ class CompanyFieldsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $index = 0;
-        foreach ($options['integration_company_fields'] as $field => $details) {
+        foreach ($options['integration_fields'] as $field => $details) {
             ++$index;
+
             $builder->add('i_'.$index, 'choice', [
-                'choices'  => array_keys($options['integration_company_fields']),
-                'label'    => 'Integration fields',
+                'choices'  => array_keys($options['integration_fields']),
+                'label'    => 'Integration',
                 'disabled' => ($index > 1) ? true : false,
             ]);
-
             $builder->add('m_'.$index, 'choice', [
-                'choices' => $options['company_fields'],
-                'label'   => 'Mautic Company Field',
-                //'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
+                'choices'    => $options['lead_fields'],
+                'label'      => 'Mautic Lead Field',
+                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onClick' => 'Mautic.matchFieldsType(this)'],
+                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' '],
                 'disabled'   => ($index > 1) ? true : false,
-
             ]);
         }
     }
@@ -54,7 +53,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_company_fields', 'company_fields']);
+        $resolver->setRequired(['integration_fields', 'lead_fields']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',
@@ -69,7 +68,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function getName()
     {
-        return 'integration_company_fields';
+        return 'integration_object_fields';
     }
 
     /**

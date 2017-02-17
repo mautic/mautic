@@ -260,19 +260,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     } else {
                                         $type = 'string';
                                     }
-                                    if ($sfObject !== 'company') {
-                                        $salesFields[$sfObject][$fieldInfo['name'].' - '.$sfObject] = [
-                                            'type'     => $type,
-                                            'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo, $sfObject),
-                                        ];
-                                    } else {
-                                        $salesFields[$sfObject][$fieldInfo['name']] = [
-                                            'type'     => $type,
-                                            'label'    => $fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo, $sfObject),
-                                        ];
-                                    }
+
+                                    $salesFields[$sfObject][$fieldInfo['name']] = [
+                                        'type'     => $type,
+                                        'label'    => $fieldInfo['label'],
+                                        'required' => $isRequired($fieldInfo, $sfObject),
+                                    ];
                                 }
 
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
