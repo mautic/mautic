@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
  * Class Focus.
