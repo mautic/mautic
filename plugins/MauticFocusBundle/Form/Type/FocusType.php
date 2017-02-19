@@ -41,7 +41,7 @@ class FocusType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
