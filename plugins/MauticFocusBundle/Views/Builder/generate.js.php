@@ -8,9 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$css            = $focus['css'];
-$htmlMode       = $focus['htmlMode'];
-$html           = $focus['html'];
 $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
