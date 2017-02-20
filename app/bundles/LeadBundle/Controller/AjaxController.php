@@ -823,28 +823,29 @@ class AjaxController extends CommonAjaxController
 
             $dataArray['fieldType'] = $leadFieldType;
             $dataArray['options']   = $options;
-
-            if ('field' === $changed) {
-                $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
-                foreach ($dataArray['operators'] as $value => $label) {
-                    $dataArray['operators'][$value] = $this->get('translator')->trans($label);
-                }
-
-                reset($dataArray['operators']);
-                $operator = key($dataArray['operators']);
-            }
-
-            $disabled = false;
-            switch ($operator) {
-                case 'empty':
-                case '!empty':
-                    $disabled = true;
-                    break;
-            }
-            $dataArray['disabled'] = $disabled;
-
         }
 
+
+        if(in_array($alias, ['tags', 'segments'])){
+            $leadFieldType = 'extended';
+        }
+        if ('field' === $changed) {
+            $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
+            foreach ($dataArray['operators'] as $value => $label) {
+                $dataArray['operators'][$value] = $this->get('translator')->trans($label);
+            }
+            reset($dataArray['operators']);
+            $operator = key($dataArray['operators']);
+        }
+
+        $disabled = false;
+        switch ($operator) {
+            case 'empty':
+            case '!empty':
+                $disabled = true;
+                break;
+        }
+        $dataArray['disabled'] = $disabled;
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);

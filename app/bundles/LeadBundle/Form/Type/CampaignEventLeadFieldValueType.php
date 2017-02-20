@@ -45,6 +45,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'with_tags'   => true,
+                'with_segments'   => true,
                 'empty_value' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
@@ -75,10 +76,10 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $fieldType   = null;
             $operator    = '=';
 
+            if ($data['field'] == 'notifications') {
+                $fieldType = 'boolean';
+            }
 
-        if ($data['field'] == 'notifications') {
-            $fieldType = 'boolean';
-        }
             if (isset($data['field'])) {
 
                 $field    = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);

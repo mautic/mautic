@@ -182,6 +182,14 @@ trait OperatorListTrait
                     '!in',
                 ],
             ],
+            'extended' => [
+                'include' => [
+                    '=',
+                    '!=',
+                    'regexp',
+                    '!regexp',
+                ],
+            ],
         ];
 
         if ($type == 'boolean') {
