@@ -62,8 +62,6 @@ $formId = $form['sessionId']->vars['data'];
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
                         <div id="mauticforms_fields">
                             <div class="available-fields mb-md">
-
-
                                         <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
                                         <select class="chosen form-control" id="available_fields">
                                             <option value=""></option>
