@@ -862,7 +862,7 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
-                    $operand = (($func == 'eq') || ($func == 'like') || ($func == 'regexp')) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = in_array($func, ['eq', 'like', 'regexp' ,'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
 
                     $column = $details['field'];
                     if($column == 'hit_url'){
