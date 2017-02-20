@@ -50,7 +50,7 @@ class SortableListType extends AbstractType
                 'collection',
                 [
                     'label'      => false,
-                    'entry_type' => ($options['with_labels']) ? SortableValueLabelListType::class : 'text',
+                    'entry_type' => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
                     'options'    => [
                         'label'    => false,
                         'required' => false,
@@ -76,7 +76,7 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank']));
+        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels']));
     }
 
     /**
@@ -84,7 +84,8 @@ class SortableListType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['isSortable'] = (!empty($options['sortable']));
+        $view->vars['isSortable']     = (!empty($options['sortable']));
+        $view->vars['addValueButton'] = $options['add_value_button'];
     }
 
     /**
@@ -101,6 +102,8 @@ class SortableListType extends AbstractType
                 'remove_icon'         => 'fa fa-times',
                 'sortable'            => 'fa fa-ellipsis-v handle',
                 'with_labels'         => false,
+                'entry_type'          => 'text',
+                'add_value_button'    => 'mautic.core.form.list.additem',
             ]
         );
 

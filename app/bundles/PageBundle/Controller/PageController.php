@@ -11,8 +11,8 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class PageController extends FormController
 {
+    use BuilderControllerTrait;
+
     /**
      * @param int $page
      *
@@ -358,10 +360,6 @@ class PageController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
-
-                    // Parse visual placeholders into tokens
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
@@ -416,7 +414,7 @@ class PageController extends FormController
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'     => $entity->isVariant(true),
-                'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
+                'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
@@ -495,9 +493,6 @@ class PageController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
-
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
@@ -546,9 +541,6 @@ class PageController extends FormController
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
             }
 
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($entity, ['tokens', 'visualTokens', 'tokenSections']);
-
             // Set to view content
             $template = $entity->getTemplate();
             if (empty($template)) {
@@ -564,7 +556,7 @@ class PageController extends FormController
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'     => $entity->isVariant(true),
-                'tokens'        => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
+                'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
@@ -612,6 +604,11 @@ class PageController extends FormController
             $entity->setVariantStartDate(null);
             $entity->setVariantHits(0);
             $entity->setIsPublished(false);
+
+            $session     = $this->get('session');
+            $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+
+            $session->set($contentName, $entity->getCustomHtml());
         }
 
         return $this->newAction($entity);
@@ -924,12 +921,10 @@ class PageController extends FormController
     private function processSlots($slots, $entity)
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
+        $assetsHelper = $this->get('templating.helper.assets');
         /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-        /** @var \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper */
-        $translatorHelper = $this->factory->getHelper('template.translator');
-        $formFactory      = $this->get('form.factory');
+        $slotsHelper = $this->get('templating.helper.slots');
+        $formFactory = $this->get('form.factory');
 
         $slotsHelper->inBuilder(true);
 
@@ -988,9 +983,12 @@ class PageController extends FormController
                 }
 
                 // Order slides
-                usort($options['slides'], function ($a, $b) {
-                    return strcmp($a['order'], $b['order']);
-                });
+                usort(
+                    $options['slides'],
+                    function ($a, $b) {
+                        return strcmp($a['order'], $b['order']);
+                    }
+                );
 
                 $options['slot']   = $slot;
                 $options['public'] = false;
@@ -1015,7 +1013,7 @@ class PageController extends FormController
                     )->getForm()->createView();
                 }
 
-                $renderingEngine = $this->container->get('templating');
+                $renderingEngine = $this->get('templating');
 
                 if (method_exists($renderingEngine, 'getEngine')) {
                     $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
@@ -1028,45 +1026,8 @@ class PageController extends FormController
 
         //add builder toolbar
         $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>" />
+        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php
         $slotsHelper->stop();
-    }
-
-    private function getAssetsForBuilder()
-    {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
-        $routerHelper = $this->factory->getHelper('template.router');
-
-        $existingAssets = $assetsHelper->getAssets();
-
-        $assetsHelper->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';");
-        $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';");
-        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';");
-        $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';");
-        $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
-        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
-
-        // Use the assetsHelper to auto-build the asset html
-        $builderAssets = $assetsHelper->getHeadDeclarations();
-
-        // Reset the assets helper to what it was before.
-        $assetsHelper->setAssets($existingAssets);
-
-        return $builderAssets;
-    }
-
-    private function buildSlotForms($slotTypes)
-    {
-        foreach ($slotTypes as &$slotType) {
-            if (isset($slotType['form'])) {
-                $slotForm         = $this->get('form.factory')->create($slotType['form']);
-                $slotType['form'] = $slotForm->createView();
-            }
-        }
-
-        return $slotTypes;
     }
 }

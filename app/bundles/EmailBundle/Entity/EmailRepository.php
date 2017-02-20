@@ -316,8 +316,14 @@ class EmailRepository extends CommonRepository
         $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.name', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                    ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('e.name', ':search'))
+                  ->setParameter('search', "%{$search}%");
+            }
         }
 
         if (!$viewOther) {
@@ -385,34 +391,16 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('e.category'),
-                    $q->expr()->eq('e.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
@@ -424,6 +412,7 @@ class EmailRepository extends CommonRepository
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -433,9 +422,7 @@ class EmailRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -448,7 +435,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -456,6 +443,8 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -533,6 +522,10 @@ class EmailRepository extends CommonRepository
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
+        );
 
         if (!empty($id)) {
             $expr->add(

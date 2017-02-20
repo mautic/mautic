@@ -71,6 +71,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.webhook.stats.subscriber' => [
+                'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'models' => [
             'mautic.webhook.model.webhook' => [

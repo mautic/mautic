@@ -12,25 +12,29 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadfield');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.field.header.index'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'templateButtons' => [
-        'new' => true,
-    ],
-    'routeBase' => 'contactfield',
-    'langVar'   => 'lead.field',
-]));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'templateButtons' => [
+                'new' => true,
+            ],
+            'routeBase' => 'contactfield',
+            'langVar'   => 'lead.field',
+        ]
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'action'          => $currentRoute,
-        'langVar'         => 'lead.field',
-        'routeBase'       => 'contactfield',
-        'templateButtons' => [
-            'delete' => $permissions['lead:fields:full'],
-        ],
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'searchValue' => $searchValue,
+            'action'      => $currentRoute,
+        ]
+    ); ?>
 
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

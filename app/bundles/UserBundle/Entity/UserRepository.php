@@ -256,50 +256,62 @@ class UserRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('u.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('u.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+                case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('r.isAdmin', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
-                $expr = $q->expr()->like('u.email', ':'.$unique);
+                case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
+                $expr            = $q->expr()->like('u.email', ':'.$unique);
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
-                $expr = $q->expr()->like('u.position', ':'.$unique);
+                case $this->translator->trans('mautic.user.user.searchcommand.position', [], null, 'en_US'):
+                $expr            = $q->expr()->like('u.position', ':'.$unique);
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.username'):
-                $expr = $q->expr()->like('u.username', ':'.$unique);
+                case $this->translator->trans('mautic.user.user.searchcommand.username', [], null, 'en_US'):
+                $expr            = $q->expr()->like('u.username', ':'.$unique);
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.role'):
-                $expr = $q->expr()->like('r.name', ':'.$unique);
+                case $this->translator->trans('mautic.user.user.searchcommand.role', [], null, 'en_US'):
+                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
+                case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
                     $q->expr()->like('u.firstName', ':'.$unique),
                     $q->expr()->like('u.lastName', ':'.$unique)
                 );
+                $returnParameter = true;
                 break;
         }
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -312,7 +324,7 @@ class UserRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.email',
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
@@ -322,6 +334,8 @@ class UserRepository extends CommonRepository
             'mautic.user.user.searchcommand.role',
             'mautic.user.user.searchcommand.username',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

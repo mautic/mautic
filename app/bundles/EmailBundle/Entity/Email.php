@@ -104,7 +104,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var
      */
-    private $emailType;
+    private $emailType = 'template';
 
     /**
      * @var \DateTime
@@ -426,7 +426,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'subject',
                     'language',
                     'category',
-
                 ]
             )
             ->addProperties(
@@ -435,6 +434,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'customHtml',
+                    'plainText',
+                    'template',
+                    'emailType',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -446,7 +449,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'variantReadCount',
                     'variantParent',
                     'variantChildren',
+                    'translationParent',
+                    'translationChildren',
+                    'unsubscribeForm',
                     'dynamicContent',
+                    'lists',
                 ]
             )
             ->build();
@@ -1046,6 +1053,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
                 $content = str_replace($url, $newUrl, $content);
             }
+        }
+    }
+
+    /**
+     * Calculate Read Percentage for each Email.
+     *
+     * @return int
+     */
+    public function getReadPercentage($includevariants = false)
+    {
+        if ($this->getSentCount($includevariants) > 0) {
+            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+        } else {
+            return 0;
         }
     }
 }

@@ -687,10 +687,10 @@
 		"Alagoas",
 		"Amazonas",
 		"Amapa",
-		"Baia",
+		"Bahia",
 		"Ceara",
+		"Distrito Federal",
 		"Espirito Santo",
-		"Fernando de Noronha",
 		"Goias",
 		"Maranhao",
 		"Minas Gerais",
@@ -709,7 +709,7 @@
 		"Santa Catarina",
 		"Sergipe",
 		"Sao Paulo",
-		"Tocatins"
+		"Tocantins"
 	],
 	"Mexico": [
 		"Distrito Federal",
@@ -911,6 +911,19 @@
 		"Zurich"
 	],
 	"France": [
+		"Auvergne-Rhône-Alpes",
+		"Bourgogne-Franche-Comté",
+		"Bretagne",
+		"Centre-Val de Loire",
+		"Corse",
+		"Grand Est",
+		"Hauts-de-France",
+		"Île-de-France",
+		"Normandie",
+		"Nouvelle-Aquitaine",
+		"Occitanie",
+		"Pays de la Loire",
+		"Provence-Alpes-Côte d'Azur",
 		"Jura",
 		"Ain",
 		"Aisne",

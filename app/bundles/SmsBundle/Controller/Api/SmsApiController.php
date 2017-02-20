@@ -13,12 +13,26 @@ namespace Mautic\SmsBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class SmsApiController.
  */
 class SmsApiController extends CommonApiController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->model           = $this->getModel('sms');
+        $this->entityClass     = 'Mautic\SmsBundle\Entity\Sms';
+        $this->entityNameOne   = 'sms';
+        $this->entityNameMulti = 'smses';
+
+        parent::initialize($event);
+    }
+
     /**
      * Obtains a list of emails.
      *

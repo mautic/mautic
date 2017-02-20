@@ -30,6 +30,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
+    use DefaultValueTrait;
+
     /**
      * @var Session
      */
@@ -50,6 +52,17 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
+    }
+
+    /**
+     * @param Company $entity
+     * @param bool    $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        $this->setEntityDefaultValues($entity, 'company');
+
+        parent::saveEntity($entity, $unlock);
     }
 
     /**
@@ -208,6 +221,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
             $fieldValues = $fields;
         }
+
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -242,58 +256,56 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $searchCompanyLead = 1, $dateManipulated = null)
     {
         // Primary company name to be peristed to the lead's contact company field
-        $companyName = '';
+        $companyName        = '';
+        $companyLeadAdd     = [];
+        $searchForCompanies = [];
 
         if ($dateManipulated == null) {
             $dateManipulated = new \DateTime();
         }
 
-        if (!$lead instanceof Lead) {
+        if ($lead instanceof Lead) {
+            $leadId = $lead->getId();
+        } else {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
-        } else {
-            $leadId = $lead->getId();
         }
-        if (!is_array($companies)) {
+
+        if ($companies instanceof Company) {
+            $companyLeadAdd[$companies->getId()] = $companies;
+            $companies                           = [$companies->getId()];
+        } elseif (!is_array($companies)) {
             $companies = [$companies];
         }
-        /** @var Company[] $companyLeadAdd */
-        $companyLeadAdd = [];
-        if (!$companies instanceof Company) {
-            //make sure they are ints
-            $searchForCompanies = [];
-            foreach ($companies as $k => &$l) {
-                $l = (int) $l;
 
-                if (!isset($companyLeadAdd[$l])) {
-                    $searchForCompanies[] = $l;
-                }
+        //make sure they are ints
+        foreach ($companies as $k => &$l) {
+            $l = (int) $l;
+
+            if (!isset($companyLeadAdd[$l])) {
+                $searchForCompanies[] = $l;
             }
+        }
 
-            if (!empty($searchForCompanies)) {
-                $companyEntities = $this->getEntities([
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => 'comp.id',
-                                'expr'   => 'in',
-                                'value'  => $searchForCompanies,
-                            ],
+        if (!empty($searchForCompanies)) {
+            $companyEntities = $this->getEntities([
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'comp.id',
+                            'expr'   => 'in',
+                            'value'  => $searchForCompanies,
                         ],
                     ],
-                ]);
+                ],
+            ]);
 
-                foreach ($companyEntities as $company) {
-                    $companyLeadAdd[$company->getId()] = $company;
-                }
+            foreach ($companyEntities as $company) {
+                $companyLeadAdd[$company->getId()] = $company;
             }
-
-            unset($companyEntities, $searchForCompanies);
-        } else {
-            $companyLeadAdd[$companies->getId()] = $companies;
-
-            $companies = [$companies->getId()];
         }
+
+        unset($companyEntities, $searchForCompanies);
 
         $persistCompany = [];
         $dispatchEvents = [];
@@ -350,7 +362,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($persistCompany)) {
-            $this->leadFieldModel->getRepository()->saveEntities($persistCompany);
+            $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
         // Clear CompanyLead entities from Doctrine memory
@@ -547,7 +559,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+                $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
 
                 break;
         }
@@ -600,5 +612,63 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         } else {
             return null;
         }
+    }
+
+    /**
+     * Company Merge function, will merge $mainCompany with $secCompany -  empty records from main company will be
+     * filled with secondary then secondary will be deleted.
+     *
+     * @param $mainCompany
+     * @param $secCompany
+     *
+     * @return mixed
+     */
+    public function companyMerge($mainCompany, $secCompany)
+    {
+        $this->logger->debug('COMPANY: Merging companies');
+
+        $mainCompanyId = $mainCompany->getId();
+        $secCompanyId  = $secCompany->getId();
+
+        //if they are the same lead, then just return one
+        if ($mainCompanyId === $secCompanyId) {
+            return $mainCompany;
+        }
+        //merge fields
+        $mergeSecFields    = $secCompany->getFields();
+        $mainCompanyFields = $mainCompany->getFields();
+        foreach ($mergeSecFields as $group => $groupFields) {
+            foreach ($groupFields as $alias => $details) {
+                //fill in empty main company fields with secondary company fields
+                if (empty($mainCompanyFields[$group][$alias]['value']) && !empty($details['value'])) {
+                    $mainCompany->addUpdatedField($alias, $details['value']);
+                    $this->logger->debug('Company: Updated '.$alias.' = '.$details['value']);
+                }
+            }
+        }
+
+        //merge owner
+        $mainCompanyOwner = $mainCompany->getOwner();
+        $secCompanyOwner  = $secCompany->getOwner();
+
+        if ($mainCompanyOwner === null && $secCompanyOwner !== null) {
+            $mainCompany->setOwner($secCompanyOwner);
+        }
+
+        //move all leads from secondary company to main company
+        $companyLeadRepo = $this->getCompanyLeadRepository();
+        $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
+
+        foreach ($secCompanyLeads as $lead) {
+            $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);
+        }
+        //save the updated company
+        $this->saveEntity($mainCompany, false);
+
+        //delete the old company
+        $this->deleteEntity($secCompany);
+
+        //return the merged company
+        return $mainCompany;
     }
 }

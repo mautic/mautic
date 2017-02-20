@@ -210,15 +210,17 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'mautic.transport.amazon'    => 'mautic.email.config.mailer_transport.amazon',
-                    'gmail'                      => 'mautic.email.config.mailer_transport.gmail',
-                    'mautic.transport.mandrill'  => 'mautic.email.config.mailer_transport.mandrill',
-                    'smtp'                       => 'mautic.email.config.mailer_transport.smtp',
-                    'mail'                       => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.postmark'  => 'mautic.email.config.mailer_transport.postmark',
-                    'mautic.transport.sendgrid'  => 'mautic.email.config.mailer_transport.sendgrid',
-                    'sendmail'                   => 'mautic.email.config.mailer_transport.sendmail',
-                    'mautic.transport.sparkpost' => 'mautic.email.config.mailer_transport.sparkpost',
+                    'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
+                    'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
+                    'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
+                    'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
+                    'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
+                    'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
+                    'mail'                          => 'mautic.email.config.mailer_transport.mail',
+                    'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
+                    'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+                    'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
+                    'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
                 ],
                 'label'    => 'mautic.email.config.mailer.transport',
                 'required' => false,
@@ -343,7 +345,9 @@ class ConfigType extends AbstractType
                 "cram-md5"
             ], "config_emailconfig_mailer_transport":[
                 "mautic.transport.mandrill",
+                "mautic.transport.mailjet",
                 "mautic.transport.sendgrid",
+                "mautic.transport.elasticemail",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
                 "gmail"
@@ -356,9 +360,11 @@ class ConfigType extends AbstractType
                 "login",
                 "cram-md5"
             ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.elasticemail",
                 "mautic.transport.sendgrid",
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
+                "mautic.transport.mailjet",
                 "gmail"
             ]
         }';
@@ -476,6 +482,45 @@ class ConfigType extends AbstractType
                     'class'   => 'btn btn-info',
                     'onclick' => 'Mautic.testEmailServerConnection(true)',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_mailjet_sandbox',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                ],
+                'data'     => empty($options['data']['mailer_mailjet_sandbox']) ? false : true,
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_mailjet_sandbox_default_mail',
+            'text',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                    'data-hide-on' => '{"config_emailconfig_mailer_mailjet_sandbox_0":"checked"}',
+                ],
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                        ]
+                    ),
+                ],
+                'required' => false,
             ]
         );
 
@@ -599,7 +644,9 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-        $builder->add('email_frequency_number', 'number',
+        $builder->add(
+            'email_frequency_number',
+            'number',
             [
                 'precision'  => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
@@ -608,8 +655,11 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
-            ]);
-        $builder->add('email_frequency_time', 'choice',
+            ]
+        );
+        $builder->add(
+            'email_frequency_time',
+            'choice',
             [
                 'choices' => [
                     'DAY'   => 'day',
@@ -623,7 +673,92 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
-            ]);
+            ]
+        );
+        $builder->add(
+            'show_contact_segments',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.segments',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_segments']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_preferences',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.preference.options',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_preferences']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_frequency',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.frequency',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_frequency']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_pause_dates',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.pause.dates',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_pause_dates']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_categories',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.categories',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
+                ],
+                'data'     => empty($options['data']['show_contact_categories']) ? false : true,
+                'required' => false,
+            ]
+        );
+        $builder->add(
+            'show_contact_preferred_channels',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.show.contact.preferred.channels',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
+                ],
+                'data'     => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'required' => false,
+            ]
+        );
     }
 
     /**

@@ -95,30 +95,17 @@ class FormRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('f.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('f.isPublished', ":$unique");
-                $forceParameters = [$unique => false];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('f.category'),
-                    $q->expr()->eq('f.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('f.createdBy', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
+
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),
@@ -149,15 +136,11 @@ class FormRepository extends CommonRepository
                         $q->expr()->eq('s.form', 'f')
                     )
                     ->getDql();
-                $expr            = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict = true;
+                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $q->expr()->like('f.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
@@ -165,7 +148,6 @@ class FormRepository extends CommonRepository
             $expr = $q->expr()->not($expr);
         }
 
-        $parameters = [];
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
@@ -234,7 +216,7 @@ class FormRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -245,6 +227,8 @@ class FormRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

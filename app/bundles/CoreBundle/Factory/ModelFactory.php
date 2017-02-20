@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,7 +32,7 @@ class ModelFactory
     /**
      * @param $modelNameKey
      *
-     * @return mixed
+     * @return AbstractCommonModel
      */
     public function getModel($modelNameKey)
     {

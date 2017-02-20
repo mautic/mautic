@@ -119,6 +119,14 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
+     * @param array $settings
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects'] = ['Company'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAuthenticationType()
@@ -205,6 +213,11 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected function getContactAccessToken(&$socialCache)
     {
+        $session = $this->factory->getSession();
+        if (!$session->isStarted()) {
+            return (isset($socialCache['accessToken'])) ? $this->decryptApiKeys($socialCache['accessToken']) : null;
+        }
+
         $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', []);
         if (!isset($accessToken[$this->getAuthTokenKey()])) {
             if (isset($socialCache['accessToken'])) {

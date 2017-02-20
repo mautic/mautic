@@ -19,7 +19,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'routeBase' => 'category',
     'query'     => ['bundle' => $bundle, 'show_bundle_select' => true],
     'editMode'  => 'ajaxmodal',
-    'editAttr'  => 'data-target="#MauticSharedModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"',
+    'editAttr'  => [
+        'data-target' => '#MauticSharedModal',
+        'data-header' => $view['translator']->trans('mautic.category.header.new'),
+        'data-toggle' => 'ajaxmodal',
+    ],
 ]));
 ?>
 
@@ -39,14 +43,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 'translateLabels' => true,
             ],
         ],
-        'action'          => $currentRoute,
-        'routeBase'       => 'category',
-        'templateButtons' => [
-            'delete' => $permissions[$permissionBase.':delete'],
-        ],
-        'query' => [
-            'bundle' => $bundle,
-        ],
+        'action' => $currentRoute,
     ]); ?>
 
     <div class="page-list">

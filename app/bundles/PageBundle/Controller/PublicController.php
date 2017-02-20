@@ -276,7 +276,7 @@ class PublicController extends CommonFormController
 
         $model->hitPage($entity, $this->request, 404);
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -293,7 +293,7 @@ class PublicController extends CommonFormController
         $entity = $model->getEntity($id);
 
         if ($entity === null) {
-            $this->notFound();
+            return $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
@@ -348,12 +348,42 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function trackingAction()
+    {
+        if (!$this->get('mautic.security')->isAnonymous()) {
+            return new JsonResponse(
+                [
+                    'success' => 0,
+                ]
+            );
+        }
+
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model = $this->getModel('page');
+        $model->hitPage(null, $this->request);
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+
+        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+
+        return new JsonResponse(
+            [
+                'success' => 1,
+                'id'      => $lead->getId(),
+                'sid'     => $trackingId,
+            ]
+        );
     }
 
     /**
@@ -518,7 +548,14 @@ class PublicController extends CommonFormController
     {
         $data = [];
         if ($this->get('mautic.security')->isAnonymous()) {
-            $data = ['id' => $this->getModel('lead')->getCurrentLead()->getId()];
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead');
+
+            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+            $data                                = [
+                'id'  => $lead->getId(),
+                'sid' => $trackingId,
+            ];
         }
 
         return new JsonResponse($data);

@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -320,6 +321,36 @@ class AjaxController extends CommonAjaxController
             if ($lead !== null && $list !== null) {
                 $class = $action == 'add' ? 'addToLists' : 'removeFromLists';
                 $leadModel->$class($lead, $list);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function togglePreferredLeadChannelAction(Request $request)
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $channel   = InputHelper::clean($request->request->get('channel'));
+        $action    = InputHelper::clean($request->request->get('channelAction'));
+
+        if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
+            $leadModel = $this->getModel('lead');
+
+            $lead = $leadModel->getEntity($leadId);
+
+            if ($lead !== null && $channel !== null) {
+                if ($action === 'remove') {
+                    $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
+                } elseif ($action === 'add') {
+                    $leadModel->removeDncForLead($lead, $channel);
+                }
                 $dataArray['success'] = 1;
             }
         }
@@ -729,14 +760,17 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateLeadFieldValuesAction(Request $request)
     {
-        $alias       = InputHelper::clean($request->request->get('alias'));
-        $dataArray   = ['success' => 0, 'options' => null];
-        $leadField   = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
-        $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
+        $alias     = InputHelper::clean($request->request->get('alias'));
+        $operator  = InputHelper::clean($request->request->get('operator'));
+        $changed   = InputHelper::clean($request->request->get('changed'));
+        $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
+        $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
-        if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
-            $properties    = $leadField->getProperties();
+        if ($leadField) {
+            $options       = null;
             $leadFieldType = $leadField->getType();
+
+            $properties = $leadField->getProperties();
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = FormFieldHelper::parseList($properties['list']);
@@ -760,49 +794,45 @@ class AjaxController extends CommonAjaxController
                     case 'locale':
                         $options = FormFieldHelper::getLocaleChoices();
                         break;
+                    case 'date':
+                    case 'datetime':
+                        if ('date' == $operator) {
+                            $fieldHelper = new FormFieldHelper();
+                            $fieldHelper->setTranslator($this->get('translator'));
+                            $options = $fieldHelper->getDateChoices();
+                        }
+                        break;
                     default:
                         $options = (!empty($properties)) ? $properties : [];
                 }
             }
 
-            $dataArray['options'] = $options;
+            $dataArray['fieldType'] = $leadFieldType;
+            $dataArray['options']   = $options;
+
+            if ('field' === $changed) {
+                $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
+                foreach ($dataArray['operators'] as $value => $label) {
+                    $dataArray['operators'][$value] = $this->get('translator')->trans($label);
+                }
+
+                reset($dataArray['operators']);
+                $operator = key($dataArray['operators']);
+            }
+
+            $disabled = false;
+            switch ($operator) {
+                case 'empty':
+                case '!empty':
+                    $disabled = true;
+                    break;
+            }
+            $dataArray['disabled'] = $disabled;
         }
 
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);
-    }
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getLeadFieldsPerObjectAction(Request $request)
-    {
-        $dataArray = ['success' => 1];
-
-        //$object = $request->request->get('object');
-
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                 'filter' => [
-                     'force' => [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true,
-                    ],
-                    ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-          ]
-        );
-
-        if (is_object($fields)) {
-            $fields = $fields->getIterator()->getArrayCopy();
-        }
-
-        $dataArray['fields'] = json_encode($fields);
-
-        return $this->sendJsonResponse($fields);
     }
 
     /**

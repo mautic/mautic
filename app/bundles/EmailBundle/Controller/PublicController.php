@@ -19,11 +19,19 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
+use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
+    use FrequencyRuleTrait;
+
+    /**
+     * @param $idHash
+     *
+     * @return Response
+     */
     public function indexAction($idHash)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
@@ -83,7 +91,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -115,57 +123,29 @@ class PublicController extends CommonFormController
         $model      = $this->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
+        $message    = '';
+        $email      = null;
+        $lead       = null;
+        $template   = null;
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
 
         if (!empty($stat)) {
-            $email = $stat->getEmail();
-            $lead  = $stat->getLead();
-
-            if ($lead) {
-                // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
-                $leadModel->setCurrentLead($lead);
-            }
-
-            $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
-            $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
-            if (!$message) {
-                $message = $translator->trans(
-                    'mautic.email.unsubscribed.success',
-                    [
-                        '%resubscribeUrl%' => '|URL|',
-                        '%email%'          => '|EMAIL|',
-                    ]
-                );
-            }
-            $message = str_replace(
-                [
-                    '|URL|',
-                    '|EMAIL|',
-                ],
-                [
-                    $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
-                    $stat->getEmailAddress(),
-                ],
-                $message
-            );
-
-            if ($email !== null) {
+            if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
+                if ('mautic_code_mode' === $template) {
+                    // Use system default
+                    $template = null;
+                }
 
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
                 $unsubscribeForm = $email->getUnsubscribeForm();
-
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
-        } else {
-            $email   = $lead   = false;
-            $message = $translator->trans('mautic.email.stat_record.not_found');
         }
 
         if (empty($template) && empty($formTemplate)) {
@@ -173,10 +153,91 @@ class PublicController extends CommonFormController
         } elseif (!empty($formTemplate)) {
             $template = $formTemplate;
         }
+
         $theme = $this->factory->getTheme($template);
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
+        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+
+        if (!empty($stat)) {
+            $lead = $stat->getLead();
+            if ($lead) {
+                // Set the lead as current lead
+                $leadModel->setCurrentLead($lead);
+            }
+
+            if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
+                $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+
+                $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
+                if (!$message) {
+                    $message = $translator->trans(
+                        'mautic.email.unsubscribed.success',
+                        [
+                            '%resubscribeUrl%' => '|URL|',
+                            '%email%'          => '|EMAIL|',
+                        ]
+                    );
+                }
+                $message = str_replace(
+                    [
+                        '|URL|',
+                        '|EMAIL|',
+                    ],
+                    [
+                        $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
+                        $stat->getEmailAddress(),
+                    ],
+                    $message
+                );
+                $message = '<h2>'.$message.'</h2>';
+            } elseif ($lead) {
+                $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+
+                $viewParameters = [
+                    'lead'                         => $lead,
+                    'idHash'                       => $idHash,
+                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_frequency'),
+                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_pause_dates'),
+                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferred_channels'),
+                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_categories'),
+                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
+                ];
+
+                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action);
+                if (true === $form) {
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]),
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => $contentTemplate,
+                        ]
+                    );
+                }
+
+                $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+                    'MauticEmailBundle:Lead:preference_options.html.php',
+                    array_merge(
+                        $viewParameters,
+                        [
+                            'form'         => $form->createView(),
+                            'currentRoute' => $this->generateUrl(
+                                'mautic_contact_action',
+                                [
+                                    'objectAction' => 'contactFrequency',
+                                    'objectId'     => $lead->getId(),
+                                ]
+                            ),
+                        ]
+                    )
+                );
+                $message = $html;
+            }
+        } else {
+            $message = $translator->trans('mautic.email.stat_record.not_found');
+        }
+
         $config = $theme->getConfig();
 
         $viewParams = [
@@ -184,11 +245,8 @@ class PublicController extends CommonFormController
             'lead'     => $lead,
             'template' => $template,
             'message'  => $message,
-            'type'     => 'notice',
-            'name'     => $translator->trans('mautic.email.unsubscribe'),
-        ];
 
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        ];
 
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
@@ -317,7 +375,7 @@ class PublicController extends CommonFormController
             return new Response('success');
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -529,6 +587,8 @@ class PublicController extends CommonFormController
             $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
 
             $stat = $model->getEmailStatus($idHash);
+
+            $stat->setSource('email.client');
 
             // stat doesn't exist, create one
             if ($stat === null) {

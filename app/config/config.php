@@ -53,23 +53,25 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
                 // Just check first file for the loadMetadata function
                 $reflectionClass = new \ReflectionClass('\\'.$baseNamespace.'\\Entity\\'.(!empty($subFolder) ? $subFolder.'\\' : '').basename($file->getFilename(), '.php'));
 
-                // Register API metadata
-                if ($reflectionClass->hasMethod('loadApiMetadata')) {
-                    $serializerMappings[$bundle] = [
-                        'namespace_prefix' => $baseNamespace.'\\Entity',
-                        'path'             => "@$bundle/Entity",
-                    ];
-                }
+                if (!$reflectionClass->implementsInterface(\Mautic\CoreBundle\Entity\DeprecatedInterface::class)) {
+                    // Register API metadata
+                    if ($reflectionClass->hasMethod('loadApiMetadata')) {
+                        $serializerMappings[$bundle] = [
+                            'namespace_prefix' => $baseNamespace.'\\Entity',
+                            'path'             => "@$bundle/Entity",
+                        ];
+                    }
 
-                // Register entities
-                if ($reflectionClass->hasMethod('loadMetadata')) {
-                    $ormMappings[$bundle] = [
-                        'dir'       => 'Entity',
-                        'type'      => 'staticphp',
-                        'prefix'    => $baseNamespace.'\\Entity',
-                        'mapping'   => true,
-                        'is_bundle' => true,
-                    ];
+                    // Register entities
+                    if ($reflectionClass->hasMethod('loadMetadata')) {
+                        $ormMappings[$bundle] = [
+                            'dir'       => 'Entity',
+                            'type'      => 'staticphp',
+                            'prefix'    => $baseNamespace.'\\Entity',
+                            'mapping'   => true,
+                            'is_bundle' => true,
+                        ];
+                    }
                 }
             }
         }
@@ -332,6 +334,11 @@ $container->loadFromExtension('jms_serializer', [
         'cache'          => 'none',
         'auto_detection' => false,
         'directories'    => $serializerMappings,
+    ],
+    'visitors' => [
+        'json' => [
+            'options' => JSON_PRETTY_PRINT,
+        ],
     ],
 ]);
 

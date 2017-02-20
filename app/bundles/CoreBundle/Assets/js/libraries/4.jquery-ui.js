@@ -960,7 +960,7 @@ var mouse = $.widget("ui.mouse", {
         };
 
         this.document
-            .bind( "mousemove." + this.widgetName, this._mouseMoveDelegate )
+                .bind( "mousemove." + this.widgetName, this._mouseMoveDelegate )
             .bind( "mouseup." + this.widgetName, this._mouseUpDelegate );
 
         event.preventDefault();

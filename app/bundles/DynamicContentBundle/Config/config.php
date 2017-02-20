@@ -15,7 +15,7 @@ return [
             'items' => [
                 'mautic.dynamicContent.dynamicContent' => [
                     'route'    => 'mautic_dynamicContent_index',
-                    'access'   => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
+                    'access'   => ['dynamiccontent:dynamiccontents:viewown', 'dynamiccontent:dynamiccontents:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 90,
                 ],
@@ -36,11 +36,19 @@ return [
         'public' => [
             'mautic_api_dynamicContent_index' => [
                 'path'       => '/dwc',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities',
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:getEntities',
             ],
             'mautic_api_dynamicContent_action' => [
                 'path'       => '/dwc/{objectAlias}',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:process',
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:process',
+            ],
+        ],
+        'api' => [
+            'mautic_api_dynamicContent_standard' => [
+                'standard_entity' => true,
+                'name'            => 'dynamicContents',
+                'path'            => '/dynamiccontents',
+                'controller'      => 'MauticDynamicContentBundle:Api\DynamicContentApi',
             ],
         ],
     ],
@@ -55,7 +63,11 @@ return [
                 ],
             ],
             'mautic.dynamicContent.js.subscriber' => [
-                'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'templating.helper.assets',
+                ],
             ],
             'mautic.dynamicContent.subscriber' => [
                 'class'     => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
@@ -63,7 +75,18 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.form.helper.token',
+                    'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.dynamicContent.subscriber.channel' => [
+                'class' => \Mautic\DynamicContentBundle\EventListener\ChannelSubscriber::class,
+            ],
+            'mautic.dynamicContent.stats.subscriber' => [
+                'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
@@ -90,9 +113,8 @@ return [
                 'alias' => 'dwcdecision_list',
             ],
             'mautic.form.type.dwc_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dwc_list',
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
+                'alias' => 'dwc_list',
             ],
         ],
         'models' => [

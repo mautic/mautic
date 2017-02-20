@@ -29,13 +29,9 @@ $view['slots']->set(
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'action'          => $currentRoute,
-        'langVar'         => 'asset.asset',
-        'routeBase'       => 'asset',
-        'templateButtons' => [
-            'delete' => $permissions['asset:assets:deleteown'] || $permissions['asset:assets:deleteother'],
-        ],
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'searchHelp'  => 'mautic.asset.asset.help.searchcommands',
     ]); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

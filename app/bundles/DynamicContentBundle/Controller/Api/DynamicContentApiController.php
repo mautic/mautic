@@ -11,37 +11,24 @@
 
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
-use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class DynamicContentApiController.
  */
-class DynamicContentApiController extends CommonController
+class DynamicContentApiController extends CommonApiController
 {
     /**
-     * @param $objectAlias
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function processAction($objectAlias)
+    public function initialize(FilterControllerEvent $event)
     {
-        $method = $this->request->getMethod();
+        $this->model           = $this->getModel('dynamicContent');
+        $this->entityClass     = 'Mautic\DynamicContentBundle\Entity\DynamicContent';
+        $this->entityNameOne   = 'dynamicContent';
+        $this->entityNameMulti = 'dynamicContents';
 
-        if (method_exists($this, $method.'Action')) {
-            return $this->{$method.'Action'}($objectAlias);
-        } else {
-            throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
-        }
-    }
-
-    public function getAction($objectAlias)
-    {
-        $lead    = $this->getModel('lead')->getCurrentLead();
-        $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentForLead($objectAlias, $lead);
-
-        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
+        parent::initialize($event);
     }
 }

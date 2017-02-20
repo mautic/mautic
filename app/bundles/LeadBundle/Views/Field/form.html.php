@@ -21,9 +21,17 @@ if (!empty($userId)) {
 }
 $view['slots']->set('headerTitle', $header);
 
-$selectTemplate      = $view['form']->row($form['properties_select_template']);
-$defaultTemplate     = $view['form']->widget($form['default_template']);
-$defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
+// Render the templates so they don't get rendered automatically
+$selectTemplate          = $view['form']->row($form['properties_select_template']);
+$lookupTemplate          = $view['form']->row($form['properties_lookup_template']);
+$defaultTextTemplate     = $view['form']->widget($form['default_template_text']);
+$defaultTextareaTemplate = $view['form']->widget($form['default_template_textarea']);
+$defaultLocaleTemplate   = $view['form']->widget($form['default_template_locale']);
+$defaultSelectTemplate   = $view['form']->widget($form['default_template_select']);
+$defaultBoolTemplate     = $view['form']->widget($form['default_template_boolean']);
+$defaultCountryTemplate  = $view['form']->widget($form['default_template_country']);
+$defaultRegionTemplate   = $view['form']->widget($form['default_template_region']);
+$defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezone']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -41,29 +49,29 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
             </div>
             <div class="row">
                 <div class="col-md-6">
+                    <?php echo $view['form']->row($form['object']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['group']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
                     <?php echo $view['form']->row($form['type']); ?>
                 </div>
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['defaultValue']); ?>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <?php echo $view['form']->row($form['group']); ?>
-                </div>
-                <div class="col-md-6">
-                    <?php echo $view['form']->row($form['order']); ?>
-                </div>
-            </div>
+
             <?php
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];
             $errors        = count($form['properties']->vars['errors']);
             $feedbackClass = (!empty($errors)) ? ' has-error' : '';
             ?>
-
             <div class="row">
-                <div class="form-group  col-xs-12 col-sm-8 col-md-6<?php echo $feedbackClass; ?>">
+                <div class="form-group col-md-6<?php echo $feedbackClass; ?>">
                     <div id="leadfield_properties">
                         <?php
                         switch ($type):
@@ -81,12 +89,17 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                             break;
                         case 'select':
                         case 'multiselect':
-                        case 'lookup':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $selectTemplate,
                             ]);
                             break;
+                        case 'lookup':
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+                                'form'           => $form['properties'],
+                                'selectTemplate' => $lookupTemplate,
+                                'isLookup'       => 'lookup',
+                            ]);
                         endswitch;
                         ?>
                     </div>
@@ -98,6 +111,11 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
     </div>
     <div class="col-md-4 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="row">
+                <div class="col-md-12">
+                    <?php echo $view['form']->row($form['order']); ?>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['isPublished']); ?>
@@ -126,9 +144,9 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['isUniqueIdentifer']); ?>
                 </div>
-                <div class="unique-identifier-warning col-md-6" style="<?php if (!$form['isUniqueIdentifer']->vars['data']) {
-                            echo 'display:none;';
-                        } ?>">
+            </div>
+            <div class="row unique-identifier-warning" style="<?php if (!$form['isUniqueIdentifer']->vars['data']): echo 'display:none;'; endif; ?>">
+                <div class="col-md-12">
                     <div class="alert alert-danger">
                         <?php echo $view['translator']->trans('mautic.lead.field.form.isuniqueidentifer.warning'); ?>
                     </div>
@@ -142,17 +160,39 @@ $defaultBoolTemplate = $view['form']->widget($form['default_bool_template']);
 
 <?php if ($isNew): ?>
 <div id="field-templates" class="hide">
-    <div class="default">
-        <?php echo $defaultTemplate; ?>
+    <div class="default_template_text">
+        <?php echo $defaultTextTemplate; ?>
     </div>
-    <div class="default_bool">
+    <div class="default_template_textarea">
+        <?php echo $defaultTextareaTemplate; ?>
+    </div>
+    <div class="default_template_boolean">
         <?php echo $defaultBoolTemplate; ?>
+    </div>
+    <div class="default_template_country">
+        <?php echo $defaultCountryTemplate; ?>
+    </div>
+    <div class="default_template_region">
+        <?php echo $defaultRegionTemplate; ?>
+    </div>
+    <div class="default_template_locale">
+        <?php echo $defaultLocaleTemplate; ?>
+    </div>
+    <div class="default_template_timezone">
+        <?php echo $defaultTimezoneTemplate; ?>
+    </div>
+    <div class="default_template_select">
+        <?php echo $defaultSelectTemplate; ?>
     </div>
 <?php
     echo $view->render('MauticLeadBundle:Field:properties_number.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php');
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
         'selectTemplate' => $selectTemplate,
+    ]);
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+        'selectTemplate' => $lookupTemplate,
+        'isLookup'       => 'lookup',
     ]);
 ?>
 </div>

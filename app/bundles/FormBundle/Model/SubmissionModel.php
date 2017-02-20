@@ -771,7 +771,7 @@ class SubmissionModel extends CommonFormModel
             // Default to currently tracked lead
             $lead          = $this->leadModel->getCurrentLead();
             $leadId        = $lead->getId();
-            $currentFields = $this->leadModel->flattenFields($lead->getFields());
+            $currentFields = $lead->getProfileFields();
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
         } else {
@@ -920,7 +920,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         //set the mapped fields
-        $this->leadModel->setFieldValues($lead, $data, false);
+        $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);
@@ -962,7 +962,13 @@ class SubmissionModel extends CommonFormModel
         $components = $this->formModel->getCustomComponents();
         foreach ([$field->getType(), 'form'] as $type) {
             if (isset($components['validators'][$type])) {
+                if (!is_array($components['validators'][$type])) {
+                    $components['validators'][$type] = [$components['validators'][$type]];
+                }
                 foreach ($components['validators'][$type] as $validator) {
+                    if (!is_array($validator)) {
+                        $validator = ['eventName' => $validator];
+                    }
                     $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
                     if (!$event->isValid()) {
                         return $event->getInvalidReason();

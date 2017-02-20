@@ -12,25 +12,29 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'role');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.roles'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'templateButtons' => [
-        'new' => $permissions['create'],
-    ],
-    'routeBase' => 'role',
-    'langVar'   => 'user.role',
-]));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'templateButtons' => [
+                'new' => $permissions['create'],
+            ],
+            'routeBase' => 'role',
+            'langVar'   => 'user.role',
+        ]
+    )
+);
 ?>
 
-<?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-    'searchValue'     => $searchValue,
-    'searchHelp'      => 'mautic.user.role.help.searchcommands',
-    'action'          => $currentRoute,
-    'langVar'         => 'user.role',
-    'routeBase'       => 'role',
-    'templateButtons' => [
-        'delete' => $permissions['delete'],
-    ],
-]); ?>
+<?php echo $view->render(
+    'MauticCoreBundle:Helper:list_toolbar.html.php',
+    [
+        'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.user.role.help.searchcommands',
+        'action'      => $currentRoute,
+    ]
+); ?>
 
 <div class="page-list">
     <?php $view['slots']->output('_content'); ?>

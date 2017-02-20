@@ -23,15 +23,16 @@ if (!empty($id)) {
 $view['slots']->set('headerTitle', $header);
 
 $templates = [
-    'countries' => 'country-template',
-    'regions'   => 'region-template',
-    'timezones' => 'timezone-template',
-    'select'    => 'select-template',
-    'lists'     => 'leadlist-template',
-    'emails'    => 'lead_email_received-template',
-    'tags'      => 'tags-template',
-    'stage'     => 'stage-template',
-    'locales'   => 'locale-template',
+    'countries'      => 'country-template',
+    'regions'        => 'region-template',
+    'timezones'      => 'timezone-template',
+    'select'         => 'select-template',
+    'lists'          => 'leadlist-template',
+    'emails'         => 'lead_email_received-template',
+    'tags'           => 'tags-template',
+    'stage'          => 'stage-template',
+    'locales'        => 'locale-template',
+    'globalcategory' => 'globalcategory-template',
 ];
 
 $mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
@@ -92,8 +93,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
-                                            $object    = $object;
+                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
                                             $list      = json_encode($choices);
                                             $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';

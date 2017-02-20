@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -24,7 +25,14 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CategoryType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var Session
+     */
     private $session;
 
     /**
@@ -45,69 +53,95 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
-        if ($options['data']->getId()) {
-            // Edit existing category from category manager - do not allow to edit bundle
-            $builder->add('bundle', 'hidden', [
-                'data' => $options['data']->getBundle(),
-            ]);
-        } elseif ($options['show_bundle_select'] == true) {
-            // Create new category from category bundle - let user select the bundle
-           $selected = $this->session->get('mautic.category.type', 'category');
-            $builder->add('bundle', 'category_bundles_form', [
-               'label'      => 'mautic.core.type',
-               'label_attr' => ['class' => 'control-label'],
-               'attr'       => ['class' => 'form-control'],
-               'required'   => true,
-               'data'       => $selected,
-           ]);
-        } else {
-            // Create new category directly from another bundle - preset bundle
-            $builder->add('bundle', 'hidden', [
-                'data' => $options['bundle'],
-            ]);
+        if (!$options['data']->getId()) {
+            // Do not allow custom bundle
+            if ($options['show_bundle_select'] == true) {
+                // Create new category from category bundle - let user select the bundle
+                $selected = $this->session->get('mautic.category.type', 'category');
+                $builder->add(
+                    'bundle',
+                    'category_bundles_form',
+                    [
+                        'label'      => 'mautic.core.type',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => ['class' => 'form-control'],
+                        'required'   => true,
+                        'data'       => $selected,
+                    ]
+                );
+            } else {
+                // Create new category directly from another bundle - preset bundle
+                $builder->add(
+                    'bundle',
+                    'hidden',
+                    [
+                        'data' => $options['bundle'],
+                    ]
+                );
+            }
         }
 
-        $builder->add('title', 'text', [
-            'label'      => 'mautic.core.title',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'title',
+            'text',
+            [
+                'label'      => 'mautic.core.title',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
-        $builder->add('description', 'text', [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            'text',
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('alias', 'text', [
-            'label'      => 'mautic.core.alias',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.category.form.alias.help',
-            ],
-            'required' => false,
-        ]);
+        $builder->add(
+            'alias',
+            'text',
+            [
+                'label'      => 'mautic.core.alias',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.category.form.alias.help',
+                ],
+                'required' => false,
+            ]
+        );
 
-        $builder->add('color', 'text', [
-            'label'      => 'mautic.core.color',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'color',
-            ],
-            'required' => false,
-        ]);
+        $builder->add(
+            'color',
+            'text',
+            [
+                'label'      => 'mautic.core.color',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'color',
+                ],
+                'required' => false,
+            ]
+        );
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $builder->add('inForm', 'hidden', [
-            'mapped' => false,
-        ]);
+        $builder->add(
+            'inForm',
+            'hidden',
+            [
+                'mapped' => false,
+            ]
+        );
 
         $builder->add('buttons', 'form_buttons');
 
@@ -117,16 +151,23 @@ class CategoryType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'data_class'         => 'Mautic\CategoryBundle\Entity\Category',
-            'show_bundle_select' => false,
-        ]);
+        $resolver->setDefaults(
+            [
+                'data_class'         => 'Mautic\CategoryBundle\Entity\Category',
+                'show_bundle_select' => false,
+                'bundle'             => function (Options $options) {
+                    if (!$bundle = $options['data']->getBundle()) {
+                        $bundle = 'category';
+                    }
 
-        $resolver->setRequired(['bundle']);
+                    return $bundle;
+                },
+            ]
+        );
     }
 
     /**

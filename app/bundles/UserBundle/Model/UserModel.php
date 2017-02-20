@@ -86,11 +86,18 @@ class UserModel extends FormModel
      * @param User                     $entity
      * @param PasswordEncoderInterface $encoder
      * @param string                   $submittedPassword
+     * @param bool|false               $validate
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword)
+    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
     {
+        if ($validate) {
+            if (strlen($submittedPassword) < 6) {
+                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
+            }
+        }
+
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
             return $encoder->encodePassword($submittedPassword, $entity->getSalt());

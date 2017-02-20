@@ -17,10 +17,6 @@ return [
 
     'routes' => [
         'main' => [
-            'mautic_focus_pagetoken_index' => [
-                'path'       => '/focus/pagetokens/{page}',
-                'controller' => 'MauticFocusBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_focus_index' => [
                 'path'       => '/focus/{page}',
                 'controller' => 'MauticFocusBundle:Focus:index',
@@ -71,6 +67,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.focus.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.focus.form.type.color' => [
@@ -105,14 +107,24 @@ return [
                 ],
             ],
         ],
+        'other' => [
+            'mautic.focus.helper.token' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Helper\TokenHelper',
+                'arguments' => [
+                    'mautic.focus.model.focus',
+                    'router',
+                ],
+            ],
+        ],
     ],
 
     'menu' => [
         'main' => [
             'mautic.focus' => [
-                'route'  => 'mautic_focus_index',
-                'access' => 'plugin:focus:items:view',
-                'parent' => 'mautic.core.channels',
+                'route'    => 'mautic_focus_index',
+                'access'   => 'plugin:focus:items:view',
+                'parent'   => 'mautic.core.channels',
+                'priority' => 10,
             ],
         ],
     ],

@@ -11,9 +11,9 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 
@@ -43,7 +43,7 @@ class MessageQueueSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
+            ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
         ];
     }
 
@@ -65,36 +65,39 @@ class MessageQueueSubscriber extends CommonSubscriber
         $sendTo            = [];
         $messagesByContact = [];
         $options           = [
-            'email_type' => 'marketing',
-        ];
+                'email_type' => 'marketing',
+            ];
 
-        /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
-            $contact = $message->getLead()->getProfileFields();
-            if (empty($contact['email'])) {
-                // No email so just let this slide
-                $message->setProcessed();
-                $message->setSuccess();
+            /** @var MessageQueue $message */
+            foreach ($messages as $id => $message) {
+                if ($email && $message->getLead()) {
+                    $contact = $message->getLead()->getProfileFields();
+                    if (empty($contact['email'])) {
+                        // No email so just let this slide
+                        $message->setProcessed();
+                        $message->setSuccess();
+                    }
+                    $sendTo[$contact['id']]            = $contact;
+                    $messagesByContact[$contact['id']] = $message;
+                } else {
+                    $message->setFailed();
+                }
             }
-
-            $sendTo[$contact['id']]            = $contact;
-            $messagesByContact[$contact['id']] = $message;
-        }
 
         if (count($sendTo)) {
             $options['resend_message_queue'] = $messagesByContact;
             $errors                          = $this->emailModel->sendEmail($email, $sendTo, $options);
 
-            // Let's see who was successful
-            foreach ($messagesByContact as $contactId => $message) {
-                // If the message is processed, it was rescheduled by sendEmail
-                if (!$message->isProcessed()) {
-                    $message->setProcessed();
-                    if (empty($errors[$contactId])) {
-                        $message->setSuccess();
+                // Let's see who was successful
+                foreach ($messagesByContact as $contactId => $message) {
+                    // If the message is processed, it was rescheduled by sendEmail
+                    if (!$message->isProcessed()) {
+                        $message->setProcessed();
+                        if (empty($errors[$contactId])) {
+                            $message->setSuccess();
+                        }
                     }
                 }
-            }
         }
 
         $event->stopPropagation();

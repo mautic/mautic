@@ -41,10 +41,6 @@
     overflow-y: scroll;
 }
 
-.builder-panel-focus .builder-panel-top {
-    -webkit-transform: translateZ(0);
-}
-
 .builder-panel-focus #focusFormContent {
     min-height: 1000px;
 }

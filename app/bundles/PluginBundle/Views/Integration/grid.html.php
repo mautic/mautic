@@ -23,7 +23,7 @@ if ($tmpl == 'index') {
                         <a href="<?php echo $view['router']->path(($item['isBundle'] ? 'mautic_plugin_info' : 'mautic_plugin_config'), ['name' => $item['name']]); ?>" data-toggle="ajaxmodal" data-target="#IntegrationEditModal" data-header="<?php echo $item['display']; ?>"<?php if ($item['isBundle']) {
     echo ' data-footer="false"';
 } ?>>
-                            <p><img class="img img-responsive" src="<?php echo $view['assets']->getUrl($item['icon']); ?>" /></p>
+                            <p><img style="height: 78px;" class="img img-responsive" src="<?php echo $view['assets']->getUrl($item['icon']); ?>" /></p>
                             <h5 class="mt-20">
                                 <span class="ellipsis" data-toggle="tooltip" title="<?php echo $plugins[$item['plugin']]['name'].' - '.$item['display']; ?>"><?php echo $item['display']; ?>
                                 </span>

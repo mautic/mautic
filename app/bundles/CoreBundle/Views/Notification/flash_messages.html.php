@@ -8,8 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if (!isset($dismissable)) {
-    $dismissable = '';
+if (!isset($dismissible)) {
+    $dismissible = '';
 }
 
 if (!isset($alertType)) {
@@ -24,7 +24,7 @@ $flashes = $app->getSession() ? $view['session']->getFlashes() : [];
 ?>
 <?php foreach ($flashes as $type => $messages): ?>
 <?php $message = (is_array($messages)) ? $messages[0] : $messages; ?>
-<div class="alert <?php echo $alertClasses[$type].$dismissable; ?> alert-new">
+<div class="alert <?php echo $alertClasses[$type].$dismissible; ?> alert-new">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="fa fa-times"></i></button>
     <span><?php echo $message; ?></span>
 </div>

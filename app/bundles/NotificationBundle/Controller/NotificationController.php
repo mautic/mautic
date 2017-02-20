@@ -52,20 +52,7 @@ class NotificationController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
         $session = $this->get('session');
-
-        $listFilters = [
-            'filters' => [
-                'multiple' => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
 
         //set limits
         $limit = $session->get('mautic.notification.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -75,90 +62,13 @@ class NotificationController extends FormController
         }
 
         $search = $this->request->get('search', $session->get('mautic.notification.filter', ''));
-        $session->set('mautic.email.filter', $search);
+        $session->set('mautic.notification.filter', $search);
 
         $filter = ['string' => $search];
 
         if (!$permissions['notification:notifications:viewother']) {
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
-
-        //retrieve a list of categories
-        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
-            'options' => $this->getModel('category')->getLookupResults('email', '', 0),
-            'prefix'  => 'category',
-        ];
-
-        //retrieve a list of Lead Lists
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $this->getModel('lead.list')->getUserLists(),
-            'prefix'  => 'list',
-        ];
-
-        //retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->factory->getInstalledThemes('email'),
-            'prefix'  => 'theme',
-        ];
-
-        $currentFilters = $session->get('mautic.notification.list_filters', []);
-        $updatedFilters = $this->request->get('filters', false);
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.notification.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $listIds = $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $listIds[] = (int) $fltr;
-                            break;
-                        case 'category':
-                            $catIds[] = (int) $fltr;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
         }
 
         $orderBy    = $session->get('mautic.notification.orderby', 'e.name');
@@ -204,7 +114,6 @@ class NotificationController extends FormController
             [
                 'viewParameters' => [
                     'searchValue' => $search,
-                    'filters'     => $listFilters,
                     'items'       => $notifications,
                     'totalItems'  => $count,
                     'page'        => $page,
@@ -407,7 +316,7 @@ class NotificationController extends FormController
                 $returnUrl      = $this->generateUrl('mautic_notification_index', $viewParameters);
                 $template       = 'MauticNotificationBundle:Notification:index';
                 //clear any modified content
-                $session->remove('mautic.notification.'.$entity->getSessionId().'.content');
+                $session->remove('mautic.notification.'.$entity->getId().'.content');
             }
 
             $passthrough = [
@@ -517,7 +426,7 @@ class NotificationController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'email');
+            return $this->isLocked($postActionVars, $entity, 'notification');
         }
 
         //Create the form
@@ -572,10 +481,10 @@ class NotificationController extends FormController
                 $passthrough = array_merge(
                     $passthrough,
                     [
-                        'updateSelect'      => $form['updateSelect']->getData(),
-                        'notificationId'    => $entity->getId(),
-                        'notificationTitle' => $entity->getName(),
-                        'notificationLang'  => $entity->getLanguage(),
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }
@@ -652,7 +561,7 @@ class NotificationController extends FormController
 
             $entity      = clone $entity;
             $session     = $this->get('session');
-            $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
+            $contentName = 'mautic.notification.'.$entity->getId().'.content';
 
             $session->set($contentName, $entity->getContent());
         }

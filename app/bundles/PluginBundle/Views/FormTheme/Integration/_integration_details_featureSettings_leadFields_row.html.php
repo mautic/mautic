@@ -31,5 +31,9 @@
         <?php endif; ?>
         <?php ++$rowCount; ?>
         <?php endforeach; ?>
+        <?php
+        if ($rowCount % 2 == 0):?>
+    </div>
+        <?php endif; ?>
     </div>
 </div>

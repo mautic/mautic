@@ -16,10 +16,7 @@ return [
                 'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
-                    'mautic.sms.api',
-                    'mautic.helper.sms',
                 ],
             ],
             'mautic.sms.configbundle.subscriber' => [
@@ -32,6 +29,21 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                ],
+            ],
+            'mautic.sms.channel.subscriber' => [
+                'class' => \Mautic\SmsBundle\EventListener\ChannelSubscriber::class,
+            ],
+            'mautic.sms.message_queue.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\MessageQueueSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.model.sms',
+                ],
+            ],
+            'mautic.sms.stats.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
@@ -51,9 +63,8 @@ return [
                 'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sms_list',
+                'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
+                'alias' => 'sms_list',
             ],
         ],
         'helpers' => [
@@ -95,6 +106,9 @@ return [
                 'class'     => 'Mautic\SmsBundle\Model\SmsModel',
                 'arguments' => [
                     'mautic.page.model.trackable',
+                    'mautic.lead.model.lead',
+                    'mautic.channel.model.queue',
+                    'mautic.sms.api',
                 ],
             ],
         ],
@@ -120,6 +134,14 @@ return [
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
             ],
         ],
+        'api' => [
+            'mautic_api_smsesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'smses',
+                'path'            => '/smses',
+                'controller'      => 'MauticSmsBundle:Api\SmsApi',
+            ],
+        ],
     ],
     'menu' => [
         'main' => [
@@ -133,6 +155,7 @@ return [
                             'sms_enabled' => true,
                         ],
                     ],
+                    'priority' => 70,
                 ],
             ],
         ],

@@ -126,6 +126,7 @@ class Role extends FormEntity
                     'name',
                     'description',
                     'isAdmin',
+                    'rawPermissions',
                 ]
             )
             ->build();

@@ -13,12 +13,26 @@ namespace Mautic\NotificationBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class NotificationApiController.
  */
 class NotificationApiController extends CommonApiController
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->model           = $this->getModel('notification');
+        $this->entityClass     = 'Mautic\NotificationBundle\Entity\Notification';
+        $this->entityNameOne   = 'notification';
+        $this->entityNameMulti = 'notifications';
+
+        parent::initialize($event);
+    }
+
     /**
      * Receive Web Push subscription request.
      *

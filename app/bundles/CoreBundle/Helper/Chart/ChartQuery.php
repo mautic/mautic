@@ -199,7 +199,7 @@ class ChartQuery extends AbstractChart
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, 't');
+        $query->from($this->prepareTable($table), 't');
 
         $this->modifyTimeDataQuery($query, $column);
         $this->applyFilters($query, $filters);
@@ -397,7 +397,7 @@ class ChartQuery extends AbstractChart
     public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, $tablePrefix);
+        $query->from($this->prepareTable($table), $tablePrefix);
         $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
@@ -491,7 +491,7 @@ class ChartQuery extends AbstractChart
     public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, $tablePrefix);
+        $query->from($this->prepareTable($table), $tablePrefix);
         $this->modifyCountDateDiffQuery($query, $dateColumn1, $dateColumn2, $startSecond, $endSecond, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn1);
@@ -532,5 +532,23 @@ class ChartQuery extends AbstractChart
         $data = $query->execute()->fetch();
 
         return (int) $data['count'];
+    }
+
+    /**
+     * @param $table
+     *
+     * @return mixed
+     */
+    protected function prepareTable($table)
+    {
+        if (MAUTIC_TABLE_PREFIX && strpos($table, MAUTIC_TABLE_PREFIX) === 0) {
+            return $table;
+        }
+
+        if (strpos($table, '(') === 0) {
+            return $table;
+        }
+
+        return MAUTIC_TABLE_PREFIX.$table;
     }
 }

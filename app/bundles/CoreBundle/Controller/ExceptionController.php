@@ -41,10 +41,22 @@ class ExceptionController extends CommonController
             }
 
             // Special handling for oauth and api urls
-            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) || strpos($request->getUri(), '/api') !== false) {
+            if (
+                (strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) ||
+                strpos($request->getUri(), '/api') !== false ||
+                (!defined('MAUTIC_AJAX_VIEW') && strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json') !== false)
+            ) {
                 $dataArray = [
+                    'errors' => [
+                        [
+                            'message' => $exception->getMessage(),
+                            'code'    => $code,
+                            'type'    => null,
+                        ],
+                    ],
+                    // @deprecated 2.6.0 to be removed in 3.0
                     'error' => [
-                        'message' => $exception->getMessage(),
+                        'message' => $exception->getMessage().' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
                         'code'    => $code,
                     ],
                 ];
@@ -99,6 +111,7 @@ class ExceptionController extends CommonController
                         ],
                         'route' => $urlParts['path'],
                     ],
+                    'responseCode' => $code,
                 ]
             );
         }

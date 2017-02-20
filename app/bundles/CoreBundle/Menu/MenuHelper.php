@@ -59,11 +59,12 @@ class MenuHelper
     /**
      * Converts menu config into something KNP menus expects.
      *
-     * @param     $items
-     * @param int $depth
-     * @param int $defaultPriority
+     * @param        $items
+     * @param int    $depth
+     * @param int    $defaultPriority
+     * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -158,11 +159,15 @@ class MenuHelper
 
             // Determine if this item needs to be listed in a bundle outside it's own
             if (isset($i['parent'])) {
-                if (!isset($this->orphans[$i['parent']])) {
-                    $this->orphans[$i['parent']] = [];
+                if (!isset($this->orphans[$type])) {
+                    $this->orphans[$type] = [];
                 }
 
-                $this->orphans[$i['parent']][$k] = $i;
+                if (!isset($this->orphans[$type][$i['parent']])) {
+                    $this->orphans[$type][$i['parent']] = [];
+                }
+
+                $this->orphans[$type][$i['parent']][$k] = $i;
 
                 unset($items[$k]);
 
@@ -177,12 +182,14 @@ class MenuHelper
     /**
      * Get and reset orphaned menu items.
      *
-     * @return array
+     * @param string $type
+     *
+     * @return mixed
      */
-    public function resetOrphans()
+    public function resetOrphans($type = 'main')
     {
-        $orphans       = $this->orphans;
-        $this->orphans = [];
+        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $this->orphans[$type] = [];
 
         return $orphans;
     }
@@ -194,12 +201,12 @@ class MenuHelper
      * @param bool  $appendOrphans
      * @param int   $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1)
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
     {
         foreach ($menuItems as $key => &$items) {
-            if (isset($this->orphans[$key])) {
+            if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
                 $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
-                foreach ($this->orphans[$key] as &$orphan) {
+                foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
                     }
@@ -209,23 +216,24 @@ class MenuHelper
                     }
                 }
 
-                $items['children'] = (!isset($items['children']))
+                $items['children'] =
+                    (!isset($items['children']))
                     ?
-                    $this->orphans[$key]
+                    $this->orphans[$type][$key]
                     :
-                    $items['children'] = array_merge($items['children'], $this->orphans[$key]);
-                unset($this->orphans[$key]);
+                    array_merge($items['children'], $this->orphans[$type][$key]);
+                unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
                 foreach ($items['children'] as $subKey => $subItems) {
-                    $this->placeOrphans($subItems, false, $depth + 1);
+                    $this->placeOrphans($subItems, false, $depth + 1, $type);
                 }
             }
         }
 
         // Append orphans that couldn't find a home
-        if ($appendOrphans && count($this->orphans)) {
-            $menuItems     = array_merge($menuItems, $this->orphans);
-            $this->orphans = [];
+        if ($appendOrphans && !empty($this->orphans[$type])) {
+            $menuItems            = array_merge($menuItems, $this->orphans[$type]);
+            $this->orphans[$type] = [];
         }
     }
 

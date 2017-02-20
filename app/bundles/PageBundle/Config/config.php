@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_page_buildertoken_index' => [
-                'path'       => '/pages/buildertokens/{page}',
-                'controller' => 'MauticPageBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_page_index' => [
                 'path'       => '/pages/{page}',
                 'controller' => 'MauticPageBundle:Page:index',
@@ -29,6 +25,10 @@ return [
             'mautic_page_tracker' => [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage',
+            ],
+            'mautic_page_tracker_cors' => [
+                'path'       => '/mtc/event',
+                'controller' => 'MauticPageBundle:Public:tracking',
             ],
             'mautic_page_tracker_getcontact' => [
                 'path'       => '/mtc',
@@ -52,13 +52,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getpages' => [
-                'path'       => '/pages',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntities',
-            ],
-            'mautic_api_getpage' => [
-                'path'       => '/pages/{id}',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntity',
+            'mautic_api_pagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'pages',
+                'path'            => '/pages',
+                'controller'      => 'MauticPageBundle:Api\PageApi',
             ],
         ],
         'catchall' => [
@@ -174,6 +172,12 @@ return [
                     'doctrine.dbal.default_connection',
                 ],
             ],
+            'mautic.page.stats.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.page' => [
@@ -279,9 +283,9 @@ return [
     ],
 
     'parameters' => [
-        'cat_in_page_url'  => false,
-        'google_analytics' => false,
-
+        'cat_in_page_url'     => false,
+        'google_analytics'    => false,
+        'track_contact_by_ip' => false,
         'redirect_list_types' => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',

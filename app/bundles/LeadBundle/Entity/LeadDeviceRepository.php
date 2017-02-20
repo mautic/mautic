@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class LeadDeviceRepository.
@@ -20,22 +19,44 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class LeadDeviceRepository extends CommonRepository
 {
     /**
-     * @param           $emailIds
-     * @param \DateTime $fromDate
+     * {@inhertidoc}.
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities($args = [])
+    {
+        $q = $this
+            ->createQueryBuilder($this->getTableAlias())
+            ->select($this->getTableAlias());
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'd';
+    }
+
+    /**
+     * @param      $lead
+     * @param null $deviceName
+     * @param null $deviceBrand
+     * @param null $deviceModel
      *
      * @return array
      */
-    public function getDevice(
-        $statIds,
-        $lead,
-        $deviceName = null,
-        $deviceBrand = null,
-        $deviceModel = null,
-        \DateTime $fromDate = null,
-        \DateTime $toDate = null
-    ) {
+    public function getDevice($lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
+    {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device')
+        $sq->select('es.id as id, es.device as device, es.device_fingerprint')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
         if (!empty($statIds)) {
             $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
@@ -72,20 +93,6 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        if ($fromDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
-            $sq->andWhere(
-                $sq->expr()->gte('es.date_added', $sq->expr()->literal($dt->toUtcString()))
-            );
-        }
-        if ($toDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($toDate);
-            $sq->andWhere(
-                $sq->expr()->lte('es.date_added', $sq->expr()->literal($dt->toUtcString()))
-            );
-        }
         //get totals
         $device = $sq->execute()->fetchAll();
 

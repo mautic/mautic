@@ -30,16 +30,6 @@ $img = $view['lead_avatar']->getAvatar($contact);
             </div>
             <div class="col-xs-8 va-t">
                 <div class="panel-body">
-                    <?php if (!empty($showCheckbox)): ?>
-                    <div class="pull-right">
-                        <div class="checkbox-inline custom-primary mnr-10">
-                            <label class="mb-0">
-                                <input class="list-checkbox" type="checkbox" value="<?php echo $contact->getId(); ?>">
-                                <span></span>
-                            </label>
-                        </div>
-                    </div>
-                    <?php endif; ?>
                     <?php if (in_array($contact->getId(), $noContactList)) : ?>
                     <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                     <?php endif; ?>

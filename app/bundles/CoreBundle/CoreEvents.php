@@ -44,6 +44,15 @@ final class CoreEvents
     const GLOBAL_SEARCH = 'mautic.global_search';
 
     /**
+     * The mautic.list_stats event is thrown to build statistical results from applicable bundles/database tables.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\StatsEvent instance.
+     *
+     * @var string
+     */
+    const LIST_STATS = 'mautic.list_stats';
+
+    /**
      * The mautic.build_command_list event is thrown to build global search's autocomplete list.
      *
      * The event listener receives a Mautic\CoreBundle\Event\CommandListEvent instance.
@@ -107,38 +116,92 @@ final class CoreEvents
     const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
 
     /**
+     * The mautic.view_inject_custom_buttons event is dispatched to inject custom buttons into Mautic's UI by plugins/other bundles.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomButtonEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_BUTTONS = 'mautic.view_inject_custom_buttons';
+
+    /**
+     * The mautic.view_inject_custom_content event is dispatched by views to collect custom content to be injected in UIs.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomContentEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_CONTENT = 'mautic.view_inject_custom_content';
+
+    /**
+     * The mautic.view_inject_custom_template event is dispatched when a template is to be rendered giving opportunity to change template or
+     * vars.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomTemplateEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_TEMPLATE = 'mautic.view_inject_custom_template';
+
+    /**
+     * The mautic.view_inject_custom_assets event is dispatched when assets are rendered.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomAssetsEvent instance.
+     *
+     * @var string
+     */
+    const VIEW_INJECT_CUSTOM_ASSETS = 'mautic.view_inject_custom_assets';
+
+    /**
+     * The mautic.on_form_type_build event is dispatched by views to inject custom fields into any form.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\CustomFormEvent instance.
+     *
+     * @var string
+     */
+    const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
+
+    /**
      * The mautic.channel_broadcast event is dispatched by the mautic:send:broadcast command to process communication to pending contacts.
      *
      * The event listener receives a Mautic\CoreBundle\Event\ChannelBroadcastEvent instance.
      *
+     * @deprecated 2.4 to be removed in 3.0. Use Mautic\CoreBundle\ChannelEvents::CHANNEL_BROADCAST instead
+     *
      * @var string
      */
-    const CHANNEL_BROADCAST = 'mautic.channel_broadcast';
+    const CHANNEL_BROADCAST = 'mautic.bc_channel_broadcast';
 
     /**
      * The mautic.message_queued event is dispatched to save a message to the queue.
      *
      * The event listener receives a Mautic\CoreBundle\Event\MessageQueueEvent instance.
      *
+     * @deprecated 2.4 to be removed in 3.0. Use Mautic\CoreBundle\ChannelEvents::CHANNEL_BROADCAST instead
+     *
      * @var string
      */
-    const MESSAGE_QUEUED = 'mautic.message_queued';
+    const MESSAGE_QUEUED = 'mautic.bc_message_queued';
 
     /**
      * The mautic.process_message_queue event is dispatched to be processed by a listener.
      *
      * The event listener receives a Mautic\CoreBundle\Event\MessageQueueProcessEvent instance.
      *
+     * @deprecated 2.4 to be removed in 3.0. Use Mautic\CoreBundle\ChannelEvents::CHANNEL_BROADCAST instead
+     *
      * @var string
      */
-    const PROCESS_MESSAGE_QUEUE = 'mautic.process_message_queue';
+    const PROCESS_MESSAGE_QUEUE = 'bc_mautic.process_message_queue';
 
     /**
      * The mautic.process_message_queue_batch event is dispatched to process a batch of messages by channel and channel ID.
      *
      * The event listener receives a Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent instance.
      *
+     * @deprecated 2.4 to be removed in 3.0. Use Mautic\CoreBundle\ChannelEvents::CHANNEL_BROADCAST instead
+     *
      * @var string
      */
-    const PROCESS_MESSAGE_QUEUE_BATCH = 'mautic.process_message_queue_batch';
+    const PROCESS_MESSAGE_QUEUE_BATCH = 'bc_mautic.process_message_queue_batch';
 }

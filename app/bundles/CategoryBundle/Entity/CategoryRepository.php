@@ -105,18 +105,20 @@ class CategoryRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command = $field = $filter->command;
-        $unique  = $this->generateRandomParameterName();
-        $expr    = false;
+        $command                 = $field                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
-                $string = true;
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
+                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $parameters[$unique] = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
-                $string = false;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
+                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $parameters[$unique] = false;
                 break;
         }
 
@@ -126,7 +128,7 @@ class CategoryRepository extends CommonRepository
 
         return [
             $expr,
-            ["$unique" => $string],
+            $parameters,
         ];
     }
 
@@ -135,10 +137,12 @@ class CategoryRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

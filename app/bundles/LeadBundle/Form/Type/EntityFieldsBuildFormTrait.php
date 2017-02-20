@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
@@ -207,16 +208,27 @@ trait EntityFieldsBuildFormTrait
                     );
                     break;
                 default:
-                    if ($type == 'lookup') {
-                        $type                = 'text';
-                        $attr['data-toggle'] = 'field-lookup';
-                        $attr['data-action'] = 'lead:fieldList';
-                        $attr['data-target'] = $alias;
+                    switch ($type) {
+                        case 'lookup':
+                            $type                = 'text';
+                            $attr['data-toggle'] = 'field-lookup';
+                            $attr['data-action'] = 'lead:fieldList';
+                            $attr['data-target'] = $alias;
 
-                        if (!empty($properties['list'])) {
-                            $attr['data-options'] = $properties['list'];
-                        }
+                            if (!empty($properties['list'])) {
+                                $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
+                            }
+                            break;
+                        case 'email':
+                            // Enforce a valid email
+                            $constraints[] = new Email(
+                                [
+                                    'message' => 'mautic.core.email.required',
+                                ]
+                            );
+                            break;
                     }
+
                     $builder->add(
                         $alias,
                         $type,
