@@ -158,6 +158,21 @@ class LeadFieldRepository extends CommonRepository
             } else {
                 return false;
             }
+        }elseif ($field === 'notifications') {
+            // Special reserved tags field
+            $q->join('l', MAUTIC_TABLE_PREFIX.'push_ids', 'x', 'l.id = x.lead_id')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead')
+                    )
+                )
+                ->setParameter('lead', (int)$lead);
+            $result = $q->execute()->fetch();
+            if($value){
+                return !empty($result['id']);
+            }else{
+                return empty($result['id']);
+            }
         } else {
             // Standard field
             if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
