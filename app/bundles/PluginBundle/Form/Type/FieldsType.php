@@ -39,6 +39,15 @@ class FieldsType extends AbstractType
                 'attr'     => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
                 'disabled' => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
             ]);
+            $builder->add('update_mautic'.$index,
+                'yesno_button_group',
+                [
+                    'label'     => false,
+                    'data'      => isset($options['data']['update_mautic']) ? (bool) $options['data']['update_mautic'] : true,
+                    'no_label'  => '<-',
+                    'yes_label' => '->',
+                ]);
+
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['lead_fields'],
                 'label'      => false,

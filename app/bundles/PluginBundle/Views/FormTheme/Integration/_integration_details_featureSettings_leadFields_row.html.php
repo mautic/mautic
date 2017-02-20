@@ -18,9 +18,12 @@
     <?php endif; ?>
 
     <div class="field form-group col-xs-12">
-        <div class="col-sm-2"></div>
-        <div class="col-sm-5"><?php echo $view['translator']->trans('mautic.plugins.integration.fields'); ?></div>
-        <div class="col-sm-5"><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></div>
+        <div class="row">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-3"><?php echo $view['translator']->trans('mautic.plugins.integration.fields'); ?></div>
+            <div class="col-sm-3"><?php echo $view['translator']->trans('mautic.plugins.mautic.direction'); ?></div>
+            <div class="col-sm-3"><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></div>
+        </div>
         <?php echo $view['form']->errors($form); ?>
 
         <?php $rowCount = 1; $indexCount = 1; ?>
@@ -35,7 +38,7 @@
 } elseif ((!isset($child->vars['data']) || empty($child->vars['data'])) || $indexCount == count($child->vars['data'])) {
     echo 'active';
 }?>">
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                 <span class="btn btn-xs btn-default removeField" onclick="Mautic.addNewPluginField();">
                     <i class="fa fa-close"></i>
                 </span>
@@ -46,19 +49,24 @@
 } ?>
             <?php endif; ?>
 
-            <div class="col-sm-5">
+            <div class="col-sm-3">
                 <?php echo $view['form']->row($child); ?>
             </div>
         <?php if ($rowCount++ % 2 == 1): ?>
 
-                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>">
-                    <?php if (isset($integrationField)): ?>
-                        <input type="hidden" id="integration_details_featureSettings_leadFields_<?php echo $integrationField ?>" name="integration_details[featureSettings][leadFields][<?php echo $mauticField; ?>]" value="<?php echo $mauticField; ?>">
-                    <?php endif; ?>
-                </div>
+
                 </div>
         <?php endif; ?>
         <?php ++$rowCount; ?>
+            <?php
+            if ($rowCount++ % 2 == 1 && $rowCount > 1):
+            ?>
+                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>" class="hide">
+            <?php if (isset($integrationField)): ?>
+                <input type="hidden" id="integration_details_featureSettings_leadFields_<?php echo $integrationField ?>" name="integration_details[featureSettings][leadFields][<?php echo $mauticField; ?>]" value="<?php echo $mauticField; ?>">
+            <?php endif; ?>
+            <?php endif; ?>
+            </div>
         <?php endforeach; ?>
         <?php
         if ($rowCount % 2 == 0):?>
