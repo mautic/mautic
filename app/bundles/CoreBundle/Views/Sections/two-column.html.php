@@ -16,7 +16,11 @@
                 <td data-slot-container valign="top" class="mobile-block">
                     <div data-slot="text" style="margin-left: 5px; margin-right: 5px;">
                         <p>Lorem ipsum dolor sit amet, alterum definitiones eu est. Eos no scripta voluptatum necessitatibus, ea his case movet. Porro vivendo delicatissimi ea qui, in usu aliquam consulatu conclusionemque. Eu vel mazim periculis consequat, quo fastidii salutandi eu, et sed nibh exerci consequuntur. Cu diam efficiendi eum, pri eu delenit insolens. Usu nihil oporteat an, et stet mucius vix, ex nostro assueverit mel.</p>
-                        <p>ripidis mea id, ut mel zril tractatos inciderint. Id eam hinc omnes, est eu labore mnesarchum, prima deserunt erroribus no nam. Hinc liber epicurei at vel, ius eirmod conclusionemque an, ad nec lorem possit. Id mollis commune principes qui.</p>
+                    </div>
+                </td>
+                <td data-slot-container valign="top" class="mobile-block">
+                    <div data-slot="text" style="margin-left: 5px; margin-right: 5px;">
+                        <p>Lorem ipsum dolor sit amet, alterum definitiones eu est. Eos no scripta voluptatum necessitatibus, ea his case movet. Porro vivendo delicatissimi ea qui, in usu aliquam consulatu conclusionemque. Eu vel mazim periculis consequat, quo fastidii salutandi eu, et sed nibh exerci consequuntur. Cu diam efficiendi eum, pri eu delenit insolens. Usu nihil oporteat an, et stet mucius vix, ex nostro assueverit mel.</p>
                     </div>
                 </td>
             </tr>
