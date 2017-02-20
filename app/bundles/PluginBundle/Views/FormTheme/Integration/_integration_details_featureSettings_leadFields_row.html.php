@@ -24,28 +24,38 @@
         <?php echo $view['form']->errors($form); ?>
 
         <?php $rowCount = 1; $indexCount = 1; ?>
+
         <?php foreach ($form->children as $child): ?>
         <?php if ($rowCount++ % 2 == 1): ?>
-        <div id="<?php echo $rowCount; ?>" class="row <?php if ($rowCount > 2) {
+                <?php if ((isset($child->vars['data']) && !empty($child->vars['data']))) {
+    $integrationField = $child->vars['data'];
+}?>
+        <div id="<?php echo $rowCount; ?>" class="row <?php if ($rowCount > 2 && (!isset($child->vars['data']) || empty($child->vars['data']))) {
     echo 'hide';
-} else {
+} elseif ((!isset($child->vars['data']) || empty($child->vars['data'])) || $indexCount == count($child->vars['data'])) {
     echo 'active';
 }?>">
                 <div class="col-sm-2">
-                <span class="btn btn-xs btn-default remove" onclick="Mautic.addNewPluginField();">
-                    <i class="fa fa-times"></i>
+                <span class="btn btn-xs btn-default removeField" onclick="Mautic.addNewPluginField();">
+                    <i class="fa fa-close"></i>
                 </span>
                 </div>
-
+            <?php else: ?>
+                <?php if ((isset($child->vars['data']) && !empty($child->vars['data']))) {
+    $mauticField = $child->vars['data'];
+} ?>
             <?php endif; ?>
-
 
             <div class="col-sm-5">
                 <?php echo $view['form']->row($child); ?>
             </div>
         <?php if ($rowCount++ % 2 == 1): ?>
 
-                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>"></div>
+                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>">
+                    <?php if (isset($integrationField)): ?>
+                        <input type="hidden" id="integration_details_featureSettings_leadFields_<?php echo $integrationField ?>" name="integration_details[featureSettings][leadFields][<?php echo $mauticField; ?>]" value="<?php echo $mauticField; ?>">
+                    <?php endif; ?>
+                </div>
                 </div>
         <?php endif; ?>
         <?php ++$rowCount; ?>

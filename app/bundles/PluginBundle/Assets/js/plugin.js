@@ -14,7 +14,7 @@ Mautic.addNewPluginField = function () {
             });
         }
     });
-    mQuery('.remove').on('click', function() {
+    mQuery('.removeField').on('click', function() {
         var previousItem = currentItem.prev();
         currentItem.removeClass('active');
         if ( previousItem.length ) {
@@ -27,6 +27,7 @@ Mautic.addNewPluginField = function () {
             currentItem = previousItem;
         }
     });
+    return true;
 };
 Mautic.matchFieldsType = function (index) {
     var mauticField = mQuery('#integration_details_featureSettings_leadFields_m_' + index ).val();

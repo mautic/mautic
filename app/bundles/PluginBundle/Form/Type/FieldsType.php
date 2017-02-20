@@ -37,7 +37,7 @@ class FieldsType extends AbstractType
                 'label'    => false,
                 'required' => true,
                 'attr'     => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
-                'disabled' => ($index > 1) ? true : false,
+                'disabled' => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
             ]);
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['lead_fields'],
@@ -45,7 +45,7 @@ class FieldsType extends AbstractType
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
-                'disabled'   => ($index > 1) ? true : false,
+                'disabled'   => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
             ]);
         }
     }
