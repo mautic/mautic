@@ -283,6 +283,7 @@ class ThemeHelper
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['key']    = $theme->getBasename();
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']    = $theme->getRealPath();
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes', false);
                 }
             }
         }
