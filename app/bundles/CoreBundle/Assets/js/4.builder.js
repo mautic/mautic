@@ -468,7 +468,7 @@ Mautic.initSectionListeners = function() {
                 'delete': {
                     classes: 'fa fa-remove',
                     onClick: function() {
-                        if (confirm(Mautic.translate('mautic.core.builder.section_delete_warning'))) {
+                        if (confirm(parent.Mautic.translate('mautic.core.builder.section_delete_warning'))) {
                             var deleteBtn = mQuery(this);
                             var focusSeciton = deleteBtn.closest('[data-section-wrapper]').remove();
                         }
