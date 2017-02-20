@@ -583,6 +583,7 @@ class EmailController extends FormController
         }
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
+        $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
@@ -592,6 +593,7 @@ class EmailController extends FormController
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
+                    'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
