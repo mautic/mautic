@@ -445,7 +445,6 @@ Mautic.toggleBuilderButton = function (hide) {
 
 Mautic.initSectionListeners = function() {
     Mautic.activateGlobalFroalaOptions();
-    Mautic.builderSlots = [];
     Mautic.selectedSlot = null;
 
     Mautic.builderContents.on('section:init', function(event, section) {
@@ -989,7 +988,7 @@ Mautic.initSlotListeners = function() {
         }
 
         // Store the slot to a global var
-        Mautic.builderSlots.push({slot: mQuery(this), type: type});
+        Mautic.builderSlots.push({slot: slot, type: type});
     });
 
     Mautic.getPredefinedLinks = function(callback) {
@@ -1045,15 +1044,13 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
-        if (params.type === 'text') {
-            if (parent.mQuery('#slot_content').length) {
-                parent.mQuery('#slot_content').froalaEditor('destroy');
-                parent.mQuery('#slot_content').find('.atwho-inserted').atwho('destroy');
-            }
-        } else if (params.type === 'image') {
+        if (params.type === 'image') {
             var image = params.slot.find('img');
-            image.removeAttr('data-froala.editor');
-            image.froalaEditor('destroy');
+            if (typeof image !== 'undefined' && image.hasClass('fr-view')) {
+                image.froalaEditor('destroy');
+                image.removeAttr('data-froala.editor');
+                image.removeClass('fr-view');
+            }
         }
 
         // Remove Symfony toolbar
