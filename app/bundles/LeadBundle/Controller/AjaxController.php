@@ -825,9 +825,15 @@ class AjaxController extends CommonAjaxController
             $dataArray['options']   = $options;
         }
 
-
         if(in_array($alias, ['tags', 'segments'])){
-            $leadFieldType = 'extended';
+            $leadFieldType =      [
+                'include' => [
+                    '=',
+                    '!=',
+                    'regexp',
+                    '!regexp',
+                ],
+            ];
         }
         if ('field' === $changed) {
             $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
