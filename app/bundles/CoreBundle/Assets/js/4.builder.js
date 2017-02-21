@@ -828,7 +828,7 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
 
-            if (mQuery(this).offset().top < 25) {
+            if (slot.offset().top < 25) {
                 // If at the top of the page, move the toolbar to be visible
                 slotToolbar.css('top', '0');
             } else {
