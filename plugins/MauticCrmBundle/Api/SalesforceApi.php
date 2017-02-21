@@ -4,7 +4,11 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
+/**
+ * @property SalesforceIntegration $integration
+ */
 class SalesforceApi extends CrmApi
 {
     protected $object          = 'Lead';
@@ -40,13 +44,13 @@ class SalesforceApi extends CrmApi
         }
 
         if (!$queryUrl) {
-            $queryUrl    = $this->integration->getApiUrl();
-            $request_url = sprintf($queryUrl.'/%s/%s', $object, $operation);
+            $queryUrl   = $this->integration->getApiUrl();
+            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
         } else {
-            $request_url = sprintf($queryUrl.'/%s', $operation);
+            $requestUrl = sprintf($queryUrl.'/%s', $operation);
         }
 
-        $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
@@ -75,6 +79,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param null|string $object
+     *
      * @return mixed
      */
     public function getLeadFields($object = null)
@@ -95,7 +101,25 @@ class SalesforceApi extends CrmApi
      */
     public function createLead(array $data, $lead)
     {
-        $createdLeadData = $this->request('', $data, 'POST');
+        //find lead
+        $update = false;
+        if (isset($data['Email'])) {
+            $findLead = 'select Id from Lead where email = \''.$data['Email'].'\'';
+            $queryUrl = $this->integration->getQueryUrl();
+            $sfLead   = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+
+            $lead = $sfLead['records'];
+            if (isset($lead[0]['Id'])) {
+                $update = true;
+            }
+        }
+
+        if ($update) {
+            $createdLeadData = $this->request('', $data, 'PATCH', false, 'Lead/'.$lead[0]['Id']);
+        } else {
+            $createdLeadData = $this->request('', $data, 'POST', false, 'Lead');
+        }
+
         //todo: check if push activities is selected in config
 
         return $createdLeadData;
@@ -195,37 +219,42 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param string $query
+     * @param array  $query
+     * @param string $object
      *
      * @return mixed
      */
     public function getLeads($query, $object)
     {
-        //find out if start date is not our of range for org
-        static $organization = [];
+        $organizationCreatedDate = $this->getOrganizationCreatedDate();
 
         if (isset($query['start'])) {
             $queryUrl = $this->integration->getQueryUrl();
 
-            if (empty($organization)) {
-                $organization = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
-            }
-            if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
-                $query['start'] = date('c', strtotime($organization['records'][0]['CreatedDate'].' +1 hour'));
+            if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
+                $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
         }
 
-        if ($object == 'Account') {
-            $fields = $this->integration->getFormCompanyFields();
-            $fields = $fields['company'];
-        } else {
-            $settings['feature_settings']['objects'][] = $object;
-            $fields                                    = $this->integration->getAvailableLeadFields($settings);
-            $fields                                    = $this->integration->ammendToSfFields($fields);
+        $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        switch ($object) {
+            case 'company':
+            case 'Account':
+                $fields = array_keys(array_filter($fields['companyFields']));
+                break;
+            default:
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                }
         }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields = implode(', ', array_keys($fields));
+            $fields   = implode(', ', $fields);
+            $fields[] = 'Id';
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
@@ -239,5 +268,22 @@ class SalesforceApi extends CrmApi
         }
 
         return $result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrganizationCreatedDate()
+    {
+        $cache = $this->integration->getCache();
+
+        if (!$organizationCreatedDate = $cache->get('organization.created_date')) {
+            $queryUrl                = $this->integration->getQueryUrl();
+            $organization            = $this->request('query', ['q' => 'SELECT CreatedDate from Organization'], 'GET', false, null, $queryUrl);
+            $organizationCreatedDate = $organization['records'][0]['CreatedDate'];
+            $cache->set('organization.created_date', $organizationCreatedDate);
+        }
+
+        return $organizationCreatedDate;
     }
 }

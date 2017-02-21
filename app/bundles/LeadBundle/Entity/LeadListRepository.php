@@ -129,6 +129,7 @@ class LeadListRepository extends CommonRepository
      * @param      $lead
      * @param bool $forList
      * @param bool $singleArrayHydration
+     * @param bool $isPublic
      *
      * @return mixed
      */
@@ -1225,28 +1226,37 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command                 = $filter->command;
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $expr = $q->expr()->eq('l.createdBy', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
+            case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('l.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;

@@ -19,6 +19,30 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class CompanyLeadRepository extends CommonRepository
 {
     /**
+     * @param CompanyLead[] $entities
+     */
+    public function saveEntities($entities)
+    {
+        // Get a list of contacts and set primary to 0
+        $contacts = [];
+        foreach ($entities as $entity) {
+            $contactId            = $entity->getLead()->getId();
+            $contacts[$contactId] = $contactId;
+            $entity->setPrimary(true);
+        }
+
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
+            ->set('is_primary', 0);
+
+        $qb->where(
+            $qb->expr()->in('lead_id', $contactId)
+        )->execute();
+
+        return parent::saveEntities($entities);
+    }
+
+    /**
      * Get companies by leadId.
      *
      * @param $leadId
@@ -51,6 +75,11 @@ class CompanyLeadRepository extends CommonRepository
         return $result;
     }
 
+    /**
+     * @param $companyId
+     *
+     * @return array
+     */
     public function getCompanyLeads($companyId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -106,6 +135,11 @@ class CompanyLeadRepository extends CommonRepository
         return $companies;
     }
 
+    /**
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
     public function getEntitiesByLead(Lead $lead)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();

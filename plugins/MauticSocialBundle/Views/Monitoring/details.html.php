@@ -8,22 +8,24 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'monitoring');
-$view['slots']->set('headerTitle', $activeMonitoring->getTitle());
+if (!$isEmbedded) {
+    $view->extend('MauticCoreBundle:Default:content.html.php');
 
+    $view['slots']->set('mauticContent', 'monitoring');
+    $view['slots']->set('headerTitle', $activeMonitoring->getTitle());
 // @todo finish ACL here
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-            'item'            => $activeMonitoring,
-            'templateButtons' => [
-                'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-                'close'  => $view['security']->isGranted('plugin:mauticSocial:monitoring:view'),
-            ],
-            'routeBase'  => 'social',
-            'langVar'    => 'monitoring',
-            'nameGetter' => 'getTitle',
-        ]));
+    $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
+        'item'            => $activeMonitoring,
+        'templateButtons' => [
+            'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
+            'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+            'close'  => $view['security']->isGranted('plugin:mauticSocial:monitoring:view'),
+        ],
+        'routeBase'  => 'social',
+        'langVar'    => 'monitoring',
+        'nameGetter' => 'getTitle',
+    ]));
+}
 echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social.js');
 ?>
 

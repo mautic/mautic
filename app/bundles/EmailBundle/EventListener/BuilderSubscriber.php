@@ -92,12 +92,6 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        if ($event->tokenSectionsRequested()) {
-            //add email tokens
-            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
-            $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $openRate = [

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -155,6 +156,7 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
+        /** @var PluginModel $pluginModel */
         $pluginModel = $this->getModel('plugin');
 
         $leadFields    = $pluginModel->getLeadFields();

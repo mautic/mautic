@@ -83,7 +83,11 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     break;
 
                 case 'gz' == $tempExt:
-                    if (function_exists('gzdecode')) {
+                    $memLimit = $this->sizeInByte(ini_get('memory_limit'));
+                    $freeMem  = $memLimit - memory_get_peak_usage();
+                    //check whether there is enough memory to handle large iplookp DB
+                    // or will throw iplookup exception
+                    if (function_exists('gzdecode') && strlen($data->body) < ($freeMem / 3)) {
                         $success = (bool) file_put_contents($localTarget, gzdecode($data->body));
                     } elseif (function_exists('gzopen')) {
                         if (file_put_contents($tempTarget, $data->body)) {
@@ -139,5 +143,18 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         }
 
         return null;
+    }
+
+    protected function sizeInByte($size)
+    {
+        $data = (int) substr($size, 0, -1);
+        switch (strtoupper(substr($size, -1))) {
+            case 'K':
+                return $data * 1024;
+            case 'M':
+                return $data * 1024 * 1024;
+            case 'G':
+                return $data * 1024 * 1024 * 1024;
+        }
     }
 }

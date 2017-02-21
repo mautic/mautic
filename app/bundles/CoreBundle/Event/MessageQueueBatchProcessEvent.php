@@ -11,61 +11,13 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+@trigger_error('Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent instead', E_DEPRECATED);
 
-class MessageQueueBatchProcessEvent extends Event
+/**
+ * Class MessageQueueBatchProcessEvent.
+ *
+ * @deprecated 2.4 to be removed in 3.0; use \Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent instead
+ */
+class MessageQueueBatchProcessEvent extends \Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent
 {
-    private $messages = [];
-
-    private $channel;
-
-    private $channelId;
-
-    /**
-     * MessageQueueBatchProcessEvent constructor.
-     *
-     * @param array $messages
-     * @param       $channel
-     * @param       $channelId
-     */
-    public function __construct(array $messages, $channel, $channelId)
-    {
-        $this->messages  = $messages;
-        $this->channel   = $channel;
-        $this->channelId = $channelId;
-    }
-
-    /**
-     * @param $channel
-     *
-     * @return bool
-     */
-    public function checkContext($channel)
-    {
-        return $channel === $this->channel;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getChannelId()
-    {
-        return $this->channelId;
-    }
 }

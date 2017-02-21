@@ -17,10 +17,6 @@ return [
 
     'routes' => [
         'main' => [
-            'mautic_focus_pagetoken_index' => [
-                'path'       => '/focus/pagetokens/{page}',
-                'controller' => 'MauticFocusBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_focus_index' => [
                 'path'       => '/focus/{page}',
                 'controller' => 'MauticFocusBundle:Focus:index',
@@ -125,9 +121,10 @@ return [
     'menu' => [
         'main' => [
             'mautic.focus' => [
-                'route'  => 'mautic_focus_index',
-                'access' => 'plugin:focus:items:view',
-                'parent' => 'mautic.core.channels',
+                'route'    => 'mautic_focus_index',
+                'access'   => 'plugin:focus:items:view',
+                'parent'   => 'mautic.core.channels',
+                'priority' => 10,
             ],
         ],
     ],

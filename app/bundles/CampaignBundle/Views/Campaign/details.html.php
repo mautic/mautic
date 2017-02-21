@@ -8,8 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set('headerTitle', $campaign->getName());
 
 $view['slots']->set(
@@ -32,7 +32,6 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
-
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
@@ -106,6 +105,7 @@ switch (true) {
             </div>
             <!--/ campaign detail collapseable toggler -->
 
+            <?php echo $view['content']->getCustomContent('left.section.top', $mauticTemplateVars); ?>
             <!-- some stats -->
             <div class="pa-md">
                 <div class="row">
@@ -140,27 +140,21 @@ switch (true) {
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($decisions): ?>
-                    <li class="<?php if ('decision' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($actions): ?>
-                    <li class="<?php if ('action' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('action' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#actions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($conditions): ?>
-                    <li class="<?php if ('condition' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('condition' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#conditions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.conditions.header'); ?>
                         </a>
@@ -171,6 +165,7 @@ switch (true) {
                         <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
+                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -179,23 +174,17 @@ switch (true) {
         <div class="tab-content pa-md">
             <!-- #events-container -->
             <?php if ($decisions): ?>
-                <div class="<?php if ('decision' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="decisions-container">
+                <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
-                <div class="<?php if ('action' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="actions-container">
+                <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
-                <div class="<?php if ('condition' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="conditions-container">
+                <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>
             <?php endif; ?>
@@ -204,17 +193,19 @@ switch (true) {
                 <?php echo $campaignLeads; ?>
                 <div class="clearfix"></div>
             </div>
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
         </div>
         <!--/ end: tab-content -->
+
+        <?php echo $view['content']->getCustomContent('left.section.bottom', $mauticTemplateVars); ?>
     </div>
     <!--/ left section -->
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-
-        <!-- recent activity -->
+        <?php echo $view['content']->getCustomContent('right.section.top', $mauticTemplateVars); ?>
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
-
+        <?php echo $view['content']->getCustomContent('right.section.bottom', $mauticTemplateVars); ?>
     </div>
     <!--/ right section -->
 </div>

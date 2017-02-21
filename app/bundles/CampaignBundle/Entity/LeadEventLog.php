@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -19,6 +20,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class LeadEventLog
 {
+    /**
+     * @var
+     */
+    private $id;
+
     /**
      * @var Event
      */
@@ -80,6 +86,16 @@ class LeadEventLog
     private $channelId;
 
     /**
+     * @var
+     */
+    private $previousScheduledState;
+
+    /**
+     * @var int
+     */
+    private $rotation = 1;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -88,17 +104,22 @@ class LeadEventLog
 
         $builder->setTable('campaign_lead_event_log')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository')
-            ->addIndex(['is_scheduled'], 'event_upcoming_search')
+            ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['lead_id', 'campaign_id'], 'campaign_leads');
+            ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
+            ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
+            ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
+
+        $builder->addId();
 
         $builder->createManyToOne('event', 'Event')
-            ->isPrimaryKey()
             ->inversedBy('log')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(false, 'CASCADE', true);
+        $builder->addLead(false, 'CASCADE');
+
+        $builder->addField('rotation', 'integer');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->addJoinColumn('campaign_id', 'id')
@@ -128,10 +149,63 @@ class LeadEventLog
             ->nullable()
             ->build();
 
-        $builder->addNullableField('channel', 'string');
+        $builder->createField('channel', 'string')
+                ->nullable()
+                ->build();
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaignEventLog')
+                 ->addProperties(
+                     [
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                         'rotation',
+                     ]
+                 )
+
+                // Add standalone groups
+                 ->setGroupPrefix('campaignEventStandaloneLog')
+                 ->addProperties(
+                     [
+                         'event',
+                         'lead',
+                         'campaign',
+                         'ipAddress',
+                         'dateTriggered',
+                         'isScheduled',
+                         'triggerDate',
+                         'metadata',
+                         'nonActionPathTaken',
+                         'channel',
+                         'channelId',
+                         'rotation',
+                     ]
+                 )
+                 ->build();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
@@ -148,6 +222,9 @@ class LeadEventLog
     public function setDateTriggered($dateTriggered)
     {
         $this->dateTriggered = $dateTriggered;
+        if (null !== $dateTriggered) {
+            $this->setIsScheduled(false);
+        }
     }
 
     /**
@@ -175,27 +252,39 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $lead
+     * @param $lead
+     *
+     * @return $this
      */
     public function setLead($lead)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return Event
      */
     public function getEvent()
     {
         return $this->event;
     }
 
-    /**
-     * @param mixed $event
+    /***
+     * @param $event
+     *
+     * @return $this
      */
     public function setEvent($event)
     {
         $this->event = $event;
+
+        if (!$this->campaign) {
+            $this->setCampaign($event->getCampaign());
+        }
+
+        return $this;
     }
 
     /**
@@ -207,11 +296,29 @@ class LeadEventLog
     }
 
     /**
-     * @param bool $isScheduled
+     * @param $isScheduled
+     *
+     * @return $this
      */
     public function setIsScheduled($isScheduled)
     {
+        if (null === $this->previousScheduledState) {
+            $this->previousScheduledState = $this->isScheduled;
+        }
+
         $this->isScheduled = $isScheduled;
+
+        return $this;
+    }
+
+    /**
+     * If isScheduled was changed, this will have the previous state.
+     *
+     * @return mixed
+     */
+    public function getPreviousScheduledState()
+    {
+        return $this->previousScheduledState;
     }
 
     /**
@@ -223,11 +330,16 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $triggerDate
+     * @param $triggerDate
+     *
+     * @return $this
      */
     public function setTriggerDate($triggerDate)
     {
         $this->triggerDate = $triggerDate;
+        $this->setIsScheduled(true);
+
+        return $this;
     }
 
     /**
@@ -239,11 +351,15 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $campaign
+     * @param $campaign
+     *
+     * @return $this
      */
     public function setCampaign($campaign)
     {
         $this->campaign = $campaign;
+
+        return $this;
     }
 
     /**
@@ -255,11 +371,15 @@ class LeadEventLog
     }
 
     /**
-     * @param bool $systemTriggered
+     * @param $systemTriggered
+     *
+     * @return $this
      */
     public function setSystemTriggered($systemTriggered)
     {
         $this->systemTriggered = $systemTriggered;
+
+        return $this;
     }
 
     /**
@@ -271,11 +391,15 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $nonActionPathTaken
+     * @param $nonActionPathTaken
+     *
+     * @return $this
      */
     public function setNonActionPathTaken($nonActionPathTaken)
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
+
+        return $this;
     }
 
     /**
@@ -287,7 +411,9 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $metatdata
+     * @param $metadata
+     *
+     * @return $this
      */
     public function setMetadata($metadata)
     {
@@ -297,6 +423,8 @@ class LeadEventLog
         }
 
         $this->metadata = $metadata;
+
+        return $this;
     }
 
     /**
@@ -335,6 +463,26 @@ class LeadEventLog
     public function setChannelId($channelId)
     {
         $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRotation()
+    {
+        return $this->rotation;
+    }
+
+    /**
+     * @param int $rotation
+     *
+     * @return LeadEventLog
+     */
+    public function setRotation($rotation)
+    {
+        $this->rotation = (int) $rotation;
 
         return $this;
     }

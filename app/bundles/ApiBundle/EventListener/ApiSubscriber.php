@@ -17,6 +17,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -62,6 +64,7 @@ class ApiSubscriber extends CommonSubscriber
     {
         return [
             KernelEvents::REQUEST         => ['onKernelRequest', 255],
+            KernelEvents::RESPONSE        => ['onKernelResponse', 0],
             ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
             ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
         ];
@@ -78,13 +81,9 @@ class ApiSubscriber extends CommonSubscriber
             return;
         }
 
-        $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
-        $request    = $event->getRequest();
-        $requestUrl = $request->getRequestUri();
-
-        // Check if /oauth or /api
-        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
-        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
+        $apiEnabled   = $this->coreParametersHelper->getParameter('api_enabled');
+        $request      = $event->getRequest();
+        $isApiRequest = $this->isApiRequest($event);
 
         if ($isApiRequest && !$apiEnabled) {
             throw new AccessDeniedHttpException(
@@ -95,6 +94,68 @@ class ApiSubscriber extends CommonSubscriber
                     ]
                 )
             );
+        }
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     */
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        $response = $event->getResponse();
+        $content  = $response->getContent();
+
+        if ($this->isApiRequest($event) && strpos($content, 'error') !== false) {
+            // Override api messages with something useful
+            if ($data = json_decode($content, true)) {
+                $type = null;
+                if (isset($data['error'])) {
+                    $error   = $data['error'];
+                    $message = false;
+                    if (is_array($error)) {
+                        if (!isset($error['message'])) {
+                            return;
+                        }
+
+                        // Catch useless oauth1a errors
+                        $error = $error['message'];
+                    }
+
+                    switch ($error) {
+                        case 'access_denied':
+                            $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
+                            $type    = $error;
+                            break;
+                        default:
+                            if (isset($data['error_description'])) {
+                                $message = $data['error_description'];
+                                $type    = $error;
+                            } elseif ($this->translator->hasId('mautic.api.auth.error.'.$error)) {
+                                $message = $this->translator->trans('mautic.api.auth.error.'.$error);
+                                $type    = $error;
+                            }
+                    }
+
+                    if ($message) {
+                        $event->setResponse(
+                            new JsonResponse(
+                                [
+                                    'errors' => [
+                                        [
+                                            'message' => $message,
+                                            'code'    => $response->getStatusCode(),
+                                            'type'    => $type,
+                                        ],
+                                    ],
+                                    // @deprecated 2.6.0 to be removed in 3.0
+                                    'error'             => $data['error'],
+                                    'error_description' => $message.' (`error` and `error_description` are deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
+                                ]
+                            )
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -136,5 +197,23 @@ class ApiSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param $event
+     *
+     * @return bool
+     */
+    private function isApiRequest($event)
+    {
+        $request    = $event->getRequest();
+        $requestUrl = $request->getRequestUri();
+
+        // Check if /oauth or /api
+        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
+
+        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
+
+        return $isApiRequest;
     }
 }

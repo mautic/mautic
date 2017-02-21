@@ -233,6 +233,6 @@ trait LeadDetailsTrait
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
 
-        return $leadEventLogRepository->getUpcomingEvents(['lead' => $lead, 'scheduled' => 1, 'eventType' => 'action']);
+        return $leadEventLogRepository->getUpcomingEvents(['lead' => $lead, 'eventType' => 'action']);
     }
 }

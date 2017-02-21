@@ -32,4 +32,12 @@ class ManyToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\ManyToM
 
         return $this;
     }
+
+    /**
+     * @return ClassMetadataBuilder
+     */
+    public function build()
+    {
+        return parent::build();
+    }
 }
