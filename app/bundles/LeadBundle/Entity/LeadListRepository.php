@@ -983,8 +983,9 @@ class LeadListRepository extends CommonRepository
                     $table = 'page_hits';
                     $select = 'id';
 
-                    if($column == 'notification'){
+                    if($details['field'] == 'notification'){
                         $table = 'push_ids';
+                        $column = 'id';
                     }
 
                     $subqb = $this->_em->getConnection()
