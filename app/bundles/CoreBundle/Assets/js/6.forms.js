@@ -555,10 +555,10 @@ Mautic.updateFieldOperatorValue = function(field, action) {
     var fieldPrefix = fieldId.slice(0,-1 * fieldType.length);
     var fieldAlias = mQuery('#'+fieldPrefix+'field').val();
     var fieldOperator = mQuery('#'+fieldPrefix+'operator').val();
-    var valueField = mQuery('#'+fieldPrefix+'value');
     Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
         if (typeof response.options != 'undefined') {
 
+            var valueField = mQuery('#'+fieldPrefix+'value');
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
                 'id': valueField.attr('id'),
