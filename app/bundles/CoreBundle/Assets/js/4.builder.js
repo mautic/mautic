@@ -1028,8 +1028,8 @@ Mautic.initSlotListeners = function() {
         } else if (fieldParam === 'button-size') {
             var values = [
                 {padding: '10px 13px', fontSize: '14px'},
-                {padding: '12px 18px', fontSize: '16px'},
-                {padding: '15px 20px', fontSize: '18px'}
+                {padding: '15px 20px', fontSize: '20px'},
+                {padding: '22px 30px', fontSize: '30px'}
             ];
             params.slot.find('a').css(values[params.field.val()]);
         } else if (fieldParam === 'background-color') {
