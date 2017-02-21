@@ -666,8 +666,7 @@ Mautic.rgb2hex = function(orig) {
 }
 
 Mautic.initSlots = function(slotContainers) {
-
-    if (!slotContainers) {
+    if (!slotContainers.length) {
         slotContainers = Mautic.builderContents.find('[data-slot-container]');
     }
 
@@ -776,7 +775,7 @@ Mautic.initSlots = function(slotContainers) {
     });
 
     // Initialize the slots
-    Mautic.builderContents.find('[data-slot]').each(function() {
+    slotContainers.find('[data-slot]').each(function() {
         mQuery(this).trigger('slot:init', this);
     });
 }
@@ -967,22 +966,23 @@ Mautic.initSlotListeners = function() {
 
         // Initialize different slot types
         if (type === 'image') {
-            var image = mQuery(this).find('img');
+            var image = slot.find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
 
             image.on('froalaEditor.click', function (e, editor) {
-                mQuery(this).closest('[data-slot]').trigger('click');
+                slot.closest('[data-slot]').trigger('click');
             });
 
             // Init Froala editor
             image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    imageEditButtons: ['imageReplace', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
+                    imageEditButtons: ['imageReplace', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
+                    useClasses: true
                 }
             ));
         } else if (type === 'button') {
-            mQuery(this).find('a').click(function(e) {
+            slot.find('a').click(function(e) {
                 e.preventDefault();
             });
         }
@@ -990,27 +990,6 @@ Mautic.initSlotListeners = function() {
         // Store the slot to a global var
         Mautic.builderSlots.push({slot: slot, type: type});
     });
-
-    Mautic.getPredefinedLinks = function(callback) {
-        var linkList = [];
-        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
-            if (tokens.length) {
-                mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') ||
-                        token.startsWith('{assetlink=') ||
-                        token.startsWith('{webview_url') ||
-                        token.startsWith('{unsubscribe_url')) {
-
-                        linkList.push({
-                            text: label,
-                            href: token
-                        });
-                    }
-                });
-            }
-            return callback(linkList);
-        });
-    }
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
@@ -1125,6 +1104,28 @@ Mautic.getBuilderTokensMethod = function() {
     return method;
 };
 
+
+Mautic.getPredefinedLinks = function(callback) {
+    var linkList = [];
+    Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
+        if (tokens.length) {
+            mQuery.each(tokens, function(token, label) {
+                if (token.startsWith('{pagelink=') ||
+                    token.startsWith('{assetlink=') ||
+                    token.startsWith('{webview_url') ||
+                    token.startsWith('{unsubscribe_url')) {
+
+                    linkList.push({
+                        text: label,
+                        href: token
+                    });
+                }
+            });
+        }
+        return callback(linkList);
+    });
+}
+
 // Init inside the builder's iframe
 mQuery(function() {
     if (parent && parent.mQuery && parent.mQuery('#builder-template-content').length) {
@@ -1132,7 +1133,12 @@ mQuery(function() {
         if (!parent.Mautic.codeMode) {
             Mautic.initSlotListeners();
             Mautic.initSections();
-            Mautic.initSlots();
+
+            // Init slots which aren't in a section
+            var singleSlots = Mautic.builderContents.find('[data-slot-container]').not('[data-section] [data-slot-container]');
+            if (singleSlots.length) {
+                Mautic.initSlots(singleSlots);
+            }
         }
     }
 });
