@@ -447,9 +447,12 @@ Mautic.initSectionListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.selectedSlot = null;
 
-    Mautic.builderContents.on('section:init', function(event, section) {
+    Mautic.builderContents.on('section:init', function(event, section, isNew) {
         section = mQuery(section);
-        Mautic.initSlots(section.find('[data-slot-container]'));
+        
+        if (isNew) {
+            Mautic.initSlots(section.find('[data-slot-container]'));
+        }
 
         section.on('click', function(e) {
             var clickedSection = mQuery(this);
@@ -583,10 +586,10 @@ Mautic.initSections = function() {
 
                 var newSection = mQuery('<div/>')
                     .attr('data-section-wrapper', ui.item.attr('data-section-type'))
-                    .html(ui.item.find('script').html())
+                    .html(ui.item.find('script').html());
                 ui.item.replaceWith(newSection);
 
-                Mautic.builderContents.trigger('section:init', newSection);
+                Mautic.builderContents.trigger('section:init', [newSection, true]);
             } else {
                 // Restore original overflow
                 mQuery('body').css(bodyOverflow);
@@ -666,7 +669,7 @@ Mautic.rgb2hex = function(orig) {
 }
 
 Mautic.initSlots = function(slotContainers) {
-    if (!slotContainers.length) {
+    if (!slotContainers) {
         slotContainers = Mautic.builderContents.find('[data-slot-container]');
     }
 
@@ -700,7 +703,7 @@ Mautic.initSlots = function(slotContainers) {
 
             Mautic.builderContents.find('[data-slot-focus]').each( function() {
                 var focusedSlot = mQuery(this).closest('[data-slot]');
-                if (focusedSlot.attr('data-slot') == 'image') {
+                if (focusedSlot.attr('data-slot') === 'image') {
                     // Deactivate froala toolbar
                     focusedSlot.find('img').each( function() {
                         mQuery(this).froalaEditor('popups.hideAll');
@@ -977,8 +980,8 @@ Mautic.initSlotListeners = function() {
             // Init Froala editor
             image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    imageEditButtons: ['imageReplace', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
-                    useClasses: true
+                    imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
+                    useClasses: false
                 }
             ));
         } else if (type === 'button') {
@@ -1133,12 +1136,7 @@ mQuery(function() {
         if (!parent.Mautic.codeMode) {
             Mautic.initSlotListeners();
             Mautic.initSections();
-
-            // Init slots which aren't in a section
-            var singleSlots = Mautic.builderContents.find('[data-slot-container]').not('[data-section] [data-slot-container]');
-            if (singleSlots.length) {
-                Mautic.initSlots(singleSlots);
-            }
+            Mautic.initSlots();
         }
     }
 });
