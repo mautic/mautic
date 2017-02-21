@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -111,7 +111,7 @@
         var $popup = editor.popups.get('table.edit');
         if (!$popup) $popup = _initEditPopup();
 
-        editor.popups.setContainer('table.edit', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('table.edit', editor.$sc);
         var offset = _selectionOffset(map);
         var left = (offset.left + offset.right) / 2;
         var top = offset.bottom;
@@ -128,12 +128,12 @@
           editor.edit.on();
 
           editor.button.bulkRefresh();
-        }
 
-        // Place selection in last selected table cell.
-        editor.selection.setAtEnd(editor.$el.find('.fr-selected-cell:last').get(0));
-        editor.$el.focus()
-        editor.selection.restore();
+          // Place selection in last selected table cell.
+          editor.selection.setAtEnd(editor.$el.find('.fr-selected-cell:last').get(0));
+          editor.$el.focus()
+          editor.selection.restore();
+        }
       }
     }
 
@@ -147,7 +147,7 @@
         var $popup = editor.popups.get('table.colors');
         if (!$popup) $popup = _initColorsPopup();
 
-        editor.popups.setContainer('table.colors', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('table.colors', editor.$sc);
         var offset = _selectionOffset(map);
         var left = (offset.left + offset.right) / 2;
         var top = offset.bottom;
@@ -2556,8 +2556,8 @@
           var top = resizer_top - editor.win.pageYOffset;
 
           if (editor.opts.iframe) {
-            left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-            top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+            left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+            top += editor.$iframe.offset().top - editor.helpers.scrollTop();
 
             max_left += editor.$iframe.offset().left;
             max_right += editor.$iframe.offset().left;
@@ -2617,8 +2617,8 @@
       var top = 0;
 
       if (editor.opts.iframe) {
-        left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-        top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+        left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+        top += editor.$iframe.offset().top - editor.helpers.scrollTop();
       }
 
       // Check where the column should be inserted.
@@ -2670,8 +2670,8 @@
       var left = 0;
       var top = 0;
       if (editor.opts.iframe) {
-        left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-        top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+        left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+        top += editor.$iframe.offset().top - editor.helpers.scrollTop();
       }
 
       // Check where the row should be inserted.
@@ -2784,7 +2784,7 @@
         var top = $table.offset().top - editor.win.pageYOffset;
 
         if (editor.opts.iframe) {
-          top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+          top += editor.$iframe.offset().top - editor.helpers.scrollTop();
         }
 
         $resizer.css('top', top);
@@ -2855,37 +2855,23 @@
         else {
           var $table_parent = $table.parent();
           var table_percentage = table_width / $table_parent.width() * 100;
+          var left_margin = (parseInt($table.css('margin-left'), 10) || 0) / $table_parent.width() * 100;
+          var right_margin = (parseInt($table.css('margin-right'), 10) || 0) / $table_parent.width() * 100;
           var width;
 
-          // RTL
-          if (editor.opts.direction == 'rtl') {
-            // Right border.
-            if (second === 0) {
-              width = (table_width + release_position - initial_positon) / table_width * table_percentage;
-              $table.css('margin-right', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + (parseInt($table.css('margin-left'), 10) || 0) + 'px)');
-            }
-
-            // Left border.
-            else {
-              width = (table_width - release_position + initial_positon) / table_width * table_percentage;
-              $table.css('margin-left', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + (parseInt($table.css('margin-right'), 10) || 0) + 'px)');
-            }
-
-          // LTR
-          } else {
-            // Left border.
-            if (second === 0) {
-              width = (table_width - release_position + initial_positon) / table_width * table_percentage;
-              $table.css('margin-left', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + (parseInt($table.css('margin-right'), 10) || 0) + 'px)');
-            }
-
-            // Right border.
-            else {
-              width = (table_width + release_position - initial_positon) / table_width * table_percentage;
-              $table.css('margin-right', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + (parseInt($table.css('margin-left'), 10) || 0) + 'px)');
-            }
+          // Right border RTL or LTR.
+          if ((editor.opts.direction == 'rtl' && second === 0) || (editor.opts.direction != 'rtl' && second !== 0)) {
+            width = (table_width + release_position - initial_positon) / table_width * table_percentage;
+            $table.css('margin-right', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + Math.round(left_margin).toFixed(4) + '%)');
           }
 
+          // Left border RTL or LTR.
+          else if ((editor.opts.direction == 'rtl' && second !== 0) || (editor.opts.direction != 'rtl' && second === 0)) {
+            width = (table_width - release_position + initial_positon) / table_width * table_percentage;
+            $table.css('margin-left', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + Math.round(right_margin).toFixed(4) + '%)');
+          }
+
+          // Update table width.
           $table.css('width', Math.round(width).toFixed(4) + '%');
         }
 
@@ -3443,12 +3429,6 @@
           for (var i = 0; i < c_selected_cells.length; i++) {
             c_selected_cells[i].className = (c_selected_cells[i].className || '').replace(/fr-selected-cell/g, '');
           }
-        });
-
-        editor.events.on('html.get', function (html) {
-          html = html.replace(/<(td|th)((?:[\w\W]*?)) class=""((?:[\w\W]*?))>((?:[\w\W]*?))<\/(td|th)>/g, '<$1$2$3>$4</$5>');
-
-          return html;
         });
 
         editor.events.on('html.afterGet', function () {
