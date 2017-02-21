@@ -256,9 +256,10 @@ class FocusModel extends FormModel
      *
      * @param Focus $focus
      * @param       $type
-     * @param       $data
+     * @param null  $data
+     * @param null  $lead
      */
-    public function addStat(Focus $focus, $type, $data = null)
+    public function addStat(Focus $focus, $type, $data = null, $lead = null)
     {
         switch ($type) {
             case Stat::TYPE_FORM:
@@ -279,7 +280,8 @@ class FocusModel extends FormModel
         $stat->setFocus($focus)
             ->setDateAdded(new \DateTime())
             ->setType($type)
-            ->setTypeId($typeId);
+            ->setTypeId($typeId)
+            ->setLead($lead);
 
         $this->getStatRepository()->saveEntity($stat);
     }

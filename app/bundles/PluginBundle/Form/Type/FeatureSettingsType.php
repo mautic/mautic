@@ -43,14 +43,14 @@ class FeatureSettingsType extends AbstractType
 
         //add custom feature settings
         $integration_object->appendToForm($builder, $options['data'], 'features');
-        $leadFields               = $options['lead_fields'];
-        $companyFields            = $options['company_fields'];
-        $integrationCompanyFields = [];
+        $leadFields    = $options['lead_fields'];
+        $companyFields = $options['company_fields'];
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields) {
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
+                'ignore_field_cache' => true,
             ];
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
@@ -88,39 +88,49 @@ class FeatureSettingsType extends AbstractType
                 $autoMatchedFields[$field] = strtolower($field);
             }
 
-            $form->add('leadFields', 'integration_fields', [
-                'label'                => 'mautic.integration.leadfield_matches',
-                'required'             => true,
-                'lead_fields'          => $leadFields,
-                'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
-                'integration_fields'   => $fields,
-                'special_instructions' => $specialInstructions,
-                'alert_type'           => $alertType,
-            ]);
+            $form->add(
+                'leadFields',
+                'integration_fields',
+                [
+                    'label'                => 'mautic.integration.leadfield_matches',
+                    'required'             => true,
+                    'lead_fields'          => $leadFields,
+                    'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
+                    'integration_fields'   => $fields,
+                    'special_instructions' => $specialInstructions,
+                    'alert_type'           => $alertType,
+                ]
+            );
             if (!empty($integrationCompanyFields)) {
-                $form->add('companyFields', 'integration_company_fields', [
-                    'label'          => 'mautic.integration.comapanyfield_matches',
-                    'required'       => false,
-                    'company_fields' => $companyFields,
-                    //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
-                    'integration_company_fields' => $integrationCompanyFields,
-                    'special_instructions'       => $specialInstructions,
-                    'alert_type'                 => $alertType,
-                ]);
+                $form->add(
+                    'companyFields',
+                    'integration_company_fields',
+                    [
+                        'label'          => 'mautic.integration.comapanyfield_matches',
+                        'required'       => false,
+                        'company_fields' => $companyFields,
+                        //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
+                        'integration_company_fields' => $integrationCompanyFields,
+                        'special_instructions'       => $specialInstructions,
+                        'alert_type'                 => $alertType,
+                    ]
+                );
             }
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));
             }
         };
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA,
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
         );
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT,
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data, 'post');

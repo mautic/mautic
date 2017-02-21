@@ -15,7 +15,10 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.pageconfig'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php foreach ($form->children as $f): ?>
+        <?php foreach ($form->children as $name => $f): ?>
+            <?php if ('track_contact_by_ip' == $name) {
+    continue;
+} ?>
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($f); ?>
@@ -36,5 +39,10 @@
 
     mt('send', 'pageview');
 &lt;/script&gt;</pre>
+        <div class="row">
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
+            </div>
+        </div>
     </div>
 </div>

@@ -162,6 +162,7 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('button', 'text')
+            ->nullable()
             ->build();
 
         $builder->createField('notificationType', 'text')
@@ -260,6 +261,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(

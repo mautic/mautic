@@ -20,21 +20,31 @@ use Mautic\CoreBundle\EventListener\StatsSubscriber as CommonStatsSubscriber;
 class StatsSubscriber extends CommonStatsSubscriber
 {
     /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
      * StatsSubscriber constructor.
      *
      * @param EntityManager $em
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:CompanyChangeLog');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:PointsChangeLog');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:StagesChangeLog');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:CompanyLead');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadCategory');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadDevice');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:LeadList');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:DoNotContact');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:FrequencyRule');
-        $this->repositories[] = $em->getRepository('MauticLeadBundle:UtmTag');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticLeadBundle:CompanyChangeLog',
+                'MauticLeadBundle:PointsChangeLog',
+                'MauticLeadBundle:StagesChangeLog',
+                'MauticLeadBundle:CompanyLead',
+                'MauticLeadBundle:LeadCategory',
+                'MauticLeadBundle:LeadDevice',
+                'MauticLeadBundle:ListLead',
+                'MauticLeadBundle:DoNotContact',
+                'MauticLeadBundle:FrequencyRule',
+                'MauticLeadBundle:UtmTag',
+            ]
+        );
     }
 }

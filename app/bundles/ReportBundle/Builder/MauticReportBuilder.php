@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -72,6 +73,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
     ];
 
     /**
+     * Standard Channel Columns.
+     */
+    const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    const CHANNEL_COLUMN_NAME            = 'channel.name';
+    const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+
+    /**
      * @var Connection
      */
     private $db;
@@ -92,17 +103,24 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $dispatcher;
 
     /**
+     * @var ChannelListHelper
+     */
+    private $channelListHelper;
+
+    /**
      * MauticReportBuilder constructor.
      *
      * @param EventDispatcherInterface $dispatcher
      * @param Connection               $db
      * @param Report                   $entity
+     * @param ChannelListHelper        $channelListHelper
      */
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity)
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
-        $this->entity     = $entity;
-        $this->dispatcher = $dispatcher;
-        $this->db         = $db;
+        $this->entity            = $entity;
+        $this->dispatcher        = $dispatcher;
+        $this->db                = $db;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -146,7 +164,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         /** @var ReportGeneratorEvent $event */
         $event = $this->dispatcher->dispatch(
             ReportEvents::REPORT_ON_GENERATE,
-            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder())
+            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper)
         );
 
         // Build the QUERY
@@ -230,15 +248,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $fields = $this->entity->getColumns();
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
-                    $select = '';
-                    $select .= (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+                    $fieldOptions = $options['columns'][$field];
+                    $select       = '';
+
+                    if (array_key_exists('channelData', $fieldOptions)) {
+                        $select .= $this->buildCaseSelect($fieldOptions['channelData']);
+                    } else {
+                        $select .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
+                    }
 
                     if (strpos($select, '{{count}}')) {
                         $select = str_replace('{{count}}', $countSql, $select);
                     }
 
-                    if (isset($options['columns'][$field]['alias'])) {
-                        $select .= ' AS '.$options['columns'][$field]['alias'];
+                    if (isset($fieldOptions['alias'])) {
+                        $select .= ' AS '.$fieldOptions['alias'];
                     }
 
                     $selectColumns[] = $select;
@@ -249,6 +273,26 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder->addSelect(implode(', ', $selectColumns));
 
         return $queryBuilder;
+    }
+
+    /**
+     * Build a CASE select statement.
+     *
+     * @param array $channelData ['channelName' => ['prefix' => XX, 'column' => 'XX.XX']
+     *
+     * @return string
+     */
+    private function buildCaseSelect(array $channelData)
+    {
+        $case = 'CASE';
+
+        foreach ($channelData as $channel => $data) {
+            $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
+        }
+
+        $case .= ' ELSE NULL END ';
+
+        return $case;
     }
 
     /**

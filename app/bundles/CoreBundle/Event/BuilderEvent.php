@@ -22,8 +22,6 @@ class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
     protected $tokens               = [];
-    protected $visualTokens         = [];
-    protected $tokenSections        = [];
     protected $abTestWinnerCriteria = [];
     protected $translator;
     protected $entity = null;
@@ -77,46 +75,6 @@ class BuilderEvent extends Event
         array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
 
         return $this->slotTypes;
-    }
-
-    /**
-     * @param $key
-     * @param $header
-     * @param $content
-     * @param $priority
-     */
-    public function addTokenSection($key, $header, $content, $priority = 0)
-    {
-        if (array_key_exists($key, $this->tokenSections)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another subscriber. Please use a different key.");
-        }
-
-        if (!empty($content)) {
-            $header                    = $this->translator->trans($header);
-            $this->tokenSections[$key] = [
-                'header'   => $header,
-                'content'  => $content,
-                'priority' => $priority,
-            ];
-        }
-    }
-
-    /**
-     * Get tokenSections.
-     *
-     * @return array
-     */
-    public function getTokenSections()
-    {
-        $sort = [];
-        foreach ($this->tokenSections as $k => $v) {
-            $sort['priority'][$k] = $v['priority'];
-            $sort['header'][$k]   = $v['header'];
-        }
-
-        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->tokenSections);
-
-        return $this->tokenSections;
     }
 
     /**
@@ -206,7 +164,7 @@ class BuilderEvent extends Event
 
     /**
      * @param array $tokens
-     * @param bool  $allowVisualPlaceholder
+     * @param bool  $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool  $convertToLinks
      */
     public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
@@ -218,24 +176,15 @@ class BuilderEvent extends Event
         }
 
         $this->tokens = array_merge($this->tokens, $tokens);
-
-        if ($allowVisualPlaceholder) {
-            $this->visualTokens = array_merge($this->visualTokens, array_keys($tokens));
-        }
     }
 
     /**
-     * @param      $key
-     * @param      $value
-     * @param bool $allowVisualPlaceholder
+     * @param   $key
+     * @param   $value
      */
-    public function addToken($key, $value, $allowVisualPlaceholder = false)
+    public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
-
-        if ($allowVisualPlaceholder) {
-            $this->visualTokens[] = $key;
-        }
     }
 
     /**
@@ -257,14 +206,6 @@ class BuilderEvent extends Event
         }
 
         return $this->tokens;
-    }
-
-    /**
-     * @return array
-     */
-    public function getVisualTokens()
-    {
-        return $this->visualTokens;
     }
 
     /**
@@ -357,7 +298,7 @@ class BuilderEvent extends Event
      * @param                    $tokens
      * @param string             $labelColumn
      * @param string             $valueColumn
-     * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
+     * @param bool               $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool               $convertToLinks         If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
@@ -401,16 +342,6 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if token sections have been requested.
-     *
-     * @return bool
-     */
-    public function tokenSectionsRequested()
-    {
-        return $this->getRequested('tokenSections');
-    }
-
-    /**
      * Check if AB Test Winner Criteria has been requested.
      *
      * @return bool
@@ -442,5 +373,51 @@ class BuilderEvent extends Event
         }
 
         return $this->requested == $type || $this->requested == 'all';
+    }
+
+    /**
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @param $key
+     * @param $header
+     * @param $content
+     * @param $priority
+     */
+    public function addTokenSection($key, $header, $content, $priority = 0)
+    {
+    }
+
+    /**
+     * Get tokenSections.
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @return array
+     */
+    public function getTokenSections()
+    {
+        return [];
+    }
+
+    /**
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @return array
+     */
+    public function getVisualTokens()
+    {
+        return [];
+    }
+
+    /**
+     * Check if token sections have been requested.
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @return bool
+     */
+    public function tokenSectionsRequested()
+    {
+        return [];
     }
 }

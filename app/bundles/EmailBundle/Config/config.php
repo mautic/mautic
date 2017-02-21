@@ -34,6 +34,13 @@ return [
                 'method'     => 'POST',
             ],
             'mautic_api_sendcontactemail' => [
+                'path'       => '/emails/{id}/contact/{leadId}/send',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'method'     => 'POST',
+            ],
+
+            // @deprecated 2.6.0 to be removed in 3.0
+            'bc_mautic_api_sendcontactemail' => [
                 'path'       => '/emails/{id}/send/contact/{leadId}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
@@ -116,7 +123,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
-                    'mautic.core.model.messagequeue',
+                    'mautic.channel.model.queue',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -206,9 +213,8 @@ return [
                 'alias'     => 'emailvariant',
             ],
             'mautic.form.type.email_list' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\EmailListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'email_list',
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
+                'alias' => 'email_list',
             ],
             'mautic.form.type.emailopen_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',
@@ -361,8 +367,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
-                    'mautic.helper.core_parameters',
-                    'mautic.core.model.messagequeue',
+                    'mautic.channel.model.queue',
                 ],
             ],
         ],

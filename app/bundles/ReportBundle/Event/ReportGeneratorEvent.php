@@ -13,7 +13,9 @@ namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 
 /**
  * Class ReportGeneratorEvent.
@@ -50,16 +52,25 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $filterExpression = null;
 
     /**
-     * Constructor.
-     *
-     * @param string $context Event context
+     * @var ChannelListHelper
      */
-    public function __construct(Report $report, array $options, QueryBuilder $qb)
+    private $channelListHelper;
+
+    /**
+     * ReportGeneratorEvent constructor.
+     *
+     * @param Report            $report
+     * @param array             $options
+     * @param QueryBuilder      $qb
+     * @param ChannelListHelper $channelListHelper
+     */
+    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
     {
-        $this->report       = $report;
-        $this->context      = $report->getSource();
-        $this->options      = $options;
-        $this->queryBuilder = $qb;
+        $this->report            = $report;
+        $this->context           = $report->getSource();
+        $this->options           = $options;
+        $this->queryBuilder      = $qb;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -233,9 +244,45 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Join channel columns.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     *
+     * @return $this
+     */
+    public function addChannelLeftJoins(QueryBuilder $queryBuilder, $prefix)
+    {
+        foreach ($this->channelListHelper->getChannels() as $channel => $details) {
+            if (!array_key_exists(ReportModel::CHANNEL_FEATURE, $details)) {
+                continue;
+            }
+
+            $reportDetails = $details[ReportModel::CHANNEL_FEATURE];
+
+            if (!array_key_exists('table', $reportDetails)) {
+                continue;
+            }
+
+            $channelParameter = 'channelParameter'.$channel;
+
+            $queryBuilder->leftJoin(
+                $prefix,
+                MAUTIC_TABLE_PREFIX.$reportDetails['table'],
+                $channel,
+                $prefix.'.channel_id = '.$channel.'.id AND '.$prefix.'.channel = :'.$channelParameter
+            );
+
+            $queryBuilder->setParameter($channelParameter, $channel);
+        }
+
+        return $this;
+    }
+
+    /**
      * Apply date filters to the query.
      *
-     * @param QueryBuilder $query
+     * @param QueryBuilder $queryBuilder
      * @param string       $dateColumn
      * @param string       $tablePrefix
      *

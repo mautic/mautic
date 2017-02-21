@@ -21,49 +21,6 @@ trait CustomFieldRepositoryTrait
     protected $useDistinctCount = false;
 
     /**
-     * Gets a list of unique values from fields for autocompletes.
-     *
-     * @param        $field
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
-     */
-    public function getValueList($field, $search = '', $limit = 10, $start = 0)
-    {
-        // Includes prefix
-        $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
-        $col   = $this->getTableAlias().'.'.$field;
-        $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("DISTINCT $col")
-            ->from($table, 'l');
-
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->neq($col, $q->expr()->literal('')),
-                $q->expr()->isNotNull($col)
-            )
-        );
-
-        if (!empty($search)) {
-            $q->andWhere("$col LIKE :search")
-                ->setParameter('search', "{$search}%");
-        }
-
-        $q->orderBy($col);
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        $results = $q->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
      * @param      $object
      * @param      $args
      * @param null $resultsCallback
@@ -72,22 +29,7 @@ trait CustomFieldRepositoryTrait
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
-        //Get the list of custom fields
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->where($fq->expr()->eq('object', ':object'))
-            ->setParameter('published', true, 'boolean')
-            ->setParameter('object', $object);
-        $results = $fq->execute()->fetchAll();
-
-        $fields = [];
-        foreach ($results as $r) {
-            $fields[$r['alias']] = $r;
-        }
-
-        unset($results);
+        list($fields, $fixedFields) = $this->getCustomFieldList($object);
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties($this->getClassName(), $args);
@@ -103,19 +45,6 @@ trait CustomFieldRepositoryTrait
         // Distinct is required here to get the correct count when group by is used due to applied filters
         $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
         $dq->select($countSelect.' as count');
-
-        // Filter by an entity query
-        if (isset($args['entity_query'])) {
-            $dq->andWhere(
-                sprintf('EXISTS (%s)', $args['entity_query']->getSQL())
-            );
-
-            if (isset($args['entity_parameters'])) {
-                foreach ($args['entity_parameters'] as $name => $value) {
-                    $dq->setParameter($name, $value);
-                }
-            }
-        }
 
         // Advanced search filters may have set a group by and if so, let's remove it for the count.
         if ($groupBy = $dq->getQueryPart('groupBy')) {
@@ -133,11 +62,12 @@ trait CustomFieldRepositoryTrait
                 $dq->groupBy($groupBy);
             }
             //now get the actual paginated results
+
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
 
-            $dq->resetQueryPart('select')
-                ->select($this->getTableAlias().'.*');
+            $dq->resetQueryPart('select');
+            $this->buildSelectClause($dq, $args);
 
             $results = $dq->execute()->fetchAll();
 
@@ -148,7 +78,7 @@ trait CustomFieldRepositoryTrait
             foreach ($results as $result) {
                 $id = $result['id'];
                 //unset all the columns that are not fields
-                $this->removeNonFieldColumns($result);
+                $this->removeNonFieldColumns($result, $fixedFields);
 
                 foreach ($result as $k => $r) {
                     if (isset($fields[$k])) {
@@ -187,6 +117,7 @@ trait CustomFieldRepositoryTrait
 
                 //ORM - generates lead entities
                 $q = $this->getEntitiesOrmQueryBuilder($order);
+                $this->buildSelectClause($dq, $args);
 
                 //only pull the leads as filtered via DBAL
                 $q->where(
@@ -196,7 +127,7 @@ trait CustomFieldRepositoryTrait
                 $q->orderBy('ORD', 'ASC');
 
                 $results = $q->getQuery()
-                    ->getResult();
+                             ->getResult();
 
                 //assign fields
                 foreach ($results as $r) {
@@ -220,41 +151,6 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $entity
-     * @param $flush
-     */
-    public function saveEntity($entity, $flush = true)
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush($entity);
-        }
-
-        // Includes prefix
-        $table  = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
-        $fields = $entity->getUpdatedFields();
-        if (!empty($fields)) {
-            $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
-        }
-    }
-
-    /**
-     * Persist an array of entities.
-     *
-     * @param array $entities
-     */
-    public function saveEntities($entities)
-    {
-        foreach ($entities as $k => $entity) {
-            // Leads cannot be batched due to requiring the ID to update the fields
-            $this->saveEntity($entity);
-        }
-    }
-
-    /**
      * @param        $id
      * @param bool   $byGroup
      * @param string $object
@@ -263,29 +159,21 @@ trait CustomFieldRepositoryTrait
      */
     public function getFieldValues($id, $byGroup = true, $object = 'lead')
     {
-        //Get the list of custom fields
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-            ->where($fq->expr()->eq('f.object', ':object'))
-            ->andWhere('f.is_published = :published')
-            ->setParameter('object', $object)
-            ->setParameter('published', true, 'boolean')
-            ->orderBy('f.field_order', 'asc');
-        $results = $fq->execute()->fetchAll();
-
-        $fields = [];
-        foreach ($results as $r) {
-            $fields[$r['alias']] = $r;
-        }
+        list($fields, $fixedFields) = $this->getCustomFieldList($object);
 
         //use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
-        $q->select($this->getTableAlias().'.*')
-            ->where($this->getTableAlias().'.id = :entityId')
-            ->setParameter('entityId', $id);
+
+        if (is_array($id)) {
+            $this->buildSelectClause($q, $id);
+            $id = $id['id'];
+        } else {
+            $q->select($this->getTableAlias().'.*');
+        }
+
+        $q->where($this->getTableAlias().'.id = '.(int) $id);
         $values = $q->execute()->fetch();
-        $this->removeNonFieldColumns($values);
+        $this->removeNonFieldColumns($values, $fixedFields);
 
         // Reorder leadValues based on field order
         $values = array_merge(array_flip(array_keys($fields)), $values);
@@ -319,16 +207,135 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * Gets a list of unique values from fields for autocompletes.
+     *
+     * @param        $field
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     *
+     * @return array
+     */
+    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    {
+        // Includes prefix
+        $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
+        $col   = $this->getTableAlias().'.'.$field;
+        $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
+                      ->select("DISTINCT $col")
+                      ->from($table, 'l');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->neq($col, $q->expr()->literal('')),
+                $q->expr()->isNotNull($col)
+            )
+        );
+
+        if (!empty($search)) {
+            $q->andWhere("$col LIKE :search")
+              ->setParameter('search', "{$search}%");
+        }
+
+        $q->orderBy($col);
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+              ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Persist an array of entities.
+     *
+     * @param array $entities
+     */
+    public function saveEntities($entities)
+    {
+        foreach ($entities as $k => $entity) {
+            // Leads cannot be batched due to requiring the ID to update the fields
+            $this->saveEntity($entity);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     * @param $flush
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush($entity);
+        }
+
+        // Includes prefix
+        $table  = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
+        $fields = $entity->getUpdatedFields();
+        if (method_exists($entity, 'getChanges')) {
+            $changes = $entity->getChanges();
+
+            // remove the fields that are part of changes as they were already saved via a setter
+            $fields = array_diff_key($fields, $changes);
+        }
+
+        if (!empty($fields)) {
+            $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
+        }
+    }
+
+    /**
      * Function to remove non custom field columns from an arrayed lead row.
      *
-     * @param array $r
+     * @param       $r
+     * @param array $fixedFields
      */
-    protected function removeNonFieldColumns(&$r)
+    protected function removeNonFieldColumns(&$r, $fixedFields = [])
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
-            unset($r[$c]);
+            if (!isset($fixedFields[$c])) {
+                unset($r[$c]);
+            }
         }
         unset($r['owner_id']);
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array [$fields, $fixedFields]
+     */
+    private function getCustomFieldList($object)
+    {
+        //Get the list of custom fields
+        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
+           ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+           ->where('f.is_published = :published')
+           ->andWhere($fq->expr()->eq('object', ':object'))
+           ->setParameter('published', true, 'boolean')
+           ->setParameter('object', $object);
+        $results = $fq->execute()->fetchAll();
+
+        $fields      = [];
+        $fixedFields = [];
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+            if ($r['is_fixed']) {
+                $fixedFields[$r['alias']] = $r['alias'];
+            }
+        }
+
+        unset($results);
+
+        return [$fields, $fixedFields];
     }
 }
