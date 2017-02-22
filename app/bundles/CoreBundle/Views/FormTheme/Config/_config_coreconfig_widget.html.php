@@ -102,7 +102,7 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips', 'do_not_track_bots']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
@@ -130,12 +130,18 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
         </div>
 
-        <?php if (isset($fields['do_not_track_ips'])): ?>
+        <?php if (isset($fields['do_not_track_ips']) || isset($fields['do_not_track_bots'])): ?>
         <hr class="text-muted" />
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+            <?php if (isset($fields['do_not_track_ips'])): ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+            <?php endif; ?>
+            <?php if (isset($fields['do_not_track_bots'])): ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_bots', $template); ?>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
+
 
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />

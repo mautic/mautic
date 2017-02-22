@@ -837,6 +837,7 @@ return [
         'cookie_secure'             => null,
         'cookie_httponly'           => false,
         'do_not_track_ips'          => [],
+        'do_not_track_bots'         => ['MSNBOT', 'msnbot-media', 'bingbot', 'Googlebot', 'Google Web Preview', 'Mediapartners-Google', 'Baiduspider', 'Ezooms', 'YahooSeeker', 'Slurp', 'AltaVista', 'AVSearch', 'Mercator', 'Scooter', 'InfoSeek', 'Ultraseek', 'Lycos', 'Wget', 'YandexBot', 'Java/1.4.1_04', 'SiteBot', 'Exabot', 'AhrefsBot', 'MJ12bot', 'NetSeer crawler', 'TurnitinBot', 'magpie-crawler', 'Nutch Crawler', 'CMS Crawler', 'rogerbot', 'Domnutch', 'ssearch_bot', 'XoviBot', 'digincore', 'fr-crawler'],
         'do_not_track_internal_ips' => [],
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,
