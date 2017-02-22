@@ -142,7 +142,6 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
         <?php endif; ?>
 
-
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
         <div class="row">
