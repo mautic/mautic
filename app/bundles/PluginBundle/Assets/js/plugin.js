@@ -1,5 +1,5 @@
 /* PluginBundle */
-Mautic.addNewPluginField = function () {
+Mautic.addNewPluginField = function (index) {
     var items = mQuery('div.field').find('div.active');
     var currentItem = items.filter('.active');
     var selectors;
@@ -12,9 +12,14 @@ Mautic.addNewPluginField = function () {
             selectors.each(function( ) {
                 mQuery( this ).prop('disabled', false).trigger("chosen:updated");
             });
+            selectors = currentItem.find('input[type="radio"]');
+            selectors.each(function( ) {
+                mQuery( this ).prop('disabled', false).trigger("chosen:updated");
+            });
         }
     });
     mQuery('.removeField').on('click', function() {
+        currentItem = mQuery('#' + index);
         var previousItem = currentItem.prev();
         currentItem.removeClass('active');
         if ( previousItem.length ) {
@@ -23,19 +28,18 @@ Mautic.addNewPluginField = function () {
             selectors.each(function( ) {
                 mQuery( this ).prop('disabled', true).trigger("chosen:updated");
             });
+            selectors = currentItem.find('input[type="radio"]');
+            selectors.each(function( ) {
+                mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+            });
             currentItem.addClass('hide');
-            currentItem = previousItem;
+            items = mQuery('div.field').find('div.active');
+            currentItem = items.filter('.active');
         }
     });
     return true;
 };
-Mautic.matchFieldsType = function (index) {
-    var mauticField = mQuery('#integration_details_featureSettings_leadFields_m_' + index ).val();
-    var integrationField = mQuery('#integration_details_featureSettings_leadFields_i_' + index ).val();
-    var hiddenInput = mQuery('<input/>',{type:'hidden',id:'integration_details_featureSettings_leadFields_' + integrationField,name:'integration_details[featureSettings][leadFields][' + mauticField + ']', value:mauticField });
 
-    mQuery('#m_i_' + index ).empty().append( hiddenInput );
-};
 Mautic.initiateIntegrationAuthorization = function() {
     mQuery('#integration_details_in_auth').val(1);
 

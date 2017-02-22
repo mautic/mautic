@@ -125,6 +125,13 @@ class SalesforceApi extends CrmApi
         return $createdLeadData;
     }
 
+    public function syncMauticToSalesforce(array $data)
+    {
+        $queryUrl = $this->integration->getCompositeUrl();
+
+        return $this->request('composite/', $data, 'POST', false, null, $queryUrl);
+    }
+
     /**
      * @param array $activity
      * @param       $object
@@ -251,6 +258,8 @@ class SalesforceApi extends CrmApi
                     }
                 }
         }
+        print_r($mixedFields);
+        die();
 
         if (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';

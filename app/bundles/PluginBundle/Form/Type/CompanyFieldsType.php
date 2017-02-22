@@ -34,8 +34,20 @@ class CompanyFieldsType extends AbstractType
             $builder->add('i_'.$index, 'choice', [
                 'choices'  => array_keys($options['integration_company_fields']),
                 'label'    => 'Integration fields',
-                'disabled' => ($index > 1) ? true : false,
+                'disabled' => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
+                'mapped'   => false,
             ]);
+            $builder->add('update_mautic_company'.$index,
+                'yesno_button_group',
+                [
+                    'label'       => false,
+                    'data'        => isset($options['data']['update_mautic_company']) ? (bool) $options['data']['update_mautic_company'] : true,
+                    'no_label'    => '<-',
+                    'yes_label'   => '->',
+                    'empty_value' => false,
+                    'disabled'    => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
+                    'mapped'      => false,
+                ]);
 
             $builder->add('m_'.$index, 'choice', [
                 'choices' => $options['company_fields'],
@@ -43,7 +55,8 @@ class CompanyFieldsType extends AbstractType
                 //'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onClick' => 'Mautic.matchFieldsType(this)'],
-                'disabled'   => ($index > 1) ? true : false,
+                'disabled'   => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
+                'mapped'     => false,
 
             ]);
         }

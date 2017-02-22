@@ -205,10 +205,20 @@ class PluginController extends FormController
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
                             $submittedFields = $this->request->request->get('integration_details[featureSettings][leadFields]', [], true);
-                            if (isset($featureSettings['leadFields'])) {
-                                foreach ($featureSettings['leadFields'] as $f => $v) {
-                                    if (empty($v) || !isset($submittedFields[$f])) {
-                                        unset($featureSettings['leadFields'][$f]);
+                            unset($featureSettings['leadFields']);
+                            unset($featureSettings['update_mautic']);
+                            if (!empty($submittedFields)) {
+                                foreach ($submittedFields as $f => $v) {
+                                    if (!strstr($f, 'update_mautic')) {
+                                        if (!empty($v) && strstr($f, 'i_')) {
+                                            $integrationField = $v;
+                                        }
+                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
+                                            $mauticField                                      = $v;
+                                            $featureSettings['leadFields'][$integrationField] = $mauticField;
+                                        }
+                                    } else {
+                                        $featureSettings['update_mautic'][$integrationField] = (int) $v;
                                     }
                                 }
                                 $entity->setFeatureSettings($featureSettings);

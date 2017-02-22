@@ -74,4 +74,45 @@ class IntegrationEntityRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * @param $integration
+     * @param $internalEntity
+     * @param null $startDate
+     * @param null $endDate
+     * @param $leadFields
+     *
+     * @return array
+     */
+    public function findLeadsToUpdate($integration, $internalEntity, $leadFields)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields)
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
+
+        $q->where('i.integration = :integration')
+            ->andWhere('i.internal_entity = :internalEntity')
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity);
+
+        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    public function findLeadsToCreate($integration, $leadFields)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id,'.$leadFields)
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $q->where('l.id not in (select i.internal_entity_id from '.MAUTIC_TABLE_PREFIX.' integration_entity i where i.integration = :integration and i.internal_entity = "Lead")')
+            ->setParameter('integration', $integration);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

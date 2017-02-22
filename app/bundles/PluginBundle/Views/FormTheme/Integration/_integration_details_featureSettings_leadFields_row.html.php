@@ -26,50 +26,36 @@
         </div>
         <?php echo $view['form']->errors($form); ?>
 
-        <?php $rowCount = 1; $indexCount = 1; ?>
+        <?php $rowCount = 0; $indexCount = 1; ?>
 
         <?php foreach ($form->children as $child): ?>
-        <?php if ($rowCount++ % 2 == 1): ?>
-                <?php if ((isset($child->vars['data']) && !empty($child->vars['data']))) {
-    $integrationField = $child->vars['data'];
-}?>
-        <div id="<?php echo $rowCount; ?>" class="row <?php if ($rowCount > 2 && (!isset($child->vars['data']) || empty($child->vars['data']))) {
+        <?php if ($rowCount % 3 == 0):   ?>
+        <div id="<?php echo $rowCount; ?>" class="row <?php if ($rowCount > 0 && empty($child->vars['value'])) {
     echo 'hide';
-} elseif ((!isset($child->vars['data']) || empty($child->vars['data'])) || $indexCount == count($child->vars['data'])) {
+} elseif ($rowCount == 0 || $rowCount == count($form->vars['data']) * 2) {
     echo 'active';
 }?>">
                 <div class="col-sm-1">
-                <span class="btn btn-xs btn-default removeField" onclick="Mautic.addNewPluginField();">
+                <span class="btn btn-xs btn-default removeField" onclick="Mautic.addNewPluginField(<?php echo $rowCount; ?>);">
                     <i class="fa fa-close"></i>
                 </span>
                 </div>
-            <?php else: ?>
-                <?php if ((isset($child->vars['data']) && !empty($child->vars['data']))) {
-    $mauticField = $child->vars['data'];
-} ?>
-            <?php endif; ?>
+            <?php  elseif ($rowCount % 3 == 1): ?>
 
+            <?php endif; ?>
+<?php ++$rowCount; ?>
             <div class="col-sm-3">
                 <?php echo $view['form']->row($child); ?>
             </div>
-        <?php if ($rowCount++ % 2 == 1): ?>
 
-
+        <?php if ($rowCount % 3 == 0):
+                $indexCount++;
+                ?>
                 </div>
         <?php endif; ?>
-        <?php ++$rowCount; ?>
-            <?php
-            if ($rowCount++ % 2 == 1 && $rowCount > 1):
-            ?>
-                <div id="m_i_<?php echo $indexCount; ++$indexCount; ?>" class="hide">
-            <?php if (isset($integrationField)): ?>
-                <input type="hidden" id="integration_details_featureSettings_leadFields_<?php echo $integrationField ?>" name="integration_details[featureSettings][leadFields][<?php echo $mauticField; ?>]" value="<?php echo $mauticField; ?>">
-            <?php endif; ?>
-            <?php endif; ?>
-            </div>
         <?php endforeach; ?>
         <?php
-        if ($rowCount % 2 == 0):?>
+        if ($rowCount % 3 == 1):?>
     </div>
 
         <?php endif; ?>

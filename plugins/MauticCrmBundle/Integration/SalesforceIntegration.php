@@ -145,6 +145,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getCompositeUrl()
+    {
+        return sprintf('%s/services/data/v38.0', $this->keys['instance_url']);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param bool $inAuthorization
@@ -243,7 +251,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                         if (!isset($salesFields[$sfObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
-
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
@@ -260,12 +267,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     } else {
                                         $type = 'string';
                                     }
-
-                                    $salesFields[$sfObject][$fieldInfo['name']] = [
-                                        'type'     => $type,
-                                        'label'    => $fieldInfo['label'],
-                                        'required' => $isRequired($fieldInfo, $sfObject),
-                                    ];
+                                    if ($sfObject !== 'company') {
+                                        $salesFields[$sfObject][$fieldInfo['name'].' - '.$sfObject] = [
+                                            'type'     => $type,
+                                            'label'    => $sfObject.' - '.$fieldInfo['label'],
+                                            'required' => $isRequired($fieldInfo),
+                                        ];
+                                    } else {
+                                        $salesFields[$sfObject][$fieldInfo['name']] = [
+                                            'type'     => $type,
+                                            'label'    => $fieldInfo['label'],
+                                            'required' => $isRequired($fieldInfo),
+                                        ];
+                                    }
                                 }
 
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
@@ -906,5 +920,54 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $newKey = trim($key[0]);
 
         return $newKey;
+    }
+
+    public function pushLeads($params = [])
+    {
+        $config                = $this->mergeConfigToFeatureSettings();
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $mauticData            = [];
+        $fields                = implode(', l.', $config['leadFields']);
+        $fields                = 'l.'.$fields;
+        $result                = 0;
+         //update lead/contact records
+        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'Lead', $fields);
+        foreach ($leadsToUpdate as $lead) {
+            //use a composite patch here that can update and create (one query) every 200 records
+            foreach ($config['leadFields'] as $sfField => $mauticField) {
+                $body[$sfField] = $lead[$mauticField];
+            }
+            $mauticData[] = [
+                'method'      => 'PATCH',
+                'url'         => '/services/data/v38.0/sobjects/'.$lead['integration_entity'].'/'.$lead['integration_entity_id'],
+                'referenceId' => $lead['internal_entity_id'].'-'.$lead['integration_entity_id'],
+                'body'        => $body,
+            ];
+        }
+        //create lead records
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields);
+
+        foreach ($leadsToCreate as $lead) {
+            //use a composite patch here that can update and create (one query) every 200 records
+            foreach ($config['leadFields'] as $sfField => $mauticField) {
+                $body[$sfField] = $lead[$mauticField];
+            }
+            $mauticData[] = [
+                'method'      => 'POST',
+                'url'         => '/services/data/v38.0/sobjects/Lead',
+                'referenceId' => $lead['id'].'- New Lead',
+                'body'        => $body,
+            ];
+        }
+        $request['allOrNone']        = 'false';
+        $request['compositeRequest'] = $mauticData;
+
+        if (!empty($request)) {
+            /** @var SalesforceApi $apiHelper */
+            $apiHelper = $this->getApiHelper();
+            $result    = $apiHelper->syncMauticToSalesforce($request);
+        }
+
+        return $result['compositeResponse'];
     }
 }

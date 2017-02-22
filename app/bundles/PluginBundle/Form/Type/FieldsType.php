@@ -29,32 +29,40 @@ class FieldsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $index             = 0;
-        $integrationFields = [0 => ''] + array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
+        $integrationFields = array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
+        $data              = $options['data'];
+
         foreach ($options['integration_fields'] as $field => $details) {
             ++$index;
             $builder->add('i_'.$index, 'choice', [
                 'choices'  => $integrationFields,
                 'label'    => false,
                 'required' => true,
+                'data'     => isset($data[$field]) ? $field : '',
                 'attr'     => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
-                'disabled' => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
+                'disabled' => ($index > 1 && !isset($data[$field])) ? true : false,
             ]);
             $builder->add('update_mautic'.$index,
                 'yesno_button_group',
                 [
-                    'label'     => false,
-                    'data'      => isset($options['data']['update_mautic']) ? (bool) $options['data']['update_mautic'] : true,
-                    'no_label'  => '<-',
-                    'yes_label' => '->',
+                    'label'       => false,
+                    'data'        => isset($options['update_mautic'][$field]) ? (bool) $options['update_mautic'][$field] : '',
+                    'no_label'    => '<-',
+                    'no_value'    => 0,
+                    'yes_label'   => '->',
+                    'yes_value'   => 1,
+                    'empty_value' => false,
+                    'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
                 ]);
 
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['lead_fields'],
                 'label'      => false,
                 'required'   => true,
+                'data'       => isset($data[$field]) ? $data[$field] : '',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
-                'disabled'   => ($index > 1 && !in_array($field, $options['data'])) ? true : false,
+                'disabled'   => ($index > 1 && !isset($data[$field])) ? true : false,
             ]);
         }
     }
@@ -64,7 +72,7 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
+        $resolver->setRequired(['integration_fields', 'lead_fields', 'update_mautic']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',

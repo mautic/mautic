@@ -53,25 +53,13 @@ class FeatureSettingsType extends AbstractType
                 'ignore_field_cache' => true,
             ];
             try {
-                $fields  = $integration_object->getFormLeadFields($settings);
-                $fields  = (isset($fields[0])) ? $fields[0] : $fields;
-                $objects = isset($settings['feature_settings']['objects']) ? true : false;
-
+                $fields = $integration_object->getFormLeadFields($settings);
+                $fields = (isset($fields[0])) ? $fields[0] : $fields;
                 unset($fields['company']);
-                if ($objects and in_array('company', $settings['feature_settings']['objects'])) {
+                if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
-
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
-                    }
-                }
-
-                if ($objects) {
-                    foreach ($settings['feature_settings']['objects'] as $object) {
-                        if ('company' == $object || 'Lead' == $object) {
-                            continue;
-                        }
-                        $integrationObjectFields[$object] = $integration_object->getFormFieldsByObject($object);
                     }
                 }
 
@@ -99,7 +87,6 @@ class FeatureSettingsType extends AbstractType
             foreach ($fieldsIntersection as $field) {
                 $autoMatchedFields[$field] = strtolower($field);
             }
-
             $form->add(
                 'leadFields',
                 'integration_fields',
@@ -108,6 +95,7 @@ class FeatureSettingsType extends AbstractType
                     'required'             => true,
                     'lead_fields'          => $leadFields,
                     'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
+                    'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
@@ -121,28 +109,12 @@ class FeatureSettingsType extends AbstractType
                         'label'                      => 'mautic.integration.comapanyfield_matches',
                         'required'                   => false,
                         'company_fields'             => $companyFields,
+                        'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
                         'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
                     ]
                 );
-            }
-
-            if ($objects) {
-                foreach ($settings['feature_settings']['objects'] as $object) {
-                    $form->add(
-                        $object.'Fields',
-                        'integration_object_fields',
-                        [
-                            'label'                => $object,
-                            'required'             => false,
-                            'lead_fields'          => $leadFields,
-                            'integration_fields'   => $integrationObjectFields,
-                            'special_instructions' => $specialInstructions,
-                            'alert_type'           => $alertType,
-                        ]
-                    );
-                }
             }
             if ($method == 'get' && $error) {
                 $form->addError(new FormError($error));

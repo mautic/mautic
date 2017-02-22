@@ -91,20 +91,22 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
             $config            = $integrationObject->mergeConfigToFeatureSettings();
+            $supportedFeatures = $integrationObject->getSupportedFeatures();
 
             $params['start'] = $startDate;
             $params['end']   = $endDate;
+            if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
+                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
+                    $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
+                    if (strtotime($startDate) > strtotime('-30 days')) {
+                        $processed = intval($integrationObject->getLeads($params));
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                if (strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = intval($integrationObject->getLeads($params));
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
-
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
-                } else {
-                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                    } else {
+                        $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                    }
                 }
             }
 
@@ -121,8 +123,14 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }
             }
+
+            if (isset($supportedFeatures[2]) && $supportedFeatures[2] == 'push_leads') {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
+                $processed = $integrationObject->pushLeads($params);
+                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.pushing.leads.events_executed', ['%events%' => count($processed)]).'</comment>'."\n");
+            }
         }
 
-        return 0;
+        return true;
     }
 }
