@@ -247,11 +247,13 @@ class SalesforceApi extends CrmApi
         switch ($object) {
             case 'company':
             case 'Account':
-                $fields = array_keys(array_filter($fields['companyFields']));
+                $companyFieldsToUpdateInMautic = isset($fields['update_mautic_company']) ? array_keys($fields['update_mautic_company'], 0) : [];
+                $fields                        = array_keys(array_filter(array_diff_key($fields['companyFields'], $companyFieldsToUpdateInMautic)));
                 break;
             default:
-                $mixedFields = array_filter($fields['leadFields']);
-                $fields      = [];
+                $fieldsToUpdateInMautic = isset($fields['update_mautic']) ? array_keys($fields['update_mautic'], 0) : [];
+                $mixedFields            = array_filter(array_diff_key($fields['leadFields'], $fieldsToUpdateInMautic));
+                $fields                 = [];
                 foreach ($mixedFields as $sfField => $mField) {
                     if (strpos($sfField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
