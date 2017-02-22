@@ -535,6 +535,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
+        } elseif ($prop == 'points') {
+            $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
         }
