@@ -62,33 +62,29 @@ class DynamicContentHelper
         $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.'.$slot);
         $content  = '';
 
-        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
-            $content = array_shift($response['action']['dwc.push_content']);
-        } else {
-            $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
+        $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
 
-            if (!empty($data)) {
-                $content = $data['content'];
-                $dwc     = $this->dynamicContentModel->getEntity($data['id']);
-                if ($dwc instanceof DynamicContent) {
-                    // Determine a translation based on contact's preferred locale
-                    /** @var DynamicContent $translation */
-                    list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
-                    if ($translation !== $dwc) {
-                        // Use translated version of content
-                        $dwc     = $translation;
-                        $content = $dwc->getContent();
-                    }
-                    $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
-
-                    $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-                    $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
-
-                    $content = $tokenEvent->getContent();
+        if (!empty($data)) {
+            $content = $data['content'];
+            $dwc     = $this->dynamicContentModel->getEntity($data['id']);
+            if ($dwc instanceof DynamicContent) {
+                // Determine a translation based on contact's preferred locale
+                /** @var DynamicContent $translation */
+                list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+                if ($translation !== $dwc) {
+                    // Use translated version of content
+                    $dwc     = $translation;
+                    $content = $dwc->getContent();
                 }
+                $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+
+                $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+                $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+
+                $content = $tokenEvent->getContent();
             }
         }
-
+        
         return $content;
     }
 
