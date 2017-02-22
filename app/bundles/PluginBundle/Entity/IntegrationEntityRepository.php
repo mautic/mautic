@@ -108,7 +108,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->select('l.id,'.$leadFields)
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        $q->where('l.id not in (select i.internal_entity_id from '.MAUTIC_TABLE_PREFIX.' integration_entity i where i.integration = :integration and i.internal_entity = "Lead")')
+        $q->where('l.id not in (select i.internal_entity_id from '.MAUTIC_TABLE_PREFIX.' integration_entity i where i.integration = :integration and i.internal_entity = "lead")')
             ->setParameter('integration', $integration);
 
         $results = $q->execute()->fetchAll();

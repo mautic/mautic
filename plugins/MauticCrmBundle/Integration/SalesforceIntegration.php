@@ -251,6 +251,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                         if (!isset($salesFields[$sfObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
+
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
@@ -271,13 +272,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         $salesFields[$sfObject][$fieldInfo['name'].' - '.$sfObject] = [
                                             'type'     => $type,
                                             'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo),
+                                            'required' => $isRequired($fieldInfo, $sfObject),
                                         ];
                                     } else {
                                         $salesFields[$sfObject][$fieldInfo['name']] = [
                                             'type'     => $type,
                                             'label'    => $fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo),
+                                            'required' => $isRequired($fieldInfo, $sfObject),
                                         ];
                                     }
                                 }
@@ -931,7 +932,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields                = 'l.'.$fields;
         $result                = 0;
          //update lead/contact records
-        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'Lead', $fields);
+        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields);
         foreach ($leadsToUpdate as $lead) {
             //use a composite patch here that can update and create (one query) every 200 records
             foreach ($config['leadFields'] as $sfField => $mauticField) {

@@ -26,21 +26,8 @@ if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && c
 
 $fieldHtml        = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
 $companyFieldHtml = (isset($form['featureSettings']['companyFields']) && count($form['featureSettings']['companyFields'])) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
-$objects          = isset($form['featureSettings']['objects']) ? $form['featureSettings']['objects'] : [];
-$index            = 0;
-foreach ($objects->vars['value'] as $object) {
-    // if ('company' == $object || 'Lead' == $object) {
-    //    continue;
-    //}
-
-        print_r($object);
-
-    ++$index;
-   // $objectFieldHtml[$object] = (isset($form['featureSettings'][$object.'Fields']) && count($form['featureSettings'][$object.'Fields'])) ? $view['form']->row($form['featureSettings'][$object.'Fields']) : '';
-}
-
-$fieldLabel    = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass = ($hasFields) ? '' : ' hide';
+$fieldLabel       = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldTabClass    = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 unset($form['featureSettings']['companyFields']);
 ?>
@@ -114,14 +101,5 @@ unset($form['featureSettings']['companyFields']);
         <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>
-    <?php if (!empty($objectFieldHtml)): ?>
-        <?php foreach ($objectFieldHtml as $object => $fieldHtml) {
-                        ;
-                    }?>
-    <div class="tab-pane fade bdr-w-0" id="company-fields-container">
-        <h4 class="mb-sm"><?php echo $object ?></h4>
-        <?php echo $fieldHtml; ?>
-    </div>
-    <?php endif; ?>
 </div>
 <?php echo $view['form']->end($form); ?>

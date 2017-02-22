@@ -256,11 +256,12 @@ class SalesforceApi extends CrmApi
                     if (strpos($sfField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
+                    if (strpos($sfField, ' - '.$object) !== false) {
+                        $fields[] = str_replace(' - '.$object, '', $sfField);
+                    }
                 }
         }
-        print_r($mixedFields);
-        die();
-
+        $result = [];
         if (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', $fields);
@@ -271,9 +272,8 @@ class SalesforceApi extends CrmApi
             }
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
-            $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } else {
-            $result = $this->request('query/'.$query, [], 'GET', false, null, $queryUrl);
+
+            $result = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         }
 
         return $result;

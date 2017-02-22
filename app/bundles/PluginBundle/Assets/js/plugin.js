@@ -1,43 +1,39 @@
 /* PluginBundle */
-Mautic.addNewPluginField = function (index) {
-    var items = mQuery('div.field').find('div.active');
+Mautic.addNewPluginField = function (selector) {
+    var items = mQuery( 'div.' + selector ).find( 'div.active' );
     var currentItem = items.filter('.active');
     var selectors;
-    mQuery('.add').on('click', function() {
-        var nextItem = currentItem.next();
-        currentItem.removeClass('active');
-        if ( nextItem.length ) {
-            currentItem = nextItem.addClass('active').removeClass('hide');
-            selectors = currentItem.find('select');
-            selectors.each(function( ) {
-                mQuery( this ).prop('disabled', false).trigger("chosen:updated");
-            });
-            selectors = currentItem.find('input[type="radio"]');
-            selectors.each(function( ) {
-                mQuery( this ).prop('disabled', false).trigger("chosen:updated");
-            });
-        }
-    });
-    mQuery('.removeField').on('click', function() {
-        currentItem = mQuery('#' + index);
-        var previousItem = currentItem.prev();
-        currentItem.removeClass('active');
-        if ( previousItem.length ) {
-            previousItem.addClass('active');
-            selectors = currentItem.find('select');
-            selectors.each(function( ) {
-                mQuery( this ).prop('disabled', true).trigger("chosen:updated");
-            });
-            selectors = currentItem.find('input[type="radio"]');
-            selectors.each(function( ) {
-                mQuery( this ).prop('disabled', true).trigger("chosen:updated");
-            });
-            currentItem.addClass('hide');
-            items = mQuery('div.field').find('div.active');
-            currentItem = items.filter('.active');
-        }
-    });
-    return true;
+    var nextItem = currentItem.next();
+    currentItem.removeClass('active');
+    if (nextItem.length) {
+        currentItem = nextItem.addClass('active').removeClass('hide');
+        selectors = currentItem.find('select');
+        selectors.each(function () {
+            mQuery(this).prop('disabled', false).trigger("chosen:updated");
+        });
+        currentItem.find('.btn-no').removeClass('disabled');
+        currentItem.find('.btn-yes').removeClass('disabled');
+        currentItem.find('input[type="radio"]').prop('disabled', false).next().prop('disabled', false);
+    }
+    Mautic.stopIconSpinPostEvent();
+};
+Mautic.removePluginField = function (indexClass) {
+    var deleteCurrentItem = mQuery('#' + indexClass);
+    var previousItem = deleteCurrentItem.prev();
+    deleteCurrentItem.removeClass('active')
+    if ( previousItem.length ) {
+        previousItem.addClass('active');
+        selectors = deleteCurrentItem.find('select');
+        selectors.each(function( ) {
+            mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+        });
+        deleteCurrentItem.find('.btn-no').addClass('disabled');
+        deleteCurrentItem.find('.btn-yes').addClass('disabled');
+        deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
+
+        deleteCurrentItem.addClass('hide');
+    }
+    Mautic.stopIconSpinPostEvent();
 };
 
 Mautic.initiateIntegrationAuthorization = function() {

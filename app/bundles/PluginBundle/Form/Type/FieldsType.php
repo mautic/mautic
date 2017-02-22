@@ -28,18 +28,18 @@ class FieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $index             = 0;
-        $integrationFields = array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
-        $data              = $options['data'];
-
-        foreach ($options['integration_fields'] as $field => $details) {
+        $index                    = 0;
+        $integrationFields        = array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
+        $data                     = isset($options['data']) ? $options['data'] : [];
+        $integrationFieldsOrdered = array_merge($data, $integrationFields);
+        foreach ($integrationFieldsOrdered as $field => $details) {
             ++$index;
             $builder->add('i_'.$index, 'choice', [
                 'choices'  => $integrationFields,
                 'label'    => false,
                 'required' => true,
                 'data'     => isset($data[$field]) ? $field : '',
-                'attr'     => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
+                'attr'     => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
                 'disabled' => ($index > 1 && !isset($data[$field])) ? true : false,
             ]);
             $builder->add('update_mautic'.$index,
@@ -47,10 +47,8 @@ class FieldsType extends AbstractType
                 [
                     'label'       => false,
                     'data'        => isset($options['update_mautic'][$field]) ? (bool) $options['update_mautic'][$field] : '',
-                    'no_label'    => '<-',
-                    'no_value'    => 0,
-                    'yes_label'   => '->',
-                    'yes_value'   => 1,
+                    'no_label'    => '<span class="fa fa-arrow-circle-left"></span>',
+                    'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
                     'empty_value' => false,
                     'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
                 ]);
@@ -61,7 +59,7 @@ class FieldsType extends AbstractType
                 'required'   => true,
                 'data'       => isset($data[$field]) ? $data[$field] : '',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' ',   'onChange' => 'Mautic.matchFieldsType('.$index.')'],
+                'attr'       => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
                 'disabled'   => ($index > 1 && !isset($data[$field])) ? true : false,
             ]);
         }
