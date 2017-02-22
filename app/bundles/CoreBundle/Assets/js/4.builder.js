@@ -449,7 +449,7 @@ Mautic.initSectionListeners = function() {
 
     Mautic.builderContents.on('section:init', function(event, section, isNew) {
         section = mQuery(section);
-        
+
         if (isNew) {
             Mautic.initSlots(section.find('[data-slot-container]'));
         }
@@ -738,7 +738,7 @@ Mautic.initSlots = function(slotContainers) {
     var iframe = mQuery('#builder-template-content', parent.document).contents();
     mQuery('#slot-type-container .slot-type-handle', parent.document).draggable({
         iframeFix: true,
-        connectToSortable: slotContainers,
+        connectToSortable: '[data-slot-container]',
         revert: 'invalid',
         iframeOffset: iframe.offset(),
         helper: function(e, ui) {
