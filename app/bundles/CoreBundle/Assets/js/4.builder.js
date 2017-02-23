@@ -4,13 +4,14 @@
  * @param formName
  */
 Mautic.launchBuilder = function (formName, actionName) {
-    Mautic.codeMode = mQuery('.builder').hasClass('code-mode');
+    var builder = mQuery('.builder');
+    Mautic.codeMode = builder.hasClass('code-mode');
     Mautic.showChangeThemeWarning = true;
 
     mQuery('body').css('overflow-y', 'hidden');
 
     // Activate the builder
-    mQuery('.builder').addClass('builder-active').removeClass('hide');
+    builder.addClass('builder-active').removeClass('hide');
 
     if (typeof actionName == 'undefined') {
         actionName = formName;
@@ -63,15 +64,23 @@ Mautic.launchBuilder = function (formName, actionName) {
         Mautic.keepPreviewAlive('builder-template-content');
     }
 
-    var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
-        panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
+    var builderPanel = mQuery('.builder-panel')
+        builderContent = mQuery('.builder-content')
+        btnCloseBuilder = mQuery('.btn-close-builder')
+        panelHeight = (builderContent.css('right') == '0px') ? builderPanel.height() : 0,
+        panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width(),
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+
+    // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
+    builderPanel.on('scroll', function(e) {
+        builderPanel.find('input:focus').blur().focus();
+    });
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
 
     // Disable the close button until everything is loaded
-    mQuery('.btn-close-builder').prop('disabled', true);
+    btnCloseBuilder.prop('disabled', true);
 
     // Insert the Mautic assets to the header
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
@@ -79,7 +88,7 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
         mQuery('#builder-overlay').addClass('hide');
-        mQuery('.btn-close-builder').prop('disabled', false);
+        btnCloseBuilder.prop('disabled', false);
     });
 };
 
