@@ -1,12 +1,12 @@
 /* PluginBundle */
 Mautic.addNewPluginField = function (selector) {
-    var items = mQuery( 'div.' + selector ).find( 'div.active' );
-    var currentItem = items.filter('.active');
+    var items = mQuery( 'div.' + selector ).find( 'div.hide' );
+    var currentItem = items.filter('.hide');
     var selectors;
-    var nextItem = currentItem.next();
-    currentItem.removeClass('active');
+    var nextItem = currentItem.first();
+
     if (nextItem.length) {
-        currentItem = nextItem.addClass('active').removeClass('hide');
+        currentItem = nextItem.removeClass('hide');
         selectors = currentItem.find('select');
         selectors.each(function () {
             mQuery(this).prop('disabled', false).trigger("chosen:updated");
@@ -17,22 +17,19 @@ Mautic.addNewPluginField = function (selector) {
     }
     Mautic.stopIconSpinPostEvent();
 };
-Mautic.removePluginField = function (indexClass) {
+Mautic.removePluginField = function (selector, indexClass) {
     var deleteCurrentItem = mQuery('#' + indexClass);
-    var previousItem = deleteCurrentItem.prev();
-    deleteCurrentItem.removeClass('active')
-    if ( previousItem.length ) {
-        previousItem.addClass('active');
-        selectors = deleteCurrentItem.find('select');
-        selectors.each(function( ) {
-            mQuery( this ).prop('disabled', true).trigger("chosen:updated");
-        });
-        deleteCurrentItem.find('.btn-no').addClass('disabled');
-        deleteCurrentItem.find('.btn-yes').addClass('disabled');
-        deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
 
-        deleteCurrentItem.addClass('hide');
-    }
+    selectors = deleteCurrentItem.find('select');
+    selectors.each(function( ) {
+        mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+    });
+
+    deleteCurrentItem.find('.btn-no').addClass('disabled');
+    deleteCurrentItem.find('.btn-yes').addClass('disabled');
+    deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
+    deleteCurrentItem.addClass('hide');
+
     Mautic.stopIconSpinPostEvent();
 };
 
@@ -87,6 +84,7 @@ Mautic.integrationOnLoad = function(container, response) {
     } else {
         Mautic.filterIntegrations();
     }
+    mQuery('[data-toggle="tooltip"]').tooltip();
 };
 
 Mautic.filterIntegrations = function(update) {

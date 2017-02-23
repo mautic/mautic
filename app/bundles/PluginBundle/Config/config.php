@@ -99,10 +99,6 @@ return [
                 'class' => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
                 'alias' => 'integration_company_fields',
             ],
-            'mautic.form.type.integration.object.fields' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\ObjectFieldsType',
-                'alias' => 'integration_object_fields',
-            ],
             'mautic.form.type.integration.keys' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\KeysType',
                 'alias' => 'integration_keys',

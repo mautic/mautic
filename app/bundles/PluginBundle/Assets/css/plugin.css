@@ -22,3 +22,7 @@
 .field-selector {
     width: 500px;
 }
+.col-centered{
+    margin: 0 auto;
+    float: none;
+}

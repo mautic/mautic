@@ -49,6 +49,7 @@ class CompanyFieldsType extends AbstractType
                     'no_label'    => '<span class="fa fa-arrow-circle-left" ></span>',
                     'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
                     'empty_value' => false,
+                    'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
                     'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
                 ]);
 
