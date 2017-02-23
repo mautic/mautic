@@ -57,6 +57,7 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
+        // register tokens only if the plugins are enabled
         $tokens         = [];
         $activeProducts = [];
         foreach (['meeting', 'training', 'assist'] as $p) {

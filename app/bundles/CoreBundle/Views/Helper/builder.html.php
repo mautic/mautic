@@ -48,7 +48,7 @@
                             <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="<?php echo $slotKey; ?>">
                                 <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
                                 <br>
-                                <?php echo $slot['header']; ?>
+                                <span class="slot-caption"><?php echo $slot['header']; ?></span>
                                 <script type="text/html">
                                     <?php echo $view->render($slot['content']); ?>
                                 </script>

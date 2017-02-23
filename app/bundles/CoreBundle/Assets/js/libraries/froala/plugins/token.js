@@ -44,7 +44,6 @@
 
     function apply (val) {
       editor.html.insert(val);
-//      editor.$el.keyup();
     }
 
     return {
@@ -68,7 +67,6 @@
           var method = location.href.match(/email/i)? 'email:getBuilderTokens' : 'page:getBuilderTokens';
           Mautic.getTokens(method, function(tokens) {
               mQuery.each(tokens, function(k,v){
-                  //if (k.match(/form=/i)){tokens[k] = 'Form: ' + v;}
                   if (k.match(/assetlink=/i)){
                       delete tokens[k];
                       var nv = v.replace('a:', '');
@@ -98,8 +96,10 @@
           for (var i = 0; i < keys.length; i++) {
               var val = keys[i];
               var str = ' <div class=\'badge-wrapper\'><span class=\'badge\'>_BADGE_</span></div>';
-              var badge = (val.match(/page link/i))? str.replace(/_BADGE_/, 'page link') : (val.match(/asset link/i))? str.replace(/_BADGE_/, 'asset link') : (val.match(/form=/i))? str.replace(/_BADGE_/,'form') : (val.match(/focus=/i))? str.replace(/_BADGE_/,'focus') : '';
-              c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + options[val] + '">' + options[val] + badge + '</a></li>';
+              var badge = (val.match(/page link/i))? str.replace(/_BADGE_/, 'page') : (val.match(/asset link/i))? str.replace(/_BADGE_/, 'asset') : (val.match(/form=/i))? str.replace(/_BADGE_/,'form') : (val.match(/focus=/i))? str.replace(/_BADGE_/,'focus') : '';
+              var title = options[val];
+              if (title.length>24) title = title.substr(0, 24) + '...';
+              c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + title + '">' + title + badge + '</a></li>';
           }
           c += '</ul>';
 

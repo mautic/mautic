@@ -119,6 +119,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
+        // $requestedComponents must be an array so ajax calls can properly manage responses
         return $model->getBuilderComponents(null, ['tokens'], $query);
     }
 }
