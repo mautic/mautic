@@ -32,6 +32,9 @@ class FocusApiController extends CommonApiController
         $this->entityNameOne    = 'focusitem';
         $this->entityNameMulti  = 'focusitems';
         $this->permissionBase  = 'plugin:focus:items';
+        $this->dataInputMasks   = [
+            'html'     => 'html',
+        ];
     }
 
     public function generateJsAction($id){
