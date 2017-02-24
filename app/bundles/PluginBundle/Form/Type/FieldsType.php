@@ -32,6 +32,7 @@ class FieldsType extends AbstractType
         $integrationFields        = array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
         $data                     = isset($options['data']) ? $options['data'] : [];
         $integrationFieldsOrdered = array_merge($data, $integrationFields);
+
         foreach ($integrationFieldsOrdered as $field => $details) {
             ++$index;
             $builder->add('i_'.$index, 'choice', [
@@ -42,18 +43,19 @@ class FieldsType extends AbstractType
                 'attr'     => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
                 'disabled' => ($index > 1 && !isset($data[$field])) ? true : false,
             ]);
-            $builder->add('update_mautic'.$index,
-                'yesno_button_group',
-                [
-                    'label'       => false,
-                    'data'        => isset($options['update_mautic'][$field]) ? (bool) $options['update_mautic'][$field] : '',
-                    'no_label'    => '<span class="fa fa-arrow-circle-left"></span>',
-                    'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
-                    'empty_value' => false,
-                    'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
-                    'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
-                ]);
-
+            if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
+                $builder->add('update_mautic'.$index,
+                    'yesno_button_group',
+                    [
+                        'label'       => false,
+                        'data'        => isset($options['update_mautic'][$field]) ? (bool) $options['update_mautic'][$field] : '',
+                        'no_label'    => '<span class="fa fa-arrow-circle-left"></span>',
+                        'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
+                        'empty_value' => false,
+                        'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
+                        'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
+                    ]);
+            }
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['lead_fields'],
                 'label'      => false,
@@ -77,6 +79,7 @@ class FieldsType extends AbstractType
                 'special_instructions' => '',
                 'alert_type'           => '',
                 'allow_extra_fields'   => true,
+                'enable_data_priority' => false,
             ]
         );
     }

@@ -177,6 +177,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function getDataPriority()
+    {
+        return true;
+    }
+
+    /**
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
