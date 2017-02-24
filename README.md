@@ -4,6 +4,8 @@ Mautic Introduction
 
 ## Getting Started
 
+The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
+
 This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
 
 <table width="100%" border="0">
@@ -31,14 +33,12 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 	</tr>
 </table>
 
-**Get stuck?** *No problem. Check out the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
+**Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
 
 # Disclaimer
-Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates.
+Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production is recommened the pre-packaged Mautic available at [mautic.com/download](https://www.mautic.org/download).
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
-
-If you prefer, there are packaged downloads ready for install at [https://www.mautic.org/download](https://www.mautic.org/download).
 
 # Keeping Up-To-Date
 
@@ -47,9 +47,9 @@ If you prefer, there are packaged downloads ready for install at [https://www.ma
 Each time you update Mautic's source after the initial setup/installation via a new checkout, download, git pull, etc; you will need to clear the cache. To do so, run the following command:
 
     $ cd /your/mautic/directory
-    $ php app/console cache:clear --env=prod
+    $ php app/console cache:clear
 
-(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to drop the <code>--env=prod</code> from the command).
+(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to add the <code>--env=dev</code> from the command).
 
 ### Database Schema
 
@@ -57,17 +57,17 @@ Before running these commands, please make a backup of your database.
 
 If updating from <a href="https://github.com/mautic/mautic/releases">a tagged release</a> to <a href="https://github.com/mautic/mautic/releases">a tagged release</a>, schema changes will be included in a migrations file. To apply the changes, run
 
-    `$ php app/console doctrine:migrations:migrate --env=prod`
+    `$ php app/console doctrine:migrations:migrate`
 
 If you are updating to the latest source (remember this is alpha), first run
 
-    `$ php app/console doctrine:schema:update --env=prod --dump-sql`
+    `$ php app/console doctrine:schema:update --dump-sql`
 
 This will list out the queries Doctrine wants to execute in order to get the schema up-to-date (no queries are actually executed). Review the queries to ensure there is nothing detrimental to your data. If you have doubts about a query, submit an issue here and we'll verify it.
 
 If you're satisfied with the queries, execute them with
 
-    `$ php app/console doctrine:schema:update --env=prod --force`
+    `$ php app/console doctrine:schema:update --force`
 
 Your schema should now be up-to-date with the source.
 
@@ -181,9 +181,22 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 
 ### Requirements
 
+#### Development / Build process requirements
+
 1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
-2. Install a server, PHP and MySql/Posgres to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
+2. Install a server, PHP and MySql to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
 3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
+4. Install [NPM](https://www.npmjs.com/).
+5. Install [Grunt](http://gruntjs.com/).
+
+#### Mautic requirements
+
+1. See [Mautic requirements](https://www.mautic.org/download/requirements).
+2. PHP modules: 
+	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
+	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
+	- recommended for development: `xdebug`
+3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
 ### Install the latest GitHub version
 
@@ -194,13 +207,23 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 5. Install dependencies (`composer install`).
 6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
 
+### Development environement
+
+Mautic downloaded from GitHub have the development environment. You can access it by adding `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`. Or in case of CLI commands, add `--env=dev` attribute to it.
+
+This development environment will display the PHP errors, warnigns and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which requires clearing the cache are in the `config.php` files.
+
+In case of assets like JS, CSS, the source files are loaded instead of concatinated, minified file. This way the changes in those files will be directly visible on refresh. If you'd want to see the change in production environment, you'd have to run the `app/console mautic:assets:generate` command.
+
+In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
+
 ### Test a pull request (PR)
 
 1. [Select a PR](https://github.com/mautic/mautic/pulls) to test.
 2. Read the description and steps to test. If it's a bug fix, follow the steps if you'll be able to recreate the issue.
-3. Use development environment for testing. To do that, add `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`
+3. Use the development environment (above) for testing.
 3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
-4. Clear cache for development environment (`app/console cache:clear -e dev`).
+4. Clear cache for development environment (`rm -rf app/cache/*` or `app/console cache:clear -e dev`).
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
 
