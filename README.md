@@ -154,13 +154,13 @@ This example demonstrates several uses of automation. First, the visitor is *aut
 
 There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.  
 
-## Customizing - plugins, themes, API, Webhooks
+## Customizing - Plugins, Themes, API, Webhooks
 
 There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. Read more in the [Mautic Developer Docummentation](https://developer.mautic.org/).
 
 ## Translations
 
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for community translation at [Transifex](https://www.transifex.com/organization/mautic/dashboard/mautic) and if you are interested you can add more languages, or help with current translations there.  
+One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for the translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.  
 
 ## How to test a pull request
 
