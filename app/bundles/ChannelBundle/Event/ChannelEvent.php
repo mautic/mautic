@@ -70,9 +70,11 @@ class ChannelEvent extends CommonEvent
     }
 
     /**
-     * Returns repository name for the provided channel. Null if not found.
+     * Returns repository name for the provided channel. Defaults to classic naming convention.
      *
-     * @return string|null
+     * @param string $channel
+     *
+     * @return string
      */
     public function getRepositoryName($channel)
     {
@@ -80,13 +82,18 @@ class ChannelEvent extends CommonEvent
             return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['repository'];
         }
 
-        return null;
+        // if not defined, try the classic naming convention
+        $channel = ucfirst($channel);
+
+        return "Mautic{$channel}Bundle:{$channel}";
     }
 
     /**
      * Returns the name of the column holding the channel name for the provided channel. Defaults to 'name'.
      *
-     * @return string|null
+     * @param string $channel
+     *
+     * @return string
      */
     public function getNameColumn($channel)
     {
