@@ -154,45 +154,13 @@ This example demonstrates several uses of automation. First, the visitor is *aut
 
 There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.  
 
-## Customizing
+## Customizing - plugins, themes, API, Webhooks
 
-There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. If you are curious about those benefits and wish to read more about the value of choosing open source you can find more information on the [Mautic](https://www.mautic.org) website.  
+There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. Read more in the [Mautic Developer Docummentation](https://developer.mautic.org/).
 
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are all stored on [Transifex](https://www.transifex.com/organization/mautic/dashboard/mautic) and if you are interested you can add more translations.  
+## Translations
 
-Customizations don't stop with the language strings. You can also construct workflows and campaigns to fit your business situation rather than adjusting your business to fit Mautic. The code is available and can be easily edited by any skilled developer. Below is some useful technical information regarding making changes.
-
-### Bundles
-
-Mautic has been configured to allow new features to be added by simply adding new bundles. These bundles can then be discovered by the software and installed from within Mautic. Each bundle contains the information for menus, routes, views, translations and more. These are self-contained objects but can interact with other bundles as necessary through triggers.
-
-*You can view the existing bundles in the GitHub repository [https://github.com/mautic/mautic/tree/master/app/bundles](https://github.com/mautic/mautic/tree/master/app/bundles)*
-
-### Templates
-
-Developers are also able to create customized templates to use within landing pages and emails. These are currently added directly through the `/themes` folder located in the root of the repository. Below is the structure of a template.
-
-
-```
-/YourThemeName
-../css
-../../style.css
-../html
-../../base.html.php
-../../email.html.php
-../../message.html.php
-../../page.html.php
-..config.php
-```
-
-**Required files**: *The only files required by Mautic for a theme is the config.php file. Every other file is optional.*
-
-### Workflows (Coming Soon)
-
-Another benefit to using Mautic, an open source platform, is the ability to share workflows and other helpful aspects of setting up a marketing automation implementation. These workflows may be the way a company handles campaigns, timing of emails, landing pages, assets, or other useful content. In a coming version of Mautic developers will be able to share these through the Mautic Marketplace&#0153;. This marketplace will provide a quick method for sharing, finding, and installing workflows.  
-
-
-*More detailed information regarding modifications and customizations as well as deeper tutorials on the above features can be found in the developer documentation when it is released.*
+One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for community translation at [Transifex](https://www.transifex.com/organization/mautic/dashboard/mautic) and if you are interested you can add more languages, or help with current translations there.  
 
 ## How to test a pull request
 
@@ -218,6 +186,8 @@ In case of assets like JS, CSS, the source files are loaded instead of concatina
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
 ### Test a pull request (PR)
+
+Every change to Mautic core happens via PRs. Every PR must have 2 successful tests to be merged to the core and released in the next version. Testing a PR is a great way how to move Mautic forward and personally improve its quality and stability.
 
 1. [Select a PR](https://github.com/mautic/mautic/pulls) to test.
 2. Read the description and steps to test. If it's a bug fix, follow the steps if you'll be able to recreate the issue.
