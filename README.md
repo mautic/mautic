@@ -40,6 +40,25 @@ Installing from source is only recommended if you are comfortable using the comm
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
+## Requirements
+
+#### Development / Build process requirements
+
+1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
+2. Install a server, PHP and MySql to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
+3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
+4. Install [NPM](https://www.npmjs.com/).
+5. Install [Grunt](http://gruntjs.com/).
+
+#### Mautic requirements
+
+1. See [Mautic requirements](https://www.mautic.org/download/requirements).
+2. PHP modules: 
+	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
+	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
+	- recommended for development: `xdebug`
+3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
+
 # Keeping Up-To-Date
 
 ### Source Files
@@ -178,25 +197,6 @@ Another benefit to using Mautic, an open source platform, is the ability to shar
 ## How to test a pull request
 
 Everyone can test submitted features and bug fixes. No programming skills are required. All you have to do is to follow the steps below.
-
-### Requirements
-
-#### Development / Build process requirements
-
-1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
-2. Install a server, PHP and MySql to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
-3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
-4. Install [NPM](https://www.npmjs.com/).
-5. Install [Grunt](http://gruntjs.com/).
-
-#### Mautic requirements
-
-1. See [Mautic requirements](https://www.mautic.org/download/requirements).
-2. PHP modules: 
-	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
-	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
-	- recommended for development: `xdebug`
-3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
 ### Install the latest GitHub version
 
