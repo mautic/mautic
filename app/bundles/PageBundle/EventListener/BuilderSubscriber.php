@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -145,6 +146,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Slots:separator.html.php',
                 'slot',
                 700
+            );
+            $event->addSlotType(
+                'gatedvideo',
+                'Video',
+                'video-camera',
+                'MauticCoreBundle:Slots:gatedvideo.html.php',
+                GatedVideoType::class,
+                600
             );
         }
     }

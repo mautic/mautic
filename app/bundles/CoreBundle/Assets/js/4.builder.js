@@ -751,13 +751,32 @@ Mautic.initSlotListeners = function() {
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
-                var attrPrefix = 'data-param-';
                 var regex = /data-param-(.*)/;
                 var match = regex.exec(attr.name);
 
                 if (match !== null) {
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
                     focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
+
+                    var selectField = focusForm.find('select[data-slot-param="'+match[1]+'"]');
+
+                    if (selectField) {
+                        selectField.val(attr.value)
+                    }
+
+                    // URL fields
+                    var urlField = focusForm.find('input[type="url"][data-slot-param="'+match[1]+'"]');
+
+                    if (urlField) {
+                        urlField.val(attr.value);
+                    }
+
+                    // Number fields
+                    var numberField = focusForm.find('input[type="number"][data-slot-param="'+match[1]+'"]');
+
+                    if (numberField) {
+                        numberField.val(attr.value);
+                    }
                 }
             });
 
@@ -911,6 +930,22 @@ Mautic.initSlotListeners = function() {
             params.slot.find('a').attr('background', '#'+params.field.val());
         } else if (fieldParam === 'color') {
             params.slot.find('a').css(fieldParam, '#'+params.field.val());
+        } else if (/gatedvideo/.test(fieldParam)) {
+            // Handle gatedVideo replacements
+            var toInsert = fieldParam.split('-')[1];
+            var insertVal = params.field.val();
+
+            if (toInsert === 'url') {
+                params.slot.find('source').attr('src', insertVal);
+            } else if (toInsert === 'gatetime') {
+                params.slot.find('video').attr('data-gate-time', insertVal);
+            } else if (toInsert === 'formid') {
+                params.slot.find('video').attr('data-form-id', insertVal);
+            } else if (toInsert === 'height') {
+                params.slot.find('video').attr('height', insertVal);
+            } else if (toInsert === 'width') {
+                params.slot.find('video').attr('width', insertVal);
+            }
         }
 
         if (params.type == 'text') {
