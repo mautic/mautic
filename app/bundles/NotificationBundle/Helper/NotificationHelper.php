@@ -143,11 +143,9 @@ class NotificationHelper
     }]);
 
     var postUserIdToMautic = function(userId) {
-        MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}?osid=' + userId, {}, function(response, xhr) {
-        if (response.osid) {
-            document.cookie = "mtc_osid="+response.osid+"; max-age=" + 60 * 60 * 24; 
-        }
-    });
+        var data = [];
+        data['osid'] = userId;
+        MauticJS.makeCORSRequest('GET', '{$leadAssociationUrl}', data);
     };
 
     OneSignal.push(function() {
@@ -199,7 +197,6 @@ JS;
         $landingPage = true;
         $server = $this->request->getCurrentRequest()->server;
         $cookies = $this->request->getCurrentRequest()->cookies;
-
         // already exist
         if($cookies->get('mtc_osid')){
             return false;
