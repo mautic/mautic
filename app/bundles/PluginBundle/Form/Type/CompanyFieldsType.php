@@ -38,6 +38,7 @@ class CompanyFieldsType extends AbstractType
             $builder->add('i_'.$index, 'choice', [
                 'choices'  => $integrationFieldsOrdered,
                 'label'    => false,
+                'required' => true,
                 'data'     => isset($data[$field]) ? $field : '',
                 'attr'     => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
                 'disabled' => ($index > 1 && !isset($data[$field])) ? true : false,
@@ -47,7 +48,7 @@ class CompanyFieldsType extends AbstractType
                     'yesno_button_group',
                     [
                         'label'       => false,
-                        'data'        => isset($options['data']['update_mautic_company']) ? (bool) $options['data']['update_mautic_company'] : true,
+                        'data'        => isset($options['update_mautic_company'][$field]) ? (bool) $options['update_mautic_company'][$field] : '',
                         'no_label'    => '<span class="fa fa-arrow-circle-left" ></span>',
                         'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
                         'empty_value' => false,
@@ -58,6 +59,8 @@ class CompanyFieldsType extends AbstractType
             $builder->add('m_'.$index, 'choice', [
                 'choices'    => $options['company_fields'],
                 'label'      => false,
+                'required'   => true,
+                'data'       => isset($data[$field]) ? $data[$field] : '',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
                 'disabled'   => ($index > 1 && !isset($data[$field])) ? true : false,
@@ -70,7 +73,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_company_fields', 'company_fields']);
+        $resolver->setRequired(['integration_company_fields', 'company_fields', 'update_mautic_company']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',

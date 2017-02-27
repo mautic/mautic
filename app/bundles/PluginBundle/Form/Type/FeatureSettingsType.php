@@ -84,7 +84,6 @@ class FeatureSettingsType extends AbstractType
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
             $enableDataPriority = false;
-            $this->factory->getLogger()->addError(print_r($formSettings, true));
             if (isset($formSettings['enable_data_priority'])) {
                 $enableDataPriority = $formSettings['enable_data_priority'];
             }
@@ -117,6 +116,7 @@ class FeatureSettingsType extends AbstractType
                         'required'                   => false,
                         'company_fields'             => $companyFields,
                         'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
+                        'update_mautic_company'      => isset($data['update_mautic_company']) && !empty($data['update_mautic_company']) ? $data['update_mautic_company'] : [],
                         'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
