@@ -28,7 +28,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:broadcasts:send')
+        $this->setName('mautic:broadcasts:send:bc')
             ->setDescription('Process contacts pending to receive a channel broadcast.')
             ->setHelp(
                 <<<'EOT'
