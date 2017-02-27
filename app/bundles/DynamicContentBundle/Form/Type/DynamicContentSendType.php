@@ -43,6 +43,24 @@ class DynamicContentSendType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
+        $builder->add(
+            'dwc_slot_name',
+            'text',
+            [
+                'label'      => 'mautic.dynamicContent.send.slot_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(['message' => 'mautic.core.value.required']),
+                ],
+            ]
+        );
+
         $builder->add(
             'dynamicContent',
             'dwc_list',

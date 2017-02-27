@@ -165,6 +165,21 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Lead           $lead
+     * @param                $slot
+     */
+    public function removeSlotContentForLead(Lead $lead, $slot)
+    {
+        $qb = $this->em->getConnection()->createQueryBuilder();
+        $qb->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data')
+            ->andWhere($qb->expr()->eq('slot', ':slot'))
+            ->andWhere($qb->expr()->eq('lead_id', ':lead_id'))
+            ->setParameter('slot', $slot)
+            ->setParameter('lead_id', $lead->getId())
+            ->execute();
+    }
+
+    /**
      * @param DynamicContent $dynamicContent
      * @param Lead|array     $lead
      * @param string         $source

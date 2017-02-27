@@ -105,6 +105,10 @@ return [
                 ],
                 'alias' => 'dwcsend_list',
             ],
+            'mautic.form.type.dwc_remove' => [
+                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentRemoveType',
+                'alias' => 'dwc_remove',
+            ],
             'mautic.form.type.dwcdecision_list' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [

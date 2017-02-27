@@ -76,20 +76,23 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'            => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
                 'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'               => 'dwcsend_list',
-                'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme'              => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
                 'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                'hideTriggerMode'        => true,
-                'connectionRestrictions' => [
-                    'anchor' => [
-                        'decision.inaction',
-                    ],
-                    'source' => [
-                        'decision' => [
-                            'dwc.decision',
-                        ],
-                    ],
-                ],
+                'channel'        => 'dynamicContent',
+                'channelIdField' => 'dwc_slot_name',
+            ]
+        );
+
+
+        $event->addAction(
+            'dwc.remove_content',
+            [
+                'label'                  => 'mautic.dynamicContent.campaign.remove_dwc',
+                'description'            => 'mautic.dynamicContent.campaign.remove_dwc.tooltip',
+                'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'               => 'dwc_remove',
+                'formTheme'              => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
+                'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
                 'channel'        => 'dynamicContent',
                 'channelIdField' => 'dwc_slot_name',
             ]
@@ -143,32 +146,39 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        $slot        = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
+        $slot        = $eventConfig['dwc_slot_name'];
 
-        $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        if ($event->checkContext('dwc.push_content')) {
 
-        if ($dwc instanceof DynamicContent) {
-            // Use translation if available
-            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
 
-            if ($slot) {
-                $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
+            if ($dwc instanceof DynamicContent) {
+                // Use translation if available
+                list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+
+                if ($slot) {
+                    $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
+                }
+
+                $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+
+                $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+                $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+
+                $content = $tokenEvent->getContent();
+                $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
+
+                $event->stopPropagation();
+
+                $result = $event->setResult($content);
+                $event->setChannel('dynamicContent', $dwc->getId());
+
+                return $result;
             }
-
-            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
-
-            $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
-
-            $content = $tokenEvent->getContent();
-            $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
-
-            $event->stopPropagation();
-
-            $result = $event->setResult($content);
-            $event->setChannel('dynamicContent', $dwc->getId());
-
-            return $result;
+        } elseif ($event->checkContext('dwc.remove_content')) {
+            if($slot){
+                $this->dynamicContentModel->removeSlotContentForLead( $lead, $slot);
+            }
         }
     }
 }
