@@ -37,6 +37,7 @@ if (!isset($clickUrl)) {
         'MauticFocusBundle:Builder:style.less.php',
         [
             'preview' => $preview,
+            'focus' => $focus,
         ]
     );
     $cssContent = $view->escape($cssContent, 'js');

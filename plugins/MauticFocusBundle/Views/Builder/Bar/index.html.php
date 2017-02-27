@@ -18,7 +18,7 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 
     <div class="mf-content">
         <?php if ($focus['htmlMode'] || $focus['html_mode']): ?>
-            <?php echo $focus['html']; ?>
+            <?php echo html_entity_decode($focus['html']); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
         <?php if ($focus['type'] == 'form' && !empty($form)): ?>
@@ -42,6 +42,7 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
                     echo ' mf-bar-collapser-sticky';
                 } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
         <style scoped>
+            <?php echo html_entity_decode($focus['css']);  ?>
             .mf-bar-collapser-icon {
                 color: #<?php  echo $color; ?>;
             }
