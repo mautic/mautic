@@ -28,12 +28,9 @@ class FieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $index             = 0;
-        $integrationFields = array_combine(array_keys($options['integration_fields']), array_keys($options['integration_fields']));
-        $data              = isset($options['data']) ? $options['data'] : [];
-        foreach ($data as $key => $field) {
-            $fieldData[str_replace('__', ' - ', $key)] = $field;
-        }
+        $index                    = 0;
+        $integrationFields        = array_combine(str_replace(' - ', '__', array_keys($options['integration_fields'])), array_keys($options['integration_fields']));
+        $fieldData                = isset($options['data']) ? $options['data'] : [];
         $integrationFieldsOrdered = array_merge($fieldData, $integrationFields);
 
         foreach ($integrationFieldsOrdered as $field => $details) {
