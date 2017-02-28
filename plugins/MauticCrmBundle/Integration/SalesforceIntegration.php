@@ -939,7 +939,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = [];
         $fieldsToUpdateInSf    = array_keys($config['update_mautic'], 1);
-        $fields                = implode(', l.', array_diff_key($config['leadFields'], $fieldsToUpdateInSf));
+        $fields                = implode(', l.', array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInSf)));
         $fields                = 'l.'.$fields;
         $result                = 0;
          //update lead/contact records
@@ -947,7 +947,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($leadsToUpdate as $lead) {
             //use a composite patch here that can update and create (one query) every 200 records
             foreach ($config['leadFields'] as $sfField => $mauticField) {
-                $body[$sfField] = $lead[$mauticField];
+                if (isset($lead[$mauticField])) {
+                    $body[$sfField] = $lead[$mauticField];
+                }
             }
             $mauticData[] = [
                 'method'      => 'PATCH',
@@ -962,7 +964,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($leadsToCreate as $lead) {
             //use a composite patch here that can update and create (one query) every 200 records
             foreach ($config['leadFields'] as $sfField => $mauticField) {
-                $body[$sfField] = $lead[$mauticField];
+                if (isset($lead[$mauticField])) {
+                    $body[$sfField] = $lead[$mauticField];
+                }
             }
             $mauticData[] = [
                 'method'      => 'POST',

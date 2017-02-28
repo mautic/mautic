@@ -214,6 +214,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
+        $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
+        $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+
         if (!isset($matchedFields['companyname'])) {
             if (isset($matchedFields['companywebsite'])) {
                 $matchedFields['companyname'] = $matchedFields['companywebsite'];
@@ -296,6 +300,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $lead = array_shift($existingLeads);
             }
         }
+        $fieldsToUpdateInMautic = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
