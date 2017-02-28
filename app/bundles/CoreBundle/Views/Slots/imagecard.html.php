@@ -11,7 +11,7 @@
 ?>
 
 <table class="imagecard" align="center" style="background-color: #ddd;">
-    <tr><td><img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/></td></tr>
-    <tr><td class="imagecard-caption" style="padding: 5px;background-color: #bbb;">Caption goes here</td></tr>
+    <tr><td class="imagecard-image" align="center"><img class="fr-view" src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/></td></tr>
+    <tr><td class="imagecard-caption" style="padding: 5px;background-color: #bbb;font-size:16px;color:#000" align="center">Your image caption goes here. You can change the position of the caption and style in the customize slot tab.</td></tr>
 </table>
 <div style="clear:both"></div>

@@ -10,7 +10,7 @@
  */
 ?>
 <figure>
-    <img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/>
-    <figcaption>Caption goes here</figcaption>
+    <img class="fr-view" src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/>
+    <figcaption style="padding: 5px;color:#000;font-size:16px;text-align: left;">Your image caption goes here. You can change the position of the caption and style in the customize slot tab.</figcaption>
 </figure>
 <div style="clear:both"></div>

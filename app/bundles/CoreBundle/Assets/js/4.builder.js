@@ -2,6 +2,7 @@
  * Launch builder
  *
  * @param formName
+ * @param actionName
  */
 Mautic.launchBuilder = function (formName, actionName) {
     Mautic.codeMode = mQuery('.builder').hasClass('code-mode');
@@ -26,6 +27,86 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Load the theme from the custom HTML textarea
     var themeHtml = mQuery('textarea.builder-html').val();
+
+    if (Mautic.codeMode) {
+        var rawTokens = mQuery.map(Mautic.builderTokens, function (element, index) {
+            return index
+        }).sort();
+        Mautic.builderCodeMirror = CodeMirror(document.getElementById('customHtmlContainer'), {
+            value: themeHtml,
+            lineNumbers: true,
+            mode: 'htmlmixed',
+            extraKeys: {"Ctrl-Space": "autocomplete"},
+            lineWrapping: true,
+            hintOptions: {
+                hint: function (editor) {
+                    var cursor = editor.getCursor();
+                    var currentLine = editor.getLine(cursor.line);
+                    var start = cursor.ch;
+                    var end = start;
+                    while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
+                    while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
+                    var curWord = start != end && currentLine.slice(start, end);
+                    var regex = new RegExp('^' + curWord, 'i');
+                    var result = {
+                        list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function(idx) {
+                            return (rawTokens[idx].indexOf(curWord) !== -1);
+                        })),
+                        from: CodeMirror.Pos(cursor.line, start),
+                        to: CodeMirror.Pos(cursor.line, end)
+                    };
+
+                    return result;
+                }
+            }
+        });
+
+        Mautic.keepPreviewAlive('builder-template-content');
+    }
+
+    var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
+        panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
+        spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
+        spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+
+    // Disable the close button until everything is loaded
+    mQuery('.btn-close-builder').prop('disabled', true);
+
+    // Insert the Mautic assets to the header
+    var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
+    themeHtml = themeHtml.replace('</head>', assets+'</head>');
+
+    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+    });
+};
+
+/**
+ * Launch builder
+ *
+ */
+Mautic.launchBuilderSlot = function (slot) {
+    Mautic.codeMode = mQuery('.builder').hasClass('code-mode');
+    Mautic.showChangeThemeWarning = true;
+
+    mQuery('slotbody').css('overflow-y', 'hidden');
+
+    // Activate the builder
+    mQuery('.builder').addClass('builder-active').removeClass('hide');
+
+    var builderCss = {
+        margin: "0",
+        padding: "0",
+        border: "none",
+        width: "100%",
+        height: "100%"
+    };
+
+    // Load the theme from the custom HTML textarea
+    var themeHtml = mQuery(slot).html();
 
     if (Mautic.codeMode) {
         var rawTokens = mQuery.map(Mautic.builderTokens, function (element, index) {
@@ -841,7 +922,7 @@ Mautic.initSlotListeners = function() {
         });
 
         // Initialize different slot types
-        if (type === 'image' || type === 'imagecaption') {
+        if (type === 'image' || type === 'imagecaption' || type === 'imagecard') {
             var image = mQuery(this).find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
@@ -860,6 +941,8 @@ Mautic.initSlotListeners = function() {
             mQuery(this).find('a').click(function(e) {
                 e.preventDefault();
             });
+        } else if (type === 'codemode') {
+            Mautic.launchBuilderSlot(this);
         }
 
         // Store the slot to a global var
@@ -890,6 +973,7 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
+        var type = params.type;
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'href') {

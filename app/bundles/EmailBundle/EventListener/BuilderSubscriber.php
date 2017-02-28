@@ -152,6 +152,22 @@ class BuilderSubscriber extends CommonSubscriber
                 900
             );
             $event->addSlotType(
+                'imagecard',
+                'Image Card',
+                'id-card-o',
+                'MauticCoreBundle:Slots:imagecard.html.php',
+                'slot_imagecard',
+                870
+            );
+            $event->addSlotType(
+                'imagecaption',
+                'Image+Caption',
+                'image',
+                'MauticCoreBundle:Slots:imagecaption.html.php',
+                'slot_imagecaption',
+                850
+            );
+            $event->addSlotType(
                 'button',
                 'Button',
                 'external-link',
@@ -160,12 +176,36 @@ class BuilderSubscriber extends CommonSubscriber
                 800
             );
             $event->addSlotType(
+                'socialshare',
+                'Social Share',
+                'share-alt',
+                'MauticCoreBundle:Slots:socialshare.html.php',
+                'slot',
+                700
+            );
+            $event->addSlotType(
+                'socialfollow',
+                'Social Follow',
+                'twitter',
+                'MauticCoreBundle:Slots:socialfollow.html.php',
+                'slot',
+                600
+            );
+            $event->addSlotType(
+                'codemode',
+                'Code Mode',
+                'code',
+                'MauticCoreBundle:Slots:codemode.html.php',
+                'slot',
+                500
+            );
+            $event->addSlotType(
                 'separator',
                 'Separator',
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
                 'slot',
-                700
+                400
             );
         }
     }

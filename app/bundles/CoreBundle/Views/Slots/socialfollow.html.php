@@ -10,4 +10,10 @@
  */
 ?>
 
-<img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/gplus.gif" alt="google+" class="fr-view fr-dii fr-draggable"><img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/facebook.gif" alt="facebook" class="fr-view fr-dii fr-draggable"><img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/twitter.gif" alt="twitter" class="fr-view fr-dii fr-draggable">
+<a href=""><img src="<?php echo $view['assets']->getUrl('themes/neopolitan/img/gplus.gif', null, null, true); ?>" alt="google+"
+                class="fr-view fr-dii fr-draggable"></a>
+<a href=""><img src="<?php echo $view['assets']->getUrl('themes/neopolitan/img/facebook.gif', null, null, true); ?>" alt="facebook"
+                class="fr-view fr-dii fr-draggable"></a>
+<a href=""><img src="<?php echo $view['assets']->getUrl('themes/neopolitan/img/twitter.gif', null, null, true); ?>" alt="twitter"
+                class="fr-view fr-dii fr-draggable"></a>
+
