@@ -234,10 +234,8 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
-
+        $queryUrl                = $this->integration->getQueryUrl();
         if (isset($query['start'])) {
-            $queryUrl = $this->integration->getQueryUrl();
-
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
