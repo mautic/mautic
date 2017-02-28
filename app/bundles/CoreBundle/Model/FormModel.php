@@ -50,10 +50,24 @@ class FormModel extends AbstractCommonModel
     {
         if (method_exists($entity, 'getCheckedOut')) {
             $checkedOut = $entity->getCheckedOut();
-            if (!empty($checkedOut)) {
-                //is it checked out by the current user?
+            if (!empty($checkedOut) && $checkedOut instanceof \DateTime) {
                 $checkedOutBy = $entity->getCheckedOutBy();
-                if (!empty($checkedOutBy) && $checkedOutBy !== $this->userHelper->getUser()->getId()) {
+                $maxLockTime  = $this->factory->getParameter('max_entity_lock_time', 0);
+
+                if ($maxLockTime !== 0 && is_numeric($maxLockTime)) {
+                    $lockValidityDate = clone $checkedOut;
+                    $lockValidityDate->add(new \DateInterval('PT'.$maxLockTime.'S'));
+                } else {
+                    $lockValidityDate = false;
+                }
+
+                //is lock expired ?
+                if ($lockValidityDate !== false && (new \DateTime()) > $lockValidityDate) {
+                    return false;
+                }
+
+                //is it checked out by the current user?
+                if (!empty($checkedOutBy) && ($checkedOutBy !== $this->factory->getUser()->getId())) {
                     return true;
                 }
             }
