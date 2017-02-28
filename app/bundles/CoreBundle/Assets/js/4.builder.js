@@ -841,7 +841,7 @@ Mautic.initSlotListeners = function() {
         });
 
         // Initialize different slot types
-        if (type === 'image') {
+        if (type === 'image' || type === 'imagecaption') {
             var image = mQuery(this).find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
@@ -899,7 +899,17 @@ Mautic.initSlotListeners = function() {
         } else if (fieldParam === 'float') {
             var values = ['left', 'center', 'right'];
             params.slot.find('a').parent().attr('align', values[params.field.val()]);
-        } else if (fieldParam === 'imgalign') {
+        } else if (fieldParam === 'caption') {
+            params.slot.find('figcaption').text(params.field.val());
+        } else if (fieldParam === 'cardcaption') {
+            params.slot.find('td.imagecard-caption').text(params.field.val());
+        } else if (fieldParam === 'imgalign' && type === 'imagecaption') {
+            var values = ['left', 'center', 'right'];
+            params.slot.find('figure').css('text-align', values[params.field.val()]);
+        } else if (fieldParam === 'imgalign' && type === 'imagecard') {
+            var values = ['left', 'center', 'right'];
+            params.slot.find('table.imagecard').attr('align', values[params.field.val()]);
+        } else if (fieldParam === 'imgalign' && type === 'image') {
             Mautic.builderContents.find('[data-slot-focus]').each( function() {
                 var focusedSlot = mQuery(this).closest('[data-slot]');
                 if (focusedSlot.attr('data-slot') == 'image') {
@@ -930,6 +940,8 @@ Mautic.initSlotListeners = function() {
         if (params.type == 'text') {
             Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), params.slot);
         }
+
+        event.stopPropagation();
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {

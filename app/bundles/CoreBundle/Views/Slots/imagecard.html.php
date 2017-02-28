@@ -10,5 +10,8 @@
  */
 ?>
 
-<img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/>
+<table class="imagecard" align="center" style="background-color: #ddd;">
+    <tr><td><img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/></td></tr>
+    <tr><td class="imagecard-caption" style="padding: 5px;background-color: #bbb;">Caption goes here</td></tr>
+</table>
 <div style="clear:both"></div>

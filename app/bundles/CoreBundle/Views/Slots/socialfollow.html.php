@@ -10,4 +10,4 @@
  */
 ?>
 
-<span>Insert text here</span>
+<img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/gplus.gif" alt="google+" class="fr-view fr-dii fr-draggable"><img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/facebook.gif" alt="facebook" class="fr-view fr-dii fr-draggable"><img src="http://mautic.virlatinus.me/index.php/themes/neopolitan/img/twitter.gif" alt="twitter" class="fr-view fr-dii fr-draggable">

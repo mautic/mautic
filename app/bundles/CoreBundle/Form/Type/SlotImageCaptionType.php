@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,6 +26,20 @@ class SlotImageCaptionType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add(
+            'caption',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.image.caption',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'caption',
+                ],
+            ]
+        );
+
         $builder->add('imagecaption_align', 'button_group', [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
