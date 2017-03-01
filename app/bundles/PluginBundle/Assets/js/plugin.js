@@ -11,6 +11,7 @@ Mautic.addNewPluginField = function (selector) {
         selectors.each(function () {
             mQuery(this).prop('disabled', false).trigger("chosen:updated");
         });
+        currentItem.find('label').removeClass('disabled');
         currentItem.find('input[type="radio"]').prop('disabled', false).next().prop('disabled', false);
     }
     Mautic.stopIconSpinPostEvent();
@@ -23,6 +24,7 @@ Mautic.removePluginField = function (selector, indexClass) {
         mQuery( this ).prop('disabled', true).trigger("chosen:updated");
     });
     deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
+    deleteCurrentItem.find('label').addClass('disabled');
     deleteCurrentItem.addClass('hide');
 
     Mautic.stopIconSpinPostEvent();

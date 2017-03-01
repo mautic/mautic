@@ -41,7 +41,7 @@ endif; ?> pl-xs pr-xs col-sm-<?php if ($rowCount % $numberOfFields == 2) :
     echo '2 ml-xs';
  else :
     echo '4';
-endif; ?>">
+endif; ?>"  <?php if ($rowCount % $numberOfFields == 2) :?>data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>" <?php endif; ?>>
                         <?php echo $view['form']->row($child); ?>
                     </div>
                     <?php if ($rowCount % $numberOfFields == 0):
