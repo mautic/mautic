@@ -148,7 +148,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Image',
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot',
+                'slot_image',
                 900
             );
             $event->addSlotType(
