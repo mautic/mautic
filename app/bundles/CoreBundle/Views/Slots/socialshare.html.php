@@ -10,7 +10,4 @@
  */
 ?>
 
-<a href="#" data-toggle="tooltip" data-token="{sharebuttons}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.page.token.share.descr'); ?>">
-    <i class="fa fa-share-alt-square"></i><br />
-    <?php echo $view['translator']->trans('mautic.page.token.share'); ?>
-</a>
+{sharebuttons}
