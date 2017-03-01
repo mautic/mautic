@@ -783,7 +783,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->isChanged('points', $this->points, $oldPoints);
+        $this->isChanged('points', (int) $this->points, (int) $oldPoints);
 
         return $this;
     }
