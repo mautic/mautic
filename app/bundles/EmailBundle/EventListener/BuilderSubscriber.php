@@ -175,14 +175,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_button',
                 800
             );
-            $event->addSlotType(
-                'socialshare',
-                'Social Share',
-                'share-alt',
-                'MauticCoreBundle:Slots:socialshare.html.php',
-                'slot_socialshare',
-                700
-            );
+//            $event->addSlotType(
+//                'socialshare',
+//                'Social Share',
+//                'share-alt',
+//                'MauticCoreBundle:Slots:socialshare.html.php',
+//                'slot_socialshare',
+//                700
+//            );
             $event->addSlotType(
                 'socialfollow',
                 'Social Follow',
