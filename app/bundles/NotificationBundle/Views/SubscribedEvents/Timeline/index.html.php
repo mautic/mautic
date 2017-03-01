@@ -9,7 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $data = $event['extra']['log']['metadata'];
-
+if (isset($data['failed'])) {
+    return;
+}
 ?>
 
 <dl class="dl-horizontal">
