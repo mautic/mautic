@@ -45,12 +45,11 @@ class CompanyFieldsType extends AbstractType
             ]);
             if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
                 $builder->add('update_mautic_company'.$index,
-                    'yesno_button_group',
+                    'button_group',
                     [
+                        'choices'     => ['<btn class="btn-nospin fa fa-arrow-circle-left"></btn>', '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>'],
                         'label'       => false,
                         'data'        => isset($options['update_mautic_company'][$field]) ? (bool) $options['update_mautic_company'][$field] : '',
-                        'no_label'    => '<span class="fa fa-arrow-circle-left" ></span>',
-                        'yes_label'   => '<span class="fa fa-arrow-circle-right"></span>',
                         'empty_value' => false,
                         'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
                         'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,
