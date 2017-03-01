@@ -167,6 +167,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot',
                 700
             );
+            $event->addSlotType(
+                'dynamicContent',
+                'Dynamic Content',
+                'list',
+                'MauticCoreBundle:Slots:dynamiccontent.html.php',
+                'slot',
+                600
+            );
         }
     }
 

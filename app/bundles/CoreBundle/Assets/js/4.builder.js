@@ -77,6 +77,9 @@ Mautic.launchBuilder = function (formName, actionName) {
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
+    // Turn Dynamic Content Tokens into builder slots
+    themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
+
     Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
@@ -346,6 +349,9 @@ Mautic.closeBuilder = function(model) {
 
             customHtml = themeHtml.find('html').get(0).outerHTML
         }
+
+        // Convert dynamic slot definitions into tokens
+        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
         // Store the HTML content to the HTML textarea
         mQuery('.builder-html').val(customHtml);
@@ -654,7 +660,7 @@ Mautic.initSlots = function() {
     Mautic.builderContents.find('[data-slot]').each(function() {
         mQuery(this).trigger('slot:init', this);
     });
-}
+};
 
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
@@ -747,7 +753,21 @@ Mautic.initSlotListeners = function() {
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = clickedSlot.attr('data-slot');
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
-            parent.mQuery('#slot-form-container').html(focusForm);
+            var slotFormContainer = parent.mQuery('#slot-form-container');
+
+            if (focusType == 'dynamicContent') {
+                var decId = 0; //clickedSlot.attr('data-dec-id');
+
+                if (decId || decId === 0) {
+                    focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
+                    focusForm.find('.text-danger').parent('.col-xs-2').remove();
+                    focusForm.find('.fr-box').remove();
+                } else {
+                    focusForm = 'wot in tarnation';
+                }
+            }
+
+            slotFormContainer.html(focusForm);
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
@@ -885,7 +905,7 @@ Mautic.initSlotListeners = function() {
             }
             return callback(linkList);
         });
-    }
+    };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
@@ -954,7 +974,7 @@ Mautic.setTextSlotEditorStyle = function(editorEl, slot)
             wrapper.css(style, overrideStyle);
         }
     });
-}
+};
 
 Mautic.getSlotStyle = function(slot, styleName, fallback) {
     if ('background-color' == styleName) {
@@ -1000,6 +1020,81 @@ Mautic.getBuilderTokensMethod = function() {
         method = 'email:getBuilderTokens';
     }
     return method;
+};
+
+Mautic.prepareDynamicContentBlocksForBuilder = function(builderHtml) {
+    for (var token in Mautic.builderTokens) {
+        // If this is a dynamic content token
+        if (Mautic.builderTokens.hasOwnProperty(token) && /\{dynamic/.test(token)) {
+            var defaultContent = Mautic.convertDynamicContentTokenToSlot(token);
+
+            builderHtml = builderHtml.replace(token, defaultContent);
+        }
+    }
+
+    return builderHtml;
+};
+
+Mautic.convertDynamicContentTokenToSlot = function(token) {
+    var dynConData = Mautic.getDynamicContentDataForToken(token);
+
+    if (dynConData) {
+        return '<div data-slot="dynamicContent" contenteditable="false" data-param-dec-id="'+dynConData.id+'">'+dynConData.content+'</div>';
+    }
+
+    return token;
+};
+
+Mautic.getDynamicContentDataForToken = function(token) {
+    var dynConName      = /\{dynamiccontent="(.*)"}/.exec(token)[1];
+    var dynConTabs      = parent.mQuery('#dynamicContentTabs');
+    var dynConTarget    = dynConTabs.find('a:contains("'+dynConName+'")').attr('href');
+    var dynConContainer = parent.mQuery(dynConTarget);
+
+    if (dynConContainer.html()) {
+        var dynConContent = dynConContainer.find(dynConTarget+'_content');
+
+        if (dynConContent.hasClass('editor')) {
+            dynConContent = dynConContent.froalaEditor('html.get');
+        } else {
+            dynConContent = dynConContent.html();
+        }
+
+        return {
+            id: parseInt(dynConTarget.replace(/[^0-9]/g, '')),
+            content: dynConContent
+        };
+    }
+
+    return null;
+};
+
+Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
+    var dynConSlots = mQuery(builderHtml).find('[data-slot="dynamicContent"]');
+
+    if (dynConSlots.length) {
+        dynConSlots.each(function(i) {
+            var $this    = mQuery(this);
+            var dynConId = $this.attr('data-param-dec-id');
+
+            dynConId = '#emailform_dynamicContent_'+dynConId;
+
+            var dynConTarget = mQuery(dynConId);
+            var dynConName   = dynConTarget.find(dynConId+'_tokenName').val();
+            var dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+
+            builderHtml = builderHtml.replace(this.outerHTML, dynConToken);
+
+            // If it's still wrapped in an atwho, remove that
+            if ($this.parent().hasClass('atwho-inserted')) {
+                var toReplace = $this.parent('.atwho-inserted').get(0).outerHTML;
+
+                builderHtml   = builderHtml.replace(toReplace, dynConToken);
+            }
+        });
+    }
+
+    return builderHtml;
 };
 
 // Init inside the builder's iframe
