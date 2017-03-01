@@ -246,6 +246,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
+    'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
 ]); ?>
 
