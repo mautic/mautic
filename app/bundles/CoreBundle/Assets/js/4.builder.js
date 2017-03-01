@@ -1020,7 +1020,11 @@ Mautic.initSlotListeners = function() {
             });
 
             var values = ['left', 'center', 'right'];
-            params.slot.find('img').parent().css('text-align', values[params.field.val()]);
+            if ('socialfollow' === type) {
+                params.slot.find('div.socialfollow').css('text-align', values[params.field.val()]);
+            } else {
+                params.slot.find('img').parent().css('text-align', values[params.field.val()]);
+            }
         } else if (fieldParam === 'button-size') {
             var values = [
                 {padding: '10px 13px', fontSize: '14px'},

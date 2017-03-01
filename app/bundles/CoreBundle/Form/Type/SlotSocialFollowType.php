@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -71,6 +72,20 @@ class SlotSocialFollowType extends SlotType
                 ],
             ]
         );
+
+        $builder->add('align', 'button_group', [
+            'label'      => 'mautic.core.image.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'align',
+            ],
+            'choice_list' => new ChoiceList(
+                ['left', 'center', 'right'],
+                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
+            ),
+        ]);
     }
 
     /**
