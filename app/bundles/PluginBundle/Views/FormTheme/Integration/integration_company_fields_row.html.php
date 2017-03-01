@@ -35,13 +35,13 @@
 } ?>">
                 <?php endif; ?>
                     <?php ++$rowCount; ?>
-                    <div class="<?php if ($rowCount % $numberOfFields == 1) {
+                    <div class="<?php if ($rowCount % $numberOfFields == 1) :
     echo 'ml-lg';
-} ?> pl-xs pr-xs col-sm-<?php if ($rowCount % $numberOfFields == 2) {
+endif; ?> pl-xs pr-xs col-sm-<?php if ($rowCount % $numberOfFields == 2) :
     echo '2 ml-xs';
-} else {
+ else :
     echo '4';
-} ?>">
+endif; ?>">
                         <?php echo $view['form']->row($child); ?>
                     </div>
                     <?php if ($rowCount % $numberOfFields == 0):
