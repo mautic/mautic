@@ -1023,7 +1023,7 @@ Mautic.initSlotListeners = function() {
             if ('socialfollow' === type) {
                 params.slot.find('div.socialfollow').css('text-align', values[params.field.val()]);
             } else {
-                params.slot.find('img').parent().css('text-align', values[params.field.val()]);
+                params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
         } else if (fieldParam === 'button-size') {
             var values = [
