@@ -1069,7 +1069,7 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
                 case 'hit_url_count':
-                case 'lead_email_received_count':
+                case 'lead_email_read_count':
                     $operand = 'EXISTS';
                     $column = $details['field'];
                     $table = 'page_hits';
