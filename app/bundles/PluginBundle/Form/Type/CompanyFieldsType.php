@@ -49,7 +49,7 @@ class CompanyFieldsType extends AbstractType
                     [
                         'choices'     => ['<btn class="btn-nospin fa fa-arrow-circle-left"></btn>', '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>'],
                         'label'       => false,
-                        'data'        => isset($options['update_mautic_company'][$field]) ? (bool) $options['update_mautic_company'][$field] : '',
+                        'data'        => isset($options['update_mautic_company'][$field]) ? (bool) $options['update_mautic_company'][$field] : 1,
                         'empty_value' => false,
                         'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
                         'disabled'    => ($index > 1 && !isset($data[$field])) ? true : false,

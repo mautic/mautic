@@ -939,14 +939,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = [];
         $fieldsToUpdateInSf    = array_keys($config['update_mautic'], 1);
-        $fields                = implode(', l.', array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInSf)));
+        $fields                = implode(', l.', $config['leadFields']);
         $fields                = 'l.'.$fields;
         $result                = 0;
          //update lead/contact records
-        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields);
+        $leadsToUpdate            = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields);
+        $fieldsToUpdateInSfUpdate = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInSf));
         foreach ($leadsToUpdate as $lead) {
             //use a composite patch here that can update and create (one query) every 200 records
-            foreach ($config['leadFields'] as $sfField => $mauticField) {
+            foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
                 if (isset($lead[$mauticField])) {
                     $body[$sfField] = $lead[$mauticField];
                 }

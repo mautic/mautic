@@ -216,15 +216,15 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
         $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
-        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+        $newMatchedFields       = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
 
-        if (!isset($matchedFields['companyname'])) {
-            if (isset($matchedFields['companywebsite'])) {
-                $matchedFields['companyname'] = $matchedFields['companywebsite'];
+        if (!isset($newMatchedFields['companyname'])) {
+            if (isset($newMatchedFields['companywebsite'])) {
+                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
             }
         }
 
-        if (empty($matchedFields)) {
+        if (empty($newMatchedFields)) {
             return;
         }
 
@@ -238,6 +238,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
+        } else {
+            $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
         }
         $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
@@ -300,7 +302,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $lead = array_shift($existingLeads);
             }
         }
-        $fieldsToUpdateInMautic = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        //use direction of fields only when updating existing lead
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) and !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
         $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
         $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
