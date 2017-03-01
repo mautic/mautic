@@ -1074,7 +1074,7 @@ class LeadListRepository extends CommonRepository
                     $column = $details['field'];
                     $table = 'page_hits';
                     $select = 'COUNT(id)';
-                    if ($details['field'] == 'lead_email_received_count') {
+                    if ($details['field'] == 'lead_email_read_count') {
                         $table = 'email_stats';
                         $select = 'SUM(open_count)';
                     }
