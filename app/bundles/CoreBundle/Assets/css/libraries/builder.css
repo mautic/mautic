@@ -5460,6 +5460,8 @@ div[data-slot].ui-sortable-helper {
 .theme-list .select-theme-link {
   margin-top: 5px;
 }
-.theme-list .select-theme-selected {
-  margin-top: 5px;
+[data-slot="dynamicContent"] {
+  font-size:20px;
+  text-align:center;
+  line-height:20px;
 }
