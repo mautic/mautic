@@ -241,7 +241,6 @@ class PluginController extends FormController
                                     }
                                 }
                             }
-                            $this->factory->getLogger()->addError(print_r($featureSettings, true));
                             $entity->setFeatureSettings($featureSettings);
                         }
                     } else {
