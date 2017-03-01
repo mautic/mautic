@@ -40,18 +40,43 @@ class SlotImageCaptionType extends SlotType
             ]
         );
 
-        $builder->add('imagecaption_align', 'button_group', [
+        $builder->add('align', 'button_group', [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'           => 'form-control',
-                'data-slot-param' => 'imgalign',
+                'data-slot-param' => 'align',
             ],
             'choice_list' => new ChoiceList(
                 ['left', 'center', 'right'],
                 ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
             ),
+        ]);
+
+        $builder->add('text-align', 'button_group', [
+            'label'      => 'mautic.core.caption.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'text-align',
+            ],
+            'choice_list' => new ChoiceList(
+                ['left', 'center', 'right'],
+                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
+            ),
+        ]);
+
+        $builder->add('color', 'text', [
+            'label'      => 'mautic.core.text.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'color',
+                'data-toggle'     => 'color',
+            ],
         ]);
 
         parent::buildForm($builder, $options);

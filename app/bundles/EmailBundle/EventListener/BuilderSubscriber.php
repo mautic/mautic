@@ -180,7 +180,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Social Share',
                 'share-alt',
                 'MauticCoreBundle:Slots:socialshare.html.php',
-                'slot',
+                'slot_socialshare',
                 700
             );
             $event->addSlotType(
@@ -188,17 +188,17 @@ class BuilderSubscriber extends CommonSubscriber
                 'Social Follow',
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot',
+                'slot_socialfollow',
                 600
             );
-            $event->addSlotType(
-                'codemode',
-                'Code Mode',
-                'code',
-                'MauticCoreBundle:Slots:codemode.html.php',
-                'slot',
-                500
-            );
+//            $event->addSlotType(
+//                'codemode',
+//                'Code Mode',
+//                'code',
+//                'MauticCoreBundle:Slots:codemode.html.php',
+//                'slot_codemode',
+//                500
+//            );
             $event->addSlotType(
                 'separator',
                 'Separator',

@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -27,19 +27,50 @@ class SlotSocialFollowType extends SlotType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add('socialfollow_align', 'button_group', [
-            'label'      => 'mautic.core.image.position',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'divalign',
-            ],
-            'choice_list' => new ChoiceList(
-                ['left', 'center', 'right'],
-                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
-            ),
-        ]);
+        $builder->add(
+            'glink',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.googleplus.url',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'value'           => 'http://plus.google.com',
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'glink',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'flink',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.facebook.url',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'value'           => 'http://www.facebook.com',
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'flink',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'tlink',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.twitter.url',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'value'           => 'http://www.twitter.com',
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'tlink',
+                ],
+            ]
+        );
     }
 
     /**

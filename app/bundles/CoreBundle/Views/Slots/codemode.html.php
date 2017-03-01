@@ -10,6 +10,9 @@
  */
 ?>
 <div id="customHtmlContainer">
-<span>Insert text here</span>
+    <div class="builder-slot page-builder-slot code-mode">
+        <div class="builder-content-slot"></div>
+        <div class="builder-panel-slot"></div>
+    </div>
 </div>
 

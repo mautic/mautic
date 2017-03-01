@@ -87,26 +87,26 @@ Mautic.launchBuilder = function (formName, actionName) {
 /**
  * Launch builder
  *
+ * @param slot mQuery object
  */
 Mautic.launchBuilderSlot = function (slot) {
-    Mautic.codeMode = mQuery('.builder').hasClass('code-mode');
-    Mautic.showChangeThemeWarning = true;
+    Mautic.codeMode = mQuery('.builder-slot').hasClass('code-mode');
 
-    mQuery('slotbody').css('overflow-y', 'hidden');
+    slot.css('overflow-y', 'hidden');
 
     // Activate the builder
-    mQuery('.builder').addClass('builder-active').removeClass('hide');
+    mQuery('.builder-slot').addClass('builder-active').removeClass('hide');
 
     var builderCss = {
         margin: "0",
         padding: "0",
         border: "none",
-        width: "100%",
-        height: "100%"
+       // width: "100%",
+       // height: "100%"
     };
 
     // Load the theme from the custom HTML textarea
-    var themeHtml = mQuery(slot).html();
+    var themeHtml = slot.html();
 
     if (Mautic.codeMode) {
         var rawTokens = mQuery.map(Mautic.builderTokens, function (element, index) {
@@ -144,24 +144,7 @@ Mautic.launchBuilderSlot = function (slot) {
         Mautic.keepPreviewAlive('builder-template-content');
     }
 
-    var panelHeight = (mQuery('.builder-content').css('right') == '0px') ? mQuery('.builder-panel').height() : 0,
-        panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
-        spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
-        spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
-
-    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-
-    // Disable the close button until everything is loaded
-    mQuery('.btn-close-builder').prop('disabled', true);
-
-    // Insert the Mautic assets to the header
-    var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
-    themeHtml = themeHtml.replace('</head>', assets+'</head>');
-
-    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
-        mQuery('#builder-overlay').addClass('hide');
-        mQuery('.btn-close-builder').prop('disabled', false);
-    });
+    Mautic.buildBuilderIframeSlot(themeHtml, 'builder-template-content', function() {});
 };
 
 /**
@@ -260,6 +243,31 @@ Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
             },
             id: id
         }).appendTo('.builder-content');
+    }
+
+    builder.on('load', function() {
+        if (typeof onLoadCallback === 'function') {
+            onLoadCallback();
+        }
+    });
+
+    Mautic.updateIframeContent(id, themeHtml);
+};
+
+Mautic.buildBuilderIframeSlot = function(themeHtml, id, onLoadCallback) {
+    if (mQuery('iframe#'+id).length) {
+        var builder = mQuery('iframe#'+id);
+    } else {
+        var builder = mQuery("<iframe />", {
+            css: {
+                margin: "0",
+                padding: "0",
+                border: "none",
+                width: "100%",
+                height: "300px"
+            },
+            id: id
+        }).appendTo('.builder-content-slot');
     }
 
     builder.on('load', function() {
@@ -911,6 +919,8 @@ Mautic.initSlotListeners = function() {
             });
 
             parent.mQuery('#slot-form-container').on('change.minicolors', function(e, hex) {
+                if (undefined === hex) return;
+
                 var field = mQuery(e.target);
 
                 // Store the slot settings as attributes
@@ -923,7 +933,7 @@ Mautic.initSlotListeners = function() {
 
         // Initialize different slot types
         if (type === 'image' || type === 'imagecaption' || type === 'imagecard') {
-            var image = mQuery(this).find('img');
+            var image = slot.find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
 
@@ -932,21 +942,22 @@ Mautic.initSlotListeners = function() {
             });
 
             // Init Froala editor
-            image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            var froalaOptions = mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }
-            ));
+            );
+            image.froalaEditor(froalaOptions);
         } else if (type === 'button') {
-            mQuery(this).find('a').click(function(e) {
+            slot.find('a').click(function(e) {
                 e.preventDefault();
             });
         } else if (type === 'codemode') {
-            Mautic.launchBuilderSlot(this);
+            Mautic.launchBuilderSlot(slot);
         }
 
         // Store the slot to a global var
-        Mautic.builderSlots.push({slot: mQuery(this), type: type});
+        Mautic.builderSlots.push({slot: slot, type: type});
     });
 
     Mautic.getPredefinedLinks = function(callback) {
@@ -976,6 +987,8 @@ Mautic.initSlotListeners = function() {
         var type = params.type;
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
+        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+            params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
@@ -987,13 +1000,14 @@ Mautic.initSlotListeners = function() {
             params.slot.find('figcaption').text(params.field.val());
         } else if (fieldParam === 'cardcaption') {
             params.slot.find('td.imagecard-caption').text(params.field.val());
-        } else if (fieldParam === 'imgalign' && type === 'imagecaption') {
+        } else if (fieldParam === 'text-align') {
             var values = ['left', 'center', 'right'];
-            params.slot.find('figure').css('text-align', values[params.field.val()]);
-        } else if (fieldParam === 'imgalign' && type === 'imagecard') {
-            var values = ['left', 'center', 'right'];
-            params.slot.find('table.imagecard').attr('align', values[params.field.val()]);
-        } else if (fieldParam === 'imgalign' && type === 'image') {
+            if (type === 'imagecard') {
+                params.slot.find('.imagecard-caption').css(fieldParam, values[params.field.val()]);
+            } else if (type === 'imagecaption') {
+                params.slot.find('figcaption').css(fieldParam, values[params.field.val()]);
+            }
+        } else if (fieldParam === 'align') {
             Mautic.builderContents.find('[data-slot-focus]').each( function() {
                 var focusedSlot = mQuery(this).closest('[data-slot]');
                 if (focusedSlot.attr('data-slot') == 'image') {
@@ -1006,7 +1020,7 @@ Mautic.initSlotListeners = function() {
             });
 
             var values = ['left', 'center', 'right'];
-            params.slot.find('img').attr('align', values[params.field.val()]);
+            params.slot.find('img').parent().css('text-align', values[params.field.val()]);
         } else if (fieldParam === 'button-size') {
             var values = [
                 {padding: '10px 13px', fontSize: '14px'},
@@ -1014,11 +1028,23 @@ Mautic.initSlotListeners = function() {
                 {padding: '15px 20px', fontSize: '18px'}
             ];
             params.slot.find('a').css(values[params.field.val()]);
+        } else if (fieldParam === 'caption-color') {
+            params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
         } else if (fieldParam === 'background-color') {
-            params.slot.find('a').css(fieldParam, '#'+params.field.val());
-            params.slot.find('a').attr('background', '#'+params.field.val());
+            if ('imagecard' === type) {
+                params.slot.find('.imagecard').css(fieldParam, '#' + params.field.val());
+            } else {
+                params.slot.find('a').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a').attr('background', '#' + params.field.val());
+            }
         } else if (fieldParam === 'color') {
-            params.slot.find('a').css(fieldParam, '#'+params.field.val());
+            if ('imagecard' === type) {
+                params.slot.find('.imagecard-caption').css(fieldParam, '#' + params.field.val());
+            } else if ('imagecaption' === type) {
+                params.slot.find('figcaption').css(fieldParam, '#' + params.field.val());
+            } else {
+                params.slot.find('a').css(fieldParam, '#' + params.field.val());
+            }
         }
 
         if (params.type == 'text') {

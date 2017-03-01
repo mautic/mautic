@@ -25,13 +25,13 @@ class SlotImageType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('image_align', 'button_group', [
+        $builder->add('align', 'button_group', [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'           => 'form-control',
-                'data-slot-param' => 'imgalign',
+                'data-slot-param' => 'align',
             ],
             'choice_list' => new ChoiceList(
                 ['left', 'center', 'right'],

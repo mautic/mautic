@@ -27,7 +27,7 @@ class SlotImageCardType extends SlotType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'cardcaption',
+            'caption',
             TextType::class,
             [
                 'label'      => 'mautic.core.image.caption',
@@ -40,18 +40,65 @@ class SlotImageCardType extends SlotType
             ]
         );
 
-        $builder->add('imagecard_align', 'button_group', [
+        $builder->add('align', 'button_group', [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'           => 'form-control',
-                'data-slot-param' => 'imgalign',
+                'data-slot-param' => 'align',
             ],
             'choice_list' => new ChoiceList(
                 ['left', 'center', 'right'],
                 ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
             ),
+        ]);
+
+        $builder->add('text-align', 'button_group', [
+            'label'      => 'mautic.core.caption.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'text-align',
+            ],
+            'choice_list' => new ChoiceList(
+                ['left', 'center', 'right'],
+                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
+            ),
+        ]);
+
+        $builder->add('background-color', 'text', [
+            'label'      => 'mautic.core.background.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'background-color',
+                'data-toggle'     => 'color',
+            ],
+        ]);
+
+        $builder->add('caption-color', 'text', [
+            'label'      => 'mautic.core.caption.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'caption-color',
+                'data-toggle'     => 'color',
+            ],
+        ]);
+
+        $builder->add('color', 'text', [
+            'label'      => 'mautic.core.text.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'color',
+                'data-toggle'     => 'color',
+            ],
         ]);
 
         parent::buildForm($builder, $options);
