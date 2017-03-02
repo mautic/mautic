@@ -952,12 +952,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $body[$sfField] = $lead[$mauticField];
                 }
             }
-            $mauticData[] = [
-                'method'      => 'PATCH',
-                'url'         => '/services/data/v38.0/sobjects/'.$lead['integration_entity'].'/'.$lead['integration_entity_id'],
-                'referenceId' => $lead['internal_entity_id'].'-'.$lead['integration_entity_id'],
-                'body'        => $body,
-            ];
+            if (!empty($body)) {
+                $mauticData[] = [
+                    'method'      => 'PATCH',
+                    'url'         => '/services/data/v38.0/sobjects/'.$lead['integration_entity'].'/'.$lead['integration_entity_id'],
+                    'referenceId' => $lead['internal_entity_id'].'-'.$lead['integration_entity_id'],
+                    'body'        => $body,
+                ];
+            }
         }
         //create lead records
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields);
@@ -969,12 +971,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $body[$sfField] = $lead[$mauticField];
                 }
             }
-            $mauticData[] = [
-                'method'      => 'POST',
-                'url'         => '/services/data/v38.0/sobjects/Lead',
-                'referenceId' => $lead['id'].'- New Lead',
-                'body'        => $body,
-            ];
+            if (!empty($body)) {
+                $mauticData[] = [
+                    'method'      => 'POST',
+                    'url'         => '/services/data/v38.0/sobjects/Lead',
+                    'referenceId' => $lead['id'].'- New Lead',
+                    'body'        => $body,
+                ];
+            }
         }
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = $mauticData;
