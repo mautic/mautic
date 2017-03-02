@@ -943,7 +943,7 @@ abstract class AbstractIntegration
                 $session    = $this->factory->getSession();
                 $request    = $this->factory->getRequest();
                 $state      = $session->get($this->getName().'_csrf_token', false);
-                $givenState = ($request->isXmlHttpRequest()) ? $equest->request->get('state') : $request->get('state');
+                $givenState = ($request->isXmlHttpRequest()) ? $request->request->get('state') : $request->get('state');
 
                 if ($state && $state !== $givenState) {
                     $session->remove($this->getName().'_csrf_token');
