@@ -1127,8 +1127,6 @@ Mautic.initSlotListeners = function() {
         if (params.type == 'text') {
             Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), params.slot);
         }
-
-        event.stopPropagation();
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {

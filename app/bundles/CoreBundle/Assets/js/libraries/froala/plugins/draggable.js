@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -41,6 +41,10 @@
 
   $.FE.PLUGINS.draggable = function (editor) {
     function _dragStart (e) {
+      if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.nodeType == Node.TEXT_NODE) {
+        return true;
+      }
+
       // Image with link.
       if (e.target && e.target.tagName == 'A' && e.target.childNodes.length == 1 && e.target.childNodes[0].tagName == 'IMG') {
         e.target = e.target.childNodes[0];
@@ -352,6 +356,23 @@
       }
     }
 
+    /**
+     * Do cleanup when the html is taken.
+     */
+    function _cleanOnGet(el) {
+      // Remove drag helper.
+      if (el && el.tagName == 'DIV' && editor.node.hasClass(el, 'fr-drag-helper')) {
+        el.parentNode.removeChild(el);
+      }
+      // Remove from nested elements too.
+      else if (el && el.nodeType == Node.ELEMENT_NODE) {
+        var els = el.querySelectorAll('div.fr-drag-helper');
+        for (var i = 0; i < els.length; i++) {
+          els[i].parentNode.removeChild(els[i]);
+        }
+      }
+    }
+
     /*
      * Initialize.
      */
@@ -375,11 +396,7 @@
       editor.events.on('drop', _drop, true);
 
       // Clean getting the HTML.
-      editor.events.on('html.get', function (html) {
-        html = html.replace(/<(div)((?:[\w\W]*?))class="([\w\W]*?)fr-drag-helper([\w\W]*?)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/(div)>/g, '');
-
-        return html;
-      });
+      editor.events.on('html.processGet', _cleanOnGet)
     }
 
     return {

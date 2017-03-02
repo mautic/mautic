@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -154,7 +154,7 @@
 
       editor.popups.refresh('forms.edit');
 
-      editor.popups.setContainer('forms.edit', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('forms.edit', editor.$sc);
       var left = $input.offset().left + $input.outerWidth() / 2;
       var top = $input.offset().top + $input.outerHeight();
 
@@ -238,7 +238,7 @@
           editor.popups.refresh('forms.update');
         }
 
-        editor.popups.setContainer('forms.update', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('forms.update', editor.$sc);
         var left = $input.offset().left + $input.outerWidth() / 2;
         var top = $input.offset().top + $input.outerHeight();
 

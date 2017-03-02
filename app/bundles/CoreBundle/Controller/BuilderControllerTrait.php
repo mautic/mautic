@@ -51,7 +51,7 @@ trait BuilderControllerTrait
     protected function buildSlotForms($slotTypes)
     {
         foreach ($slotTypes as $key => $slotType) {
-            if (isset($slotType['form'])) {
+            if (!empty($slotType['form'])) {
                 $slotForm                = $this->get('form.factory')->create($slotType['form']);
                 $slotTypes[$key]['form'] = $slotForm->createView();
             }
