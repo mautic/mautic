@@ -804,6 +804,64 @@ Mautic.initSlots = function(slotContainers) {
     });
 };
 
+Mautic.getSlotToolbar = function() {
+    Mautic.builderContents.find('[data-slot-toolbar]').remove();
+
+    var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
+    var deleteLink  = Mautic.getSlotDeleteLink();
+
+    deleteLink.appendTo(slotToolbar);
+
+    return slotToolbar;
+};
+
+Mautic.getSlotDeleteLink = function() {
+    if (typeof Mautic.deleteLink == 'undefined') {
+        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
+            .attr('data-slot-action', 'delete')
+            .attr('alt', 'delete')
+            .addClass('btn btn-delete btn-default');
+    }
+
+    return Mautic.deleteLink;
+};
+
+Mautic.getSlotFocus = function() {
+    Mautic.builderContents.find('[data-slot-focus]').remove();
+
+    return mQuery('<div/>').attr('data-slot-focus', true);
+};
+
+Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
+    var decId = clickedSlot.attr('data-param-dec-id');
+
+    var focusForm;
+
+    if (decId || decId === 0) {
+        focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
+
+        // remove existing froala editor
+        focusForm.find('.fr-box').remove();
+    }
+
+    var focusFormHeader = mQuery('#customize-slot-panel').find('.panel-heading');
+    var newDynConButton = mQuery('<button/>')
+        .css('float', 'right')
+        .addClass('btn btn-default')
+        .text('Add Variant')
+        .click(function(e){
+            e.stopPropagation();
+
+            var tabId = Mautic.createNewDynamicContentItem(parent.mQuery);
+        });
+
+    focusFormHeader.append(newDynConButton);
+
+    console.log(focusFormHeader);
+
+    return focusForm;
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -821,17 +879,17 @@ Mautic.initSlotListeners = function() {
         var type = slot.attr('data-slot');
 
         // initialize the drag handle
-        var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
-        var deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
-            .attr('data-slot-action', 'delete')
-            .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
-        deleteLink.appendTo(slotToolbar);
+        var slotToolbar = Mautic.getSlotToolbar();
+        var deleteLink  = Mautic.getSlotDeleteLink();
+        var focus       = Mautic.getSlotFocus();
 
-        Mautic.builderContents.find('[data-slot-focus]').remove();
-        var focus = mQuery('<div/>').attr('data-slot-focus', true);
+        slot.hover(function(e) {
+            e.stopPropagation();
 
-        slot.hover(function() {
+            // Get new copies of the focus, toolbar
+            slotToolbar = Mautic.getSlotToolbar();
+            focus       = Mautic.getSlotFocus();
+
             if (Mautic.sortActive) {
                 // don't activate while sorting
 
@@ -870,8 +928,8 @@ Mautic.initSlotListeners = function() {
             focus.remove();
         });
 
-        slot.on('click', function() {
-            Mautic.deleteCodeModeSlot();
+        slot.on('click', function(e) {
+            e.stopPropagation();
 
             var clickedSlot = mQuery(this);
 
@@ -900,15 +958,7 @@ Mautic.initSlotListeners = function() {
             var slotFormContainer = parent.mQuery('#slot-form-container');
 
             if (focusType == 'dynamicContent') {
-                var decId = 0; //clickedSlot.attr('data-dec-id');
-
-                if (decId || decId === 0) {
-                    focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
-                    focusForm.find('.text-danger').parent('.col-xs-2').remove();
-                    focusForm.find('.fr-box').remove();
-                } else {
-                    focusForm = 'wot in tarnation';
-                }
+                focusForm = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
             }
 
             slotFormContainer.html(focusForm);

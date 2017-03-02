@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="tab-pane dynamic-content-filter bdr-w-0<?php echo $form->vars['name'] === '0' ? ' active' : ' fade' ?>" id="<?php echo $form->vars['id'] ?>">
+<div class="tab-pane dynamic-content-filter bdr-w-0" id="<?php echo $form->vars['id'] ?>">
     <div class="row form-group">
         <div class="col-xs-10">
             <?php echo $view['form']->label($form['content']); ?>
