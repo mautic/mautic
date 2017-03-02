@@ -275,11 +275,11 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     return tabId;
 };
 
-Mautic.createNewDynamicContentFilter = function(jQueryVariant) {
+Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     // To support the parent.mQuery from the builder
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
 
-    var $this                = mQuery(this);
+    var $this                = mQuery(el);
     var parentElement        = $this.parents('.panel');
     var tabHolder            = parentElement.find('.nav');
     var filterHolder         = parentElement.find('.tab-content');
@@ -340,7 +340,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant) {
     $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
-        Mautic.createNewDynamicContentFilter();
+        Mautic.createNewDynamicContentFilter(this);
     });
 
     $el.find('.dynamic-content-token-name').on('input', function (e) {
