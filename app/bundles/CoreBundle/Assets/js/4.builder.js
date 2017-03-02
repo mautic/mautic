@@ -712,7 +712,7 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
     newDynConButton.on('click', function(e) {
         e.stopPropagation();
 
-        var tabId = Mautic.createNewDynamicContentFilter(parent.mQuery);
+        var tabId = Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
     });
 
     focusFormHeader.append(newDynConButton);
