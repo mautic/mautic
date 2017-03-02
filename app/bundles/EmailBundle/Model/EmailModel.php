@@ -827,12 +827,29 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Email $email
+     * @param bool  $includeVariants
+     *
+     * @return array|int
+     */
+    public function getQueuedCounts(Email $email, $includeVariants = true)
+    {
+        $ids = ($includeVariants) ? $email->getRelatedEntityIds() : null;
+        if (!in_array($email->getId(), $ids)) {
+            $ids[] = $email->getId();
+        }
+
+        return $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+    }
+
+    /**
      * Send an email to lead lists.
      *
-     * @param Email $email
-     * @param array $lists
-     * @param int   $limit
-     * @param bool  $batch True to process and batch all pending leads
+     * @param Email           $email
+     * @param array           $lists
+     * @param int             $limit
+     * @param bool            $batch  True to process and batch all pending leads
+     * @param OutputInterface $output
      *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
@@ -1165,7 +1182,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         //get a count of leads
         $count = count($sendTo);
 
-        //noone to send to so bail or if marketing email from a campaign has been put in a queue
+        //no one to send to so bail or if marketing email from a campaign has been put in a queue
         if (empty($count)) {
             return $singleEmail ? true : [];
         }
@@ -1778,10 +1795,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Modifies the line chart query for the DNC.
      *
-     * @param ChartQuery $q
+     * @param ChartQuery $query
      * @param array      $filter
-     * @param bool       $reason
-     * @param bool       $canViewOthers
+     * @param            $reason
+     * @param            $canViewOthers
+     *
+     * @return array
      */
     public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers)
     {
@@ -1843,14 +1862,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get pie chart data of ignored vs opened emails.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param   $dateFrom
+     * @param   $dateTo
      *
      * @return array
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo, $canViewOthers = true)
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo)
     {
         $chart = new PieChart();
 
@@ -1990,6 +2007,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string $filter
      * @param int    $limit
      * @param int    $start
+     * @param array  $options
+     *
+     * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
     {
