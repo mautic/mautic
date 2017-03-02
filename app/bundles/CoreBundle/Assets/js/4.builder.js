@@ -847,21 +847,24 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
     var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
     var newDynConButton = mQuery('<button/>')
         .css('float', 'right')
-        .addClass('btn btn-success btn-sm');
+        .addClass('btn btn-success btn-xs');
 
     newDynConButton.text('Add Variant');
 
     newDynConButton.on('click', function(e) {
         e.stopPropagation();
 
-        var tabId = Mautic.createNewDynamicContentItem(parent.mQuery);
+        var tabId = Mautic.createNewDynamicContentFilter(parent.mQuery);
     });
 
     focusFormHeader.append(newDynConButton);
 
-    console.log(focusFormHeader, newDynConButton);
-
     return focusForm;
+};
+
+Mautic.removeAddVariantButton = function() {
+    // Remove the Add Variant button for dynamicContent slots
+    parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
 };
 
 Mautic.initSlotListeners = function() {
@@ -872,8 +875,7 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:selected', function(event, slot) {
         slot = mQuery(slot);
         Mautic.builderContents.find('[data-slot-focus]').remove();
-        var focus = mQuery('<div/>').attr('data-slot-focus', true);
-        slot.append(focus);
+        mQuery(slot).append(Mautic.getSlotFocus());
     });
 
     Mautic.builderContents.on('slot:init', function(event, slot) {
@@ -932,6 +934,8 @@ Mautic.initSlotListeners = function() {
 
         slot.on('click', function(e) {
             e.stopPropagation();
+
+            Mautic.removeAddVariantButton();
 
             var clickedSlot = mQuery(this);
 
@@ -1174,6 +1178,8 @@ Mautic.initSlotListeners = function() {
     };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
+        Mautic.removeAddVariantButton();
+
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         var type = params.type;
@@ -1280,8 +1286,14 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
-        Mautic.deleteCodeModeSlot();
-        if (params.type === 'image') {
+        Mautic.removeAddVariantButton();
+
+        if (params.type === 'text') {
+            if (parent.mQuery('#slot_content').length) {
+                parent.mQuery('#slot_content').froalaEditor('destroy');
+                parent.mQuery('#slot_content').find('.atwho-inserted').atwho('destroy');
+            }
+        } else if (params.type === 'image') {
             var image = params.slot.find('img');
             if (typeof image !== 'undefined' && image.hasClass('fr-view')) {
                 image.froalaEditor('destroy');
