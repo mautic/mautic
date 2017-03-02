@@ -228,6 +228,35 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * Get the channel name from the database.
+     *
+     * @param int    $id
+     * @param string $entityName
+     * @param string $nameColumn
+     *
+     * @return string|null
+     */
+    public function getChannelName($id, $entityName, $nameColumn = 'name')
+    {
+        if (!$id || !$entityName || !$nameColumn) {
+            return null;
+        }
+
+        $repo = $this->em->getRepository($entityName);
+        $qb   = $repo->createQueryBuilder('e')
+            ->select('e.'.$nameColumn)
+            ->where('e.id = :id')
+            ->setParameter('id', (int) $id);
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        if (isset($result[$nameColumn])) {
+            return $result[$nameColumn];
+        }
+
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @throws MethodNotAllowedHttpException
