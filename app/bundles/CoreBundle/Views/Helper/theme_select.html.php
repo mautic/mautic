@@ -37,7 +37,7 @@ $isCodeMode = ($active == $codeMode);
         <?php if (isset($themeInfo['config']['features']) && !in_array($type, $themeInfo['config']['features'])) {
     continue;
 } ?>
-        <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png'); ?>
+        <?php $thumbnailUrl = $view['assets']->getUrl($themeInfo['themesLocalDir'].'/'.$themeKey.'/thumbnail.png'); ?>
         <?php $hasThumbnail = file_exists($themeInfo['dir'].'/thumbnail.png'); ?>
         <div class="col-md-3 theme-list">
             <div class="panel panel-default <?php echo $isSelected ? 'theme-selected' : ''; ?>">
