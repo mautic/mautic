@@ -153,8 +153,15 @@ $container->loadFromExtension('mautic_core');
 // Set template engines
 $engines = ['php', 'twig'];
 
+// Load parameters array from local configuration
+if (isset($paths['local_config'])) {
+    if (file_exists($paths['local_config'])) {
+        include $paths['local_config'];
+    }
+}
+
 // Generate session name
-$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+$key         = isset($parameters['secret_key']) ? $parameters['secret_key'] : uniqid();
 $sessionName = md5(md5($paths['local_config']).$key);
 
 $container->loadFromExtension('framework', [
