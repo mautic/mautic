@@ -776,7 +776,7 @@ class AjaxController extends CommonAjaxController
 
         if ($leadField ||  $leadFieldType) {
             $options       = null;
-            if(!$leadFieldType) {
+            if (!$leadFieldType) {
                 $leadFieldType = $leadField->getType();
                 $properties = $leadField->getProperties();
             }
@@ -825,8 +825,8 @@ class AjaxController extends CommonAjaxController
             $dataArray['options']   = $options;
         }
 
-        if(in_array($alias, ['tags', 'segments'])){
-            $leadFieldType =      [
+        if (in_array($alias, ['tags', 'segments'])) {
+            $leadFieldType = [
                 'include' => [
                     '=',
                     '!=',
@@ -844,14 +844,7 @@ class AjaxController extends CommonAjaxController
             $operator = key($dataArray['operators']);
         }
 
-        $disabled = false;
-        switch ($operator) {
-            case 'empty':
-            case '!empty':
-                $disabled = true;
-                break;
-        }
-        $dataArray['disabled'] = $disabled;
+        $dataArray['disabled'] = in_array($operator, ['empty', '!empty']);
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);

@@ -99,7 +99,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                             0 => $properties['no'],
                             1 => $properties['yes'],
                         ];
-                    }elseif ($fieldType == 'boolean') {
+                    } elseif ($fieldType == 'boolean') {
                         $fieldHelper = new FormFieldHelper();
                         $fieldHelper->setTranslator($this->factory->getTranslator());
                         $fieldValues = $fieldHelper->getBooleanChoices();
