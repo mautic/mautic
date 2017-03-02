@@ -4370,6 +4370,9 @@ lesshat-selector { -lh-property: 0 ;
   border: 1px solid #eee;
   height: auto;
 }
+#slot_codemode .CodeMirror {
+  height: 200px;
+}
 .CodeMirror-hints {
   position: absolute;
   z-index: 9999 !important;

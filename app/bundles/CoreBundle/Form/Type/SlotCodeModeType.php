@@ -24,7 +24,17 @@ class SlotCodeModeType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
+        $builder->add(
+            'content',
+            'spacer',
+            [
+                'label'    => false,
+                'required' => false,
+                'attr'     => [
+                    'data-slot-param' => 'content',
+                ],
+            ]
+        );
     }
 
     /**
