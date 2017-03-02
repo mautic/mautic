@@ -931,6 +931,8 @@ abstract class AbstractIntegration
      * @param array $parameters
      *
      * @return bool|string false if no error; otherwise the error string
+     *
+     * @throws InvalidArgumentException if OAuth2 state does not match
      */
     public function authCallback($settings = [], $parameters = [])
     {
@@ -938,6 +940,16 @@ abstract class AbstractIntegration
 
         switch ($authType) {
             case 'oauth2':
+                $session    = $this->factory->getSession();
+                $request    = $this->factory->getRequest();
+                $state      = $session->get($this->getName().'_csrf_token', false);
+                $givenState = ($request->isXmlHttpRequest()) ? $equest->request->get('state') : $request->get('state');
+
+                if ($state && $state !== $givenState) {
+                    $session->remove($this->getName().'_csrf_token');
+                    throw \InvalidArgumentException('mautic.integration.auth.invalid.state');
+                }
+
                 if (!empty($settings['use_refresh_token'])) {
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
