@@ -74,6 +74,12 @@ class BuilderEvent extends Event
 
         array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
 
+        foreach ($this->slotTypes as $i => $slot) {
+            $slot['header'] = str_replace(' ', '<br />', $slot['header']);
+
+            $this->slotTypes[$i] = $slot;
+        }
+
         return $this->slotTypes;
     }
 
