@@ -76,7 +76,6 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
 
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_key', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime', $template); ?>
         </div>
 

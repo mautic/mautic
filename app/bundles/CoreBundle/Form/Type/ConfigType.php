@@ -307,26 +307,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'rememberme_key',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.rememberme.key',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.rememberme.key.tooltip',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
             'rememberme_lifetime',
             'text',
             [
