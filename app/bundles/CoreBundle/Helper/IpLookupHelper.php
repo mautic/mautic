@@ -45,6 +45,11 @@ class IpLookupHelper
     /**
      * @var array
      */
+    protected $doNotTrackBots;
+
+    /**
+     * @var array
+     */
     protected $doNotTrackInternalIps;
 
     /**
@@ -65,6 +70,7 @@ class IpLookupHelper
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
         $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
+        $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
     }
 
@@ -141,6 +147,10 @@ class IpLookupHelper
                 $this->doNotTrackIps = [];
             }
 
+            if (!is_array($this->doNotTrackBots)) {
+                $this->doNotTrackBots = [];
+            }
+
             if (!is_array($this->doNotTrackInternalIps)) {
                 $this->doNotTrackInternalIps = [];
             }
@@ -150,7 +160,19 @@ class IpLookupHelper
                 // Do not track internal IPs
                 $doNotTrack = array_merge($doNotTrack, ['127.0.0.1', '::1']);
             }
+
             $ipAddress->setDoNotTrackList($doNotTrack);
+
+            if($ipAddress->isTrackable()) {
+                $userAgent = $this->request->headers->get('User-Agent');
+                foreach ($this->doNotTrackBots as $bot) {
+                    if (strpos($userAgent, $bot) !== false) {
+                        $doNotTrack[] = $ip;
+                        $ipAddress->setDoNotTrackList($doNotTrack);
+                        continue;
+                    }
+                }
+            }
 
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && empty($details['city'])) {
