@@ -938,7 +938,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = [];
-        $fieldsToUpdateInSf    = array_keys($config['update_mautic'], 1);
+        $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $fields                = implode(', l.', $config['leadFields']);
         $fields                = 'l.'.$fields;
         $result                = 0;
