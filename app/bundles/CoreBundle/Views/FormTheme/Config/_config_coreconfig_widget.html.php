@@ -57,36 +57,6 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php // Email specific settings moved to EmailBundle to prevent confusion due to tab names?>
-
-<?php if (count(array_intersect($fieldKeys, ['cookie_path']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.cookie'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_domain', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_secure', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_httponly', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_domain', $template); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <?php if (count(array_intersect($fieldKeys, ['cors_restrict_domains']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">

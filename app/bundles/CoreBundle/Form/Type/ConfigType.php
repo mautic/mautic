@@ -307,60 +307,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'rememberme_lifetime',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.rememberme.lifetime',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.rememberme.lifetime.tooltip',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'rememberme_path',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.rememberme.path',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.rememberme.path.tooltip',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'rememberme_domain',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.rememberme.domain',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.rememberme.domain.tooltip',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'default_pagelimit',
             'choice',
             [
@@ -620,65 +566,6 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
                 'empty_value' => false,
-            ]
-        );
-
-        $builder->add(
-            'cookie_path',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.cookie.path',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.cookie.path.tooltip',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'cookie_domain',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.cookie.domain',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.cookie.domain.tooltip',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'cookie_secure',
-            'yesno_button_group',
-            [
-                'label'       => 'mautic.core.config.form.cookie.secure',
-                'empty_value' => 'mautic.core.form.default',
-                'data'        => (array_key_exists('cookie_secure', $options['data'])) ? $options['data']['cookie_secure'] : '',
-                'attr'        => [
-                    'tooltip' => 'mautic.core.config.form.cookie.secure.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
-            'cookie_httponly',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.core.config.form.cookie.httponly',
-                'data'  => (array_key_exists('cookie_httponly', $options['data']) && !empty($options['data']['cookie_httponly'])) ? true : false,
-                'attr'  => [
-                    'tooltip' => 'mautic.core.config.form.cookie.httponly.tooltip',
-                ],
             ]
         );
 
