@@ -154,13 +154,8 @@ $container->loadFromExtension('mautic_core');
 $engines = ['php', 'twig'];
 
 // Generate session name
-if (isset($_COOKIE['mautic_session_name'])) {
-    // Attempt to keep from losing sessions if cache is cleared through UI
-    $sessionName = $_COOKIE['mautic_session_name'];
-} else {
-    $key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
-    $sessionName = md5(md5($paths['local_config']).$key);
-}
+$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+$sessionName = md5(md5($paths['local_config']).$key);
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
