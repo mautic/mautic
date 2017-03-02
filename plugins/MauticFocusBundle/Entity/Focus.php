@@ -163,6 +163,7 @@ class Focus extends FormEntity
 
         $builder->createField('htmlMode', 'boolean')
             ->columnName('html_mode')
+            ->nullable()
             ->build();
 
         $builder->addNullableField('html', 'text');

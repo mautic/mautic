@@ -28,10 +28,11 @@ class FocusApiController extends CommonApiController
         parent::initialize($event);
 
         $this->model            = $this->getModel('focus');
-        $this->entityClass      = Focus::class;
-        $this->entityNameOne    = 'focusitem';
-        $this->entityNameMulti  = 'focusitems';
+        $this->entityClass      = 'MauticPlugin\MauticFocusBundle\Entity\Focus';
+        $this->entityNameOne    = 'focus';
+        $this->entityNameMulti  = 'focus';
         $this->permissionBase  = 'plugin:focus:items';
+        $this->serializerGroups = ['properties'];
         $this->dataInputMasks   = [
             'html'     => 'html',
         ];
