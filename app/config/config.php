@@ -147,18 +147,11 @@ unset($setBundles, $setPluginBundles);
 $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
-$loader->import('parameters.php');
+include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
 $engines = ['php', 'twig'];
-
-// Load parameters array from local configuration
-if (isset($paths['local_config'])) {
-    if (file_exists($paths['local_config'])) {
-        include $paths['local_config'];
-    }
-}
 
 // Generate session name
 $key         = isset($parameters['secret_key']) ? $parameters['secret_key'] : uniqid();
