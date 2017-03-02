@@ -1648,6 +1648,17 @@ class EventModel extends CommonFormModel
             //trigger the action
             $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true, $log);
 
+            // Check if the lead wasn't deleted during the event callback
+            if (null === $lead->getId() && $response === true) {
+                ++$executedEventCount;
+
+                $this->logger->debug(
+                    'CAMPAIGN: Contact was deleted while executing '.ucfirst($event['eventType']).' ID# '.$event['id']
+                );
+
+                return true;
+            }
+
             $eventTriggered = false;
             if ($response instanceof LeadEventLog) {
                 // Listener handled the event and returned a log entry

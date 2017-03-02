@@ -69,6 +69,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
+                ['onCampaignTriggerActionDeleteContact', 6],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -130,6 +131,20 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.scorecontactscompanies', $action);
+
+        $trigger = [
+            'label'                  => 'mautic.lead.lead.events.delete',
+            'description'            => 'mautic.lead.lead.events.delete_descr',
+            'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'connectionRestrictions' => [
+                'target' => [
+                    'decision'  => ['none'],
+                    'action'    => ['none'],
+                    'condition' => ['none'],
+                ],
+            ],
+        ];
+        $event->addAction('lead.deletecontact', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
@@ -276,6 +291,20 @@ class CampaignSubscriber extends CommonSubscriber
         } else {
             return $event->setResult(true);
         }
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerActionDeleteContact(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('lead.deletecontact')) {
+            return;
+        }
+
+        $this->leadModel->deleteEntity($event->getLead());
+
+        return $event->setResult(true);
     }
 
     /**
