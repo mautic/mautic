@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div id="codemodeHtmlContainer" style="height: 100px">
+<div id="codemodeHtmlContainer">
     <p>Place your content here</p>
 </div>
 
