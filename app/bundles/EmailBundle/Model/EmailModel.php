@@ -1201,6 +1201,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Store stat entities
         $errors          = [];
         $saveEntities    = [];
+        $deleteEntities  = [];
+        $statEntities    = [];
+        $statBatchCount  = 0;
         $emailSentCounts = [];
 
         // Setup the mailer
@@ -1208,7 +1211,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $mailer->enableQueue();
 
         // Flushes the batch in case of using API mailers
-        $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
+        $flushQueue = function ($reset = true) use (&$mailer, &$statEntities, &$saveEntities, &$deleteEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
             if ($sendBatchMail) {
                 $flushResult = $mailer->flushQueue();
                 if (!$flushResult) {
@@ -1219,7 +1222,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                         // Prevent the stat from saving
                         foreach ($sendFailures['failures'] as $failedEmail) {
                             /** @var Stat $stat */
-                            $stat = $saveEntities[$failedEmail];
+                            $stat = $statEntities[$failedEmail];
                             // Add lead ID to list of failures
                             $errors[$stat->getLead()->getId()] = $failedEmail;
 
@@ -1227,8 +1230,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             $emailId = $stat->getEmail()->getId();
                             ++$emailSentCounts[$emailId];
 
-                            // Delete the stat
-                            unset($saveEntities[$failedEmail]);
+                            if ($stat->getId()) {
+                                $deleteEntities[] = $stat;
+                            }
+                            unset($statEntities[$failedEmail], $saveEntities[$failedEmail]);
                         }
                     }
                 }
@@ -1359,7 +1364,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     //create a stat
-                    $saveEntities[$contact['email']] = $mailer->createEmailStat(false, null, $listId);
+                    $saveEntities[$contact['email']] = $statEntities[$contact['email']] = $mailer->createEmailStat(false, null, $listId);
+                    ++$statBatchCount;
+
+                    if (20 === $statBatchCount) {
+                        // Save in batches of 20 to prevent email loops if the there are issuses with persisting a large number of stats at once
+                        $statRepo->saveEntities($saveEntities);
+                        $statBatchCount = 0;
+                        $saveEntities   = [];
+                    }
 
                     // Up sent counts
                     if (!isset($emailSentCounts[$translatedId])) {
@@ -1380,8 +1393,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Send batched mail if applicable
         $flushQueue();
 
-        // Persist stats
-        $statRepo->saveEntities($saveEntities);
+        // Persist left over stats
+        if (count($saveEntities)) {
+            $statRepo->saveEntities($saveEntities);
+        }
+        if (count($deleteEntities)) {
+            $statRepo->deleteEntities($deleteEntities);
+        }
 
         // Update bad emails as bounces
         if (count($badEmails)) {
@@ -1416,7 +1434,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->em->clear('Mautic\EmailBundle\Entity\Stat');
         $this->em->clear('Mautic\LeadBundle\Entity\DoNotContact');
 
-        unset($saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
+        unset($saveEntities, $saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
         $success = empty($errors);
         if (!$success && $returnErrorMessages) {
