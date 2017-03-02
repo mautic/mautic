@@ -605,7 +605,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
-        if (empty($query)) {
+        if (!$query) {
             $query = $this->getFetchQuery($params);
         }
 
