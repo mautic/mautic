@@ -702,20 +702,22 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
         focusForm.find('.fr-box').remove();
     }
 
-    var focusFormHeader = mQuery('#customize-slot-panel').find('.panel-heading');
+    var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
     var newDynConButton = mQuery('<button/>')
         .css('float', 'right')
-        .addClass('btn btn-default')
-        .text('Add Variant')
-        .click(function(e){
-            e.stopPropagation();
+        .addClass('btn btn-success btn-sm');
 
-            var tabId = Mautic.createNewDynamicContentItem(parent.mQuery);
-        });
+    newDynConButton.text('Add Variant');
+
+    newDynConButton.on('click', function(e) {
+        e.stopPropagation();
+
+        var tabId = Mautic.createNewDynamicContentItem(parent.mQuery);
+    });
 
     focusFormHeader.append(newDynConButton);
 
-    console.log(focusFormHeader);
+    console.log(focusFormHeader, newDynConButton);
 
     return focusForm;
 };
