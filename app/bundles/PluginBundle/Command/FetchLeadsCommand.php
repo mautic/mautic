@@ -91,7 +91,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
             $config            = $integrationObject->mergeConfigToFeatureSettings();
-            $supportedFeatures = $integrationObject->getSupportedFeatures();
+            $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
             $params['start'] = $startDate;
             $params['end']   = $endDate;
