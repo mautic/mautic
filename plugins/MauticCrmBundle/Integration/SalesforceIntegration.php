@@ -391,8 +391,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticCompany($dataObject, true, null);
                         $mauticObjectReference = 'company';
                     } else {
-                        $this->logIntegrationError(new \Exception(
-                            sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)));
+                        $this->logIntegrationError(
+                            new \Exception(
+                                sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)
+                            )
+                        );
                         continue;
                     }
 
@@ -981,7 +984,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $request['allOrNone']        = 'false';
-        $request['compositeRequest'] = $mauticData;
+        $request['compositeRequest'] = array_values($mauticData);
 
         if (!empty($request)) {
             /** @var SalesforceApi $apiHelper */
@@ -990,7 +993,31 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         // Store integration objects if created
-        return $this->processCompositeResponse($result['compositeResponse']);
+        $count = $this->processCompositeResponse($result['compositeResponse'], $tryAsContacts);
+
+        if (!empty($tryAsContacts)) {
+            $request['compositeRequest'] = [];
+
+            foreach ($tryAsContacts as $referenceId) {
+                list($contactId, $object) = explode('-', $referenceId);
+                $this->buildCompositeBody(
+                    $request['compositeRequest'],
+                    $availableFields,
+                    $contactSfFields,
+                    'Contact',
+                    $leadsToCreate[$contactId]
+                );
+            }
+
+            if (!empty($request['compositeRequest'])) {
+                $result       = $apiHelper->syncMauticToSalesforce($request);
+                $contactCount = $this->processCompositeResponse($result['compositeResponse']);
+
+                $count += $contactCount;
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -1032,6 +1059,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null)
     {
+        $body = [];
         //use a composite patch here that can update and create (one query) every 200 records
         foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
             $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
@@ -1049,19 +1077,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($objectId) {
                 $url .= '/'.$objectId;
             }
-            $mauticData[] = [
+            $id              = $lead['id'].'-'.$object;
+            $mauticData[$id] = [
                 'method'      => ($objectId) ? 'PATCH' : 'POST',
                 'url'         => $url,
-                'referenceId' => $lead['id'].'-'.$object,
+                'referenceId' => $id,
                 'body'        => $body,
             ];
         }
     }
 
     /**
-     * @param $response
+     * @param       $response
+     * @param array $tryAsContacts
+     *
+     * @return int
      */
-    protected function processCompositeResponse($response)
+    protected function processCompositeResponse($response, &$tryAsContacts = [])
     {
         $count = 0;
 
@@ -1090,7 +1122,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                     ++$count;
                 } else {
-                    $this->logIntegrationError(new \Exception($item['body']['message'].' ('.$item['referenceId'].')'));
+                    if (!empty($item['body'][0]['message']['errorCode']) && 'CANNOT_UPDATE_CONVERTED_LEAD' === $item['body'][0]['message']['errorCode']) {
+                        $tryAsContacts[] = $item['referenceId'];
+                    } else {
+                        $error = 'unknown';
+                        switch (true) {
+                            case !empty($item['body'][0]['message']['message']):
+                                $error = $item['body'][0]['message']['message'];
+                                break;
+                            case !empty($item['body']['message']):
+                                $error = $item['body']['message'];
+                                break;
+                        }
+                        $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
+                    }
                 }
             }
 
