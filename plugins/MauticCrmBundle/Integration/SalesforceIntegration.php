@@ -287,7 +287,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     if ($sfObject !== 'company') {
                                         $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject] = [
                                             'type'        => $type,
-                                            'label'       => $sfObject.' - '.$fieldInfo['label'],
+                                            'label'       => $sfObject.'-'.$fieldInfo['label'],
                                             'required'    => $isRequired($fieldInfo, $sfObject),
                                             'group'       => $sfObject,
                                             'optionLabel' => $fieldInfo['label'],

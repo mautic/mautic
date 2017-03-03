@@ -270,8 +270,8 @@ class SalesforceApi extends CrmApi
                     if (strpos($sfField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
-                    if (strpos($sfField, ' - '.$object) !== false) {
-                        $fields[] = str_replace(' - '.$object, '', $sfField);
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
         }
