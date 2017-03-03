@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -38,7 +38,7 @@ class GatedVideoType extends SlotType
 
         $builder->add(
             'gatetime',
-            IntegerType::class,
+            TextType::class,
             [
                 'label'      => 'Gate Time',
                 'label_attr' => ['class' => 'control-label'],
@@ -71,7 +71,7 @@ class GatedVideoType extends SlotType
 
         $builder->add(
             'width',
-            IntegerType::class,
+            TextType::class,
             [
                 'label'      => 'Width',
                 'label_attr' => ['class' => 'control-label'],
@@ -85,7 +85,7 @@ class GatedVideoType extends SlotType
 
         $builder->add(
             'height',
-            IntegerType::class,
+            TextType::class,
             [
                 'label'      => 'Height',
                 'label_attr' => ['class' => 'control-label'],
