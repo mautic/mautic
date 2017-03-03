@@ -37,10 +37,6 @@ Mautic.addNewPluginField = function (selector) {
 Mautic.removePluginField = function (selector, indexClass) {
     var deleteCurrentItem = mQuery('#' + indexClass);
 
-    var selectors = deleteCurrentItem.find('select');
-    selectors.each(function( ) {
-        mQuery( this ).prop('disabled', true).trigger("chosen:updated");
-    });
     deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
     deleteCurrentItem.find('label').addClass('disabled');
 
@@ -52,12 +48,31 @@ Mautic.removePluginField = function (selector, indexClass) {
         deleteCurrentItem.insertAfter(deleteCurrentItem.closest('.fields-container').find('.field-container').last());
     }
 
+    // Add back the option to other selects
+    var integrationSelect = deleteCurrentItem.find('select.integration-field').first();
+    var groupSelects = mQuery(deleteCurrentItem).closest('.fields-container').find('select.integration-field').not(integrationSelect);
+    mQuery('option[value="' + integrationSelect.val() + '"]', groupSelects).each(function() {
+        if (!mQuery(this).closest('select').prop('disabled')) {
+            mQuery(this).prop('disabled', false);
+            mQuery(this).removeAttr('disabled');
+        }
+    });
+
     deleteCurrentItem.find('option').each(function() {
         mQuery(this).prop('disabled', false);
         mQuery(this).removeAttr('disabled');
     });
 
+    groupSelects.each(function() {
+        if (!mQuery(this).closest('.field-container').hasClass('hide')) {
+            mQuery(this).trigger('change');
+        }
+    });
+
     deleteCurrentItem.addClass('hide');
+    deleteCurrentItem.find('select').each(function( ) {
+        mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+    });
 
     Mautic.stopIconSpinPostEvent();
 };
@@ -211,8 +226,8 @@ Mautic.getIntegrationLeadFields = function (integration, el, settings) {
         function(response) {
             if (response.success) {
                 mQuery('#leadFieldsContainer').replaceWith(response.html);
-                Mautic.onPageLoad('#leadFieldsContainer', {mauticContent: 'integrationConfig'});
-
+                Mautic.onPageLoad('#leadFieldsContainer');
+                Mautic.integrationConfigOnLoad('#leadFieldsContainer');
                 if (mQuery('#fields-tab').length) {
                     mQuery('#fields-tab').removeClass('hide');
                 }
@@ -241,7 +256,8 @@ Mautic.getIntegrationCompanyFields = function (integration, el, settings) {
         function(response) {
             if (response.success) {
                 mQuery('#companyFieldsContainer').replaceWith(response.html);
-                Mautic.onPageLoad('#companyFieldsContainer', {mauticContent: 'integrationConfig'});
+                Mautic.onPageLoad('#companyFieldsContainer');
+                Mautic.integrationConfigOnLoad('#companyFieldsContainer');
 
                 if (mQuery('#company-fields-container').length) {
                     mQuery('#company-fields-container').removeClass('hide');
@@ -272,9 +288,10 @@ Mautic.getIntegrationConfig = function (el, settings) {
         function (response) {
             if (response.success) {
                 mQuery('.integration-config-container').html(response.html);
-                Mautic.onPageLoad('.integration-config-container');
+                Mautic.onPageLoad('.integration-config-container', response);
             }
 
+            Mautic.integrationConfigOnLoad('.integration-config-container');
             Mautic.removeLabelLoadingIndicator();
         }
     );
