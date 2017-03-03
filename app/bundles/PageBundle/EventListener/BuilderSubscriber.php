@@ -156,6 +156,33 @@ class BuilderSubscriber extends CommonSubscriber
                 600
             );
         }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                'One Column',
+                'file-text-o',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+            $event->addSection(
+                'two-column',
+                'Two Columns',
+                'columns',
+                'MauticCoreBundle:Sections:two-column.html.php',
+                null,
+                900
+            );
+            $event->addSection(
+                'three-column',
+                'Three Columns',
+                'th',
+                'MauticCoreBundle:Sections:three-column.html.php',
+                null,
+                800
+            );
+        }
     }
 
     /**

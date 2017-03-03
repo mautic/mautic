@@ -101,21 +101,32 @@ class SalesforceApi extends CrmApi
      */
     public function createLead(array $data, $lead)
     {
-        //find lead
-        $update = false;
-        if (isset($data['Email'])) {
-            $findLead = 'select Id from Lead where email = \''.$data['Email'].'\'';
+        $createdLeadData = [];
+        //search for SF id in mautic records first to avoid making an API call
+        if (is_object($lead)) {
+            $sfLeadRecords = $this->integration->getSalesforceLeadId($lead);
+        }
+        //if not found then go ahead and make an API call to find all the records with that email
+        if (isset($data['Email']) && empty($sfLeadId)) {
+            $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Email'].'\'';
             $queryUrl = $this->integration->getQueryUrl();
             $sfLead   = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
-            $lead = $sfLead['records'];
-            if (isset($lead[0]['Id'])) {
-                $update = true;
-            }
+            $sfLeadRecords = $sfLead['records'];
         }
 
-        if ($update) {
-            $createdLeadData = $this->request('', $data, 'PATCH', false, 'Lead/'.$lead[0]['Id']);
+        if (!empty($sfLeadRecords)) {
+            foreach ($sfLeadRecords as $sfLeadRecord) {
+                $sfLeadId = (isset($sfLeadRecord['integration_entity_id']) ? $sfLeadRecord['integration_entity_id'] : $sfLeadRecord['Id']);
+                $sfObject = (isset($sfLeadRecord['integration_entity']) ? $sfLeadRecord['integration_entity'] : 'Lead');
+                //update the converted contact if found and not the Lead because it will error in SF
+                if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
+                    unset($data['Company']); //because this record is not in the Contact object
+                    $createdLeadData[] = $this->request('', $data, 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
+                } else {
+                    $createdLeadData[] = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfLeadId);
+                }
+            }
         } else {
             $createdLeadData = $this->request('', $data, 'POST', false, 'Lead');
         }
@@ -253,8 +264,8 @@ class SalesforceApi extends CrmApi
         }
 
         if (!empty($fields) and isset($query['start'])) {
-            $fields   = implode(', ', $fields);
             $fields[] = 'Id';
+            $fields   = implode(', ', $fields);
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {

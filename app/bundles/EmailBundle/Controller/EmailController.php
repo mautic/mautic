@@ -583,6 +583,7 @@ class EmailController extends FormController
         }
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
+        $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
@@ -592,6 +593,7 @@ class EmailController extends FormController
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
+                    'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
@@ -782,6 +784,7 @@ class EmailController extends FormController
         $attachmentSize = $this->getModel('asset')->getTotalFilesize($assets);
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
+        $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
@@ -790,6 +793,7 @@ class EmailController extends FormController
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
+                    'sections'           => $this->buildSlotForms($sections),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,

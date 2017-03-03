@@ -12,7 +12,9 @@
 namespace Mautic\ChannelBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\ChannelBundle\Event\ChannelEvent;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -51,6 +53,28 @@ class MessageApiController extends CommonApiController
                 } else {
                     $params['channels'][$channelType]['channel'] = $channelType;
                 }
+            }
+        }
+    }
+
+    /**
+     * Load and set channel names to the response.
+     *
+     * @param        $entity
+     * @param string $action
+     *
+     * @return mixed
+     */
+    protected function preSerializeEntity(&$entity, $action = 'view')
+    {
+        $event = $this->dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
+
+        if ($channels = $entity->getChannels()) {
+            foreach ($channels as $channel) {
+                $repository = $event->getRepositoryName($channel->getChannel());
+                $nameColumn = $event->getNameColumn($channel->getChannel());
+                $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);
+                $channel->setChannelName($name);
             }
         }
     }

@@ -256,14 +256,14 @@ class ListModel extends FormModel
             ],
             'last_active' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_modified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_modified'),
-                'properties' => ['type' => 'date'],
-                'operators'  => 'default',
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'owner_id' => [

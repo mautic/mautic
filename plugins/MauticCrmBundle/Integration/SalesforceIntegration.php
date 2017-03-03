@@ -914,4 +914,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $newKey;
     }
+
+    public function getSalesforceLeadId($lead)
+    {
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $result                = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'Lead', $lead->getId());
+        if (empty($result)) {
+            //try searching for lead as this has been changed before in updated done to the plugin
+            $result = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', $lead->getId());
+        }
+
+        return $result;
+    }
 }
