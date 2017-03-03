@@ -398,7 +398,7 @@ Mautic.updateEntitySelect = function (response) {
 
         if (mQueryParent(el).prop('disabled')) {
             mQueryParent(el).prop('disabled', false);
-                var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+            var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
         } else {
             if (mQueryParent(el + ' option[value=""]').length) {
                 emptyOption = mQueryParent(el + ' option[value=""]').clone();
@@ -417,7 +417,7 @@ Mautic.updateEntitySelect = function (response) {
             var optgroup = el + ' optgroup[label="'+response.group+'"]';
             if (mQueryParent(optgroup).length) {
                 // update option when new option equal with option item in group.
-                    var firstOptionGroups = mQueryParent(optgroup);
+                var firstOptionGroups = mQueryParent(optgroup);
                 var isUpdateOption = false;
                 firstOptionGroups.each(function () {
                     var firstOptions = mQuery(this).children();
@@ -432,7 +432,7 @@ Mautic.updateEntitySelect = function (response) {
 
                 if (!isUpdateOption) {
                     //the optgroup exist so append to it
-                        mQueryParent(optgroup).append(newOption);
+                    mQueryParent(optgroup).append(newOption);
                 }
             } else {
                 //create the optgroup
@@ -555,17 +555,18 @@ Mautic.updateFieldOperatorValue = function(field, action) {
     var fieldPrefix = fieldId.slice(0,-1 * fieldType.length);
     var fieldAlias = mQuery('#'+fieldPrefix+'field').val();
     var fieldOperator = mQuery('#'+fieldPrefix+'operator').val();
-
     Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
         if (typeof response.options != 'undefined') {
+
             var valueField = mQuery('#'+fieldPrefix+'value');
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
                 'id': valueField.attr('id'),
                 'name': valueField.attr('name'),
                 'autocomplete': valueField.attr('autocomplete'),
-                'value': valueField.attr('value')
+                'value': valueField.val()
             };
+
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
                 mQuery('#'+fieldPrefix+'value').chosen('destroy');
@@ -582,6 +583,9 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     var option = mQuery("<option/>")
                         .attr('value', optionKey)
                         .text(optionVal);
+                    if (fieldType != 'field' && optionKey == valueFieldAttrs['value']) {
+                        option.attr('selected', 'selected');
+                    }
                     newValueField.append(option);
                 });
                 valueField.replaceWith(newValueField);
@@ -593,8 +597,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('class', valueFieldAttrs['class'])
                     .attr('id', valueFieldAttrs['id'])
                     .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
+                    .attr('autocomplete', valueFieldAttrs['autocomplete']);
 
                 if (response.disabled) {
                     newValueField.prop('disabled', true);
@@ -618,7 +621,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     'id': operatorField.attr('id'),
                     'name': operatorField.attr('name'),
                     'autocomplete': operatorField.attr('autocomplete'),
-                    'value': operatorField.attr('value')
+                    'value': operatorField.val()
                 };
 
                 var newOperatorField = mQuery('<select/>')
@@ -632,6 +635,9 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     var option = mQuery("<option/>")
                         .attr('value', optionKey)
                         .text(optionVal);
+                    if (optionKey == operatorFieldAttrs['value']) {
+                        option.attr('selected', 'selected');
+                    }
                     newOperatorField.append(option);
                 });
                 operatorField.replaceWith(newOperatorField);
