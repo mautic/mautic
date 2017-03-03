@@ -29,11 +29,6 @@ class ThemeHelper
     private $templatingHelper;
 
     /**
-     * @var CacheHelper
-     */
-    private $cacheHelper;
-
-    /**
      * @var array|mixed
      */
     private $themes = [];
@@ -63,13 +58,11 @@ class ThemeHelper
      *
      * @param PathsHelper      $pathsHelper
      * @param TemplatingHelper $templatingHelper
-     * @param CacheHelper      $cacheHelper
      */
-    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, CacheHelper $cacheHelper)
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
     {
         $this->pathsHelper      = $pathsHelper;
         $this->templatingHelper = $templatingHelper;
-        $this->cacheHelper      = $cacheHelper;
     }
 
     /**
@@ -411,9 +404,6 @@ class ThemeHelper
             } else {
                 $zipper->close();
                 unlink($zipFile);
-
-                // Clear the cache to apply the change
-                $this->cacheHelper->clearTwigCache();
 
                 return true;
             }

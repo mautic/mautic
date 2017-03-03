@@ -125,15 +125,6 @@ class CacheHelper
     }
 
     /**
-     * Clears the cache for twig.
-     */
-    public function clearTwigCache()
-    {
-        $fs = new Filesystem();
-        $fs->remove($this->cacheDir.'/twig');
-    }
-
-    /**
      * Clears the cache for routing.
      */
     public function clearRoutingCache()
