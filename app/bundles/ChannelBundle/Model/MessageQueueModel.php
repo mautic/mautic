@@ -363,6 +363,15 @@ class MessageQueueModel extends FormModel
     }
 
     /**
+     * @param       $channel
+     * @param array $channelIds
+     */
+    public function getQueuedChannelCount($channel, $channelIds = [])
+    {
+        return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
@@ -411,8 +420,12 @@ class MessageQueueModel extends FormModel
      *
      * @param $action
      * @param $event
+     * @param $entity
+     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     *
+     * @return Event|null
      */
     protected function dispatchDeprecatedEvent($action, Event $event = null, $entity = null, $isNew = null)
     {
