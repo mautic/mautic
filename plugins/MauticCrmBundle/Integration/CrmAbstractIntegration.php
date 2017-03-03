@@ -182,11 +182,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $helper;
     }
 
+    /**
+     * @param \DateTime|null $startDate
+     * @param \DateTime|null $endDate
+     * @param                $leadId
+     *
+     * @return array
+     */
     public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
     {
         return [];
     }
 
+    /**
+     * @param array $params
+     */
     public function pushLeadActivity($params = [])
     {
     }
@@ -351,7 +361,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|mixed
      */
-    public function getFormFieldsByObject($object)
+    protected function getFormFieldsByObject($object, $settings = [])
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 

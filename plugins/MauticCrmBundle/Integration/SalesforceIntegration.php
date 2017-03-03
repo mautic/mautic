@@ -195,7 +195,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('company');
+        return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
@@ -207,8 +207,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        $leadFields    = $this->getFormFieldsByObject('Lead');
-        $contactFields = $this->getFormFieldsByObject('Contact');
+        $leadFields    = $this->getFormFieldsByObject('Lead', $settings);
+        $contactFields = $this->getFormFieldsByObject('Contact', $settings);
 
         return array_merge($leadFields, $contactFields);
     }
@@ -279,10 +279,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         $type = 'string';
                                     }
                                     if ($sfObject !== 'company') {
-                                        $salesFields[$sfObject][$fieldInfo['name'].' - '.$sfObject] = [
-                                            'type'     => $type,
-                                            'label'    => $sfObject.' - '.$fieldInfo['label'],
-                                            'required' => $isRequired($fieldInfo, $sfObject),
+                                        $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject] = [
+                                            'type'        => $type,
+                                            'label'       => $sfObject.' - '.$fieldInfo['label'],
+                                            'required'    => $isRequired($fieldInfo, $sfObject),
+                                            'group'       => $sfObject,
+                                            'optionLabel' => $fieldInfo['label'],
                                         ];
                                     } else {
                                         $salesFields[$sfObject][$fieldInfo['name']] = [
@@ -933,6 +935,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $newKey;
     }
 
+    /**
+     * @param array $params
+     *
+     * @return mixed
+     */
     public function pushLeads($params = [])
     {
         $config                = $this->mergeConfigToFeatureSettings();
