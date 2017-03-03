@@ -47,6 +47,7 @@ $limitOptions        = [
     30  => '30',
     50  => '50',
     100 => '100',
+    500 => '500',
 ];
 
 foreach ($responsiveViewports as $viewport):
