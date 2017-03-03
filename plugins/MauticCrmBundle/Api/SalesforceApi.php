@@ -125,6 +125,11 @@ class SalesforceApi extends CrmApi
         return $createdLeadData;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return mixed|string
+     */
     public function syncMauticToSalesforce(array $data)
     {
         $queryUrl = $this->integration->getCompositeUrl();
@@ -262,7 +267,7 @@ class SalesforceApi extends CrmApi
         $result = [];
         if (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
-            $fields   = implode(', ', $fields);
+            $fields   = implode(', ', array_unique($fields));
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
