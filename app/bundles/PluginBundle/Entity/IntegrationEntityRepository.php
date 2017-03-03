@@ -34,16 +34,19 @@ class IntegrationEntityRepository extends CommonRepository
     public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('i.integration_entity_id, i.id, i.internal_entity_id')
+            ->select('i.integration_entity_id, i.id, i.internal_entity_id, i.integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         $q->where('i.integration = :integration')
-            ->andWhere('i.integration_entity = :integrationEntity')
             ->andWhere('i.internal_entity = :internalEntity')
-
             ->setParameter('integration', $integration)
-            ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntity', $internalEntity);
+
+        if ($integrationEntity) {
+            $q->andWhere('i.integration_entity = :integrationEntity')
+                ->setParameter('integrationEntity', $integrationEntity);
+        }
+
         if ($push) {
             $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.last_active >= :startDate')
                 ->setParameter('startDate', $startDate);
