@@ -18,53 +18,19 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class SocialMediaServiceType.
+ * Class FieldsType.
  */
 class FieldsType extends AbstractType
 {
+    use FieldsTypeTrait;
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $index                    = 0;
-        $integrationFields        = array_combine(str_replace(' - ', '__', array_keys($options['integration_fields'])), array_keys($options['integration_fields']));
-        $fieldData                = isset($options['data']) ? $options['data'] : [];
-        $integrationFieldsOrdered = array_merge($fieldData, $integrationFields);
-
-        foreach ($integrationFieldsOrdered as $field => $details) {
-            ++$index;
-            $builder->add('i_'.$index, 'choice', [
-                'choices'  => $integrationFieldsOrdered,
-                'label'    => false,
-                'required' => true,
-                'data'     => isset($fieldData[$field]) ? $field : '',
-                'attr'     => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
-                'disabled' => ($index > 1 && !isset($fieldData[$field])) ? true : false,
-            ]);
-            if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
-                $builder->add('update_mautic'.$index,
-                    'button_group',
-                    [
-                        'choices'     => ['<btn class="btn-nospin fa fa-arrow-circle-left"></btn>', '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>'],
-                        'label'       => false,
-                        'data'        => isset($options['update_mautic'][$field]) ? (bool) $options['update_mautic'][$field] : 1,
-                        'empty_value' => false,
-                        'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
-                        'disabled'    => ($index > 1 && !isset($fieldData[$field])) ? true : false,
-                    ]);
-            }
-            $builder->add('m_'.$index, 'choice', [
-                'choices'    => $options['lead_fields'],
-                'label'      => false,
-                'required'   => true,
-                'data'       => isset($fieldData[$field]) ? $fieldData[$field] : '',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'field-selector form-control', 'data-placeholder' => ' '],
-                'disabled'   => ($index > 1 && !isset($fieldData[$field])) ? true : false,
-            ]);
-        }
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['lead_fields']);
     }
 
     /**

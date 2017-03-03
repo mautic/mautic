@@ -30,8 +30,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             ->setName('mautic:integration:fetchleads')
             ->setAliases(
                 [
-                    'mautic:integration:fetchleads',
-                    'mautic:fetchleads:integration',
+                    'mautic:integration:synccontacts',
                 ]
             )
             ->setDescription('Fetch leads from integration.')

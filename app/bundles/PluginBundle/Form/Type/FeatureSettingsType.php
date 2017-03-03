@@ -51,7 +51,7 @@ class FeatureSettingsType extends AbstractType
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => true,
+                'ignore_field_cache' => ('GET' === $_SERVER['REQUEST_METHOD']),
             ];
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
