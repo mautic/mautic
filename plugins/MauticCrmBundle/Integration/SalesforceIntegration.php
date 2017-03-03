@@ -1125,7 +1125,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if (!empty($item['body'][0]['message']['errorCode']) && 'CANNOT_UPDATE_CONVERTED_LEAD' === $item['body'][0]['message']['errorCode']) {
                         $tryAsContacts[] = $item['referenceId'];
                     } else {
-                        $error = 'unknown';
+                        $error = 'http status code '.$item['httpStatusCode'];
                         switch (true) {
                             case !empty($item['body'][0]['message']['message']):
                                 $error = $item['body'][0]['message']['message'];
