@@ -18,18 +18,31 @@ if (!$hasFields = (isset($form['featureSettings']) && count($form['featureSettin
     // Unset if set to prevent features tab from showing when there's no feature to show
     unset($form['featureSettings']['leadFields']);
 }
-if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count($form['featureSettings']) > 1) || (!$hasFields && count($form['featureSettings']))))) {
+if (!$hasFeatureSettings = (isset($form['featureSettings'])
+    && (($hasFields && count($form['featureSettings']) > 1)
+        || (!$hasFields
+            && count(
+                $form['featureSettings']
+            ))))
+) {
     if (isset($form['featureSettings'])) {
         $form['featureSettings']->setRendered();
     }
 }
+$hasCompanyFields      = (isset($form['featureSettings']['companyFields']) && count($form['featureSettings']['companyFields']));
+$companyFieldHtml      = ($hasCompanyFields) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
+$fieldHtml             = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
+$fieldLabel            = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
+$fieldTabClass         = ($hasFields) ? '' : ' hide';
+$hasLeadFieldErrors    = ($hasFields && $view['form']->containsErrors($form['featureSettings']['leadFields']));
+$hasCompanyFieldErrors = ($hasCompanyFields && $view['form']->containsErrors($form['featureSettings']['companyFields']));
 
-$fieldHtml        = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
-$companyFieldHtml = (isset($form['featureSettings']['companyFields']) && count($form['featureSettings']['companyFields'])) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
-$fieldLabel       = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass    = ($hasFields) ? '' : ' hide';
 unset($form['featureSettings']['leadFields']);
 unset($form['featureSettings']['companyFields']);
+
+$hasFeatureErrors =
+    ($hasSupportedFeatures && $view['form']->containsErrors($form['supportedFeatures'])) ||
+    ($hasFeatureSettings && $view['form']->containsErrors($form['featureSettings']));
 ?>
 
 <?php if (!empty($description)) : ?>
@@ -38,15 +51,40 @@ unset($form['featureSettings']['companyFields']);
     </div>
 <?php endif; ?>
 <ul class="nav nav-tabs">
-    <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
+    <li class="active" id="details-tab">
+        <a href="#details-container" role="tab" data-toggle="tab">
+            <?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?>
+        </a>
+    </li>
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
-        <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
+        <li class="" id="features-tab">
+            <a href="#features-container" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?>
+                <?php if ($hasFeatureErrors): ?>
+                <i class="fa fa-fw fa-warning text-danger"></i>
+                <?php endif; ?>
+            </a>
+        </li>
     <?php endif; ?>
     <?php if ($hasFields): ?>
-        <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
+        <li class="<?php echo $fieldTabClass; ?>" id="fields-tab">
+            <a href="#fields-container" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?>
+                <?php if ($hasLeadFieldErrors): ?>
+                    <i class="fa fa-fw fa-warning text-danger"></i>
+                <?php endif; ?>
+            </a>
+        </li>
     <?php endif; ?>
     <?php if (!empty($companyFieldHtml)) : ?>
-    <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#company-fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.companyfieldmapping'); ?></a></li>
+        <li class="<?php echo $fieldTabClass; ?>" id="fields-tab">
+            <a href="#company-fields-container" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.plugin.integration.tab.companyfieldmapping'); ?>
+                <?php if ($hasCompanyFieldErrors): ?>
+                    <i class="fa fa-fw fa-warning text-danger"></i>
+                <?php endif; ?>
+            </a>
+        </li>
     <?php endif; ?>
 </ul>
 
@@ -63,8 +101,8 @@ unset($form['featureSettings']['companyFields']);
         <?php endif; ?>
         <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
             <div class="well well-sm">
-                <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br />
-                <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $callbackUrl; ?>" class="form-control" />
+                <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
+                <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $callbackUrl; ?>" class="form-control"/>
             </div>
         <?php endif; ?>
         <?php if (isset($form['authButton'])): ?>
