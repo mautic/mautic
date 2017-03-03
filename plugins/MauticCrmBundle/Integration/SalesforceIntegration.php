@@ -1007,10 +1007,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $availableFields,
                             (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $contactSfFields : $leadSfFields,
                             (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? 'Contact' : 'Lead',
-                            $leadsToUpdate[$sfLeadRecord['email']],
+                            $leadsToUpdate[$sfLeadRecord['Email']],
                             $sfLeadRecord['Id']
                         );
-                        unset($leadsToUpdate[$sfLeadRecord['email']]);
+                        unset($leadsToUpdate[$sfLeadRecord['Email']]);
                     }
                 }
                 $leadsToCreate = $leadsToUpdate; //if not found either in Mautic records or SF records proceed to create a lead in SF
