@@ -98,7 +98,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
-        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date');
+        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date and l.date_identified is not null');
 
         $q->setMaxResults($limit);
 
@@ -119,7 +119,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->select('l.id,'.$leadFields)
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        $q->where('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity = "lead" and i.internal_entity_id = l.id )')
+        $q->where('l.date_identified is not null and not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity = "lead" and i.internal_entity_id = l.id )')
             ->setParameter('integration', $integration);
 
         $q->setMaxResults($limit);
