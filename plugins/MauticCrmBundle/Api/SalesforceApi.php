@@ -281,7 +281,7 @@ class SalesforceApi extends CrmApi
             $fields   = implode(', ', array_unique($fields));
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
-            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner' && $object != 'Account') {
+            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
 
