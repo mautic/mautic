@@ -413,7 +413,7 @@ class ThemeHelper
                 unlink($zipFile);
 
                 // Clear the cache to apply the change
-                $this->cacheHelper->clearCache();
+                $this->cacheHelper->clearTwigCache();
 
                 return true;
             }
