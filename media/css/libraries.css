@@ -1,11 +1,11 @@
 
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}:focus{outline:0}.fr-element,.fr-element:focus{outline:0px
-solid transparent}.fr-box.fr-basic .fr-element{text-align:initial;color:#000;padding:10px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;overflow-x:auto;min-height:40px}.fr-element{background:transparent;position:relative;z-index:2;-webkit-user-select:auto}.fr-element
+solid transparent}.fr-box.fr-basic .fr-element{color:#000;padding:10px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;overflow-x:auto;min-height:40px}.fr-element{background:transparent;position:relative;z-index:2;-webkit-user-select:auto}.fr-element
 a{user-select:auto;-o-user-select:auto;-moz-user-select:auto;-khtml-user-select:auto;-webkit-user-select:auto;-ms-user-select:auto}.fr-element.fr-disabled{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element [contenteditable="false"]{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element [contenteditable="true"]{outline:0px
 solid transparent}.fr-box a.fr-floating-btn{-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);border-radius:100%;-moz-border-radius:100%;-webkit-border-radius:100%;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;height:32px;width:32px;background:#fff;color:#1e88e5;-webkit-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-moz-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-ms-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-o-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;outline:none;left:0;top:0;line-height:32px;-webkit-transform:scale(0);-moz-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0);text-align:center;display:block;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:none}.fr-box a.fr-floating-btn
 svg{-webkit-transition:transform 0.2s ease 0s;-moz-transition:transform 0.2s ease 0s;-ms-transition:transform 0.2s ease 0s;-o-transition:transform 0.2s ease 0s;fill:#1e88e5}.fr-box a.fr-floating-btn
@@ -78,7 +78,7 @@ textarea{width:100%;margin:0px
 0 1px 0;border:none;border-bottom:solid 1px #bdbdbd;color:#222;font-size:14px;padding:6px
 0 2px;background:rgba(0, 0, 0, 0);position:relative;z-index:2;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-popup .fr-input-line input[type="text"]:focus,
 .fr-popup .fr-input-line textarea:focus{border-bottom:solid 2px #1e88e5;margin-bottom:0px}.fr-popup .fr-input-line input + label,
-.fr-popup .fr-input-line textarea+label{position:absolute;top:0;left:0;font-size:12px;color:rgba(0, 0, 0, 0);-webkit-transition:color 0.2s ease 0s;-moz-transition:color 0.2s ease 0s;-ms-transition:color 0.2s ease 0s;-o-transition:color 0.2s ease 0s;z-index:1}.fr-popup .fr-input-line input.fr-not-empty:focus + label,
+.fr-popup .fr-input-line textarea+label{position:absolute;top:0;left:0;font-size:12px;color:rgba(0, 0, 0, 0);-webkit-transition:color 0.2s ease 0s;-moz-transition:color 0.2s ease 0s;-ms-transition:color 0.2s ease 0s;-o-transition:color 0.2s ease 0s;z-index:3;width:100%;display:block;background:#fff}.fr-popup .fr-input-line input.fr-not-empty:focus + label,
 .fr-popup .fr-input-line textarea.fr-not-empty:focus+label{color:#1e88e5}.fr-popup .fr-input-line input.fr-not-empty + label,
 .fr-popup .fr-input-line textarea.fr-not-empty+label{color:#808080}.fr-popup input,
 .fr-popup
@@ -98,40 +98,47 @@ label{cursor:pointer;margin:0
 2px;border-radius:2px;-moz-border-radius:2px;-webkit-border-radius:2px;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);text-align:left;border:0px;border-top:5px solid #222;text-rendering:optimizelegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fr-toolbar::after{clear:both;display:block;content:"";height:0}.fr-toolbar.fr-rtl{text-align:right}.fr-toolbar.fr-inline{display:none;white-space:nowrap;position:absolute;margin-top:10px}.fr-toolbar.fr-inline .fr-arrow{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #222;position:absolute;top:-9px;left:50%;margin-left:-5px;display:inline-block}.fr-toolbar.fr-inline.fr-above{margin-top:-10px;-webkit-box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);border-bottom:5px solid #222;border-top:0}.fr-toolbar.fr-inline.fr-above .fr-arrow{top:auto;bottom:-9px;border-bottom:0;border-top-color:inherit;border-top-style:solid;border-top-width:5px}.fr-toolbar.fr-top{top:0;border-radius:2px 2px 0 0;-moz-border-radius:2px 2px 0 0;-webkit-border-radius:2px 2px 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0,0,0,0.16)}.fr-toolbar.fr-bottom{bottom:0;border-radius:0 0 2px 2px;-moz-border-radius:0 0 2px 2px;-webkit-border-radius:0 0 2px 2px;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0,0,0,0.16)}.fr-separator{background:#ebebeb;display:block;vertical-align:top;float:left}.fr-separator+.fr-separator{display:none}.fr-separator.fr-vs{height:34px;width:1px;margin:2px}.fr-separator.fr-hs{clear:both;height:1px;width:calc(96%);margin:0
 2px}.fr-separator.fr-hidden{display:none !important}.fr-rtl .fr-separator{float:right}.fr-toolbar.fr-inline .fr-separator.fr-hs{float:none}.fr-toolbar.fr-inline .fr-separator.fr-vs{float:none;display:inline-block}.fr-visibility-helper{display:none;margin-left:0px !important}@media (min-width: 768px){.fr-visibility-helper{margin-left:1px !important}}@media (min-width: 992px){.fr-visibility-helper{margin-left:2px !important}}@media (min-width: 1200px){.fr-visibility-helper{margin-left:3px !important}}.fr-opacity-0{-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}.fr-box{position:relative}.fr-sticky{position:-webkit-sticky;position:-moz-sticky;position:-ms-sticky;position:-o-sticky;position:sticky}.fr-sticky-off{position:relative}.fr-sticky-on{position:fixed}.fr-sticky-on.fr-sticky-ios{position:absolute;left:0;right:0;width:auto !important}.fr-sticky-dummy{display:none}.fr-sticky-on+.fr-sticky-dummy,.fr-sticky-box>.fr-sticky-dummy{display:block}span.fr-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-box .fr-counter{position:absolute;bottom:0px;padding:5px;right:0px;color:#ccc;content:attr(data-chars);font-size:15px;font-family:"Times New Roman",Georgia,Serif;z-index:1;background:#fff;border-top:solid 1px #ebebeb;border-left:solid 1px #ebebeb;border-radius:2px 0 0 0;-moz-border-radius:2px 0 0 0;-webkit-border-radius:2px 0 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box}.fr-box.fr-rtl .fr-counter{left:0px;right:auto;border-left:none;border-right:solid 1px #ebebeb;border-radius:0 2px 0 0;-moz-border-radius:0 2px 0 0;-webkit-border-radius:0 2px 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box}.fr-box.fr-code-view .fr-counter{display:none}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-drag-helper{background:#1e88e5;height:2px;margin-top:-1px;-webkit-opacity:0.2;-moz-opacity:0.2;opacity:0.2;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";position:absolute;z-index:9999;display:none}.fr-drag-helper.fr-visible{display:block}.fr-dragging{-webkit-opacity:0.4;-moz-opacity:0.4;opacity:0.4;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 body.fr-fullscreen{overflow:hidden;height:100%;width:100%;position:fixed}.fr-box.fr-fullscreen{margin:0
 !important;position:fixed;top:0;left:0;bottom:0;right:0;z-index:9990 !important;width:auto !important}.fr-box.fr-fullscreen .fr-toolbar.fr-top{top:0 !important}.fr-box.fr-fullscreen .fr-toolbar.fr-bottom{bottom:0 !important}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-line-breaker{cursor:text;border-top:1px solid #1e88e5;position:fixed;z-index:2;display:none}.fr-line-breaker.fr-visible{display:block}.fr-line-breaker a.fr-floating-btn{position:absolute;left:calc(34%);top:-16px}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
-.clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element .fr-video{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element .fr-video::after{position:absolute;content:'';z-index:1;top:0;left:0;right:0;bottom:0;cursor:pointer;display:block;background:rgba(0, 0, 0, 0)}.fr-element .fr-video.fr-active>*{z-index:2;position:relative}.fr-element .fr-video>*{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;max-width:100%;border:none}.fr-box .fr-video-resizer{position:absolute;border:solid 1px #1e88e5;display:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box .fr-video-resizer.fr-active{display:block}.fr-box .fr-video-resizer .fr-handler{display:block;position:absolute;background:#1e88e5;border:solid 1px #fff;z-index:4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-box .fr-video-resizer .fr-handler.fr-hnw{cursor:nw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hne{cursor:ne-resize}.fr-box .fr-video-resizer .fr-handler.fr-hsw{cursor:sw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hse{cursor:se-resize}.fr-box .fr-video-resizer .fr-handler{width:12px;height:12px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-6px;bottom:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-6px;bottom:-6px}@media (min-width: 1200px){.fr-box .fr-video-resizer .fr-handler{width:10px;height:10px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-5px;bottom:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-5px;bottom:-5px}}.fr-video-size-layer .fr-video-group .fr-input-line{width:calc(45%);display:inline-block}.fr-video-size-layer .fr-video-group .fr-input-line+.fr-input-line{margin-left:10px}.fr-video-overlay{position:fixed;top:0;left:0;bottom:0;right:0;z-index:9999;display:none}
+.clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element .fr-video{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element .fr-video::after{position:absolute;content:'';z-index:1;top:0;left:0;right:0;bottom:0;cursor:pointer;display:block;background:rgba(0, 0, 0, 0)}.fr-element .fr-video.fr-active>*{z-index:2;position:relative}.fr-element .fr-video>*{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;max-width:100%;border:none}.fr-box .fr-video-resizer{position:absolute;border:solid 1px #1e88e5;display:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box .fr-video-resizer.fr-active{display:block}.fr-box .fr-video-resizer .fr-handler{display:block;position:absolute;background:#1e88e5;border:solid 1px #fff;z-index:4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-box .fr-video-resizer .fr-handler.fr-hnw{cursor:nw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hne{cursor:ne-resize}.fr-box .fr-video-resizer .fr-handler.fr-hsw{cursor:sw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hse{cursor:se-resize}.fr-box .fr-video-resizer .fr-handler{width:12px;height:12px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-6px;bottom:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-6px;bottom:-6px}@media (min-width: 1200px){.fr-box .fr-video-resizer .fr-handler{width:10px;height:10px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-5px;bottom:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-5px;bottom:-5px}}.fr-video-size-layer .fr-video-group .fr-input-line{width:calc(45%);display:inline-block}.fr-video-size-layer .fr-video-group .fr-input-line+.fr-input-line{margin-left:10px}.fr-video-upload-layer{border:dashed 2px #bdbdbd;padding:25px
+0;position:relative;font-size:14px;letter-spacing:1px;line-height:140%;text-align:center}.fr-video-upload-layer:hover{background:#ebebeb}.fr-video-upload-layer.fr-drop{background:#ebebeb;border-color:#1e88e5}.fr-video-upload-layer .fr-form{-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";position:absolute;top:0;bottom:0;left:0;right:0;z-index:9999;overflow:hidden;margin:0
+!important;padding:0
+!important;width:100% !important}.fr-video-upload-layer .fr-form
+input{cursor:pointer;position:absolute;right:0px;top:0px;bottom:0px;width:500%;height:100%;margin:0px;font-size:400px}.fr-video-progress-bar-layer>h3{font-size:16px;margin:10px
+0;font-weight:normal}.fr-video-progress-bar-layer>div.fr-action-buttons{display:none}.fr-video-progress-bar-layer>div.fr-loader{background:#bcdbf7;height:10px;width:100%;margin-top:20px;overflow:hidden;position:relative}.fr-video-progress-bar-layer > div.fr-loader
+span{display:block;height:100%;width:0%;background:#1e88e5;-webkit-transition:width 0.2s ease 0s;-moz-transition:width 0.2s ease 0s;-ms-transition:width 0.2s ease 0s;-o-transition:width 0.2s ease 0s}.fr-video-progress-bar-layer > div.fr-loader.fr-indeterminate
+span{width:30% !important;position:absolute;top:0;-webkit-animation:loading 2s linear infinite;-moz-animation:loading 2s linear infinite;-o-animation:loading 2s linear infinite;animation:loading 2s linear infinite}.fr-video-progress-bar-layer.fr-error>div.fr-loader{display:none}.fr-video-progress-bar-layer.fr-error>div.fr-action-buttons{display:block}.fr-video-overlay{position:fixed;top:0;left:0;bottom:0;right:0;z-index:9999;display:none}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}textarea.fr-code{display:none;width:100%;resize:none;-moz-resize:none;-webkit-resize:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:none;padding:10px;margin:0px;font-family:"Courier New",monospace;font-size:14px;background:#fff;color:#000;outline:none}.fr-box.fr-rtl textarea.fr-code{direction:rtl}.fr-box
 .CodeMirror{display:none}.fr-box.fr-code-view textarea.fr-code{display:block}.fr-box.fr-code-view.fr-inline{-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16)}.fr-box.fr-code-view .fr-element,
@@ -141,16 +148,16 @@ body.fr-fullscreen{overflow:hidden;height:100%;width:100%;position:fixed}.fr-box
 12px;-webkit-transition:background 0.2s ease 0s;-moz-transition:background 0.2s ease 0s;-ms-transition:background 0.2s ease 0s;-o-transition:background 0.2s ease 0s;border-radius:0;-moz-border-radius:0;-webkit-border-radius:0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;z-index:2;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;text-decoration:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box.fr-inline .fr-command.fr-btn.html-switch
 i{font-size:14px;width:14px;text-align:center}.fr-box.fr-inline .fr-command.fr-btn.html-switch.fr-desktop:hover{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-popup .fr-emoticon{display:inline-block;font-size:20px;width:20px;padding:5px;line-height:1;cursor:default;font-weight:normal;font-family:"Apple Color Emoji","Segoe UI Emoji","NotoColorEmoji","Segoe UI Symbol","Android Emoji","EmojiSymbols";-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.fr-popup .fr-emoticon
 img{height:20px}.fr-popup .fr-link:focus{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element
 img{cursor:pointer}.fr-image-resizer{position:absolute;border:solid 1px #1e88e5;display:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.fr-image-resizer.fr-active{display:block}.fr-image-resizer .fr-handler{display:block;position:absolute;background:#1e88e5;border:solid 1px #fff;z-index:4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-image-resizer .fr-handler.fr-hnw{cursor:nw-resize}.fr-image-resizer .fr-handler.fr-hne{cursor:ne-resize}.fr-image-resizer .fr-handler.fr-hsw{cursor:sw-resize}.fr-image-resizer .fr-handler.fr-hse{cursor:se-resize}.fr-image-resizer .fr-handler{width:12px;height:12px}.fr-image-resizer .fr-handler.fr-hnw{left:-6px;top:-6px}.fr-image-resizer .fr-handler.fr-hne{right:-6px;top:-6px}.fr-image-resizer .fr-handler.fr-hsw{left:-6px;bottom:-6px}.fr-image-resizer .fr-handler.fr-hse{right:-6px;bottom:-6px}@media (min-width: 1200px){.fr-image-resizer .fr-handler{width:10px;height:10px}.fr-image-resizer .fr-handler.fr-hnw{left:-5px;top:-5px}.fr-image-resizer .fr-handler.fr-hne{right:-5px;top:-5px}.fr-image-resizer .fr-handler.fr-hsw{left:-5px;bottom:-5px}.fr-image-resizer .fr-handler.fr-hse{right:-5px;bottom:-5px}}.fr-image-overlay{position:fixed;top:0;left:0;bottom:0;right:0;z-index:9999;display:none}.fr-image-upload-layer{border:dashed 2px #bdbdbd;padding:25px
@@ -166,16 +173,16 @@ loading{from{left:-25%}to{left:100%}}@-moz-keyframes
 loading{from{left:-25%}to{left:100%}}@-o-keyframes
 loading{from{left:-25%}to{left:100%}}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-quick-insert{position:absolute;z-index:9998;white-space:nowrap;padding-right:5px;margin-left:-5px;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.fr-quick-insert.fr-on a.fr-floating-btn
 svg{-webkit-transform:rotate(135deg);-moz-transform:rotate(135deg);-ms-transform:rotate(135deg);-o-transform:rotate(135deg)}.fr-quick-insert.fr-hidden{display:none}.fr-qi-helper{position:absolute;z-index:3;padding-left:10px;white-space:nowrap}.fr-qi-helper a.fr-btn.fr-floating-btn{text-align:center;display:inline-block;color:#222;-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";-webkit-transform:scale(0);-moz-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0)}.fr-qi-helper a.fr-btn.fr-floating-btn.fr-size-1{-webkit-opacity:1;-moz-opacity:1;opacity:1;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";-webkit-transform:scale(1);-moz-transform:scale(1);-ms-transform:scale(1);-o-transform:scale(1)}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-modal-head .fr-modal-head-line::after{clear:both;display:block;content:"";height:0}.fr-modal-head .fr-modal-head-line i.fr-modal-more{float:left;opacity:1;-webkit-transition:padding 0.2s ease 0s, width 0.2s ease 0s, opacity 0.2s ease 0s;-moz-transition:padding 0.2s ease 0s, width 0.2s ease 0s, opacity 0.2s ease 0s;-ms-transition:padding 0.2s ease 0s, width 0.2s ease 0s, opacity 0.2s ease 0s;-o-transition:padding 0.2s ease 0s, width 0.2s ease 0s, opacity 0.2s ease 0s}.fr-modal-head .fr-modal-head-line i.fr-modal-more.fr-not-available{opacity:0;width:0;padding:12px
 0}.fr-modal-head .fr-modal-tags{display:none}.fr-modal-head .fr-modal-tags
@@ -191,9 +198,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img{displa
 img{-webkit-opacity:0.75;-moz-opacity:0.75;opacity:0.75;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container:hover .fr-delete-img,
 .fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container:hover .fr-insert-img{display:inline-block}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container .fr-delete-img:hover{background:#bf4644;color:#fff}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img:hover{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-popup .fr-colors-tabs{-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);margin-bottom:5px;line-height:16px;margin-left:-2px;margin-right:-2px}.fr-popup .fr-colors-tabs .fr-colors-tab{display:inline-block;width:50%;cursor:pointer;text-align:center;color:#222;font-size:13px;padding:8px
 0;position:relative}.fr-popup .fr-colors-tabs .fr-colors-tab:hover,
@@ -201,9 +208,9 @@ img{-webkit-opacity:0.75;-moz-opacity:0.75;opacity:0.75;-ms-filter:"progid:DXIma
 .fr-popup .fr-color-set>span:focus{outline:1px
 solid #222;z-index:2}.fr-rtl .fr-popup .fr-colors-tabs .fr-colors-tab.fr-selected-tab[data-param1="text"]~[data-param1="background"]::after{-webkit-transform:translate3d(100%, 0, 0);-moz-transform:translate3d(100%, 0, 0);-ms-transform:translate3d(100%, 0, 0);-o-transform:translate3d(100%, 0, 0)}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-file-upload-layer{border:dashed 2px #bdbdbd;padding:25px
 0;position:relative;font-size:14px;letter-spacing:1px;line-height:140%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;text-align:center}.fr-file-upload-layer:hover{background:#ebebeb}.fr-file-upload-layer.fr-drop{background:#ebebeb;border-color:#1e88e5}.fr-file-upload-layer .fr-form{-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";position:absolute;top:0;bottom:0;left:0;right:0;z-index:9999;overflow:hidden;margin:0
@@ -218,9 +225,9 @@ loading{from{left:-25%}to{left:100%}}@-moz-keyframes
 loading{from{left:-25%}to{left:100%}}@-o-keyframes
 loading{from{left:-25%}to{left:100%}}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element table td.fr-selected-cell,
 .fr-element table th.fr-selected-cell{border:1px
@@ -262,13 +269,13 @@ li{display:block;padding:5px
 10px;border-bottom:1px solid #DDD;cursor:pointer}.atwho-view
 small{font-size:smaller;color:#777;font-weight:normal}.fr-popup{z-index:9999 !important}div[data-slot-focus]{top:-1px;right:-1px;bottom:-1px;left:-1px;content:'';margin:0;padding:0;position:absolute;border:1px
 solid #4e5e9e;z-index:1}div[data-section-focus]{content:'';position:absolute;border:1px
-solid #fdb933}div[data-section-focus="top"]{left:0px;right:0px;top:0px}div[data-section-focus="right"]{bottom:0px;right:0px;top:0px}div[data-section-focus="bottom"]{bottom:0px;right:0px;left:0px}div[data-section-focus="left"]{bottom:0px;top:0px;left:0px}div[data-slot-toolbar]{position:absolute;top:-24px;left:-1px;right:-1px;height:25px;width:100%;z-index:10;cursor:pointer;cursor:move;background-color:#4e5e9e;border-left:1px solid #4e5e9e;border-right:1px solid #4e5e9e}div[data-slot-toolbar] .btn{width:20px;height:20px;padding:0;display:inline-block;margin-bottom:0;font-weight:600;text-align:center;vertical-align:middle;cursor:pointer;border:1px
+solid #fdb933}div[data-section-focus="top"]{left:0px;right:0px;top:0px}div[data-section-focus="right"]{bottom:0px;right:0px;top:0px}div[data-section-focus="bottom"]{bottom:0px;right:0px;left:0px}div[data-section-focus="left"]{bottom:0px;top:0px;left:0px}div[data-section-focus="handle"]{width:25px;height:25px;bottom:10px;left:10px;background:#4e5e9e;color:#fff;text-align:center;border:0;line-height:25px}div[data-section-focus="delete"]{width:25px;height:25px;bottom:36px;left:10px;background:#4e5e9e;color:#fff;text-align:center;border:0;line-height:25px}div[data-slot-toolbar]{position:absolute;top:-24px;left:-1px;right:-1px;height:25px;width:100%;z-index:10;cursor:pointer;cursor:move;background-color:#4e5e9e;border-left:1px solid #4e5e9e;border-right:1px solid #4e5e9e}div[data-slot-toolbar] .btn{width:20px;height:20px;padding:0;display:inline-block;margin-bottom:0;font-weight:600;text-align:center;vertical-align:middle;cursor:pointer;border:1px
 solid transparent;white-space:nowrap;line-height:1.3856;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;font-size:11px;line-height:1.456;float:right;margin-right:5px;color:#fff}div[data-slot-toolbar] .btn
 .fa{padding-top:4px}div[data-slot],[data-section-wrapper]{position:relative}div[data-slot="image"]{padding-top:1px;padding-bottom:1px}div[data-slot="image"] img{z-index:2;position:relative}div[data-slot].ui-sortable-helper{border:1px
 solid #4e5e9e}.slot-placeholder{border:2px
 dotted #4e5e9e}[data-slot="text"].fr-box{padding:initial}[data-slot="text"].fr-box .fr-toolbar{border-top:2px solid #4e5e9e;position:absolute;left:-15px;bottom:initial !important;min-width:385px}[data-slot="text"].fr-box .fr-toolbar.fr-top{top:-78px !important;bottom:initial !important}[data-slot="text"].fr-box .fr-toolbar.fr-bottom{bottom:-78px !important;top:initial !important}[data-slot="text"].fr-box .fr-wrapper{border-radius:0 0 0px 0px;-moz-border-radius:0 0 0px 0px;-webkit-border-radius:0 0 0px 0px;-webkit-box-shadow:none  !important;-moz-box-shadow:none  !important;box-shadow:none  !important;background:transparent !important}[data-slot="text"].fr-box .fr-wrapper .fr-element{text-align:inherit !important;padding:0
 !important;overflow-x:initial !important;color:inherit !important;min-height:inherit !important}.slot-type-handle.btn{float:left;width:111px;margin:2px;height:62px}.slot-type-handle.ui-draggable-dragging{color:#5d6c7c;background-color:#f5f5f5;border-color:#d3d3d3;padding:10px
-16px;font-size:16px;line-height:1.25;border-radius:4px;margin:2px;text-align:center}.theme-list .panel-body{height:350px}.theme-list .select-theme-link{margin-top:5px}
+16px;font-size:16px;line-height:1.25;border-radius:4px;margin:2px;text-align:center}.theme-list .panel-body{height:350px}.theme-list .select-theme-link{margin-top:5px}.theme-list .select-theme-selected{margin-top:5px}
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
 html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}dfn{font-style:italic}h1{font-size:2em;margin:0.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em
 40px}hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,
@@ -1110,9 +1117,9 @@ pre{position:static}div.CodeMirror-cursors{visibility:hidden;position:relative;z
 span{*vertical-align:text-bottom}.cm-force-border{padding-right: .1px}@media
 print{.CodeMirror div.CodeMirror-cursors{visibility:hidden}}.cm-tab-wrap-hack:after{content:''}span.CodeMirror-selectedtext{background:none}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1120,7 +1127,7 @@ print{.CodeMirror div.CodeMirror-cursors{visibility:hidden}}.cm-tab-wrap-hack:af
 .container-fluid::after,
 .row::after,
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}:focus{outline:0}.fr-element,.fr-element:focus{outline:0px
-solid transparent}.fr-box.fr-basic .fr-element{text-align:initial;color:#000;padding:10px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;overflow-x:auto;min-height:40px}.fr-element{background:transparent;position:relative;z-index:2;-webkit-user-select:auto}.fr-element
+solid transparent}.fr-box.fr-basic .fr-element{color:#000;padding:10px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;overflow-x:auto;min-height:40px}.fr-element{background:transparent;position:relative;z-index:2;-webkit-user-select:auto}.fr-element
 a{user-select:auto;-o-user-select:auto;-moz-user-select:auto;-khtml-user-select:auto;-webkit-user-select:auto;-ms-user-select:auto}.fr-element.fr-disabled{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element [contenteditable="false"]{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element [contenteditable="true"]{outline:0px
 solid transparent}.fr-box a.fr-floating-btn{-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);border-radius:100%;-moz-border-radius:100%;-webkit-border-radius:100%;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;height:32px;width:32px;background:#fff;color:#1e88e5;-webkit-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-moz-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-ms-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;-o-transition:background 0.2s ease 0s, color 0.2s ease 0s, transform 0.2s ease 0s;outline:none;left:0;top:0;line-height:32px;-webkit-transform:scale(0);-moz-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0);text-align:center;display:block;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:none}.fr-box a.fr-floating-btn
 svg{-webkit-transition:transform 0.2s ease 0s;-moz-transition:transform 0.2s ease 0s;-ms-transition:transform 0.2s ease 0s;-o-transition:transform 0.2s ease 0s;fill:#1e88e5}.fr-box a.fr-floating-btn
@@ -1193,7 +1200,7 @@ textarea{width:100%;margin:0px
 0 1px 0;border:none;border-bottom:solid 1px #bdbdbd;color:#222;font-size:14px;padding:6px
 0 2px;background:rgba(0, 0, 0, 0);position:relative;z-index:2;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-popup .fr-input-line input[type="text"]:focus,
 .fr-popup .fr-input-line textarea:focus{border-bottom:solid 2px #1e88e5;margin-bottom:0px}.fr-popup .fr-input-line input + label,
-.fr-popup .fr-input-line textarea+label{position:absolute;top:0;left:0;font-size:12px;color:rgba(0, 0, 0, 0);-webkit-transition:color 0.2s ease 0s;-moz-transition:color 0.2s ease 0s;-ms-transition:color 0.2s ease 0s;-o-transition:color 0.2s ease 0s;z-index:1}.fr-popup .fr-input-line input.fr-not-empty:focus + label,
+.fr-popup .fr-input-line textarea+label{position:absolute;top:0;left:0;font-size:12px;color:rgba(0, 0, 0, 0);-webkit-transition:color 0.2s ease 0s;-moz-transition:color 0.2s ease 0s;-ms-transition:color 0.2s ease 0s;-o-transition:color 0.2s ease 0s;z-index:3;width:100%;display:block;background:#fff}.fr-popup .fr-input-line input.fr-not-empty:focus + label,
 .fr-popup .fr-input-line textarea.fr-not-empty:focus+label{color:#1e88e5}.fr-popup .fr-input-line input.fr-not-empty + label,
 .fr-popup .fr-input-line textarea.fr-not-empty+label{color:#808080}.fr-popup input,
 .fr-popup
@@ -1213,9 +1220,9 @@ label{cursor:pointer;margin:0
 2px;border-radius:2px;-moz-border-radius:2px;-webkit-border-radius:2px;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);text-align:left;border:0px;border-top:5px solid #222;text-rendering:optimizelegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fr-toolbar::after{clear:both;display:block;content:"";height:0}.fr-toolbar.fr-rtl{text-align:right}.fr-toolbar.fr-inline{display:none;white-space:nowrap;position:absolute;margin-top:10px}.fr-toolbar.fr-inline .fr-arrow{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #222;position:absolute;top:-9px;left:50%;margin-left:-5px;display:inline-block}.fr-toolbar.fr-inline.fr-above{margin-top:-10px;-webkit-box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 -1px 3px rgba(0, 0, 0, 0.12), 0 -1px 1px 1px rgba(0, 0, 0, 0.16);border-bottom:5px solid #222;border-top:0}.fr-toolbar.fr-inline.fr-above .fr-arrow{top:auto;bottom:-9px;border-bottom:0;border-top-color:inherit;border-top-style:solid;border-top-width:5px}.fr-toolbar.fr-top{top:0;border-radius:2px 2px 0 0;-moz-border-radius:2px 2px 0 0;-webkit-border-radius:2px 2px 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0,0,0,0.16)}.fr-toolbar.fr-bottom{bottom:0;border-radius:0 0 2px 2px;-moz-border-radius:0 0 2px 2px;-webkit-border-radius:0 0 2px 2px;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);-moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0, 0, 0, 0.16);box-shadow:0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px 1px rgba(0,0,0,0.16)}.fr-separator{background:#ebebeb;display:block;vertical-align:top;float:left}.fr-separator+.fr-separator{display:none}.fr-separator.fr-vs{height:34px;width:1px;margin:2px}.fr-separator.fr-hs{clear:both;height:1px;width:calc(96%);margin:0
 2px}.fr-separator.fr-hidden{display:none !important}.fr-rtl .fr-separator{float:right}.fr-toolbar.fr-inline .fr-separator.fr-hs{float:none}.fr-toolbar.fr-inline .fr-separator.fr-vs{float:none;display:inline-block}.fr-visibility-helper{display:none;margin-left:0px !important}@media (min-width: 768px){.fr-visibility-helper{margin-left:1px !important}}@media (min-width: 992px){.fr-visibility-helper{margin-left:2px !important}}@media (min-width: 1200px){.fr-visibility-helper{margin-left:3px !important}}.fr-opacity-0{-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}.fr-box{position:relative}.fr-sticky{position:-webkit-sticky;position:-moz-sticky;position:-ms-sticky;position:-o-sticky;position:sticky}.fr-sticky-off{position:relative}.fr-sticky-on{position:fixed}.fr-sticky-on.fr-sticky-ios{position:absolute;left:0;right:0;width:auto !important}.fr-sticky-dummy{display:none}.fr-sticky-on+.fr-sticky-dummy,.fr-sticky-box>.fr-sticky-dummy{display:block}span.fr-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1224,9 +1231,9 @@ label{cursor:pointer;margin:0
 .row::after,
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-box .fr-counter{position:absolute;bottom:0px;padding:5px;right:0px;color:#ccc;content:attr(data-chars);font-size:15px;font-family:"Times New Roman",Georgia,Serif;z-index:1;background:#fff;border-top:solid 1px #ebebeb;border-left:solid 1px #ebebeb;border-radius:2px 0 0 0;-moz-border-radius:2px 0 0 0;-webkit-border-radius:2px 0 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box}.fr-box.fr-rtl .fr-counter{left:0px;right:auto;border-left:none;border-right:solid 1px #ebebeb;border-radius:0 2px 0 0;-moz-border-radius:0 2px 0 0;-webkit-border-radius:0 2px 0 0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box}.fr-box.fr-code-view .fr-counter{display:none}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1235,16 +1242,16 @@ label{cursor:pointer;margin:0
 .row::after,
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-drag-helper{background:#1e88e5;height:2px;margin-top:-1px;-webkit-opacity:0.2;-moz-opacity:0.2;opacity:0.2;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";position:absolute;z-index:9999;display:none}.fr-drag-helper.fr-visible{display:block}.fr-dragging{-webkit-opacity:0.4;-moz-opacity:0.4;opacity:0.4;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 body.fr-fullscreen{overflow:hidden;height:100%;width:100%;position:fixed}.fr-box.fr-fullscreen{margin:0
 !important;position:fixed;top:0;left:0;bottom:0;right:0;z-index:9990 !important;width:auto !important}.fr-box.fr-fullscreen .fr-toolbar.fr-top{top:0 !important}.fr-box.fr-fullscreen .fr-toolbar.fr-bottom{bottom:0 !important}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1253,20 +1260,27 @@ body.fr-fullscreen{overflow:hidden;height:100%;width:100%;position:fixed}.fr-box
 .row::after,
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-line-breaker{cursor:text;border-top:1px solid #1e88e5;position:fixed;z-index:2;display:none}.fr-line-breaker.fr-visible{display:block}.fr-line-breaker a.fr-floating-btn{position:absolute;left:calc(34%);top:-16px}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
 .container::after,
 .container-fluid::after,
 .row::after,
-.form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element .fr-video{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element .fr-video::after{position:absolute;content:'';z-index:1;top:0;left:0;right:0;bottom:0;cursor:pointer;display:block;background:rgba(0, 0, 0, 0)}.fr-element .fr-video.fr-active>*{z-index:2;position:relative}.fr-element .fr-video>*{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;max-width:100%;border:none}.fr-box .fr-video-resizer{position:absolute;border:solid 1px #1e88e5;display:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box .fr-video-resizer.fr-active{display:block}.fr-box .fr-video-resizer .fr-handler{display:block;position:absolute;background:#1e88e5;border:solid 1px #fff;z-index:4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-box .fr-video-resizer .fr-handler.fr-hnw{cursor:nw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hne{cursor:ne-resize}.fr-box .fr-video-resizer .fr-handler.fr-hsw{cursor:sw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hse{cursor:se-resize}.fr-box .fr-video-resizer .fr-handler{width:12px;height:12px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-6px;bottom:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-6px;bottom:-6px}@media (min-width: 1200px){.fr-box .fr-video-resizer .fr-handler{width:10px;height:10px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-5px;bottom:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-5px;bottom:-5px}}.fr-video-size-layer .fr-video-group .fr-input-line{width:calc(45%);display:inline-block}.fr-video-size-layer .fr-video-group .fr-input-line+.fr-input-line{margin-left:10px}.fr-video-overlay{position:fixed;top:0;left:0;bottom:0;right:0;z-index:9999;display:none}
+.form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-element .fr-video{user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-element .fr-video::after{position:absolute;content:'';z-index:1;top:0;left:0;right:0;bottom:0;cursor:pointer;display:block;background:rgba(0, 0, 0, 0)}.fr-element .fr-video.fr-active>*{z-index:2;position:relative}.fr-element .fr-video>*{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;max-width:100%;border:none}.fr-box .fr-video-resizer{position:absolute;border:solid 1px #1e88e5;display:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box .fr-video-resizer.fr-active{display:block}.fr-box .fr-video-resizer .fr-handler{display:block;position:absolute;background:#1e88e5;border:solid 1px #fff;z-index:4;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.fr-box .fr-video-resizer .fr-handler.fr-hnw{cursor:nw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hne{cursor:ne-resize}.fr-box .fr-video-resizer .fr-handler.fr-hsw{cursor:sw-resize}.fr-box .fr-video-resizer .fr-handler.fr-hse{cursor:se-resize}.fr-box .fr-video-resizer .fr-handler{width:12px;height:12px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-6px;top:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-6px;bottom:-6px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-6px;bottom:-6px}@media (min-width: 1200px){.fr-box .fr-video-resizer .fr-handler{width:10px;height:10px}.fr-box .fr-video-resizer .fr-handler.fr-hnw{left:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hne{right:-5px;top:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hsw{left:-5px;bottom:-5px}.fr-box .fr-video-resizer .fr-handler.fr-hse{right:-5px;bottom:-5px}}.fr-video-size-layer .fr-video-group .fr-input-line{width:calc(45%);display:inline-block}.fr-video-size-layer .fr-video-group .fr-input-line+.fr-input-line{margin-left:10px}.fr-video-upload-layer{border:dashed 2px #bdbdbd;padding:25px
+0;position:relative;font-size:14px;letter-spacing:1px;line-height:140%;text-align:center}.fr-video-upload-layer:hover{background:#ebebeb}.fr-video-upload-layer.fr-drop{background:#ebebeb;border-color:#1e88e5}.fr-video-upload-layer .fr-form{-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";position:absolute;top:0;bottom:0;left:0;right:0;z-index:9999;overflow:hidden;margin:0
+!important;padding:0
+!important;width:100% !important}.fr-video-upload-layer .fr-form
+input{cursor:pointer;position:absolute;right:0px;top:0px;bottom:0px;width:500%;height:100%;margin:0px;font-size:400px}.fr-video-progress-bar-layer>h3{font-size:16px;margin:10px
+0;font-weight:normal}.fr-video-progress-bar-layer>div.fr-action-buttons{display:none}.fr-video-progress-bar-layer>div.fr-loader{background:#bcdbf7;height:10px;width:100%;margin-top:20px;overflow:hidden;position:relative}.fr-video-progress-bar-layer > div.fr-loader
+span{display:block;height:100%;width:0%;background:#1e88e5;-webkit-transition:width 0.2s ease 0s;-moz-transition:width 0.2s ease 0s;-ms-transition:width 0.2s ease 0s;-o-transition:width 0.2s ease 0s}.fr-video-progress-bar-layer > div.fr-loader.fr-indeterminate
+span{width:30% !important;position:absolute;top:0;-webkit-animation:loading 2s linear infinite;-moz-animation:loading 2s linear infinite;-o-animation:loading 2s linear infinite;animation:loading 2s linear infinite}.fr-video-progress-bar-layer.fr-error>div.fr-loader{display:none}.fr-video-progress-bar-layer.fr-error>div.fr-action-buttons{display:block}.fr-video-overlay{position:fixed;top:0;left:0;bottom:0;right:0;z-index:9999;display:none}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1281,9 +1295,9 @@ body.fr-fullscreen{overflow:hidden;height:100%;width:100%;position:fixed}.fr-box
 12px;-webkit-transition:background 0.2s ease 0s;-moz-transition:background 0.2s ease 0s;-ms-transition:background 0.2s ease 0s;-o-transition:background 0.2s ease 0s;border-radius:0;-moz-border-radius:0;-webkit-border-radius:0;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;z-index:2;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;text-decoration:none;user-select:none;-o-user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none}.fr-box.fr-inline .fr-command.fr-btn.html-switch
 i{font-size:14px;width:14px;text-align:center}.fr-box.fr-inline .fr-command.fr-btn.html-switch.fr-desktop:hover{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1293,9 +1307,9 @@ i{font-size:14px;width:14px;text-align:center}.fr-box.fr-inline .fr-command.fr-b
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.fr-popup .fr-emoticon{display:inline-block;font-size:20px;width:20px;padding:5px;line-height:1;cursor:default;font-weight:normal;font-family:"Apple Color Emoji","Segoe UI Emoji","NotoColorEmoji","Segoe UI Symbol","Android Emoji","EmojiSymbols";-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.fr-popup .fr-emoticon
 img{height:20px}.fr-popup .fr-link:focus{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1316,9 +1330,9 @@ loading{from{left:-25%}to{left:100%}}@-moz-keyframes
 loading{from{left:-25%}to{left:100%}}@-o-keyframes
 loading{from{left:-25%}to{left:100%}}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1328,9 +1342,9 @@ loading{from{left:-25%}to{left:100%}}
 .form-horizontal .form-group::after,.btn-toolbar::after,.btn-group-vertical>.btn-group::after,.nav::after,.navbar::after,.navbar-header::after,.navbar-collapse::after,.pager::after,.panel-body::after,.modal-footer::after{clear:both;display:block;content:"";height:0}.hide-by-clipping{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.fr-quick-insert{position:absolute;z-index:9998;white-space:nowrap;padding-right:5px;margin-left:-5px;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.fr-quick-insert.fr-on a.fr-floating-btn
 svg{-webkit-transform:rotate(135deg);-moz-transform:rotate(135deg);-ms-transform:rotate(135deg);-o-transform:rotate(135deg)}.fr-quick-insert.fr-hidden{display:none}.fr-qi-helper{position:absolute;z-index:3;padding-left:10px;white-space:nowrap}.fr-qi-helper a.fr-btn.fr-floating-btn{text-align:center;display:inline-block;color:#222;-webkit-opacity:0;-moz-opacity:0;opacity:0;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";-webkit-transform:scale(0);-moz-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0)}.fr-qi-helper a.fr-btn.fr-floating-btn.fr-size-1{-webkit-opacity:1;-moz-opacity:1;opacity:1;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";-webkit-transform:scale(1);-moz-transform:scale(1);-ms-transform:scale(1);-o-transform:scale(1)}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1351,9 +1365,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img{displa
 img{-webkit-opacity:0.75;-moz-opacity:0.75;opacity:0.75;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container:hover .fr-delete-img,
 .fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container:hover .fr-insert-img{display:inline-block}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container .fr-delete-img:hover{background:#bf4644;color:#fff}.fr-desktop .fr-modal-wrapper div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img:hover{background:#ebebeb}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1366,9 +1380,9 @@ img{-webkit-opacity:0.75;-moz-opacity:0.75;opacity:0.75;-ms-filter:"progid:DXIma
 .fr-popup .fr-color-set>span:focus{outline:1px
 solid #222;z-index:2}.fr-rtl .fr-popup .fr-colors-tabs .fr-colors-tab.fr-selected-tab[data-param1="text"]~[data-param1="background"]::after{-webkit-transform:translate3d(100%, 0, 0);-moz-transform:translate3d(100%, 0, 0);-ms-transform:translate3d(100%, 0, 0);-o-transform:translate3d(100%, 0, 0)}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -1388,9 +1402,9 @@ loading{from{left:-25%}to{left:100%}}@-moz-keyframes
 loading{from{left:-25%}to{left:100%}}@-o-keyframes
 loading{from{left:-25%}to{left:100%}}
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
