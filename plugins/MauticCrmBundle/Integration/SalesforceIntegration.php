@@ -943,6 +943,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields                = implode(', l.', $config['leadFields']);
         $fields                = 'l.'.$fields;
         $result                = 0;
+        $sfLeadRecords         = [];
 
         $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
         $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
@@ -1028,16 +1029,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = array_values($mauticData);
 
+        /** @var SalesforceApi $apiHelper */
+        $apiHelper = $this->getApiHelper();
         if (!empty($request)) {
-            /** @var SalesforceApi $apiHelper */
-            $apiHelper = $this->getApiHelper();
-            $result    = $apiHelper->syncMauticToSalesforce($request);
+            $result = $apiHelper->syncMauticToSalesforce($request);
         }
 
         // Store integration objects if created
         $count = $this->processCompositeResponse($result['compositeResponse'], $tryAsContacts);
 
-        if (!empty($tryAsContacts)) {
+        if (!empty($tryAsContacts) and (isset($leadsToCreate) && !empty($leadsToCreate))) {
             $request['compositeRequest'] = [];
 
             foreach ($tryAsContacts as $referenceId) {
@@ -1177,6 +1178,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $error = $item['body']['message'];
                                 break;
                         }
+
                         $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
                     }
                 }
