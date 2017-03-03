@@ -398,7 +398,7 @@ Mautic.updateEntitySelect = function (response) {
 
         if (mQueryParent(el).prop('disabled')) {
             mQueryParent(el).prop('disabled', false);
-            var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+                var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
         } else {
             if (mQueryParent(el + ' option[value=""]').length) {
                 emptyOption = mQueryParent(el + ' option[value=""]').clone();
@@ -417,7 +417,7 @@ Mautic.updateEntitySelect = function (response) {
             var optgroup = el + ' optgroup[label="'+response.group+'"]';
             if (mQueryParent(optgroup).length) {
                 // update option when new option equal with option item in group.
-                var firstOptionGroups = mQueryParent(optgroup);
+                    var firstOptionGroups = mQueryParent(optgroup);
                 var isUpdateOption = false;
                 firstOptionGroups.each(function () {
                     var firstOptions = mQuery(this).children();
@@ -432,7 +432,7 @@ Mautic.updateEntitySelect = function (response) {
 
                 if (!isUpdateOption) {
                     //the optgroup exist so append to it
-                    mQueryParent(optgroup).append(newOption);
+                        mQueryParent(optgroup).append(newOption);
                 }
             } else {
                 //create the optgroup
