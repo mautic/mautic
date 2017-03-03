@@ -14,10 +14,13 @@ if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['
     }
 }
 
-if (!$hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
+if (!$hasFields = (!empty($formSettings['dynamic_contact_fields']) || isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
     // Unset if set to prevent features tab from showing when there's no feature to show
     unset($form['featureSettings']['leadFields']);
+} else {
+    $hideContactFieldTab = (!empty($formSettings['dynamic_contact_fields']) && !count($form['featureSettings']['leadFields']));
 }
+
 if (!$hasFeatureSettings = (isset($form['featureSettings'])
     && (($hasFields && count($form['featureSettings']) > 1)
         || (!$hasFields
@@ -33,7 +36,7 @@ $hasCompanyFields      = (isset($form['featureSettings']['companyFields']) && co
 $companyFieldHtml      = ($hasCompanyFields) ? $view['form']->row($form['featureSettings']['companyFields']) : '';
 $fieldHtml             = ($hasFields) ? $view['form']->row($form['featureSettings']['leadFields']) : '';
 $fieldLabel            = ($hasFields) ? $form['featureSettings']['leadFields']->vars['label'] : '';
-$fieldTabClass         = ($hasFields) ? '' : ' hide';
+$fieldTabClass         = ($hasFields && empty($hideContactFieldTab)) ? '' : ' hide';
 $hasLeadFieldErrors    = ($hasFields && $view['form']->containsErrors($form['featureSettings']['leadFields']));
 $hasCompanyFieldErrors = ($hasCompanyFields && $view['form']->containsErrors($form['featureSettings']['companyFields']));
 
