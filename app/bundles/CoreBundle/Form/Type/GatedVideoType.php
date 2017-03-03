@@ -37,7 +37,7 @@ class GatedVideoType extends SlotType
         );
 
         $builder->add(
-            'gateTime',
+            'gatetime',
             IntegerType::class,
             [
                 'label'      => 'Gate Time',
@@ -51,7 +51,7 @@ class GatedVideoType extends SlotType
         );
 
         $builder->add(
-            'formId',
+            'formid',
             EntityType::class,
             [
                 'label'      => 'Form',
