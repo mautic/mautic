@@ -40,9 +40,21 @@ $indexCount = 1;
             if ('hidden' === $child->vars['block_prefixes'][1]):
                 echo $view['form']->row($child);
             else:
+                $class = '';
+                switch (true):
+                    case $rowCount % $numberOfFields == 1:
+                        $class = (4 === $numberOfFields) ? 'ml-lg col-sm-4' : 'ml-lg col-sm-5';
+                        break;
+                    case $rowCount % $numberOfFields == 2:
+                        $class = (4 === $numberOfFields) ? 'ml-xs col-sm-2' : 'col-sm-5';
+                        break;
+                    case $rowCount % $numberOfFields == 3:
+                        $class = 'col-sm-4';
+                        break;
+                endswitch;
             ?>
-            <div class="<?php echo ($rowCount % $numberOfFields == 1) ? 'ml-lg ' : ''; ?>pl-xs pr-xs col-sm-<?php echo ($rowCount % $numberOfFields == 2) ? '2 ml-xs' : '4'; ?>"
-                 <?php if ($rowCount % $numberOfFields == 2): ?>data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>"<?php endif; ?>>
+            <div class="pl-xs pr-xs <?php echo $class; ?>"
+                 <?php if ($numberOfFields === 4 && $rowCount % $numberOfFields == 2): ?>data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>"<?php endif; ?>>
                 <?php
                 if ($isRequired && $rowCount % $numberOfFields == 1):
                     $name                            = $child->vars['full_name'];

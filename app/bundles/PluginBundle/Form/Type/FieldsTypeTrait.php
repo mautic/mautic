@@ -58,15 +58,19 @@ trait FieldsTypeTrait
                     $optionalFields[$field] = $details;
                 }
 
-                if (isset($details['group'])) {
-                    if (!isset($choices[$details['group']])) {
-                        $choices[$details['group']] = [];
-                    }
+                if (is_array($details)) {
+                    if (isset($details['group'])) {
+                        if (!isset($choices[$details['group']])) {
+                            $choices[$details['group']] = [];
+                        }
 
-                    $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                    $choices[$details['group']][$field] = $label;
+                        $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
+                        $choices[$details['group']][$field] = $label;
+                    } else {
+                        $choices[$field] = $details['label'];
+                    }
                 } else {
-                    $choices[$field] = $details['label'];
+                    $choices[$field] = $details;
                 }
             }
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
@@ -110,7 +114,7 @@ trait FieldsTypeTrait
                                 '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
                             ],
                             'label'       => false,
-                            'data'        => isset($options[$updateName][$field]) ? (bool) $options[$updateName][$field] : 1,
+                            'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
                             'empty_value' => false,
                             'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
                             'disabled'    => $disabled,

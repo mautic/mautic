@@ -38,7 +38,8 @@ class CompanyFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_company_fields', 'company_fields', 'update_mautic_company']);
+        $resolver->setDefined(['update_mautic_company']);
+        $resolver->setRequired(['integration_company_fields', 'company_fields']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',

@@ -38,7 +38,8 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields', 'update_mautic']);
+        $resolver->setRequired(['integration_fields', 'lead_fields']);
+        $resolver->setDefined(['update_mautic']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',

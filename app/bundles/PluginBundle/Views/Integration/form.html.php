@@ -135,9 +135,11 @@ $hasFeatureErrors =
             <?php echo $fieldHtml; ?>
         </div>
     <?php endif; ?>
+    <?php if ($hasCompanyFields): ?>
     <div class="tab-pane fade bdr-w-0" id="company-fields-container">
         <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>
+    <?php endif; ?>
 </div>
 <?php echo $view['form']->end($form); ?>
