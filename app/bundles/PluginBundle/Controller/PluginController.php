@@ -287,7 +287,7 @@ class PluginController extends FormController
                         'closeModal'    => 1,
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
-                        'mauticContent' => 'integration',
+                        'mauticContent' => 'integrationConfig',
                     ]
                 );
             }
@@ -330,7 +330,7 @@ class PluginController extends FormController
                 'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
-                    'mauticContent' => 'integration',
+                    'mauticContent' => 'integrationConfig',
                     'route'         => false,
                 ],
             ]
