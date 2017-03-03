@@ -576,6 +576,7 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
+                    'mautic.helper.cache',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
