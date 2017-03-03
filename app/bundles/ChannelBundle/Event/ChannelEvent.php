@@ -11,7 +11,9 @@
 
 namespace Mautic\ChannelBundle\Event;
 
+use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class ChannelEvent.
@@ -68,6 +70,41 @@ class ChannelEvent extends CommonEvent
     }
 
     /**
+     * Returns repository name for the provided channel. Defaults to classic naming convention.
+     *
+     * @param string $channel
+     *
+     * @return string
+     */
+    public function getRepositoryName($channel)
+    {
+        if (isset($this->channels[$channel][MessageModel::CHANNEL_FEATURE]['repository'])) {
+            return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['repository'];
+        }
+
+        // if not defined, try the classic naming convention
+        $channel = ucfirst($channel);
+
+        return "Mautic{$channel}Bundle:{$channel}";
+    }
+
+    /**
+     * Returns the name of the column holding the channel name for the provided channel. Defaults to 'name'.
+     *
+     * @param string $channel
+     *
+     * @return string
+     */
+    public function getNameColumn($channel)
+    {
+        if (isset($this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'])) {
+            return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'];
+        }
+
+        return 'name';
+    }
+
+    /**
      * @param $feature
      *
      * @return array
@@ -86,7 +123,7 @@ class ChannelEvent extends CommonEvent
      */
     public function setChannel($channel)
     {
-        $this->addChannel($channel, [\Mautic\LeadBundle\Model\LeadModel::CHANNEL_FEATURE => []]);
+        $this->addChannel($channel, [LeadModel::CHANNEL_FEATURE => []]);
     }
 
     /**

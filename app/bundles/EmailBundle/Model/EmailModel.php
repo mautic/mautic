@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
+use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
@@ -56,6 +57,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
+    use BuilderModelTrait;
 
     /**
      * @var IpLookupHelper
@@ -531,35 +533,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', $tokenFilter = null, $withBC = true)
     {
-        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
-        $components      = [];
-        $event           = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
+        $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
 
-        if (!is_array($requestedComponents)) {
-            $requestedComponents = [$requestedComponents];
-        }
-
-        foreach ($requestedComponents as $requested) {
-            switch ($requested) {
-                case 'tokens':
-                    $components[$requested] = $event->getTokens($withBC);
-                    break;
-                case 'abTestWinnerCriteria':
-                    $components[$requested] = $event->getAbTestWinnerCriteria();
-                    break;
-                case 'slotTypes':
-                    $components[$requested] = $event->getSlotTypes();
-                    break;
-                default:
-                    $components['tokens']               = $event->getTokens($withBC);
-                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
-                    $components['slotTypes']            = $event->getSlotTypes();
-                    break;
-            }
-        }
-
-        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
+        return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
 
     /**

@@ -29,14 +29,17 @@ class CampaignController extends AbstractStandardFormController
      * @var array
      */
     protected $addedSources = [];
+
     /**
      * @var array
      */
     protected $campaignEvents = [];
+
     /**
      * @var array
      */
     protected $campaignSources = [];
+
     /**
      * @var array
      */
@@ -46,14 +49,17 @@ class CampaignController extends AbstractStandardFormController
      * @var array
      */
     protected $deletedEvents = [];
+
     /**
      * @var array
      */
     protected $deletedSources = [];
+
     /**
      * @var array
      */
     protected $listFilters = [];
+
     /**
      * @var array
      */
@@ -278,7 +284,7 @@ class CampaignController extends AbstractStandardFormController
 
         if ($isPost) {
             $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
-            $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources);
+            $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources, true);
         } else {
             if (!$isClone) {
                 //clear out existing fields in case the form was refreshed, browser closed, etc
@@ -288,6 +294,8 @@ class CampaignController extends AbstractStandardFormController
                 if ($entity->getId()) {
                     $campaignSources = $this->getCampaignModel()->getLeadSources($entity->getId());
                     $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources);
+
+                    $this->setSessionCanvasSettings($sessionId, $entity->getCanvasSettings());
                 }
             }
 
@@ -764,7 +772,7 @@ class CampaignController extends AbstractStandardFormController
      * @param   $objectId
      * @param   $campaignSources
      */
-    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources)
+    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
     {
         $this->campaignSources = [];
         if (is_array($campaignSources)) {
@@ -780,9 +788,11 @@ class CampaignController extends AbstractStandardFormController
             }
         }
 
-        $session = $this->get('session');
-        $session->set('mautic.campaign.'.$objectId.'.leadsources.current', $campaignSources);
-        $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $campaignSources);
+        if (!$isPost) {
+            $session = $this->get('session');
+            $session->set('mautic.campaign.'.$objectId.'.leadsources.current', $campaignSources);
+            $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $campaignSources);
+        }
     }
 
     /**

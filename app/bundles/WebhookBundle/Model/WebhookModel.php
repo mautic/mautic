@@ -364,7 +364,7 @@ class WebhookModel extends FormModel
                 $payload[$type][] = $queuePayload;
 
                 $this->webhookQueueIdList[] = $queue->getId();
-                $this->em->clear($queue);
+                $this->em->clear('\Mautic\WebhookBundle\Entity\WebhookQueue');
             }
         }
 

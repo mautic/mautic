@@ -63,6 +63,30 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.section.types'); ?></h4>
+                </div>
+                <div class="panel-body">
+                    <?php if ($sections): ?>
+                    <div id="section-type-container" class="col-md-12">
+                        <?php foreach ($sections as $sectionKey => $section): ?>
+                            <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="<?php echo $sectionKey; ?>">
+                                <i class="fa fa-<?php echo $section['icon']; ?>" aria-hidden="true"></i>
+                                <br>
+                                <?php echo $section['header']; ?>
+                                <script type="text/html">
+                                    <?php echo $view->render($section['content']); ?>
+                                </script>
+                            </div>
+                        <?php endforeach; ?>
+                        <div class="clearfix"></div>
+                    </div>
+                    <?php endif; ?>
+                    <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.drag.info'); ?></i></p>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
                     <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.customize.slot'); ?></h4>
                 </div>
                 <div class="panel-body" id="customize-form-container">
