@@ -952,15 +952,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
         //update lead/contact records
-        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
+        $leadsToUpdate   = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
+        $checkEmailsInSF = '( ';
         foreach ($leadsToUpdate as $lead) {
+            if (isset($lead['email']) && !empty($lead['email'])) {
+                $checkEmailsInSF .= "'".$lead['email']."',";
+                $leadsToUpdate[$lead['email']] = $lead;
+            }
+        }
+        $checkEmailsInSF = substr($checkEmailsInSF, 0, -1).')';
+        if ($checkEmailsInSF !== '()') {
+            $findLead      = 'select Id, ConvertedContactId, Email from Lead where Email in '.$checkEmailsInSF.' and IsDeleted = false';
+            $queryUrl      = $this->getQueryUrl();
+            $sfLead        = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $sfLeadRecords = $sfLead['records'];
+        }
+        foreach ($sfLeadRecords as $sfLeadRecord) {
             $this->buildCompositeBody(
                 $mauticData,
                 $availableFields,
-                ('Lead' === $lead['integration_entity']) ? $leadSfFields : $contactSfFields,
-                $lead['integration_entity'],
-                $lead,
-                $lead['integration_entity_id']
+                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $contactSfFields : $leadSfFields,
+                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? 'Contact' : 'Lead',
+                $leadsToUpdate[$sfLeadRecord['Email']],
+                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $sfLeadRecord['ConvertedContactId'] : $sfLeadRecord['Id']
             );
         }
 
@@ -971,7 +985,35 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         //create lead records
         if (null === $limit || $limit) {
-            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
+            $leadsToCreate   = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
+            $checkEmailsInSF = '( ';
+            foreach ($leadsToCreate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $checkEmailsInSF .= "'".$lead['email']."',";
+                    $leadsToUpdate[$lead['email']] = $lead;
+                }
+            }
+            $checkEmailsInSF = substr($checkEmailsInSF, 0, -1).')';
+            if ($checkEmailsInSF !== '()') {
+                $findLead      = 'select Id, ConvertedContactId, Email from Lead where Email in '.$checkEmailsInSF.' and IsDeleted = false';
+                $queryUrl      = $this->getQueryUrl();
+                $sfLead        = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+                $sfLeadRecords = $sfLead['records'];
+                if (!empty($sfLeadRecords)) {
+                    foreach ($sfLeadRecords as $sfLeadRecord) {
+                        $this->buildCompositeBody(
+                            $mauticData,
+                            $availableFields,
+                            (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $contactSfFields : $leadSfFields,
+                            (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? 'Contact' : 'Lead',
+                            $leadsToUpdate[$sfLeadRecord['email']],
+                            $sfLeadRecord['Id']
+                        );
+                        unset($leadsToUpdate[$sfLeadRecord['email']]);
+                    }
+                }
+                $leadsToCreate = $leadsToUpdate; //if not found either in Mautic records or SF records proceed to create a lead in SF
+            }
             foreach ($leadsToCreate as $lead) {
                 $this->buildCompositeBody(
                     $mauticData,
@@ -1008,7 +1050,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $leadsToCreate[$contactId]
                 );
             }
-
             if (!empty($request['compositeRequest'])) {
                 $result       = $apiHelper->syncMauticToSalesforce($request);
                 $contactCount = $this->processCompositeResponse($result['compositeResponse']);
@@ -1060,30 +1101,32 @@ class SalesforceIntegration extends CrmAbstractIntegration
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null)
     {
         $body = [];
-        //use a composite patch here that can update and create (one query) every 200 records
-        foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
-            $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
-            if (isset($lead[$mauticField])) {
-                $body[$sfField] = $lead[$mauticField];
+        if (isset($lead['email']) && !empty($lead['email'])) {
+            //use a composite patch here that can update and create (one query) every 200 records
+            foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
+                $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
+                if (isset($lead[$mauticField])) {
+                    $body[$sfField] = $lead[$mauticField];
+                }
+
+                if ($required && empty($body[$sfField])) {
+                    $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                }
             }
 
-            if ($required && empty($body[$sfField])) {
-                $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+            if (!empty($body)) {
+                $url = '/services/data/v38.0/sobjects/'.$object;
+                if ($objectId) {
+                    $url .= '/'.$objectId;
+                }
+                $id              = $lead['id'].'-'.$object;
+                $mauticData[$id] = [
+                    'method'      => ($objectId) ? 'PATCH' : 'POST',
+                    'url'         => $url,
+                    'referenceId' => $id,
+                    'body'        => $body,
+                ];
             }
-        }
-
-        if (!empty($body)) {
-            $url = '/services/data/v38.0/sobjects/'.$object;
-            if ($objectId) {
-                $url .= '/'.$objectId;
-            }
-            $id              = $lead['id'].'-'.$object;
-            $mauticData[$id] = [
-                'method'      => ($objectId) ? 'PATCH' : 'POST',
-                'url'         => $url,
-                'referenceId' => $id,
-                'body'        => $body,
-            ];
         }
     }
 
