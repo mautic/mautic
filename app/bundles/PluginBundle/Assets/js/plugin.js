@@ -45,10 +45,16 @@ Mautic.removePluginField = function (selector, indexClass) {
     deleteCurrentItem.find('label').addClass('disabled');
 
     // Move the item to be the first hidden
-    deleteCurrentItem.insertBefore(deleteCurrentItem.closest('.fields-container').find('.field-container.hide').first());
+    if (deleteCurrentItem.closest('.fields-container').find('.field-container.hide').length) {
+        deleteCurrentItem.insertBefore(deleteCurrentItem.closest('.fields-container').find('.field-container.hide').first());
+    } else {
+        // There are no more so append to the end
+        deleteCurrentItem.insertAfter(deleteCurrentItem.closest('.fields-container').find('.field-container').last());
+    }
+
     deleteCurrentItem.find('option').each(function() {
-        mQuery(option).prop('disabled', false);
-        mQuery(option).removeAttr('disabled');
+        mQuery(this).prop('disabled', false);
+        mQuery(this).removeAttr('disabled');
     });
 
     deleteCurrentItem.addClass('hide');
