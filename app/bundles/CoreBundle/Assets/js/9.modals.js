@@ -235,15 +235,23 @@ Mautic.processModalContent = function (response, target) {
 
         //activate content specific stuff
         Mautic.onPageLoad(target, response, true);
-        Mautic.modalMauticContent = response.mauticContent ? response.mauticContent : false;
-
+        Mautic.modalMauticContent = false;
         if (response.closeModal) {
             mQuery('body').removeClass('noscroll');
             mQuery(target).modal('hide');
 
+            if (response.mauticContent) {
+                if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
+                    Mautic[response.mauticContent + "OnLoad"](target, response);
+                }
+            }
+
             if (!response.updateModalContent) {
                 Mautic.onPageUnload(target, response);
             }
+        } else {
+            // Note for the hidden event
+            Mautic.modalMauticContent = response.mauticContent ? response.mauticContent : false;
         }
     }
 };
