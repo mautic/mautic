@@ -689,7 +689,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'list.alias', $likeExpr, $unique, ($filter->not) ? true : null,
+                    $this->generateFilterExpression($q, 'list.alias', $eqExpr, $unique, ($filter->not) ? true : null,
                         // orX for filter->not either manuall removed or is null
                         $q->expr()->$xExpr(
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
