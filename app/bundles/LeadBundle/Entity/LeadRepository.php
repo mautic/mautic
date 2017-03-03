@@ -696,6 +696,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     )
                 );
+                $filter->strict  = true;
                 $returnParameter = true;
 
                 break;
