@@ -87,7 +87,7 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function findLeadsToUpdate($integration, $internalEntity, $leadFields)
+    public function findLeadsToUpdate($integration, $internalEntity, $leadFields, $limit = 25)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields)
@@ -100,12 +100,20 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date');
 
+        $q->setMaxResults($limit);
+
         $results = $q->execute()->fetchAll();
 
         return $results;
     }
 
-    public function findLeadsToCreate($integration, $leadFields)
+    /**
+     * @param $integration
+     * @param $leadFields
+     *
+     * @return array
+     */
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id,'.$leadFields)
@@ -113,6 +121,8 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('l.id not in (select i.internal_entity_id from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity = "lead")')
             ->setParameter('integration', $integration);
+
+        $q->setMaxResults($limit);
 
         $results = $q->execute()->fetchAll();
 

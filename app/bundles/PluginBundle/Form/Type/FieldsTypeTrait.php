@@ -50,7 +50,7 @@ trait FieldsTypeTrait
                     $matchedFields[$field] = !empty($fieldData['m_'.$fieldData[$field]]) ? $fieldData['m_'.$fieldData[$field]] : $fieldData[$field];
                 }
 
-                if (!empty($integrationFields[$field]['required'])) {
+                if (is_array($details) && !empty($details['required'])) {
                     $requiredFields[$field] = $details;
                 } elseif ($matched) {
                     $populatedFields[$field] = $details;
@@ -73,6 +73,7 @@ trait FieldsTypeTrait
                     $choices[$field] = $details;
                 }
             }
+
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
 
             foreach ($fields as $field => $details) {

@@ -25,6 +25,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
+    private $objects = [
+        'Lead',
+        'Contact',
+        'Account',
+    ];
+
     /**
      * {@inheritdoc}
      *
@@ -521,8 +527,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($keys as $key) {
             if (strstr($key, '__'.$object)) {
-                $newKey                       = str_replace('__'.$object, '', $key);
-                $leadFields[$object][$newKey] = $fields['leadFields'][$key];
+                $newKey              = str_replace('__'.$object, '', $key);
+                $leadFields[$newKey] = $fields['leadFields'][$key];
             }
         }
 
@@ -549,7 +555,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $leadFields = $this->cleanSalesForceData($config, $fields, $object);
 
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields[$object], 'object' => $object]);
+        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (empty($mappedData[$object])) {
@@ -570,7 +576,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setIntegration('Salesforce');
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($createdLeadData['id']);
-                        $integrationEntity->setInternalEntity('Lead');
+                        $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
                     } else {
                         $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
@@ -665,24 +671,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $executed;
-    }
-
-    /**
-     * @param array $fields
-     *
-     * @return array
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function amendToSfFields($fields)
-    {
-        $newFields = [];
-        foreach ($fields as $key => $field) {
-            $key                      = explode('-', $key);
-            $newFields[trim($key[0])] = $field;
-        }
-
-        return $newFields;
     }
 
     /**
@@ -929,10 +917,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function convertLeadFieldKey($key, $field)
     {
-        $key    = explode(' - ', $key);
-        $newKey = trim($key[0]);
+        $search = [];
+        foreach ($this->objects as $object) {
+            $search[] = '__'.$object;
+        }
 
-        return $newKey;
+        return str_replace($search, '', $key);
     }
 
     /**
@@ -942,6 +932,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
+        $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = [];
@@ -949,44 +940,46 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields                = implode(', l.', $config['leadFields']);
         $fields                = 'l.'.$fields;
         $result                = 0;
-         //update lead/contact records
-        $leadsToUpdate            = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields);
-        $fieldsToUpdateInSfUpdate = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInSf));
-        foreach ($leadsToUpdate as $lead) {
-            //use a composite patch here that can update and create (one query) every 200 records
-            foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
-                if (isset($lead[$mauticField])) {
-                    $body[$sfField] = $lead[$mauticField];
-                }
-            }
-            if (!empty($body)) {
-                $mauticData[] = [
-                    'method'      => 'PATCH',
-                    'url'         => '/services/data/v38.0/sobjects/'.$lead['integration_entity'].'/'.$lead['integration_entity_id'],
-                    'referenceId' => $lead['internal_entity_id'].'-'.$lead['integration_entity_id'],
-                    'body'        => $body,
-                ];
-            }
-        }
-        //create lead records
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields);
 
-        foreach ($leadsToCreate as $lead) {
-            //use a composite patch here that can update and create (one query) every 200 records
-            foreach ($config['leadFields'] as $sfField => $mauticField) {
-                if (isset($lead[$mauticField])) {
-                    $body[$sfField] = $lead[$mauticField];
-                }
-            }
-            if (!empty($body)) {
-                $mauticData[] = [
-                    'method'      => 'POST',
-                    'url'         => '/services/data/v38.0/sobjects/Lead',
-                    'referenceId' => $lead['id'].'- New Lead',
-                    'body'        => $body,
-                ];
+        $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
+        $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
+        $contactSfFields = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
+
+        $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
+        $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
+
+        //update lead/contact records
+        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
+        foreach ($leadsToUpdate as $lead) {
+            $this->buildCompositeBody(
+                $mauticData,
+                $availableFields,
+                ('Lead' === $lead['integration_entity']) ? $leadSfFields : $contactSfFields,
+                $lead['integration_entity'],
+                $lead,
+                $lead['integration_entity_id']
+            );
+        }
+
+        // Only get the max limit
+        if ($limit) {
+            $limit -= count($leadsToUpdate);
+        }
+
+        //create lead records
+        if (null === $limit || $limit) {
+            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
+            foreach ($leadsToCreate as $lead) {
+                $this->buildCompositeBody(
+                    $mauticData,
+                    $availableFields,
+                    $leadSfFields,
+                    'Lead',
+                    $lead
+                );
             }
         }
+
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = $mauticData;
 
@@ -996,7 +989,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $result    = $apiHelper->syncMauticToSalesforce($request);
         }
 
-        return $result['compositeResponse'];
+        // Store integration objects if created
+        return $this->processCompositeResponse($result['compositeResponse']);
     }
 
     /**
@@ -1015,5 +1009,98 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     */
+    public function amendToSfFields($fields)
+    {
+    }
+
+    /**
+     * @param      $mauticData
+     * @param      $availableFields
+     * @param      $fieldsToUpdateInSfUpdate
+     * @param      $object
+     * @param      $lead
+     * @param null $objectId
+     */
+    protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null)
+    {
+        //use a composite patch here that can update and create (one query) every 200 records
+        foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
+            $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
+            if (isset($lead[$mauticField])) {
+                $body[$sfField] = $lead[$mauticField];
+            }
+
+            if ($required && empty($body[$sfField])) {
+                $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+            }
+        }
+
+        if (!empty($body)) {
+            $url = '/services/data/v38.0/sobjects/'.$object;
+            if ($objectId) {
+                $url .= '/'.$objectId;
+            }
+            $mauticData[] = [
+                'method'      => ($objectId) ? 'PATCH' : 'POST',
+                'url'         => $url,
+                'referenceId' => $lead['id'].'-'.$object,
+                'body'        => $body,
+            ];
+        }
+    }
+
+    /**
+     * @param $response
+     */
+    protected function processCompositeResponse($response)
+    {
+        $count = 0;
+
+        if (is_array($response)) {
+            $newEntities = [];
+            foreach ($response as $item) {
+                if (isset($item['body'][0]['errorCode'])) {
+                    $this->logIntegrationError(new \Exception($item['body'][0]['message']));
+
+                    continue;
+                }
+
+                list($contactId, $object) = explode('-', $item['referenceId']);
+
+                if (!empty($item['body']['success'])) {
+                    if (201 === $item['httpStatusCode']) {
+                        // New object created
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setIntegration($this->getName());
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setIntegrationEntityId($item['body']['id']);
+                        $integrationEntity->setInternalEntity('lead');
+                        $integrationEntity->setInternalEntityId($contactId);
+                        $newEntities[] = $integrationEntity;
+                    }
+                    ++$count;
+                } else {
+                    $this->logIntegrationError(new \Exception($item['body']['message'].' ('.$item['referenceId'].')'));
+                }
+            }
+
+            if ($newEntities) {
+                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($newEntities);
+                unset($newEntities);
+                $this->em->clear(IntegrationEntity::class);
+            }
+        }
+
+        return $count;
     }
 }
