@@ -145,8 +145,9 @@ Mautic.openServerBrowser = function(url, width, height) {
  * Creates an iframe and keeps its content live from CodeMirror changes
  *
  * @param iframeId
+ * @param slot
  */
-Mautic.keepPreviewAlive = function(iframeId) {
+Mautic.keepPreviewAlive = function(iframeId, slot) {
     var codeChanged = false;
     // Watch for code changes
     Mautic.builderCodeMirror.on('change', function(cm, change) {
@@ -156,7 +157,7 @@ Mautic.keepPreviewAlive = function(iframeId) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
-            Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value);
+            Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
     }, 2000);
@@ -291,19 +292,20 @@ Mautic.initSelectTheme = function(themeField) {
 /**
  * Updates content of an iframe
  *
- * @param iframe ID
- * @param HTML content
+ * @param iframeId ID
+ * @param content HTML content
+ * @param slot
  */
-Mautic.updateIframeContent = function(iframeId, content) {
-    var iframe = document.getElementById(iframeId);
-    if (iframeId === 'codemodeHtmlContainer') {
-        iframe.innerHTML = content;
-        return;
+Mautic.updateIframeContent = function(iframeId, content, slot) {
+    if (iframeId) {
+        var iframe = document.getElementById(iframeId);
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(content);
+        doc.close();
+    } else if (slot) {
+        slot.html(content);
     }
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(content);
-    doc.close();
 };
 
 /**
@@ -938,33 +940,38 @@ Mautic.initSlotListeners = function() {
                 var rawTokens = [];
                 var element = focusForm.find('#slot_codemode_content')[0];
                 if (element) {
-                    Mautic.builderCodeMirror = CodeMirror(element, {
-                        value: slot.find('#codemodeHtmlContainer').html(),
+                    Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
+                        //value: slot.find('#codemodeHtmlContainer').html(),
                         lineNumbers: true,
                         mode: 'htmlmixed',
                         extraKeys: {"Ctrl-Space": "autocomplete"},
                         lineWrapping: true,
-                        hintOptions: {
-                            hint: function (editor) {
-                                var cursor = editor.getCursor();
-                                var currentLine = editor.getLine(cursor.line);
-                                var start = cursor.ch;
-                                var end = start;
-                                while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
-                                while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
-                                var curWord = start != end && currentLine.slice(start, end);
-                                var regex = new RegExp('^' + curWord, 'i');
-                                return {
-                                    list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
-                                        return (rawTokens[idx].indexOf(curWord) !== -1);
-                                    })),
-                                    from: CodeMirror.Pos(cursor.line, start),
-                                    to: CodeMirror.Pos(cursor.line, end)
-                                };
-                            }
-                        }
+                        // hintOptions: {
+                        //     hint: function (editor) {
+                        //         var cursor = editor.getCursor();
+                        //         var currentLine = editor.getLine(cursor.line);
+                        //         var start = cursor.ch;
+                        //         var end = start;
+                        //         while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
+                        //         while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
+                        //         var curWord = start != end && currentLine.slice(start, end);
+                        //         var regex = new RegExp('^' + curWord, 'i');
+                        //         return {
+                        //             list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
+                        //                 return (rawTokens[idx].indexOf(curWord) !== -1);
+                        //             })),
+                        //             from: CodeMirror.Pos(cursor.line, start),
+                        //             to: CodeMirror.Pos(cursor.line, end)
+                        //         };
+                        //     }
+                        // }
                     });
-                    Mautic.keepPreviewAlive('codemodeHtmlContainer');
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
+                    // Mautic.builderCodeMirror.on('mousedown', function(instance, e){
+                    //     console.log(Mautic.builderCodeMirror);
+                    //     instance.focus();
+                    // });
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
                 }
             }
 
