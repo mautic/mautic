@@ -65,17 +65,17 @@ Mautic.launchBuilder = function (formName, actionName) {
         Mautic.keepPreviewAlive('builder-template-content');
     }
 
-    var builderPanel = mQuery('.builder-panel')
-        builderContent = mQuery('.builder-content')
-        btnCloseBuilder = mQuery('.btn-close-builder')
-        panelHeight = (builderContent.css('right') == '0px') ? builderPanel.height() : 0,
-        panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width(),
-        spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
-        spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+    var builderPanel = mQuery('.builder-panel');
+    var builderContent = mQuery('.builder-content');
+    var btnCloseBuilder = mQuery('.btn-close-builder');
+    var panelHeight = (builderContent.css('right') == '0px') ? builderPanel.height() : 0;
+    var panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width();
+    var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
+    var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
     builderPanel.on('scroll', function(e) {
-        builderPanel.find('input:focus').blur().focus();
+        builderPanel.find('input:focus').blur();
     });
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
@@ -650,7 +650,7 @@ Mautic.initSections = function() {
 
             mQuery('#builder-template-content', parent.document).css('overflow', 'visible');
             mQuery('#builder-template-content', parent.document).attr('scrolling', 'yes');
-        },
+        }
     }).disableSelection();
 
     // Initialize the slots
@@ -748,7 +748,7 @@ Mautic.initSlots = function(slotContainers) {
             }
 
             Mautic.sortActive = false;
-        },
+        }
     });
 
     // Allow to drag&drop new slots from the slot type menu
@@ -767,11 +767,9 @@ Mautic.initSlots = function(slotContainers) {
                 overflowY: 'hidden'
             });
 
-            var helper = mQuery(this).clone()
+            return mQuery(this).clone()
                 .css('height', mQuery(this).height())
                 .css('width', mQuery(this).width());
-
-            return helper;
         },
         zIndex: 8000,
         cursorAt: {top: 15, left: 15},
@@ -900,28 +898,38 @@ Mautic.initSlotListeners = function() {
                 var regex = /data-param-(.*)/;
                 var match = regex.exec(attr.name);
 
+                console.log('Attribute', attr);
+                console.log('Match', match);
                 if (match !== null) {
+
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
-                    focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
+                    focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', true);
 
                     var selectField = focusForm.find('select[data-slot-param="'+match[1]+'"]');
 
-                    if (selectField) {
+                    if (selectField.length) {
                         selectField.val(attr.value)
                     }
 
                     // URL fields
                     var urlField = focusForm.find('input[type="url"][data-slot-param="'+match[1]+'"]');
 
-                    if (urlField) {
+                    if (urlField.length) {
                         urlField.val(attr.value);
                     }
 
                     // Number fields
                     var numberField = focusForm.find('input[type="number"][data-slot-param="'+match[1]+'"]');
 
-                    if (numberField) {
+                    if (numberField.length) {
                         numberField.val(attr.value);
+                    }
+
+                    var radioField = focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]');
+
+                    if (radioField.length) {
+                        radioField.parent('.btn').addClass('active');
+                        radioField.attr('checked', true);
                     }
                 }
             });
