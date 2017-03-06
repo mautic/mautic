@@ -45,12 +45,13 @@ class FeatureSettingsType extends AbstractType
         $integration_object->appendToForm($builder, $options['data'], 'features');
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
+        $formSettings  = $options['integration_object']->getFormDisplaySettings();
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields, $formSettings) {
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => true,
+                'ignore_field_cache' => ('GET' === $_SERVER['REQUEST_METHOD']),
             ];
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
@@ -82,12 +83,15 @@ class FeatureSettingsType extends AbstractType
             $integrationFields  = array_keys($fields);
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
+            $enableDataPriority = false;
+            if (isset($formSettings['enable_data_priority'])) {
+                $enableDataPriority = $formSettings['enable_data_priority'];
+            }
 
             $autoMatchedFields = [];
             foreach ($fieldsIntersection as $field) {
                 $autoMatchedFields[$field] = strtolower($field);
             }
-
             $form->add(
                 'leadFields',
                 'integration_fields',
@@ -96,9 +100,11 @@ class FeatureSettingsType extends AbstractType
                     'required'             => true,
                     'lead_fields'          => $leadFields,
                     'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
+                    'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
+                    'enable_data_priority' => $enableDataPriority,
                 ]
             );
             if (!empty($integrationCompanyFields)) {
@@ -106,13 +112,15 @@ class FeatureSettingsType extends AbstractType
                     'companyFields',
                     'integration_company_fields',
                     [
-                        'label'          => 'mautic.integration.comapanyfield_matches',
-                        'required'       => false,
-                        'company_fields' => $companyFields,
-                        //'data'               => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
+                        'label'                      => 'mautic.integration.comapanyfield_matches',
+                        'required'                   => false,
+                        'company_fields'             => $companyFields,
+                        'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
+                        'update_mautic_company'      => isset($data['update_mautic_company']) && !empty($data['update_mautic_company']) ? $data['update_mautic_company'] : [],
                         'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
+                        'enable_data_priority'       => $enableDataPriority,
                     ]
                 );
             }

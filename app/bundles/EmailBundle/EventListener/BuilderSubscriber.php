@@ -148,8 +148,24 @@ class BuilderSubscriber extends CommonSubscriber
                 'Image',
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot',
+                'slot_image',
                 900
+            );
+            $event->addSlotType(
+                'imagecard',
+                'Image Card',
+                'id-card-o',
+                'MauticCoreBundle:Slots:imagecard.html.php',
+                'slot_imagecard',
+                870
+            );
+            $event->addSlotType(
+                'imagecaption',
+                'Image+Caption',
+                'image',
+                'MauticCoreBundle:Slots:imagecaption.html.php',
+                'slot_imagecaption',
+                850
             );
             $event->addSlotType(
                 'button',
@@ -160,12 +176,55 @@ class BuilderSubscriber extends CommonSubscriber
                 800
             );
             $event->addSlotType(
+                'socialfollow',
+                'Social Follow',
+                'twitter',
+                'MauticCoreBundle:Slots:socialfollow.html.php',
+                'slot_socialfollow',
+                600
+            );
+//            $event->addSlotType(
+//                'codemode',
+//                'Code Mode',
+//                'code',
+//                'MauticCoreBundle:Slots:codemode.html.php',
+//                'slot_codemode',
+//                500
+//            );
+            $event->addSlotType(
                 'separator',
                 'Separator',
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
                 'slot',
-                700
+                400
+            );
+        }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                'One Column',
+                'file-text-o',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+            $event->addSection(
+                'two-column',
+                'Two Columns',
+                'columns',
+                'MauticCoreBundle:Sections:two-column.html.php',
+                null,
+                900
+            );
+            $event->addSection(
+                'three-column',
+                'Three Columns',
+                'th',
+                'MauticCoreBundle:Sections:three-column.html.php',
+                null,
+                800
             );
         }
     }

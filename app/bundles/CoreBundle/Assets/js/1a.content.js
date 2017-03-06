@@ -617,11 +617,9 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-        if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-            if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
-                Mautic.loadedContent[contentSpecific] = true;
-                Mautic[contentSpecific + "OnLoad"](container, response);
-            }
+        if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+            Mautic.loadedContent[contentSpecific] = true;
+            Mautic[contentSpecific + "OnLoad"](container, response);
         }
     }
 
@@ -735,7 +733,7 @@ Mautic.onPageUnload = function (container, response) {
             Mautic[contentSpecific + "OnUnload"](container, response);
         }
 
-        if (typeof (Mautic.loadedContent[contentSpecific])) {
+        if (typeof Mautic.loadedContent[contentSpecific] !== 'undefined') {
             delete Mautic.loadedContent[contentSpecific];
         }
     }
@@ -1346,7 +1344,7 @@ Mautic.activateListFilterSelect = function(el) {
  * Converts an input to a color picker
  * @param el
  */
-Mautic.activateColorPicker = function(el) {
+Mautic.activateColorPicker = function(el, options) {
     var pickerOptions = mQuery(el).data('color-options');
     if (!pickerOptions) {
         pickerOptions = {
@@ -1355,6 +1353,10 @@ Mautic.activateColorPicker = function(el) {
                 mQuery(el).trigger('change.minicolors', hex);
             }
         };
+    }
+
+    if (typeof options == 'object') {
+        pickerOptions = mQuery.extend(pickerOptions, options);
     }
 
     mQuery(el).minicolors(pickerOptions);

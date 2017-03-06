@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -27,7 +27,6 @@
   outline: 0px solid transparent;
 }
 .fr-box.fr-basic .fr-element {
-  text-align: initial;
   color: #000000;
   padding: 10px;
   -webkit-box-sizing: border-box;
@@ -760,7 +759,10 @@ body.prevent-scroll.fr-mobile {
   -moz-transition: color 0.2s ease 0s;
   -ms-transition: color 0.2s ease 0s;
   -o-transition: color 0.2s ease 0s;
-  z-index: 1;
+  z-index: 3;
+  width: 100%;
+  display: block;
+  background: #ffffff;
 }
 .fr-popup .fr-input-line input.fr-not-empty:focus + label,
 .fr-popup .fr-input-line textarea.fr-not-empty:focus + label {
@@ -1182,9 +1184,9 @@ span.fr-sr-only {
   border: 0;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1238,9 +1240,9 @@ span.fr-sr-only {
   display: none;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1280,9 +1282,9 @@ span.fr-sr-only {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 body.fr-fullscreen {
   overflow: hidden;
@@ -1307,9 +1309,9 @@ body.fr-fullscreen {
   bottom: 0 !important;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1343,9 +1345,9 @@ body.fr-fullscreen {
   top: -16px;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1479,6 +1481,90 @@ body.fr-fullscreen {
 .fr-video-size-layer .fr-video-group .fr-input-line + .fr-input-line {
   margin-left: 10px;
 }
+.fr-video-upload-layer {
+  border: dashed 2px #bdbdbd;
+  padding: 25px 0;
+  position: relative;
+  font-size: 14px;
+  letter-spacing: 1px;
+  line-height: 140%;
+  text-align: center;
+}
+.fr-video-upload-layer:hover {
+  background: #ebebeb;
+}
+.fr-video-upload-layer.fr-drop {
+  background: #ebebeb;
+  border-color: #1e88e5;
+}
+.fr-video-upload-layer .fr-form {
+  -webkit-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.fr-video-upload-layer .fr-form input {
+  cursor: pointer;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 500%;
+  height: 100%;
+  margin: 0px;
+  font-size: 400px;
+}
+.fr-video-progress-bar-layer > h3 {
+  font-size: 16px;
+  margin: 10px 0;
+  font-weight: normal;
+}
+.fr-video-progress-bar-layer > div.fr-action-buttons {
+  display: none;
+}
+.fr-video-progress-bar-layer > div.fr-loader {
+  background: #bcdbf7;
+  height: 10px;
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  position: relative;
+}
+.fr-video-progress-bar-layer > div.fr-loader span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #1e88e5;
+  -webkit-transition: width 0.2s ease 0s;
+  -moz-transition: width 0.2s ease 0s;
+  -ms-transition: width 0.2s ease 0s;
+  -o-transition: width 0.2s ease 0s;
+}
+.fr-video-progress-bar-layer > div.fr-loader.fr-indeterminate span {
+  width: 30% !important;
+  position: absolute;
+  top: 0;
+  -webkit-animation: loading 2s linear infinite;
+  -moz-animation: loading 2s linear infinite;
+  -o-animation: loading 2s linear infinite;
+  animation: loading 2s linear infinite;
+}
+.fr-video-progress-bar-layer.fr-error > div.fr-loader {
+  display: none;
+}
+.fr-video-progress-bar-layer.fr-error > div.fr-action-buttons {
+  display: block;
+}
 .fr-video-overlay {
   position: fixed;
   top: 0;
@@ -1489,9 +1575,9 @@ body.fr-fullscreen {
   display: none;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1600,9 +1686,9 @@ textarea.fr-code {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1640,9 +1726,9 @@ textarea.fr-code {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1883,9 +1969,9 @@ textarea.fr-code {
   }
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -1952,9 +2038,9 @@ textarea.fr-code {
   -o-transform: scale(1);
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -2215,9 +2301,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -2338,9 +2424,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   -o-transform: translate3d(100%, 0, 0);
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -2483,9 +2569,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   }
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after {
   clear: both;
@@ -2851,7 +2937,7 @@ html body .fr-gatedvideo-overlay {
 }
 .fa-border {
   padding: .2em .25em .15em;
-  border: solid 0.08em #eeeeee;
+  border: solid 0.08em #eee;
   border-radius: .1em;
 }
 .fa-pull-left {
@@ -2966,7 +3052,7 @@ html body .fr-gatedvideo-overlay {
   font-size: 2em;
 }
 .fa-inverse {
-  color: #ffffff;
+  color: #fff;
 }
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
@@ -5233,6 +5319,28 @@ div[data-section-focus="left"] {
   top: 0px;
   left: 0px;
 }
+div[data-section-focus="handle"] {
+  width: 25px;
+  height: 25px;
+  bottom: 10px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+div[data-section-focus="delete"] {
+  width: 25px;
+  height: 25px;
+  bottom: 36px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
 div[data-slot-toolbar] {
   position: absolute;
   top: -24px;
@@ -5246,6 +5354,7 @@ div[data-slot-toolbar] {
   background-color: #4e5e9e;
   border-left: 1px solid #4e5e9e;
   border-right: 1px solid #4e5e9e;
+  padding-top: 2px;
 }
 div[data-slot-toolbar] .btn {
   width: 20px;
@@ -5267,8 +5376,8 @@ div[data-slot-toolbar] .btn {
   font-size: 11px;
   line-height: 1.456;
   float: right;
-  margin-right: 5px;
-  color: #ffffff;
+  margin-right: 2px;
+  color: #fff;
 }
 div[data-slot-toolbar] .btn .fa {
   padding-top: 4px;
@@ -5277,11 +5386,11 @@ div[data-slot],
 [data-section-wrapper] {
   position: relative;
 }
-div[data-slot="image"] {
+div[data-slot^="image"] {
   padding-top: 1px;
   padding-bottom: 1px;
 }
-div[data-slot="image"] img {
+div[data-slot^="image"] img {
   z-index: 2;
   position: relative;
 }
@@ -5325,13 +5434,16 @@ div[data-slot].ui-sortable-helper {
   color: inherit !important;
   min-height: inherit !important;
 }
-.slot-type-handle.btn {
+.slot-type-handle.btn,
+.section-type-handle.btn {
   float: left;
   width: 111px;
   margin: 2px;
   height: 62px;
+  padding: 10px;
 }
-.slot-type-handle.ui-draggable-dragging {
+.slot-type-handle.ui-draggable-dragging,
+.section-type-handle.ui-draggable-dragging {
   color: #5d6c7c;
   background-color: #f5f5f5;
   border-color: #d3d3d3;
@@ -5346,5 +5458,8 @@ div[data-slot].ui-sortable-helper {
   height: 350px;
 }
 .theme-list .select-theme-link {
+  margin-top: 5px;
+}
+.theme-list .select-theme-selected {
   margin-top: 5px;
 }

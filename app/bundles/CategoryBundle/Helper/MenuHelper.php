@@ -26,6 +26,6 @@ class MenuHelper
      */
     public static function addCategoryMenuItems(&$items, $bundleName, CorePermissions $security)
     {
-        @trigger_error('Individual category menu items are no longer used.', E_DEPRECATED);
+        @trigger_error('Individual category menu items are no longer used.', E_USER_DEPRECATED);
     }
 }
