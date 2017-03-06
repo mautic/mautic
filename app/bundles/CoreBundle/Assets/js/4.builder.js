@@ -675,7 +675,7 @@ Mautic.sectionBackgroundChanged = function(element, color) {
             Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), focusedSlot);
         }
     });
-}
+};
 
 Mautic.rgb2hex = function(orig) {
     var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
@@ -683,7 +683,7 @@ Mautic.rgb2hex = function(orig) {
         ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
         ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
         ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
-}
+};
 
 Mautic.initSlots = function(slotContainers) {
     if (!slotContainers) {
@@ -787,7 +787,7 @@ Mautic.initSlots = function(slotContainers) {
             mQuery('#builder-template-content', parent.document).css('overflow', 'visible');
             mQuery('#builder-template-content', parent.document).attr('scrolling', 'yes');
             slotContainers.sortable('option', 'scroll', true);
-        },
+        }
     }).disableSelection();
 
     iframe.on('scroll', function() {
@@ -798,7 +798,7 @@ Mautic.initSlots = function(slotContainers) {
     slotContainers.find('[data-slot]').each(function() {
         mQuery(this).trigger('slot:init', this);
     });
-}
+};
 
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
@@ -926,7 +926,7 @@ Mautic.initSlotListeners = function() {
                 }
             });
 
-            focusForm.on('keyup', function(e) {
+            focusForm.on('keyup change', function(e) {
                 var field = mQuery(e.target);
 
                 // Store the slot settings as attributes
@@ -950,7 +950,11 @@ Mautic.initSlotListeners = function() {
 
             // Initialize the color picker
             focusForm.find('input[data-toggle="color"]').each(function() {
-                parent.Mautic.activateColorPicker(this);
+                parent.Mautic.activateColorPicker(this, {
+                    change: function() {
+                        clickedSlot.trigger('slot:change', {slot: clickedSlot, field: mQuery(this), type: focusType});
+                    }
+                });
             });
 
             // initialize code mode slots
@@ -1033,18 +1037,6 @@ Mautic.initSlotListeners = function() {
                 parent.mQuery(this).val(slotHtml.html());
 
                 parent.mQuery(this).froalaEditor(parent.mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
-            });
-
-            parent.mQuery('#slot-form-container').on('change.minicolors', function(e, hex) {
-                if (typeof hex === 'undefined') return;
-
-                var field = mQuery(e.target);
-
-                // Store the slot settings as attributes
-                clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
-
-                // Trigger the slot:change event
-                clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field, type: focusType});
             });
         });
 
