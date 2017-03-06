@@ -898,12 +898,9 @@ Mautic.initSlotListeners = function() {
                 var regex = /data-param-(.*)/;
                 var match = regex.exec(attr.name);
 
-                console.log('Attribute', attr);
-                console.log('Match', match);
                 if (match !== null) {
 
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
-                    focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', true);
 
                     var selectField = focusForm.find('select[data-slot-param="'+match[1]+'"]');
 
