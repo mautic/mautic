@@ -238,7 +238,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) || ($object == 'Lead' && in_array($field['name'], ['Company']));
+            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']))
+                || ($object == 'Lead'
+                    && in_array($field['name'], ['Company']));
         };
 
         $salesFields = [];
@@ -943,7 +945,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields                = implode(', l.', $config['leadFields']);
         $fields                = 'l.'.$fields;
         $result                = 0;
-        $sfLeadRecords         = [];
+        $checkEmailsInSF       = [];
 
         $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
         $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
@@ -953,30 +955,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
         //update lead/contact records
-        $leadsToUpdate   = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
-        $checkEmailsInSF = '( ';
+        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
         foreach ($leadsToUpdate as $lead) {
             if (isset($lead['email']) && !empty($lead['email'])) {
-                $checkEmailsInSF .= "'".$lead['email']."',";
-                $leadsToUpdate[$lead['email']] = $lead;
+                $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
             }
-        }
-        $checkEmailsInSF = substr($checkEmailsInSF, 0, -1).')';
-        if ($checkEmailsInSF !== '()') {
-            $findLead      = 'select Id, ConvertedContactId, Email from Lead where Email in '.$checkEmailsInSF.' and IsDeleted = false';
-            $queryUrl      = $this->getQueryUrl();
-            $sfLead        = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
-            $sfLeadRecords = $sfLead['records'];
-        }
-        foreach ($sfLeadRecords as $sfLeadRecord) {
-            $this->buildCompositeBody(
-                $mauticData,
-                $availableFields,
-                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $contactSfFields : $leadSfFields,
-                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? 'Contact' : 'Lead',
-                $leadsToUpdate[$sfLeadRecord['Email']],
-                (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $sfLeadRecord['ConvertedContactId'] : $sfLeadRecord['Id']
-            );
         }
 
         // Only get the max limit
@@ -986,36 +969,59 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         //create lead records
         if (null === $limit || $limit) {
-            $leadsToCreate   = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
-            $checkEmailsInSF = '( ';
+            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
             foreach ($leadsToCreate as $lead) {
-                if (isset($lead['email']) && !empty($lead['email'])) {
-                    $checkEmailsInSF .= "'".$lead['email']."',";
-                    $leadsToUpdate[$lead['email']] = $lead;
+                $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
+            }
+        }
+
+        $deletedSFLeads      = [];
+        $salesforceIdMapping = [];
+        if ($checkEmailsInSF) {
+            $findLead = 'select Id, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                .'\')';
+            $queryUrl = $this->getQueryUrl();
+            $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            if ($sfLeadRecords = $sfLead['records']) {
+                foreach ($sfLeadRecords as $sfLeadRecord) {
+                    $key = mb_strtolower($sfLeadRecord['Email']);
+                    if (isset($checkEmailsInSF[$key])) {
+                        $isConverted = (isset($sfLeadRecord['ConvertedContactId'])
+                            && $sfLeadRecord['ConvertedContactId'] != null);
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = ($isConverted) ? $sfLeadRecord['ConvertedContactId']
+                            : $sfLeadRecord['Id'];
+
+                        if (empty($sfLeadRecord['IsDeleted'])) {
+                            $this->buildCompositeBody(
+                                $mauticData,
+                                $availableFields,
+                                $isConverted ? $contactSfFields : $leadSfFields,
+                                $isConverted ? 'Contact' : 'Lead',
+                                $checkEmailsInSF[$key],
+                                $isConverted ? $sfLeadRecord['ConvertedContactId'] : $sfLeadRecord['Id']
+                            );
+                        } else {
+                            // @todo - Salesforce doesn't seem to be returning deleted contacts by default
+                            $deletedSFLeads[] = $sfLeadRecord['Id'];
+                            if (!empty($sfLeadRecord['ConvertedContactId'])) {
+                                $deletedSFLeads[] = $sfLeadRecord['ConvertedContactId'];
+                            }
+                        }
+
+                        unset($checkEmailsInSF[$key]);
+                    } // Otherwise a duplicate in Salesforce and has already been processed
                 }
             }
-            $checkEmailsInSF = substr($checkEmailsInSF, 0, -1).')';
-            if ($checkEmailsInSF !== '()') {
-                $findLead      = 'select Id, ConvertedContactId, Email from Lead where Email in '.$checkEmailsInSF.' and IsDeleted = false';
-                $queryUrl      = $this->getQueryUrl();
-                $sfLead        = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
-                $sfLeadRecords = $sfLead['records'];
-                if (!empty($sfLeadRecords)) {
-                    foreach ($sfLeadRecords as $sfLeadRecord) {
-                        $this->buildCompositeBody(
-                            $mauticData,
-                            $availableFields,
-                            (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? $contactSfFields : $leadSfFields,
-                            (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) ? 'Contact' : 'Lead',
-                            $leadsToUpdate[$sfLeadRecord['Email']],
-                            $sfLeadRecord['Id']
-                        );
-                        unset($leadsToUpdate[$sfLeadRecord['Email']]);
-                    }
-                }
-                $leadsToCreate = $leadsToUpdate; //if not found either in Mautic records or SF records proceed to create a lead in SF
-            }
-            foreach ($leadsToCreate as $lead) {
+        }
+
+        // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
+        if ($deletedSFLeads) {
+            $integrationEntityRepo->markAsDeleted($deletedSFLeads, $this->getName(), 'lead');
+        }
+
+        // Create any left over
+        if ($checkEmailsInSF) {
+            foreach ($checkEmailsInSF as $lead) {
                 $this->buildCompositeBody(
                     $mauticData,
                     $availableFields,
@@ -1035,31 +1041,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $result = $apiHelper->syncMauticToSalesforce($request);
         }
 
-        // Store integration objects if created
-        $count = $this->processCompositeResponse($result['compositeResponse'], $tryAsContacts);
-
-        if (!empty($tryAsContacts) and (isset($leadsToCreate) && !empty($leadsToCreate))) {
-            $request['compositeRequest'] = [];
-
-            foreach ($tryAsContacts as $referenceId) {
-                list($contactId, $object) = explode('-', $referenceId);
-                $this->buildCompositeBody(
-                    $request['compositeRequest'],
-                    $availableFields,
-                    $contactSfFields,
-                    'Contact',
-                    $leadsToCreate[$contactId]
-                );
-            }
-            if (!empty($request['compositeRequest'])) {
-                $result       = $apiHelper->syncMauticToSalesforce($request);
-                $contactCount = $this->processCompositeResponse($result['compositeResponse']);
-
-                $count += $contactCount;
-            }
-        }
-
-        return $count;
+        return $this->processCompositeResponse($result['compositeResponse'], $salesforceIdMapping);
     }
 
     /**
@@ -1120,7 +1102,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if ($objectId) {
                     $url .= '/'.$objectId;
                 }
-                $id              = $lead['id'].'-'.$object;
+                $id              = $lead['internal_entity_id'].'-'.$object.(!empty($lead['id']) ? '-'.$lead['id'] : '');
                 $mauticData[$id] = [
                     'method'      => ($objectId) ? 'PATCH' : 'POST',
                     'url'         => $url,
@@ -1133,64 +1115,104 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param       $response
-     * @param array $tryAsContacts
+     * @param array $salesforceIdMapping
      *
-     * @return int
+     * @return array
      */
-    protected function processCompositeResponse($response, &$tryAsContacts = [])
+    protected function processCompositeResponse($response, array $salesforceIdMapping = [])
     {
-        $count = 0;
+        $created = 0;
+        $updated = 0;
 
         if (is_array($response)) {
-            $newEntities = [];
+            $persistEntities = [];
             foreach ($response as $item) {
+                $contactId = $integrationEntityId = null;
+                if (!empty($item['referenceId'])) {
+                    $reference = explode('-', $item['referenceId']);
+                    if (3 === count($reference)) {
+                        list($contactId, $object, $integrationEntityId) = $reference;
+                    } else {
+                        list($contactId, $object) = $reference;
+                    }
+                }
+
                 if (isset($item['body'][0]['errorCode'])) {
                     $this->logIntegrationError(new \Exception($item['body'][0]['message']));
 
-                    continue;
-                }
+                    if ($integrationEntityId) {
+                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        $integrationEntity->setLastSyncDate(new \DateTime());
 
-                list($contactId, $object) = explode('-', $item['referenceId']);
+                        $persistEntities[] = $integrationEntity;
+                    } elseif ($contactId) {
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setIntegration($this->getName());
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setInternalEntity('lead-error');
+                        $integrationEntity->setInternal(['error' => $item['body'][0]['message']]);
+                        $integrationEntity->setInternalEntityId($contactId);
 
-                if (!empty($item['body']['success'])) {
+                        $persistEntities[] = $integrationEntity;
+                    }
+                } elseif (!empty($item['body']['success'])) {
                     if (201 === $item['httpStatusCode']) {
                         // New object created
                         $integrationEntity = new IntegrationEntity();
                         $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setLastSyncDate(new \DateTime());
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($item['body']['id']);
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($contactId);
-                        $newEntities[] = $integrationEntity;
-                    }
-                    ++$count;
-                } else {
-                    if (!empty($item['body'][0]['message']['errorCode']) && 'CANNOT_UPDATE_CONVERTED_LEAD' === $item['body'][0]['message']['errorCode']) {
-                        $tryAsContacts[] = $item['referenceId'];
-                    } else {
-                        $error = 'http status code '.$item['httpStatusCode'];
-                        switch (true) {
-                            case !empty($item['body'][0]['message']['message']):
-                                $error = $item['body'][0]['message']['message'];
-                                break;
-                            case !empty($item['body']['message']):
-                                $error = $item['body']['message'];
-                                break;
-                        }
 
-                        $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
+                        $persistEntities[] = $integrationEntity;
                     }
+                    ++$created;
+                } elseif (204 === $item['httpStatusCode']) {
+                    // Record was updated
+                    if ($integrationEntityId) {
+                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        $integrationEntity->setLastSyncDate(new \DateTime());
+                    } else {
+                        // Found in Salesforce so create a new record for it
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setIntegration($this->getName());
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setIntegrationEntityId($salesforceIdMapping[$contactId]);
+                        $integrationEntity->setInternalEntity('lead');
+                        $integrationEntity->setInternalEntityId($contactId);
+                    }
+
+                    $persistEntities[] = $integrationEntity;
+                    ++$updated;
+                } else {
+                    $error = 'http status code '.$item['httpStatusCode'];
+                    switch (true) {
+                        case !empty($item['body'][0]['message']['message']):
+                            $error = $item['body'][0]['message']['message'];
+                            break;
+                        case !empty($item['body']['message']):
+                            $error = $item['body']['message'];
+                            break;
+                    }
+
+                    $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
                 }
             }
 
-            if ($newEntities) {
-                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($newEntities);
-                unset($newEntities);
+            if ($persistEntities) {
+                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                unset($persistEntities);
                 $this->em->clear(IntegrationEntity::class);
             }
         }
 
-        return $count;
+        return [$updated, $created];
     }
 }
