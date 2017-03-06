@@ -77,4 +77,83 @@ class IntegrationEntityRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * @param $integration
+     * @param $internalEntity
+     * @param null $startDate
+     * @param null $endDate
+     * @param $leadFields
+     *
+     * @return array
+     */
+    public function findLeadsToUpdate($integration, $internalEntity, $leadFields, $limit = 25)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields)
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
+
+        $q->where('i.integration = :integration')
+            ->andWhere('i.internal_entity = :internalEntity')
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity);
+
+        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date and l.date_identified is not null and l.email is not null');
+
+        $q->setMaxResults($limit);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * @param $integration
+     * @param $leadFields
+     *
+     * @return array
+     */
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('l.id as internal_entity_id,'.$leadFields)
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        $q->where('l.date_identified is not null')
+            ->andWhere('l.email is not null')
+            ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and (i.internal_entity = "lead" or i.internal_entity = "lead-deleted" or i.internal_entity = "lead-error") and i.internal_entity_id = l.id )')
+            ->setParameter('integration', $integration);
+
+        $q->setMaxResults($limit);
+
+        $results = $q->execute()->fetchAll();
+
+        $leads = [];
+        foreach ($results as $result) {
+            $leads[$result['internal_entity_id']] = $result;
+        }
+
+        return $leads;
+    }
+
+    /**
+     * @param array $integrationIds
+     * @param       $integration
+     * @param       $internalEntityType
+     */
+    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->set('internal_entity', ':entity')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('integration', ':integration'),
+                    $q->expr()->in('integration_entity_id', array_map([$q->expr(), 'literal'], $integrationIds))
+                )
+            )
+            ->setParameter('integration', $integration)
+            ->setParameter('entity', $internalEntityType.'-deleted')
+            ->execute();
+    }
 }

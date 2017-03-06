@@ -163,7 +163,7 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if($ipAddress->isTrackable()) {
+            if ($ipAddress->isTrackable()) {
                 $userAgent = $this->request->headers->get('User-Agent');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (strpos($userAgent, $bot) !== false) {
