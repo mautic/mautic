@@ -897,13 +897,32 @@ Mautic.initSlotListeners = function() {
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
-                var attrPrefix = 'data-param-';
                 var regex = /data-param-(.*)/;
                 var match = regex.exec(attr.name);
 
                 if (match !== null) {
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
                     focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
+
+                    var selectField = focusForm.find('select[data-slot-param="'+match[1]+'"]');
+
+                    if (selectField) {
+                        selectField.val(attr.value)
+                    }
+
+                    // URL fields
+                    var urlField = focusForm.find('input[type="url"][data-slot-param="'+match[1]+'"]');
+
+                    if (urlField) {
+                        urlField.val(attr.value);
+                    }
+
+                    // Number fields
+                    var numberField = focusForm.find('input[type="number"][data-slot-param="'+match[1]+'"]');
+
+                    if (numberField) {
+                        numberField.val(attr.value);
+                    }
                 }
             });
 
@@ -1061,6 +1080,9 @@ Mautic.initSlotListeners = function() {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         var type = params.type;
+
+        Mautic.clearSlotFormError(fieldParam);
+
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
@@ -1129,6 +1151,30 @@ Mautic.initSlotListeners = function() {
             } else {
                 params.slot.find('a').css(fieldParam, '#' + params.field.val());
             }
+        } else if (/gatedvideo/.test(fieldParam)) {
+            // Handle gatedVideo replacements
+            var toInsert = fieldParam.split('-')[1];
+            var insertVal = params.field.val();
+
+            if (toInsert === 'url') {
+                var videoProvider = Mautic.getVideoProvider(insertVal);
+
+                if (videoProvider == null) {
+                    Mautic.slotFormError(fieldParam, 'Please enter a valid YouTube, Vimeo, or MP4 url.');
+                } else {
+                    params.slot.find('source')
+                        .attr('src', insertVal)
+                        .attr('type', videoProvider);
+                }
+            } else if (toInsert === 'gatetime') {
+                params.slot.find('video').attr('data-gate-time', insertVal);
+            } else if (toInsert === 'formid') {
+                params.slot.find('video').attr('data-form-id', insertVal);
+            } else if (toInsert === 'height') {
+                params.slot.find('video').attr('height', insertVal);
+            } else if (toInsert === 'width') {
+                params.slot.find('video').attr('width', insertVal);
+            }
         }
 
         if (params.type == 'text') {
@@ -1158,6 +1204,61 @@ Mautic.deleteCodeModeSlot = function() {
     delete Mautic.codeMode;
 };
 
+Mautic.clearSlotFormError = function(field) {
+    var customizeSlotField = parent.mQuery('#customize-form-container').find('[data-slot-param="'+field+'"]');
+
+    if (customizeSlotField.length) {
+        customizeSlotField.attr('style', '');
+        customizeSlotField.next('[data-error]').remove();
+    }
+};
+
+Mautic.slotFormError = function (field, message) {
+    var customizeSlotField = parent.mQuery('#customize-form-container').find('[data-slot-param="'+field+'"]');
+
+    if (customizeSlotField.length) {
+        customizeSlotField.css('border-color', 'red');
+
+        if (message.length) {
+            var messageContainer = mQuery('<p/>')
+                .text(message)
+                .attr('data-error', 'true')
+                .css({
+                    color: 'red',
+                    padding: '5px 0'
+                });
+
+            messageContainer.insertAfter(customizeSlotField);
+        }
+    }
+};
+
+Mautic.getVideoProvider = function(url) {
+    var providers = [
+        {
+            test_regex: /^.*((youtu.be)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))?\??v?=?([^#\&\?]*).*/,
+            provider: 'video/youtube'
+        },
+        {
+            test_regex: /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/,
+            provider: 'video/vimeo'
+        },
+        {
+            test_regex: /mp4/,
+            provider: 'video/mp4'
+        }
+    ];
+
+    for (var i = 0; i < providers.length; i++) {
+        var vp = providers[i];
+        if (vp.test_regex.test(url)) {
+            return vp.provider;
+        }
+    }
+
+    return null;
+};
+
 Mautic.setTextSlotEditorStyle = function(editorEl, slot)
 {
     // Set the editor CSS to that of the slot
@@ -1177,7 +1278,7 @@ Mautic.setTextSlotEditorStyle = function(editorEl, slot)
             wrapper.css(style, overrideStyle);
         }
     });
-}
+};
 
 Mautic.getSlotStyle = function(slot, styleName, fallback) {
     if ('background-color' == styleName) {
