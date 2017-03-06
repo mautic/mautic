@@ -582,7 +582,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 valueField.chosen('destroy');
             }
 
-            if (!mQuery.isEmptyObject(response.options)) {
+            if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
                     .attr('id', valueFieldAttrs['id'])
@@ -624,11 +624,12 @@ Mautic.updateFieldOperatorValue = function(field, action) {
             }
 
             if (!mQuery.isEmptyObject(response.operators)) {
+                var operatorField = mQuery('#'+fieldPrefix+'operator');
+
                 if (mQuery('#'+fieldPrefix+'operator_chosen').length) {
-                    mQuery('#'+fieldPrefix+'operator').chosen('destroy');
+                    operatorField.chosen('destroy');
                 }
 
-                var operatorField = mQuery('#'+fieldPrefix+'operator');
                 var operatorFieldAttrs = {
                     'class': operatorField.attr('class'),
                     'id': operatorField.attr('id'),
@@ -645,10 +646,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('value', operatorFieldAttrs['value'])
                     .attr('onchange', 'Mautic.updateLeadFieldValues(this)');
                 mQuery.each(response.operators, function(optionKey, optionVal) {
-                    var option = mQuery("<option/>")
-                        .attr('value', optionKey)
-                        .text(optionVal);
-                    newOperatorField.append(option);
+                    newOperatorField.append(Mautic.createOption(optionKey, optionVal));
                 });
                 operatorField.replaceWith(newOperatorField);
                 Mautic.activateChosenSelect(newOperatorField);
