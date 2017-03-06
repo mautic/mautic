@@ -1344,7 +1344,7 @@ Mautic.activateListFilterSelect = function(el) {
  * Converts an input to a color picker
  * @param el
  */
-Mautic.activateColorPicker = function(el) {
+Mautic.activateColorPicker = function(el, options) {
     var pickerOptions = mQuery(el).data('color-options');
     if (!pickerOptions) {
         pickerOptions = {
@@ -1353,6 +1353,10 @@ Mautic.activateColorPicker = function(el) {
                 mQuery(el).trigger('change.minicolors', hex);
             }
         };
+    }
+
+    if (typeof options == 'object') {
+        pickerOptions = mQuery.extend(pickerOptions, options);
     }
 
     mQuery(el).minicolors(pickerOptions);
