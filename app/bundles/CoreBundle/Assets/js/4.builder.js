@@ -952,7 +952,12 @@ Mautic.initSlotListeners = function() {
             focusForm.find('input[data-toggle="color"]').each(function() {
                 parent.Mautic.activateColorPicker(this, {
                     change: function() {
-                        clickedSlot.trigger('slot:change', {slot: clickedSlot, field: mQuery(this), type: focusType});
+                        var field = mQuery(this);
+
+                        // Store the slot settings as attributes
+                        clickedSlot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                        clickedSlot.trigger('slot:change', {slot: clickedSlot, field: field, type: focusType});
                     }
                 });
             });
