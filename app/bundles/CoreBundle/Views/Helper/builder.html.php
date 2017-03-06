@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <div class="panel panel-default" id="customize-slot-panel">
+            <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.section.types'); ?></h4>
                 </div>
@@ -85,7 +85,7 @@
                 </div>
             </div>
 
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="customize-slot-panel">
                 <div class="panel-heading">
                     <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.customize.slot'); ?></h4>
                 </div>
