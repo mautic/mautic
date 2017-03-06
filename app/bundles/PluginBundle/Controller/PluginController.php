@@ -205,14 +205,43 @@ class PluginController extends FormController
                             //make sure now non-existent aren't saved
                             $featureSettings = $entity->getFeatureSettings();
                             $submittedFields = $this->request->request->get('integration_details[featureSettings][leadFields]', [], true);
-                            if (isset($featureSettings['leadFields'])) {
-                                foreach ($featureSettings['leadFields'] as $f => $v) {
-                                    if (empty($v) || !isset($submittedFields[$f])) {
-                                        unset($featureSettings['leadFields'][$f]);
+                            if (!empty($submittedFields)) {
+                                unset($featureSettings['leadFields']);
+                                unset($featureSettings['update_mautic']);
+                                foreach ($submittedFields as $f => $v) {
+                                    if (!strstr($f, 'update_mautic')) {
+                                        if (!empty($v) && strstr($f, 'i_')) {
+                                            $integrationField = $v;
+                                        }
+                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
+                                            $mauticField                                      = $v;
+                                            $featureSettings['leadFields'][$integrationField] = $mauticField;
+                                        }
+                                    } else {
+                                        $featureSettings['update_mautic'][$integrationField] = (int) $v;
                                     }
                                 }
-                                $entity->setFeatureSettings($featureSettings);
                             }
+                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
+
+                            if (!empty($submittedCompanyFields)) {
+                                unset($featureSettings['companyFields']);
+                                unset($featureSettings['update_mautic_company']);
+                                foreach ($submittedCompanyFields as $f => $v) {
+                                    if (!strstr($f, 'update_mautic_company')) {
+                                        if (!empty($v) && strstr($f, 'i_')) {
+                                            $integrationField = $v;
+                                        }
+                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
+                                            $mauticField                                         = $v;
+                                            $featureSettings['companyFields'][$integrationField] = $mauticField;
+                                        }
+                                    } else {
+                                        $featureSettings['update_mautic_company'][$integrationField] = (int) $v;
+                                    }
+                                }
+                            }
+                            $entity->setFeatureSettings($featureSettings);
                         }
                     } else {
                         //make sure they aren't overwritten because of API connection issues
@@ -258,7 +287,7 @@ class PluginController extends FormController
                         'closeModal'    => 1,
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
-                        'mauticContent' => 'integration',
+                        'mauticContent' => 'integrationConfig',
                     ]
                 );
             }
@@ -301,7 +330,7 @@ class PluginController extends FormController
                 'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
-                    'mauticContent' => 'integration',
+                    'mauticContent' => 'integrationConfig',
                     'route'         => false,
                 ],
             ]

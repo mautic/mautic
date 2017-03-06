@@ -535,6 +535,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
+        } elseif ($prop == 'points' && $current != $val) {
+            $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
         }
@@ -781,7 +783,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->isChanged('points', $this->points, $oldPoints);
+        $this->isChanged('points', (int) $this->points, (int) $oldPoints);
 
         return $this;
     }
