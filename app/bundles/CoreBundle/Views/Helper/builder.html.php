@@ -72,7 +72,7 @@
                             <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="<?php echo $sectionKey; ?>">
                                 <i class="fa fa-<?php echo $section['icon']; ?>" aria-hidden="true"></i>
                                 <br>
-                                <?php echo $section['header']; ?>
+                                <span class="slot-caption"><?php echo $section['header']; ?></span>
                                 <script type="text/html">
                                     <?php echo $view->render($section['content']); ?>
                                 </script>

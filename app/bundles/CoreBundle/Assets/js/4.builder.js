@@ -1036,7 +1036,7 @@ Mautic.initSlotListeners = function() {
             });
 
             parent.mQuery('#slot-form-container').on('change.minicolors', function(e, hex) {
-                if (undefined === hex) return;
+                if (typeof hex === 'undefined') return;
 
                 var field = mQuery(e.target);
 
