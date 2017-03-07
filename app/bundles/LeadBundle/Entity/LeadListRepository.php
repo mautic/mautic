@@ -401,9 +401,12 @@ class LeadListRepository extends CommonRepository
                         'll',
                         $listOnExpr
                     );
-                    $expr->add($q->expr()->isNull('ll.lead_id'));
-
-                    if ($batchExpr->count()) {
+                    if ($expr) {
+                        $expr->add($q->expr()->isNull('ll.lead_id'));
+                    } else {
+                        $expr = $q->expr()->andX($q->expr()->isNull('ll.lead_id'));
+                    }
+                    if ($batchExpr->count() and count($expr)) {
                         $expr->add($batchExpr);
                     }
 
@@ -434,7 +437,7 @@ class LeadListRepository extends CommonRepository
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                    if ($includesContactFields) {
+                    if ($includesContactFields and $expr) {
                         $sq->andWhere($expr);
                     }
 
@@ -1113,7 +1116,7 @@ class LeadListRepository extends CommonRepository
                             $groupExpr->add(
                                 $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
                             );
-
+                            echo 'hola';
                             $ignoreAutoFilter = true;
                             break;
 
@@ -1176,11 +1179,10 @@ class LeadListRepository extends CommonRepository
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
         }
-
         if (count($groups) === 1) {
             // Only one andX expression
             $expr = $groups[0];
-        } else {
+        } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
             $orX = $q->expr()->orX();
             $orX->addMultiple($groups);
