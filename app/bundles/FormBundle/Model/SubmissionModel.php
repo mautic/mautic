@@ -166,6 +166,18 @@ class SubmissionModel extends CommonFormModel
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
+        // Get updated lead if applicable with tracking ID
+        if ($form->isInKioskMode()) {
+            $lead = $this->leadModel->getCurrentLead();
+        } else {
+            list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
+
+            //set tracking ID for stats purposes to determine unique hits
+            $submission->setTrackingId($trackingId);
+        }
+
+        $submission->setLead($lead);
+
         if (!empty($post['return'])) {
             $referer = $post['return'];
         } elseif (!empty($server['HTTP_REFERER'])) {
@@ -296,6 +308,18 @@ class SubmissionModel extends CommonFormModel
                     $leadValue = implode($delimeter, $leadValue);
                 }
 
+                if ('company' === $leadField) {
+                    $company = $this->companyModel->getRepository()->identifyCompany($value);
+                    if (!empty($company['id'])) {
+                        $this->companyModel->addLeadToCompany([$company['id']], $lead);
+                    } else {
+                        $companyEntity = $this->companyModel->getEntity();
+                        $companyEntity->setName($value);
+                        $this->companyModel->saveEntity($companyEntity);
+                        $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                    }
+                }
+
                 $leadFieldMatches[$leadField] = $leadValue;
             }
 
@@ -310,6 +334,12 @@ class SubmissionModel extends CommonFormModel
             if ($f->getSaveResult() !== false) {
                 $results[$alias] = $value;
             }
+        }
+
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            $submission->setLead($lead);
         }
 
         // Set the results
@@ -328,23 +358,6 @@ class SubmissionModel extends CommonFormModel
         if (!empty($validationErrors)) {
             return ['errors' => $validationErrors];
         }
-
-        // Create/update lead
-        if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
-            $submission->setLead($lead);
-        }
-
-        // Get updated lead if applicable with tracking ID
-        if ($form->isInKioskMode()) {
-            $lead = $this->leadModel->getCurrentLead();
-        } else {
-            list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
-
-            //set tracking ID for stats purposes to determine unique hits
-            $submission->setTrackingId($trackingId);
-        }
-        $submission->setLead($lead);
 
         // Save the submission
         $this->saveEntity($submission);
