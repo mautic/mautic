@@ -21,7 +21,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\QueueBundle\Model\QueueName;
+use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -103,10 +103,11 @@ class PublicController extends CommonFormController
     public function trackingImageAction($idHash)
     {
         $logger = $this->get('monolog.logger.mautic');
-        if ($this->get('mautic.helper.queue')->trackMailUseQueue()) {
+        $queueService = $this->get('mautic.queue.service');
+        if ($queueService->isQueueEnabled()) {
             $logger->log('info', 'using the queue');
             $msg = ['request' => $this->request, 'idHash' => $idHash];
-            $this->get('mautic.task_email_service')->addMessageToQueue(serialize($msg), QueueName::Email);
+            $queueService->publishToQueue(QueueName::HIT_EMAIL, $msg);
         } else {
             $logger->log('info', 'not using the queue');
             $this->getModel('email')->hitEmail($idHash, $this->request);

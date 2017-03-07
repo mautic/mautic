@@ -35,6 +35,13 @@ class ConsumeQueueCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Process queues orders for a specific queue. If not specified, all queues will be processed.',
                 null
+            )
+            ->addOption(
+                '--messages',
+                '-m',
+                InputOption::VALUE_OPTIONAL,
+                'Number of messages from the queue to process. Default is infinite',
+                null
             );
         parent::configure();
     }
@@ -46,21 +53,25 @@ class ConsumeQueueCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-      /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-      $factory  = $container->get('mautic.factory');
+        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
+        $factory  = $container->get('mautic.factory');
         $useQueue = $factory->getParameter('use_queue');
 
-      // check to make sure we are in queue mode
-      if (!$useQueue) {
-          $output->writeLn('You have not configured mautic to use queue mode, nothing will be processed');
+        // check to make sure we are in queue mode
+        if (!$useQueue) {
+            $output->writeLn('You have not configured mautic to use queue mode, nothing will be processed');
 
-          return 0;
-      }
+            return 0;
+        }
 
-      // $queue_name = $input->getOption('queue_name');
+        $queueName = $input->getOption('queue_name');
+        $messages = $input->getOption('messages');
+        if (0 > $messages) {
+            $output->writeLn('You did not provide a valid number of messages. It should be null or greater than 0');
+        }
 
-      // /** @var \Mautic\QueueBundle\Model\QueueModel $model */
-      // $model = $this->factory->getModel('queue');
-      return 0;
+        $queueService = $container->get('mautic.queue.service');
+        $queueService->consumeFromQueue($queueName, $messages);
+        return 0;
     }
 }

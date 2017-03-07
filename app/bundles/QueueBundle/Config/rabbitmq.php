@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
+
+/*
+ * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl3.0.html
  */
+
 $container->loadFromExtension(
     'old_sound_rabbit_mq',
     [
@@ -24,25 +26,29 @@ $container->loadFromExtension(
             ],
         ],
         'producers' => [
-            'task_email' => [
+            'mautic' => [
+                'class' => 'Mautic\QueueBundle\Model\RabbitMqProducer',
                 'connection'       => 'default',
                 'exchange_options' => [
-                    'name' => 'task_email',
+                    'name' => 'mautic',
                     'type' => 'direct',
+                ],
+                'queue_options' => [
+                    'name' => 'hit_email',
                 ],
             ],
         ],
         'consumers' => [
-            'task_email' => [
-              'connection'       => 'default',
-              'exchange_options' => [
-                  'name' => 'task_email',
-                  'type' => 'direct',
-              ],
-              'queue_options' => [
-                'name' => 'task_email',
-              ],
-              'callback' => 'email_consumer',
+            'mautic' => [
+                'connection'       => 'default',
+                'exchange_options' => [
+                    'name' => 'mautic',
+                    'type' => 'direct',
+                ],
+                'queue_options' => [
+                    'name' => 'hit_email',
+                ],
+                'callback' => 'mautic.queue.model.rabbitmq_consumer',
             ],
         ],
     ]

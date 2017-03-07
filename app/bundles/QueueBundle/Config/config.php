@@ -11,31 +11,30 @@
 
 return [
     'services' => [
-      'other' => [
-        'mautic.helper.queue' => [
-          'class'     => 'Mautic\QueueBundle\Helper\QueueHelper',
-          'arguments' => 'mautic.factory',
+        'events' => [
+            'mautic.queue.rabbitmq.subscriber' => [
+                'class'     => 'Mautic\QueueBundle\EventListener\RabbitMqSubscriber',
+                'arguments' => [
+                    'old_sound_rabbit_mq.mautic_producer',
+                    'old_sound_rabbit_mq.mautic_consumer',
+                ],
+            ],
         ],
-      ],
-      'helper' => [
-        'mautic.rabbitMQ' => [
-          'class'     => 'Mautic\QueueBundle\Model\RabbitMq',
-          'arguments' => [
-            'old_sound_rabbit_mq.task_email_producer',
-          ],
+        'models' => [
+            'mautic.queue.model.rabbitmq_consumer' => [
+                'class'     => 'Mautic\QueueBundle\Model\RabbitMqConsumer',
+                'arguments' => 'mautic.email.model.email',
+            ],
         ],
-        'mautic.task_email_service' => [
-          'class'     => 'Mautic\QueueBundle\Model\TaskEmailService',
-          'arguments' => [
-            'mautic.helper.queue',
-            'mautic.rabbitMQ',
-          ],
+        'other' => [
+            'mautic.queue.service' => [
+                'class'     => 'Mautic\QueueBundle\Queue\QueueService',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'event_dispatcher',
+                ],
+            ]
         ],
-        'email_consumer' => [
-          'class'     => 'Mautic\QueueBundle\Model\RabbitmqConsumer',
-          'arguments' => 'mautic.email.model.email',
-        ],
-      ],
     ],
     'parameters' => [
         'use_queue'            => false,

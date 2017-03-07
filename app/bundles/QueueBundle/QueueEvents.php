@@ -17,4 +17,7 @@ namespace Mautic\QueueBundle;
  */
 final class QueueEvents
 {
+    const CONSUME_MESSAGE = 'mautic.queue_consume_message';
+
+    const PUBLISH_MESSAGE = 'mautic.queue_publish_message';
 }

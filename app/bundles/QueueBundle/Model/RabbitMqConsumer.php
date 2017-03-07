@@ -5,18 +5,27 @@ namespace Mautic\QueueBundle\Model;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Mautic\EmailBundle\Model\EmailModel;
-use Monolog\Logger;
 
-class Consumer implements ConsumerInterface
+class RabbitMqConsumer implements ConsumerInterface
 {
+    /**
+     * @var EmailModel
+     */
    private $model;
 
+    /**
+     * RabbitMqConsumer constructor.
+     * @param EmailModel $model
+     */
    public function __construct(EmailModel $model)
    {
         $this->model = $model;
         echo "Consumer is listening!" . PHP_EOL;
    }
 
+    /**
+     * {@inheritdoc}
+     */
    public function execute(AMQPMessage $msg)
    {
         echo "Begin processing " . PHP_EOL;

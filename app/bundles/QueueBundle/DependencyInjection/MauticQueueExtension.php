@@ -11,6 +11,7 @@
 
 namespace Mautic\QueueBundle\DependencyInjection;
 
+use Mautic\QueueBundle\Queue\QueueProtocol;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,14 +25,22 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class MauticQueueExtension extends Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
-        // if ($queueProtocol = $container->getParameter('mautic.queue_protocol')) {
-        //     if (file_exists(__DIR__.'/../Config/'.$queueProtocol.'.php')) {
-        //         $container->registerExtension(new OldSoundRabbitMqExtension());
-        //         $container->addCompilerPass(new RegisterPartsPass());
-        //         include __DIR__.'/../Config/'.$queueProtocol.'.php';
-        //     }
-        // }
+        if (!$queueProtocol = $container->getParameter('mautic.queue_protocol')) {
+            return;
+        }
+
+        if (file_exists(__DIR__.'/../Config/'.$queueProtocol.'.php')) {
+            include __DIR__.'/../Config/'.$queueProtocol.'.php';
+        }
+
+        if ($queueProtocol == QueueProtocol::RABBITMQ) {
+            $container->registerExtension(new OldSoundRabbitMqExtension());
+            $container->addCompilerPass(new RegisterPartsPass());
+        }
     }
 }
