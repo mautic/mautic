@@ -1116,7 +1116,6 @@ class LeadListRepository extends CommonRepository
                             $groupExpr->add(
                                 $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
                             );
-                            echo 'hola';
                             $ignoreAutoFilter = true;
                             break;
 
