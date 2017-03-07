@@ -23,7 +23,7 @@ return [
         'models' => [
             'mautic.queue.model.rabbitmq_consumer' => [
                 'class'     => 'Mautic\QueueBundle\Model\RabbitMqConsumer',
-                'arguments' => 'mautic.email.model.email',
+                'arguments' => 'event_dispatcher',
             ],
         ],
         'other' => [

@@ -50,6 +50,7 @@ class QueueService
     public function publishToQueue($queueName, $payload=[])
     {
         $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
+        $payload['mauticQueueName'] = $queueName;
         $event = new QueueEvent($protocol, $queueName, 'publish', $payload);
         $this->eventDispatcher->dispatch(QueueEvents::PUBLISH_MESSAGE, $event);
     }
@@ -63,7 +64,6 @@ class QueueService
         $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
         $event = new QueueEvent($protocol, $queueName, 'consume', [], $messages);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
-
     }
 
     /**

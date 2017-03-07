@@ -34,7 +34,7 @@ $container->loadFromExtension(
                     'type' => 'direct',
                 ],
                 'queue_options' => [
-                    'name' => 'hit_email',
+                    'name' => 'email_hit',
                 ],
             ],
         ],
@@ -46,7 +46,7 @@ $container->loadFromExtension(
                     'type' => 'direct',
                 ],
                 'queue_options' => [
-                    'name' => 'hit_email',
+                    'name' => 'email_hit',
                 ],
                 'callback' => 'mautic.queue.model.rabbitmq_consumer',
             ],

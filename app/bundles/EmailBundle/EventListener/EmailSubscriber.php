@@ -18,6 +18,8 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\QueueBundle\Event\QueueConsumerEvent;
+use Mautic\QueueBundle\QueueEvents;
 
 /**
  * Class EmailSubscriber.
@@ -65,6 +67,7 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
             EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
             EmailEvents::EMAIL_PARSE       => ['onEmailParse', 0],
+            QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
         ];
     }
 
@@ -199,5 +202,16 @@ class EmailSubscriber extends CommonSubscriber
                 $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
             }
         }
+    }
+
+    /**
+     * @param QueueConsumerEvent $event
+     */
+    public function onEmailHit(QueueConsumerEvent $event)
+    {
+        $payload = $event->getPayload();
+        $request = $payload['request'];
+        $idHash = $payload['idHash'];
+        $this->emailModel->hitEmail($idHash, $request);
     }
 }

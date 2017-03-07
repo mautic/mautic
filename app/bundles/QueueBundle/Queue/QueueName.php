@@ -16,5 +16,5 @@ namespace Mautic\QueueBundle\Queue;
  */
 final class QueueName
 {
-    const HIT_EMAIL = 'hit_email';
+    const EMAIL_HIT = 'email_hit';
 }
