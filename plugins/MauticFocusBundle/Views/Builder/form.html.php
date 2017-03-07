@@ -109,7 +109,7 @@ if (empty($preview)):
         <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url(
             'mautic_form_postresults',
             ['formId' => $form->getId()],
-            true
+            self::ABSOLUTE_PATH
         ); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo $jsFormName; ?>">
             <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
             <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
