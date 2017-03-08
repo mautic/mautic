@@ -4,6 +4,8 @@ Mautic Introduction
 
 ## Getting Started
 
+The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
+
 This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
 
 <table width="100%" border="0">
@@ -31,14 +33,31 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 	</tr>
 </table>
 
-**Get stuck?** *No problem. Check out the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
+**Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
 
 # Disclaimer
-Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates.
+Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production is recommened the pre-packaged Mautic available at [mautic.com/download](https://www.mautic.org/download).
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
-If you prefer, there are packaged downloads ready for install at [https://www.mautic.org/download](https://www.mautic.org/download).
+## Requirements
+
+#### Development / Build process requirements
+
+1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
+2. Install a server, PHP and MySql to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
+3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
+4. Install [NPM](https://www.npmjs.com/).
+5. Install [Grunt](http://gruntjs.com/).
+
+#### Mautic requirements
+
+1. See [Mautic requirements](https://www.mautic.org/download/requirements).
+2. PHP modules: 
+	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
+	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
+	- recommended for development: `xdebug`
+3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
 # Keeping Up-To-Date
 
@@ -47,9 +66,9 @@ If you prefer, there are packaged downloads ready for install at [https://www.ma
 Each time you update Mautic's source after the initial setup/installation via a new checkout, download, git pull, etc; you will need to clear the cache. To do so, run the following command:
 
     $ cd /your/mautic/directory
-    $ php app/console cache:clear --env=prod
+    $ php app/console cache:clear
 
-(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to drop the <code>--env=prod</code> from the command).
+(Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to add the <code>--env=dev</code> from the command).
 
 ### Database Schema
 
@@ -57,17 +76,17 @@ Before running these commands, please make a backup of your database.
 
 If updating from <a href="https://github.com/mautic/mautic/releases">a tagged release</a> to <a href="https://github.com/mautic/mautic/releases">a tagged release</a>, schema changes will be included in a migrations file. To apply the changes, run
 
-    `$ php app/console doctrine:migrations:migrate --env=prod`
+    `$ php app/console doctrine:migrations:migrate`
 
 If you are updating to the latest source (remember this is alpha), first run
 
-    `$ php app/console doctrine:schema:update --env=prod --dump-sql`
+    `$ php app/console doctrine:schema:update --dump-sql`
 
 This will list out the queries Doctrine wants to execute in order to get the schema up-to-date (no queries are actually executed). Review the queries to ensure there is nothing detrimental to your data. If you have doubts about a query, submit an issue here and we'll verify it.
 
 If you're satisfied with the queries, execute them with
 
-    `$ php app/console doctrine:schema:update --env=prod --force`
+    `$ php app/console doctrine:schema:update --force`
 
 Your schema should now be up-to-date with the source.
 
@@ -135,55 +154,25 @@ This example demonstrates several uses of automation. First, the visitor is *aut
 
 There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.  
 
-## Customizing
+## Customizing - Plugins, Themes
 
-There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. If you are curious about those benefits and wish to read more about the value of choosing open source you can find more information on the [Mautic](https://www.mautic.org) website.  
+There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. You can choose whether you want to submit your feature as to the community as a pull request or wheter to build it as a plugin or theme.
 
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are all stored on [Transifex](https://www.transifex.com/organization/mautic/dashboard/mautic) and if you are interested you can add more translations.  
+Read more about plugins and themes in the [Mautic Developer Docummentation](https://developer.mautic.org).
 
-Customizations don't stop with the language strings. You can also construct workflows and campaigns to fit your business situation rather than adjusting your business to fit Mautic. The code is available and can be easily edited by any skilled developer. Below is some useful technical information regarding making changes.
+## Connecting - API, Webhooks
 
-### Bundles
+Mautic have a REST API which you can use to connect it with another app. Of you can use the webhooks to send the updates which happens in Mautic to another app.
 
-Mautic has been configured to allow new features to be added by simply adding new bundles. These bundles can then be discovered by the software and installed from within Mautic. Each bundle contains the information for menus, routes, views, translations and more. These are self-contained objects but can interact with other bundles as necessary through triggers.
+Read more about API and webhooks in the [Mautic Developer Docummentation](https://developer.mautic.org).
 
-*You can view the existing bundles in the GitHub repository [https://github.com/mautic/mautic/tree/master/app/bundles](https://github.com/mautic/mautic/tree/master/app/bundles)*
+## Translations
 
-### Templates
-
-Developers are also able to create customized templates to use within landing pages and emails. These are currently added directly through the `/themes` folder located in the root of the repository. Below is the structure of a template.
-
-
-```
-/YourThemeName
-../css
-../../style.css
-../html
-../../base.html.php
-../../email.html.php
-../../message.html.php
-../../page.html.php
-..config.php
-```
-
-**Required files**: *The only files required by Mautic for a theme is the config.php file. Every other file is optional.*
-
-### Workflows (Coming Soon)
-
-Another benefit to using Mautic, an open source platform, is the ability to share workflows and other helpful aspects of setting up a marketing automation implementation. These workflows may be the way a company handles campaigns, timing of emails, landing pages, assets, or other useful content. In a coming version of Mautic developers will be able to share these through the Mautic Marketplace&#0153;. This marketplace will provide a quick method for sharing, finding, and installing workflows.  
-
-
-*More detailed information regarding modifications and customizations as well as deeper tutorials on the above features can be found in the developer documentation when it is released.*
+One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for the translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.  
 
 ## How to test a pull request
 
 Everyone can test submitted features and bug fixes. No programming skills are required. All you have to do is to follow the steps below.
-
-### Requirements
-
-1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
-2. Install a server, PHP and MySql/Posgres to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
-3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
 
 ### Install the latest GitHub version
 
@@ -194,13 +183,25 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 5. Install dependencies (`composer install`).
 6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
 
+### Development environement
+
+Mautic downloaded from GitHub have the development environment. You can access it by adding `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`. Or in case of CLI commands, add `--env=dev` attribute to it.
+
+This development environment will display the PHP errors, warnigns and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which requires clearing the cache are in the `config.php` files.
+
+In case of assets like JS, CSS, the source files are loaded instead of concatinated, minified file. This way the changes in those files will be directly visible on refresh. If you'd want to see the change in production environment, you'd have to run the `app/console mautic:assets:generate` command.
+
+In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
+
 ### Test a pull request (PR)
+
+Every change to Mautic core happens via PRs. Every PR must have 2 successful tests to be merged to the core and released in the next version. Testing a PR is a great way how to move Mautic forward and personally improve its quality and stability.
 
 1. [Select a PR](https://github.com/mautic/mautic/pulls) to test.
 2. Read the description and steps to test. If it's a bug fix, follow the steps if you'll be able to recreate the issue.
-3. Use development environment for testing. To do that, add `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`
+3. Use the development environment (above) for testing.
 3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
-4. Clear cache for development environment (`app/console cache:clear -e dev`).
+4. Clear cache for development environment (`rm -rf app/cache/*` or `app/console cache:clear -e dev`).
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
 

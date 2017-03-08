@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
-@trigger_error('\Mautic\LeadBundle\Event\ChannelEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\ChannelEvent instead', E_DEPRECATED);
+@trigger_error('\Mautic\LeadBundle\Event\ChannelEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\ChannelEvent instead', E_USER_DEPRECATED);
 
 /**
  * Class ChannelEvent.
