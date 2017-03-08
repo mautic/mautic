@@ -7792,6 +7792,66 @@
             "time": "2016-12-01T00:05:05+00:00"
         },
         {
+            "name": "leezy/pheanstalk-bundle",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/armetiz/LeezyPheanstalkBundle.git",
+                "reference": "76c69a6e906f5fc324205102a211150e996d9ff3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/armetiz/LeezyPheanstalkBundle/zipball/76c69a6e906f5fc324205102a211150e996d9ff3",
+                "reference": "76c69a6e906f5fc324205102a211150e996d9ff3",
+                "shasum": ""
+            },
+            "require": {
+                "pda/pheanstalk": "~3.0",
+                "php": ">=5.5.9",
+                "psr/log": "~1.0",
+                "symfony/console": "~2.5|~3.0",
+                "symfony/framework-bundle": "~2.5|~3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit-mock-objects": "2.3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Leezy\\PheanstalkBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Tourlourat",
+                    "email": "thomas@tourlourat.com",
+                    "homepage": "http://www.armetiz.info"
+                }
+            ],
+            "description": "The LeezyPheanstalkBundle is a Symfony2 Bundle that provides a command line interface for manage the Beanstalkd workqueue server & a pheanstalk integration.",
+            "homepage": "https://github.com/armetiz/LeezyPheanstalkBundle",
+            "keywords": [
+                "asynchronous",
+                "beanstalkd",
+                "bundle",
+                "messaging",
+                "pheanstalk",
+                "queueing",
+                "symfony"
+            ],
+            "time": "2016-08-12T07:08:28+00:00"
+        },
+        {
             "name": "liip/functional-test-bundle",
             "version": "1.6.3",
             "source": {
@@ -7865,6 +7925,56 @@
                 "Symfony2"
             ],
             "time": "2016-05-10T22:04:27+00:00"
+        },
+        {
+            "name": "pda/pheanstalk",
+            "version": "v3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pda/pheanstalk.git",
+                "reference": "430e77c551479aad0c6ada0450ee844cf656a18b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/430e77c551479aad0c6ada0450ee844cf656a18b",
+                "reference": "430e77c551479aad0c6ada0450ee844cf656a18b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pheanstalk\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Annesley",
+                    "email": "paul@annesley.cc",
+                    "homepage": "http://paul.annesley.cc/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP client for beanstalkd queue",
+            "homepage": "https://github.com/pda/pheanstalk",
+            "keywords": [
+                "beanstalkd"
+            ],
+            "time": "2015-08-07T21:42:41+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",

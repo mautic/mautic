@@ -2,26 +2,25 @@
 
 namespace Mautic\QueueBundle\Model;
 
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
+use Mautic\QueueBundle\Queue\QueueService;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RabbitMqConsumer implements ConsumerInterface
 {
 
     /**
-     * @var EventDispatcher
+     * @var QueueService
      */
-    private $eventDispatcher;
+    private $queueService;
 
     /**
      * RabbitMqConsumer constructor.
-     * @param EventDispatcher $eventDispatcher
+     * @param QueueService $queueService
      */
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(QueueService $queueService)
     {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->queueService = $queueService;
     }
 
     /**
@@ -29,14 +28,7 @@ class RabbitMqConsumer implements ConsumerInterface
      */
     public function execute(AMQPMessage $msg)
     {
-        $payload = unserialize($msg->body);
-
-        $queueName = $payload['mauticQueueName'];
-        unset($payload['mauticQueueName']);
-        $eventName = "mautic.queue_{$queueName}";
-
-        $event = new QueueConsumerEvent($payload);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->queueService->dispatchConsumerEventFromPayload($msg->body);
         return true;
     }
 }

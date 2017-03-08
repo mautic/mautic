@@ -11,20 +11,23 @@
 
 namespace Mautic\QueueBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Model\RabbitMqConsumer;
 use Mautic\QueueBundle\Model\RabbitMqProducer;
 use Mautic\QueueBundle\Queue\QueueProtocol;
-use Mautic\QueueBundle\QueueEvents;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 
 
 /**
  * Class RabbitMqSubscriber
  */
-class RabbitMqSubscriber extends CommonSubscriber
+class RabbitMqSubscriber extends AbstractQueueSubscriber
 {
+    /**
+     * @var string
+     */
+    protected $protocol = QueueProtocol::RABBITMQ;
+
     /**
      * @var RabbitMqProducer
      */
@@ -47,25 +50,10 @@ class RabbitMqSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            QueueEvents::PUBLISH_MESSAGE => ['onPublishMessage', 0],
-            QueueEvents::CONSUME_MESSAGE => ['onConsumeMessage', 0],
-        ];
-    }
-
-    /**
      * @param Events\QueueEvent $event
      */
-    public function onPublishMessage(Events\QueueEvent $event)
+    public function publishMessage(Events\QueueEvent $event)
     {
-        if (!$event->checkContext(QueueProtocol::RABBITMQ)) {
-            return;
-        }
-
         $this->producer->setQueue($event->getQueueName());
         $this->producer->publish(serialize($event->getPayload()), $event->getQueueName());
     }
@@ -73,12 +61,8 @@ class RabbitMqSubscriber extends CommonSubscriber
     /**
      * @param Events\QueueEvent $event
      */
-    public function onConsumeMessage(Events\QueueEvent $event)
+    public function consumeMessage(Events\QueueEvent $event)
     {
-        if (!$event->checkContext(QueueProtocol::RABBITMQ)) {
-            return;
-        }
-
         $this->consumer->setQueueOptions(['name' => $event->getQueueName()]);
         $this->consumer->setRoutingKey($event->getQueueName());
         $this->consumer->consume($event->getMessages());

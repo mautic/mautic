@@ -19,11 +19,18 @@ return [
                     'old_sound_rabbit_mq.mautic_consumer',
                 ],
             ],
+            'mautic.queue.beanstalkd.subscriber' => [
+                'class'     => 'Mautic\QueueBundle\EventListener\BeanstalkdSubscriber',
+                'arguments' => [
+                    'leezy.pheanstalk',
+                    'mautic.queue.service',
+                ],
+            ],
         ],
         'models' => [
             'mautic.queue.model.rabbitmq_consumer' => [
                 'class'     => 'Mautic\QueueBundle\Model\RabbitMqConsumer',
-                'arguments' => 'event_dispatcher',
+                'arguments' => 'mautic.queue.service',
             ],
         ],
         'other' => [
@@ -45,5 +52,8 @@ return [
         'rabbitmq_vhost'       => '/',
         'rabbitmq_user'        => 'guest',
         'rabbitmq_password'    => 'guest',
+        'beanstalkd_host'      => 'localhost',
+        'beanstalkd_port'      => '11300',
+        'beanstalkd_timeout'   => '60',
     ],
 ];

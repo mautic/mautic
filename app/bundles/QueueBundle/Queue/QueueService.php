@@ -13,6 +13,7 @@ namespace Mautic\QueueBundle\Queue;
 
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Event\QueueEvent;
 use Mautic\QueueBundle\QueueEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -47,7 +48,7 @@ class QueueService
      * @param string $queueName
      * @param array $payload
      */
-    public function publishToQueue($queueName, $payload=[])
+    public function publishToQueue($queueName, array $payload=[])
     {
         $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
         $payload['mauticQueueName'] = $queueName;
@@ -64,6 +65,22 @@ class QueueService
         $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
         $event = new QueueEvent($protocol, $queueName, 'consume', [], $messages);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
+    }
+
+    /**
+     * @param array $payload
+     */
+    public function dispatchConsumerEventFromPayload(array $payload)
+    {
+        $payload = unserialize($payload);
+
+        // This is needed since OldSound RabbitMqBundle consumers don't know what their queue is
+        $queueName = $payload['mauticQueueName'];
+        unset($payload['mauticQueueName']);
+        $eventName = "mautic.queue_{$queueName}";
+
+        $event = new QueueConsumerEvent($payload);
+        $this->eventDispatcher->dispatch($eventName, $event);
     }
 
     /**
