@@ -32,8 +32,8 @@ class ConsumeQueueCommand extends ContainerAwareCommand
             ->addOption(
                 '--queue-name',
                 '-i',
-                InputOption::VALUE_OPTIONAL,
-                'Process queues orders for a specific queue. If not specified, all queues will be processed.',
+                InputOption::VALUE_REQUIRED,
+                'Process queues orders for a specific queue.',
                 null
             )
             ->addOption(
@@ -53,9 +53,8 @@ class ConsumeQueueCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory  = $container->get('mautic.factory');
-        $useQueue = $factory->getParameter('use_queue');
+        $parametersHelper  = $container->get('mautic.helper.core_parameters');
+        $useQueue = $parametersHelper->getParameter('use_queue');
 
         // check to make sure we are in queue mode
         if (!$useQueue) {
@@ -64,10 +63,18 @@ class ConsumeQueueCommand extends ContainerAwareCommand
             return 0;
         }
 
-        $queueName = $input->getOption('queue_name');
+        $queueName = $input->getOption('queue-name');
+        if (empty($queueName)) {
+            $output->writeLn('You did not provide a valid queue name');
+
+            return 0;
+        }
+
         $messages = $input->getOption('messages');
         if (0 > $messages) {
             $output->writeLn('You did not provide a valid number of messages. It should be null or greater than 0');
+
+            return 0;
         }
 
         $queueService = $container->get('mautic.queue.service');

@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class QueueEvent extends CommonEvent
 {
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $messages;
 
@@ -49,7 +49,7 @@ class QueueEvent extends CommonEvent
      * @param string $queueName
      * @param string $type
      * @param array $payload
-     * @param integer|null $messages
+     * @param int|null $messages
      */
     public function __construct($protocol, $queueName, $type='publish', $payload=[], $messages=null)
     {

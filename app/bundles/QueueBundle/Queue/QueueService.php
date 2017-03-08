@@ -17,6 +17,7 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Event\QueueEvent;
 use Mautic\QueueBundle\QueueEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class QueueService
@@ -29,16 +30,16 @@ class QueueService
     private $coreParametersHelper;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
     /**
      * QueueService constructor.
      * @param CoreParametersHelper $coreParametersHelper
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcher $eventDispatcher)
+    public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $eventDispatcher)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->eventDispatcher = $eventDispatcher;
@@ -58,7 +59,7 @@ class QueueService
 
     /**
      * @param string $queueName
-     * @param integer|null $messages
+     * @param int|null $messages
      */
     public function consumeFromQueue($queueName, $messages=null)
     {
@@ -68,9 +69,9 @@ class QueueService
     }
 
     /**
-     * @param array $payload
+     * @param string $payload
      */
-    public function dispatchConsumerEventFromPayload(array $payload)
+    public function dispatchConsumerEventFromPayload($payload)
     {
         $payload = unserialize($payload);
 

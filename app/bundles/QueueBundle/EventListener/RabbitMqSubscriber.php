@@ -16,6 +16,7 @@ use Mautic\QueueBundle\Model\RabbitMqConsumer;
 use Mautic\QueueBundle\Model\RabbitMqProducer;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 /**
@@ -29,24 +30,18 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
     protected $protocol = QueueProtocol::RABBITMQ;
 
     /**
-     * @var RabbitMqProducer
+     * @var ContainerInterface
      */
-    private $producer;
-
-    /**
-     * @var RabbitMqConsumer
-     */
-    private $consumer;
+    private $container;
 
     /**
      * RabbitMqSubscriber constructor.
-     * @param RabbitMqProducer $producer
-     * @param Consumer $consumer
+     * @param ContainerInterface $container
      */
-    public function __construct(RabbitMqProducer $producer, Consumer $consumer)
+    public function __construct(ContainerInterface $container)
     {
-        $this->producer = $producer;
-        $this->consumer = $consumer;
+        // The container is needed due to non-required binding of the producer & consumer
+        $this->container = $container;
     }
 
     /**
@@ -54,8 +49,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     public function publishMessage(Events\QueueEvent $event)
     {
-        $this->producer->setQueue($event->getQueueName());
-        $this->producer->publish(serialize($event->getPayload()), $event->getQueueName());
+        $producer = $this->container->get('old_sound_rabbit_mq.mautic_producer');
+        $producer->setQueue($event->getQueueName());
+        $producer->publish(serialize($event->getPayload()), $event->getQueueName());
     }
 
     /**
@@ -63,8 +59,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     public function consumeMessage(Events\QueueEvent $event)
     {
-        $this->consumer->setQueueOptions(['name' => $event->getQueueName()]);
-        $this->consumer->setRoutingKey($event->getQueueName());
-        $this->consumer->consume($event->getMessages());
+        $consumer = $this->container->get('old_sound_rabbit_mq.mautic_consumer');
+        $consumer->setQueueOptions(['name' => $event->getQueueName()]);
+        $consumer->setRoutingKey($event->getQueueName());
+        $consumer->consume($event->getMessages());
     }
 }

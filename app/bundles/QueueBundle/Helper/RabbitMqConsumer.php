@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\QueueBundle\Model;
+namespace Mautic\QueueBundle\Helper;
 
 use Mautic\QueueBundle\Queue\QueueService;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;

@@ -14,7 +14,7 @@ namespace Mautic\QueueBundle\EventListener;
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Mautic\QueueBundle\Queue\QueueService;
-use Pheanstalk\Pheanstalk;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class BeanstalkdSubscriber
@@ -27,9 +27,9 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     protected $protocol = QueueProtocol::BEANSTALKD;
 
     /**
-     * @var Pheanstalk
+     * @var ContainerInterface
      */
-    private $pheanstalk;
+    private $container;
 
     /**
      * @var QueueService
@@ -38,12 +38,13 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
     /**
      * BeanstalkdSubscriber constructor.
-     * @param Pheanstalk $pheanstalk
+     * @param ContainerInterface $container
      * @param QueueService $queueService
      */
-    public function __construct(Pheanstalk $pheanstalk, QueueService $queueService)
+    public function __construct(ContainerInterface $container, QueueService $queueService)
     {
-        $this->pheanstalk = $pheanstalk;
+        // The container is needed due to non-required binding of pheanstalk
+        $this->container = $container;
         $this->queueService = $queueService;
     }
 
@@ -52,7 +53,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
      */
     public function publishMessage(Events\QueueEvent $event)
     {
-        $this->pheanstalk
+        $this->container->get('leezy.pheanstalk')
             ->useTube($event->getQueueName())
             ->put(serialize($event->getPayload()));
     }
@@ -65,12 +66,15 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
         $messagesConsumed = 0;
 
         while ($event->getMessages() === null || $event->getMessages() > $messagesConsumed) {
-            $job = $this->pheanstalk
+            $pheanstalk = $this->container->get('leezy.pheanstalk');
+            $job = $pheanstalk
                 ->watch($event->getQueueName())
                 ->ignore('default')
                 ->reserve();
 
             $this->queueService->dispatchConsumerEventFromPayload($job->getData());
+
+            $pheanstalk->delete($job);
 
             $messagesConsumed++;
         }

@@ -27,7 +27,7 @@ $container->loadFromExtension(
         ],
         'producers' => [
             'mautic' => [
-                'class' => 'Mautic\QueueBundle\Model\RabbitMqProducer',
+                'class' => 'Mautic\QueueBundle\Helper\RabbitMqProducer',
                 'connection'       => 'default',
                 'exchange_options' => [
                     'name' => 'mautic',
@@ -48,7 +48,7 @@ $container->loadFromExtension(
                 'queue_options' => [
                     'name' => 'email_hit',
                 ],
-                'callback' => 'mautic.queue.model.rabbitmq_consumer',
+                'callback' => 'mautic.queue.helper.rabbitmq_consumer',
             ],
         ],
     ]

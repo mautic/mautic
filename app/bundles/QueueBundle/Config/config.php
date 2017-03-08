@@ -14,23 +14,14 @@ return [
         'events' => [
             'mautic.queue.rabbitmq.subscriber' => [
                 'class'     => 'Mautic\QueueBundle\EventListener\RabbitMqSubscriber',
-                'arguments' => [
-                    'old_sound_rabbit_mq.mautic_producer',
-                    'old_sound_rabbit_mq.mautic_consumer',
-                ],
+                'arguments' => 'service_container'
             ],
             'mautic.queue.beanstalkd.subscriber' => [
                 'class'     => 'Mautic\QueueBundle\EventListener\BeanstalkdSubscriber',
                 'arguments' => [
-                    'leezy.pheanstalk',
+                    'service_container',
                     'mautic.queue.service',
                 ],
-            ],
-        ],
-        'models' => [
-            'mautic.queue.model.rabbitmq_consumer' => [
-                'class'     => 'Mautic\QueueBundle\Model\RabbitMqConsumer',
-                'arguments' => 'mautic.queue.service',
             ],
         ],
         'other' => [
@@ -40,12 +31,16 @@ return [
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
                 ],
-            ]
+            ],
+            'mautic.queue.helper.rabbitmq_consumer' => [
+                'class'     => 'Mautic\QueueBundle\Helper\RabbitMqConsumer',
+                'arguments' => 'mautic.queue.service',
+            ],
         ],
     ],
     'parameters' => [
         'use_queue'            => false,
-        'track_mail_use_queue' => true,
+        'track_mail_use_queue' => false,
         'queue_protocol'       => 'rabbitmq',
         'rabbitmq_host'        => 'localhost',
         'rabbitmq_port'        => '5672',

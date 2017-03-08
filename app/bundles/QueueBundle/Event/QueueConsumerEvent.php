@@ -11,10 +11,12 @@
 
 namespace Mautic\QueueBundle\Event;
 
+use Mautic\CoreBundle\Event\CommonEvent;
+
 /**
  * Class QueueConsumerEvent
  */
-class QueueConsumerEvent
+class QueueConsumerEvent extends CommonEvent
 {
     /**
      * @var array
