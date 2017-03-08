@@ -148,7 +148,7 @@ class TrackableRepository extends CommonRepository
     public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('count(DISTINCT(cut.redirect_id)) as click_count')
+            ->select('count(cut.redirect_id) as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
             ->leftJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id');
 
@@ -160,7 +160,7 @@ class TrackableRepository extends CommonRepository
             if (!is_array($channelIds)) {
                 $channelIds = [(int) $channelIds];
             }
-            $q->where(
+            $q->andWhere(
                 $q->expr()->in('cut.channel_id', $channelIds)
             );
         }
