@@ -124,10 +124,11 @@ class EntityLookupType extends AbstractType
 
                     return $this->choiceLoaders[$options['model']];
                 },
-                'expanded'    => false,
-                'multiple'    => false,
-                'required'    => false,
-                'empty_value' => '',
+                'choice_translation_domain' => false,
+                'expanded'                  => false,
+                'multiple'                  => false,
+                'required'                  => false,
+                'empty_value'               => '',
             ]
         );
     }
