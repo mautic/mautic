@@ -1829,7 +1829,7 @@ class LeadModel extends FormModel
                             break;
                         case 'multiselect':
                             if (!is_array($fieldData[$leadField['alias']])) {
-                                $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
+                                $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
                             }
                             break;
                     }

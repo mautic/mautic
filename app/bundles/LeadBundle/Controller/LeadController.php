@@ -1366,6 +1366,11 @@ class LeadController extends FormController
                             // Decrease batch count
                             --$batchSize;
 
+                            if ([null] == $data) {
+                                // ignore empty lines
+                                continue;
+                            }
+
                             if (is_array($data) && $dataCount = count($data)) {
                                 // Ensure the number of headers are equal with data
                                 $headerCount = count($headers);
@@ -1484,6 +1489,10 @@ class LeadController extends FormController
                                         // Get the number of lines so we can track progress
                                         $file->seek(PHP_INT_MAX);
                                         $linecount = $file->key();
+                                        if (!is_array($file->current()) && strlen($file->current()) === 0) {
+                                            // do not count last empty line
+                                            --$linecount;
+                                        }
 
                                         if (!empty($headers) && is_array($headers)) {
                                             array_walk($headers, create_function('&$val', '$val = trim($val);'));
