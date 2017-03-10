@@ -366,8 +366,17 @@ return [
             ],
             'mautic.form.type.leadlist' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
-                'arguments' => ['translator', 'mautic.lead.model.list', 'mautic.email.model.email', 'mautic.security', 'mautic.lead.model.lead', 'mautic.stage.model.stage', 'mautic.category.model.category'],
-                'alias'     => 'leadlist',
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.list',
+                    'mautic.email.model.email',
+                    'mautic.security',
+                    'mautic.lead.model.lead',
+                    'mautic.stage.model.stage',
+                    'mautic.category.model.category',
+                    'mautic.helper.user',
+                ],
+                'alias' => 'leadlist',
             ],
             'mautic.form.type.leadlist_choices' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadListType',
