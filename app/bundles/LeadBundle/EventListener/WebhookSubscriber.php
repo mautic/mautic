@@ -91,7 +91,8 @@ class WebhookSubscriber extends CommonSubscriber
         $this->webhookModel->queueWebhooksByType(
             $event->isNew() ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'lead' => $event->getLead(),
+                'lead'    => $event->getLead(),
+                'contact' => $event->getLead(),
             ],
             [
                 'leadDetails',
@@ -110,8 +111,9 @@ class WebhookSubscriber extends CommonSubscriber
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
             [
-                'lead'   => $event->getLead(),
-                'points' => [
+                'lead'    => $event->getLead(),
+                'contact' => $event->getLead(),
+                'points'  => [
                     'old_points' => $event->getOldPoints(),
                     'new_points' => $event->getNewPoints(),
                 ],
@@ -130,10 +132,13 @@ class WebhookSubscriber extends CommonSubscriber
      */
     public function onLeadDelete(LeadEvent $event)
     {
+        $lead = $event->getLead();
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POST_DELETE,
             [
-                'lead' => $event->getLead(),
+                'id'      => $lead->deletedId,
+                'lead'    => $lead,
+                'contact' => $lead,
             ],
             [
                 'leadDetails',
