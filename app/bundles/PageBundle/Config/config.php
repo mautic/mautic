@@ -95,6 +95,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
@@ -244,8 +245,6 @@ return [
             'mautic.page.model.page' => [
                 'class'     => 'Mautic\PageBundle\Model\PageModel',
                 'arguments' => [
-                    'mautic.helper.cookie',
-                    'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',

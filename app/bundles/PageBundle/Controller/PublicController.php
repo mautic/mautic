@@ -13,12 +13,15 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,43 +44,47 @@ class PublicController extends CommonFormController
     public function indexAction($slug, Request $request)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model    = $this->getModel('page');
+        $model = $this->getModel('page');
         $security = $this->get('mautic.security');
         /** @var Page $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
-            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
-            $published  = $entity->isPublished();
+            $userAccess = $security->hasEntityAccess(
+                'page:pages:viewown',
+                'page:pages:viewother',
+                $entity->getCreatedBy()
+            );
+            $published = $entity->isPublished();
 
             // Make sure the page is published or deny access if not
             if (!$published && !$userAccess) {
                 // If the page has a redirect type, handle it
                 if ($entity->getRedirectType() != null) {
-                    $model->hitPage($entity, $this->request, $entity->getRedirectType());
+                    $this->hitPage($model, $entity, $this->request, $entity->getRedirectType());
 
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
                 } else {
-                    $model->hitPage($entity, $this->request, 401);
+                    $this->hitPage($model, $entity, $this->request, 401);
 
                     return $this->accessDenied();
                 }
             }
 
-            $lead  = null;
+            $lead = null;
             $query = null;
             if (!$userAccess) {
                 /** @var LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
                 // Extract the lead from the request so it can be used to determine language if applicable
                 $query = $model->getHitQuery($this->request, $entity);
-                $lead  = $leadModel->getContactFromRequest($query);
+                $lead = $leadModel->getContactFromRequest($query);
             }
 
             // Correct the URL if it doesn't match up
             if (!$request->attributes->get('ignore_mismatch', 0)) {
                 // Make sure URLs match up
-                $url        = $model->generateUrl($entity, false);
+                $url = $model->generateUrl($entity, false);
                 $requestUri = $this->request->getRequestUri();
 
                 // Remove query when comparing
@@ -88,7 +95,7 @@ class PublicController extends CommonFormController
 
                 // Redirect if they don't match
                 if ($requestUri != $url) {
-                    $model->hitPage($entity, $this->request, 301, $lead, $query);
+                    $this->hitPage($model, $entity, $this->request, 301, $lead, $query);
 
                     return $this->redirect($url, 301);
                 }
@@ -99,7 +106,7 @@ class PublicController extends CommonFormController
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant != $entity && !$userAccess) {
-                $model->hitPage($entity, $this->request, 301, $lead, $query);
+                $this->hitPage($model, $entity, $this->request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
                 return $this->redirect($url, 301);
@@ -109,16 +116,16 @@ class PublicController extends CommonFormController
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariants)) {
-                    $variants      = [];
+                    $variants = [];
                     $variantWeight = 0;
-                    $totalHits     = $entity->getVariantHits();
+                    $totalHits = $entity->getVariantHits();
 
                     foreach ($childrenVariants as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
-                            $variants[$id]   = [
+                            $variants[$id] = [
                                 'weight' => ($variantSettings['weight'] / 100),
-                                'hits'   => $child->getVariantHits(),
+                                'hits' => $child->getVariantHits(),
                             ];
                             $variantWeight += $variantSettings['weight'];
 
@@ -127,7 +134,7 @@ class PublicController extends CommonFormController
                             /** @var Page $translation */
                             foreach ($translations as $translation) {
                                 if ($translation->isPublished()) {
-                                    $variants[$id]['hits'] += (int) $translation->getVariantHits();
+                                    $variants[$id]['hits'] += (int)$translation->getVariantHits();
                                 }
                             }
 
@@ -150,7 +157,7 @@ class PublicController extends CommonFormController
                             // Add parent weight
                             $variants[$entity->getId()] = [
                                 'weight' => ((100 - $variantWeight) / 100),
-                                'hits'   => $entity->getVariantHits(),
+                                'hits' => $entity->getVariantHits(),
                             ];
 
                             // Count translations for the parent as well
@@ -158,7 +165,7 @@ class PublicController extends CommonFormController
                             /** @var Page $translation */
                             foreach ($translations as $translation) {
                                 if ($translation->isPublished()) {
-                                    $variants[$entity->getId()]['hits'] += (int) $translation->getVariantHits();
+                                    $variants[$entity->getId()]['hits'] += (int)$translation->getVariantHits();
                                 }
                             }
                             $totalHits += $variants[$id]['hits'];
@@ -192,7 +199,11 @@ class PublicController extends CommonFormController
                             $useId = key($variants);
 
                             //set the cookie - 14 days
-                            $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
+                            $this->get('mautic.helper.cookie')->setCookie(
+                                'mautic_page_'.$entity->getId(),
+                                $useId,
+                                3600 * 24 * 14
+                            );
 
                             if ($useId != $entity->getId()) {
                                 $entity = $childrenVariants[$useId];
@@ -203,12 +214,16 @@ class PublicController extends CommonFormController
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
-                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
+                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity(
+                        $entity,
+                        $lead,
+                        $this->request
+                    );
 
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$this->request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
-                            $model->hitPage($entity, $this->request, 302, $lead, $query);
+                            $this->hitPage($model, $entity, $this->request, 302, $lead, $query);
 
                             return $this->redirect($url, 302);
                         }
@@ -220,7 +235,7 @@ class PublicController extends CommonFormController
             $analytics = $this->get('mautic.helper.template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
-            $content   = $entity->getCustomHtml();
+            $content = $entity->getCustomHtml();
             // This condition remains so the Mautic v1 themes would display the content
             if (empty($content) && !empty($BCcontent)) {
                 /**
@@ -228,7 +243,7 @@ class PublicController extends CommonFormController
                  */
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
-                $slots   = $this->factory->getTheme($template)->getSlots('page');
+                $slots = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
                 $this->processSlots($slots, $entity);
@@ -243,11 +258,11 @@ class PublicController extends CommonFormController
                 $response = $this->render(
                     $logicalName,
                     [
-                        'slots'    => $slots,
-                        'content'  => $content,
-                        'page'     => $entity,
+                        'slots' => $slots,
+                        'content' => $content,
+                        'page' => $entity,
                         'template' => $template,
-                        'public'   => true,
+                        'public' => true,
                     ]
                 );
 
@@ -269,14 +284,51 @@ class PublicController extends CommonFormController
             $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $this->request, 200, $lead, $query);
+            $this->hitPage($model, $entity, $this->request, 200, $lead, $query);
 
             return new Response($content);
         }
 
-        $model->hitPage($entity, $this->request, 404);
+        $this->hitPage($model, $entity, $this->request, 404);
 
         return $this->notFound();
+    }
+
+    /**
+     * @param PageModel $model
+     * @param $page
+     * @param Request $request
+     * @param string $code
+     * @param Lead|null $lead
+     * @param array $query
+     */
+    private function hitPage(PageModel $model, $page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    {
+        $ipLookupHelper = $this->get('mautic.helper.ip_lookup');
+        $ipAddress = $ipLookupHelper->getIpAddress();
+
+        list($hit, $trackingNewlyGenerated) = $model->generateHit($page, $request, $ipAddress, $code, $lead, $query);
+
+        //save hit to the cookie to use to update the exit time
+        $cookieHelper = $this->get('mautic.helper.cookie');
+        $cookieHelper->setCookie('mautic_referer_id', $hit ? $hit->getId() : null);
+
+        $logger = $this->get('monolog.logger.mautic');
+        $queueService = $this->get('mautic.queue.service');
+        if ($queueService->isQueueEnabled()) {
+            $logger->log('info', 'using the queue');
+            $msg = [
+                'hit'     => $hit,
+                'page'    => $page,
+                'request' => $request,
+                'isNew'   => $trackingNewlyGenerated,
+            ];
+            $queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
+        } else {
+            $logger->log('info', 'not using the queue');
+            $model->hitPage($hit, $page, $request, $trackingNewlyGenerated);
+        }
+
     }
 
     /**
@@ -350,7 +402,7 @@ class PublicController extends CommonFormController
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+        $this->hitPage($model, null, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
     }
@@ -403,7 +455,8 @@ class PublicController extends CommonFormController
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 
-        $this->getModel('page')->hitPage($redirect, $this->request);
+        $pageModel = $this->getModel('page');
+        $this->hitPage($pageModel, $redirect, $this->request);
 
         $url = $redirect->getUrl();
 

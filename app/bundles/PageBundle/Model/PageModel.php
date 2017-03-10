@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Model;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -24,6 +25,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\EmailBundle\Exception\IsAnonymousException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -60,16 +62,6 @@ class PageModel extends FormModel
     protected $trackByFingerprint;
 
     /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
      * @var LeadModel
      */
     protected $leadModel;
@@ -92,23 +84,17 @@ class PageModel extends FormModel
     /**
      * PageModel constructor.
      *
-     * @param CookieHelper   $cookieHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel      $leadModel
-     * @param FieldModel     $leadFieldModel
-     * @param RedirectModel  $pageRedirectModel
+     * @param LeadModel $leadModel
+     * @param FieldModel $leadFieldModel
+     * @param RedirectModel $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
      */
     public function __construct(
-        CookieHelper $cookieHelper,
-        IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel
     ) {
-        $this->cookieHelper       = $cookieHelper;
-        $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->leadFieldModel     = $leadFieldModel;
         $this->pageRedirectModel  = $pageRedirectModel;
@@ -402,23 +388,28 @@ class PageModel extends FormModel
     }
 
     /**
-     * Record page hit.
-     *
-     * @param           $page
-     * @param Request   $request
-     * @param string    $code
+     * Generates a basic page hit that can later be fleshed out asynchronously
+     * @param $page
+     * @param Request $request
+     * @param IpAddress $ipAddress
+     * @param string $code
      * @param Lead|null $lead
-     * @param array     $query
-     *
-     * @return Hit $hit
-     *
+     * @param array $query
+     * @return array
      * @throws \Exception
      */
-    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function generateHit(
+        $page,
+        Request $request,
+        IpAddress $ipAddress,
+        $code = '200',
+        Lead $lead = null,
+        $query = []
+    )
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
-            return;
+            return null;
         }
 
         // Process the query
@@ -429,18 +420,16 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
+        // Set info from request
+        $hit->setQuery($query);
+        $hit->setCode($code);
+
         // Check for existing IP
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
         // Check for any clickthrough info
-        $clickthrough = [];
-        if (!empty($query['ct'])) {
-            $clickthrough = $query['ct'];
-            if (!is_array($clickthrough)) {
-                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-            }
-
+        $clickthrough = $this->generateClickThrough($hit);
+        if (!empty($clickthrough)) {
             if (!empty($clickthrough['channel'])) {
                 if (count($clickthrough['channel']) === 1) {
                     $channelId = reset($clickthrough['channel']);
@@ -501,9 +490,83 @@ class PageModel extends FormModel
         // Store tracking ID
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
         $hit->setTrackingId($trackingId);
+
+        $this->leadModel->saveEntity($lead);
         $hit->setLead($lead);
 
+        // Wrap in a try/catch to prevent deadlock errors on busy servers
+        try {
+            $this->em->persist($hit);
+            $this->em->flush($hit);
+        } catch (\Exception $exception) {
+            if (MAUTIC_ENV === 'dev') {
+                throw $exception;
+            } else {
+                $this->logger->addError(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        }
+
+        return [$hit, $trackingNewlyGenerated];
+    }
+
+    /**
+     * @param Hit $hit
+     * @return array|mixed
+     */
+    protected function generateClickThrough(Hit $hit) {
+        $query = $hit->getQuery();
+
+        // Check for any clickthrough info
+        $clickthrough = [];
+        if (!empty($query['ct'])) {
+            $clickthrough = $query['ct'];
+            if (!is_array($clickthrough)) {
+                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
+            }
+        }
+
+        return $clickthrough;
+    }
+
+    /**
+     * Record page hit.
+     *
+     * @param Hit|null $hit
+     * @param $page
+     * @param Request $request
+     * @param bool $trackingNewlyGenerated
+     *
+     * @throws \Exception
+     */
+    public function hitPage(Hit $hit, $page, Request $request, $trackingNewlyGenerated)
+    {
+        // Don't skew results with user hits
+        if (null == $hit || !$this->security->isAnonymous()) {
+            return;
+        }
+
+        // Reload hit and page from repo so that they are persisted.  Needed for async processing.
+        if (!$this->em->contains($hit) || (null !== $page && !$this->em->contains($page))) {
+            /** @var Hit $hit */
+            $hit = $this->getHitRepository()->find($hit->getId());
+
+            if ($page instanceof Page) {
+                $pageRepo = $this->em->getRepository('MauticPageBundle:Page');
+                $page = $pageRepo->find($page->getId());
+            } elseif ($page instanceof Redirect) {
+                $redirectRepo = $this->em->getRepository('MauticPageBundle:Redirect');
+                $page = $redirectRepo->find($page->getId());
+            }
+        }
+
+        $lead = $hit->getLead();
+        $query = $hit->getQuery() ? $hit->getQuery() : [];
+
         $isUnique = $trackingNewlyGenerated;
+        $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
@@ -514,6 +577,8 @@ class PageModel extends FormModel
             // Check if this is a unique page hit
             $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId);
         }
+
+        $clickthrough = $this->generateClickThrough($hit);
 
         if (!empty($page)) {
             if ($page instanceof Page) {
@@ -557,6 +622,7 @@ class PageModel extends FormModel
         }
 
         //glean info from the IP address
+        $ipAddress = $hit->getIpAddress();
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
@@ -565,7 +631,6 @@ class PageModel extends FormModel
             $hit->setOrganization($details['organization']);
         }
 
-        $hit->setCode($code);
         if (!$hit->getReferer()) {
             $hit->setReferer($request->server->get('HTTP_REFERER'));
         }
@@ -679,14 +744,9 @@ class PageModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
+            $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
-
-        //save hit to the cookie to use to update the exit time
-        $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId());
-
-        return $hit;
     }
 
     /**

@@ -16,7 +16,10 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event as Events;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Event\QueueConsumerEvent;
+use Mautic\QueueBundle\QueueEvents;
 
 /**
  * Class PageSubscriber.
@@ -39,17 +42,29 @@ class PageSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
      * PageSubscriber constructor.
      *
      * @param AssetsHelper   $assetsHelper
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
+     * @param PageModel      $pageModel
      */
-    public function __construct(AssetsHelper $assetsHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(
+        AssetsHelper $assetsHelper,
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        PageModel $pageModel
+    )
     {
         $this->assetsHelper   = $assetsHelper;
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
+        $this->pageModel      = $pageModel;
     }
 
     /**
@@ -61,6 +76,7 @@ class PageSubscriber extends CommonSubscriber
             PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
             PageEvents::PAGE_POST_DELETE => ['onPageDelete', 0],
             PageEvents::PAGE_ON_DISPLAY  => ['onPageDisplay', -255], // We want this to run last
+            QueueEvents::PAGE_HIT        => ['onPageHit', 0],
         ];
     }
 
@@ -146,5 +162,15 @@ class PageSubscriber extends CommonSubscriber
         }
 
         $event->setContent($content);
+    }
+
+    public function onPageHit(QueueConsumerEvent $event)
+    {
+        $payload = $event->getPayload();
+        $hit                    = $payload['hit'];
+        $page                   = $payload['page'];
+        $request                = $payload['request'];
+        $trackingNewlyGenerated = $payload['isNew'];
+        $this->pageModel->hitPage($hit, $page, $request, $trackingNewlyGenerated);
     }
 }
