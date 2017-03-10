@@ -114,7 +114,12 @@ class EntityLookupType extends AbstractType
                 'choice_loader'          => function (Options $options) {
                     if (!isset($this->choiceLoaders[$options['model']])) {
                         // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
-                        $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader($this->modelFactory, $this->translator, $this->connection, $options);
+                        $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader(
+                            $this->modelFactory,
+                            $this->translator,
+                            $this->connection,
+                            $options
+                        );
                     }
 
                     return $this->choiceLoaders[$options['model']];
@@ -135,6 +140,11 @@ class EntityLookupType extends AbstractType
         return ChoiceType::class;
     }
 
+    /**
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $attr =
