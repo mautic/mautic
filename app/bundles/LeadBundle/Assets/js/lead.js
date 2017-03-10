@@ -314,6 +314,19 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 };
 
+Mautic.updateLookupListFilter = function(field, datum) {
+    if (datum && datum.id) {
+        var filterField = '#'+field.replace('_display', '_filter');
+        mQuery(filterField).val(datum.id);
+    }
+};
+
+Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions) {
+    mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
+
+    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+};
+
 Mautic.addLeadListFilter = function (elId) {
     var filterId = '#available_' + elId;
     var label    = mQuery(filterId).text();

@@ -889,9 +889,9 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal) {
  * @param options
  */
 Mautic.activateFieldTypeahead = function (field, target, options, action) {
-    if (options) {
+    if (options && typeof options === 'String') {
         var keys = values = [];
-        //check to see if there is a key/value split
+
         options = options.split('||');
         if (options.length == 2) {
             keys = options[1].split('|');
@@ -913,15 +913,18 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
         });
     }
 
-    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
+    var callback = function (event, datum) {
         if (mQuery("#" + field).length && datum["value"]) {
             mQuery("#" + field).val(datum["value"]);
+
+            var lookupCallback = mQuery('#' + field).data("lookup-callback");
+            if (lookupCallback && typeof Mautic[lookupCallback] == 'function') {
+                Mautic[lookupCallback](field, datum);
+            }
         }
-    }).on('typeahead:autocompleted', function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
-        }
-    });
+    };
+
+    mQuery(fieldTypeahead).on('typeahead:selected', callback).on('typeahead:autocompleted', callback);
 };
 
 /**
