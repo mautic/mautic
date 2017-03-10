@@ -257,7 +257,7 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId).prop('disabled', disabled);
+    mQuery(filterId+', #leadlist_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
