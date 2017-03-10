@@ -1904,7 +1904,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         foreach ($deviceStats as $device) {
-            $chart->setDataset($device['device'], $device['count']);
+            $chart->setDataset(
+                ($device['device']) ? $device['device'] : $this->translator->trans('mautic.core.unknown'),
+                $device['count']
+            );
         }
 
         return $chart->render();
