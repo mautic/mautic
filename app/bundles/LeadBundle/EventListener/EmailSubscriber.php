@@ -82,7 +82,7 @@ class EmailSubscriber extends CommonSubscriber
         $content .= $event->getContent();
         $content .= $event->getPlainText();
         $lead = $event->getLead();
-
+       // $this->factory->getLogger()->addError(print_r($content, true));
         $tokenList = TokenHelper::findLeadTokens($content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);

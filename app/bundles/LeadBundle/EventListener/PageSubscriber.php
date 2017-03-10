@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 
@@ -46,32 +45,6 @@ class PageSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested(self::$contactFieldRegex)) {
             $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
-        }
-    }
-
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailDisplay(EmailSendEvent $event)
-    {
-        $this->onEmailGenerate($event);
-    }
-
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailGenerate(EmailSendEvent $event)
-    {
-        // Combine all possible content to find tokens across them
-        $content = $event->getSubject();
-        $content .= $event->getContent();
-        $content .= $event->getPlainText();
-        $lead = $event->getLead();
-        $this->factory->getLogger()->addError(print_r($content));
-        $tokenList = TokenHelper::findLeadTokens($content, $lead);
-        if (count($tokenList)) {
-            $event->addTokens($tokenList);
-            unset($tokenList);
         }
     }
 }

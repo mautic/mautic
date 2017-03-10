@@ -245,11 +245,8 @@ class TrackableModel extends AbstractCommonModel
             'first_pass' => [
                 // Remove internal attributes
                 // Editor may convert to HTML4
-                'mautic:disable-tracking=""' => '',
-                // HTML5
-                'mautic:disable-tracking' => '',
+                'data-mautic-tracking="disable"' => '',
             ],
-            'first_pass'  => [],
             'second_pass' => [],
         ];
 
@@ -402,7 +399,7 @@ class TrackableModel extends AbstractCommonModel
             $url = $link->getAttribute('href');
 
             // Check for a do not track
-            if ($link->hasAttribute('mautic:disable-tracking')) {
+            if ($link->hasAttribute('data-mautic-tracking="disable"')) {
                 $this->doNotTrack[$url] = $url;
 
                 continue;
@@ -567,7 +564,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function isInDoNotTrack($url)
     {
-        // Ensure it's not in the do not track list
+        // Ensure it's not in the do not track ** list this isn't working well **
         foreach ($this->doNotTrack as $notTrackable) {
             if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
                 return true;
