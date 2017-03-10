@@ -393,7 +393,7 @@ class InputHelper
 
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
-                "/<\/*[o|w]:[^>]*>/is",
+                "/<\/*[o|w|v]:[^>]*>/is",
                 function ($matches) {
                     return '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>';
                 },
