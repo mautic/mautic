@@ -2037,7 +2037,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $results = [];
         switch ($type) {
             case 'email':
-                $emails = $this->getRepository()->getEmailList(
+                $emailRepo = $this->getRepository();
+                $emailRepo->setCurrentUser($this->userHelper->getUser());
+                $emails = $emailRepo->getEmailList(
                     $filter,
                     $limit,
                     $start,
