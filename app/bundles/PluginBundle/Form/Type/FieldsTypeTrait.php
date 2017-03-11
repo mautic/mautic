@@ -79,8 +79,8 @@ trait FieldsTypeTrait
             foreach ($fields as $field => $details) {
                 $matched = isset($matchedFields[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
-                $disabled = (!$required && $index > 1 && !$matched);
-
+                $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
+                $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
                 ++$index;
 
                 $form->add(
@@ -98,6 +98,7 @@ trait FieldsTypeTrait
                             'data-value'       => $field,
                             'data-matched'     => $matched,
                             'data-choices'     => !empty($choices) ? $choices : [],
+                            'disabled'         => $disabled,
                         ],
                         'disabled' => $disabled,
                     ]
@@ -137,8 +138,9 @@ trait FieldsTypeTrait
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
                             'data-choices'     => !empty($mauticFields) ? $mauticFields : [],
+                            'disabled'         => $mauticDisabled,
                         ],
-                        'disabled'    => $disabled,
+                        'disabled'    => $mauticDisabled,
                         'empty_value' => 'mautic.core.form.chooseone',
                         'constraints' => ($required) ? [
                             new NotBlank(

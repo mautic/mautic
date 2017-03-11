@@ -69,11 +69,10 @@ $indexCount = 1;
                     <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
-                        class="field-selector integration-field form-control"
+                        class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
-                        data-required="1"
                         data-value="<?php echo $child->vars['value']; ?>"
-                        disabled="<?php echo $child->vars['disabled']?>"
+                        <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
                     <?php
 
@@ -117,11 +116,10 @@ $indexCount = 1;
                 <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
-                        class="field-selector integration-field form-control"
+                        class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
                         data-required="1"
-                        data-value="<?php echo $child->vars['value']; ?>"
-                        disabled="<?php echo $child->vars['disabled']?>"
+                        <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
 
                     <?php
