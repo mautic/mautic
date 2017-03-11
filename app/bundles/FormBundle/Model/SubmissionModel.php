@@ -802,8 +802,6 @@ class SubmissionModel extends CommonFormModel
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
-                $data[$alias] = '';
-
                 if (isset($currentFields[$alias])) {
                     $value        = $currentFields[$alias];
                     $data[$alias] = $value;
