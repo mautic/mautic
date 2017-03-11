@@ -97,6 +97,7 @@ trait FieldsTypeTrait
                             'data-required'    => $required,
                             'data-value'       => $field,
                             'data-matched'     => $matched,
+                            'data-choices'     => !empty($choices) ? $choices : [],
                         ],
                         'disabled' => $disabled,
                     ]
@@ -135,6 +136,7 @@ trait FieldsTypeTrait
                             'class'            => 'field-selector form-control',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
+                            'data-choices'     => !empty($mauticFields) ? $mauticFields : [],
                         ],
                         'disabled'    => $disabled,
                         'empty_value' => 'mautic.core.form.chooseone',
