@@ -567,10 +567,9 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 'value': valueField.val()
             };
 
-
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
                 valueFieldAttrs['value'] = '';
-                mQuery('#'+fieldPrefix+'value').chosen('destroy');
+                valueField.chosen('destroy');
             }
 
             if (!mQuery.isEmptyObject(response.options)) {
@@ -578,8 +577,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('class', valueFieldAttrs['class'])
                     .attr('id', valueFieldAttrs['id'])
                     .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
+                    .attr('autocomplete', valueFieldAttrs['autocomplete']);
                 mQuery.each(response.options, function(optionKey, optionVal) {
                     var option = mQuery("<option/>")
                         .attr('value', optionKey)
@@ -601,11 +599,10 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('autocomplete', valueFieldAttrs['autocomplete']);
 
                 if (response.disabled) {
+                    valueFieldAttrs['value'] = ''
                     newValueField.prop('disabled', true);
-                }else{
-                    newValueField.attr('value', valueFieldAttrs['value']);
                 }
-
+                newValueField.attr('value', valueFieldAttrs['value']);
                 valueField.replaceWith(newValueField);
 
                 if (response.fieldType == 'date' || response.fieldType == 'datetime') {
