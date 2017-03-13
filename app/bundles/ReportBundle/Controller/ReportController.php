@@ -783,9 +783,12 @@ class ReportController extends FormController
         $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
         $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
+        $dynamicFilters = $session->get('mautic.report.'.$objectId.'.filters', []);
+
         $reportData = $model->getReportData($entity, null, [
-            'dateFrom' => new \DateTime($fromDate),
-            'dateTo'   => new \DateTime($toDate),
+            'dateFrom'       => new \DateTime($fromDate),
+            'dateTo'         => new \DateTime($toDate),
+            'dynamicFilters' => $dynamicFilters,
         ]);
 
         return $model->exportResults($format, $entity, $reportData);

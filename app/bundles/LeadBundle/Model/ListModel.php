@@ -270,7 +270,7 @@ class ListModel extends FormModel
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
                 'properties' => [
                     'type'     => 'lookup_id',
-                    'callback' => 'activateLeadFieldTypeahead',
+                    'callback' => 'activateSegmentFilterTypeahead',
                 ],
                 'operators' => $this->getOperatorsForFieldType('text'),
                 'object'    => 'lead',
