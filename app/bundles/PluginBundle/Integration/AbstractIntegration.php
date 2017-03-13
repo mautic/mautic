@@ -167,6 +167,15 @@ abstract class AbstractIntegration
     abstract public function getAuthenticationType();
 
     /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return false;
+    }
+    /**
      * Get a list of supported features for this integration.
      *
      * Options are:
@@ -1711,7 +1720,8 @@ abstract class AbstractIntegration
      */
     public function getFormSettings()
     {
-        $type = $this->getAuthenticationType();
+        $type               = $this->getAuthenticationType();
+        $enableDataPriority = $this->getDataPriority();
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
@@ -1726,6 +1736,7 @@ abstract class AbstractIntegration
             'requires_callback'      => $callback,
             'requires_authorization' => $authorization,
             'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
 

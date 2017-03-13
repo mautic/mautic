@@ -44,7 +44,8 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.notification.config.form.notification.landingpage.enabled',
                 'data'  => (bool) $options['data']['notification_landing_page_enabled'],
                 'attr'  => [
-                    'tooltip' => 'mautic.notification.config.form.notification.landingpage.enabled.tooltip',
+                    'tooltip'      => 'mautic.notification.config.form.notification.landingpage.enabled.tooltip',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
                 ],
             ]
         );

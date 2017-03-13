@@ -7,9 +7,8 @@ Mautic.reportOnLoad = function (container) {
 
     // Append an index of the number of filters on the edit form
     if (mQuery('div[id=report_filters]').length) {
-        mQuery('div[id=report_filters]').data('index', mQuery('#report_filters > div').length);
-
-        mQuery('div[id=report_tableOrder]').data('index', mQuery('#report_tableOrder > div').length);
+        mQuery('div[id=report_filters]').attr('data-index', mQuery('#report_filters > div').length + 1);
+        mQuery('div[id=report_tableOrder]').attr('data-index', mQuery('#report_tableOrder > div').length + 1);
 
         if (mQuery('.filter-columns').length) {
             mQuery('.filter-columns').each(function () {
