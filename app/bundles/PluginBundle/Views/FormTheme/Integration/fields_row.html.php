@@ -52,68 +52,86 @@ $indexCount = 1;
                         $class = 'col-sm-4';
                         break;
                 endswitch;
-            ?>
 
-                <?php
                 if ($isRequired && $rowCount % $numberOfFields == 1):
                     $name                            = $child->vars['full_name'];
                     $child->vars['full_name']        = $child->vars['id'];
                     $child->vars['attr']['disabled'] = 'disabled';
                     echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
-                    endif;
-                ?>
-                <?php
+                endif;
+
                 if ($rowCount % $numberOfFields == 1):
                     $choices = $child->vars['attr']['data-choices'];
                     ?>
-                    <div class="pl-xs pr-xs <?php echo $class; ?>">
-                <select id="<?php echo $child->vars['id']; ?>"
+                <div class="pl-xs pr-xs <?php echo $class; ?>">
+                    <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
                         data-value="<?php echo $child->vars['value']; ?>"
                         <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
-                    <?php
-
-                    foreach ($choices as $keyLabel => $options):  ?>
-                        <?php if (is_array($options)) : ?>
-                    <optgroup label="<?php echo $keyLabel; ?>">
-                            <?php foreach ($options as $keyValue => $o): ?>
-                                <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']) {
-                        echo 'selected';
-                    } ?>><?php echo $o; ?></option>
+                            <?php foreach ($choices as $keyLabel => $options):  ?>
+                            <?php if (is_array($options)) : ?>
+                            <optgroup label="<?php echo $keyLabel; ?>">
+                                <?php foreach ($options as $keyValue => $o): ?>
+                                <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif ?>>
+                                    <?php echo $o; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <?php else: ?>
+                            <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
+                                <?php echo $options; ?>
+                            </option>
+                            <?php endif; ?>
                             <?php endforeach; ?>
-
-                                </optgroup>
-                        <?php
-                        else : ?>
-                            <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']) {
-                            echo 'selected';
-                        } ?>><?php echo $options; ?></option>
-                       <?php endif; ?>
-
-                    <?php endforeach; ?>
-                </select>
-                    </div>
+                    </select>
+                </div>
                 <?php endif; ?>
-
             <?php endif; ?>
 
-
-                    <?php
-                    if ($rowCount % $numberOfFields == 2): ?>
-                        <div class="pl-xs pr-xs <?php echo $class; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
-                    <?php echo $view['form']->row($child); ?>
+            <?php if ($rowCount % $numberOfFields == 2): ?>
+            <div class="pl-xs pr-xs <?php echo $class; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="choice-wrapper">
+                            <div class="btn-group btn-block" data-toggle="buttons">
+                                <?php $checked = $child->vars['value'] === '0'; ?>
+                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                    <input type="radio"
+                                           id="<?php echo $child->vars['id']; ?>_0"
+                                           name="<?php echo $child->vars['full_name']; ?>"
+                                           data-toggle="tooltip"
+                                           title=""
+                                           autocomplete="false"
+                                           value="0"
+                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>>
+                                    <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
+                                </label>
+                                <?php $checked = $child->vars['value'] === '1'; ?>
+                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                    <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
+                                           name="<?php echo $child->vars['full_name']; ?>"
+                                           data-toggle="tooltip"
+                                           title=""
+                                           autocomplete="false"
+                                           value="1"
+                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
+                                    <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-                    <?php endif; ?>
-
+            <?php endif; ?>
 
             <?php
             if ($rowCount % $numberOfFields == 3):
                 $mauticChoices = $child->vars['attr']['data-choices'];
                 ?>
-                <div class="pl-xs pr-xs <?php echo $class; ?>">
+            <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']?>"
@@ -122,30 +140,25 @@ $indexCount = 1;
                         <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
 
-                    <?php
+                    <?php foreach ($mauticChoices as $keyLabel => $options): ?>
+                    <?php if (is_array($options)) : ?>
+                    <optgroup label="<?php echo $keyLabel; ?>">
+                        <?php foreach ($options as $keyValue => $o): ?>
+                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif; ?>>
+                            <?php echo $o; ?>
+                        </option>
+                        <?php endforeach; ?>
 
-                    foreach ($mauticChoices as $keyLabel => $options): ?>
-                        <?php if (is_array($options)) : ?>
-                            <optgroup label="<?php echo $keyLabel; ?>">
-                                <?php foreach ($options as $keyValue => $o): ?>
-                                    <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']) {
-                        echo 'selected';
-                    } ?>><?php echo $o; ?></option>
-                                <?php endforeach; ?>
-
-                            </optgroup>
-                            <?php
-                        else : ?>
-                            <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']) {
-                            echo 'selected';
-                        } ?>><?php echo $options; ?></option>
-                        <?php endif; ?>
-
+                    </optgroup>
+                    <?php else : ?>
+                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
+                        <?php echo $options; ?>
+                    </option>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>
-
 
             <?php if ($rowCount % $numberOfFields == 0): ?>
                 <div class="pl-xs pr-xs col-sm-1">
