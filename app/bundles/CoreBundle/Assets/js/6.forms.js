@@ -569,6 +569,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
 
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
+                valueFieldAttrs['value'] = '';
                 mQuery('#'+fieldPrefix+'value').chosen('destroy');
             }
 
@@ -601,6 +602,8 @@ Mautic.updateFieldOperatorValue = function(field, action) {
 
                 if (response.disabled) {
                     newValueField.prop('disabled', true);
+                }else{
+                    newValueField.attr('value', valueFieldAttrs['value']);
                 }
 
                 valueField.replaceWith(newValueField);
