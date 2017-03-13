@@ -188,6 +188,57 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @param null            $emailIds
+     * @param null            $listId
+     * @param ChartQuery|null $chartQuery
+     *
+     * @return array|int
+     */
+    public function getClickedCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(s.id) as clicked_count')
+        ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+
+        if ($emailIds) {
+            if (!is_array($emailIds)) {
+                $emailIds = [(int) $emailIds];
+            }
+            $q->where(
+                $q->expr()->in('s.email_id', $emailIds)
+                );
+        }
+
+        if (true === $listId) {
+            $q->addSelect('s.list_id')
+            ->groupBy('s.list_id');
+        } elseif ($listId) {
+            $q->andWhere('s.list_id = '.(int) $listId);
+        }
+
+        $q->andWhere('is_clicked = :true')
+        ->setParameter('true', true, 'boolean');
+
+        if ($chartQuery) {
+            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        if (true === $listId) {
+            // Return list group of counts
+            $byList = [];
+            foreach ($results as $result) {
+                $byList[$result['list_id']] = $result['clicked_count'];
+            }
+
+            return $byList;
+        }
+
+        return (isset($results[0])) ? $results[0]['clicked_count'] : 0;
+    }
+    /**
      * @param           $emailIds
      * @param \DateTime $fromDate
      *

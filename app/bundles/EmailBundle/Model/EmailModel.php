@@ -398,6 +398,41 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * count unique click by email.
+     *
+     * @param stat    $stat
+     * @param request $request
+     */
+    public function clickEmail($stat, $request)
+    {
+        if ($stat->isClicked() === true) {
+            // this Email is already counted as clicked
+            $this->logger->debug('Email already clicked');
+
+            return;
+        }
+
+        $email = $stat->getEmail();
+        $lead  = $stat->getLead();
+
+        // Only up counts if associated with both an email and lead
+        if (!is_null($email) && !is_null($lead)) {
+            $this->getRepository()->upCount($email->getId(), 'clicked', 1, $email->isVariant());
+
+            $readDateTime = new DateTimeHelper();
+            $stat->setDateClicked($readDateTime->getDateTime());
+            $stat->setIsClicked(true);
+
+            $this->em->persist($stat);
+            $this->em->flush();
+
+            $this->logger->debug('Email id: '.$email->getId().', lead_id : '.$lead->getId().' counted as clicked');
+        } else {
+            $this->logger->debug('Email or lead is null, email clicked not counted');
+        }
+    }
+
+    /**
      * @param      $stat
      * @param      $request
      * @param bool $viaBrowser
@@ -617,7 +652,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $sentCounts         = $statRepo->getSentCount($emailIds, true, $query);
             $readCounts         = $statRepo->getReadCount($emailIds, true, $query);
             $failedCounts       = $statRepo->getFailedCount($emailIds, true, $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, true, $query);
+            $clickCounts        = $statRepo->getClickedCount($emailIds, true, $query);
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, true, $query);
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, true, $query);
 
@@ -1774,18 +1809,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($flag == 'all' || $flag == 'clicked') {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', [])
-                ->join('t', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 't.redirect_id = cut.redirect_id')
-                ->andWhere('cut.channel = :channel')
-                ->setParameter('channel', 'email');
+            $q = $query->prepareTimeDataQuery('email_stats', 'date_clicked', []);
+
+            $q->andWhere($q->expr()->eq('t.is_clicked', true));
 
             if (isset($filter['email_id'])) {
                 if (is_array($filter['email_id'])) {
-                    $q->andWhere('cut.channel_id IN(:channel_id)');
-                    $q->setParameter('channel_id', implode(',', $filter['email_id']));
+                    $q->andWhere('t.email_id IN(:email_id)');
+                    $q->setParameter('email_id', implode(',', $filter['email_id']));
                 } else {
-                    $q->andWhere('cut.channel_id = :channel_id');
-                    $q->setParameter('channel_id', $filter['email_id']);
+                    $q->andWhere('t.email_id = :email_id');
+                    $q->setParameter('email_id', $filter['email_id']);
                 }
             }
 

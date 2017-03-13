@@ -88,6 +88,11 @@ class ReportSubscriber extends CommonSubscriber
                     'label' => 'mautic.email.report.sent_count',
                     'type'  => 'int',
                 ],
+                $prefix.'clicked_count' => [
+                    'alias' => 'clicked',
+                    'label' => 'mautic.email.report.clicked',
+                    'type'  => 'string',
+                ],
                 'hits' => [
                     'alias'   => 'hits',
                     'label'   => 'mautic.email.report.hits_count',
@@ -100,20 +105,19 @@ class ReportSubscriber extends CommonSubscriber
                     'type'    => 'string',
                     'formula' => $channelUrlTrackables.'unique_hits',
                 ],
-                'hits_ratio' => [
-                    'alias'   => 'hits_ratio',
-                    'label'   => 'mautic.email.report.hits_ratio',
+                'clicked_ratio' => [
+                    'alias'   => 'clicked_ratio',
+                    'label'   => 'mautic.email.report.clicked_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND(('.$prefix.'clicked_count/'.$prefix.'read_count)*100),\'%\')',
                 ],
-                'unique_ratio' => [
-                    'alias'   => 'unique_ratio',
-                    'label'   => 'mautic.email.report.unique_ratio',
-                    'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
-                ],
+//                 'unique_ratio' => [
+//                     'alias'   => 'unique_ratio',
+//                     'label'   => 'mautic.email.report.unique_ratio',
+//                     'type'    => 'string',
+//                     'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+//                         .'trackable_count)*100),\'%\')',
+//                 ],
                 'unsubscribed' => [
                     'alias'   => 'unsubscribed',
                     'label'   => 'mautic.email.report.unsubscribed',

@@ -56,29 +56,31 @@ class PageSubscriber extends CommonSubscriber
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();
 
-        if ($redirect && $email = $hit->getEmail()) {
+        if ($redirect && $hit->getEmail()) {
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
             if (isset($clickthrough['stat'])) {
-                $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
+                $emailStat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
-
-            if (empty($stat)) {
+            if (empty($emailStat)) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
                     $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());
                     if (count($stats)) {
-                        $stat = $stats[0];
+                        $emailStat = $stats[0];
                     }
                 }
             }
-
-            if (!empty($stat)) {
+            if (!empty($emailStat)) {
                 // Check to see if it has been marked as opened
-                if (!$stat->isRead()) {
+                if (!$emailStat->isRead()) {
                     // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->request);
+                    $this->emailModel->hitEmail($emailStat, $this->request);
+                }
+
+                if (!$emailStat->isClicked()) {
+                    $this->emailModel->clickEmail($emailStat, $this->request);
                 }
             }
         }

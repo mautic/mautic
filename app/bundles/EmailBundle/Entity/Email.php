@@ -129,6 +129,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var int
      */
+    private $clickedCount = 0;
+
+    /**
+     * @var int
+     */
     private $revision = 1;
 
     /**
@@ -179,6 +184,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats            = new ArrayCollection();
         $this->sentCount        = 0;
         $this->readCount        = 0;
+        $this->clickedCount     = 0;
         $this->revision         = 0;
         $this->variantSentCount = 0;
         $this->variantStartDate = null;
@@ -277,6 +283,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->createField('sentCount', 'integer')
             ->columnName('sent_count')
+            ->build();
+
+        $builder->createField('clickedCount', 'integer')
+            ->columnName('clicked_count')
             ->build();
 
         $builder->addField('revision', 'integer');
@@ -442,6 +452,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'publishDown',
                     'readCount',
                     'sentCount',
+                    'clickedCount',
                     'revision',
                     'assetAttachments',
                     'variantStartDate',
@@ -590,6 +601,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setReadCount($readCount)
     {
         $this->readCount = $readCount;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getClickedCount($includeVariants = false)
+    {
+        return ($includeVariants) ? $this->getAccumulativeVariantCount('getClickedCount') : $this->readCount;
+    }
+
+    /**
+     * @param $clickedCount
+     *
+     * @return $this
+     */
+    public function setClickedCount($clickedCount)
+    {
+        $this->clickedCount = $clickedCount;
 
         return $this;
     }

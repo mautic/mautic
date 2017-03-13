@@ -65,6 +65,11 @@ class Stat
     /**
      * @var bool
      */
+    private $isClicked = false;
+
+    /**
+     * @var bool
+     */
     private $isFailed = false;
 
     /**
@@ -76,6 +81,11 @@ class Stat
      * @var \DateTime
      */
     private $dateRead;
+
+    /**
+     * @var \DateTime
+     */
+    private $dateClicked;
 
     /**
      * @var string
@@ -135,6 +145,7 @@ class Stat
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
             ->addIndex(['is_read'], 'stat_email_read_search')
+            ->addIndex(['is_clicked'], 'stat_email_clicked_search')
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
@@ -167,6 +178,10 @@ class Stat
             ->columnName('is_read')
             ->build();
 
+        $builder->createField('isClicked', 'boolean')
+            ->columnName('is_clicked')
+            ->build();
+
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
             ->build();
@@ -177,6 +192,11 @@ class Stat
 
         $builder->createField('dateRead', 'datetime')
             ->columnName('date_read')
+            ->nullable()
+            ->build();
+
+        $builder->createField('dateClicked', 'datetime')
+            ->columnName('date_clicked')
             ->nullable()
             ->build();
 
@@ -229,8 +249,10 @@ class Stat
                     'ipAddress',
                     'dateSent',
                     'isRead',
+                    'isClicked',
                     'isFailed',
                     'dateRead',
+                    'dateClicked',
                     'retryCount',
                     'source',
                     'openCount',
@@ -259,6 +281,22 @@ class Stat
     public function setDateRead($dateRead)
     {
         $this->dateRead = $dateRead;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateClicked()
+    {
+        return $this->dateClicked;
+    }
+
+    /**
+     * @param \DateTime $dateClicked
+     */
+    public function setDateClicked($dateClicked)
+    {
+        $this->dateClicked = $dateClicked;
     }
 
     /**
@@ -339,6 +377,30 @@ class Stat
     public function setIsRead($isRead)
     {
         $this->isRead = $isRead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsClicked()
+    {
+        return $this->isClicked;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isClicked()
+    {
+        return $this->getIsClicked();
+    }
+
+    /**
+     * @param mixed $isRead
+     */
+    public function setIsClicked($isClicked)
+    {
+        $this->isClicked = $isClicked;
     }
 
     /**

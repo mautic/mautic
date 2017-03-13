@@ -180,7 +180,6 @@ class TrackableRepository extends CommonRepository
         if ($chartQuery) {
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
-
         $results = $q->execute()->fetchAll();
 
         if (true === $listId) {
