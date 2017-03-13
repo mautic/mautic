@@ -125,7 +125,7 @@ trait FieldsTypeTrait
                             'label'       => false,
                             'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
                             'empty_value' => false,
-                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
+                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update', 'disabled' => $disabled],
                             'disabled'    => $disabled,
                         ]
                     );

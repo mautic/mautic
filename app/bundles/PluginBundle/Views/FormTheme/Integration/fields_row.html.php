@@ -109,6 +109,7 @@ unset($form['m_choices']);
                                            title=""
                                            autocomplete="false"
                                            value="0"
+                                           <?php echo $child->vars['attr']['disabled']?>
                                            <?php if ($checked): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
@@ -120,6 +121,7 @@ unset($form['m_choices']);
                                            title=""
                                            autocomplete="false"
                                            value="1"
+                                           <?php echo $child->vars['attr']['disabled']?>
                                            <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
@@ -172,7 +174,9 @@ unset($form['m_choices']);
                 </div>
                 <?php
                 ++$indexCount;
-            endif; ?>
+            endif;
+            unset($form[$child->vars['name']]);
+            ?>
         <?php endforeach; ?>
         <a href="#" class="add btn btn-warning ml-sm btn-add-item" onclick="Mautic.addNewPluginField('<?php echo $object; ?>-field', null);">
             <?php echo $view['translator']->trans('mautic.plugin.form.add.fields'); ?>
