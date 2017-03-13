@@ -65,7 +65,7 @@ unset($form['m_choices']);
                     echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
                 endif;
 
-                if ($rowCount % $numberOfFields == 1):?>
+                if ($child->vars['name'] == 'i_'.$indexCount):?>
                 <div class="pl-xs pr-xs <?php echo $class; ?>">
                     <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
@@ -94,7 +94,7 @@ unset($form['m_choices']);
                 <?php endif; ?>
             <?php endif; ?>
 
-            <?php if ($rowCount % $numberOfFields == 2): ?>
+            <?php if (strstr($child->vars['name'], 'update_mautic')): ?>
             <div class="pl-xs pr-xs <?php echo $class; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
                 <div class="row">
                     <div class="form-group col-xs-12 ">
@@ -133,7 +133,7 @@ unset($form['m_choices']);
             <?php endif; ?>
 
             <?php
-            if ($rowCount % $numberOfFields == 3):?>
+            if ($child->vars['name'] == 'm_'.$indexCount):?>
             <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
