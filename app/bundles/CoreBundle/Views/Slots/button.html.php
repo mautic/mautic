@@ -1,5 +1,4 @@
 <?php
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -10,17 +9,7 @@
  */
 ?>
 
-<table style="font-size: 16px; color: #ffffff; text-decoration: none; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5e9e; display: inline-block;">
-    <tbody>
-        <tr>
-            <td style="width: 25px; height: 40px;">&nbsp;</td>
-            <td style="height: 40px;">
-                <a href="#" target="_blank" style="font-size: 16px; color: #ffffff; text-decoration: none;" >
-                    I want this!
-                </a>
-            </td>
-            <td style="width: 25px; height: 40px;">&nbsp;</td>
-        </tr>
-    </tbody>
-</table>
+<a href="#"  class="button" target="_blank" style="display:inline-block;text-decoration:none;border-color:#d21d00;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #d21d00; display: inline-block;font-size: 16px; color: #ffffff; ">
+    I want this!
+</a>
 <div style="clear:both"></div>

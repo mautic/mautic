@@ -1090,12 +1090,12 @@ Mautic.initSlotListeners = function() {
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
-            params.slot.find('a').attr('href', params.field.val());
+            params.slot.find('a.button').attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
-            params.slot.find('a').text(params.field.val());
+            params.slot.find('a.button').text(params.field.val());
         } else if (fieldParam === 'float') {
             var values = ['left', 'center', 'right'];
-            params.slot.find('table').parent().attr('align', values[params.field.val()]);
+            params.slot.find('a').parent().attr('align', values[params.field.val()]);
         } else if (fieldParam === 'caption') {
             params.slot.find('figcaption').text(params.field.val());
         } else if (fieldParam === 'cardcaption') {
@@ -1135,16 +1135,16 @@ Mautic.initSlotListeners = function() {
                 {padding: '10px 13px', fontSize: '20px'},
                 {padding: '15px 20px', fontSize: '30px'}
             ];
-            params.slot.find('table').css('padding', values[params.field.val()]['padding']);
-            params.slot.find('a').css('fontSize', values[params.field.val()]['fontSize']);
+            params.slot.find('a').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
             params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
         } else if (fieldParam === 'background-color') {
             if ('imagecard' === type) {
                 params.slot.find('.imagecard').css(fieldParam, '#' + params.field.val());
             } else {
-                params.slot.find('table').css(fieldParam, '#' + params.field.val());
-                params.slot.find('table').attr('background', '#' + params.field.val());
+                params.slot.find('a.button').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a.button').attr('background', '#' + params.field.val());
+                params.slot.find('a.button').css('border-color', '#' + params.field.val());
             }
         } else if (fieldParam === 'color') {
             if ('imagecard' === type) {
@@ -1152,7 +1152,7 @@ Mautic.initSlotListeners = function() {
             } else if ('imagecaption' === type) {
                 params.slot.find('figcaption').css(fieldParam, '#' + params.field.val());
             } else {
-                params.slot.find('a').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a.button').css(fieldParam, '#' + params.field.val());
             }
         } else if (/gatedvideo/.test(fieldParam)) {
             // Handle gatedVideo replacements
