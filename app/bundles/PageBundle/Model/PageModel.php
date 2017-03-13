@@ -36,6 +36,7 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -85,6 +86,11 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
+     * @var $userProvider
+     */
+    protected $userProvider;
+
+    /**
      * PageModel constructor.
      *
      * @param CookieHelper   $cookieHelper
@@ -93,6 +99,7 @@ class PageModel extends FormModel
      * @param FieldModel     $leadFieldModel
      * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
+     * @param UserProvider   $userProvider
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -100,7 +107,8 @@ class PageModel extends FormModel
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel
+        TrackableModel $pageTrackableModel,
+        UserProvider $userProvider
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -109,6 +117,7 @@ class PageModel extends FormModel
         $this->pageRedirectModel  = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->dateTimeHelper     = new DateTimeHelper();
+        $this->userProvider       = $userProvider;
     }
 
     /**
@@ -466,6 +475,17 @@ class PageModel extends FormModel
             // Multiply by -1 because Firgerprint2 seems to have it the other way around.
             $timezone = (-1 * $query['timezone_offset'] * 60);
             $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+        }
+
+        //  change contact owner
+        if (isset($query['owner'])) {
+            $currentOwner = $lead->getOwner();
+            if (!$currentOwner || ($currentOwner && $currentOwner->getUsername() != $query['owner'])) {
+                $newOwner = $this->userProvider->loadUserByUsername($query['owner']);
+                if ($newOwner) {
+                    $lead->setOwner($newOwner);
+                }
+            }
         }
 
         $this->leadModel->saveEntity($lead);
