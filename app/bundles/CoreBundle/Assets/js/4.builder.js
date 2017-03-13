@@ -972,40 +972,15 @@ Mautic.initSlotListeners = function() {
             // initialize code mode slots
             if ('codemode' === type) {
                 Mautic.codeMode = true;
-                var rawTokens = [];
                 var element = focusForm.find('#slot_codemode_content')[0];
                 if (element) {
                     Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
-                        //value: slot.find('#codemodeHtmlContainer').html(),
                         lineNumbers: true,
                         mode: 'htmlmixed',
                         extraKeys: {"Ctrl-Space": "autocomplete"},
                         lineWrapping: true,
-                        // hintOptions: {
-                        //     hint: function (editor) {
-                        //         var cursor = editor.getCursor();
-                        //         var currentLine = editor.getLine(cursor.line);
-                        //         var start = cursor.ch;
-                        //         var end = start;
-                        //         while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
-                        //         while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
-                        //         var curWord = start != end && currentLine.slice(start, end);
-                        //         var regex = new RegExp('^' + curWord, 'i');
-                        //         return {
-                        //             list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
-                        //                 return (rawTokens[idx].indexOf(curWord) !== -1);
-                        //             })),
-                        //             from: CodeMirror.Pos(cursor.line, start),
-                        //             to: CodeMirror.Pos(cursor.line, end)
-                        //         };
-                        //     }
-                        // }
                     });
                     Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
-                    // Mautic.builderCodeMirror.on('mousedown', function(instance, e){
-                    //     console.log(Mautic.builderCodeMirror);
-                    //     instance.focus();
-                    // });
                     Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
                 }
             }
