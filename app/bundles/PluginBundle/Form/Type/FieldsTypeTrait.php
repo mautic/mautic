@@ -75,7 +75,14 @@ trait FieldsTypeTrait
             }
 
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-
+            $form->add('i_choices', HiddenType::class,
+                [
+                    'data' => !empty($choices) ? $choices : [],
+                ]);
+            $form->add('m_choices', HiddenType::class,
+                [
+                    'data' => !empty($mauticFields) ? $mauticFields : [],
+                ]);
             foreach ($fields as $field => $details) {
                 $matched = isset($matchedFields[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
@@ -97,7 +104,6 @@ trait FieldsTypeTrait
                             'data-required'    => $required,
                             'data-value'       => $field,
                             'data-matched'     => $matched,
-                            'data-choices'     => !empty($choices) ? $choices : [],
                             'disabled'         => $disabled,
                         ],
                         'disabled' => $disabled,
@@ -137,7 +143,7 @@ trait FieldsTypeTrait
                             'class'            => 'field-selector form-control',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
-                            'data-choices'     => !empty($mauticFields) ? $mauticFields : [],
+                            'data-value'       => $matched ? $matchedFields[$field] : '',
                             'disabled'         => $mauticDisabled,
                         ],
                         'disabled'    => $mauticDisabled,

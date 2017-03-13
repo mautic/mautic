@@ -12,6 +12,11 @@
 /** @var int $numberOfFields */
 $rowCount   = 0;
 $indexCount = 1;
+
+$choices = $form['i_choices']->vars['data'];
+unset($form['i_choices']);
+$mauticChoices = $form['m_choices']->vars['data'];
+unset($form['m_choices']);
 ?>
 
 <div class="row fields-container" id="<?php echo $containerId; ?>">
@@ -60,9 +65,7 @@ $indexCount = 1;
                     echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
                 endif;
 
-                if ($rowCount % $numberOfFields == 1):
-                    $choices = $child->vars['attr']['data-choices'];
-                    ?>
+                if ($rowCount % $numberOfFields == 1):?>
                 <div class="pl-xs pr-xs <?php echo $class; ?>">
                     <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
@@ -128,9 +131,7 @@ $indexCount = 1;
             <?php endif; ?>
 
             <?php
-            if ($rowCount % $numberOfFields == 3):
-                $mauticChoices = $child->vars['attr']['data-choices'];
-                ?>
+            if ($rowCount % $numberOfFields == 3):?>
             <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
