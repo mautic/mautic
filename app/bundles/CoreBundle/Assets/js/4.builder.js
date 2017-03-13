@@ -156,8 +156,9 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
 
     window.setInterval(function() {
         if (codeChanged) {
-            var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
+            var value = (Mautic.builderCodeMirror) ? Mautic.builderCodeMirror.getValue() : '';
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
+
             codeChanged = false;
         }
     }, 2000);
@@ -434,7 +435,7 @@ Mautic.clearFroalaStyles = function(content) {
     // data-atwho-at-query causes not working tokens
     content.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
     return content;
-}
+};
 
 Mautic.toggleBuilderButton = function (hide) {
     if (mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder')) {
@@ -893,6 +894,7 @@ Mautic.initSlotListeners = function() {
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
             parent.mQuery('#slot-form-container').html(focusForm);
 
+
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
                 var regex = /data-param-(.*)/;
@@ -931,6 +933,45 @@ Mautic.initSlotListeners = function() {
                 }
             });
 
+            // initialize code mode slots
+            if ('codemode' === type) {
+                Mautic.codeMode = true;
+                var rawTokens = [];
+                var element = focusForm.find('#slot_codemode_content')[0];
+                if (element) {
+                    Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
+                        //value: slot.find('#codemodeHtmlContainer').html(),
+                        lineNumbers: true,
+                        mode: 'htmlmixed',
+                        extraKeys: {"Ctrl-Space": "autocomplete"},
+                        autofocus: true,
+                        lineWrapping: true
+                        // hintOptions: {
+                        //     hint: function (editor) {
+                        //         var cursor = editor.getCursor();
+                        //         var currentLine = editor.getLine(cursor.line);
+                        //         var start = cursor.ch;
+                        //         var end = start;
+                        //         while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
+                        //         while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
+                        //         var curWord = start != end && currentLine.slice(start, end);
+                        //         var regex = new RegExp('^' + curWord, 'i');
+                        //         return {
+                        //             list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
+                        //                 return (rawTokens[idx].indexOf(curWord) !== -1);
+                        //             })),
+                        //             from: CodeMirror.Pos(cursor.line, start),
+                        //             to: CodeMirror.Pos(cursor.line, end)
+                        //         };
+                        //     }
+                        // }
+                    });
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
+
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
+                }
+            }
+
             focusForm.on('keyup change', function(e) {
                 var field = mQuery(e.target);
 
@@ -968,47 +1009,6 @@ Mautic.initSlotListeners = function() {
                     }
                 });
             });
-
-            // initialize code mode slots
-            if ('codemode' === type) {
-                Mautic.codeMode = true;
-                var rawTokens = [];
-                var element = focusForm.find('#slot_codemode_content')[0];
-                if (element) {
-                    Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
-                        //value: slot.find('#codemodeHtmlContainer').html(),
-                        lineNumbers: true,
-                        mode: 'htmlmixed',
-                        extraKeys: {"Ctrl-Space": "autocomplete"},
-                        lineWrapping: true,
-                        // hintOptions: {
-                        //     hint: function (editor) {
-                        //         var cursor = editor.getCursor();
-                        //         var currentLine = editor.getLine(cursor.line);
-                        //         var start = cursor.ch;
-                        //         var end = start;
-                        //         while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
-                        //         while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
-                        //         var curWord = start != end && currentLine.slice(start, end);
-                        //         var regex = new RegExp('^' + curWord, 'i');
-                        //         return {
-                        //             list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
-                        //                 return (rawTokens[idx].indexOf(curWord) !== -1);
-                        //             })),
-                        //             from: CodeMirror.Pos(cursor.line, start),
-                        //             to: CodeMirror.Pos(cursor.line, end)
-                        //         };
-                        //     }
-                        // }
-                    });
-                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
-                    // Mautic.builderCodeMirror.on('mousedown', function(instance, e){
-                    //     console.log(Mautic.builderCodeMirror);
-                    //     instance.focus();
-                    // });
-                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
-                }
-            }
 
             focusForm.find('textarea.editor').each(function() {
                 var theEditor = this;
