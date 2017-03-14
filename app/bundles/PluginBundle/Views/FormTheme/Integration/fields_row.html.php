@@ -136,20 +136,22 @@ $baseUrl = $view['router']->path(
             <?php endif; ?>
 
             <?php
-            if ($child->vars['name'] == 'm_'.$indexCount):?>
+            if ($child->vars['name'] == 'm_'.$indexCount):
+                $selected = false;
+                ?>
             <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
-                        autocomplete="false">
+                        autocomplete="false" onchange="Mautic.matcheFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')">
                     <?php
                     $mauticChoices = $child->vars['attr']['data-choices'];
                     foreach ($mauticChoices as $keyLabel => $options): ?>
                     <?php if (is_array($options)) : ?>
                     <optgroup label="<?php echo $keyLabel; ?>">
                         <?php foreach ($options as $keyValue => $o): ?>
-                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; elseif ($keyValue == '-1'): echo 'selected'; endif; ?>>
+                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (!$selected || $keyValue == '-1'): echo 'selected'; endif; ?>>
                             <?php echo $o; ?>
                         </option>
                         <?php endforeach; ?>
@@ -166,6 +168,7 @@ $baseUrl = $view['router']->path(
             <?php endif; ?>
 
             <?php if ($rowCount % $numberOfFields == 0): ?>
+                <div id="matched-message-<?php echo $indexCount?>"></div>
                 </div>
                 <?php
                 ++$indexCount;

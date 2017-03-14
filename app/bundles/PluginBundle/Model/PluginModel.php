@@ -67,4 +67,10 @@ class PluginModel extends FormModel
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
+
+    public function saveFeatureSettings($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+    }
 }

@@ -81,30 +81,35 @@ class FeatureSettingsType extends AbstractType
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => ('GET' === $_SERVER['REQUEST_METHOD']),
+                'ignore_field_cache' => ($page == 1) ? true : false,
             ];
             try {
-                $fields      = $integration_object->getFormLeadFields($settings);
-                $totalFields = count($fields);
-                $fields      = array_slice($fields, $start, $limit);
-                $fields      = (isset($fields[0])) ? $fields[0] : $fields;
-                unset($fields['company']);
+                if (empty($fields)) {
+                    $fields = $integration_object->getFormLeadFields($settings);
+                    $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                    unset($fields['company']);
+                }
+                $totalFields     = count($fields);
+                $fieldsPaginated = array_slice($fields, $start, $limit);
+
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
-                    $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
-                    $totalCompanyFields       = count($integrationCompanyFields);
-                    $integrationCompanyFields = array_slice($integrationCompanyFields, $companyStart, $limit);
+                    if (empty($integrationCompanyFields)) {
+                        $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                    }
+                    $totalCompanyFields = count($integrationCompanyFields);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
+                    $paginatedCompanyFields = array_slice($integrationCompanyFields, $companyStart, $limit);
                 }
 
-                if (!is_array($fields)) {
-                    $fields = [];
+                if (!is_array($fieldsPaginated)) {
+                    $fieldsPaginated = [];
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fields = [];
-                $error  = $e->getMessage();
+                $fieldsPaginated = [];
+                $error           = $e->getMessage();
             }
             list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
             /**
@@ -114,7 +119,7 @@ class FeatureSettingsType extends AbstractType
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
             }
-            $integrationFields  = array_keys($fields);
+            $integrationFields  = array_keys($fieldsPaginated);
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
             $enableDataPriority = false;
@@ -136,7 +141,7 @@ class FeatureSettingsType extends AbstractType
                     'lead_fields'          => $leadFields,
                     'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
                     'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
-                    'integration_fields'   => $fields,
+                    'integration_fields'   => $fieldsPaginated,
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
@@ -157,7 +162,7 @@ class FeatureSettingsType extends AbstractType
                         'company_fields'             => $companyFields,
                         'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
                         'update_mautic_company'      => isset($data['update_mautic_company']) && !empty($data['update_mautic_company']) ? $data['update_mautic_company'] : [],
-                        'integration_company_fields' => $integrationCompanyFields,
+                        'integration_company_fields' => $paginatedCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
                         'enable_data_priority'       => $enableDataPriority,

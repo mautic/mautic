@@ -224,45 +224,29 @@ class PluginController extends FormController
                             $featureSettings = $entity->getFeatureSettings();
                             $submittedFields = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
                             if (!empty($submittedFields)) {
-                                unset($featureSettings['leadFields']);
-                                unset($featureSettings['update_mautic']);
-                                foreach ($submittedFields as $f => $v) {
-                                    if ($v === '-1') {
-                                        continue;
-                                    }
-                                    if (!strstr($f, 'update_mautic')) {
-                                        if (!empty($v) && strstr($f, 'i_')) {
-                                            $integrationField = $v;
-                                        }
-                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
-                                            $mauticField                                      = $v;
-                                            $featureSettings['leadFields'][$integrationField] = $mauticField;
-                                        }
-                                    } else {
-                                        $featureSettings['update_mautic'][$integrationField] = (int) $v;
-                                    }
+                                if (isset($currentFeatureSettings['leadFields'])) {
+                                    $featureSettings['leadFields'] = $currentFeatureSettings['leadFields'];
+                                } else {
+                                    $featureSettings['leadFields'] = [];
+                                }
+                                if (isset($currentFeatureSettings['update_mautic'])) {
+                                    $featureSettings['update_mautic'] = $currentFeatureSettings['update_mautic'];
+                                } else {
+                                    $featureSettings['update_mautic'] = [];
                                 }
                             }
                             $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
 
                             if (!empty($submittedCompanyFields)) {
-                                unset($featureSettings['companyFields']);
-                                unset($featureSettings['update_mautic_company']);
-                                foreach ($submittedCompanyFields as $f => $v) {
-                                    if ($v === '-1') {
-                                        continue;
-                                    }
-                                    if (!strstr($f, 'update_mautic_company')) {
-                                        if (!empty($v) && strstr($f, 'i_')) {
-                                            $integrationField = $v;
-                                        }
-                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
-                                            $mauticField                                         = $v;
-                                            $featureSettings['companyFields'][$integrationField] = $mauticField;
-                                        }
-                                    } else {
-                                        $featureSettings['update_mautic_company'][$integrationField] = (int) $v;
-                                    }
+                                if (isset($currentFeatureSettings['companyFields'])) {
+                                    $featureSettings['companyFields'] = $currentFeatureSettings['companyFields'];
+                                } else {
+                                    $featureSettings['companyFields'] = [];
+                                }
+                                if (isset($currentFeatureSettings['update_mautic_company'])) {
+                                    $featureSettings['update_mautic_company'] = $currentFeatureSettings['update_mautic_company'];
+                                } else {
+                                    $featureSettings['update_mautic_company'] = [];
                                 }
                             }
                             $entity->setFeatureSettings($featureSettings);

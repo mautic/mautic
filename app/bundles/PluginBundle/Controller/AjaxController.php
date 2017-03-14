@@ -231,17 +231,47 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function getPaginatedFields(Request $request)
+    protected function matchFieldsAction(Request $request)
     {
-        $settings           = $request->request->get('settings');
-        $integration        = $request->request->get('integration');
-        $start              = $request->request->get('start');
-        $limit              = $request->request->get('limit');
+        $dataArray         = ['success' => 0];
+        $integration       = $request->request->get('integration');
+        $integration_field = $request->request->get('integrationField');
+        $mautic_field      = $request->request->get('mauticField');
+        $update_mautic     = $request->request->get('updateMautic');
+        $object            = $request->request->get('object');
+
         $helper             = $this->factory->getHelper('integration');
         $integration_object = $helper->getIntegrationObject($integration);
-        $fields             = $integration_object->getFormLeadFields($settings);
-        $fields             = array_slice($fields, $start, $limit);
+        $entity             = $integration_object->getIntegrationSettings();
+        $featureSettings    = $entity->getFeatureSettings();
 
-        return $fields;
+        $doNotMatchField = ($mautic_field === '-1');
+        if ($object == 'lead') {
+            $fields       = 'leadFields';
+            $updateFields = 'update_mautic';
+        } else {
+            $fields       = 'companyFields';
+            $updateFields = 'update_mautic_company';
+        }
+        $newFeatureSettings = [];
+        if ($doNotMatchField) {
+            if (array_key_exists($integration_field, $featureSettings[$updateFields])) {
+                unset($featureSettings[$updateFields][$integration_field]);
+            }
+            if (array_key_exists($integration_field, $featureSettings[$fields])) {
+                unset($featureSettings[$fields][$integration_field]);
+            }
+        } else {
+            $newFeatureSettings[$integration_field] = $update_mautic;
+            $featureSettings[$updateFields]         = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            $newFeatureSettings[$integration_field] = $mautic_field;
+            $featureSettings[$fields]               = array_merge($featureSettings[$fields], $newFeatureSettings);
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        $this->getModel('plugin')->saveFeatureSettings($entity);
+
+        return $this->sendJsonResponse($dataArray);
     }
 }

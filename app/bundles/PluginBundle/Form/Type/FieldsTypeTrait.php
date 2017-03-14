@@ -45,13 +45,13 @@ trait FieldsTypeTrait
 
             // First loop to build options
             foreach ($integrationFields as $field => $details) {
-                if ($matched = ($isPost) ? !empty($fieldData['m_'.$fieldData[$field]]) : !empty($fieldData[$field])) {
-                    $matchedFields[$field] = !empty($fieldData['m_'.$fieldData[$field]]) ? $fieldData['m_'.$fieldData[$field]] : $fieldData[$field];
-                }
+                //if ($matched = ($isPost) ? !empty($fieldData['m_'.$fieldData[$field]]) : !empty($fieldData[$field])) {
+                //    $matchedFields[$field] = !empty($fieldData['m_'.$fieldData[$field]]) ? $fieldData['m_'.$fieldData[$field]] : $fieldData[$field];
+                //}
 
                 if (is_array($details) && !empty($details['required'])) {
                     $requiredFields[$field] = $details;
-                } elseif ($matched) {
+                } elseif (isset($fieldData[$field])) {
                     $populatedFields[$field] = $details;
                 } else {
                     $optionalFields[$field] = $details;
@@ -76,7 +76,7 @@ trait FieldsTypeTrait
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
 
             foreach ($fields as $field => $details) {
-                $matched = isset($matchedFields[$field]);
+                $matched = isset($fieldData[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
                 $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
                 $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
@@ -129,13 +129,13 @@ trait FieldsTypeTrait
                     [
                         'choices'    => $mauticFields,
                         'label'      => false,
-                        'data'       => $matched ? $matchedFields[$field] : '',
+                        'data'       => $matched ? $fieldData[$field] : '',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class'            => 'field-selector',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
-                            'data-value'       => $matched ? $matchedFields[$field] : '',
+                            'data-value'       => $matched ? $fieldData[$field] : '',
                             'disabled'         => $mauticDisabled,
                             'data-choices'     => $mauticFields,
                         ],
