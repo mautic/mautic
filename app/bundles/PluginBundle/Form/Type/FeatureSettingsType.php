@@ -75,8 +75,8 @@ class FeatureSettingsType extends AbstractType
             $page    = $session->get('mautic.plugin.lead.page', 1);
             $start   = $session->get('mautic.plugin.lead.start', 1);
 
-            $companyPage  = $session->get('mautic.plugin.company.start', 1);
-            $companyStart = $session->get('mautic.plugin.company.lead.page', 1);
+            $companyPage  = $session->get('mautic.plugin.company.lead.page', 1);
+            $companyStart = $session->get('mautic.plugin.company.start', 1);
 
             $settings = [
                 'silence_exceptions' => false,
