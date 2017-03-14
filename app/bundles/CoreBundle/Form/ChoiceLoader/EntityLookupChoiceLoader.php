@@ -190,6 +190,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // must be [$label => $id]
         $prepped = $this->prepareChoices($this->choices[$modelName]);
+
         array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
@@ -215,7 +216,26 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             }
         }
 
-        return $isGrouped ? $prepped : array_flip($prepped);
+        if (!$isGrouped) {
+            // Same labels will cause options to be merged with Symfony 2.8+ so ensure labels are unique
+            $counts     = array_count_values($prepped);
+            $duplicates = array_filter(
+                $prepped,
+                function ($value) use ($counts) {
+                    return $counts[$value] > 1;
+                }
+            );
+
+            if (count($duplicates)) {
+                foreach ($duplicates as $value => $label) {
+                    $prepped[$value] = "$label ($value)";
+                }
+            }
+
+            $prepped = array_flip($prepped);
+        }
+
+        return $prepped;
     }
 
     /**

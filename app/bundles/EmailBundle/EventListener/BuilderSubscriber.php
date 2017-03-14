@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -256,7 +257,7 @@ class BuilderSubscriber extends CommonSubscriber
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', $unsubscribeText);
+        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
 
@@ -265,7 +266,7 @@ class BuilderSubscriber extends CommonSubscriber
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
         $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
-        $event->addToken('{webview_text}', $webviewText);
+        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -281,14 +282,14 @@ class BuilderSubscriber extends CommonSubscriber
             $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
             if ($owner && !empty($owner['signature'])) {
                 $fromName      = $owner['first_name'].' '.$owner['last_name'];
-                $signatureText = $owner['signature'];
+                $signatureText = EmojiHelper::toHtml($owner['signature']);
             }
         }
 
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
-        $event->addToken('{signature}', $signatureText);
+        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
-        $event->addToken('{subject}', $event->getSubject());
+        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
     /**

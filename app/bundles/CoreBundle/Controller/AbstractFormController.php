@@ -30,8 +30,9 @@ abstract class AbstractFormController extends CommonController
      */
     public function unlockAction($id, $modelName)
     {
-        $model  = $this->getModel($modelName);
-        $entity = $model->getEntity($id);
+        $model                = $this->getModel($modelName);
+        $entity               = $model->getEntity($id);
+        $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
             if ($entity !== null && $entity->getCheckedOutBy() !== null) {
@@ -190,16 +191,22 @@ abstract class AbstractFormController extends CommonController
     {
         $security = $this->get('mautic.security');
 
-        if ($this->getPermissionBase()) {
-            if ($entity && $security->checkPermissionExists($this->getPermissionBase().':editown')) {
+        if ($this->permissionBase) {
+            $permissionBase = $this->permissionBase;
+        } else {
+            $permissionBase = $this->getPermissionBase();
+        }
+
+        if ($permissionBase) {
+            if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
                 return $security->hasEntityAccess(
-                    $this->getPermissionBase().':editown',
-                    $this->getPermissionBase().':editother',
+                    $permissionBase.':editown',
+                    $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($security->checkPermissionExists($this->getPermissionBase().':edit')) {
+            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
                 return $security->isGranted(
-                    $this->getPermissionBase().':edit'
+                    $permissionBase.':edit'
                 );
             }
         }

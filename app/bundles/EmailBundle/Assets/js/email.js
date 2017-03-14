@@ -177,33 +177,35 @@ Mautic.getTotalAttachmentSize = function() {
 };
 
 Mautic.standardEmailUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
+    if (options && options.windowUrl && options.origin) {
+        var url = options.windowUrl;
         var editEmailKey = '/emails/edit/emailId';
         var previewEmailKey = '/email/preview/emailId';
         if (url.indexOf(editEmailKey) > -1 ||
             url.indexOf(previewEmailKey) > -1) {
-            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
+            options.windowUrl = url.replace('emailId', mQuery(options.origin).val());
         }
     }
 
     return options;
 };
 
-Mautic.disabledEmailAction = function(opener) {
+/**
+ * Enables/Disables email preview and edit. Can be triggered from campaign or form actions
+ * @param opener
+ * @param origin
+ */
+Mautic.disabledEmailAction = function(opener, origin) {
     if (typeof opener == 'undefined') {
         opener = window;
     }
-    var email = opener.mQuery('#campaignevent_properties_email').val();
+    var email = opener.mQuery(origin);
+    if (email.length == 0) return;
+    var emailId = email.val();
+    var disabled = emailId === '' || emailId === null;
 
-    var disabled = email === '' || email === null;
-
-    opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
-    opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+    opener.mQuery('[id$=_editEmailButton]').prop('disabled', disabled);
+    opener.mQuery('[id$=_previewEmailButton]').prop('disabled', disabled);
 };
 
 Mautic.initEmailDynamicContent = function() {

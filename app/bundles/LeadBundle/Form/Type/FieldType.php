@@ -272,13 +272,13 @@ class FieldType extends AbstractType
                 case 'boolean':
                     if (is_array($data)) {
                         $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
-                        $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'matuic.core.form.yes';
-                        $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'matuic.core.form.no';
+                        $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'mautic.core.form.yes';
+                        $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'mautic.core.form.no';
                     } else {
                         $value    = $data->getDefaultValue();
                         $props    = $data->getProperties();
-                        $yesLabel = !empty($props['yes']) ? $props['yes'] : 'matuic.core.form.yes';
-                        $noLabel  = !empty($props['no']) ? $props['no'] : 'matuic.core.form.no';
+                        $yesLabel = !empty($props['yes']) ? $props['yes'] : 'mautic.core.form.yes';
+                        $noLabel  = !empty($props['no']) ? $props['no'] : 'mautic.core.form.no';
                     }
 
                     if ($value !== '' && $value !== null) {
