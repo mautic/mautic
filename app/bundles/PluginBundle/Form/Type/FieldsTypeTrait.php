@@ -64,7 +64,8 @@ trait FieldsTypeTrait
                         }
 
                         $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                        $choices[$details['group']][$field] = $label;
+                        $group[$field] = $details['group'];
+                        $choices[$field] = $label;
                     } else {
                         $choices[$field] = $details['label'];
                     }
@@ -81,25 +82,21 @@ trait FieldsTypeTrait
                 $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
                 $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
                 ++$index;
-
                 $form->add(
-                    'i_'.$index,
-                    'choice',
+                    'label_'.$index,
+                    'text',
                     [
-                        'choices'  => $choices,
-                        'label'    => false,
-                        'required' => true,
-                        'data'     => $field, // default to this field
-                        'attr'     => [
-                            'class'            => 'field-selector integration-field',
-                            'data-placeholder' => ' ',
-                            'data-required'    => $required,
-                            'data-value'       => $field,
-                            'data-matched'     => $matched,
-                            'disabled'         => $disabled,
-                            'data-choices'     => $choices,
+                        'label' => false,
+                        'data'  => $choices[$field],
+                        'attr'  => [
+                            'class'         => 'form-control',
+                            'data-required' => $required,
+                            'data-label'    => $choices[$field],
+                            'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                            'readonly'      => true,
                         ],
-                        'disabled' => $disabled,
+                        'by_reference' => true,
+                        'mapped'       => false,
                     ]
                 );
                 if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
@@ -142,7 +139,16 @@ trait FieldsTypeTrait
                         'disabled' => $mauticDisabled,
                     ]
                 );
-
+                $form->add(
+                    'i_'.$index,
+                    HiddenType::class,
+                    [
+                        'data' => $field,
+                        'attr' => [
+                            'data-required' => $required,
+                        ],
+                    ]
+                );
                 $form->add(
                     $field,
                     HiddenType::class,

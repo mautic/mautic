@@ -31,7 +31,7 @@ $baseUrl = $view['router']->path(
     <div class="<?php echo $object; ?>-field form-group col-xs-12">
         <div class="row">
             <div class="mb-xs ml-lg pl-xs pr-xs col-sm-4 text-center"><h4><?php echo $view['translator']->trans('mautic.plugins.integration.fields'); ?></h4></div>
-            <?php if ($numberOfFields == 4): ?>
+            <?php if ($numberOfFields == 5): ?>
                 <div class="pl-xs pr-xs col-sm-2"></div>
             <?php endif; ?>
             <div class="pl-xs pr-xs col-sm-4 text-center"><h4><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></h4></div>
@@ -53,53 +53,28 @@ $baseUrl = $view['router']->path(
                 $class = '';
                 switch (true):
                     case $rowCount % $numberOfFields == 1:
-                        $class = (4 === $numberOfFields) ? 'ml-lg col-sm-4' : 'ml-lg col-sm-5';
+                        $class = (5 === $numberOfFields) ? 'ml-lg col-sm-4' : 'ml-lg col-sm-5';
                         break;
                     case $rowCount % $numberOfFields == 2:
-                        $class = (4 === $numberOfFields) ? 'ml-xs col-sm-2' : 'col-sm-5';
+                        $class = (5 === $numberOfFields) ? 'ml-xs col-sm-2' : 'col-sm-5';
                         break;
                     case $rowCount % $numberOfFields == 3:
                         $class = 'col-sm-4';
                         break;
                 endswitch;
-
-                if ($isRequired && $rowCount % $numberOfFields == 1):
-                    $name                            = $child->vars['full_name'];
-                    $child->vars['full_name']        = $child->vars['id'];
-                    $child->vars['attr']['disabled'] = 'disabled';
+            endif;
+            if ($child->vars['name'] == 'label_'.$indexCount):
+                if ($isRequired):
+                    $name = $child->vars['full_name'];
                     echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
                 endif;
-
-                if ($child->vars['name'] == 'i_'.$indexCount):?>
+                ?>
                 <div class="pl-xs pr-xs <?php echo $class; ?>">
-                    <select id="<?php echo $child->vars['id']; ?>"
-                        name="<?php echo $child->vars['full_name']; ?>"
-                        class="<?php echo $child->vars['attr']['class']?>"
-                        data-placeholder=" "
-                        data-value="<?php echo $child->vars['value']; ?>"
-                        autocomplete="false">
-                            <?php
-                            $choices = $child->vars['attr']['data-choices'];
-                            foreach ($choices as $keyLabel => $options):  ?>
-                            <?php if (is_array($options)) : ?>
-                            <optgroup label="<?php echo $keyLabel; ?>">
-                                <?php foreach ($options as $keyValue => $o): ?>
-                                <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif ?>>
-                                    <?php echo $o; ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </optgroup>
-                            <?php else: ?>
-                            <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
-                                <?php echo $options; ?>
-                            </option>
-                            <?php endif; ?>
-                            <?php endforeach; ?>
-                    </select>
+                    <div class="placeholder" data-placeholder="<?php echo $child->vars['attr']['placeholder']; ?>">
+                        <?php echo $view['form']->row($child); ?>
+                    </div>
                 </div>
-                <?php endif; ?>
             <?php endif; ?>
-
             <?php if (strstr($child->vars['name'], 'update_mautic')): ?>
             <div class="pl-xs pr-xs <?php echo $class; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
                 <div class="row">
@@ -166,15 +141,17 @@ $baseUrl = $view['router']->path(
                     <?php endforeach; ?>
                 </select>
             </div>
-            <?php endif; ?>
+                <div class="pl-xs pr-xs ml-xs col-sm-1">
+                    <?php if ($object == 'contact'): $use = 'lead'; else : $use = 'company'; endif; ?>
+                <div id="matched-<?php echo $indexCount.'-'.$use; ?>"><?php if ($selected) : ?><i class="fa fa-check-circle text-success"></i><?php endif; ?></div>
+                </div>
+                    <?php endif; ?>
 
             <?php if ($rowCount % $numberOfFields == 0): ?>
-                <div id="matched-message-<?php echo $indexCount?>"></div>
                 </div>
                 <?php
                 ++$indexCount;
             endif;
-            unset($form[$child->vars['name']]);
             ?>
         <?php endforeach; ?>
     </div>

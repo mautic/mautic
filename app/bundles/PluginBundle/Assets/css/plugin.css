@@ -26,3 +26,18 @@
     margin: 0 auto;
     float: none;
 }
+
+.placeholder
+{
+    position: relative;
+}
+
+.placeholder::after
+{
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    content: attr(data-placeholder);
+    pointer-events: none;
+    opacity: 0.6;
+}

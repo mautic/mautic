@@ -1,94 +1,15 @@
 /* PluginBundle */
-Mautic.addNewPluginField = function (selector) {
-    var items = mQuery( 'div.' + selector ).find( 'div.hide' );
-    var currentItem = items.filter('.hide');
-    var selectors;
-    var nextItem = currentItem.first();
-
-    if (nextItem.length) {
-        currentItem = nextItem.removeClass('hide');
-
-        // Disable options already active
-        var integrationSelect = currentItem.find('select.integration-field').first();
-        mQuery(currentItem).closest('.fields-container').find('.field-container:not(.hide) select').not(integrationSelect).find('option:selected').each(
-            function() {
-                var option = integrationSelect.find('option[value="'+mQuery(this).val()+'"]');
-                mQuery(option).prop('disabled', true);
-                mQuery(option).attr('disabled', 'disabled');
-            }
-        );
-
-        // Select the first option that's not disabled
-        mQuery(integrationSelect).val(mQuery('option:enabled', integrationSelect).first().val());
-
-        currentItem.find('select').each(function () {
-            mQuery(this).prop('disabled', false)
-                .trigger('change')
-                .trigger('chosen:updated');
-        });
-
-        currentItem.find('label').removeClass('disabled');
-        currentItem.find('input[type="radio"]').prop('disabled', false).next().prop('disabled', false);
-    }
-
-    Mautic.stopIconSpinPostEvent();
-};
-
-Mautic.removePluginField = function (selector, indexClass, btn) {
-    var deleteCurrentItem = mQuery('#' + indexClass);
-    var enabled = mQuery('.' + btn).hasClass('text-success');
-
-    deleteCurrentItem.find('input[type="radio"]').prop('disabled', enabled).next().prop('disabled', enabled);
-    if (enabled) {
-        deleteCurrentItem.find('label').addClass('disabled');
-    } else {
-        deleteCurrentItem.find('label').removeClass('enabled');
-    }
-
-    // Add back the option to other selects
-    var integrationSelect = deleteCurrentItem.find('select.integration-field').first();
-    var groupSelects = mQuery(deleteCurrentItem).closest('.fields-container').find('select.integration-field').not(integrationSelect);
-    mQuery('option[value="' + integrationSelect.val() + '"]', groupSelects).each(function() {
-        if (!mQuery(this).closest('select').prop('disabled')) {
-            mQuery(this).prop('disabled', false);
-            mQuery(this).removeAttr('disabled');
-        }
-    });
-
-    deleteCurrentItem.find('option').each(function() {
-        mQuery(this).prop('disabled', false);
-        mQuery(this).removeAttr('disabled');
-    });
-
-    if (enabled) {
-        groupSelects.each(function() {
-            if (!mQuery(this).closest('.field-container').hasClass('disabled')) {
-                mQuery(this).trigger('change');
-            }
-        });
-        mQuery('.' + btn).removeClass('text-default').addClass('text-success').trigger("chosen:updated");
-    } else {
-        mQuery('.' + btn).removeClass('text-success').addClass('text-default').trigger("chosen:updated");
-    }
-
-    deleteCurrentItem.find('select').each(function( ) {
-        mQuery( this ).prop('disabled', enabled).trigger("chosen:updated");
-    });
-
-};
 Mautic.matcheFields = function (index, object, integration) {
-    var integrationField = mQuery('#integration_details_featureSettings_leadFields_i_' + index + ' option:selected').val();
-    var mauticField = mQuery('#integration_details_featureSettings_leadFields_m_' + index + ' option:selected').val();
+    var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).val();
+    var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
     if (object == 'lead') {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]:checked').val();
     } else {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic_company' + index + ']"]:checked').val();
     }
     Mautic.ajaxActionRequest('plugin:matchFields', {object: object, integration: integration, integrationField : integrationField, mauticField: mauticField, updateMautic : updateMauticField}, function(response) {
-        var theMessage = (response.success) ? 'Matched' : 'Not matched';
-        var theClass = (response.success) ? 'text-success' : 'text-warning';
-        mQuery('#matched-message-' + index).html(theMessage);
-        mQuery('#matched-message-' + index).addClass(theClass);
+        var theMessage = (response.success) ? '<i class="fa fa-check-circle text-success"></i>' : '';
+        mQuery('#matched-' + index + "-" + object).html(theMessage);
     });
 };
 Mautic.initiateIntegrationAuthorization = function() {
