@@ -254,19 +254,24 @@ class AjaxController extends CommonAjaxController
         }
         $newFeatureSettings = [];
         if ($doNotMatchField) {
-            if (array_key_exists($integration_field, $featureSettings[$updateFields])) {
+            if (isset($featureSettings[$updateFields]) && array_key_exists($integration_field, $featureSettings[$updateFields])) {
                 unset($featureSettings[$updateFields][$integration_field]);
             }
-            if (array_key_exists($integration_field, $featureSettings[$fields])) {
+            if (isset($featureSettings[$fields]) && array_key_exists($integration_field, $featureSettings[$fields])) {
                 unset($featureSettings[$fields][$integration_field]);
             }
             $dataArray = ['success' => 0];
         } else {
             $newFeatureSettings[$integration_field] = $update_mautic;
-            $featureSettings[$updateFields]         = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            if (isset($featureSettings[$updateFields])) {
+                $featureSettings[$updateFields] = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            }
             $newFeatureSettings[$integration_field] = $mautic_field;
-            $featureSettings[$fields]               = array_merge($featureSettings[$fields], $newFeatureSettings);
-            $dataArray                              = ['success' => 1];
+            if (isset($featureSettings[$fields])) {
+                $featureSettings[$fields] = array_merge($featureSettings[$fields], $newFeatureSettings);
+            }
+
+            $dataArray = ['success' => 1];
         }
 
         $entity->setFeatureSettings($featureSettings);
