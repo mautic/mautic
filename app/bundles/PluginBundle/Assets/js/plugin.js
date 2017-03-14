@@ -34,18 +34,15 @@ Mautic.addNewPluginField = function (selector) {
     Mautic.stopIconSpinPostEvent();
 };
 
-Mautic.removePluginField = function (selector, indexClass) {
+Mautic.removePluginField = function (selector, indexClass, btn) {
     var deleteCurrentItem = mQuery('#' + indexClass);
+    var enabled = mQuery('.' + btn).hasClass('text-success');
 
-    deleteCurrentItem.find('input[type="radio"]').prop('disabled', true).next().prop('disabled', true);
-    deleteCurrentItem.find('label').addClass('disabled');
-
-    // Move the item to be the first hidden
-    if (deleteCurrentItem.closest('.fields-container').find('.field-container.hide').length) {
-        deleteCurrentItem.insertBefore(deleteCurrentItem.closest('.fields-container').find('.field-container.hide').first());
+    deleteCurrentItem.find('input[type="radio"]').prop('disabled', enabled).next().prop('disabled', enabled);
+    if (enabled) {
+        deleteCurrentItem.find('label').addClass('disabled');
     } else {
-        // There are no more so append to the end
-        deleteCurrentItem.insertAfter(deleteCurrentItem.closest('.fields-container').find('.field-container').last());
+        deleteCurrentItem.find('label').removeClass('enabled');
     }
 
     // Add back the option to other selects
@@ -63,18 +60,21 @@ Mautic.removePluginField = function (selector, indexClass) {
         mQuery(this).removeAttr('disabled');
     });
 
-    groupSelects.each(function() {
-        if (!mQuery(this).closest('.field-container').hasClass('hide')) {
-            mQuery(this).trigger('change');
-        }
-    });
+    if (enabled) {
+        groupSelects.each(function() {
+            if (!mQuery(this).closest('.field-container').hasClass('disabled')) {
+                mQuery(this).trigger('change');
+            }
+        });
+        mQuery('.' + btn).removeClass('text-default').addClass('text-success').trigger("chosen:updated");
+    } else {
+        mQuery('.' + btn).removeClass('text-success').addClass('text-default').trigger("chosen:updated");
+    }
 
-    deleteCurrentItem.addClass('hide');
     deleteCurrentItem.find('select').each(function( ) {
-        mQuery( this ).prop('disabled', true).trigger("chosen:updated");
+        mQuery( this ).prop('disabled', enabled).trigger("chosen:updated");
     });
 
-    Mautic.stopIconSpinPostEvent();
 };
 
 Mautic.initiateIntegrationAuthorization = function() {

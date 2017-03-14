@@ -38,7 +38,7 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
+        $resolver->setRequired(['integration_fields', 'lead_fields', 'integration', 'totalFields', 'page', 'fixedPageNum']);
         $resolver->setDefined(['update_mautic']);
         $resolver->setDefaults(
             [
@@ -65,5 +65,9 @@ class FieldsType extends AbstractType
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];
         $view->vars['alertType']           = $options['alert_type'];
+        $view->vars['integration']         = $options['integration'];
+        $view->vars['totalFields']         = $options['totalFields'];
+        $view->vars['page']                = $options['page'];
+        $view->vars['fixedPageNum']        = $options['fixedPageNum'];
     }
 }

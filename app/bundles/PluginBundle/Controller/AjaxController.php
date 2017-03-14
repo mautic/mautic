@@ -230,4 +230,18 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    protected function getPaginatedFields(Request $request)
+    {
+        $settings           = $request->request->get('settings');
+        $integration        = $request->request->get('integration');
+        $start              = $request->request->get('start');
+        $limit              = $request->request->get('limit');
+        $helper             = $this->factory->getHelper('integration');
+        $integration_object = $helper->getIntegrationObject($integration);
+        $fields             = $integration_object->getFormLeadFields($settings);
+        $fields             = array_slice($fields, $start, $limit);
+
+        return $fields;
+    }
 }

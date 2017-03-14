@@ -15,7 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait FieldsTypeTrait
 {
@@ -75,14 +74,7 @@ trait FieldsTypeTrait
             }
 
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-            $form->add('i_choices', HiddenType::class,
-                [
-                    'data' => !empty($choices) ? $choices : [],
-                ]);
-            $form->add('m_choices', HiddenType::class,
-                [
-                    'data' => !empty($mauticFields) ? $mauticFields : [],
-                ]);
+
             foreach ($fields as $field => $details) {
                 $matched = isset($matchedFields[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
@@ -99,12 +91,13 @@ trait FieldsTypeTrait
                         'required' => true,
                         'data'     => $field, // default to this field
                         'attr'     => [
-                            'class'            => 'field-selector integration-field form-control',
+                            'class'            => 'field-selector integration-field',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
                             'data-value'       => $field,
                             'data-matched'     => $matched,
                             'disabled'         => $disabled,
+                            'data-choices'     => $choices,
                         ],
                         'disabled' => $disabled,
                     ]
@@ -136,25 +129,17 @@ trait FieldsTypeTrait
                     [
                         'choices'    => $mauticFields,
                         'label'      => false,
-                        'required'   => true,
                         'data'       => $matched ? $matchedFields[$field] : '',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class'            => 'field-selector form-control',
+                            'class'            => 'field-selector',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
                             'data-value'       => $matched ? $matchedFields[$field] : '',
                             'disabled'         => $mauticDisabled,
+                            'data-choices'     => $mauticFields,
                         ],
-                        'disabled'    => $mauticDisabled,
-                        'empty_value' => 'mautic.core.form.chooseone',
-                        'constraints' => ($required) ? [
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.core.value.required',
-                                ]
-                            ),
-                        ] : [],
+                        'disabled' => $mauticDisabled,
                     ]
                 );
 

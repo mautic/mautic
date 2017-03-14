@@ -13,10 +13,13 @@
 $rowCount   = 0;
 $indexCount = 1;
 
-$choices = $form['i_choices']->vars['data'];
-unset($form['i_choices']);
-$mauticChoices = $form['m_choices']->vars['data'];
-unset($form['m_choices']);
+$baseUrl = $view['router']->path(
+    'mautic_plugin_config',
+    [
+        'name' => $integration,
+    ]
+);
+
 ?>
 
 <div class="row fields-container" id="<?php echo $containerId; ?>">
@@ -36,9 +39,9 @@ unset($form['m_choices']);
         </div>
         <?php echo $view['form']->errors($form); ?>
         <?php foreach ($form->children as $child): ?>
-            <?php $isRequired = !empty($child->vars['attr']['data-required']); ?>
+            <?php if (isset($child->vars['attr']['data-required'])) : $isRequired = !empty($child->vars['attr']['data-required']); endif; ?>
             <?php if ($rowCount % $numberOfFields == 0):  ?>
-            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row<?php echo ($rowCount > 0 && !$isRequired && empty($child->vars['attr']['data-matched'])) ? ' hide' : ''; ?>">
+            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row">
             <?php endif; ?>
             <?php ++$rowCount; ?>
             <?php
@@ -72,9 +75,10 @@ unset($form['m_choices']);
                         class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
                         data-value="<?php echo $child->vars['value']; ?>"
-                        <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
-                            <?php foreach ($choices as $keyLabel => $options):  ?>
+                            <?php
+                            $choices = $child->vars['attr']['data-choices'];
+                            foreach ($choices as $keyLabel => $options):  ?>
                             <?php if (is_array($options)) : ?>
                             <optgroup label="<?php echo $keyLabel; ?>">
                                 <?php foreach ($options as $keyValue => $o): ?>
@@ -109,7 +113,7 @@ unset($form['m_choices']);
                                            title=""
                                            autocomplete="false"
                                            value="0"
-                                           <?php echo $child->vars['attr']['disabled']?>
+
                                            <?php if ($checked): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
@@ -121,7 +125,6 @@ unset($form['m_choices']);
                                            title=""
                                            autocomplete="false"
                                            value="1"
-                                           <?php echo $child->vars['attr']['disabled']?>
                                            <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
@@ -139,22 +142,21 @@ unset($form['m_choices']);
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
-                        data-required="1"
-                        <?php echo $child->vars['attr']['disabled']?>
                         autocomplete="false">
-
-                    <?php foreach ($mauticChoices as $keyLabel => $options): ?>
+                    <?php
+                    $mauticChoices = $child->vars['attr']['data-choices'];
+                    foreach ($mauticChoices as $keyLabel => $options): ?>
                     <?php if (is_array($options)) : ?>
                     <optgroup label="<?php echo $keyLabel; ?>">
                         <?php foreach ($options as $keyValue => $o): ?>
-                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif; ?>>
+                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; elseif ($keyValue == '-1'): echo 'selected'; endif; ?>>
                             <?php echo $o; ?>
                         </option>
                         <?php endforeach; ?>
 
                     </optgroup>
                     <?php else : ?>
-                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
+                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; elseif ($keyLabel == '-1'): echo 'selected'; endif; ?>>
                         <?php echo $options; ?>
                     </option>
                     <?php endif; ?>
@@ -164,13 +166,6 @@ unset($form['m_choices']);
             <?php endif; ?>
 
             <?php if ($rowCount % $numberOfFields == 0): ?>
-                <div class="pl-xs pr-xs col-sm-1">
-                    <button type="button" class="btn btn-default remove-field"
-                            onclick="Mautic.removePluginField('<?php echo $object; ?>-field','<?php echo $object; ?>-<?php echo $rowCount - $numberOfFields; ?>');"
-                            <?php if ($isRequired): ?>disabled<?php endif; ?>>
-                        <span class="fa fa-close"></span>
-                    </button>
-                </div>
                 </div>
                 <?php
                 ++$indexCount;
@@ -178,8 +173,20 @@ unset($form['m_choices']);
             unset($form[$child->vars['name']]);
             ?>
         <?php endforeach; ?>
-        <a href="#" class="add btn btn-warning ml-sm btn-add-item" onclick="Mautic.addNewPluginField('<?php echo $object; ?>-field', null);">
-            <?php echo $view['translator']->trans('mautic.plugin.form.add.fields'); ?>
-        </a>
+    </div>
+    <div class="panel-footer">
+
+        <?php echo $view->render(
+            'MauticCoreBundle:Helper:pagination.html.php',
+            [
+                'page'        => $page,
+                'fixedPages'  => $fixedPageNum,
+                'fixedLimit'  => true,
+                'baseUrl'     => $baseUrl,
+                'target'      => '.modal-body-content',
+                'totalItems'  => $totalFields,
+                'queryString' => '&activeTab='.$containerId,
+            ]
+        ); ?>
     </div>
 </div>

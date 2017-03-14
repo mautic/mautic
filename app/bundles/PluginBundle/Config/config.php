@@ -25,7 +25,7 @@ return [
                 'controller' => 'MauticPluginBundle:Plugin:index',
             ],
             'mautic_plugin_config' => [
-                'path'       => '/plugins/config/{name}',
+                'path'       => '/plugins/config/{name}/{page}',
                 'controller' => 'MauticPluginBundle:Plugin:config',
             ],
             'mautic_plugin_info' => [
@@ -88,7 +88,7 @@ return [
             ],
             'mautic.form.type.integration.settings' => [
                 'class'     => 'Mautic\PluginBundle\Form\Type\FeatureSettingsType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters', 'translator'],
                 'alias'     => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [

@@ -39,7 +39,7 @@ class CompanyFieldsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_mautic_company']);
-        $resolver->setRequired(['integration_company_fields', 'company_fields']);
+        $resolver->setRequired(['integration_company_fields', 'company_fields', 'integration', 'totalFields', 'page', 'fixedPageNum']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',
@@ -65,5 +65,9 @@ class CompanyFieldsType extends AbstractType
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];
         $view->vars['alertType']           = $options['alert_type'];
+        $view->vars['integration']         = $options['integration'];
+        $view->vars['totalFields']         = $options['totalFields'];
+        $view->vars['page']                = $options['page'];
+        $view->vars['fixedPageNum']        = $options['fixedPageNum'];
     }
 }
