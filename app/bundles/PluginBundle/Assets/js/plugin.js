@@ -79,18 +79,16 @@ Mautic.removePluginField = function (selector, indexClass, btn) {
 Mautic.matcheFields = function (index, object, integration) {
     var integrationField = mQuery('#integration_details_featureSettings_leadFields_i_' + index + ' option:selected').val();
     var mauticField = mQuery('#integration_details_featureSettings_leadFields_m_' + index + ' option:selected').val();
-    console.log(object);
     if (object == 'lead') {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]:checked').val();
     } else {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic_company' + index + ']"]:checked').val();
     }
-    console.log(mauticField);
-console.log(integrationField);
-    console.log(updateMauticField);
     Mautic.ajaxActionRequest('plugin:matchFields', {object: object, integration: integration, integrationField : integrationField, mauticField: mauticField, updateMautic : updateMauticField}, function(response) {
         var theMessage = (response.success) ? 'Matched' : 'Not matched';
-        mQuery('#matched-message-' + index).html('has-success has-error').html(theMessage);
+        var theClass = (response.success) ? 'text-success' : 'text-warning';
+        mQuery('#matched-message-' + index).html(theMessage);
+        mQuery('#matched-message-' + index).addClass(theClass);
     });
 };
 Mautic.initiateIntegrationAuthorization = function() {

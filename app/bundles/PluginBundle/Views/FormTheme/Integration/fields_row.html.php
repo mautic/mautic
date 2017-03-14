@@ -38,7 +38,9 @@ $baseUrl = $view['router']->path(
             <div class="pl-xs pr-xs col-sm-1 text-center"></div>
         </div>
         <?php echo $view['form']->errors($form); ?>
-        <?php foreach ($form->children as $child): ?>
+        <?php foreach ($form->children as $child):
+            $selected = false;
+            ?>
             <?php if (isset($child->vars['attr']['data-required'])) : $isRequired = !empty($child->vars['attr']['data-required']); endif; ?>
             <?php if ($rowCount % $numberOfFields == 0):  ?>
             <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row">
@@ -137,7 +139,6 @@ $baseUrl = $view['router']->path(
 
             <?php
             if ($child->vars['name'] == 'm_'.$indexCount):
-                $selected = false;
                 ?>
             <div class="pl-xs pr-xs <?php echo $class; ?>">
                 <select id="<?php echo $child->vars['id']; ?>"
@@ -151,14 +152,14 @@ $baseUrl = $view['router']->path(
                     <?php if (is_array($options)) : ?>
                     <optgroup label="<?php echo $keyLabel; ?>">
                         <?php foreach ($options as $keyValue => $o): ?>
-                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (!$selected || $keyValue == '-1'): echo 'selected'; endif; ?>>
+                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && $keyValue == '-1'): echo 'selected'; endif; ?>>
                             <?php echo $o; ?>
                         </option>
                         <?php endforeach; ?>
 
                     </optgroup>
                     <?php else : ?>
-                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; elseif ($keyLabel == '-1'): echo 'selected'; endif; ?>>
+                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && $keyLabel == '-1'): echo 'selected'; endif; ?>>
                         <?php echo $options; ?>
                     </option>
                     <?php endif; ?>

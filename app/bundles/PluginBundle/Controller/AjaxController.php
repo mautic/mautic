@@ -233,7 +233,6 @@ class AjaxController extends CommonAjaxController
 
     protected function matchFieldsAction(Request $request)
     {
-        $dataArray         = ['success' => 0];
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');
         $mautic_field      = $request->request->get('mauticField');
@@ -261,11 +260,13 @@ class AjaxController extends CommonAjaxController
             if (array_key_exists($integration_field, $featureSettings[$fields])) {
                 unset($featureSettings[$fields][$integration_field]);
             }
+            $dataArray = ['success' => 0];
         } else {
             $newFeatureSettings[$integration_field] = $update_mautic;
             $featureSettings[$updateFields]         = array_merge($featureSettings[$updateFields], $newFeatureSettings);
             $newFeatureSettings[$integration_field] = $mautic_field;
             $featureSettings[$fields]               = array_merge($featureSettings[$fields], $newFeatureSettings);
+            $dataArray                              = ['success' => 1];
         }
 
         $entity->setFeatureSettings($featureSettings);
