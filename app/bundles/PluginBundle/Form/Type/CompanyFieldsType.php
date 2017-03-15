@@ -30,7 +30,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->buildFormFields($builder, $options, $options['integration_company_fields'], $options['company_fields'], 'company');
+        $this->buildFormFields($builder, $options, $options['integration_company_fields'], $options['company_fields'], 'company', $options['limit'], $options['start']);
     }
 
     /**
@@ -39,7 +39,7 @@ class CompanyFieldsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_mautic_company']);
-        $resolver->setRequired(['integration_company_fields', 'company_fields', 'integration', 'totalFields', 'page', 'fixedPageNum']);
+        $resolver->setRequired(['integration_company_fields', 'company_fields', 'integration', 'totalFields', 'page', 'fixedPageNum', 'limit', 'start']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',

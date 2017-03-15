@@ -180,7 +180,6 @@ class PluginController extends FormController
 
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
-
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
 

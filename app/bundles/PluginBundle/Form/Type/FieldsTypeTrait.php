@@ -30,9 +30,13 @@ trait FieldsTypeTrait
         array $options,
         array $integrationFields,
         array $mauticFields,
-        $fieldObject = ''
+        $fieldObject,
+        $limit,
+        $start
     ) {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject) {
+        asort($integrationFields);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
             $form = $event->getForm();
             $index = 0;
             $choices = [];
@@ -45,10 +49,6 @@ trait FieldsTypeTrait
 
             // First loop to build options
             foreach ($integrationFields as $field => $details) {
-                //if ($matched = ($isPost) ? !empty($fieldData['m_'.$fieldData[$field]]) : !empty($fieldData[$field])) {
-                //    $matchedFields[$field] = !empty($fieldData['m_'.$fieldData[$field]]) ? $fieldData['m_'.$fieldData[$field]] : $fieldData[$field];
-                //}
-
                 if (is_array($details) && !empty($details['required'])) {
                     $requiredFields[$field] = $details;
                 } elseif (isset($fieldData[$field])) {
@@ -75,8 +75,8 @@ trait FieldsTypeTrait
             }
 
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-
-            foreach ($fields as $field => $details) {
+            $paginatedFields = array_slice($fields, $start, $limit);
+            foreach ($paginatedFields as $field => $details) {
                 $matched = isset($fieldData[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
                 $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';

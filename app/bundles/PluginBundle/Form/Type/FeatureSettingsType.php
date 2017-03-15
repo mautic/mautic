@@ -89,8 +89,7 @@ class FeatureSettingsType extends AbstractType
                     $fields = (isset($fields[0])) ? $fields[0] : $fields;
                     unset($fields['company']);
                 }
-                $totalFields     = count($fields);
-                $fieldsPaginated = array_slice($fields, $start, $limit);
+                $totalFields = count($fields);
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     if (empty($integrationCompanyFields)) {
@@ -100,16 +99,15 @@ class FeatureSettingsType extends AbstractType
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
-                    $paginatedCompanyFields = array_slice($integrationCompanyFields, $companyStart, $limit);
                 }
 
-                if (!is_array($fieldsPaginated)) {
-                    $fieldsPaginated = [];
+                if (!is_array($fields)) {
+                    $fields = [];
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fieldsPaginated = [];
-                $error           = $e->getMessage();
+                $fields = [];
+                $error  = $e->getMessage();
             }
             list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
             /**
@@ -119,7 +117,7 @@ class FeatureSettingsType extends AbstractType
             foreach (array_values($leadFields) as $fieldsWithoutGroups) {
                 $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
             }
-            $integrationFields  = array_keys($fieldsPaginated);
+            $integrationFields  = array_keys($fields);
             $flattenLeadFields  = array_keys($flattenLeadFields);
             $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
             $enableDataPriority = false;
@@ -141,13 +139,15 @@ class FeatureSettingsType extends AbstractType
                     'lead_fields'          => $leadFields,
                     'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
                     'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
-                    'integration_fields'   => $fieldsPaginated,
+                    'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
                     'integration'          => $integration_object->getName(),
                     'totalFields'          => $totalFields,
                     'page'                 => $page,
+                    'limit'                => $limit,
+                    'start'                => $start,
                     'fixedPageNum'         => round($totalFields / $limit),
                 ]
             );
@@ -162,13 +162,15 @@ class FeatureSettingsType extends AbstractType
                         'company_fields'             => $companyFields,
                         'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
                         'update_mautic_company'      => isset($data['update_mautic_company']) && !empty($data['update_mautic_company']) ? $data['update_mautic_company'] : [],
-                        'integration_company_fields' => $paginatedCompanyFields,
+                        'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
                         'enable_data_priority'       => $enableDataPriority,
                         'integration'                => $integration_object->getName(),
                         'totalFields'                => $totalCompanyFields,
                         'page'                       => $companyPage,
+                        'limit'                      => $limit,
+                        'start'                      => $companyStart,
                         'fixedPageNum'               => round($totalCompanyFields / $limit),
                     ]
                 );

@@ -30,7 +30,7 @@ class FieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['lead_fields']);
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['lead_fields'], '', $options['limit'], $options['start']);
     }
 
     /**
@@ -38,7 +38,7 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields', 'integration', 'totalFields', 'page', 'fixedPageNum']);
+        $resolver->setRequired(['integration_fields', 'lead_fields', 'integration', 'totalFields', 'page', 'fixedPageNum', 'limit', 'start']);
         $resolver->setDefined(['update_mautic']);
         $resolver->setDefaults(
             [
