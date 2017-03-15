@@ -89,7 +89,7 @@ trait FieldsTypeTrait
                         'label' => false,
                         'data'  => $choices[$field],
                         'attr'  => [
-                            'class'         => 'form-control',
+                            'class'         => 'form-control integration-fields',
                             'data-required' => $required,
                             'data-label'    => $choices[$field],
                             'placeholder'   => isset($group[$field]) ? $group[$field] : '',

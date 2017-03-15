@@ -35,9 +35,15 @@
 .placeholder::after
 {
     position: absolute;
-    right: 7px;
-    top: 7px;
+    right: 3px;
+    top: 19px;
     content: attr(data-placeholder);
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.3;
+    font-size: 9px
+}
+
+.integration-fields{
+    font-size: 12px;
+    padding-left: 7px;
 }
