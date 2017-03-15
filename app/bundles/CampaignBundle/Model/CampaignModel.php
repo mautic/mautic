@@ -1018,6 +1018,7 @@ class CampaignModel extends CommonFormModel
                 $start += $limit;
 
                 $processedLeads = [];
+                $this->em->getConnection()->beginTransaction();
                 foreach ($newLeadList as $l) {
                     $this->addLeads($campaign, [$l], false, true, -1);
                     $processedLeads[] = $l;
@@ -1040,6 +1041,9 @@ class CampaignModel extends CommonFormModel
                         new Events\CampaignLeadChangeEvent($campaign, $processedLeads, 'added')
                     );
                 }
+
+                $this->em->flush(); 
+                $this->em->getConnection()->commit();
 
                 unset($newLeadList);
 
@@ -1104,6 +1108,8 @@ class CampaignModel extends CommonFormModel
                 );
 
                 $processedLeads = [];
+
+                $this->em->getConnection()->beginTransaction();
                 foreach ($removeLeadList as $l) {
                     $this->removeLeads($campaign, [$l], false, true, true);
                     $processedLeads[] = $l;
@@ -1127,6 +1133,8 @@ class CampaignModel extends CommonFormModel
 
                 $start += $limit;
 
+                $this->em->flush();
+                $this->em->getConnection()->commit();
                 unset($removeLeadList);
 
                 // Free some memory

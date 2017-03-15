@@ -596,6 +596,7 @@ class EventModel extends CommonFormModel
 
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             $leadDebugCounter = 1;
+            $this->em->getConnection()->beginTransaction();
             foreach ($leads as $lead) {
                 $this->logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
@@ -717,6 +718,8 @@ class EventModel extends CommonFormModel
                 ++$leadDebugCounter;
             }
 
+            $this->em->flush();
+            $this->em->getConnection()->commit();
             $this->em->clear('Mautic\LeadBundle\Entity\Lead');
             $this->em->clear('Mautic\UserBundle\Entity\User');
 
@@ -871,6 +874,7 @@ class EventModel extends CommonFormModel
 
             $this->logger->debug('CAMPAIGN: Processing the following contacts '.implode(', ', array_keys($events)));
             $leadDebugCounter = 1;
+            $this->em->getConnection()->beginTransaction();
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
                     $this->logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
@@ -957,6 +961,9 @@ class EventModel extends CommonFormModel
             }
 
             // Free RAM
+
+            $this->em->flush();
+            $this->em->getConnection().commit();
             $this->em->clear('Mautic\LeadBundle\Entity\Lead');
             $this->em->clear('Mautic\UserBundle\Entity\User');
             unset($events, $leads);
@@ -1165,6 +1172,7 @@ class EventModel extends CommonFormModel
 
                     $leadDebugCounter = 1;
                     /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+                    $this->em->getConnection()->beginTransaction();
                     foreach ($leads as $lead) {
                         ++$negativeEvaluatedCount;
 
@@ -1319,6 +1327,9 @@ class EventModel extends CommonFormModel
 
                 // Next batch
                 $start += $limit;
+
+                $this->em->flush();
+                $this->em->getConnection()->commit();
 
                 // Save RAM
                 $this->em->clear('Mautic\LeadBundle\Entity\Lead');

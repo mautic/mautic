@@ -564,6 +564,8 @@ class ListModel extends FormModel
                 }
 
                 $processedLeads = [];
+
+                $this->em->getConnection()->beginTransaction();
                 foreach ($newLeadList[$id] as $l) {
                     $this->addLead($l, $entity, false, true, -1, $localDateTime);
                     $processedLeads[] = $l;
@@ -588,6 +590,10 @@ class ListModel extends FormModel
                         new ListChangeEvent($processedLeads, $entity, true)
                     );
                 }
+
+
+                $this->em->flush();
+                $this->em->getConnection()->commit();
 
                 unset($newLeadList);
 
@@ -665,6 +671,7 @@ class ListModel extends FormModel
                 }
 
                 $processedLeads = [];
+                $this->em->getConnection()->beginTransaction();
                 foreach ($removeLeadList[$id] as $l) {
                     $this->removeLead($l, $entity, false, true, true);
                     $processedLeads[] = $l;
@@ -687,7 +694,8 @@ class ListModel extends FormModel
                 }
 
                 $start += $limit;
-
+                $this->em->flush();
+                $this->em->getConnection()->commit();
                 unset($removeLeadList);
 
                 // Free some memory
