@@ -34,8 +34,6 @@ trait FieldsTypeTrait
         $limit,
         $start
     ) {
-        asort($integrationFields);
-
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
             $form = $event->getForm();
             $index = 0;
@@ -56,13 +54,11 @@ trait FieldsTypeTrait
                 } else {
                     $optionalFields[$field] = $details;
                 }
-
                 if (is_array($details)) {
                     if (isset($details['group'])) {
                         if (!isset($choices[$details['group']])) {
                             $choices[$details['group']] = [];
                         }
-
                         $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
                         $group[$field] = $details['group'];
                         $choices[$field] = $label;

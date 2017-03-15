@@ -271,7 +271,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                         if (!isset($salesFields[$sfObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
-
+                           // asort($fields);
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
@@ -318,6 +318,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+        asort($salesFields[$sfObject]);
 
         return $salesFields;
     }
