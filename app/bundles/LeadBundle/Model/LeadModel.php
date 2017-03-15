@@ -866,6 +866,10 @@ class LeadModel extends FormModel
 
         if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
             $lead = $this->getEntity($clickthrough['lead']);
+            // identify contact from link
+            if(!isset($queryFields['email']) && empty($queryFields['email']) && $lead && $email = $lead->getEmail()) {
+                    $queryFields['email'] = $email;
+            }
             $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
         }
 
