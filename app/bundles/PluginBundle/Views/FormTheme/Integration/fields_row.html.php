@@ -90,7 +90,7 @@ $baseUrl = $view['router']->path(
                                            title=""
                                            autocomplete="false"
                                            value="0"
-
+                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')"
                                            <?php if ($checked): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
@@ -102,6 +102,7 @@ $baseUrl = $view['router']->path(
                                            title=""
                                            autocomplete="false"
                                            value="1"
+                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')"
                                            <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
@@ -120,7 +121,7 @@ $baseUrl = $view['router']->path(
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']?>"
                         data-placeholder=" "
-                        autocomplete="false" onchange="Mautic.matcheFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')">
+                        autocomplete="false" onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')">
                     <?php
                     $mauticChoices = $child->vars['attr']['data-choices'];
                     foreach ($mauticChoices as $keyLabel => $options): ?>

@@ -1,5 +1,5 @@
 /* PluginBundle */
-Mautic.matcheFields = function (index, object, integration) {
+Mautic.matchedFields = function (index, object, integration) {
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).val();
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
     if (object == 'lead') {
