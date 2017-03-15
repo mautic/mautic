@@ -943,22 +943,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $mauticData            = [];
+        $mauticData            = $leadsToUpdate            = $fields            = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $fields                = implode(', l.', $config['leadFields']);
-        $fields                = 'l.'.$fields;
-        $result                = 0;
-        $checkEmailsInSF       = [];
 
-        $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
-        $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
-        $contactSfFields = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
+        if (!empty($config['leadFields'])) {
+            $fields          = implode(', l.', $config['leadFields']);
+            $fields          = 'l.'.$fields;
+            $result          = 0;
+            $checkEmailsInSF = [];
 
-        $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
-        $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
+            $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
+            $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
+            $contactSfFields = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
 
-        //update lead/contact records
-        $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
+            $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
+            $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
+
+            //update lead/contact records
+            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
+        }
         foreach ($leadsToUpdate as $lead) {
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
@@ -969,12 +972,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($limit) {
             $limit -= count($leadsToUpdate);
         }
-
+        $checkEmailsInSF = [];
         //create lead records
-        if (null === $limit || $limit) {
+        if (null === $limit || $limit && !empty($fields)) {
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
             foreach ($leadsToCreate as $lead) {
-                $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
+                if (isset($lead['email'])) {
+                    $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
+                }
             }
         }
 
