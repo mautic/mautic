@@ -188,16 +188,24 @@ if ($tmpl == 'index') {
                                 ['%count%' => $item->getSentCount(true)]
                             ); ?>
                         </span>
+                        <!--
                         <span class="mt-xs label label-success">
                             <?php echo $view['translator']->trans(
                                 'mautic.email.stat.readcount',
                                 ['%count%' => $item->getReadCount(true)]
                             ); ?>
                         </span>
+                         -->
                         <span class="mt-xs label label-primary">
                             <?php echo $view['translator']->trans(
                                 'mautic.email.stat.readpercent',
                                 ['%count%' => $item->getReadPercentage(true)]
+                            ); ?>
+                        </span>
+                        <span class="mt-xs label label-info">
+                            <?php echo $view['translator']->trans(
+                                'mautic.email.stat.clickedpercent',
+                                ['%count%' => $item->getClickedPercentage(true)]
                             ); ?>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>

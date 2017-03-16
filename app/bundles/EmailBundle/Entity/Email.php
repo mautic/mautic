@@ -610,7 +610,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getClickedCount($includeVariants = false)
     {
-        return ($includeVariants) ? $this->getAccumulativeVariantCount('getClickedCount') : $this->readCount;
+        return ($includeVariants) ? $this->getAccumulativeVariantCount('getClickedCount') : $this->clickedCount;
     }
 
     /**
@@ -1095,7 +1095,21 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getReadPercentage($includevariants = false)
     {
         if ($this->getSentCount($includevariants) > 0) {
-            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 1);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate Clicked Percentage for each Email.
+     *
+     * @return int
+     */
+    public function getClickedPercentage($includevariants = false)
+    {
+        if ($this->getReadCount($includevariants) > 0) {
+            return round($this->getClickedCount($includevariants) / ($this->getReadCount($includevariants)) * 100, 1);
         } else {
             return 0;
         }

@@ -400,10 +400,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * count unique click by email.
      *
-     * @param stat    $stat
-     * @param request $request
+     * @param stat $stat
      */
-    public function clickEmail($stat, $request)
+    public function clickEmail($stat)
     {
         if ($stat->isClicked() === true) {
             // this Email is already counted as clicked
