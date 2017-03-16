@@ -21,6 +21,8 @@ final class QueueEvents
 
     const PUBLISH_MESSAGE = 'mautic.queue_publish_message';
 
+    const BUILD_CONFIG = 'mautic.queue_build_config';
+
     const EMAIL_HIT = 'mautic.queue_email_hit';
 
     const PAGE_HIT = 'mautic.queue_page_hit';

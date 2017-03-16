@@ -15,6 +15,7 @@ use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class BeanstalkdSubscriber
@@ -25,6 +26,11 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
      * @var string
      */
     protected $protocol = QueueProtocol::BEANSTALKD;
+
+    /**
+     * @var string
+     */
+    protected $protocolUiTranslation = 'mautic.queue.config.protocol.beanstalkd';
 
     /**
      * @var ContainerInterface
@@ -78,5 +84,79 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
             $messagesConsumed++;
         }
+    }
+
+    /**
+     * @param Events\QueueConfigEvent $event
+     */
+    public function buildConfig(Events\QueueConfigEvent $event)
+    {
+        $showConditions = '{"config_queueconfig_queue_protocol":["beanstalkd"]}';
+
+        $event->addFormField(
+            'beanstalkd_host',
+            'text',
+            [
+                'label'      => 'mautic.queue.config.host',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'data-show-on' => $showConditions,
+                    'tooltip' => 'mautic.queue.config.host.tooltip',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
+                'data' => empty($options['data']['beanstalkd_host']) ? 'localhost' : $options['data']['beanstalkd_host'],
+            ]
+        );
+
+        $event->addFormField(
+            'beanstalkd_port',
+            'text',
+            [
+                'label'      => 'mautic.queue.config.port',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'data-show-on' => $showConditions,
+                    'tooltip' => 'mautic.queue.config.port.tooltip',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
+                'data' => empty($options['data']['beanstalkd_port']) ? '11300' : $options['data']['beanstalkd_port'],
+            ]
+        );
+
+        $event->addFormField(
+            'beanstalkd_timeout',
+            'text',
+            [
+                'label'      => 'mautic.queue.config.beanstalkd.timeout',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'data-show-on' => $showConditions,
+                    'tooltip' => 'mautic.queue.config.beanstalkd.timeout.tooltip',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
+                'data' => empty($options['data']['beanstalkd_timeout']) ? '60' : $options['data']['beanstalkd_timeout'],
+            ]
+        );
     }
 }

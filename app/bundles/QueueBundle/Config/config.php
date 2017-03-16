@@ -23,6 +23,16 @@ return [
                     'mautic.queue.service',
                 ],
             ],
+            'mautic.queue.configbundle.subscriber' => [
+                'class'     => 'Mautic\QueueBundle\EventListener\ConfigSubscriber',
+            ],
+        ],
+        'forms' => [
+            'mautic.form.type.queueconfig' => [
+                'class'     => 'Mautic\QueueBundle\Form\Type\ConfigType',
+                'arguments' => 'event_dispatcher',
+                'alias'     => 'queueconfig',
+            ],
         ],
         'other' => [
             'mautic.queue.service' => [
@@ -41,7 +51,7 @@ return [
     'parameters' => [
         'use_queue'            => false,
         'track_mail_use_queue' => false,
-        'queue_protocol'       => 'rabbitmq',
+        'queue_protocol'       => '',
         'rabbitmq_host'        => 'localhost',
         'rabbitmq_port'        => '5672',
         'rabbitmq_vhost'       => '/',
