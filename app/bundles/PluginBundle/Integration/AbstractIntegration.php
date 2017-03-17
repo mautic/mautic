@@ -1415,6 +1415,7 @@ abstract class AbstractIntegration
                 $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
+        unset($gleanedData);
 
         return $matched;
     }

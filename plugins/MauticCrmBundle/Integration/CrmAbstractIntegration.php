@@ -278,6 +278,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
+
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {

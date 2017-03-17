@@ -367,6 +367,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $count  = 0;
         $entity = null;
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
@@ -405,9 +407,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     if ($entity) {
-                        /** @var IntegrationEntityRepository $integrationEntityRepo */
-                        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-                        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
+                        $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
                             'Salesforce',
                             $object,
                             $mauticObjectReference,
@@ -434,11 +434,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
-
-                unset($data);
+                unset($record);
+                unset($entity);
             }
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+            unset($data);
         }
 
         return $count;
@@ -633,6 +634,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                         if (isset($result['nextRecordsUrl'])) {
                             $query = $result['nextRecordsUrl'];
+                            unset($result);
                             $this->getLeads($params, $query);
                         }
                     }
