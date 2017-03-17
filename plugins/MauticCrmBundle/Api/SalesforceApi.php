@@ -286,8 +286,9 @@ class SalesforceApi extends CrmApi
             }
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
-
-            $result = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+            $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+        } elseif (!isset($query['start'])) {
+            $result = $this->request('query/'.$query, [], 'GET', false, null, $queryUrl);
         }
 
         return $result;
