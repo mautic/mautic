@@ -617,7 +617,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $salesForceObjects[] = 'Lead';
 
-        if (isset($config['objects'])) {
+        if (isset($config['objects']) && !empty($config['objects'])) {
             $salesForceObjects = $config['objects'];
         }
 
@@ -699,7 +699,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $apiHelper = $this->getApiHelper();
 
         $salesForceObjects[] = 'Lead';
-        if (isset($config['objects'])) {
+        if (isset($config['objects']) && !empty($config['objects'])) {
             $salesForceObjects = $config['objects'];
         }
 
