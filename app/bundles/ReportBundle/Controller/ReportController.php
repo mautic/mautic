@@ -787,13 +787,6 @@ class ReportController extends FormController
         $name = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($entity->getName(), false, '-');
         $options = array( 'dateFrom' => new \DateTime($fromDate),'dateTo' => new \DateTime($toDate));
 
-        if($format === 'html') {
-            if ($format === 'xlsx') {
-                $options['ignoreGraphData'] = true;
-            }
-            $reportData = $model->getReportData($entity, null, $options);
-            $response = $model->exportResults($format, $entity, $reportData, null, null);
-        }
         if($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
                 function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {
@@ -818,6 +811,12 @@ class ReportController extends FormController
             $response->headers->set('Expires', 0);
             $response->headers->set('Cache-Control', 'must-revalidate');
             $response->headers->set('Pragma', 'public');
+        }else{
+            if ($format === 'xlsx') {
+                $options['ignoreGraphData'] = true;
+            }
+            $reportData = $model->getReportData($entity, null, $options);
+            $response = $model->exportResults($format, $entity, $reportData, null, null);
         }
 
         return $response;
