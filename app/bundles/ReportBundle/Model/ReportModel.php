@@ -577,7 +577,8 @@ public function exportResults($format, $report, $reportData, $handle, $page)
             if ($paginate) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
-                if (!empty($limit = $options['limit'])) {
+                if (!empty($options['limit'])) {
+                    $limit = $options['limit'];
                     $reportPage = $options['page'];
                 }
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
