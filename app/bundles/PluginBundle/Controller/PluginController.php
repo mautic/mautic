@@ -210,10 +210,10 @@ class PluginController extends FormController
                                 unset($featureSettings['update_mautic']);
                                 foreach ($submittedFields as $f => $v) {
                                     if (!strstr($f, 'update_mautic')) {
-                                        if (!empty($v) && strstr($f, 'i_')) {
+                                        if (!empty($v) && (substr($f, 0, 2) == 'i_')) {
                                             $integrationField = $v;
                                         }
-                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
+                                        if (!empty($v) && (substr($f, 0, 2) == 'm_') && isset($integrationField)) {
                                             $mauticField                                      = $v;
                                             $featureSettings['leadFields'][$integrationField] = $mauticField;
                                         }

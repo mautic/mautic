@@ -49,6 +49,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
+                '--fetch-all',
+                null,
+                InputOption::VALUE_NONE,
+                'Get all CRM contacts whatever the date is. Should be used at instance initialization only'
+            )
+            ->addOption(
                 '--time-interval',
                 '-a',
                 InputOption::VALUE_OPTIONAL,
@@ -92,6 +98,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if (!$endDate) {
             $endDate = date('c');
         }
+
+        if ($input->getOption('fetch-all')) {
+            $interval  = '43199000 minutes';
+            $startDate = date('c', strtotime('-'.$interval));
+            $endDate   = date('c');
+        }
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
@@ -103,10 +115,14 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['start'] = $startDate;
             $params['end']   = $endDate;
             $params['limit'] = $limit;
+
             if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
-                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
+                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects'])
+              || in_array('Leads', $config['objects'])
+              || in_array('Contacts', $config['objects'])
+                )) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                    if (strtotime($startDate) > strtotime('-30 days')) {
+                    if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
                         $processed = intval($integrationObject->getLeads($params));
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
@@ -121,7 +137,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && in_array('company', $config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
-                if (strtotime($startDate) > strtotime('-30 days')) {
+                if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
                     $processed = intval($integrationObject->getCompanies($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');

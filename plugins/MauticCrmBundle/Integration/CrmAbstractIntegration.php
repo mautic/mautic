@@ -313,9 +313,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
         //use direction of fields only when updating existing lead
-        $fieldsToUpdateInMautic = (isset($config['update_mautic']) and !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
-        $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
-        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+        if (!empty($existingLeads)) {
+            $fieldsToUpdateInMautic = (isset($config['update_mautic'])) ? array_keys($config['update_mautic'], 0) : [];
+            $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+            $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+        }
+
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
