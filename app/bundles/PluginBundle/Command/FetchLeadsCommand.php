@@ -107,12 +107,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        $result = [];
                         if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, null, $result, 'Lead'));
+                            $processed = intval($integrationObject->getLeads($params, null, null, [], 'Lead'));
                         }
                         if (in_array('Contact', $config['objects'])) {
-                            $processed += intval($integrationObject->getLeads($params, null, null, $result, 'Contact'));
+                            $processed += intval($integrationObject->getLeads($params, null, null, [], 'Contact'));
                         }
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');

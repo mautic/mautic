@@ -605,6 +605,7 @@ abstract class AbstractIntegration
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
         }
+        $headers[] = 'Sforce-Query-Options: batchSize=200';
 
         if (!isset($settings['query'])) {
             $settings['query'] = [];
@@ -669,6 +670,7 @@ abstract class AbstractIntegration
                 }
             }
         }
+
         $options = [
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_HEADER         => 1,
@@ -1414,7 +1416,6 @@ abstract class AbstractIntegration
                 $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
-        unset($gleanedData);
 
         return $matched;
     }

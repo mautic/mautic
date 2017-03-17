@@ -364,19 +364,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
         $params['fields']                          = implode(',', $fields);
-        $limit                                     = 500;
-        $count                                     = 0;
-        $entity                                    = null;
-        if (isset($data['records']) and $object !== 'Activity') {
-            $batches = array_chunk($data['records'], $limit, true);
-        } else {
-            return $count;
-        }
+
+        $count  = 0;
+        $entity = null;
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        unset($data);
-        for ($i = 0; $i < count($batches); ++$i) {
-            foreach ($batches[$i] as $record) {
+
+        if (isset($data['records']) and $object !== 'Activity') {
+            foreach ($data['records'] as $record) {
                 $integrationEntities = [];
                 if (isset($record['attributes']['type']) && $record['attributes']['type'] == 'Account') {
                     $newName = '';
@@ -616,7 +611,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, $executed = null, $result = [], $object = 'Lead')
     {
-        $r = [];
+        $config = $this->mergeConfigToFeatureSettings([]);
 
         if (!$query) {
             $query = $this->getFetchQuery($params);
@@ -624,15 +619,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
-                    $r = $this->getApiHelper()->getLeads($query, $object);
-                    if (isset($r['records'])) {
-                        $result['records'] = array_merge($result, $r['records']);
-                    }
-                    if (isset($r['nextRecordsUrl'])) {
-                        $query = $r['nextRecordsUrl'];
+                    $result = $this->getApiHelper()->getLeads($query, $object);
+                    $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
+                    if (isset($result['nextRecordsUrl'])) {
+                        $query = $result['nextRecordsUrl'];
                         $this->getLeads($params, $query, $executed, $result['records'], $object);
-                    } else {
-                        $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     }
                 }
 
@@ -643,11 +634,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $executed;
-    }
-
-    public function processMore($params = [], $query = null, $executed = null)
-    {
-        $this->getLeads($params, $query, $executed);
     }
 
     /**

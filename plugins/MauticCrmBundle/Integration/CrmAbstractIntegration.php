@@ -93,8 +93,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param $lead
      */
-    public function getLeads($params = [], $query = null, $executed = null, $result = [])
+    public function getLeads($params = [])
     {
+        $executed = null;
+
         $query = $this->getFetchQuery($params);
 
         try {
@@ -276,7 +278,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {
@@ -313,8 +314,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         //use direction of fields only when updating existing lead
         $fieldsToUpdateInMautic = (isset($config['update_mautic']) and !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
-        $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
-        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+        $fieldsToUpdateInMautic = array_diff_key(array_flip($fieldsToUpdateInMautic), $config['leadFields']);
+        $matchedFields          = array_diff($matchedFields, array_flip($fieldsToUpdateInMautic));
+
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
