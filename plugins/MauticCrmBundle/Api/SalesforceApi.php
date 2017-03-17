@@ -293,6 +293,16 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    public function getCampaigns()
+    {
+        $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
+        $queryUrl      = $this->integration->getQueryUrl();
+
+        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
+
     /**
      * @return mixed
      */

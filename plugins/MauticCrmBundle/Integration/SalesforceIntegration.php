@@ -1223,4 +1223,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return [$updated, $created];
     }
+
+    public function getCampaigns()
+    {
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
+        try {
+            $campaigns = $this->getApiHelper()->getCampaigns();
+            $this->factory->getLogger()->addError(print_r($campaigns, true));
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+            if (!$silenceExceptions) {
+                throw $e;
+            }
+        }
+
+        return [];
+    }
 }
