@@ -255,13 +255,6 @@ class SalesforceApi extends CrmApi
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
-        } else {
-            $query  = str_replace('/services/data/v34.0/query/', '', $query);
-            $result = $this->request('query/'.$query, [], 'GET', false, null, $queryUrl);
-            print_r($result);
-            die();
-
-            return $result;
         }
 
         $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
