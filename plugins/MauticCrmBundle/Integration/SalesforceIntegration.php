@@ -631,11 +631,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if ($object !== 'Activity' and $object !== 'company') {
                         $result = $this->getApiHelper()->getLeads($query, $object);
                         $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
-                        if (isset($result['nextRecordsUrl'])) {
+                        /*if (isset($result['nextRecordsUrl'])) {
                             $query = $result['nextRecordsUrl'];
                             unset($result);
                             $this->getLeads($params, $query);
-                        }
+                        }*/
                     }
                 }
 
