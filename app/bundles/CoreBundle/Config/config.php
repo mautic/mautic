@@ -112,7 +112,7 @@ return [
                 'route'     => 'mautic_themes_index',
                 'iconClass' => 'fa-newspaper-o',
                 'id'        => 'mautic_themes_index',
-                'access'    => 'admin',
+                'access'    => 'core:themes:view',
             ],
         ],
         'extra' => [
