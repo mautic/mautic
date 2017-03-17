@@ -609,7 +609,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getLeads($params = [], $query = null, $executed = null, $result = [], $object = 'Lead')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
         $config = $this->mergeConfigToFeatureSettings([]);
 

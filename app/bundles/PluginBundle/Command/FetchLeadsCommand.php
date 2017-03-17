@@ -82,6 +82,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate     = $input->getOption('end-date');
         $interval    = $input->getOption('time-interval');
         $limit       = $input->getOption('limit');
+        $leads       = $contacts       = 0;
 
         if (!$interval) {
             $interval = '15 minutes';
@@ -108,10 +109,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
                         if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, null, [], 'Lead'));
+                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
                         }
                         if (in_array('Contact', $config['objects'])) {
-                            $processed += intval($integrationObject->getLeads($params, null, null, [], 'Contact'));
+                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
                         }
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
