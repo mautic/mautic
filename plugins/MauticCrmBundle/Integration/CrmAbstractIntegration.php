@@ -93,10 +93,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param $lead
      */
-    public function getLeads($params = [])
+    public function getLeads($params = [], $query = null, $executed = null, $result = [])
     {
-        $executed = null;
-
         $query = $this->getFetchQuery($params);
 
         try {

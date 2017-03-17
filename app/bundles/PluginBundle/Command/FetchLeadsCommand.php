@@ -104,10 +104,16 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['end']   = $endDate;
             $params['limit'] = $limit;
             if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
-                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects']) && (in_array('Lead', $config['objects']) || in_array('Contact', $config['objects']))) {
+                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        $processed = intval($integrationObject->getLeads($params));
+                        $result = [];
+                        if (in_array('Lead', $config['objects'])) {
+                            $processed = intval($integrationObject->getLeads($params, null, null, $result, 'Lead'));
+                        }
+                        if (in_array('Contact', $config['objects'])) {
+                            $processed += intval($integrationObject->getLeads($params, null, null, $result, 'Contact'));
+                        }
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
@@ -146,8 +152,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     .'</comment>'."\n"
                 );
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 }

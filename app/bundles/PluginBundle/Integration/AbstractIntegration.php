@@ -669,7 +669,6 @@ abstract class AbstractIntegration
                 }
             }
         }
-
         $options = [
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_HEADER         => 1,
