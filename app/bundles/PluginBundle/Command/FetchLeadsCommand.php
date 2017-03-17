@@ -104,7 +104,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['end']   = $endDate;
             $params['limit'] = $limit;
             if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
-                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
+                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects']) && (in_array('Lead', $config['objects']) || in_array('Contact', $config['objects']))) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
                         $processed = intval($integrationObject->getLeads($params));
@@ -118,7 +118,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && in_array('company', $config['objects'])) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
                 if (strtotime($startDate) > strtotime('-30 days')) {
