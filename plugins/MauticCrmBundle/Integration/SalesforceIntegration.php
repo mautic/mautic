@@ -434,12 +434,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                unset($record);
-                unset($entity);
+                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+                $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+
+                unset($data);
             }
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
-            unset($data);
         }
 
         return $count;
@@ -625,7 +624,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
-
+        $result = [];
         try {
             if ($this->isAuthorized()) {
                 foreach ($salesForceObjects as $object) {
