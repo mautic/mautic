@@ -55,15 +55,21 @@ class LeadListSubscriber extends CommonSubscriber
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
     {
         $integration = $this->helper->getIntegrationObject('Salesforce');
+        $choices     = [];
         $campaigns   = $integration->getCampaigns();
+        if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+            foreach ($campaigns['records'] as $campaign) {
+                $choices[$campaign['Id']] = $campaign['Name'];
+            }
+        }
         if (!empty($campaigns)) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
-                'properties' => ['type' => 'integrationcampaign_filter', 'options' => [$campaigns]],
+                'properties' => ['type' => 'integration_campaigns', 'options' => ['campaigns' => $choices, 'integration' => 'Salesforce']],
                 'operators'  => $this->listModel->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ];
-            $event->addChoice('lead', 'Campaign members', $config);
+            $event->addChoice('lead', 'integration_campaigns', $config);
         }
     }
 }
