@@ -942,9 +942,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $result          = 0;
             $checkEmailsInSF = [];
 
-            $leadSfFields    = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
-            $leadSfFields    = array_diff_key($leadSfFields, array_flip($fieldsToUpdateInSf));
-            $contactSfFields = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
+            $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
+            $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
+            $contactSfFields      = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
 
             $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
             $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
@@ -1023,7 +1023,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->buildCompositeBody(
                     $mauticData,
                     $availableFields,
-                    $leadSfFields,
+                    $leadSfFieldsToCreate, //use all matched fields when creating new records in SF
                     'Lead',
                     $lead
                 );
