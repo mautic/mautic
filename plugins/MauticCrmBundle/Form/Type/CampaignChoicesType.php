@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -21,31 +20,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class CampaignChoicesType extends AbstractType
 {
-    private $integrationHelper;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->model = $factory->getModel('lead.list');
-    }
-
     /**
      * @param OptionsResolverInterface $resolver
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
-
-                $choices = [];
-                foreach ($lists as $l) {
-                    $choices[$l['id']] = $l['name'];
-                }
+            'choices' => function (Options $options) {
+                $choices = (!empty($options['campaigns'])) ? $options['campaigns'] : [];
 
                 return $choices;
             },
@@ -67,6 +49,6 @@ class CampaignChoicesType extends AbstractType
      */
     public function getName()
     {
-        return 'leadlist_choices';
+        return 'integration_campaigns_choices';
     }
 }

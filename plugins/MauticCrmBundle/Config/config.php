@@ -42,5 +42,11 @@ return [
                 ],
             ],
         ],
+        'forms' => [
+            'mautic.form.type.campaign.choices' => [
+                'class' => 'Mautic\PluginBundle\Form\Type\CampaignChoicesType',
+                'alias' => 'integration_campaigns_choices',
+            ],
+        ],
     ],
 ];

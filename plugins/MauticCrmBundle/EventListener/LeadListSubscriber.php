@@ -65,7 +65,7 @@ class LeadListSubscriber extends CommonSubscriber
         if (!empty($campaigns)) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
-                'properties' => ['type' => 'integration_campaigns', 'options' => ['campaigns' => $choices, 'integration' => 'Salesforce']],
+                'properties' => ['type' => 'select', 'list' => $choices],
                 'operators'  => $this->listModel->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ];
