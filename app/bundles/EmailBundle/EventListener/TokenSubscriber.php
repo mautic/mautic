@@ -150,12 +150,52 @@ class TokenSubscriber extends CommonSubscriber
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
 
+            switch ($data['type']) {
+                case 'boolean':
+                    $leadVal   = (bool) $leadVal;
+                    $filterVal = (bool) $filterVal;
+                    break;
+                case 'date':
+                case 'datetime':
+                    if (!$leadVal instanceof \DateTime) {
+                        $leadVal = new \DateTime($leadVal);
+                    }
+
+                    if (!$filterVal instanceof \DateTime) {
+                        $filterVal = new \DateTime($filterVal);
+                    }
+                    break;
+                case 'multiselect':
+                    $leadVal   = (array) $leadVal;
+                    $filterVal = (array) $filterVal;
+
+                    asort($leadVal);
+                    asort($filterVal);
+                    break;
+                case 'number':
+                    $leadVal   = (int) $leadVal;
+                    $filterVal = (int) $filterVal;
+                    break;
+                case 'time':
+                    // Trim leading 0's before standard string comparision
+                    $leadVal   = ltrim($leadVal, '0');
+                    $filterVal = ltrim($filterVal, '0');
+                    break;
+                case 'select':
+                default:
+                    if (is_numeric($leadVal)) {
+                        $leadVal   = (int) $leadVal;
+                        $filterVal = (int) $filterVal;
+                    }
+                    break;
+            }
+
             switch ($data['operator']) {
                 case '=':
-                    $groups[$groupNum] = $leadVal === $filterVal;
+                    $groups[$groupNum] = $leadVal == $filterVal;
                     break;
                 case '!=':
-                    $groups[$groupNum] = $leadVal !== $filterVal;
+                    $groups[$groupNum] = $leadVal != $filterVal;
                     break;
                 case 'gt':
                     $groups[$groupNum] = $leadVal > $filterVal;
