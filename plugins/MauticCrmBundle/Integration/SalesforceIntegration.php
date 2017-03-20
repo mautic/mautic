@@ -1230,7 +1230,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
-            $this->factory->getLogger()->addError(print_r($campaigns, true));
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
             if (!$silenceExceptions) {
@@ -1238,6 +1237,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
         }
 
-        return [];
+        return $campaigns;
     }
 }

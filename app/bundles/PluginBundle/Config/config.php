@@ -117,6 +117,10 @@ return [
                 'class' => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
                 'alias' => 'integration_config',
             ],
+            'mautic.form.type.integration.config' => [
+                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationCampaignsType',
+                'alias' => 'integration_campaigns',
+            ],
         ],
         'other' => [
             'mautic.helper.integration' => [

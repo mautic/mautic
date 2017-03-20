@@ -64,9 +64,9 @@ class IntegrationCampaignListType extends AbstractType
                 'multiple'   => false,
                 'label'      => 'mautic.integration.integration',
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.integration.integration.tooltip',
-                    //'onchange' => 'Mautic.getIntegrationCampaigns(this);',
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.integration.integration.tooltip',
+                    'onchange' => 'Mautic.getIntegrationCampaigns(this);',
                 ],
                 'required'    => true,
                 'constraints' => [
@@ -78,26 +78,39 @@ class IntegrationCampaignListType extends AbstractType
         );
 
         $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {
-            $campaigns = [];
+            $choices     = [];
+            $integration = '';
             if (isset($data['integration'])) {
+                $integration       = $data['integration'];
                 $integrationObject = $this->integrationHelper->getIntegrationObject($data['integration']);
                 $campaigns         = $integrationObject->getCampaigns();
+                if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                    foreach ($campaigns['records'] as $campaign) {
+                        $choices[$campaign['Id']] = $campaign['Name'];
+                    }
+                }
             }
-
             $form->add(
+                'campaigns',
                 'integration_campaigns',
-                'choice',
                 [
-                    'choices' => $campaigns,
-                    'label'   => 'mautic.integration.campaigns',
-                    'attr'    => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.integration.integration.tooltip',
+                    'campaigns'   => $choices,
+                    'integration' => $integration,
+                    'label'       => false,
+                    'attr'        => [
+                        'class' => 'integration-campaigns',
                     ],
                 ]
             );
         };
 
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $data = $event->getData();
+                $formModifier($event->getForm(), $data);
+            }
+        );
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {

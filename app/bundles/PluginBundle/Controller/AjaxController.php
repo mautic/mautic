@@ -231,6 +231,57 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * Get the HTML for campaigns list dropdown.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getIntegrationCampaignsAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $dataArray   = ['success' => 0];
+
+        if (!empty($integration)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+            $data   = [];
+            if ($object) {
+                $campaigns = $object->getCampaigns();
+                if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                    foreach ($campaigns['records'] as $campaign) {
+                        $data[$campaign['Id']] = $campaign['Name'];
+                    }
+                }
+                $this->factory->getLogger()->addError(print_r($data, true));
+                $form = $this->createForm('integration_campaigns', $data, [
+                    'integration'     => $integration,
+                    'campaigns'       => $data,
+                    'csrf_protection' => false,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'row',
+                    'variables' => [
+                        'campaigns'   => $data,
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
     protected function matchFieldsAction(Request $request)
     {
         $integration       = $request->request->get('integration');
