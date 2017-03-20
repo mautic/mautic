@@ -104,7 +104,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['start'] = $startDate;
             $params['end']   = $endDate;
             $params['limit'] = $limit;
-            if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
+            if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
@@ -138,7 +138,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if (isset($supportedFeatures[2]) && $supportedFeatures[2] == 'push_leads') {
+            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
                 list($updated, $created) = $integrationObject->pushLeads($params);
                 $output->writeln(
