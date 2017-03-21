@@ -150,9 +150,14 @@ class TokenSubscriber extends CommonSubscriber
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
 
+            $leadValCount = $filterValCount = 1;
+
             switch ($data['type']) {
                 case 'boolean':
-                    $leadVal   = (bool) $leadVal;
+                    if (!empty($leadVal)) {
+                        $leadVal = (bool) $leadVal;
+                    }
+
                     $filterVal = (bool) $filterVal;
                     break;
                 case 'date':
@@ -161,16 +166,18 @@ class TokenSubscriber extends CommonSubscriber
                         $leadVal = new \DateTime($leadVal);
                     }
 
+                    $leadVal = $leadVal->format('u');
+
                     if (!$filterVal instanceof \DateTime) {
                         $filterVal = new \DateTime($filterVal);
                     }
+
+                    $filterVal = $filterVal->format('u');
                     break;
                 case 'multiselect':
-                    $leadVal   = (array) $leadVal;
-                    $filterVal = (array) $filterVal;
+                    $leadValCount   = count($leadVal);
+                    $filterValCount = count($filterVal);
 
-                    asort($leadVal);
-                    asort($filterVal);
                     break;
                 case 'number':
                     $leadVal   = (int) $leadVal;
@@ -222,10 +229,28 @@ class TokenSubscriber extends CommonSubscriber
                     $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
                     break;
                 case 'in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
+                            $groups[$groupNum] = true;
+                            // Break once we find a match
+                            break;
+                        }
+
+                        $groups[$groupNum] = false;
+                    }
                     break;
                 case '!in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
+                    $leadValNotMatched = true;
+
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
+                            $leadValNotMatched = false;
+                            // Break once we find a match
+                            break;
+                        }
+                    }
+
+                    $groups[$groupNum] = $leadValNotMatched;
                     break;
                 case 'regexp':
                     $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) === 1;
