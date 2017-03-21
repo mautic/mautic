@@ -286,12 +286,17 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     var tabHolder            = parentElement.find('.nav');
     var filterHolder         = parentElement.find('.tab-content');
     var filterBlockPrototype = mQuery('#filterBlockPrototype');
-    var filterIndex          = filterHolder.find('.tab-pane').length;
+    var filterIndex          = filterHolder.find('.tab-pane').length - 1;
     var dynamicContentIndex  = $this.attr('id').match(/\d+$/)[0];//$this.data('index');
 
     var filterPrototype   = filterBlockPrototype.data('prototype');
-    var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex;
-    var newTab            = mQuery('<li><a role="tab" data-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex) + '</a></li>');
+    var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
+    // prevent duplicate ids
+    while (mQuery(filterContainerId).length > 0) {
+        filterIndex++;
+        filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
+    }
+    var newTab            = mQuery('<li><a role="tab" data-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
     var newForm           = filterPrototype.replace(/__name__/g, filterIndex)
         .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
         .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
@@ -318,7 +323,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
         // Set custom buttons with separator between them.
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
         heightMin: 100
     }));
 
@@ -380,8 +385,6 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant) {
     });
 
     Mautic.initRemoveEvents($el.find('.remove-item'));
-
-
 };
 
 Mautic.updateDynamicContentDropdown = function () {
@@ -397,7 +400,8 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
-Mautic.initRemoveEvents = function (elements) {
+Mautic.initRemoveEvents = function (elements, jQueryVariant, parentButton) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
         elements.on('click', function() {
             mQuery(this).closest('.panel').animate(
@@ -411,6 +415,10 @@ Mautic.initRemoveEvents = function (elements) {
     } else {
         elements.on('click', function (e) {
             e.preventDefault();
+
+            if (typeof parentButton !== 'undefined') {
+                parentButton.click();
+            }
 
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
