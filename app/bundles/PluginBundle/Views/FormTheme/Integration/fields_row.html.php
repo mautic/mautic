@@ -12,6 +12,11 @@
 /** @var int $numberOfFields */
 $rowCount   = 0;
 $indexCount = 1;
+
+$choices = $form['i_choices']->vars['data'];
+unset($form['i_choices']);
+$mauticChoices = $form['m_choices']->vars['data'];
+unset($form['m_choices']);
 ?>
 
 <div class="row fields-container" id="<?php echo $containerId; ?>">
@@ -52,10 +57,7 @@ $indexCount = 1;
                         $class = 'col-sm-4';
                         break;
                 endswitch;
-            ?>
-            <div class="pl-xs pr-xs <?php echo $class; ?>"
-                 <?php if ($numberOfFields === 4 && $rowCount % $numberOfFields == 2): ?>data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>"<?php endif; ?>>
-                <?php
+
                 if ($isRequired && $rowCount % $numberOfFields == 1):
                     $name                            = $child->vars['full_name'];
                     $child->vars['full_name']        = $child->vars['id'];
@@ -63,10 +65,104 @@ $indexCount = 1;
                     echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
                 endif;
 
-                echo $view['form']->row($child);
-                ?>
+                if ($child->vars['name'] == 'i_'.$indexCount):?>
+                <div class="pl-xs pr-xs <?php echo $class; ?>">
+                    <select id="<?php echo $child->vars['id']; ?>"
+                        name="<?php echo $child->vars['full_name']; ?>"
+                        class="<?php echo $child->vars['attr']['class']?>"
+                        data-placeholder=" "
+                        data-value="<?php echo $child->vars['value']; ?>"
+                        <?php echo $child->vars['attr']['disabled']?>
+                        autocomplete="false">
+                            <?php foreach ($choices as $keyLabel => $options):  ?>
+                            <?php if (is_array($options)) : ?>
+                            <optgroup label="<?php echo $keyLabel; ?>">
+                                <?php foreach ($options as $keyValue => $o): ?>
+                                <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif ?>>
+                                    <?php echo $o; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <?php else: ?>
+                            <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
+                                <?php echo $options; ?>
+                            </option>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if (strstr($child->vars['name'], 'update_mautic')): ?>
+            <div class="pl-xs pr-xs <?php echo $class; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.plugin.direction.data.update'); ?>">
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="choice-wrapper">
+                            <div class="btn-group btn-block" data-toggle="buttons">
+                                <?php $checked = $child->vars['value'] === '0'; ?>
+                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                    <input type="radio"
+                                           id="<?php echo $child->vars['id']; ?>_0"
+                                           name="<?php echo $child->vars['full_name']; ?>"
+                                           data-toggle="tooltip"
+                                           title=""
+                                           autocomplete="false"
+                                           value="0"
+                                           <?php echo $child->vars['attr']['disabled']?>
+                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>>
+                                    <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
+                                </label>
+                                <?php $checked = $child->vars['value'] === '1'; ?>
+                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                    <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
+                                           name="<?php echo $child->vars['full_name']; ?>"
+                                           data-toggle="tooltip"
+                                           title=""
+                                           autocomplete="false"
+                                           value="1"
+                                           <?php echo $child->vars['attr']['disabled']?>
+                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
+                                    <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <?php endif; ?>
+
+            <?php
+            if ($child->vars['name'] == 'm_'.$indexCount):?>
+            <div class="pl-xs pr-xs <?php echo $class; ?>">
+                <select id="<?php echo $child->vars['id']; ?>"
+                        name="<?php echo $child->vars['full_name']; ?>"
+                        class="<?php echo $child->vars['attr']['class']?>"
+                        data-placeholder=" "
+                        data-required="1"
+                        <?php echo $child->vars['attr']['disabled']?>
+                        autocomplete="false">
+
+                    <?php foreach ($mauticChoices as $keyLabel => $options): ?>
+                    <?php if (is_array($options)) : ?>
+                    <optgroup label="<?php echo $keyLabel; ?>">
+                        <?php foreach ($options as $keyValue => $o): ?>
+                        <option value="<?php echo $keyValue; ?>" <?php if ($keyValue == $child->vars['data']): echo 'selected'; endif; ?>>
+                            <?php echo $o; ?>
+                        </option>
+                        <?php endforeach; ?>
+
+                    </optgroup>
+                    <?php else : ?>
+                    <option value="<?php echo $keyLabel; ?>" <?php if ($keyLabel == $child->vars['data']): echo 'selected'; endif; ?>>
+                        <?php echo $options; ?>
+                    </option>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
+
             <?php if ($rowCount % $numberOfFields == 0): ?>
                 <div class="pl-xs pr-xs col-sm-1">
                     <button type="button" class="btn btn-default remove-field"
@@ -78,7 +174,9 @@ $indexCount = 1;
                 </div>
                 <?php
                 ++$indexCount;
-            endif; ?>
+            endif;
+            unset($form[$child->vars['name']]);
+            ?>
         <?php endforeach; ?>
         <a href="#" class="add btn btn-warning ml-sm btn-add-item" onclick="Mautic.addNewPluginField('<?php echo $object; ?>-field', null);">
             <?php echo $view['translator']->trans('mautic.plugin.form.add.fields'); ?>

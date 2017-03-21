@@ -75,12 +75,19 @@ trait FieldsTypeTrait
             }
 
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-
+            $form->add('i_choices', HiddenType::class,
+                [
+                    'data' => !empty($choices) ? $choices : [],
+                ]);
+            $form->add('m_choices', HiddenType::class,
+                [
+                    'data' => !empty($mauticFields) ? $mauticFields : [],
+                ]);
             foreach ($fields as $field => $details) {
                 $matched = isset($matchedFields[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
-                $disabled = (!$required && $index > 1 && !$matched);
-
+                $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
+                $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
                 ++$index;
 
                 $form->add(
@@ -97,6 +104,7 @@ trait FieldsTypeTrait
                             'data-required'    => $required,
                             'data-value'       => $field,
                             'data-matched'     => $matched,
+                            'disabled'         => $disabled,
                         ],
                         'disabled' => $disabled,
                     ]
@@ -117,7 +125,7 @@ trait FieldsTypeTrait
                             'label'       => false,
                             'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
                             'empty_value' => false,
-                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
+                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update', 'disabled' => $disabled],
                             'disabled'    => $disabled,
                         ]
                     );
@@ -135,8 +143,10 @@ trait FieldsTypeTrait
                             'class'            => 'field-selector form-control',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
+                            'data-value'       => $matched ? $matchedFields[$field] : '',
+                            'disabled'         => $mauticDisabled,
                         ],
-                        'disabled'    => $disabled,
+                        'disabled'    => $mauticDisabled,
                         'empty_value' => 'mautic.core.form.chooseone',
                         'constraints' => ($required) ? [
                             new NotBlank(
