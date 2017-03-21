@@ -832,16 +832,39 @@ Mautic.getSlotFocus = function() {
     return mQuery('<div/>').attr('data-slot-focus', true);
 };
 
+Mautic.cloneAndIncrementId = function(id, jQueryVariant) {
+    // To support the parent.mQuery from the builder
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : parent.mQuery;
+    var $clone = mQuery(id).clone();    // Create your clone
+
+    // Get the number at the end of the ID, increment it, and replace the old id
+    $clone.attr('id', $clone.attr('id').replace(/(\d+)?$/, function(str) { var v = parseInt(str); return isNaN(v)? 0 : v + 1; }) );
+
+    // Find all elements in $clone that have an ID, and iterate using each()
+    $clone.find('[id]').each(function() {
+        //Perform the same replace as above
+        var $th = mQuery(this);
+        var newID = $th.attr('id').replace(/_(\d+)_/, function(a, b) { var v = parseInt(b); return '_' + (isNaN(v)? 0 : v + 1) + '_'; });
+        $th.attr('id', newID);
+    });
+    // Find all elements in $clone that have an href to an id, and iterate using each()
+    $clone.find('[href^=#]').each(function() {
+        //Perform the same replace as above
+        var $th = mQuery(this);
+        var newHref = $th.attr('href').replace(/_(\d+)_/, function(a, b) { var v = parseInt(b); return '_' + (isNaN(v)? 0 : v + 1) + '_'; });
+        $th.attr('href', newHref);
+    });
+    return $clone;
+};
+
 Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
     var decId = clickedSlot.attr('data-param-dec-id');
 
     var focusForm;
 
     if (decId || decId === 0) {
-        focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
-
-        // remove existing froala editor
-        focusForm.find('.fr-box').remove();
+        // focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
+        focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
     }
 
     var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
@@ -853,8 +876,9 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
 
     newDynConButton.on('click', function(e) {
         e.stopPropagation();
-
         var tabId = Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
+        var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+        parent.mQuery('#slot-form-container').empty().html(focusForm);
     });
 
     focusFormHeader.append(newDynConButton);
@@ -966,9 +990,24 @@ Mautic.initSlotListeners = function() {
 
             if (focusType == 'dynamicContent') {
                 focusForm = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
+                // window.myself = focusForm[0];
+                // mQuery(focusForm).find('li a').click(function (event) {
+                //     // simulate tab plugin
+                //     //parent.mQuery(event.target).tab('show');
+                //
+                //     var jQueryInit = jQuery.fn.init;
+                //     jQuery.fn.init = function(arg1, arg2, rootjQuery){
+                //         arg2 = arg2 || myself;
+                //         return new jQueryInit(arg1, arg2, rootjQuery);
+                //     };
+                //     var selector = mQuery(event.target).attr('href');
+                //     mQuery(selector).siblings().removeClass('active');
+                //     mQuery(selector).addClass('active');
+                // }.bind(parent.document));
             }
 
-            slotFormContainer.html(focusForm);
+            // slotFormContainer.html(focusForm);
+            slotFormContainer.empty().append(focusForm);
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
@@ -1058,31 +1097,8 @@ Mautic.initSlotListeners = function() {
                         mode: 'htmlmixed',
                         extraKeys: {"Ctrl-Space": "autocomplete"},
                         lineWrapping: true,
-                        // hintOptions: {
-                        //     hint: function (editor) {
-                        //         var cursor = editor.getCursor();
-                        //         var currentLine = editor.getLine(cursor.line);
-                        //         var start = cursor.ch;
-                        //         var end = start;
-                        //         while (end < currentLine.length && /[\w|}$]+/.test(currentLine.charAt(end))) ++end;
-                        //         while (start && /[\w|{$]+/.test(currentLine.charAt(start - 1))) --start;
-                        //         var curWord = start != end && currentLine.slice(start, end);
-                        //         var regex = new RegExp('^' + curWord, 'i');
-                        //         return {
-                        //             list: (!curWord ? rawTokens : mQuery(rawTokens).filter(function (idx) {
-                        //                 return (rawTokens[idx].indexOf(curWord) !== -1);
-                        //             })),
-                        //             from: CodeMirror.Pos(cursor.line, start),
-                        //             to: CodeMirror.Pos(cursor.line, end)
-                        //         };
-                        //     }
-                        // }
                     });
                     Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
-                    // Mautic.builderCodeMirror.on('mousedown', function(instance, e){
-                    //     console.log(Mautic.builderCodeMirror);
-                    //     instance.focus();
-                    // });
                     Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
                 }
             }
