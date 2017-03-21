@@ -1343,7 +1343,7 @@ class EventModel extends CommonFormModel
                 }
 
                 // Free some memory
-                gc_collect_cycles();
+                //gc_collect_cycles();
 
                 ++$batchDebugCounter;
             }
@@ -1441,6 +1441,7 @@ class EventModel extends CommonFormModel
                         }
 
                         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+                        $this->em->getConnection()->beginTransaction();
                         $leadDebugCounter = 0;
                         foreach ($leads as $lead) {
                             ++$leadDebugCounter; // start with 1
@@ -1477,6 +1478,8 @@ class EventModel extends CommonFormModel
                             }
                         }
 
+                        $this->em->flush();
+                        $this->em->getConnection()->commit();
                         // Free RAM
                         $this->em->clear('Mautic\LeadBundle\Entity\Lead');
                         $this->em->clear('Mautic\UserBundle\Entity\User');

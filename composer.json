@@ -105,7 +105,10 @@
         "doctrine/data-fixtures": "1.2.1",
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
-        "symfony/expression-language": "~2.8"
+        "symfony/expression-language": "~2.8",
+        "php-amqplib/php-amqplib": "2.6.*",
+        "ext-bcmath":"*"
+
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -115,7 +118,8 @@
         "webfactory/exceptions-bundle": "~4.3",
         "phpunit/phpunit": "4.5",
         "friendsofphp/php-cs-fixer": "^1.12",
-        "symfony/var-dumper": "^3.2"
+        "symfony/var-dumper": "^3.2",
+        "php-amqplib/php-amqplib": "2.6.*"
     },
     "repositories": [
         {

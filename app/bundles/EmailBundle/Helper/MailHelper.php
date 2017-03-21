@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+require_once '/var/www/html/vendor/autoload.php';
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -21,6 +22,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\LeadBundle\Entity\Lead;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * Class MailHelper.
@@ -231,6 +235,11 @@ class MailHelper
             $this->logError($e);
         }
 
+        $this->handle = fopen("email.log","a");
+        $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $this->channel = $this->connection->channel();
+        $this->channel->queue_declare('hello', false, false, false, false);
+
         $this->from       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -422,7 +431,12 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
-                $this->mailer->send($this->message, $failures);
+
+                //$this->mailer->send($this->message, $failures);
+
+                //fputs($this->handle,serialize($this->message));
+                $msg = new AMQPMessage(serialize($this->message));
+                $this->channel->basic_publish($msg, '', 'hello');
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
@@ -1888,4 +1902,10 @@ class MailHelper
 
         return $name;
     }
+
+    public function flushFile($name)
+    { 
+      $this->handle->flush();
+    }
 }
+

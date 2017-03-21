@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 
 /**
  * CLI command to process the e-mail queue.
@@ -56,12 +58,41 @@ EOT
         $options    = $input->getOptions();
         $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
+        $this->dispatcher = $container->get('event_dispatcher');
 
         $skipClear = $input->getOption('do-not-clear');
         $quiet     = $input->getOption('quiet');
         $timeout   = $input->getOption('clear-timeout');
         $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+
+        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+
+        $channel->queue_declare('hello', false, false, false, false);
+        $this->transport = $this->getContainer()->get('swiftmailer.transport.real');
+            if (!$this->transport->isStarted()) {
+                $this->transport->start();
+            }
+
+
+				$callback = function($msg) {
+          try {
+            $message = unserialize($msg->body);
+            $this->transport->send($message);
+          } catch (\Swift_TransportException $e) {
+            if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+              $event = new QueueEmailEvent($message);
+              $this->dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+            }
+          }
+
+				};
+
+				$channel->basic_consume('hello', '', false, true, false, false, $callback);
+
+				while(count($channel->callbacks)) {
+						$channel->wait();
+				}
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
