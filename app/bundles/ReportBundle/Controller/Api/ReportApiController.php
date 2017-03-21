@@ -25,31 +25,13 @@ class ReportApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('report');
         $this->entityClass      = 'Mautic\ReportBundle\Entity\Report';
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
-        $this->permissionBase   = 'report:reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
-    }
 
-    /**
-     * Obtains a list of reports.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction()
-    {
-        if (!$this->security->isGranted('report:reports:viewother')) {
-            $this->listFilters = [
-                'column' => 'r.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
-        return parent::getEntitiesAction();
+        parent::initialize($event);
     }
 
     /**

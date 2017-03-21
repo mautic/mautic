@@ -26,7 +26,12 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticDynamicContentBundle:Stat');
-        $this->repositories[] = $em->getRepository('MauticDynamicContentBundle:DynamicContentLeadData');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticDynamicContentBundle:Stat',
+                'MauticDynamicContentBundle:DynamicContentLeadData',
+            ]
+        );
     }
 }

@@ -12,11 +12,13 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -184,10 +186,20 @@ class Campaign extends FormEntity
                     'publishUp',
                     'publishDown',
                     'events',
-                    'leads', // @deprecated, will be renamed to 'contacts' in 3.0.0
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
                     'canvasSettings',
+                ]
+            )
+            ->setGroupPrefix('campaignBasic')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'events',
+                    'publishUp',
+                    'publishDown',
                 ]
             )
             ->build();
@@ -390,8 +402,8 @@ class Campaign extends FormEntity
     /**
      * Add lead.
      *
-     * @param                                    $key
-     * @param \Mautic\CampaignBundle\Entity\Lead $lead
+     * @param      $key
+     * @param Lead $lead
      *
      * @return Campaign
      */
@@ -421,7 +433,7 @@ class Campaign extends FormEntity
     /**
      * Get leads.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Lead[]|\Doctrine\Common\Collections\Collection
      */
     public function getLeads()
     {
@@ -512,5 +524,23 @@ class Campaign extends FormEntity
     public function setCanvasSettings(array $canvasSettings)
     {
         $this->canvasSettings = $canvasSettings;
+    }
+
+    /**
+     * Get contact membership.
+     *
+     * @param Contact $contact
+     *
+     * @return \Doctrine\Common\Collections\Collection|static|\Mautic\CampaignBundle\Entity\Contact[]
+     */
+    public function getContactMembership(Contact $contact)
+    {
+        return $this->leads->matching(
+            Criteria::create()
+                    ->where(
+                        Criteria::expr()->eq('lead', $contact)
+                    )
+                    ->orderBy(['dateAdded' => Criteria::DESC])
+        );
     }
 }

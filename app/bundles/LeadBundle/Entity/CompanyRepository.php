@@ -31,14 +31,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function getEntity($id = 0)
     {
         try {
-            /** @var Lead $entity */
-            $entity = $this
-                ->createQueryBuilder('comp')
-                ->select('comp')
-                ->where('comp.id = :companyId')
-                ->setParameter('companyId', $id)
-                ->getQuery()
-                ->getSingleResult();
+            $q = $this->createQueryBuilder($this->getTableAlias());
+            if (is_array($id)) {
+                $this->buildSelectClause($q, $id);
+                $companyId = (int) $id['id'];
+            } else {
+                $companyId = $id;
+            }
+            $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
+            $entity = $q->getQuery()->getSingleResult();
         } catch (\Exception $e) {
             $entity = null;
         }
@@ -122,20 +123,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $results = $q->execute()->fetchAll();
 
         return $results;
-    }
-
-    /**
-     * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $r
-     */
-    protected function removeNonFieldColumns(&$r)
-    {
-        $baseCols = $this->getBaseColumns('Mautic\\LeadBundle\\Entity\\Company', true);
-        foreach ($baseCols as $c) {
-            unset($r[$c]);
-        }
-        unset($r['owner_id']);
     }
 
     /**
@@ -368,14 +355,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * Get companies.
+     * @param     $query
+     * @param int $limit
+     * @param int $offset
      *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return mixed
      */
     public function getMostCompanies($query, $limit = 10, $offset = 0)
     {
@@ -387,6 +371,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $results;
     }
 
+    /**
+     * @param CompositeExpression|null $expr
+     * @param array                    $parameters
+     * @param null                     $labelColumn
+     * @param string                   $valueColumn
+     *
+     * @return array
+     */
     public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

@@ -68,7 +68,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
             // just hard bounces https://elasticemail.com/support/user-interface/activity/bounced-category-filters
             $rows[DoNotContact::BOUNCED]['emails'][$email] = $category;
         } elseif ($status == 'Error') {
-            $rows[DoNotContact::BOUNCED]['emails'][$email] = $translator->trans('mautic.email.complaint.reason.unkown');
+            $rows[DoNotContact::BOUNCED]['emails'][$email] = $translator->trans('mautic.email.complaint.reason.unknown');
         }
 
         return $rows;

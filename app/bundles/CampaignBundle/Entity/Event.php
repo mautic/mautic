@@ -12,15 +12,21 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead as Contact;
 
 /**
  * Class Event.
  */
 class Event
 {
+    const TYPE_DECISION  = 'decision';
+    const TYPE_ACTION    = 'action';
+    const TYPE_CONDITION = 'condition';
+
     /**
      * @var int
      */
@@ -107,6 +113,23 @@ class Event
     private $log;
 
     /**
+     * Used by API to house contact specific logs.
+     *
+     * @var array
+     */
+    private $contactLog = [];
+
+    /**
+     * @var
+     */
+    private $channel;
+
+    /**
+     * @var
+     */
+    private $channelId;
+
+    /**
      * @var
      */
     private $changes;
@@ -122,9 +145,11 @@ class Event
      */
     public function __clone()
     {
-        $this->id       = null;
-        $this->tempId   = null;
-        $this->campaign = null;
+        $this->id        = null;
+        $this->tempId    = null;
+        $this->campaign  = null;
+        $this->channel   = null;
+        $this->channelId = null;
     }
 
     /**
@@ -136,8 +161,9 @@ class Event
 
         $builder->setTable('campaign_events')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
-            ->addIndex(['type', 'event_type'], 'campaign_event_type_search')
-            ->addIndex(['event_type'], 'event_type');
+            ->addIndex(['type', 'event_type'], 'campaign_event_search')
+            ->addIndex(['event_type'], 'campaign_event_type')
+            ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
 
         $builder->addIdColumns();
 
@@ -211,6 +237,15 @@ class Event
             ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('channel', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('channelId', 'integer')
+            ->columnName('channel_id')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -220,27 +255,91 @@ class Event
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('campaign')
-            ->addProperties(
+        $metadata->setGroupPrefix('campaignEvent')
+            ->addListProperties(
                 [
                     'id',
                     'name',
                     'description',
                     'type',
                     'eventType',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
                     'order',
                     'properties',
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
                     'triggerMode',
-                    'children',
-                    'parent',
                     'decisionPath',
+                    'channel',
+                    'channelId',
+                    'parent',
+                    'children',
                 ]
             )
             ->setMaxDepth(1, 'parent')
-            ->build();
+            ->setMaxDepth(1, 'children')
+
+            // Add standalone groups
+            ->setGroupPrefix('campaignEventStandalone')
+             ->addListProperties(
+                 [
+                     'id',
+                     'name',
+                     'description',
+                     'type',
+                     'eventType',
+                     'channel',
+                     'channelId',
+                 ]
+             )
+             ->addProperties(
+                 [
+                     'campaign',
+                     'order',
+                     'properties',
+                     'triggerDate',
+                     'triggerInterval',
+                     'triggerIntervalUnit',
+                     'triggerMode',
+                     'children',
+                     'parent',
+                     'decisionPath',
+                 ]
+             )
+
+            // Include logs
+            ->setGroupPrefix('campaignEventWithLogs')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'eventType',
+                    'contactLog',
+                    'triggerDate',
+                    'triggerInterval',
+                    'triggerIntervalUnit',
+                    'triggerMode',
+                    'decisionPath',
+                    'order',
+                    'parent',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
+                    'campaign',
+                ]
+            )
+             ->build();
     }
 
     /**
@@ -480,7 +579,7 @@ class Event
      *
      * @return Event
      */
-    public function addChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function addChild(Event $children)
     {
         $this->children[] = $children;
 
@@ -492,7 +591,7 @@ class Event
      *
      * @param \Mautic\CampaignBundle\Entity\Event $children
      */
-    public function removeChild(\Mautic\CampaignBundle\Entity\Event $children)
+    public function removeChild(Event $children)
     {
         $this->children->removeElement($children);
     }
@@ -514,7 +613,7 @@ class Event
      *
      * @return Event
      */
-    public function setParent(\Mautic\CampaignBundle\Entity\Event $parent = null)
+    public function setParent(Event $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -654,5 +753,84 @@ class Event
     public function setTempId($tempId)
     {
         $this->tempId = $tempId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @param mixed $channel
+     */
+    public function setChannel($channel)
+    {
+        $this->channel = $channel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @param int $channelId
+     */
+    public function setChannelId($channelId)
+    {
+        $this->channelId = (int) $channelId;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @param Contact|null $contact
+     *
+     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     */
+    public function getContactLog(Contact $contact = null)
+    {
+        if ($this->contactLog) {
+            return $this->contactLog;
+        }
+
+        return $this->log->matching(
+            Criteria::create()
+                    ->where(
+                        Criteria::expr()->eq('lead', $contact)
+                    )
+        );
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @param array $contactLog
+     *
+     * @return Event
+     */
+    public function setContactLog($contactLog)
+    {
+        $this->contactLog = $contactLog;
+
+        return $this;
+    }
+
+    /**
+     * Used by the API.
+     *
+     * @return Event
+     */
+    public function addContactLog($contactLog)
+    {
+        $this->contactLog[] = $contactLog;
+
+        return $this;
     }
 }

@@ -14,11 +14,9 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -150,16 +148,17 @@ class CompanyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class'  => 'Mautic\LeadBundle\Entity\Company',
-                'isShortForm' => false,
+                'data_class'    => 'Mautic\LeadBundle\Entity\Company',
+                'isShortForm'   => false,
+                'update_select' => false,
             ]
         );
 
-        $resolver->setRequired(['fields', 'update_select']);
+        $resolver->setRequired(['fields']);
     }
 
     /**

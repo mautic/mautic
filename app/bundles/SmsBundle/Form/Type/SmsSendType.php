@@ -116,6 +116,9 @@ class SmsSendType extends AbstractType
         }
     }
 
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(['update_select']);

@@ -105,6 +105,10 @@ class MailchimpIntegration extends EmailAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         static $leadFields = [];
 
         if (empty($leadFields)) {
@@ -133,6 +137,8 @@ class MailchimpIntegration extends EmailAbstractIntegration
                 }
             }
         }
+
+        $this->cache->set('leadFields', $leadFields);
 
         return $leadFields;
     }
@@ -176,5 +182,16 @@ class MailchimpIntegration extends EmailAbstractIntegration
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormSettings()
+    {
+        $settings                           = parent::getFormSettings();
+        $settings['dynamic_contact_fields'] = true;
+
+        return $settings;
     }
 }

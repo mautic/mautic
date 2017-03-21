@@ -96,6 +96,8 @@ class CampaignSubscriber extends CommonSubscriber
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
                     'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'channel'          => 'notification',
+                    'channelIdField'   => 'notification',
                 ]
             );
         }

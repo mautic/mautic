@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -61,7 +61,7 @@
     imageDefaultDisplay: 'block',
     imageSplitHTML: false,
     imageStyles: {
-      'fr-rounded': 'Rounded',
+      'ft-rounded': 'Rounded',
       'fr-bordered': 'Bordered'
     },
     imageMove: true,
@@ -70,7 +70,8 @@
     imagePaste: true,
     imagePasteProcess: false,
     imageMinWidth: 16,
-    imageOutputSize: false
+    imageOutputSize: false,
+    imageDefaultMargin: 5
   });
 
   $.FE.PLUGINS.image = function (editor) {
@@ -149,7 +150,7 @@
       if (!$popup) $popup = _initEditPopup();
 
       if ($popup) {
-        editor.popups.setContainer('image.edit', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('image.edit', editor.$sc);
         editor.popups.refresh('image.edit');
         var left = $current_image.offset().left + $current_image.outerWidth() / 2;
         var top = $current_image.offset().top + $current_image.outerHeight();
@@ -169,54 +170,10 @@
     /**
      * Convert style to classes.
      */
-
     function _convertStyleToClasses ($img) {
       if (!$img.hasClass('fr-dii') && !$img.hasClass('fr-dib')) {
-        // Set float to none.
-        var flt = $img.css('float');
-        $img.css('float', 'none');
-
-        // Image has display block.
-        if ($img.css('display') == 'block') {
-          // Set float to the initial value.
-          $img.css('float', flt);
-
-          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0) {
-            // Margin left is 0.
-            // Margin right is auto.
-            if (parseInt($img.css('margin-left'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-right: auto') >= 0) {
-              $img.addClass('fr-fil');
-            }
-
-            // Margin left is auto.
-            // Margin right is 0.
-            else if (parseInt($img.css('margin-right'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-left: auto') >= 0) {
-              $img.addClass('fr-fir');
-            }
-          }
-
-          $img.addClass('fr-dib');
-        }
-
-        // Display inline.
-        else {
-          // Set float.
-          $img.css('float', flt);
-
-          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0) {
-            // Float left.
-            if ($img.css('float') == 'left') {
-              $img.addClass('fr-fil');
-            }
-
-            // Float right.
-            else if ($img.css('float') == 'right') {
-              $img.addClass('fr-fir');
-            }
-          }
-
-          $img.addClass('fr-dii');
-        }
+        $img.addClass('fr-fi' + getAlign($img)[0]);
+        $img.addClass('fr-di' + getDisplay($img)[0]);
 
         // Reset inline style.
         $img.css('margin', '');
@@ -230,22 +187,40 @@
     }
 
     /**
+     * Convert classes to style.
+     */
+    function _convertClassesToStyle ($img) {
+      var d = $img.hasClass('fr-dib') ? 'block' : $img.hasClass('fr-dii') ? 'inline' : null;
+      var a = $img.hasClass('fr-fil') ? 'left' : $img.hasClass('fr-fir') ? 'right' : getAlign($img);
+
+      _setStyle($img, d, a);
+
+      $img.removeClass('fr-dib fr-dii fr-fir fr-fil');
+    }
+
+    /**
      * Refresh the image list.
      */
-
     function _refreshImageList () {
       var images = editor.el.tagName == 'IMG' ? [editor.el] : editor.el.querySelectorAll('img');
 
       for (var i = 0; i < images.length; i++) {
         var $img = $(images[i]);
 
-        if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
-          _convertStyleToClasses($img);
-        }
+        if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
+            _convertStyleToClasses($img);
+          }
 
-        // Do not allow text near image.
-        if (!editor.opts.imageTextNear) {
-          $img.removeClass('fr-dii').addClass('fr-dib');
+          // Do not allow text near image.
+          if (!editor.opts.imageTextNear) {
+            $img.removeClass('fr-dii').addClass('fr-dib');
+          }
+        }
+        else if (!editor.opts.htmlUntouched && !editor.opts.useClasses) {
+          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
+            _convertClassesToStyle($img);
+          }
         }
 
         if (editor.opts.iframe) {
@@ -294,7 +269,7 @@
     function _repositionResizer () {
       if (!$image_resizer) _initImageResizer();
 
-      var $container = editor.$wp || $(editor.opts.scrollableContainer);
+      var $container = editor.$wp || editor.$sc;
 
       $container.append($image_resizer);
       $image_resizer.data('instance', editor);
@@ -462,7 +437,8 @@
         if (editor.$wp) {
           editor.events.$on(editor.$wp, 'scroll', function () {
             if ($current_image && editor.popups.isVisible('image.edit')) {
-              _showEditPopup();
+              editor.events.disableBlur();
+              _editImg($current_image);
             }
           });
         }
@@ -502,7 +478,7 @@
       $popup.find('.fr-buttons').hide();
 
       if ($current_image) {
-        editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('image.insert', editor.$sc);
         var left = $current_image.offset().left + $current_image.width() / 2;
         var top = $current_image.offset().top + $current_image.height();
 
@@ -829,7 +805,8 @@
       }
 
       // Create image object and set the load event.
-      var $img = $('<img class="' + (editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : '') + '" src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
+      var $img = $('<img src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
+      _setStyle($img, editor.opts.imageDefaultDisplay, editor.opts.imageDefaultAlign);
 
       $img.on('load', loadCallback);
 
@@ -954,7 +931,6 @@
         if (editor.events.trigger('image.beforeUpload', [images]) === false) {
           return false;
         }
-
         var image = images[0];
 
         // Check image max size.
@@ -1087,7 +1063,7 @@
             var $popup = editor.popups.get('image.insert');
             if (!$popup) $popup = _initInsertPopup();
 
-            editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
+            editor.popups.setContainer('image.insert', editor.$sc);
             editor.popups.show('image.insert', e.originalEvent.pageX, e.originalEvent.pageY);
             showProgressBar();
 
@@ -1108,6 +1084,7 @@
       var t;
       var p_node;
       var r = editor.selection.ranges(0);
+
       if (r.collapsed && r.startContainer.nodeType == Node.ELEMENT_NODE) {
         // Click after image.
         if (r.startContainer.childNodes.length == r.startOffset) {
@@ -1132,6 +1109,8 @@
             }
           }
         }
+
+        // Click before image.
         else if (r.startOffset === 0 && r.startContainer.childNodes.length > r.startOffset) {
           t = r.startContainer.childNodes[r.startOffset];
           if (t && t.tagName == 'IMG' && $(t).css('display') == 'block') {
@@ -1221,6 +1200,8 @@
           _exitEdit();
           return false;
         }
+
+        _unmarkExit();
       });
       editor.events.on('commands.mousedown', function ($btn) {
         if ($btn.parents('.fr-toolbar').length > 0) {
@@ -1228,7 +1209,9 @@
         }
       });
 
-      editor.events.on('mouseup', _placeCursor);
+      if (!editor.browser.edge) {
+        editor.events.on('mouseup', _placeCursor);
+      }
 
       editor.events.on('blur image.hideResizer commands.undo commands.redo element.dropped', function () {
         mousedown = false;
@@ -1328,7 +1311,7 @@
 
       hideProgressBar();
       editor.popups.refresh('image.alt');
-      editor.popups.setContainer('image.alt', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('image.alt', editor.$sc);
       var left = $current_image.offset().left + $current_image.width() / 2;
       var top = $current_image.offset().top + $current_image.height();
 
@@ -1407,7 +1390,7 @@
 
       hideProgressBar();
       editor.popups.refresh('image.size');
-      editor.popups.setContainer('image.size', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('image.size', editor.$sc);
       var left = $current_image.offset().left + $current_image.width() / 2;
       var top = $current_image.offset().top + $current_image.height();
 
@@ -1459,8 +1442,13 @@
     function setSize (width, height) {
       if ($current_image) {
         var $popup = editor.popups.get('image.size');
-        $current_image.css('width', width || $popup.find('input[name="width"]').val());
-        $current_image.css('height', height || $popup.find('input[name="height"]').val());
+
+        width = width || $popup.find('input[name="width"]').val() || '';
+        height = height || $popup.find('input[name="height"]').val() || '';
+
+        var regex = /^[\d]+((px)|%)*$/g;
+        if (width.match(regex)) $current_image.css('width', width);
+        if (height.match(regex)) $current_image.css('height', height);
 
         $popup.find('input:focus').blur();
         _editImg($current_image);
@@ -1538,7 +1526,7 @@
       _handlerMousemove.call(this, e);
       _handlerMouseup.call(this, e);
 
-      return step++;
+      return ++step;
     }
 
     /**
@@ -1637,6 +1625,10 @@
             else if ((keycode == $.FE.KEYCODE.HYPHEN || (editor.browser.mozilla && keycode == $.FE.KEYCODE.FF_HYPHEN)) && ctrlKey && !e.altKey) {
               step = _resizeImage.call(this, e, 2, -1, step);
             }
+            else if (!editor.keys.ctrlKey(e) && keycode == $.FE.KEYCODE.ENTER) {
+              $current_image.before('<br>');
+              _editImg($current_image);
+            }
 
             // Save key code.
             prevKey = keycode;
@@ -1692,20 +1684,22 @@
         e.preventDefault();
         e.stopPropagation();
         remove();
+
         return false;
       }
 
-      if ($current_image && key_code == $.FE.KEYCODE.ESC) {
+      else if ($current_image && key_code == $.FE.KEYCODE.ESC) {
         var $img = $current_image;
         _exitEdit(true);
         editor.selection.setAfter($img.get(0));
         editor.selection.restore();
         e.preventDefault();
+
         return false;
       }
 
       // Move cursor if left and right arrows are used.
-      if ($current_image && (key_code == $.FE.KEYCODE.ARROW_LEFT || key_code == $.FE.KEYCODE.ARROW_RIGHT)) {
+      else if ($current_image && (key_code == $.FE.KEYCODE.ARROW_LEFT || key_code == $.FE.KEYCODE.ARROW_RIGHT)) {
         var img = $current_image.get(0);
         _exitEdit(true);
         if (key_code == $.FE.KEYCODE.ARROW_LEFT) {
@@ -1714,13 +1708,42 @@
         else {
           editor.selection.setAfter(img);
         }
+
         editor.selection.restore();
         e.preventDefault();
+
         return false;
       }
-      if ($current_image && key_code != $.FE.KEYCODE.F10 && !editor.keys.isBrowserAction(e)) {
+
+      else if ($current_image && key_code != $.FE.KEYCODE.F10 && !editor.keys.isBrowserAction(e)) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
+      }
+    }
+
+    /**
+     * Do some cleanup on images.
+     */
+    function _cleanOnGet(el) {
+      // Tag is image.
+      if (el && el.tagName == 'IMG') {
+        // Remove element if it has class fr-uploading or fr-error.
+        if (editor.node.hasClass(el, 'fr-uploading') || editor.node.hasClass(el, 'fr-error')) {
+          el.parentNode.removeChild(el);
+        }
+        // Remove class if it is draggable.
+        else if (editor.node.hasClass(el, 'fr-draggable')) {
+          el.classList.remove('fr-draggable');
+        }
+      }
+
+      // Look for inner nodes that might be in a similar case.
+      else if (el && el.nodeType == Node.ELEMENT_NODE) {
+        var imgs = el.querySelectorAll('img.fr-uploading, img.fr-error, img.fr-draggable');
+        for (var i = 0; i < imgs.length; i++) {
+          _cleanOnGet(imgs[i]);
+        }
       }
     }
 
@@ -1749,6 +1772,11 @@
 
       if (editor.$wp) {
         editor.events.on('window.keydown keydown', _editorKeydownHandler, true)
+        editor.events.on('keyup', function (e) {
+          if (e.which == $.FE.KEYCODE.ENTER) {
+            return false;
+          }
+        }, true);
       }
       else {
         editor.events.$on(editor.$win, 'keydown', _editorKeydownHandler);
@@ -1771,9 +1799,18 @@
         }
       }, true);
 
+      // focusEditor from accessibility.
+      editor.events.on('toolbar.focusEditor', function () {
+        if ($current_image) {
+          return false;
+        }
+      }, true);
+
       // Copy/cut image.
       editor.events.on('window.cut window.copy', function (e) {
-        if ($current_image) {
+
+        // Do copy only if image.edit popups is visible and not focused.
+        if ($current_image && editor.popups.isVisible('image.edit') && !editor.popups.get('image.edit').find(':focus').length) {
           _selectImage();
           $.FE.copied_text = '\n';
           $.FE.copied_html = $current_image.get(0).outerHTML;
@@ -1781,7 +1818,7 @@
           if (e.type == 'copy') {
             setTimeout(function () {
               _editImg($current_image);
-            })
+            });
           }
           else {
             _exitEdit(true);
@@ -1827,11 +1864,8 @@
         images = [];
       })
 
-      editor.events.on('html.get', function (html) {
-        html = html.replace(/<(img)((?:[\w\W]*?))class="([\w\W]*?)(fr-uploading|fr-error)([\w\W]*?)"((?:[\w\W]*?))>/g, '');
-
-        return html;
-      });
+      // Remove any fr-uploading / fr-error images.
+      editor.events.on('html.processGet', _cleanOnGet);
 
       if (editor.opts.imageOutputSize) {
         var imgs;
@@ -1866,11 +1900,10 @@
 
       editor.events.$on($(editor.o_win), 'orientationchange.image', function () {
         setTimeout(function () {
-          var $current_image = get();
           if ($current_image) {
             _editImg($current_image);
           }
-        }, 0);
+        }, 100);
       });
 
       _initEditPopup(true);
@@ -1934,7 +1967,7 @@
           }
 
           // Images without http (Safari ones.).
-          else if (img.src.indexOf('http') !== 0) {
+          else if (img.src.indexOf('http') !== 0 || img.src.indexOf('https://mail.google.com/mail') === 0) {
             editor.selection.save();
             $(img).remove();
             editor.selection.restore();
@@ -2067,15 +2100,82 @@
     }
 
     /**
+     * Set style for image.
+     */
+    function _setStyle ($img, _display, _align) {
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        $img.removeClass('fr-fil fr-fir fr-dib fr-dii');
+        $img.addClass('fr-fi' + _align[0] + ' fr-di' + _display[0]);
+      }
+      else {
+        if (_display == 'inline') {
+          $img.css({
+            display: 'inline-block',
+            verticalAlign: 'bottom',
+            margin: editor.opts.imageDefaultMargin
+          })
+
+          if (_align == 'center') {
+            $img.css({
+              'float': 'none',
+              marginBottom: '',
+              marginTop: '',
+              maxWidth: 'calc(100% - ' + (2 * editor.opts.imageDefaultMargin) + 'px)'
+            })
+          }
+          else if (_align == 'left') {
+            $img.css({
+              'float': 'left',
+              marginLeft: 0,
+              maxWidth: 'calc(100% - ' + editor.opts.imageDefaultMargin + 'px)'
+            })
+          }
+          else {
+            $img.css({
+              'float': 'right',
+              marginRight: 0,
+              maxWidth: 'calc(100% - ' + editor.opts.imageDefaultMargin + 'px)'
+            })
+          }
+        }
+        else if (_display == 'block') {
+          $img.css({
+            display: 'block',
+            'float': 'none',
+            verticalAlign: 'top',
+            margin: editor.opts.imageDefaultMargin + 'px auto'
+          })
+
+          if (_align == 'left') {
+            $img.css({
+              marginLeft: 0
+            })
+          }
+          else if (_align == 'right') {
+            $img.css({
+              marginRight: 0
+            })
+          }
+        }
+      }
+    }
+
+    /**
      * Align image.
      */
-
     function align (val) {
       $current_image.removeClass('fr-fir fr-fil');
-      if (val == 'left') {
-        $current_image.addClass('fr-fil');
-      } else if (val == 'right') {
-        $current_image.addClass('fr-fir');
+
+      // Easy case. Use classes.
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        if (val == 'left') {
+          $current_image.addClass('fr-fil');
+        } else if (val == 'right') {
+          $current_image.addClass('fr-fir');
+        }
+      }
+      else {
+        _setStyle($current_image, getDisplay(), val);
       }
 
       _repositionResizer();
@@ -2083,18 +2183,107 @@
     }
 
     /**
+     * Get image alignment.
+     */
+    function getAlign ($img) {
+      if (typeof $img == 'undefined') $img = $current_image;
+
+      if ($img) {
+        // Image has left class.
+        if ($img.hasClass('fr-fil')) {
+          return 'left';
+        }
+        // Image has right class.
+        else if ($img.hasClass('fr-fir')) {
+          return 'right';
+        }
+        // Image has display class set.
+        else if ($img.hasClass('fr-dib') || $img.hasClass('fr-dii')) {
+          return 'center';
+        }
+        else {
+          // Set float to none.
+          var flt = $img.css('float');
+          $img.css('float', 'none');
+
+          // Image has display block.
+          if ($img.css('display') == 'block') {
+            // Set float to the initial value.
+            $img.css('float', '');
+            if ($img.css('float') != flt) $img.css('float', flt);
+
+            // Margin left is 0.
+            // Margin right is auto.
+            if (parseInt($img.css('margin-left'), 10) === 0) {
+              return 'left';
+            }
+
+            // Margin left is auto.
+            // Margin right is 0.
+            else if (parseInt($img.css('margin-right'), 10) === 0) {
+              return 'right';
+            }
+          }
+
+          // Display inline.
+          else {
+            // Set float.
+            $img.css('float', '');
+            if ($img.css('float') != flt) $img.css('float', flt);
+
+            // Float left.
+            if ($img.css('float') == 'left') {
+              return 'left';
+            }
+
+            // Float right.
+            else if ($img.css('float') == 'right') {
+              return 'right';
+            }
+          }
+        }
+      }
+
+      return 'center';
+    }
+
+    /**
+     * Get image display.
+     */
+    function getDisplay ($img) {
+      if (typeof $img == 'undefined') $img = $current_image;
+
+      // Set float to none.
+      var flt = $img.css('float');
+      $img.css('float', 'none');
+
+      // Image has display block.
+      if ($img.css('display') == 'block') {
+        // Set float to the initial value.
+        $img.css('float', '');
+        if ($img.css('float') != flt) $img.css('float', flt);
+
+        return 'block';
+      }
+
+      // Display inline.
+      else {
+        // Set float.
+        $img.css('float', '');
+        if ($img.css('float') != flt) $img.css('float', flt);
+
+        return 'inline';
+      }
+
+      return 'inline';
+    }
+
+    /**
      * Refresh the align icon.
      */
-
     function refreshAlign ($btn) {
       if ($current_image) {
-        if ($current_image.hasClass('fr-fil')) {
-          $btn.find('> *:first').replaceWith(editor.icon.create('align-left'));
-        } else if ($current_image.hasClass('fr-fir')) {
-          $btn.find('> *:first').replaceWith(editor.icon.create('align-right'));
-        } else {
-          $btn.find('> *:first').replaceWith(editor.icon.create('align-justify'));
-        }
+        $btn.find('> *:first').replaceWith(editor.icon.create('image-align-' + getAlign()));
       }
     }
 
@@ -2104,15 +2293,7 @@
 
     function refreshAlignOnShow ($btn, $dropdown) {
       if ($current_image) {
-        var alignment = 'justify';
-
-        if ($current_image.hasClass('fr-fil')) {
-          alignment = 'left';
-        } else if ($current_image.hasClass('fr-fir')) {
-          alignment = 'right';
-        }
-
-        $dropdown.find('.fr-command[data-param1="' + alignment + '"]').addClass('fr-active').attr('aria-selected', true);
+        $dropdown.find('.fr-command[data-param1="' + getAlign() + '"]').addClass('fr-active').attr('aria-selected', true);
       }
     }
 
@@ -2122,10 +2303,17 @@
 
     function display (val) {
       $current_image.removeClass('fr-dii fr-dib');
-      if (val == 'inline') {
-        $current_image.addClass('fr-dii');
-      } else if (val == 'block') {
-        $current_image.addClass('fr-dib');
+
+      // Easy case. Use classes.
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        if (val == 'inline') {
+          $current_image.addClass('fr-dii');
+        } else if (val == 'block') {
+          $current_image.addClass('fr-dib');
+        }
+      }
+      else {
+        _setStyle($current_image, val, getAlign());
       }
 
       _repositionResizer();
@@ -2137,12 +2325,9 @@
      */
 
     function refreshDisplayOnShow ($btn, $dropdown) {
-      var d = 'block';
-      if ($current_image.hasClass('fr-dii')) {
-        d = 'inline';
+      if ($current_image) {
+        $dropdown.find('.fr-command[data-param1="' + getDisplay() + '"]').addClass('fr-active').attr('aria-selected', true);
       }
-
-      $dropdown.find('.fr-command[data-param1="' + d + '"]').addClass('fr-active').attr('aria-selected', true);
     }
 
     /**
@@ -2156,7 +2341,7 @@
       if (!editor.popups.isVisible('image.insert')) {
         hideProgressBar();
         editor.popups.refresh('image.insert');
-        editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('image.insert', editor.$sc);
       }
 
       var left = $current_image.offset().left + $current_image.width() / 2;
@@ -2221,7 +2406,13 @@
         $current_image.removeClass(styles.join(' '));
       }
 
-      $current_image.toggleClass(val);
+      if (typeof imageStyles[val] == 'object') {
+        $current_image.removeAttr('style');
+        $current_image.css(imageStyles[val].style);
+      }
+      else {
+        $current_image.toggleClass(val);
+      }
 
       _editImg($current_image);
     }
@@ -2356,23 +2547,20 @@
   })
 
   // Image align.
-  if (!$.FE.ICONS.align) {
-    $.FE.DefineIcon('align', { NAME: 'align-left' });
-    $.FE.DefineIcon('align-left', { NAME: 'align-left' });
-    $.FE.DefineIcon('align-right', { NAME: 'align-right' });
-    $.FE.DefineIcon('align-center', { NAME: 'align-center' });
-    $.FE.DefineIcon('align-justify', { NAME: 'align-justify' });
-  }
+  $.FE.DefineIcon('image-align', { NAME: 'align-left' });
+  $.FE.DefineIcon('image-align-left', { NAME: 'align-left' });
+  $.FE.DefineIcon('image-align-right', { NAME: 'align-right' });
+  $.FE.DefineIcon('image-align-center', { NAME: 'align-justify' });
 
   $.FE.DefineIcon('imageAlign', {
-    NAME: 'align-center'
+    NAME: 'align-justify'
   })
   $.FE.RegisterCommand('imageAlign', {
     type: 'dropdown',
     title: 'Align',
     options: {
       left: 'Align Left',
-      justify: 'None',
+      center: 'None',
       right: 'Align Right'
     },
     html: function () {
@@ -2380,7 +2568,7 @@
       var options = $.FE.COMMANDS.imageAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="imageAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
+          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="imageAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('image-align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
         }
       }
       c += '</ul>';
@@ -2468,7 +2656,11 @@
       var options = this.opts.imageStyles;
       for (var cls in options) {
         if (options.hasOwnProperty(cls)) {
-          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="imageStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+          var val = options[cls];
+
+          if (typeof val == 'object') val = val.title;
+
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="imageStyle" data-param1="' + cls + '">' + this.language.translate(val) + '</a></li>';
         }
       }
       c += '</ul>';

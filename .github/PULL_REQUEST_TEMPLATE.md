@@ -15,13 +15,12 @@
 [//]: # ( Required: )
 #### Description:
 
-
-#### Steps to test this PR:
+[//]: # ( As applicable: )
+#### Steps to reproduce the bug:
 1. 
 2. 
 
-[//]: # ( As applicable: )
-#### Steps to reproduce the bug:
+#### Steps to test this PR:
 1. 
 2. 
 

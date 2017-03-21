@@ -45,18 +45,27 @@ if (!isset($templateButtons)) {
 }
 
 //Set langVar to routeBase if not set
-if (!isset($langVar) && isset($routeBase)) {
-    $langVar = $routeBase;
+if (!isset($translationBase)) {
+    if (!isset($langVar)) {
+        $langVar = (isset($routeBase)) ? $routeBase : '';
+    }
+    $translationBase = 'mautic.'.$langVar;
 }
 
 // Set index and action routes
 if (isset($route) && !isset($actionRoute)) {
     $actionRoute = $route;
 } elseif (!isset($actionRoute)) {
-    $actionRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_action' : '';
+    $actionRoute = '';
+    if (isset($routeBase)) {
+        $actionRoute = 'mautic_'.str_replace('mautic_', '', $routeBase).'_action';
+    }
 }
 if (!isset($indexRoute)) {
-    $indexRoute = (isset($routeBase)) ? 'mautic_'.$routeBase.'_index' : '';
+    $indexRoute = '';
+    if (isset($routeBase)) {
+        $indexRoute = 'mautic_'.str_replace('mautic_', '', $routeBase).'_index';
+    }
 }
 
 //Extra HTML to be inserted after the buttons

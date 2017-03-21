@@ -23,7 +23,7 @@ class ApiMetadataDriver extends PhpDriver
     private $metadata = null;
 
     /**
-     * @var array
+     * @var PropertyMetadata[]
      */
     private $properties = [];
 
@@ -118,7 +118,10 @@ class ApiMetadataDriver extends PhpDriver
      */
     public function createProperty($name)
     {
-        $this->properties[$name]   = new PropertyMetadata($this->metadata->name, $name);
+        if (!isset($this->properties[$name])) {
+            $this->properties[$name] = new PropertyMetadata($this->metadata->name, $name);
+        }
+
         $this->currentPropertyName = $name;
 
         return $this;
@@ -127,13 +130,27 @@ class ApiMetadataDriver extends PhpDriver
     /**
      * Add property and set default version and Details group.
      *
-     * @param $name
+     * @param      $name
+     * @param null $serializedName
+     * @param bool $useGetter
      *
      * @return $this
      */
-    public function addProperty($name)
+    public function addProperty($name, $serializedName = null, $useGetter = false)
     {
+        if (empty($name)) {
+            return $this;
+        }
+
         $this->createProperty($name);
+
+        if ($useGetter && !$this->properties[$name]->getter) {
+            $this->properties[$name]->getter = 'get'.ucfirst($name);
+        }
+
+        if ($serializedName) {
+            $this->properties[$name]->serializedName = $serializedName;
+        }
 
         if ($this->defaultVersion !== null) {
             // Set the default version
@@ -153,16 +170,23 @@ class ApiMetadataDriver extends PhpDriver
      *
      * @param array      $properties
      * @param bool|false $addToListGroup
+     * @param bool|false $useGetter
      *
      * @return $this
      */
-    public function addProperties(array $properties, $addToListGroup = false)
+    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false)
     {
         foreach ($properties as $prop) {
-            $this->addProperty($prop);
+            if (!empty($prop)) {
+                $serializedName = null;
+                if (is_array($prop)) {
+                    list($prop, $serializedName) = $prop;
+                }
+                $this->addProperty($prop, $serializedName, $useGetter);
 
-            if ($addToListGroup) {
-                $this->inListGroup();
+                if ($addToListGroup) {
+                    $this->inListGroup();
+                }
             }
         }
 
@@ -192,7 +216,7 @@ class ApiMetadataDriver extends PhpDriver
     public function setSinceVersion($version, $property = null)
     {
         if ($property === null) {
-            $property = $this->currentPropertyName;
+            $property = $this->getCurrentPropertyName();
         }
 
         $this->properties[$property]->sinceVersion = $version;
@@ -209,7 +233,7 @@ class ApiMetadataDriver extends PhpDriver
     public function setUntilVersion($version, $property = null)
     {
         if ($property === null) {
-            $property = $this->currentPropertyName;
+            $property = $this->getCurrentPropertyName();
         }
 
         $this->properties[$property]->untilVersion = $version;
@@ -226,7 +250,7 @@ class ApiMetadataDriver extends PhpDriver
     public function setSerializedName($name, $property = null)
     {
         if ($property === null) {
-            $property = $this->currentPropertyName;
+            $property = $this->getCurrentPropertyName();
         }
 
         $this->properties[$property]->serializedName = $name;
@@ -249,7 +273,7 @@ class ApiMetadataDriver extends PhpDriver
         }
 
         if ($property === null) {
-            $property = $this->currentPropertyName;
+            $property = $this->getCurrentPropertyName();
         }
 
         $this->properties[$property]->groups = $groups;
@@ -261,17 +285,23 @@ class ApiMetadataDriver extends PhpDriver
      * Add a group the property belongs to.
      *
      * @param      $group
-     * @param null $property
+     * @param null $property True to apply to all current properties
      *
      * @return $this
      */
     public function addGroup($group, $property = null)
     {
-        if ($property === null) {
-            $property = $this->currentPropertyName;
-        }
+        if (true === $property) {
+            foreach ($this->properties as $prop => $metadata) {
+                $this->addGroup($group, $prop);
+            }
+        } else {
+            if ($property === null) {
+                $property = $this->getCurrentPropertyName();
+            }
 
-        $this->properties[$property]->groups[] = $group;
+            $this->properties[$property]->groups[] = $group;
+        }
 
         return $this;
     }
@@ -300,7 +330,7 @@ class ApiMetadataDriver extends PhpDriver
     public function setMaxDepth($depth, $property = null)
     {
         if ($property === null) {
-            $property = $this->currentPropertyName;
+            $property = $this->getCurrentPropertyName();
         }
 
         $this->properties[$property]->maxDepth = (int) $depth;
@@ -319,5 +349,19 @@ class ApiMetadataDriver extends PhpDriver
 
         $this->currentPropertyName = null;
         $this->properties          = [];
+    }
+
+    /**
+     * @return string
+     *
+     * @throws \Exception
+     */
+    protected function getCurrentPropertyName()
+    {
+        if (empty($this->currentPropertyName)) {
+            throw new \Exception('Current property is not set');
+        }
+
+        return $this->currentPropertyName;
     }
 }
