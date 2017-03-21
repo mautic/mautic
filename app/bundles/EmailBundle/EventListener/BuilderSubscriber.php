@@ -184,14 +184,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_socialfollow',
                 600
             );
-//            $event->addSlotType(
-//                'codemode',
-//                'Code Mode',
-//                'code',
-//                'MauticCoreBundle:Slots:codemode.html.php',
-//                'slot_codemode',
-//                500
-//            );
+            $event->addSlotType(
+                'codemode',
+                'Code Mode',
+                'code',
+                'MauticCoreBundle:Slots:codemode.html.php',
+                'slot_codemode',
+                500
+            );
             $event->addSlotType(
                 'separator',
                 'Separator',
@@ -200,6 +200,35 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot',
                 400
             );
+
+            $emails = $this->emailModel->getRepository()->getEntities([
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'e.dynamicContent',
+                            'expr'   => 'notLike',
+                            'value'  => '%"tokenName";N%',
+                        ],
+                    ],
+                ],
+                'oderBy'         => 'e.dynamicContent',
+                'orderByDir'     => 'ASC',
+                'limit'          => 5,
+                'hydration_mode' => 'HYDRATE_ARRAY',
+            ]);
+            foreach ($emails as $email) {
+                foreach ($email['dynamicContent'] as $dec) {
+                    $event->addSlotType(
+                        'dynamicContent_'.$dec['tokenName'],
+                        $dec['tokenName'],
+                        'tag',
+                        'MauticCoreBundle:Slots:dynamiccontent.html.php',
+                        'slot_dynamiccontent',
+                        300,
+                        ['tokenName' => $dec['tokenName']]
+                    );
+                }
+            }
         }
 
         if ($event->sectionsRequested()) {
@@ -226,14 +255,6 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Sections:three-column.html.php',
                 null,
                 800
-            );
-            $event->addSlotType(
-                'dynamicContent',
-                'Dynamic Content',
-                'list',
-                'MauticCoreBundle:Slots:dynamiccontent.html.php',
-                'slot',
-                600
             );
         }
     }

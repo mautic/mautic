@@ -864,6 +864,7 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
 
     if (decId || decId === 0) {
         focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+        focusForm.removeClass('fade');
         // remove froala editor
         focusForm.find('.fr-box').remove();
     }
@@ -879,6 +880,7 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
         e.stopPropagation();
         var tabId = Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
         var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+        focusForm.removeClass('fade');
         var removeButton = focusForm.find('.remove-item');
         var parentButton = parent.mQuery('#emailform_dynamicContent_' + decId).find('.remove-item');
         Mautic.initRemoveEvents(removeButton, parent.mQuery, parentButton);
@@ -1116,7 +1118,10 @@ Mautic.initSlotListeners = function() {
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
-                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                if (focusType == 'dynamicContent') {
+                    buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                }
 
                 var builderEl = parent.mQuery('.builder');
 
@@ -1516,7 +1521,7 @@ Mautic.getDynamicContentDataForToken = function(token) {
 };
 
 Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
-    var dynConSlots = mQuery(builderHtml).find('[data-slot="dynamicContent"]');
+    var dynConSlots = mQuery(builderHtml).find('[data-slot^="dynamicContent"]');
 
     if (dynConSlots.length) {
         dynConSlots.each(function(i) {

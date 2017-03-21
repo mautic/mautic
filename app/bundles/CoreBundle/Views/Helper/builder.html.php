@@ -50,7 +50,7 @@
                                 <br>
                                 <span class="slot-caption"><?php echo $slot['header']; ?></span>
                                 <script type="text/html">
-                                    <?php echo $view->render($slot['content']); ?>
+                                    <?php echo $view->render($slot['content'], isset($slot['params']) ? $slot['params'] : []); ?>
                                 </script>
                             </div>
                         <?php endforeach; ?>
