@@ -160,11 +160,13 @@ class TokenSubscriber extends CommonSubscriber
 
             switch ($data['type']) {
                 case 'boolean':
-                    if (!empty($leadVal)) {
+                    if ($leadVal !== null) {
                         $leadVal = (bool) $leadVal;
                     }
 
-                    $filterVal = (bool) $filterVal;
+                    if ($filterVal !== null) {
+                        $filterVal = (bool) $filterVal;
+                    }
                     break;
                 case 'date':
                     if (!$leadVal instanceof \DateTime) {
@@ -176,25 +178,26 @@ class TokenSubscriber extends CommonSubscriber
                     }
                     break;
                 case 'datetime':
-                    if (!$leadVal instanceof \DateTime) {
-                        $leadVal = new \DateTime($leadVal);
-                    }
+                case 'time':
+                    $leadValCount   = substr_count($leadVal, ':');
+                    $filterValCount = substr_count($filterVal, ':');
 
-                    if (!$filterVal instanceof \DateTime) {
-                        $filterVal = new \DateTime($filterVal);
+                    if ($leadValCount === 2 && $filterValCount === 1) {
+                        $filterVal .= ':00';
                     }
                     break;
                 case 'multiselect':
-                    // noop
+                    if (!is_array($leadVal)) {
+                        $leadVal = explode('|', $leadVal);
+                    }
+
+                    if (!is_array($filterVal)) {
+                        $filterVal = explode('|', $filterVal);
+                    }
                     break;
                 case 'number':
                     $leadVal   = (int) $leadVal;
                     $filterVal = (int) $filterVal;
-                    break;
-                case 'time':
-                    // Trim leading 0's before standard string comparision
-                    $leadVal   = ltrim($leadVal, '0');
-                    $filterVal = ltrim($filterVal, '0');
                     break;
                 case 'select':
                 default:
@@ -243,8 +246,6 @@ class TokenSubscriber extends CommonSubscriber
                             // Break once we find a match
                             break;
                         }
-
-                        $groups[$groupNum] = false;
                     }
                     break;
                 case '!in':
