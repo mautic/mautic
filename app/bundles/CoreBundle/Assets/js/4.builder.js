@@ -838,20 +838,20 @@ Mautic.cloneAndIncrementId = function(id, jQueryVariant) {
     var $clone = mQuery(id).clone();    // Create your clone
 
     // Get the number at the end of the ID, increment it, and replace the old id
-    $clone.attr('id', $clone.attr('id').replace(/(\d+)?$/, function(str) { var v = parseInt(str); return isNaN(v)? 0 : v + 1; }) );
+    $clone.attr('id', 'new_' + $clone.attr('id') );
 
     // Find all elements in $clone that have an ID, and iterate using each()
     $clone.find('[id]').each(function() {
         //Perform the same replace as above
         var $th = mQuery(this);
-        var newID = $th.attr('id').replace(/_(\d+)_/, function(a, b) { var v = parseInt(b); return '_' + (isNaN(v)? 0 : v + 1) + '_'; });
+        var newID = 'new_' + $th.attr('id');
         $th.attr('id', newID);
     });
     // Find all elements in $clone that have an href to an id, and iterate using each()
     $clone.find('[href^=#]').each(function() {
         //Perform the same replace as above
         var $th = mQuery(this);
-        var newHref = $th.attr('href').replace(/_(\d+)_/, function(a, b) { var v = parseInt(b); return '_' + (isNaN(v)? 0 : v + 1) + '_'; });
+        var newHref = $th.attr('href').replace(/^#/, function() { return '#new_'; });
         $th.attr('href', newHref);
     });
     return $clone;
@@ -863,8 +863,9 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
     var focusForm;
 
     if (decId || decId === 0) {
-        // focusForm = mQuery(parent.mQuery('#emailform_dynamicContent_' + decId).html());
         focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+        // remove froala editor
+        focusForm.find('.fr-box').remove();
     }
 
     var focusFormHeader = parent.mQuery('#customize-slot-panel').find('.panel-heading h4');
@@ -878,6 +879,9 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
         e.stopPropagation();
         var tabId = Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
         var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+        var removeButton = focusForm.find('.remove-item');
+        var parentButton = parent.mQuery('#emailform_dynamicContent_' + decId).find('.remove-item');
+        Mautic.initRemoveEvents(removeButton, parent.mQuery, parentButton);
         parent.mQuery('#slot-form-container').empty().html(focusForm);
     });
 
@@ -990,20 +994,23 @@ Mautic.initSlotListeners = function() {
 
             if (focusType == 'dynamicContent') {
                 focusForm = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
-                // window.myself = focusForm[0];
-                // mQuery(focusForm).find('li a').click(function (event) {
-                //     // simulate tab plugin
-                //     //parent.mQuery(event.target).tab('show');
-                //
-                //     var jQueryInit = jQuery.fn.init;
-                //     jQuery.fn.init = function(arg1, arg2, rootjQuery){
-                //         arg2 = arg2 || myself;
-                //         return new jQueryInit(arg1, arg2, rootjQuery);
-                //     };
-                //     var selector = mQuery(event.target).attr('href');
-                //     mQuery(selector).siblings().removeClass('active');
-                //     mQuery(selector).addClass('active');
-                // }.bind(parent.document));
+                // update token name in outside form
+                focusForm.find('.dynamic-content-token-name').on('input', function (e) {
+                    var $this = mQuery(this);
+                    var id = $this.attr('id').replace(/^new_/, '');
+                    $this = parent.mQuery('#'+id);
+                    var parentTab = $this.parents('.tab-pane');
+                    var correspondingTabLink = parent.mQuery('a[href="#' + parentTab.attr('id') + '"]');
+                    var tabContainer = correspondingTabLink.parents('ul').first();
+                    var correspondingTabLinkIndex = tabContainer.find('a[data-toggle="tab"]').index(correspondingTabLink);
+
+                    var tokenName = mQuery(this).val() || 'Dynamic Content ' + (correspondingTabLinkIndex + 1);
+
+                    correspondingTabLink.text(tokenName);
+                    $this.val(tokenName);
+
+                    Mautic.updateDynamicContentDropdown();
+                });
             }
 
             // slotFormContainer.html(focusForm);
@@ -1103,13 +1110,13 @@ Mautic.initSlotListeners = function() {
                 }
             }
 
-            focusForm.find('textarea.editor').each(function() {
+            focusForm.find('textarea.editor').each(function () {
                 var theEditor = this;
                 var slotHtml = parent.mQuery('<div/>').html(clickedSlot.html());
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
-                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
 
                 var builderEl = parent.mQuery('.builder');
 
@@ -1128,18 +1135,22 @@ Mautic.initSlotListeners = function() {
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 };
 
-                // init AtWho in a froala editor
-                parent.mQuery(this).on('froalaEditor.initialized', function (e, editor) {
-                    parent.Mautic.initAtWho(editor.$el, parent.Mautic.getBuilderTokensMethod(), editor);
+                // prevent overriding variant content in editor
+                if (focusType !== 'dynamicContent') {
+                    // init AtWho in a froala editor
+                    parent.mQuery(this).on('froalaEditor.initialized', function (e, editor) {
+                        parent.Mautic.initAtWho(editor.$el, parent.Mautic.getBuilderTokensMethod(), editor);
 
-                    Mautic.setTextSlotEditorStyle(editor.$el, clickedSlot);
-                });
+                        Mautic.setTextSlotEditorStyle(editor.$el, clickedSlot);
+                    });
 
-                parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                    var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
-                    clickedSlot.html(slotHtml.html());
-                });
-                parent.mQuery(this).val(slotHtml.html());
+                    parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
+                        var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
+                        clickedSlot.html(slotHtml.html());
+                    });
+
+                    parent.mQuery(this).val(slotHtml.html());
+                }
 
                 parent.mQuery(this).froalaEditor(parent.mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
             });
@@ -1195,11 +1206,14 @@ Mautic.initSlotListeners = function() {
     };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
-        Mautic.removeAddVariantButton();
 
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         var type = params.type;
+
+        if (type !== "dynamicContent") {
+            Mautic.removeAddVariantButton();
+        }
 
         Mautic.clearSlotFormError(fieldParam);
 
