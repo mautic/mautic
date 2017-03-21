@@ -147,10 +147,16 @@ class TokenSubscriber extends CommonSubscriber
                 continue;
             }
 
+            /*
+             * If we are checking the first filter in a group
+             * assume that the group will not match.
+             */
+            if ($groups[$groupNum] === null) {
+                $groups[$groupNum] = false;
+            }
+
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
-
-            $leadValCount = $filterValCount = 1;
 
             switch ($data['type']) {
                 case 'boolean':
@@ -161,23 +167,25 @@ class TokenSubscriber extends CommonSubscriber
                     $filterVal = (bool) $filterVal;
                     break;
                 case 'date':
+                    if (!$leadVal instanceof \DateTime) {
+                        $leadVal = new \DateTime($leadVal);
+                    }
+
+                    if (!$filterVal instanceof \DateTime) {
+                        $filterVal = new \DateTime($filterVal);
+                    }
+                    break;
                 case 'datetime':
                     if (!$leadVal instanceof \DateTime) {
                         $leadVal = new \DateTime($leadVal);
                     }
 
-                    $leadVal = $leadVal->format('u');
-
                     if (!$filterVal instanceof \DateTime) {
                         $filterVal = new \DateTime($filterVal);
                     }
-
-                    $filterVal = $filterVal->format('u');
                     break;
                 case 'multiselect':
-                    $leadValCount   = count($leadVal);
-                    $filterValCount = count($filterVal);
-
+                    // noop
                     break;
                 case 'number':
                     $leadVal   = (int) $leadVal;
