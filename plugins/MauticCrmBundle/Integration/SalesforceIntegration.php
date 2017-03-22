@@ -426,6 +426,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $integrationEntity->setLastSyncDate(new \DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
+                        $this->em->detach($entity);
+                        unset($entity);
                     } else {
                         continue;
                     }
