@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -74,7 +75,7 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'int',
                         'link'  => 'mautic_page_action',
                     ],
-                    $pagePrefix.'name' => [
+                    $pagePrefix.'title' => [
                         'label' => 'mautic.form.report.page_name',
                         'type'  => 'string',
                     ],

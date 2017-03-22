@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -72,7 +73,7 @@ class StagesChangeLog
             ->build();
 
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
-            ->inversedBy('stageChangeLog')
+            ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
 

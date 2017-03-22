@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -27,11 +28,11 @@
     <?php if (isset($form['triggerMode'])): ?>
     <div<?php echo $hideTriggerMode ? ' class="hide"' : ''; ?>>
         <?php echo $view['form']->row($form['triggerMode']); ?>
-    
+
         <div<?php echo ($form['triggerMode']->vars['data'] != 'date') ? ' class="hide"' : ''; ?> id="triggerDate">
             <?php echo $view['form']->row($form['triggerDate']); ?>
         </div>
-    
+
         <div<?php echo ($form['triggerMode']->vars['data'] != 'interval') ? ' class="hide"' : ''; ?> id="triggerInterval">
             <div class="row">
                 <div class="col-sm-4">

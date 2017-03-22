@@ -39,15 +39,15 @@
     height: 150px;
 }
 
-._jsPlumb_endpoint {
+.jtk-endpoint {
     z-index: 1005;
 }
 
-._jsPlumb_endpoint.dragActive {
+.jtk-endpoint.dragActive {
     /* changes endpoint when dragging connector */
 }
 
-._jsPlumb_label {
+.jtk-label {
     background-color: white;
     opacity:0.9;
     padding:0.3em;
@@ -58,21 +58,35 @@
     color: #47535f;
 }
 
-._jsPlumb_connector {
+.jtk-connector {
     z-index: 1000;
 }
 
-._jsPlumb_clickable_anchor {
+.jtk-clickable_anchor {
     cursor: pointer;
     z-index: 1050;
 }
 
-._jsPlumb_endpoint svg text {
+.jtk-endpoint svg text {
     display: none;
 }
 
-._jsPlumb_clickable_anchor svg text {
+.jtk-clickable_anchor svg text {
     display: block;
+}
+
+.jtk-surface {
+    overflow: hidden !important;
+    position: relative;
+    cursor: move;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    touch-action:none;
+}
+
+.jtk-surface-nopan {
+    overflow: scroll !important;
+    cursor:default;
 }
 
 .list-campaign-event, .list-campaign-source {
@@ -171,6 +185,7 @@
 #CampaignCanvas {
     height: 10000px;
     width: 10000px;
+    position: relative;
 }
 
 .campaign-event-list .progress-bar {

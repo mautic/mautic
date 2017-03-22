@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -104,6 +105,6 @@ class PublicController extends CommonFormController
 
         $model->trackDownload($entity, $this->request, 404);
 
-        $this->notFound();
+        return $this->notFound();
     }
 }

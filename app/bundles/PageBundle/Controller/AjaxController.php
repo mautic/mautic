@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -118,6 +119,6 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
-        return $model->getBuilderComponents(null, ['tokens', 'visualTokens'], $query);
+        return $model->getBuilderComponents(null, ['tokens'], $query);
     }
 }

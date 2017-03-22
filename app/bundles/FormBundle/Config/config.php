@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_form_pagetoken_index' => [
-                'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_formaction_action' => [
                 'path'       => '/forms/action/{objectAction}/{objectId}',
                 'controller' => 'MauticFormBundle:Action:execute',
@@ -38,9 +35,9 @@ return [
                     'format' => 'csv',
                 ],
             ],
-            'mautic_form_results_delete' => [
-                'path'       => '/forms/results/{formId}/delete/{objectId}',
-                'controller' => 'MauticFormBundle:Result:delete',
+            'mautic_form_results_action' => [
+                'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
+                'controller' => 'MauticFormBundle:Result:execute',
                 'defaults'   => [
                     'objectId' => 0,
                 ],
@@ -51,13 +48,21 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getforms' => [
-                'path'       => '/forms',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntities',
+            'mautic_api_formstandard' => [
+                'standard_entity' => true,
+                'name'            => 'forms',
+                'path'            => '/forms',
+                'controller'      => 'MauticFormBundle:Api\FormApi',
             ],
-            'mautic_api_getform' => [
-                'path'       => '/forms/{id}',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntity',
+            'mautic_api_formdeletefields' => [
+                'path'       => '/forms/{formId}/fields/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',
+                'method'     => 'DELETE',
+            ],
+            'mautic_api_formdeleteactions' => [
+                'path'       => '/forms/{formId}/actions/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteActions',
+                'method'     => 'DELETE',
             ],
         ],
         'public' => [
@@ -162,13 +167,22 @@ return [
                 ],
             ],
             'mautic.form.webhook.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'class'       => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
             'mautic.form.dashboard.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\DashboardSubscriber',
                 'arguments' => [
                     'mautic.form.model.submission',
                     'mautic.form.model.form',
+                ],
+            ],
+            'mautic.form.stats.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
@@ -296,6 +310,12 @@ return [
                 'arguments' => [
                     'translator',
                     'validator',
+                ],
+            ],
+            'mautic.form.helper.token' => [
+                'class'     => 'Mautic\FormBundle\Helper\TokenHelper',
+                'arguments' => [
+                    'mautic.form.model.form',
                 ],
             ],
         ],

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -71,16 +71,16 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $this->corsHeaders['Access-Control-Allow-Origin'] = $this->getAllowOriginHeaderValue($request);
 
-        // If this is an initial OPTIONS request, just set the CORS headers and exit.
-        if (
-            $request->getMethod() === 'OPTIONS'
-            && $request->headers->has('Access-Control-Request-Headers')
-            && $request->headers->has('Origin')
-        ) {
+        // Capture all OPTIONS requests
+        if ($request->getMethod() === 'OPTIONS') {
             $response = new Response('', Response::HTTP_NO_CONTENT);
 
-            // Only add the CORS headers if the request Origin is valid.
-            if ($this->requestOriginIsValid) {
+            // If this is a valid OPTIONS request, set the CORS headers on the Response and exit.
+            if (
+                $this->requestOriginIsValid
+                && $request->headers->has('Access-Control-Request-Headers')
+                && $request->headers->has('Origin')
+            ) {
                 foreach ($this->corsHeaders as $header => $value) {
                     $response->headers->set($header, $value);
                 }
@@ -91,6 +91,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         $response = $this->app->handle($request, $type, $catch);
 
+        // Add standard CORS headers to any XHR
         if ($request->isXmlHttpRequest()) {
             foreach ($this->corsHeaders as $header => $value) {
                 $response->headers->set($header, $value);
@@ -115,6 +116,17 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         // If we're not restricting domains, set the header to the request origin
         if (!$this->restrictCORSDomains || in_array($origin, $this->validCORSDomains)) {
             $this->requestOriginIsValid = true;
+
+            return $origin;
+        }
+
+        // Check the domains using shell wildcard patterns
+        $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
+            return fnmatch($validCorsDomain, $origin, FNM_CASEFOLD);
+        };
+        if (array_filter($this->validCORSDomains, $validCorsDomainFilter)) {
+            $this->requestOriginIsValid = true;
+            $this->corsHeaders['Vary']  = 'Origin';
 
             return $origin;
         }

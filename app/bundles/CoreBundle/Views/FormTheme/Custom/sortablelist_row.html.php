@@ -1,5 +1,11 @@
 <?php
-$list          = $form->children['list'];
+$list            = $form->children['list'];
+$parentHasErrors = $view['form']->containsErrors($form->parent);
+if ($parentHasErrors && empty($list->vars['value'])) {
+    // Work around for Symfony bug not repopulating values
+    $list = $form->parent->children['properties']['list'];
+}
+
 $hasErrors     = count($list->vars['errors']);
 $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 $datePrototype = (isset($list->vars['prototype'])) ?
@@ -11,7 +17,7 @@ $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
         <?php echo $view['form']->label($form, $label) ?>
         <a  data-prototype="<?php echo $datePrototype; ?>"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="<?php echo $form->vars['id']; ?>_additem">
-            <?php echo $view['translator']->trans('mautic.core.form.list.additem'); ?>
+            <?php echo $view['translator']->trans($addValueButton); ?>
         </a>
         <?php if ($isSortable): ?>
         <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) {

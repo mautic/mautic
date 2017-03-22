@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,7 +27,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class FilterType extends AbstractType
 {
-    private $operatorChoices;
     private $translator;
     private $currentListId;
 
@@ -35,15 +35,6 @@ class FilterType extends AbstractType
      */
     public function __construct(MauticFactory $factory)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel             = $factory->getModel('lead.list');
-        $operatorChoices       = $listModel->getFilterExpressionFunctions();
-        $this->operatorChoices = [];
-        foreach ($operatorChoices as $key => $value) {
-            if (empty($value['hide'])) {
-                $this->operatorChoices[$key] = $value['label'];
-            }
-        }
         $this->translator    = $factory->getTranslator();
         $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
     }
@@ -70,11 +61,10 @@ class FilterType extends AbstractType
             ]
         );
 
-        $translator      = $this->translator;
-        $operatorChoices = $this->operatorChoices;
-        $currentListId   = $this->currentListId;
+        $translator    = $this->translator;
+        $currentListId = $this->currentListId;
 
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $currentListId) {
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $currentListId) {
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
@@ -148,6 +138,16 @@ class FilterType extends AbstractType
                     $customOptions['choices'] = $options['stage'];
                     $type                     = 'choice';
                     break;
+                case 'globalcategory':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = [];
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = [$data['filter']];
+                    }
+                    $customOptions['choices']  = $options['globalcategory'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                 case 'country':
                 case 'region':
@@ -192,11 +192,12 @@ class FilterType extends AbstractType
                     $displayAttr = array_merge(
                         $displayAttr,
                         [
-                            'class'       => 'form-control',
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans(
+                            'class'                => 'form-control',
+                            'data-toggle'          => 'field-lookup',
+                            'data-target'          => $data['field'],
+                            'data-action'          => 'lead:fieldList',
+                            'data-lookup-callback' => 'updateLookupListFilter',
+                            'placeholder'          => $translator->trans(
                                 'mautic.lead.list.form.filtervalue'
                             ),
                         ]
@@ -227,10 +228,13 @@ class FilterType extends AbstractType
                         }
                     }
 
-                    $list    = $field['properties']['list'];
-                    $choices = FormFieldHelper::parseList($list);
+                    $choices = [];
+                    if (!empty($field['properties']['list'])) {
+                        $list    = $field['properties']['list'];
+                        $choices = FormFieldHelper::parseList($list, true, ('boolean' === $fieldType));
+                    }
 
-                    if ($fieldType == 'select') {
+                    if ('select' == $fieldType) {
                         // array_unshift cannot be used because numeric values get lost as keys
                         $choices     = array_reverse($choices, true);
                         $choices[''] = '';
@@ -241,18 +245,20 @@ class FilterType extends AbstractType
                     break;
                 case 'lookup':
                 default:
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                    if ('number' !== $fieldType) {
+                        $attr = array_merge(
+                            $attr,
+                            [
+                                'data-toggle' => 'field-lookup',
+                                'data-target' => $data['field'],
+                                'data-action' => 'lead:fieldList',
+                                'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                            ]
+                        );
 
-                    if (isset($field['properties']['list'])) {
-                        $attr['data-options'] = $field['properties']['list'];
+                        if (isset($field['properties']['list'])) {
+                            $attr['data-options'] = $field['properties']['list'];
+                        }
                     }
 
                     break;
@@ -311,21 +317,12 @@ class FilterType extends AbstractType
                 ]
             );
 
-            $choices = $operatorChoices;
-            if (isset($field['operators']['include'])) {
-                // Inclusive operators
-                $choices = array_intersect_key($choices, array_flip($field['operators']['include']));
-            } elseif (isset($field['operators']['exclude'])) {
-                // Inclusive operators
-                $choices = array_diff_key($choices, array_flip($field['operators']['exclude']));
-            }
-
             $form->add(
                 'operator',
                 'choice',
                 [
                     'label'   => false,
-                    'choices' => $choices,
+                    'choices' => isset($field['operators']) ? $field['operators'] : [],
                     'attr'    => [
                         'class'    => 'form-control not-chosen',
                         'onchange' => 'Mautic.convertLeadFilterInput(this)',
@@ -375,6 +372,7 @@ class FilterType extends AbstractType
                 'tags',
                 'stage',
                 'locales',
+                'globalcategory',
             ]
         );
 

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -68,10 +69,12 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add trigger
         $pageHitTrigger = [
-            'label'       => 'mautic.page.campaign.event.pagehit',
-            'description' => 'mautic.page.campaign.event.pagehit_descr',
-            'formType'    => 'campaignevent_pagehit',
-            'eventName'   => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'label'          => 'mautic.page.campaign.event.pagehit',
+            'description'    => 'mautic.page.campaign.event.pagehit_descr',
+            'formType'       => 'campaignevent_pagehit',
+            'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'channel'        => 'page',
+            'channelIdField' => 'pages',
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
     }
@@ -120,7 +123,7 @@ class CampaignSubscriber extends CommonSubscriber
             $pageHitId = 0;
         }
 
-        $limitToPages = $config['pages'];
+        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
 
         $urlMatches = [];
 
@@ -135,6 +138,19 @@ class CampaignSubscriber extends CommonSubscriber
             }
         }
 
+        $refererMatches = [];
+
+        // Check Landing Pages URL or Tracing Pixel URL
+        if (isset($config['referer']) && $config['referer']) {
+            $refererUrl      = $eventDetails->getReferer();
+            $limitToReferers = explode(',', $config['referer']);
+
+            foreach ($limitToReferers as $referer) {
+                $referer                  = trim($referer);
+                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
+            }
+        }
+
         // **Page hit is true if:**
         // 1. no landing page is set and no URL rule is set
         $applyToAny = (empty($config['url']) && empty($limitToPages));
@@ -145,7 +161,10 @@ class CampaignSubscriber extends CommonSubscriber
         // 3. URL rule is set and match with URL hit
         $urlIsHit = (!empty($config['url']) && in_array(true, $urlMatches));
 
-        if ($applyToAny || $langingPageIsHit || $urlIsHit) {
+        // 3. URL rule is set and match with URL hit
+        $refererIsHit = (!empty($config['referer']) && in_array(true, $refererMatches));
+
+        if ($applyToAny || $langingPageIsHit || $urlIsHit || $refererIsHit) {
             return $event->setResult(true);
         }
 

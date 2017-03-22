@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -105,7 +106,7 @@ PAYLOAD;
     }
 
     /**
-     * Test that a complaint message without a feedback report is processed with the reason "unkown".
+     * Test that a complaint message without a feedback report is processed with the reason "unknown".
      */
     public function testSingleComplaintWithoutFeedbackCallbackSuccessfull()
     {
@@ -133,7 +134,7 @@ PAYLOAD;
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals('mautic.email.complaint.reason.unkown', $rows[1]['emails']['richard@example.com']);
+        $this->assertEquals('mautic.email.complaint.reason.unknown', $rows[1]['emails']['richard@example.com']);
     }
 
     /**

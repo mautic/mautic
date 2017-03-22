@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -31,6 +32,8 @@
         </div>
     </div>
 </div>
+<?php echo $view['form']->row($form['templates']); ?>
 <?php echo $view['form']->row($form['to']); ?>
 <?php echo $view['form']->row($form['cc']); ?>
 <?php echo $view['form']->row($form['bcc']); ?>
+

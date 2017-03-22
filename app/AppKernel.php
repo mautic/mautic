@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,6 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 2;
+    const MINOR_VERSION = 7;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 1;
+    const PATCH_VERSION = 2;
 
     /**
      * Extra version identifier.
@@ -49,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-dev';
 
     /**
      * @var array
@@ -120,7 +122,9 @@ class AppKernel extends Kernel
                         [
                             '%code%' => $e->getCode(),
                         ]
-                    )
+                    ),
+                    0,
+                    $e
                 );
             }
         }
@@ -157,6 +161,7 @@ class AppKernel extends Kernel
             new Mautic\CalendarBundle\MauticCalendarBundle(),
             new Mautic\CampaignBundle\MauticCampaignBundle(),
             new Mautic\CategoryBundle\MauticCategoryBundle(),
+            new Mautic\ChannelBundle\MauticChannelBundle(),
             new Mautic\ConfigBundle\MauticConfigBundle(),
             new Mautic\CoreBundle\MauticCoreBundle(),
             new Mautic\DashboardBundle\MauticDashboardBundle(),
@@ -174,6 +179,8 @@ class AppKernel extends Kernel
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle(),
+            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
+            new LightSaml\SpBundle\LightSamlSpBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles
@@ -194,6 +201,12 @@ class AppKernel extends Kernel
                 $plugin = new $class();
 
                 if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
+                        // Check if this version supports the plugin before loading it
+                        if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
+                            continue;
+                        }
+                    }
                     $bundles[] = $plugin;
                 }
 

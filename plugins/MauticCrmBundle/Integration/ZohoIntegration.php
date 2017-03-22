@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -142,6 +143,10 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $zohoFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -182,6 +187,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
             return false;
         }
+
+        $this->cache->set('leadFields', $zohoFields);
 
         return $zohoFields;
     }

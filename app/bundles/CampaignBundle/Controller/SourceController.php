@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -74,7 +75,7 @@ class SourceController extends CommonFormController
                     $success = 1;
 
                     $modifiedSources              = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified');
-                    $modifiedSources[$sourceType] = $form[$sourceType]->getData();
+                    $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
                     $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $modifiedSources);
                 } else {
                     $success = 0;
@@ -95,7 +96,7 @@ class SourceController extends CommonFormController
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
-                        'names'      => implode(', ', array_intersect_key($sourceList, array_flip($modifiedSources[$sourceType]))),
+                        'names'      => implode(', ', array_intersect_key($sourceList, $modifiedSources[$sourceType])),
                     ]
                 );
                 $passthroughVars['sourceType'] = $sourceType;
@@ -138,7 +139,7 @@ class SourceController extends CommonFormController
             $sourceType = $this->request->query->get('sourceType');
             $source     = [
                 'sourceType' => $sourceType,
-                $sourceType  => $selectedSources[$sourceType],
+                $sourceType  => array_flip($selectedSources[$sourceType]),
             ];
         }
 
@@ -179,7 +180,7 @@ class SourceController extends CommonFormController
                     $success = 1;
 
                     //save the properties to session
-                    $modifiedSources[$sourceType] = $form[$sourceType]->getData();
+                    $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
                     $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $modifiedSources);
                 } else {
                     $success = 0;
@@ -200,7 +201,7 @@ class SourceController extends CommonFormController
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
-                        'names'      => implode(', ', array_intersect_key($sourceList, array_flip($modifiedSources[$sourceType]))),
+                        'names'      => implode(', ', array_intersect_key($sourceList, $modifiedSources[$sourceType])),
                         'update'     => true,
                     ]
                 );

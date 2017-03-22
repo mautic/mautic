@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,11 @@ class ThemeHelper
      * @var PathsHelper
      */
     private $pathsHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templatingHelper;
 
     /**
      * @var array|mixed
@@ -50,7 +56,8 @@ class ThemeHelper
     /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper $pathsHelper
+     * @param PathsHelper      $pathsHelper
+     * @param TemplatingHelper $templatingHelper
      */
     public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
     {
@@ -276,12 +283,13 @@ class ThemeHelper
                 }
 
                 if ($addTheme) {
-                    $this->themes[$specificFeature][$theme->getBasename()]               = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]           = [];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name']   = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key']    = $theme->getBasename();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']    = $theme->getRealPath();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
+                    $this->themes[$specificFeature][$theme->getBasename()]                       = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]                   = [];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name']           = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key']            = $theme->getBasename();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']            = $theme->getRealPath();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config']         = $config;
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes', false);
                 }
             }
         }
@@ -369,7 +377,7 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig    = false;
-            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff'];
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff', 'eot', 'woff'];
             $allowedFiles      = [];
             for ($i = 0; $i < $zipper->numFiles; ++$i) {
                 $entry     = $zipper->getNameIndex($i);

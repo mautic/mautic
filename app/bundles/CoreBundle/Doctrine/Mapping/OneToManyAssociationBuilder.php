@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,5 +31,13 @@ class OneToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\OneToMan
         $this->mapping['orphanRemoval'] = $orphanRemoval;
 
         return $this;
+    }
+
+    /**
+     * @return ClassMetadataBuilder
+     */
+    public function build()
+    {
+        return parent::build();
     }
 }

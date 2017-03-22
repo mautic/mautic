@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -325,5 +326,33 @@ class DateTimeHelper
             default:
                 return false;
         }
+    }
+
+    /**
+     * Tries to guess timezone from timezone offset.
+     *
+     * @param int $offset in seconds
+     *
+     * @return string
+     */
+    public function guessTimezoneFromOffset($offset = 0)
+    {
+        // Sanitize input
+        $offset = (int) $offset;
+
+        $timezone = timezone_name_from_abbr('', $offset, false);
+
+        // In case http://bugs.php.net/44780 bug happens
+        if (empty($timezone)) {
+            foreach (timezone_abbreviations_list() as $abbr) {
+                foreach ($abbr as $city) {
+                    if ($city['offset'] == $offset) {
+                        return $city['timezone_id'];
+                    }
+                }
+            }
+        }
+
+        return $timezone;
     }
 }

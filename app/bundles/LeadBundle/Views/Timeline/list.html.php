@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -73,7 +74,7 @@ $baseUrl = $view['router']->path(
 
             $details = '';
             if (isset($event['contentTemplate']) && $view->exists($event['contentTemplate'])):
-                $details = trim($view->render($event['contentTemplate'], ['event' => $event]));
+                $details = trim($view->render($event['contentTemplate'], ['event' => $event, 'lead' => $lead]));
             endif;
 
             $rowStripe = ($counter % 2 === 0) ? ' timeline-row-highlighted' : '';
@@ -113,6 +114,7 @@ $baseUrl = $view['router']->path(
         'fixedLimit' => true,
         'baseUrl'    => $baseUrl,
         'target'     => '#timeline-table',
+        'totalItems' => $events['total'],
     ]
 ); ?>
 

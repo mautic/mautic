@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -32,6 +33,19 @@ class ConfigType extends AbstractType
                 'data'  => (bool) $options['data']['notification_enabled'],
                 'attr'  => [
                     'tooltip' => 'mautic.notification.config.form.notification.enabled.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'notification_landing_page_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.landingpage.enabled',
+                'data'  => (bool) $options['data']['notification_landing_page_enabled'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.landingpage.enabled.tooltip',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
                 ],
             ]
         );
@@ -73,6 +87,32 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip'      => 'mautic.notification.config.form.notification.rest_api_key.tooltip',
                     'class'        => 'form-control',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
+        $builder->add(
+            'gcm_sender_id',
+            'text',
+            [
+                'label' => 'mautic.notification.config.form.notification.gcm_sender_id',
+                'data'  => $options['data']['gcm_sender_id'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.gcm_sender_id.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'welcomenotification_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.welcome.enabled',
+                'data'  => (bool) $options['data']['welcomenotification_enabled'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.welcome.tooltip',
                     'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
                 ],
             ]

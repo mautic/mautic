@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,7 +31,6 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             ->setAliases(
                 [
                     'mautic:integration:pushactivity',
-                    'mautic:pushactivity:integration',
                 ]
             )
             ->setDescription('Push lead activity to integration.')

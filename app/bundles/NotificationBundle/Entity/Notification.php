@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -61,6 +62,11 @@ class Notification extends FormEntity
      * @var string
      */
     private $message;
+
+    /**
+     * @var string
+     */
+    private $button;
 
     /**
      * @var \DateTime
@@ -153,6 +159,10 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('message', 'text')
+            ->build();
+
+        $builder->createField('button', 'text')
+            ->nullable()
             ->build();
 
         $builder->createField('notificationType', 'text')
@@ -251,6 +261,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
@@ -368,6 +379,23 @@ class Notification extends FormEntity
     {
         $this->isChanged('heading', $heading);
         $this->heading = $heading;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButton()
+    {
+        return $this->button;
+    }
+
+    /**
+     * @param string $heading
+     */
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
     }
 
     /**

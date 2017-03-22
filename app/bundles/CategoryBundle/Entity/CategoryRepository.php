@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -44,15 +45,26 @@ class CategoryRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
+    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, $includeGlobal = true)
     {
         $q = $this->createQueryBuilder('c');
-        $q->select('partial c.{id, title, alias, color}');
+        $q->select('partial c.{id, title, alias, color, bundle}');
 
         $q->where('c.isPublished = :true')
             ->setParameter('true', true, 'boolean');
-        $q->andWhere('c.bundle = :bundle')
-            ->setParameter('bundle', $bundle);
+
+        $expr = $q->expr()->orX(
+            $q->expr()->eq('c.bundle', ':bundle')
+        );
+
+        if ($includeGlobal && 'global' !== $bundle) {
+            $expr->add(
+                $q->expr()->eq('c.bundle', $q->expr()->literal('global'))
+            );
+        }
+
+        $q->andWhere($expr)
+          ->setParameter('bundle', $bundle);
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('c.title', ':search'))
@@ -93,18 +105,20 @@ class CategoryRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command = $field = $filter->command;
-        $unique  = $this->generateRandomParameterName();
-        $expr    = false;
+        $command                 = $field                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
-                $string = true;
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
+                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $parameters[$unique] = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr   = $q->expr()->eq('c.isPublished', ":$unique");
-                $string = false;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
+                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $parameters[$unique] = false;
                 break;
         }
 
@@ -114,7 +128,7 @@ class CategoryRepository extends CommonRepository
 
         return [
             $expr,
-            ["$unique" => $string],
+            $parameters,
         ];
     }
 
@@ -123,10 +137,12 @@ class CategoryRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

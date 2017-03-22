@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  *	Filemanager PHP connector
  *  This file should at least declare auth() function
  *  and instantiate the Filemanager as '$fm'.
@@ -15,6 +16,7 @@
  *  @author		Simon Georget <simon (at) linea21 (dot) com>
  *	@copyright	Authors
  */
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -26,6 +28,9 @@ try {
     require_once __DIR__.'/../../../../../../../../../autoload.php';
     require_once __DIR__.'/../../../../../../../../../bootstrap.php.cache';
     require_once __DIR__.'/../../../../../../../../../AppKernel.php';
+
+    \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
+
     $kernel = new AppKernel('prod', false);
     $kernel->boot();
     $container = $kernel->getContainer();

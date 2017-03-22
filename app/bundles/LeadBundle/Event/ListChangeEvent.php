@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -25,8 +26,11 @@ class ListChangeEvent extends Event
     private $added;
 
     /**
-     * @param Lead $lead
-     * @param List $list
+     * ListChangeEvent constructor.
+     *
+     * @param          $leads
+     * @param LeadList $list
+     * @param bool     $added
      */
     public function __construct($leads, LeadList $list, $added = true)
     {

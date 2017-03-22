@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -9,4 +10,4 @@
  */
 ?>
 
-Insert text here
+<span>Insert text here</span>

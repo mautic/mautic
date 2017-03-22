@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,6 +15,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class EmailTokenHelper.
+ *
+ * @deprecated 2.6.0 to be removed in 3.0
  */
 class EmailTokenHelper
 {

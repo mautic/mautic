@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -8,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
+<?php echo $view['content']->getCustomContent('details.top', $mauticTemplateVars); ?>
 <?php if (method_exists($entity, 'getCategory')): ?>
 <tr>
     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
@@ -57,3 +58,4 @@ if ($modified):
         <td><?php echo $entity->getId(); ?></td>
     </tr>
 <?php endif; ?>
+<?php echo $view['content']->getCustomContent('details.bottom', $mauticTemplateVars); ?>

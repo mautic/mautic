@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -40,10 +41,6 @@ return [
             'mautic_integration_auth_user' => [
                 'path'       => '/plugins/integrations/authuser/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authUser',
-            ],
-            'mautic_integration_auth_callback_bc' => [
-                'path'       => '/addon/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback',
             ],
             'mautic_integration_auth_callback' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
@@ -97,6 +94,10 @@ return [
             'mautic.form.type.integration.fields' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\FieldsType',
                 'alias' => 'integration_fields',
+            ],
+            'mautic.form.type.integration.company.fields' => [
+                'class' => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
+                'alias' => 'integration_company_fields',
             ],
             'mautic.form.type.integration.keys' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\KeysType',

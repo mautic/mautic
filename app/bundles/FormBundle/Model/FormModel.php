@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -147,9 +148,12 @@ class FormModel extends CommonFormModel
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('mauticform', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('mauticform', $entity, $options);
     }
 
     /**
@@ -414,6 +418,26 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Get results for a form and lead.
+     *
+     * @param Form $form
+     * @param int  $leadId
+     * @param int  $limit
+     *
+     * @return array
+     */
+    public function getLeadSubmissions(Form $form, $leadId, $limit = 200)
+    {
+        return $this->getRepository()->getFormResults(
+            $form,
+            [
+                'leadId' => $leadId,
+                'limit'  => $limit,
+            ]
+        );
+    }
+
+    /**
      * Generate the form's html.
      *
      * @param Form $entity
@@ -434,13 +458,7 @@ class FormModel extends CommonFormModel
         }
 
         if ($entity->usesProgressiveProfiling()) {
-            $submissions = $this->getRepository()->getFormResults(
-                $entity,
-                [
-                    'leadId' => $lead->getId(),
-                    'limit'  => 200,
-                ]
-            );
+            $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
         if ($entity->getRenderStyle()) {

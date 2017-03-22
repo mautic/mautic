@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,11 +20,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that content is detected as HTML
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testHtmlIsDetectedInContent()
     {
@@ -64,11 +65,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that content is detected as plain text
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromText
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromText
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testPlainTextIsDetectedInContent()
     {
@@ -109,11 +110,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link with a standard query is parsed correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithStandardQuery()
     {
@@ -143,11 +144,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link without a query parses correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithoutQuery()
     {
@@ -177,11 +178,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link with a tokenized query parses correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithTokenizedQuery()
     {
@@ -209,9 +210,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testTokenizedHostIsIgnored()
     {
@@ -233,9 +234,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testIgnoredTokensAreNotConverted()
     {
@@ -258,9 +259,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testUnsupportedTokensAreNotConverted()
     {
@@ -282,9 +283,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a URL injected into the do not track list is not converted
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testIgnoredUrlDoesNotCrash()
     {
@@ -304,12 +305,12 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testTokenAsHostIsConvertedToTrackableToken()
     {
@@ -331,11 +332,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a URLs with same base or correctly replaced
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testUrlsWithSameBaseAreReplacedCorrectly()
     {

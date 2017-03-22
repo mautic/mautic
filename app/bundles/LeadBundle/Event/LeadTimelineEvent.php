@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -295,7 +296,7 @@ class LeadTimelineEvent extends Event
         return [
             'leadId' => $this->lead->getId(),
             'limit'  => $this->limit,
-            'start'  => (1 === $this->page) ? 0 : ($this->page - 1) * $this->limit,
+            'start'  => (1 >= $this->page) ? 0 : ($this->page - 1) * $this->limit,
         ];
     }
 

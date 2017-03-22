@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -196,6 +197,7 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->setSubject($config['subject']);
 
             $this->mailer->addTokens($tokens);
+
             $this->mailer->setBody($config['message']);
             $this->mailer->parsePlainText($config['message']);
 

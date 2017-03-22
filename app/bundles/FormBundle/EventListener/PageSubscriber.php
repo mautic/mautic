@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -57,12 +58,6 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $formSubmissions = [
@@ -74,6 +69,7 @@ class PageSubscriber extends CommonSubscriber
         }
 
         if ($event->tokensRequested($this->formRegex)) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
             $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
         }
     }

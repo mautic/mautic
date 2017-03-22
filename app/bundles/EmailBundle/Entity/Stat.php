@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -404,6 +405,9 @@ class Stat
         $this->retryCount = $retryCount;
     }
 
+    /**
+     * Increase the retry count.
+     */
     public function upRetryCount()
     {
         ++$this->retryCount;

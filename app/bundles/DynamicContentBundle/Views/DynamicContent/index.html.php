@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -18,7 +19,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $permissions['dynamicContent:dynamicContents:create'],
+                'new' => $permissions['dynamiccontent:dynamiccontents:create'],
             ],
             'routeBase' => 'dynamicContent',
         ]
@@ -27,15 +28,14 @@ $view['slots']->set(
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'searchHelp'      => 'mautic.page.help.searchcommands',
-        'action'          => $currentRoute,
-        'routeBase'       => 'dynamicContent',
-        'templateButtons' => [
-            'delete' => $permissions['dynamicContent:dynamicContents:deleteown'] || $permissions['dynamicContent:dynamicContents:deleteother'],
-        ],
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.page.help.searchcommands',
+            'action'      => $currentRoute,
+        ]
+    ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>

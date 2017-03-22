@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,8 +27,11 @@ class PointEventHelper
      */
     public static function validateEmail($eventDetails, $action)
     {
-        $emailId       = $eventDetails->getId();
-        $limitToEmails = $action['properties']['emails'];
+        $emailId = $eventDetails->getId();
+
+        if (isset($action['properties']['emails'])) {
+            $limitToEmails = $action['properties']['emails'];
+        }
 
         if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
             //no points change

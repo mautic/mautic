@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -30,6 +31,11 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
+    /**
+     * @param array $args
+     *
+     * @return Paginator
+     */
     public function getPublishedEntities($args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
@@ -41,8 +47,8 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /*
-     *
+    /**
+     * @return float|int
      */
     public function getPublishedEntitiesCount()
     {

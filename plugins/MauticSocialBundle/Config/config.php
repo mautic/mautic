@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -46,6 +47,12 @@ return [
             'mautic.social.configbundle.subscriber' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber',
             ],
+            'mautic.social.subscriber.channel' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ChannelSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.social.sociallogin' => [
@@ -53,6 +60,7 @@ return [
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.form.model.form',
+                    'mautic.helper.core_parameters',
                     ],
                 'alias' => 'sociallogin',
             ],
@@ -125,9 +133,10 @@ return [
     'menu' => [
         'main' => [
             'mautic.social.monitoring' => [
-                'route'  => 'mautic_social_index',
-                'parent' => 'mautic.core.channels',
-                'access' => 'plugin:mauticSocial:monitoring:view',
+                'route'    => 'mautic_social_index',
+                'parent'   => 'mautic.core.channels',
+                'access'   => 'plugin:mauticSocial:monitoring:view',
+                'priority' => 0,
             ],
         ],
     ],

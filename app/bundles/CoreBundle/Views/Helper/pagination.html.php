@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -22,7 +23,7 @@ if (empty($fixedPages)) {
 }
 
 if (!isset($range)) {
-    $range = 4;
+    $range = 5;
 }
 
 if ($page <= 0) {
@@ -75,7 +76,7 @@ foreach ($responsiveViewports as $viewport):
             </div>
         <?php endif; ?>
 
-        <div class="<?php echo $paginationWrapper; ?>">
+        <div class="<?php echo $paginationWrapper; ?> text-center">
             <ul class="pagination nm <?php echo $pageClass; ?>">
                 <?php
                 $urlPage = '/1';
@@ -104,7 +105,7 @@ foreach ($responsiveViewports as $viewport):
                 </li>
 
                 <?php
-                $startPage = $page - $range + 1;
+                $startPage = $page - ceil($range / 2) + 1;
                 if ($startPage <= 0) {
                     $startPage = 1;
                 }
@@ -153,6 +154,21 @@ foreach ($responsiveViewports as $viewport):
                 </li>
             </ul>
             <div class="clearfix"></div>
+            <small class="text-muted">
+                <?php echo $view['translator']->transChoice(
+                    'mautic.core.pagination.items',
+                    $totalItems,
+                    ['%count%' => $totalItems]
+                ); ?>,
+                <?php echo $view['translator']->transChoice(
+                    'mautic.core.pagination.pages',
+                    $totalPages,
+                    ['%count%' => $totalPages]
+                ); ?>
+                <?php echo $view['translator']->trans(
+                    'mautic.core.pagination.total'
+                ); ?>
+            </small>
         </div>
     </div>
 <?php endforeach; ?>

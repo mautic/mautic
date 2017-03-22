@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -164,6 +165,10 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $vtigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -195,6 +200,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
             return false;
         }
+
+        $this->cache->set('leadFields', $vtigerFields);
 
         return $vtigerFields;
     }

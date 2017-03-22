@@ -42,7 +42,7 @@ Mautic.getNetworkFormAction = function(networkType) {
  */
 Mautic.composeSocialWatcher = function() {
     // the text area
-    var input = mQuery('#compose-tweet textarea');
+    var input = mQuery('textarea.tweet-message');
 
     // on load
     Mautic.updateCharacterCount();
@@ -52,9 +52,9 @@ Mautic.composeSocialWatcher = function() {
         Mautic.updateCharacterCount();
     });
 
-    var pageId  = mQuery('#page select');
-    var assetId = mQuery('#asset select');
-    var handle  = mQuery('#handle button');
+    var pageId  = mQuery('select.tweet-insert-page');
+    var assetId = mQuery('select.tweet-insert-asset');
+    var handle  = mQuery('button.tweet-insert-handle');
 
     pageId.on('change', function() {
         Mautic.insertSocialLink(pageId.val(), 'pagelink', false);
@@ -113,7 +113,7 @@ Mautic.insertSocialLink = function(id, type, skipId) {
         var link = '{' + type + '=' + id + '}';
     }
 
-    var textarea = mQuery('#compose-tweet textarea');
+    var textarea = mQuery('textarea.tweet-message');
     var currentVal = textarea.val();
     var newVal = (currentVal) ? currentVal + ' ' + link : link;
     textarea.val(newVal);

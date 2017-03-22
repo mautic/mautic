@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,8 +12,10 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
+use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -20,6 +23,8 @@ use Mautic\WebhookBundle\WebhookEvents;
  */
 class WebhookSubscriber extends CommonSubscriber
 {
+    use WebhookModelTrait;
+
     /**
      * @return array
      */
@@ -27,6 +32,7 @@ class WebhookSubscriber extends CommonSubscriber
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
+            FormEvents::FORM_ON_SUBMIT      => ['onFormSubmit', 0],
         ];
     }
 
@@ -45,5 +51,25 @@ class WebhookSubscriber extends CommonSubscriber
 
         // add it to the list
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
+    }
+
+    /**
+     * @param SubmissionEvent $event
+     */
+    public function onFormSubmit(SubmissionEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            FormEvents::FORM_ON_SUBMIT,
+            [
+                'submission' => $event->getSubmission(),
+            ],
+            [
+                'submissionDetails',
+                'ipAddress',
+                'leadList',
+                'pageList',
+                'formList',
+            ]
+        );
     }
 }

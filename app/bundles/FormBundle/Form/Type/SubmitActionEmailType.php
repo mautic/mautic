@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -91,6 +92,21 @@ class SubmitActionEmailType extends AbstractType
             [
                 'label' => 'mautic.form.action.sendemail.copytolead',
                 'data'  => $default,
+            ]
+        );
+
+        $builder->add(
+            'templates',
+            'email_list',
+            [
+                'label'      => 'mautic.lead.email.template',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.getLeadEmailContent(this)',
+                ],
+                'multiple' => false,
             ]
         );
 

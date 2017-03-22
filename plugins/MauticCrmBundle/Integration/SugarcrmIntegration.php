@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -164,6 +165,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -206,6 +211,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
+        $this->cache->set('leadFields', $sugarFields);
 
         return $sugarFields;
     }

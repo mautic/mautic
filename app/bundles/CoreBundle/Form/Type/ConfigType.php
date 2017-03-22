@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -281,6 +282,24 @@ class ConfigType extends AbstractType
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.do_not_track_ips.tooltip',
+                        'rows'    => 8,
+                    ],
+                    'required' => false,
+                ]
+            )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            $builder->create(
+                'do_not_track_bots',
+                'textarea',
+                [
+                    'label'      => 'mautic.core.config.form.do_not_track_bots',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.core.config.form.do_not_track_bots.tooltip',
+                        'rows'    => 8,
                     ],
                     'required' => false,
                 ]

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,6 +13,8 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
 /**
  * Class DoctrineEventsSubscriber.
@@ -19,6 +22,11 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 class DoctrineEventsSubscriber implements EventSubscriber
 {
     protected $tablePrefix;
+
+    /**
+     * @var
+     */
+    protected $deprecatedEntityTables;
 
     /**
      * DoctrineEventsSubscriber constructor.
@@ -35,7 +43,10 @@ class DoctrineEventsSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return ['loadClassMetadata'];
+        return [
+            'loadClassMetadata',
+            'postGenerateSchema',
+        ];
     }
 
     /**
@@ -112,6 +123,27 @@ class DoctrineEventsSubscriber implements EventSubscriber
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
+            }
+
+            // Note deprecated entities so they can be removed from the schema before it's generated
+            if ($classMetadata->reflClass->implementsInterface(DeprecatedInterface::class)) {
+                $this->deprecatedEntityTables[] = $classMetadata->getTableName();
+            }
+        }
+    }
+
+    /**
+     * @param GenerateSchemaEventArgs $args
+     */
+    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    {
+        $schema = $args->getSchema();
+        $tables = $schema->getTables();
+
+        foreach ($tables as $table) {
+            if (in_array($table->getName(), $this->deprecatedEntityTables)) {
+                // remove table from schema
+                $schema->dropTable($table->getName());
             }
         }
     }

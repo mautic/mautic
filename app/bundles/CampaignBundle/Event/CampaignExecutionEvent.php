@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -53,13 +54,25 @@ class CampaignExecutionEvent extends Event
      */
     protected $eventSettings;
 
-    /** @var LeadEventLog */
+    /**
+     * @var LeadEventLog|null
+     */
     protected $log;
 
     /**
      * @var bool
      */
     protected $logUpdatedByListener = false;
+
+    /**
+     * @var
+     */
+    protected $channel;
+
+    /**
+     * @var
+     */
+    protected $channelId;
 
     /**
      * CampaignExecutionEvent constructor.
@@ -130,14 +143,22 @@ class CampaignExecutionEvent extends Event
 
     /**
      * @param $result
+     *
+     * @return $this
      */
     public function setResult($result)
     {
         $this->result = $result;
+
+        return $this;
     }
 
     /**
      * Set the result to failed.
+     *
+     * @param null $reason
+     *
+     * @return $this
      */
     public function setFailed($reason = null)
     {
@@ -145,6 +166,8 @@ class CampaignExecutionEvent extends Event
             'failed' => 1,
             'reason' => $reason,
         ];
+
+        return $this;
     }
 
     /**
@@ -159,11 +182,15 @@ class CampaignExecutionEvent extends Event
      * Set a custom log entry to override auto-handling of the log entry.
      *
      * @param LeadEventLog $log
+     *
+     * @return $this
      */
     public function setLogEntry(LeadEventLog $log)
     {
         $this->logUpdatedByListener = true;
         $this->log                  = $log;
+
+        return $this;
     }
 
     /**
@@ -197,13 +224,36 @@ class CampaignExecutionEvent extends Event
     /**
      * @param      $channel
      * @param null $channelId
+     *
+     * @return $this
      */
     public function setChannel($channel, $channelId = null)
     {
         if (null !== $this->log) {
             // Set the channel since we have the resource
             $this->log->setChannel($channel)
-                ->setChannelId($channelId);
+                      ->setChannelId($channelId);
         }
+
+        $this->channel   = $channel;
+        $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
     }
 }

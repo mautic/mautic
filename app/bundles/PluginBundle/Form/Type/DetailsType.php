@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -105,6 +106,7 @@ class DetailsType extends AbstractType
             'integration'        => $options['integration'],
             'integration_object' => $options['integration_object'],
             'lead_fields'        => $options['lead_fields'],
+            'company_fields'     => $options['company_fields'],
         ]);
 
         $builder->add('name', 'hidden', ['data' => $options['integration']]);
@@ -130,7 +132,7 @@ class DetailsType extends AbstractType
             'data_class' => 'Mautic\PluginBundle\Entity\Integration',
         ]);
 
-        $resolver->setRequired(['integration', 'integration_object', 'lead_fields']);
+        $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
     /**

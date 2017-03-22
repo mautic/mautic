@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,3 +21,7 @@
         <?php echo $view['form']->row($form['value']); ?>
     </div>
 </div>
+
+<script>
+    Mautic.updateLeadFieldValues('#<?php echo $form['field']->vars['id']; ?>');
+</script>

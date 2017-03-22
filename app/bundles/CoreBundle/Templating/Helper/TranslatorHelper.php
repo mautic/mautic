@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -48,6 +49,9 @@ class TranslatorHelper extends BaseHelper
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
 
+    /**
+     * @return string
+     */
     public function getJsLang()
     {
         $this->translator->addResource('mautic', null, $this->translator->getLocale(), 'javascript');

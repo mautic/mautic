@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -125,6 +126,7 @@ class Role extends FormEntity
                     'name',
                     'description',
                     'isAdmin',
+                    'rawPermissions',
                 ]
             )
             ->build();

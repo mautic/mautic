@@ -286,7 +286,7 @@
             var containerId = Form.getFieldContainerId(formId, fieldId);
 
             // If within a page break - go back to the page that includes this field
-            var pageBreak = pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
+            var pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
             if (pageBreak) {
                 var page = pageBreak.getAttribute('data-mautic-form-page');
                 if (switchPage) {
@@ -300,12 +300,14 @@
         Form.findAncestor = function (el, cls) {
             var ancestor = false;
             while (true) {
-                var parent = el.parentElement
+                var parent = el.parentElement;
                 if (!parent || Form.hasClass(parent, 'mauticform-innerform')) {
                     break;
                 } else if (Form.hasClass(parent, cls)) {
                     ancestor = parent;
                     break;
+                } else {
+                   el = parent;
                 }
             }
 

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -100,8 +101,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     protected function createSparkPost()
     {
-        if ($this->apiKey === null) {
-            $this->throwException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
+        if (empty($this->apiKey)) {
+            $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
         }
 
         $httpAdapter = new GuzzleAdapter(new Client());

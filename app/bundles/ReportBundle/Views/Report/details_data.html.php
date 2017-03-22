@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,7 +15,7 @@ if ($tmpl == 'index') {
 $dataCount   = count($data);
 $columnOrder = $report->getColumns();
 $graphOrder  = $report->getGraphs();
-$startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1) : 1;
+$startCount  = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 ?>
 
 <?php if (!empty($columnOrder)): ?>
@@ -31,7 +32,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         if (isset($columns[$key])):
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                 'sessionVar' => 'report.'.$report->getId(),
-                                'orderBy'    => $key,
+                                'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
                                 'text'       => $columns[$key]['label'],
                                 'class'      => 'col-report-'.$columns[$key]['type'],
                                 'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
@@ -50,16 +51,23 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         <tr>
                             <td><?php echo $startCount; ?></td>
                             <?php foreach ($columnOrder as $key): ?>
+                                <?php if (isset($columns[$key])): ?>
                                 <td>
                                     <?php $closeLink = false; ?>
                                     <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
-                                    <?php $closeLink = true; ?>
-                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                    <?php $closeLink = true;
+                                    if (array_key_exists('comp.id', $columns)) {
+                                        $objectAction = 'edit';
+                                    } else {
+                                        $objectAction = 'view';
+                                    }
+                                    ?>
+                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
                                     <?php endif; ?>
                                     <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
                                     <?php if ($closeLink): ?></a><?php endif; ?>
                                 </td>
-
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </tr>
                         <?php ++$startCount; ?>

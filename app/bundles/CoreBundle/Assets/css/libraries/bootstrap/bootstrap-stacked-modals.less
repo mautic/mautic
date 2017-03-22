@@ -1,0 +1,57 @@
+@import "../../app/less/lesshat";
+
+@distance:40px; /* distance between stacked modals*/
+
+@modal-translate-z: -340px; /* The first modal translateZ value*/
+
+.transform(@translateZ) {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(@translateZ);
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(@translateZ);
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(@translateZ);
+  transform: scale(0.8) rotateY(45deg) translateZ(@translateZ);
+}
+
+.preserve-3d(){
+  -webkit-transform-style:preserve-3d;
+  -ms-transform-style:preserve-3d;
+  -o-transform-style:preserve-3d;
+  transform-style:preserve-3d;
+}
+
+.perspective(@perspective){
+  -webkit-perspective:@perspective;
+  -moz-perspective:@perspective;
+  -ms-perspective:@perspective;
+  -o-perspective:@perspective;
+  perspective:@perspective;
+}
+.container{
+  margin:5em auto;
+}
+
+.modal.in{
+  .perspective(2000px);
+
+  .modal-dialog{
+    &.aside{
+      .transform(@modal-translate-z);
+      .preserve-3d();
+
+      &.aside-1{
+        .transform(calc(@modal-translate-z + @distance));
+      }
+      &.aside-2{
+        .transform(calc(@modal-translate-z + (@distance * 2)));
+      }
+      &.aside-3{
+        .transform(calc(@modal-translate-z + (@distance * 3)));
+      }
+      &.aside-4{
+        .transform(calc(@modal-translate-z + (@distance * 4)));
+      }
+      &.aside-5{
+        .transform(calc(@modal-translate-z + (@distance * 5)));
+      }
+    }
+  }
+}

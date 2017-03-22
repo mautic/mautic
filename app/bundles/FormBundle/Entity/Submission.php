@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -311,5 +312,16 @@ class Submission
     public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
+    }
+
+    /**
+     * This method is used by standard entity algorithms to check if the current
+     * user has permission to view/edit/delete this item. Provide the form creator for it.
+     *
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->getForm()->getCreatedBy();
     }
 }

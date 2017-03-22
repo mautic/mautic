@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,14 +15,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Theme:form.html.p
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'action'          => $currentRoute,
-        'langVar'         => 'core.theme',
-        'routeBase'       => 'themes',
-        'templateButtons' => [
-            'delete' => $permissions['core:themes:delete'],
-        ],
-    ]); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        [
+            'action' => $currentRoute,
+        ]
+    ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>

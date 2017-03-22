@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -125,6 +126,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.template.formatter',
                     'mautic.helper.templating',
+                    'mautic.channel.helper.channel_list',
                 ],
             ],
         ],

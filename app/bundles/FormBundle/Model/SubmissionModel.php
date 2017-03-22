@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -323,11 +324,6 @@ class SubmissionModel extends CommonFormModel
         // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
         $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
-        //return errors if there any - this should be moved to right after foreach($fields) once validateActionCallbacks support is dropped
-        if (!empty($validationErrors)) {
-            return ['errors' => $validationErrors];
-        }
-
         // Create/update lead
         if (!empty($leadFieldMatches)) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
@@ -344,6 +340,22 @@ class SubmissionModel extends CommonFormModel
             $submission->setTrackingId($trackingId);
         }
         $submission->setLead($lead);
+
+        // Remove validation errors if the field is not visible
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+
+            foreach ($fields as $field) {
+                if (isset($validationErrors[$field->getAlias()]) && !$field->showForContact($leadSubmissions, $lead, $form)) {
+                    unset($validationErrors[$field->getAlias()]);
+                }
+            }
+        }
+
+        //return errors if there any
+        if (!empty($validationErrors)) {
+            return ['errors' => $validationErrors];
+        }
 
         // Save the submission
         $this->saveEntity($submission);
@@ -770,7 +782,7 @@ class SubmissionModel extends CommonFormModel
             // Default to currently tracked lead
             $lead          = $this->leadModel->getCurrentLead();
             $leadId        = $lead->getId();
-            $currentFields = $this->leadModel->flattenFields($lead->getFields());
+            $currentFields = $lead->getProfileFields();
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
         } else {
@@ -790,8 +802,6 @@ class SubmissionModel extends CommonFormModel
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
-                $data[$alias] = '';
-
                 if (isset($currentFields[$alias])) {
                     $value        = $currentFields[$alias];
                     $data[$alias] = $value;
@@ -919,7 +929,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         //set the mapped fields
-        $this->leadModel->setFieldValues($lead, $data, false);
+        $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);
@@ -961,7 +971,13 @@ class SubmissionModel extends CommonFormModel
         $components = $this->formModel->getCustomComponents();
         foreach ([$field->getType(), 'form'] as $type) {
             if (isset($components['validators'][$type])) {
+                if (!is_array($components['validators'][$type])) {
+                    $components['validators'][$type] = [$components['validators'][$type]];
+                }
                 foreach ($components['validators'][$type] as $validator) {
+                    if (!is_array($validator)) {
+                        $validator = ['eventName' => $validator];
+                    }
                     $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
                     if (!$event->isValid()) {
                         return $event->getInvalidReason();
