@@ -1230,10 +1230,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $campaigns;
     }
 
-    public function getCampaignMembers($list, $settings)
+    public function getCampaignMembers($campaignId, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $campaignId        = $list['filters'][0]['filter'];
         $existingLeads     = $existingContacts     = [];
 
         try {
