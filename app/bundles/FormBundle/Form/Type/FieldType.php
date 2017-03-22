@@ -110,9 +110,6 @@ class FieldType extends AbstractType
                 case 'pagebreak':
                     $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
-                case 'email':
-                    $addBehaviorFields = false;
-                    break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
                     break;
