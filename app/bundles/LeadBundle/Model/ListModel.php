@@ -507,6 +507,8 @@ class ListModel extends FormModel
 
         $localDateTime = $dtHelper->getLocalDateTime();
 
+        $this->processIntegrationLeads($list);
+
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
             $list,
@@ -1294,5 +1296,9 @@ class ListModel extends FormModel
         ];
 
         return $chartData;
+    }
+
+    public function processIntegrationLeads($list)
+    {
     }
 }

@@ -46,6 +46,7 @@ class LeadListSubscriber extends CommonSubscriber
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],
+           // LeadEvents::LEAD_LIST_BATCH_CHANGE => ['onLeadListBatchChange', 0],
         ];
     }
 
@@ -66,10 +67,41 @@ class LeadListSubscriber extends CommonSubscriber
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
                 'properties' => ['type' => 'select', 'list' => $choices],
-                'operators'  => $this->listModel->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'operators'  => $this->listModel->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                        ],
+                    ]),
+                'object' => 'lead',
             ];
             $event->addChoice('lead', 'integration_campaigns', $config);
+        }
+    }
+
+    /**
+     * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
+     *
+     * @param ListChangeEvent $event
+     */
+    public function onLeadListBatchChange(ListChangeEvent $event)
+    {
+        //get Integration Campaign members
+        $integrationObjects = $this->helper->getIntegrationObjects();
+        $list               = $event->getList();
+
+        foreach ($integrationObjects as $name => $integrationObject) {
+            $settings = $integrationObject->getIntegrationSettings();
+            if (!$settings->isPublished()) {
+                continue;
+            }
+
+            if (method_exists($integrationObject, 'getCampaignMembers')) {
+                if ($integrationObject->getCampaignMembers($list)) {
+                    $success = true;
+                }
+            }
         }
     }
 }
