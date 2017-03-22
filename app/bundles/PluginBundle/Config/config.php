@@ -108,18 +108,9 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'integration_list',
             ],
-            'mautic.form.type.integration.campaigns.list' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\IntegrationCampaignListType',
-                'arguments' => 'mautic.helper.integration',
-                'alias'     => 'integration_campaign_list',
-            ],
             'mautic.form.type.integration.config' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
                 'alias' => 'integration_config',
-            ],
-            'mautic.form.type.integration.config' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationCampaignsType',
-                'alias' => 'integration_campaigns',
             ],
         ],
         'other' => [
