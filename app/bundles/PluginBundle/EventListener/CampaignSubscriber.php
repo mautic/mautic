@@ -63,16 +63,6 @@ class CampaignSubscriber extends CommonSubscriber
         ];
 
         $event->addAction('plugin.leadpush', $action);
-
-        $action = [
-            'label'       => 'mautic.plugin.actions.push_lead_to_integration_campaign',
-            'description' => 'mautic.plugin.actions.push_lead_to_integration_campaign.tooltip',
-            'formType'    => 'integration_campaign_list',
-            'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
-            'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-        ];
-
-        $event->addAction('plugin.leadpushtocampaign', $action);
     }
 
     /**
@@ -83,9 +73,8 @@ class CampaignSubscriber extends CommonSubscriber
         $config = $event->getConfig();
         $lead   = $event->getLead();
 
-        $integration         = (!empty($config['integration'])) ? $config['integration'] : null;
-        $integrationCampaign = (!empty($config['integration_campaign'])) ? $config['integration_campaign'] : null;
-        $feature             = (empty($integration) || empty($integrationCampaign)) ? 'push_lead' : 'push_to_campaign';
+        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
+        $feature     = (empty($integration)) ? 'push_lead' : null;
 
         $services = $this->integrationHelper->getIntegrationObjects($integration, $feature);
         $success  = false;
@@ -96,13 +85,8 @@ class CampaignSubscriber extends CommonSubscriber
                 continue;
             }
 
-            if (method_exists($s, 'pushLead') && $feature == 'push_lead') {
+            if (method_exists($s, 'pushLead')) {
                 if ($s->pushLead($lead, $config)) {
-                    $success = true;
-                }
-            }
-            if (method_exists($s, 'pushLeadToCampaign') && $feature == 'push_to_campaign') {
-                if ($s->pushLeadToCampaign($lead, $config)) {
                     $success = true;
                 }
             }
