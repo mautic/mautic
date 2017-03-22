@@ -256,7 +256,6 @@ class AjaxController extends CommonAjaxController
                         $data[$campaign['Id']] = $campaign['Name'];
                     }
                 }
-                $this->factory->getLogger()->addError(print_r($data, true));
                 $form = $this->createForm('integration_campaigns', $data, [
                     'integration'     => $integration,
                     'campaigns'       => $data,

@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCrmBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -46,7 +47,7 @@ class LeadListSubscriber extends CommonSubscriber
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],
-           // LeadEvents::LEAD_LIST_BATCH_CHANGE => ['onLeadListBatchChange', 0],
+            LeadEvents::LIST_PRE_PROCESS_LIST            => ['onLeadListProcessList', 0],
         ];
     }
 
@@ -85,11 +86,12 @@ class LeadListSubscriber extends CommonSubscriber
      *
      * @param ListChangeEvent $event
      */
-    public function onLeadListBatchChange(ListChangeEvent $event)
+    public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
         //get Integration Campaign members
         $integrationObjects = $this->helper->getIntegrationObjects();
         $list               = $event->getList();
+        $success            = false;
 
         foreach ($integrationObjects as $name => $integrationObject) {
             $settings = $integrationObject->getIntegrationSettings();
@@ -103,5 +105,7 @@ class LeadListSubscriber extends CommonSubscriber
                 }
             }
         }
+
+        return $success;
     }
 }

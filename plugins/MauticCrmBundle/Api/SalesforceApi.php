@@ -264,16 +264,7 @@ class SalesforceApi extends CrmApi
               $fields = array_keys(array_filter($fields['companyFields']));
                 break;
             default:
-                $mixedFields = array_filter($fields['leadFields']);
-                $fields      = [];
-                foreach ($mixedFields as $sfField => $mField) {
-                    if (strpos($sfField, '__'.$object) !== false) {
-                        $fields[] = str_replace('__'.$object, '', $sfField);
-                    }
-                    if (strpos($sfField, '-'.$object) !== false) {
-                        $fields[] = str_replace('-'.$object, '', $sfField);
-                    }
-                }
+                $fields = $this->integration->getMixedLeadFields($fields, $object);
         }
         $result = [];
         if (!empty($fields) and isset($query['start'])) {
@@ -287,9 +278,11 @@ class SalesforceApi extends CrmApi
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } elseif (!isset($query['start'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query);
+        } elseif (isset($query['nextUrl'])) {
+            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
             $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
+        } else {
+            $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
         }
 
         return $result;
@@ -324,10 +317,9 @@ class SalesforceApi extends CrmApi
 
     public function getCampaignMembers($campaignId)
     {
-        $campaignMembersQuery = 'Select Id, ContactId, LeadId, isDeleted where CampaignId = '.$campaignId;
+        $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         $queryUrl             = $this->integration->getQueryUrl();
-
-        $result = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
 
         return $result;
     }

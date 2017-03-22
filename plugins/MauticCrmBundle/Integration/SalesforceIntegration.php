@@ -615,13 +615,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
+
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
                     $result = $this->getApiHelper()->getLeads($query, $object);
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     if (isset($result['nextRecordsUrl'])) {
-                        $query = $result['nextRecordsUrl'];
+                        $query['nextUrl'] = $result['nextRecordsUrl'];
                         $this->getLeads($params, $query, $executed, $result['records'], $object);
                     }
                 }
@@ -656,8 +657,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $result = $this->getApiHelper()->getLeads($query, $salesForceObject);
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $salesForceObject);
                 if (isset($result['nextRecordsUrl'])) {
-                    $query  = $result['nextRecordsUrl'];
-                    $result = null;
+                    $query['nextUrl'] = $result['nextRecordsUrl'];
+                    $result           = null;
                     $this->getCompanies($params, $query, $executed);
                 }
 
@@ -1232,7 +1233,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getCampaignMembers($list, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $campaignId        = $list['filter'];
+        $campaignId        = $list['filters'][0]['filter'];
+        $existingLeads     = $existingContacts     = [];
 
         try {
             $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
@@ -1242,6 +1244,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
+
         //prepare contacts to import to mautic contacts to delete from mautic
         if (isset($campaignsMembersResults['records']) && !empty($campaignsMembersResults['records'])) {
             foreach ($campaignsMembersResults['records'] as $campaignMember) {
@@ -1265,24 +1268,103 @@ class SalesforceIntegration extends CrmAbstractIntegration
                    ];
                 }
             }
+
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
             //update lead/contact records
-            $listOfLeads    = implode(',', $leadList);
-            $leads          = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', null, null, null, false, 0, 0, $listOfLeads);
-            $listOfContacts = implode(',', $contactList);
-            $contacts       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', null, null, null, false, 0, 0, $listOfContacts);
-            $leads          = array_merge($leads, $contacts);
+            $listOfLeads = implode('", "', array_keys($leadList));
+            $listOfLeads = '"'.$listOfLeads.'"';
+            $leads       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', null, null, null, false, 0, 0, $listOfLeads);
 
-            $existingLeads = array_map(function ($lead) {
-                return ($lead['integration_entity'] == 'Lead') ? $lead['integration_entity_id'] : [];
-            }, $leads);
+            $listOfContacts = implode('", "', $contactList);
+            $listOfContacts = '"'.$listOfContacts.'"';
+            $contacts       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', null, null, null, false, 0, 0, $listOfContacts);
 
-            $existingContacts = array_map(function ($lead) {
-                return ($lead['integration_entity'] == 'Contact') ? $lead['integration_entity_id'] : [];
-            }, $leads);
-
+            if (!empty($leads)) {
+                $existingLeads = array_map(function ($lead) {
+                    if (($lead['integration_entity'] == 'Lead')) {
+                        return $lead['integration_entity_id'];
+                    }
+                }, $leads);
+            }
+            if (!empty($contacts)) {
+                $existingContacts = array_map(function ($lead) {
+                    return ($lead['integration_entity'] == 'Contact') ? $lead['integration_entity_id'] : [];
+                }, $contacts);
+            }
+            //record campaigns in integration entity for segment to process
+            $allCampaignMembers = array_merge(array_values($existingLeads), array_values($existingContacts));
+            //Leads
             $leadsToFetch = array_diff_key($leadList, $existingLeads);
+            if (!empty($leadsToFetch)) {
+                $listOfLeadsToFetch = implode("','", array_keys($leadsToFetch));
+                $listOfLeadsToFetch = "'".$listOfLeadsToFetch."'";
+
+                $mixedFields = $this->getIntegrationSettings()->getFeatureSettings();
+                $fields      = $this->getMixedLeadFields($mixedFields, 'Lead');
+                $fields[]    = 'Id';
+                $fields      = implode(', ', array_unique($fields));
+                $leadQuery   = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
+                $executed    = 0;
+                $this->getLeads([], $leadQuery, $executed, [], 'Contact');
+
+                $allCampaignMembers = array_merge($allCampaignMembers, array_keys($leadsToFetch));
+            }
+            //Contacts
+            $contactsToFetch = array_diff_key($contactList, $existingContacts);
+            if (!empty($contactsToFetch)) {
+                $listOfContactsToFetch = implode(',', $contactsToFetch);
+                $listOfContactsToFetch = "'".$listOfContactsToFetch."'";
+
+                $fields       = $this->getMixedLeadFields($mixedFields, 'Contact');
+                $fields[]     = 'Id';
+                $fields       = implode(', ', array_unique($fields));
+                $contactQuery = 'SELECT '.$fields.' from Contact where Id in ('.$listOfContactsToFetch.')';
+                $this->getLeads([], $contactQuery);
+                $allCampaignMembers = array_merge($allCampaignMembers, array_keys($contactsToFetch));
+            }
+            if (!empty($allCampaignMembers)) {
+                $internalLeadIds = implode('", "', $allCampaignMembers);
+                $internalLeadIds = '"'.$internalLeadIds.'"';
+                $leads           = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', null, null, null, false, 0, 0, $internalLeadIds);
+                //first find existing campaign members.
+                foreach ($leads as $campaignMember) {
+                    $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'CampaignMember', 'lead', $campaignMember['internal_entity_id']);
+                    if (empty($existingCampaignMember)) {
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setIntegration($this->getName());
+                        $integrationEntity->setIntegrationEntity('CampaignMember');
+                        $integrationEntity->setIntegrationEntityId($campaignId);
+                        $integrationEntity->setInternalEntity('lead');
+                        $integrationEntity->setInternalEntityId($campaignMember['internal_entity_id']);
+                        $persistEntities[] = $integrationEntity;
+                    }
+                }
+
+                if ($persistEntities) {
+                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                    unset($persistEntities);
+                    $this->em->clear(IntegrationEntity::class);
+                }
+            }
         }
+    }
+
+    public function getMixedLeadFields($fields, $object)
+    {
+        $mixedFields = array_filter($fields['leadFields']);
+        $fields      = [];
+        foreach ($mixedFields as $sfField => $mField) {
+            if (strpos($sfField, '__'.$object) !== false) {
+                $fields[] = str_replace('__'.$object, '', $sfField);
+            }
+            if (strpos($sfField, '-'.$object) !== false) {
+                $fields[] = str_replace('-'.$object, '', $sfField);
+            }
+        }
+
+        return $fields;
     }
 }

@@ -1062,7 +1062,8 @@ class LeadListRepository extends CommonRepository
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.internal_entity_id', 'l.id'),
                                     $q->expr()->eq($alias.'.integration_entity_id', ":$parameter"),
-                                    $q->expr()->eq($alias.'.internal_entity', "'lead'")
+                                    $q->expr()->eq($alias.'.internal_entity', "'lead'"),
+                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'")
                                 )
                             );
                             break;

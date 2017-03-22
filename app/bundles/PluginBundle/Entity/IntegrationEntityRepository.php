@@ -73,8 +73,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
         if ($integrationEntityIds) {
-            $q->andWhere('i.integration_entity_id in (:integrationEntityList)')
-                ->setParameter('integrationEntityList', $integrationEntityIds);
+            $q->andWhere('i.integration_entity_id in ('.$integrationEntityIds.')');
         }
 
         $results = $q->execute()->fetchAll();
