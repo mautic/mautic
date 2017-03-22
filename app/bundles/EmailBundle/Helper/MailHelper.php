@@ -235,10 +235,10 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->handle = fopen("email.log","a");
+        // TODO : Create a mailer_spool_type amqp for the messsage queue
         $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
         $this->channel = $this->connection->channel();
-        $this->channel->queue_declare('hello', false, false, false, false);
+        $this->channel->queue_declare('email', false, false, false, false);
 
         $this->from       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
         $this->returnPath = $factory->getParameter('mailer_return_path');
@@ -432,11 +432,8 @@ class MailHelper
                     $this->transportStartTime = time();
                 }
 
-                //$this->mailer->send($this->message, $failures);
-
-                //fputs($this->handle,serialize($this->message));
                 $msg = new AMQPMessage(serialize($this->message));
-                $this->channel->basic_publish($msg, '', 'hello');
+                $this->channel->basic_publish($msg, '', 'email');
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
@@ -1903,9 +1900,5 @@ class MailHelper
         return $name;
     }
 
-    public function flushFile($name)
-    { 
-      $this->handle->flush();
-    }
 }
 

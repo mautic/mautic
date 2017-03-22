@@ -1343,7 +1343,7 @@ class EventModel extends CommonFormModel
                 }
 
                 // Free some memory
-                //gc_collect_cycles();
+                gc_collect_cycles();
 
                 ++$batchDebugCounter;
             }

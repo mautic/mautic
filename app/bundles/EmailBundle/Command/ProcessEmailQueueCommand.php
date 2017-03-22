@@ -68,31 +68,49 @@ EOT
         $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
         $channel = $connection->channel();
 
-        $channel->queue_declare('hello', false, false, false, false);
+
+        // TODO: Create a queuMode ampq and execute this code only when this queue mode is selected
+
+        $channel->queue_declare('email', false, false, false, false);
+
         $this->transport = $this->getContainer()->get('swiftmailer.transport.real');
             if (!$this->transport->isStarted()) {
                 $this->transport->start();
             }
 
+        $callback = function($msg) {
+            try {
 
-				$callback = function($msg) {
-          try {
-            $message = unserialize($msg->body);
-            $this->transport->send($message);
-          } catch (\Swift_TransportException $e) {
-            if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
-              $event = new QueueEmailEvent($message);
-              $this->dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+              $message = unserialize($msg->body);
+              $this->transport->send($message);
+
+            } catch (\Swift_TransportException $e) {
+              if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                  $event = new QueueEmailEvent($message);
+                  $this->dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+              }
             }
+        };
+
+        $channel->basic_consume('email', '', false, true, false, false, $callback);
+
+        // Timeout in 10 seconds  and give up on $max_timeout 
+        $max_timeout = 1;
+        $timeout_counter = 0 ;
+
+        while(count($channel->callbacks) >= 1 && ($timeout_counter < $max_timeout) ) {
+
+          try {
+
+            $channel->wait(null,false,10);
+          }catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e){
+
+              $output->writeln('Email wait timeout counter ' + $timeout_counter );
+              $timeout_counter = $timeout_counter + 1;
           }
 
-				};
 
-				$channel->basic_consume('hello', '', false, true, false, false, $callback);
-
-				while(count($channel->callbacks)) {
-						$channel->wait();
-				}
+        }
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
