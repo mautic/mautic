@@ -220,8 +220,44 @@ class PluginController extends FormController
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             //make sure now non-existent aren't saved
-                            $featureSettings = $entity->getFeatureSettings();
-                            $submittedFields = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
+                            $featureSettings        = $entity->getFeatureSettings();
+                            $submittedObjects       = $this->request->get('integration_details[featureSettings][objects]', [], true);
+                            $submittedFields        = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
+                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
+                            //make sure now non-existent aren't saved
+                            $settings = [
+                                'ignore_field_cache' => false,
+                            ];
+                            $settings['feature_settings']['objects'] = $submittedObjects;
+                            $newIntegrationFields                    = $integrationObject->getAvailableLeadFields($settings);
+                            $leadNewIntegrationFields                = [];
+                            $removeCompanyFields                     = [];
+                            if (isset($newIntegrationFields['Lead'])) {
+                                $leadNewIntegrationFields = $newIntegrationFields['Lead'];
+                            }
+                            if (isset($newIntegrationFields['Contact'])) {
+                                $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
+                            }
+                            $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
+
+                            foreach ($removeLeadFields as $key => $removeLeadField) {
+                                unset($currentFeatureSettings['leadFields'][$key]);
+                                if (isset($currentFeatureSettings['update_mautic'])) {
+                                    unset($currentFeatureSettings['update_mautic'][$key]);
+                                }
+                            }
+
+                            if (isset($newIntegrationFields['company'])) {
+                                $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
+                                $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
+                            }
+                            foreach ($removeCompanyFields as $key => $removeCompanyField) {
+                                unset($currentFeatureSettings['companyFields'][$key]);
+                                if (isset($currentFeatureSettings['update_mautic_company'])) {
+                                    unset($currentFeatureSettings['update_mautic_company'][$key]);
+                                }
+                            }
+
                             if (!empty($submittedFields)) {
                                 if (isset($currentFeatureSettings['leadFields'])) {
                                     $featureSettings['leadFields'] = $currentFeatureSettings['leadFields'];
@@ -234,7 +270,6 @@ class PluginController extends FormController
                                     $featureSettings['update_mautic'] = [];
                                 }
                             }
-                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
 
                             if (!empty($submittedCompanyFields)) {
                                 if (isset($currentFeatureSettings['companyFields'])) {
