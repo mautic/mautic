@@ -25,7 +25,6 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -431,10 +430,6 @@ class ListModel extends FormModel
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
-                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_BAR,
-                        FormFieldHelper::parseList($properties['list'])
-                    ) : '';
                 }
             }
             $choices[$field->getObject()][$field->getAlias()] = [
