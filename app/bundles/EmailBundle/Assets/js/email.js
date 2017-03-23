@@ -261,6 +261,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 
     textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
         // Set custom buttons with separator between them.
+        toolbarSticky: false,
         toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
         heightMin: 100
     }));
@@ -323,11 +324,12 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
         // Set custom buttons with separator between them.
+        toolbarSticky: false,
         toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
         heightMin: 100
     }));
 
-    Mautic.initRemoveEvents(removeButton);
+    Mautic.initRemoveEvents(removeButton, mQuery);
 
     newTab.find('a').tab('show');
 
@@ -400,7 +402,7 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
-Mautic.initRemoveEvents = function (elements, jQueryVariant, parentButton) {
+Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
         elements.on('click', function() {
@@ -415,11 +417,6 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant, parentButton) {
     } else {
         elements.on('click', function (e) {
             e.preventDefault();
-
-            if (typeof parentButton !== 'undefined') {
-                parentButton.click();
-            }
-
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
 
@@ -432,7 +429,12 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant, parentButton) {
 
             parentElement.remove();
             tabLink.remove();
-            tabContainer.find('li').first().next().find('a').tab('show');
+            // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
+            if (tabContainer.hasClass('tabs-left')) {
+                tabContainer.find('li').first().next().find('a').tab('show');
+            } else {
+                tabContainer.find('li').first().find('a').tab('show');
+            }
 
             Mautic.updateDynamicContentDropdown();
         });

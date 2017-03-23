@@ -201,34 +201,14 @@ class BuilderSubscriber extends CommonSubscriber
                 400
             );
 
-            $emails = $this->emailModel->getRepository()->getEntities([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'e.dynamicContent',
-                            'expr'   => 'notLike',
-                            'value'  => '%"tokenName";N%',
-                        ],
-                    ],
-                ],
-                'oderBy'         => 'e.dynamicContent',
-                'orderByDir'     => 'ASC',
-                'limit'          => 5,
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]);
-            foreach ($emails as $email) {
-                foreach ($email['dynamicContent'] as $dec) {
-                    $event->addSlotType(
-                        'dynamicContent_'.$dec['tokenName'],
-                        $dec['tokenName'],
-                        'tag',
-                        'MauticCoreBundle:Slots:dynamiccontent.html.php',
-                        'slot_dynamiccontent',
-                        300,
-                        ['tokenName' => $dec['tokenName']]
-                    );
-                }
-            }
+            $event->addSlotType(
+                'dynamicContent',
+                'Dynamic Content',
+                'tag',
+                'MauticCoreBundle:Slots:dynamiccontent.html.php',
+                'slot_dynamiccontent',
+                300
+            );
         }
 
         if ($event->sectionsRequested()) {
