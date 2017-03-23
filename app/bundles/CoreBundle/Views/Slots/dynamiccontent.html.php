@@ -10,5 +10,5 @@
  */
 ?>
 
-{dynamiccontent="<?php echo $tokenName; ?>"}
+__dynamicContent__
 

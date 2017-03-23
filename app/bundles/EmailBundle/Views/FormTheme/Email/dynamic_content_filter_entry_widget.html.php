@@ -19,7 +19,9 @@
         </div>
     </div>
     <div class="row form-group">
-        <?php echo $view['form']->widget($form['content']); ?>
+        <div class="col-xs-12">
+            <?php echo $view['form']->widget($form['content']); ?>
+        </div>
     </div>
     <div class="row">
         <div class="col-xs-7">
