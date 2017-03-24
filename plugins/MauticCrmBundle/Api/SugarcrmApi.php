@@ -23,7 +23,7 @@ class SugarcrmApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-        $tokenData            = $this->integration->getKeys();
+        $tokenData = $this->integration->getKeys();
 
         if ($tokenData['version'] == '6') {
             $request_url = sprintf('%s/service/v4_1/rest.php', $tokenData['sugarcrm_url']);
@@ -35,7 +35,7 @@ class SugarcrmApi extends CrmApi
                 $sessionParams['module_name'] = $object;
             } //Making sure that module_name is the second value of the array
             else {
-                $sessionParams['module_names']                              = $data['module_names'];
+                $sessionParams['module_names'] = $data['module_names'];
             }
 
             $sessionParams = array_merge($sessionParams, $data);
@@ -180,6 +180,7 @@ class SugarcrmApi extends CrmApi
 
         if ($tokenData['version'] == '6') {
             $leadFieldsList = [];
+            $response       = [];
 
             foreach ($data as $object => $leadFieldsList) {
                 $parameters = [
@@ -239,16 +240,16 @@ class SugarcrmApi extends CrmApi
         if (!empty($activity)) {
             foreach ($activity as $sugarId => $records) {
                 foreach ($records['records'] as $key => $record) {
-                    $rec                              = [];
-                    $rec[]                            = ['name' => 'name', 'value' => $record['name']];
-                    $rec[]                            = ['name' => 'description', 'value' => $record['description']];
-                    $rec[]                            = ['name' => 'url', 'value' => $records['leadUrl']];
-                    $rec[]                            = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
-                    $rec[]                            = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
+                    $rec   = [];
+                    $rec[] = ['name' => 'name', 'value' => $record['name']];
+                    $rec[] = ['name' => 'description', 'value' => $record['description']];
+                    $rec[] = ['name' => 'url', 'value' => $records['leadUrl']];
+                    $rec[] = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
+                    $rec[] = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
                     if ($object == 'Contacts') {
                         $rec[] = ['name' => 'contact_id_c', 'value' => $sugarId];
                     } else {
-                        $rec[]                       = ['name' => 'lead_id_c', 'value' => $sugarId];
+                        $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
                     }
 
                     $set_name_value_lists[] = $rec;
@@ -270,32 +271,32 @@ class SugarcrmApi extends CrmApi
                     foreach ($activity as $sugarId => $records) {
                         $related_ids_row = [];
 
-                        $module_names[]                                = $object;
-                        $module_ids[]                                  = $sugarId;
+                        $module_names[] = $object;
+                        $module_ids[]   = $sugarId;
                         if ($object == 'Contacts') {
                             $link_field_names[] = 'mtc_webactivities_contacts';
                         } else {
-                            $link_field_names[]                 = 'mtc_webactivities_leads';
+                            $link_field_names[] = 'mtc_webactivities_leads';
                         }
                         ++$nbLeads;
                         foreach ($records['records'] as $key => $record) {
-                            $name_value_lists[]               = [];
-                            $delete_array[]                   = 0;
-                            $rec                              = [];
-                            $rec[]                            = ['name' => 'name', 'value' => $record['name']];
-                            $rec[]                            = ['name' => 'description', 'value' => $record['description']];
-                            $rec[]                            = ['name' => 'url', 'value' => $records['leadUrl']];
-                            $rec[]                            = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
-                            $rec[]                            = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
+                            $name_value_lists[] = [];
+                            $delete_array[]     = 0;
+                            $rec                = [];
+                            $rec[]              = ['name' => 'name', 'value' => $record['name']];
+                            $rec[]              = ['name' => 'description', 'value' => $record['description']];
+                            $rec[]              = ['name' => 'url', 'value' => $records['leadUrl']];
+                            $rec[]              = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
+                            $rec[]              = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
                             if ($object == 'Contacts') {
                                 $rec[] = ['name' => 'contact_id_c', 'value' => $sugarId];
                             } else {
-                                $rec[]                       = ['name' => 'lead_id_c', 'value' => $sugarId];
+                                $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
                             }
-                            $set_name_value_lists[]           = $rec;
-                            $idList[]                         = $sugarId;
-                            $related_ids_row[]                = $resp['ids'][$nbAct];
-                            ++$nbAct ;
+                            $set_name_value_lists[] = $rec;
+                            $idList[]               = $sugarId;
+                            $related_ids_row[]      = $resp['ids'][$nbAct];
+                            ++$nbAct;
                         }
                         $related_ids[] = $related_ids_row;
                     }
@@ -413,7 +414,7 @@ class SugarcrmApi extends CrmApi
                     if ($type == 'BYID') {
                         $res[$fields['id']] = $fields['email1'];
                     } else {
-                        $res[$fields['email1']]             = $fields['id'];
+                        $res[$fields['email1']] = $fields['id'];
                     }
                 }
             }
@@ -437,7 +438,7 @@ class SugarcrmApi extends CrmApi
         if ($query == null) {
             $query = ['type' => 'BYEMAIL'];
         } else {
-            $query['type']        = 'BYEMAIL';
+            $query['type'] = 'BYEMAIL';
         }
 
         return $this->getEmailBySugarUserId($query);
@@ -505,16 +506,16 @@ class SugarcrmApi extends CrmApi
                     $fields[] = 'deleted';
                 }
 
-                $q                                   = implode('AND', $qry);
-                $fields[]                            = 'id';
-                $fields[]                            = 'date_modified';
-                $fields[]                            = 'date_entered';
-                $fields[]                            = 'assigned_user_id';
-                $fields[]                            = 'email1';
+                $q        = implode('AND', $qry);
+                $fields[] = 'id';
+                $fields[] = 'date_modified';
+                $fields[] = 'date_entered';
+                $fields[] = 'assigned_user_id';
+                $fields[] = 'email1';
                 if ($object != 'Accounts') {
                     $fields[] = 'account_id';
                 }
-                $parameters                          = [
+                $parameters = [
                      'query'                    => $q,
                      'order_by'                 => '',
                      'offset'                   => $query['offset'],
