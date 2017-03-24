@@ -29,6 +29,14 @@ return [
                 'path'       => '/monitoring/view/{objectId}/contacts/{page}',
                 'controller' => 'MauticSocialBundle:Monitoring:contacts',
             ],
+            'mautic_tweet_index' => [
+                'path'       => '/tweets/{page}',
+                'controller' => 'MauticSocialBundle:Tweet:index',
+            ],
+            'mautic_tweet_action' => [
+                'path'       => '/tweets/{objectAction}/{objectId}',
+                'controller' => 'MauticSocialBundle:Tweet:execute',
+            ],
         ],
     ],
 
@@ -81,8 +89,11 @@ return [
                 'alias' => 'socialmedia_linkedin',
             ],
             'mautic.social.form.type.twitter.tweet' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetType',
-                'alias' => 'twitter_tweet',
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetType',
+                'alias'     => 'twitter_tweet',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.social.form.type.monitoring' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType',
@@ -109,6 +120,10 @@ return [
                 'alias'     => 'social_config',
                 'arguments' => 'mautic.lead.model.field',
             ],
+            'mautic.social.tweet.list' => [
+                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetListType',
+                'alias' => 'tweet_list',
+            ],
         ],
         'models' => [
             'mautic.social.model.monitoring' => [
@@ -116,6 +131,9 @@ return [
             ],
             'mautic.social.model.postcount' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
+            ],
+            'mautic.social.model.tweet' => [
+                'class' => 'MauticPlugin\MauticSocialBundle\Model\TweetModel',
             ],
         ],
         'others' => [

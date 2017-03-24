@@ -64,9 +64,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'propertiesFormType' => 'twitter_tweet',
-                        'channelTemplate'    => 'MauticSocialBundle:SubscribedEvents\Channel:message.html.php',
-                        'formTheme'          => 'MauticSocialBundle:FormTheme',
+                        'lookupFormType' => 'tweet_list',
                     ],
                 ]
             );
