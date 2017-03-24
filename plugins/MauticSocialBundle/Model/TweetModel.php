@@ -37,22 +37,27 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
     {
         $results = [];
+
         switch ($type) {
+            case 'social.tweet':
             case 'tweet':
                 $tweetRepo = $this->getRepository();
                 $tweetRepo->setCurrentUser($this->userHelper->getUser());
-                $tweets = $tweetRepo->getEmailList(
+                $entities = $tweetRepo->getEmailList(
                     $filter,
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother')
                 );
 
-                foreach ($tweets as $tweet) {
-                    $results[$tweet['id']] = $tweet['name'];
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                unset($tweets);
+                //sort by language
+                ksort($results);
+
+                unset($entities);
 
                 break;
         }
