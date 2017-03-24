@@ -19,18 +19,70 @@ use Symfony\Component\Form\Form;
  */
 class TweetController extends FormController
 {
-    public function __construct()
+    /**
+     * @return mixed
+     */
+    protected function getModelName()
     {
-        $this->setStandardParameters(
-            'social.tweet', // model name
-            'plugin:mauticSocial:tweets', // permission base
-            'mautic_tweet', // route base
-            'mautic_tweet', // session base
-            'mautic.integration.Twitter', // lang string base
-            'MauticSocialBundle:Tweet', // template base
-            'mautic_webhook', // activeLink
-            'socialTweet' // mauticContent
-        );
+        return 'social.tweet';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getJsLoadMethodPrefix()
+    {
+        return 'socialTweet';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getRouteBase()
+    {
+        return 'mautic_tweet';
+    }
+
+    /**
+     * @param null $objectId
+     *
+     * @return mixed
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        return 'mautic_tweet';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTemplateBase()
+    {
+        return 'MauticSocialBundle:Tweet';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getControllerBase()
+    {
+        return 'mautic_tweet';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTranslationBase()
+    {
+        return 'mautic.integration.Twitter';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getPermissionBase()
+    {
+        return 'plugin:mauticSocial:tweets';
     }
 
     /**
@@ -105,7 +157,7 @@ class TweetController extends FormController
     }
 
     /**
-     * Displays details on a Focus.
+     * Displays details.
      *
      * @param $objectId
      *
@@ -113,7 +165,7 @@ class TweetController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'webhook', 'webhook');
+        return parent::viewStandard($objectId, 'tweet', 'social');
     }
 
     /**

@@ -774,7 +774,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = null)
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
     {
         $options = [
             'updateSelect' => $updateSelect,
