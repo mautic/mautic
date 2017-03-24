@@ -406,8 +406,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
             return $this->isLocked($postActionVars, $entity, $this->getModelName());
         }
 
-        $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $options = $this->getEntityFormOptions();
+        $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
 
         $isPost = !$ignorePost && $this->request->getMethod() == 'POST';
         $this->beforeFormProcessed($entity, $form, 'edit', $isPost, $objectId, $isClone);
@@ -754,6 +755,41 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * Return array of options for the form when it's being created.
+     *
+     * @return array
+     */
+    protected function getEntityFormOptions()
+    {
+        return [];
+    }
+
+    /**
+     * Return array of options update select response.
+     *
+     * @param string $updateSelect HTML id of the select
+     * @param object $entity
+     * @param string $nameMethod   name of the entity method holding the name
+     * @param string $groupMethod  name of the entity method holding the select group
+     *
+     * @return array
+     */
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = null)
+    {
+        $options = [
+            'updateSelect' => $updateSelect,
+            'id'           => $entity->getId(),
+            'name'         => $entity->$nameMethod(),
+        ];
+
+        if ($groupMethod) {
+            $options['group'] = $entity->$groupMethod();
+        }
+
+        return $options;
+    }
+
+    /**
      * @param        $objectId
      * @param        $returnUrl
      * @param string $timezone
@@ -929,8 +965,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
 
-        $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $options = $this->getEntityFormOptions();
+        $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
+        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
 
         ///Check for a submitted form and process it
         $isPost = $this->request->getMethod() === 'POST';
@@ -963,17 +1000,31 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
             }
 
+            $passthrough = [
+                'mauticContent' => $this->getJsLoadMethodPrefix(),
+            ];
+
+            if ($isInPopup = isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    $this->getUpdateSelectParams($form['updateSelect']->getData(), $entity)
+                );
+            }
+
             if ($cancelled || ($valid && !$this->isFormApplied($form))) {
+                if ($isInPopup) {
+                    $passthrough['closeModal'] = true;
+                }
+
                 return $this->postActionRedirect(
                     $this->getPostActionRedirectArguments(
                         [
                             'returnUrl'       => $returnUrl,
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => $template,
-                            'passthroughVars' => [
-                                'mauticContent' => $this->getJsLoadMethodPrefix(),
-                            ],
-                            'entity' => $entity,
+                            'passthroughVars' => $passthrough,
+                            'entity'          => $entity,
                         ],
                         'new'
                     )
@@ -1008,6 +1059,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 ),
             ],
             'entity' => $entity,
+            'form'   => $form,
         ];
 
         return $this->delegateView(
