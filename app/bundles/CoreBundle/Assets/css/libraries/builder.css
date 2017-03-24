@@ -2937,7 +2937,7 @@ html body .fr-gatedvideo-overlay {
 }
 .fa-border {
   padding: .2em .25em .15em;
-  border: solid 0.08em #eee;
+  border: solid 0.08em #eeeeee;
   border-radius: .1em;
 }
 .fa-pull-left {
@@ -3052,7 +3052,7 @@ html body .fr-gatedvideo-overlay {
   font-size: 2em;
 }
 .fa-inverse {
-  color: #fff;
+  color: #ffffff;
 }
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
@@ -5440,9 +5440,9 @@ div[data-slot].ui-sortable-helper {
   width: 111px;
   margin: 2px;
   height: 75px;
-  padding-left:5px;
-  padding-right:5px;
-  text-align:center;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
   word-wrap: break-word;
 }
 .slot-type-handle.ui-draggable-dragging,
@@ -5467,8 +5467,5 @@ div[data-slot].ui-sortable-helper {
   margin-top: 5px;
 }
 [data-slot="dynamicContent"] {
-  font-size:20px;
-  text-align:center;
-  line-height:20px;
-  z-index:50;
+  z-index: 50;
 }

@@ -703,6 +703,7 @@ Mautic.initSlots = function(slotContainers) {
     // Make slots sortable
     var bodyOverflow = {};
     Mautic.sortActive = false;
+    Mautic.parentDocument = parent.document;
 
     slotContainers.sortable({
         helper: function(e, ui) {
@@ -765,10 +766,11 @@ Mautic.initSlots = function(slotContainers) {
         revert: 'invalid',
         iframeOffset: iframe.offset(),
         helper: function(e, ui) {
+            // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
-            bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
-            bodyOverflow.overflowY = mQuery('body', parent.document).css('overflow-y');
-            mQuery('body', parent.document).css({
+            bodyOverflow.overflowX = mQuery('body', Mautic.parentDocument).css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body', Mautic.parentDocument).css('overflow-y');
+            mQuery('body', Mautic.parentDocument).css({
                 overflowX: 'hidden',
                 overflowY: 'hidden'
             });
@@ -780,22 +782,24 @@ Mautic.initSlots = function(slotContainers) {
         zIndex: 8000,
         cursorAt: {top: 15, left: 15},
         start: function(event, ui) {
-            mQuery('#builder-template-content', parent.document).css('overflow', 'hidden');
-            mQuery('#builder-template-content', parent.document).attr('scrolling', 'no');
-            slotContainers.sortable('option', 'scroll', false);
+            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'hidden');
+            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'no');
+            // check if it is initialized first to prevent error
+            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', false);
         },
         stop: function(event, ui) {
             // Restore original overflow
-            mQuery('body', parent.document).css(bodyOverflow);
+            mQuery('body', Mautic.parentDocument).css(bodyOverflow);
 
-            mQuery('#builder-template-content', parent.document).css('overflow', 'visible');
-            mQuery('#builder-template-content', parent.document).attr('scrolling', 'yes');
-            slotContainers.sortable('option', 'scroll', true);
+            mQuery('#builder-template-content', Mautic.parentDocument).css('overflow', 'visible');
+            mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'yes');
+            // check if it is initialized first to prevent error
+            if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
         }
     }).disableSelection();
 
     iframe.on('scroll', function() {
-        mQuery('#slot-type-container .slot-type-handle', parent.document).draggable("option", "cursorAt", { top: -1 * iframe.scrollTop() + 15 });
+        mQuery('#slot-type-container .slot-type-handle', Mautic.parentDocument).draggable("option", "cursorAt", { top: -1 * iframe.scrollTop() + 15 });
     });
 
     // Initialize the slots
@@ -861,6 +865,8 @@ Mautic.cloneFocusForm = function(decId){
     var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
     // show if hidden
     focusForm.removeClass('fade');
+    // remove froala editor
+    focusForm.find('.fr-box').remove();
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').remove();
     var removeButton = focusForm.find('.remove-item');
@@ -1123,7 +1129,6 @@ Mautic.initSlotListeners = function() {
             // initialize code mode slots
             if ('codemode' === type) {
                 Mautic.codeMode = true;
-                var rawTokens = [];
                 var element = focusForm.find('#slot_codemode_content')[0];
                 if (element) {
                     Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
@@ -1172,20 +1177,27 @@ Mautic.initSlotListeners = function() {
                     // init AtWho in a froala editor
                     parent.mQuery(this).on('froalaEditor.initialized', function (e, editor) {
                         parent.Mautic.initAtWho(editor.$el, parent.Mautic.getBuilderTokensMethod(), editor);
-
                         Mautic.setTextSlotEditorStyle(editor.$el, clickedSlot);
                     });
+                }
 
-                    parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                        var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
-                        clickedSlot.html(slotHtml.html());
-                    });
+                parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
+                    var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
+                    clickedSlot.html(slotHtml.html());
+
+                    if (focusType == 'dynamicContent') {
+                        // update DEC content in outside form
+                        var id = mQuery(this).attr('id').replace(/^new_/, '');
+                        parent.mQuery('#' + id).froalaEditor('html.set', mQuery(this).val());
+                        parent.mQuery('#' + id).html(mQuery(this).val());
+                    }
+                });
 
                     parent.mQuery(this).val(slotHtml.html());
-                }
 
                 parent.mQuery(this).froalaEditor(parent.mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
             });
+
         });
 
         // Initialize different slot types
