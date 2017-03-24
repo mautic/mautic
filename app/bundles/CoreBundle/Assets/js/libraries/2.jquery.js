@@ -5514,7 +5514,15 @@
     var rnumnonpx = new RegExp("^(" + pnum + ")(?!px)[a-z%]+$", "i");
 
     var getStyles = function (elem) {
-        return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+        // prevent Uncaught error: call to getComputedStyle on undefined
+        try {
+            return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+        } catch(err) {
+            if (elem.defaultView) {
+                return elem.defaultView.getComputedStyle(elem, null);
+            }
+            return null;
+        }
     };
 
 
@@ -5617,8 +5625,11 @@
             docElem.appendChild(container);
 
             var divStyle = window.getComputedStyle(div, null);
-            pixelPositionVal = divStyle.top !== "1%";
-            boxSizingReliableVal = divStyle.width === "4px";
+            // fix for Uncaught TypeError: Cannot read property 'top' of undefined
+            if (divStyle) {
+                pixelPositionVal = divStyle.top !== "1%";
+                boxSizingReliableVal = divStyle.width === "4px";
+            }
 
             docElem.removeChild(container);
         }

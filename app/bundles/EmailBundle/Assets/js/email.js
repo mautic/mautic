@@ -246,11 +246,13 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var filterHolder            = mQuery('#dynamicContentContainer');
     var dynamicContentPrototype = mQuery('#dynamicContentPrototype').data('prototype');
     var dynamicContentIndex     = tabHolder.find('li').length - 1;
+    while (mQuery('#emailform_dynamicContent_' + dynamicContentIndex).length > 0) {
+        dynamicContentIndex++; // prevent duplicate ids
+    }
     var tabId                   = '#emailform_dynamicContent_' + dynamicContentIndex;
     var tokenName               = 'Dynamic Content ' + (dynamicContentIndex + 1);
     var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
     var newTab                  = mQuery('<li><a role="tab" data-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
-
 
     tabHolder.append(newTab);
     filterHolder.append(newForm);
