@@ -196,12 +196,21 @@ class AjaxController extends CommonAjaxController
             $object = $helper->getIntegrationObject($integration);
 
             if ($object) {
+                $data           = $statusData           = [];
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
-
+                if (method_exists($object, 'getCampaigns')) {
+                    $campaigns = $object->getCampaigns();
+                    if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                        foreach ($campaigns['records'] as $campaign) {
+                            $data[$campaign['Id']] = $campaign['Name'];
+                        }
+                    }
+                }
                 $form = $this->createForm('integration_config', $defaults, [
                     'integration'     => $object,
                     'csrf_protection' => false,
+                    'campaigns'       => $data,
                 ]);
 
                 $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
@@ -227,6 +236,100 @@ class AjaxController extends CommonAjaxController
                 $dataArray['html']    = $html;
             }
         }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function getIntegrationCampaignStatusAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $campaign    = $request->request->get('campaign');
+        $dataArray   = ['success' => 0];
+        $statusData  = [];
+        if (!empty($integration) && !empty($campaign)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+
+            if ($object) {
+                if (method_exists($object, 'getCampaignMemberStatus')) {
+                    $campaignMemberStatus = $object->getCampaignMemberStatus($campaign);
+                    if (isset($campaignMemberStatus['records']) && !empty($campaignMemberStatus['records'])) {
+                        foreach ($campaignMemberStatus['records'] as $status) {
+                            $statusData[$status['Label']] = $status['Label'];
+                        }
+                    }
+                }
+                $form = $this->createForm('integration_campaign_status', $statusData, [
+                    'csrf_protection'       => false,
+                    'campaignContactStatus' => $statusData,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'widget',
+                    'variables' => [
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function matchFieldsAction(Request $request)
+    {
+        $integration       = $request->request->get('integration');
+        $integration_field = $request->request->get('integrationField');
+        $mautic_field      = $request->request->get('mauticField');
+        $update_mautic     = $request->request->get('updateMautic');
+        $object            = $request->request->get('object');
+
+        $helper             = $this->factory->getHelper('integration');
+        $integration_object = $helper->getIntegrationObject($integration);
+        $entity             = $integration_object->getIntegrationSettings();
+        $featureSettings    = $entity->getFeatureSettings();
+
+        $doNotMatchField = ($mautic_field === '-1');
+        if ($object == 'lead') {
+            $fields       = 'leadFields';
+            $updateFields = 'update_mautic';
+        } else {
+            $fields       = 'companyFields';
+            $updateFields = 'update_mautic_company';
+        }
+        $newFeatureSettings = [];
+        if ($doNotMatchField) {
+            if (isset($featureSettings[$updateFields]) && array_key_exists($integration_field, $featureSettings[$updateFields])) {
+                unset($featureSettings[$updateFields][$integration_field]);
+            }
+            if (isset($featureSettings[$fields]) && array_key_exists($integration_field, $featureSettings[$fields])) {
+                unset($featureSettings[$fields][$integration_field]);
+            }
+            $dataArray = ['success' => 0];
+        } else {
+            $newFeatureSettings[$integration_field] = $update_mautic;
+            if (isset($featureSettings[$updateFields])) {
+                $featureSettings[$updateFields] = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            }
+            $newFeatureSettings[$integration_field] = $mautic_field;
+            if (isset($featureSettings[$fields])) {
+                $featureSettings[$fields] = array_merge($featureSettings[$fields], $newFeatureSettings);
+            }
+
+            $dataArray = ['success' => 1];
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        $this->getModel('plugin')->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
     }

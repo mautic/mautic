@@ -16,45 +16,38 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class IntegrationConfigType.
+ * Class IntegrationCampaignsType.
  */
-class IntegrationConfigType extends AbstractType
+class IntegrationCampaignsType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * @param FormBuilderInterface $builder
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['integration'] != null) {
-            $options['integration']->appendToForm($builder, $options['data'], 'integration');
-        }
-
-        if (!empty($options['campaigns'])) {
+        if (!empty($options['campaignContactStatus'])) {
             $builder->add(
-                'campaigns',
+                'campaign_member_status',
                 'choice',
                 [
-                    'choices' => $options['campaigns'],
+                    'choices' => $options['campaignContactStatus'],
                     'attr'    => [
-                        'class' => 'form-control', 'onchange' => 'Mautic.getIntegrationCampaignStatus(this);', ],
-                    'label'       => 'mautic.plugin.integration.campaigns',
-                    'empty_value' => 'mautic.plugin.config.campaign.member.chooseone',
+                        'class' => 'form-control integration-campaigns-status', ],
+                    'label'       => 'mautic.plugin.integration.campaigns.member.status',
+                    'empty_value' => false,
                 ]
 
             );
         }
     }
-
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['integration']);
-        $resolver->setDefaults([
-            'label'     => false,
-            'campaigns' => [],
-        ]);
+        $resolver->setDefaults(
+            ['campaignContactStatus' => []]);
     }
 
     /**
@@ -62,6 +55,6 @@ class IntegrationConfigType extends AbstractType
      */
     public function getName()
     {
-        return 'integration_config';
+        return 'integration_campaign_status';
     }
 }

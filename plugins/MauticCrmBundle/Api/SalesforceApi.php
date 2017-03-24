@@ -309,4 +309,33 @@ class SalesforceApi extends CrmApi
 
         return $organizationCreatedDate;
     }
+
+    public function getCampaigns()
+    {
+        $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
+        $queryUrl      = $this->integration->getQueryUrl();
+
+        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
+
+    public function getCampaignMembers($campaignId)
+    {
+        $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
+        $queryUrl             = $this->integration->getQueryUrl();
+        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
+
+    public function getCampaignMemberStatus($campaignId)
+    {
+        $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
+        $queryUrl      = $this->integration->getQueryUrl();
+
+        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
 }

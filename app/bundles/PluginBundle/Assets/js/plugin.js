@@ -295,4 +295,26 @@ Mautic.getIntegrationConfig = function (el, settings) {
             Mautic.removeLabelLoadingIndicator();
         }
     );
+
+
+};
+
+Mautic.getIntegrationCampaignStatus = function (el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val()};
+
+    mQuery('.integration-campaigns-status').html('');
+
+    Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,
+        function (response) {
+            if (response.success) {
+                mQuery('.integration-campaigns-status').append(response.html);
+                Mautic.onPageLoad('.integration-campaigns-status', response);
+            }
+
+            Mautic.integrationConfigOnLoad('.integration-campaigns-status');
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
 };
