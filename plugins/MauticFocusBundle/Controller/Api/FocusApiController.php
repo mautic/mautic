@@ -32,7 +32,6 @@ class FocusApiController extends CommonApiController
         $this->entityNameOne    = 'focus';
         $this->entityNameMulti  = 'focus';
         $this->permissionBase  = 'plugin:focus:items';
-        $this->serializerGroups = ['properties'];
         $this->dataInputMasks   = [
             'html'     => 'html',
         ];
