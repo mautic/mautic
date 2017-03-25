@@ -95,14 +95,15 @@ EOT
         $channel->basic_consume('email', '', false, true, false, false, $callback);
 
         // Timeout in 10 seconds  and give up on $max_timeout 
-        $max_timeout = 1;
+        $max_timeout = 10;
         $timeout_counter = 0 ;
 
         while(count($channel->callbacks) >= 1 && ($timeout_counter < $max_timeout) ) {
 
           try {
 
-            $channel->wait(null,false,10);
+            $channel->wait(null,false,0.2);
+            $timeout_counter = 0;
           }catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e){
 
               $output->writeln('Email wait timeout counter ' + $timeout_counter );
