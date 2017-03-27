@@ -95,6 +95,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead', 'get_leads', 'push_leads'];
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string

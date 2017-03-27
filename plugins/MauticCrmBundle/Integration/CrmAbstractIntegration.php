@@ -55,7 +55,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return ['push_lead', 'get_leads', 'push_leads'];
+        return ['push_lead', 'get_leads'];
     }
 
     /**
