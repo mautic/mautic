@@ -29,7 +29,9 @@ trait PropertiesTrait
                 $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
 
                 // Merge the parent data over so the child forms could use them
-                $properties = array_merge($options['data'], $properties);
+                if (is_array($properties)) {
+                    $properties = array_merge($options['data'], $properties);
+                }
             } elseif (is_object($options['data']) && method_exists($options['data'], 'getProperties')) {
                 $properties = $options['data']->getProperties();
             }
