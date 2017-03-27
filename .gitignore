@@ -44,3 +44,4 @@
 !/media/images/.htaccess
 /media/dashboards/*
 !/media/dashboards/*.json
+cachegrind*
