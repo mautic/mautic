@@ -16,13 +16,13 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class CampaignSubscriber.
@@ -45,28 +45,28 @@ class CampaignSubscriber extends CommonSubscriber
     protected $notificationApi;
 
     /**
-     * @var CoreParametersHelper
+     * @var IntegrationHelper
      */
-    protected $coreParametersHelper;
+    protected $integrationHelper;
 
     /**
      * CampaignSubscriber constructor.
      *
-     * @param CoreParametersHelper    $coreParametersHelper
+     * @param IntegrationHelper       $integrationHelper
      * @param LeadModel               $leadModel
      * @param NotificationModel       $notificationModel
      * @param AbstractNotificationApi $notificationApi
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
+        IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadModel            = $leadModel;
-        $this->notificationModel    = $notificationModel;
-        $this->notificationApi      = $notificationApi;
+        $this->integrationHelper = $integrationHelper;
+        $this->leadModel         = $leadModel;
+        $this->notificationModel = $notificationModel;
+        $this->notificationApi   = $notificationApi;
     }
 
     /**
@@ -85,7 +85,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->coreParametersHelper->getParameter('notification_enabled')) {
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addAction(
                 'notification.send_notification',
                 [
@@ -105,6 +107,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return mixed
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {

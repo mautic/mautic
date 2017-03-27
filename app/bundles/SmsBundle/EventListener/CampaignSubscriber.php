@@ -15,7 +15,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
@@ -25,9 +25,9 @@ use Mautic\SmsBundle\SmsEvents;
 class CampaignSubscriber extends CommonSubscriber
 {
     /**
-     * @var CoreParametersHelper
+     * @var IntegrationHelper
      */
-    protected $coreParametersHelper;
+    protected $integrationHelper;
 
     /**
      * @var SmsModel
@@ -37,15 +37,15 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param SmsModel             $smsModel
+     * @param IntegrationHelper $integrationHelper
+     * @param SmsModel          $smsModel
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
+        IntegrationHelper $integrationHelper,
         SmsModel $smsModel
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->smsModel             = $smsModel;
+        $this->integrationHelper = $integrationHelper;
+        $this->smsModel          = $smsModel;
     }
 
     /**
@@ -64,7 +64,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->coreParametersHelper->getParameter('sms_enabled')) {
+        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addAction(
                 'sms.send_text_sms',
                 [
@@ -84,6 +86,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return mixed
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {

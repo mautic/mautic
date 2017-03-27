@@ -174,6 +174,8 @@ class IntegrationHelper
                                 $integrations[$integrationName]->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
+                            } else {
+                                continue;
                             }
                         }
 
@@ -246,7 +248,7 @@ class IntegrationHelper
                     $integrations[$integrationName] = new $class($this->factory);
                     $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
                 } else {
-                    $integrations[$integrationName] = false;
+                    continue;
                 }
             }
 

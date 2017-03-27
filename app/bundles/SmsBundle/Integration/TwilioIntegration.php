@@ -47,9 +47,8 @@ class TwilioIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'username'             => 'mautic.sms.config.form.sms.username',
-            'password'             => 'mautic.sms.config.form.sms.password',
-            'sending_phone_number' => 'mautic.sms.config.form.sms.sending_phone_number',
+            'username' => 'mautic.sms.config.form.sms.username',
+            'password' => 'mautic.sms.config.form.sms.password',
         ];
     }
 
@@ -71,5 +70,53 @@ class TwilioIntegration extends AbstractIntegration
     public function getAuthenticationType()
     {
         return 'none';
+    }
+
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $builder->add(
+                'sending_phone_number',
+                'text',
+                [
+                    'label'      => 'mautic.sms.config.form.sms.sending_phone_number',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+            $builder->add('frequency_number', 'number',
+                [
+                    'precision'  => 0,
+                    'label'      => 'mautic.sms.list.frequency.number',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'attr'       => [
+                        'class' => 'form-control frequency',
+                    ],
+                ]);
+            $builder->add('frequency_time', 'choice',
+                [
+                    'choices' => [
+                        'DAY'   => 'day',
+                        'WEEK'  => 'week',
+                        'MONTH' => 'month',
+                    ],
+                    'label'      => 'mautic.lead.list.frequency.times',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'multiple'   => false,
+                    'attr'       => [
+                        'class' => 'form-control frequency',
+                    ],
+                ]);
+        }
     }
 }
