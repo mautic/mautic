@@ -94,6 +94,8 @@ EOT
         };
 
 
+        // TODO: improve message retry functionality for now its is just going to retry forever
+        // until the message is sent, implement retry count limit, TTL expiring or dead lettered messages
         $channel->basic_qos(null,1,null);
         $channel->basic_consume('email', '', false, false, false, false, $callback);
 
