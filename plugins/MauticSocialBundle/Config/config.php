@@ -149,6 +149,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
+                    'mautic.social.model.tweet',
                 ],
             ],
         ],

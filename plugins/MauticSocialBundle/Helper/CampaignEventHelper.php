@@ -12,11 +12,13 @@
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 /**
  * Class CampaignEventHelper.
@@ -44,6 +46,11 @@ class CampaignEventHelper
     protected $assetTokenHelper;
 
     /**
+     * @var TweetModel
+     */
+    protected $tweetModel;
+
+    /**
      * @var array
      */
     protected $clickthrough = [];
@@ -53,28 +60,38 @@ class CampaignEventHelper
      *
      * @param IntegrationHelper $integrationHelper
      * @param TrackableModel    $trackableModel
+     * @param PageTokenHelper   $pageTokenHelper
+     * @param AssetTokenHelper  $assetTokenHelper
+     * @param TweetModel        $tweetModel
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper
+        AssetTokenHelper $assetTokenHelper,
+        TweetModel $tweetModel
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->trackableModel    = $trackableModel;
         $this->pageTokenHelper   = $pageTokenHelper;
         $this->assetTokenHelper  = $assetTokenHelper;
+        $this->tweetModel        = $tweetModel;
     }
 
     /**
-     * @param   $lead
-     * @param   $event
+     * @param Lead  $lead
+     * @param array $event
      *
-     * @return bool
+     * @return array|false
      */
-    public function sendTweetAction($lead, $event)
+    public function sendTweetAction(Lead $lead, array $event)
     {
-        $tweetSent = false;
+        $tweetSent   = false;
+        $tweetEntity = $this->tweetModel->getEntity($event['channelId']);
+
+        if (!$tweetEntity) {
+            return ['failed' => 1, 'response' => 'Tweet entity '.$event['channelId'].' not found'];
+        }
 
         /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
         $twitterIntegration = $this->integrationHelper->getIntegrationObject('Twitter');
@@ -89,8 +106,8 @@ class CampaignEventHelper
             return false;
         }
 
-        $tweetText = $event['properties']['tweet_text'];
-        $tweetText = $this->parseTweetText($tweetText, $leadArray);
+        $tweetText = $tweetEntity->getText();
+        $tweetText = $this->parseTweetText($tweetText, $leadArray, $tweetEntity->getId());
         $tweetUrl  = $twitterIntegration->getApiUrl('statuses/update');
         $status    = ['status' => $tweetText];
 
@@ -103,6 +120,10 @@ class CampaignEventHelper
         }
 
         if ($tweetSent) {
+            $tweetEntity->setTweetId($sendTweet['id_str'])
+                ->setDateTweeted(new \DateTime());
+            $this->tweetModel->saveEntity($tweetEntity);
+
             return ['timeline' => $tweetText, 'response' => $sendTweet];
         }
 
@@ -117,12 +138,13 @@ class CampaignEventHelper
     /**
      * PreParse the twitter message and replace placeholders with values.
      *
-     * @param $tweet
-     * @param $lead
+     * @param string $text
+     * @param array  $lead
+     * @param int    $channelId
      *
-     * @return mixed
+     * @return string
      */
-    protected function parseTweetText($tweet, $lead)
+    protected function parseTweetText($text, $lead, $channelId = -1)
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
@@ -131,16 +153,16 @@ class CampaignEventHelper
 
         $tokens = array_merge(
             $tokens,
-            TokenHelper::findLeadTokens($tweet, $lead),
-            $this->pageTokenHelper->findPageTokens($tweet, $this->clickthrough),
-            $this->assetTokenHelper->findAssetTokens($tweet, $this->clickthrough)
+            TokenHelper::findLeadTokens($text, $lead),
+            $this->pageTokenHelper->findPageTokens($text, $this->clickthrough),
+            $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );
 
-        list($tweet, $trackables) = $this->trackableModel->parseContentForTrackables(
-            $tweet,
+        list($text, $trackables) = $this->trackableModel->parseContentForTrackables(
+            $text,
             $tokens,
             'social_twitter',
-            -1 // No specific id associated with this so just send something
+            $channelId
         );
 
         /**
@@ -151,6 +173,6 @@ class CampaignEventHelper
             $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $this->clickthrough);
         }
 
-        return str_replace(array_keys($tokens), array_values($tokens), $tweet);
+        return str_replace(array_keys($tokens), array_values($tokens), $text);
     }
 }
