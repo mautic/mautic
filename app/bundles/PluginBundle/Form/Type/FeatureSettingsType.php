@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class FeatureSettingsType.
@@ -26,11 +27,17 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class FeatureSettingsType extends AbstractType
 {
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, TranslatorInterface $translator)
     {
-        $this->factory = $factory;
+        $this->factory    = $factory;
+        $this->translator = $translator;
     }
 
     /**
@@ -92,6 +99,9 @@ class FeatureSettingsType extends AbstractType
             foreach ($fieldsIntersection as $field) {
                 $autoMatchedFields[$field] = strtolower($field);
             }
+
+            $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
+
             $form->add(
                 'leadFields',
                 'integration_fields',

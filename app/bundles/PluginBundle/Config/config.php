@@ -88,7 +88,7 @@ return [
             ],
             'mautic.form.type.integration.settings' => [
                 'class'     => 'Mautic\PluginBundle\Form\Type\FeatureSettingsType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'translator'],
                 'alias'     => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [
