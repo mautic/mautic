@@ -65,6 +65,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'form.submit',
                         ],
                         'lookupFormType' => 'tweet_list',
+                        'repository'     => 'MauticSocialBundle:Tweet',
                     ],
                 ]
             );

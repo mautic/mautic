@@ -38,6 +38,14 @@ return [
                 'controller' => 'MauticSocialBundle:Tweet:execute',
             ],
         ],
+        'api' => [
+            'mautic_api_tweetsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'tweets',
+                'path'            => '/tweets',
+                'controller'      => 'MauticSocialBundle:Api\TweetApi',
+            ],
+        ],
     ],
 
     'services' => [

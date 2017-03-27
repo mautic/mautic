@@ -61,6 +61,20 @@ class TweetType extends AbstractType
         );
 
         $builder->add(
+            'description',
+            'textarea',
+            [
+                'label'      => 'mautic.social.monitoring.twitter.tweet.description',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'tooltip' => 'mautic.social.monitoring.twitter.tweet.description.tooltip',
+                    'class'   => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
             'text',
             'textarea',
             [
