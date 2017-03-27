@@ -41,9 +41,15 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         switch ($type) {
             case 'social.tweet':
             case 'tweet':
+
+                if (isset($filter['tweet_text'])) {
+                    // This tweet was created as the campaign action param and these params are not the filter. Clear the filter.
+                    $filter = '';
+                }
+
                 $tweetRepo = $this->getRepository();
                 $tweetRepo->setCurrentUser($this->userHelper->getUser());
-                $entities = $tweetRepo->getEmailList(
+                $entities = $tweetRepo->getTweetList(
                     $filter,
                     $limit,
                     $start,

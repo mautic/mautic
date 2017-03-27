@@ -88,15 +88,15 @@ class Version20170323111702 extends AbstractMauticMigration
 
         // Migrate tweets stored in Marketing Message params
         $qb->select('mc.id, mc.properties, mc.message_id, m.is_published, m.date_added, m.created_by, m.created_by_user')
-           ->from($this->prefix.'message_channels', 'mc')
-           ->leftJoin('mc', $this->prefix.'messages', 'm', 'm.id = mc.message_id')
-           ->where('mc.channel = :tweet')
-           ->andWhere('mc.properties <> :emptyTweet')
-           ->andWhere('mc.properties <> :emptyProps')
-           ->setParameter('emptyTweet', '{"tweet_text":null,"asset_link":null,"page_link":null}')
-           ->setParameter('emptyProps', '[]')
-           ->setParameter('tweet', 'tweet')
-           ->setMaxResults($batch);
+            ->from($this->prefix.'message_channels', 'mc')
+            ->leftJoin('mc', $this->prefix.'messages', 'm', 'm.id = mc.message_id')
+            ->where('mc.channel = :tweet')
+            ->andWhere('mc.properties <> :emptyTweet')
+            ->andWhere('mc.properties <> :emptyProps')
+            ->setParameter('emptyTweet', '{"tweet_text":null,"asset_link":null,"page_link":null}')
+            ->setParameter('emptyProps', '[]')
+            ->setParameter('tweet', 'tweet')
+            ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
 
@@ -143,11 +143,11 @@ class Version20170323111702 extends AbstractMauticMigration
         $start = 0;
 
         $qb->select('ce.id, ce.properties, ce.campaign_id, c.is_published, c.date_added, c.created_by, c.created_by_user')
-           ->from($this->prefix.'campaign_events', 'ce')
-           ->leftJoin('ce', $this->prefix.'campaigns', 'c', 'c.id = ce.campaign_id')
-           ->andWhere('ce.channel = :tweet')
-           ->setParameter('tweet', 'social.tweet')
-           ->setMaxResults($batch);
+            ->from($this->prefix.'campaign_events', 'ce')
+            ->leftJoin('ce', $this->prefix.'campaigns', 'c', 'c.id = ce.campaign_id')
+            ->andWhere('ce.channel = :tweet')
+            ->setParameter('tweet', 'social.tweet')
+            ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
 

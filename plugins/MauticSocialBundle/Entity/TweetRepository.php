@@ -24,7 +24,7 @@ class TweetRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, array $ignoreIds = [])
+    public function getTweetList($search = '', $limit = 10, $start = 0, $viewOther = false, array $ignoreIds = [])
     {
         $qb = $this->createQueryBuilder('t');
         $qb->select('partial t.{id, text, name, language}');

@@ -29,7 +29,7 @@ class TweetListType extends AbstractType
         $resolver->setDefaults(
             [
                 'modal_route'         => 'mautic_tweet_action',
-                'modal_header'        => 'mautic.tweet.header.new',
+                'modal_header'        => 'mautic.integration.Twitter.new.tweet',
                 'model'               => 'social.tweet',
                 'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => function (Options $options) {

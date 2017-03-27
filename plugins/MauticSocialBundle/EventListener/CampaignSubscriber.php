@@ -56,12 +56,13 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
-            'label'       => 'mautic.social.twitter.tweet.event.open',
-            'description' => 'mautic.social.twitter.tweet.event.open_desc',
-            'eventName'   => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'twitter_tweet',
-            'formTheme'   => 'MauticSocialBundle:FormTheme',
-            'channel'     => 'social.tweet',
+            'label'           => 'mautic.social.twitter.tweet.event.open',
+            'description'     => 'mautic.social.twitter.tweet.event.open_desc',
+            'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formTypeOptions' => ['update_select' => 'campaignevent_properties_tweet'],
+            'formType'        => 'tweetsend_list',
+            'channel'         => 'social.tweet',
+            'channelIdField'  => 'channelId',
         ];
 
         $event->addAction('twitter.tweet', $action);

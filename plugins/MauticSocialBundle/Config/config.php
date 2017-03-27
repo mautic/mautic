@@ -124,6 +124,11 @@ return [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetListType',
                 'alias' => 'tweet_list',
             ],
+            'mautic.social.tweetsend_list' => [
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType',
+                'arguments' => 'router',
+                'alias'     => 'tweetsend_list',
+            ],
         ],
         'models' => [
             'mautic.social.model.monitoring' => [
