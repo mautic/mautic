@@ -446,7 +446,6 @@ class EventModel extends CommonFormModel
     }
 
     public function consumeStartingEvents(
-        $channel,
         $campaign,
         &$totalEventCount,
         $limit = 100,
@@ -465,6 +464,10 @@ class EventModel extends CommonFormModel
         $campaignRepo = $this->getCampaignRepository();
         $logRepo      = $this->getLeadEventLogRepository();
 
+        // Create a channel and a queue for receiving  the events
+        $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $this->connection->channel();
+        $channel->queue_declare('trigger_start', false, false, false, false);
 
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
             // Include decisions if there are listeners
@@ -483,14 +486,11 @@ class EventModel extends CommonFormModel
 
         $rootEventCount = count($events);
 
-
         // Event settings
         $eventSettings = $this->campaignModel->getEvents();
 
-
         // Try to save some memory
         gc_enable();
-
 
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
 
@@ -523,7 +523,6 @@ class EventModel extends CommonFormModel
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             $leadDebugCounter = 1;
             foreach ($leads as $lead) {
-                //$output->writeln($lead->getId());
                 $this->logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                 // Set lead in case this is triggered by the system
@@ -636,7 +635,7 @@ class EventModel extends CommonFormModel
             // Free some memory
             gc_collect_cycles();
 
-            //$this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
+            $this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
 
           ++$batchDebugCounter;
           $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
@@ -652,25 +651,23 @@ class EventModel extends CommonFormModel
         $channel->basic_qos(null,1,null);
         $channel->basic_consume('trigger_start', '', false, false, false, false, $callback);
 
-        // Timeout in 10 seconds  and give up on $max_timeout 
+        // Timeout in  $timeout_period in seconds  and give up on $max_timeout retries
+        // Reset counter on success
         $max_timeout = 10;
+        $timeout_period = 0.2;
         $timeout_counter = 0 ;
 
         while(count($channel->callbacks) >=1 && ($timeout_counter < $max_timeout) ) {
 
           try {
 
-            $channel->wait(null,false,0.2);
+            $channel->wait(null,false,$timeout_period);
             $timeout_counter = 0;
           }catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e){
-
-              $output->writeln('trigger_start wait timeout counter ' + $timeout_counter );
+              $output->writeln('trigger_start wait timeout counter ' . $timeout_counter );
               $timeout_counter = $timeout_counter + 1;
           }
         }
-
-
-
 
     }
 
@@ -711,21 +708,7 @@ class EventModel extends CommonFormModel
         $channel = $connection->channel();
         $channel->queue_declare('trigger_start', false, false, false, false);
 
-        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
-            // Include decisions if there are listeners
-            $events = $repo->getRootLevelEvents($campaignId, true, true);
-
-            // Filter out decisions
-            $decisionChildren = [];
-            foreach ($events as $event) {
-                if ($event['eventType'] == 'decision') {
-                    $decisionChildren[$event['id']] = $repo->getEventsByParent($event['id']);
-                }
-            }
-        } else {
-            $events = $repo->getRootLevelEvents($campaignId);
-        }
-
+        $events = $repo->getRootLevelEvents($campaignId);
         $rootEventCount = count($events);
 
         if (empty($rootEventCount)) {
@@ -739,9 +722,6 @@ class EventModel extends CommonFormModel
                 'totalExecuted'  => 0,
             ] : 0;
         }
-
-        // Event settings
-        $eventSettings = $this->campaignModel->getEvents();
 
         // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
         $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, array_keys($events));
@@ -772,7 +752,6 @@ class EventModel extends CommonFormModel
             ] : 0;
         }
 
-        $evaluatedEventCount = $executedEventCount = $rootEvaluatedCount = $rootExecutedCount = 0;
 
         // Try to save some memory
         gc_enable();
@@ -784,34 +763,31 @@ class EventModel extends CommonFormModel
             $progress->start();
         }
 
-        $continue = true;
 
-        $sleepBatchCount   = 0;
-        $batchDebugCounter = 1;
 
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
 
         $batchCount = ceil($leadCount /$limit);
+
         $batchIdx= 0;
+        // paginate
         $lastId = null;
+
         while ($batchIdx < $batchCount) {
             $batchIdx++;
             $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
-            $output->writeln($lastId);
+
+            //  Paginate the lead list limit  with the batch size
             if($lastId == null) {
-            $campaignLeads = ($leadId) ? [$leadId] : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
+                $campaignLeads = ($leadId) ? [$leadId] : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
             }else{
-            $campaignLeads = $campaignRepo->getCampaignLeadIdsNext($campaignId,$lastId, 0, $limit, true);
+                $this->logger->debug('LAST BATCH ID #'.$lastId);
+                $campaignLeads = $campaignRepo->getCampaignLeadIdsNext($campaignId,$lastId, 0, $limit, true);
             }
-            // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
 
 
-            //foreach(array_chunk($campaignLeads,ceil($limit/5)) as $chunk){
-
-//              $output->writeln(implode (' ',$chunk));
-              $msg = new AMQPMessage(implode(' ',$campaignLeads));
-              $channel->basic_publish($msg, '', 'trigger_start');
-            //}
+            $msg = new AMQPMessage(implode(' ',$campaignLeads));
+            $channel->basic_publish($msg, '', 'trigger_start');
             $lastId = array_values(array_slice($campaignLeads, -1))[0];
         }
 
@@ -820,6 +796,8 @@ class EventModel extends CommonFormModel
             $output->writeln('');
         }
 
+        # TODO: This counter does not work anymore because the events are now processed 
+        #  in other thread
         $counts = [
             'events'         => $totalStartingEvents,
             'evaluated'      => $rootEvaluatedCount,

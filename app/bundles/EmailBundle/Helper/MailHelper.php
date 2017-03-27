@@ -724,7 +724,6 @@ class MailHelper
      *
      * @return bool|MauticMessage
      */
-
     public function getMessageInstance()
     {
         try {
@@ -1733,8 +1732,32 @@ class MailHelper
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
 
+
+        /* TODO : Recover email copy code and make it paralellizable
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
-        $id = md5($this->subject.$this->body['content']);
+        $id =  md5($this->subject.$this->body['content']);
+        if (!isset($copies[$id])) {
+            $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
+
+            $copy        = $emailModel->getCopyRepository()->findByHash($hash);
+            $copyCreated = false;
+            if (null === $copy) {
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                    // Try one more time to find the ID in case there was overlap when creating
+                    $copy = $emailModel->getCopyRepository()->findByHash($hash);
+                } else {
+                    $copyCreated = true;
+                }
+            }
+
+            if ($copy || $copyCreated) {
+                $copies[$id] = $hash;
+            }
+        }
+
+        if (isset($copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        }*/
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);

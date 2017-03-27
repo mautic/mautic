@@ -65,11 +65,12 @@ EOT
         $timeout   = $input->getOption('clear-timeout');
         $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
 
+
+
+        // TODO: Create a queueMode ampq and execute this code only when this queue mode is selected
+        // if($queueMode == "ampq")
         $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
         $channel = $connection->channel();
-
-
-        // TODO: Create a queuMode ampq and execute this code only when this queue mode is selected
 
         $channel->queue_declare('email', false, false, false, false);
 
@@ -83,7 +84,7 @@ EOT
 
               $message = unserialize($msg->body);
               $this->transport->send($message);
-
+              $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             } catch (\Swift_TransportException $e) {
               if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
                   $event = new QueueEmailEvent($message);
@@ -92,7 +93,10 @@ EOT
             }
         };
 
-        $channel->basic_consume('email', '', false, true, false, false, $callback);
+
+        $channel->basic_qos(null,1,null);
+        $channel->basic_consume('email', '', false, false, false, false, $callback);
+
 
         // Timeout in 10 seconds  and give up on $max_timeout 
         $max_timeout = 10;
@@ -112,6 +116,9 @@ EOT
 
 
         }
+        return 0;
+
+        // This code path is disabled for the moment
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');

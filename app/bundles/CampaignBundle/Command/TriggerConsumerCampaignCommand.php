@@ -19,8 +19,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * Class TriggerConsumerCampaignCommand.
@@ -85,9 +83,6 @@ class TriggerConsumerCampaignCommand extends ModeratedCommand
             return 0;
         }
 
-        $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
-        $channel = $this->connection->channel();
-        $channel->queue_declare('trigger_start', false, false, false, false);
 
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
@@ -103,7 +98,7 @@ class TriggerConsumerCampaignCommand extends ModeratedCommand
 
                     //trigger starting action events for newly added contacts
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                    $processed = $model->consumeStartingEvents($channel,$campaign, $totalProcessed, $batch, $max, $output);
+                    $processed = $model->consumeStartingEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
                     );
@@ -130,7 +125,7 @@ class TriggerConsumerCampaignCommand extends ModeratedCommand
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $c->getId()]).'</info>');
                         //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
-                        $processed = $model->consumeStartingEvents($channel,$c, $totalProcessed, $batch, $max, $output);
+                        $processed = $model->consumeStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(
                             '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
                             ."\n"
