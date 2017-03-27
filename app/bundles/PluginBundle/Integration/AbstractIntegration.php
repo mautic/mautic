@@ -31,6 +31,11 @@ use Symfony\Component\Form\FormBuilder;
 abstract class AbstractIntegration
 {
     /**
+     * @var bool
+     */
+    protected $coreIntegration = false;
+
+    /**
      * @var MauticFactory
      */
     protected $factory;
@@ -96,6 +101,14 @@ abstract class AbstractIntegration
      */
     public function init()
     {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCoreIntegration()
+    {
+        return $this->coreIntegration;
     }
 
     /**

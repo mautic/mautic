@@ -20,6 +20,11 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 class TwilioIntegration extends AbstractIntegration
 {
     /**
+     * @var bool
+     */
+    protected $coreIntegration = true;
+
+    /**
      * {@inheritdoc}
      *
      * @return string
