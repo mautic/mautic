@@ -70,6 +70,11 @@ class Version20170324112219 extends AbstractMauticMigration
             'features' => [],
         ];
 
+        // Ensure an empty string doesn't get persisted, as a numeric or null is required.
+        if (empty($twilioFeatureSettings['frequency_number'])) {
+            $twilioFeatureSettings['frequency_number'] = null;
+        }
+
         if ($coreParametersHelper->getParameter('notification_landing_page_enabled')) {
             $osFeatureSettings['features'][] = 'landing_page_enabled';
         }
