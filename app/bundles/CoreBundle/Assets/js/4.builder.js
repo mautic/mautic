@@ -1183,17 +1183,23 @@ Mautic.initSlotListeners = function() {
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
                     var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
-                    clickedSlot.html(slotHtml.html());
+                    // replace DEC with content from the first editor
+                    if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
+                        clickedSlot.html(slotHtml.html());
+                    }
 
                     if (focusType == 'dynamicContent') {
                         // update DEC content in outside form
                         var id = mQuery(this).attr('id').replace(/^new_/, '');
+                        parent.document.getElementById(id).value = mQuery(this).val();
                         parent.mQuery('#' + id).froalaEditor('html.set', mQuery(this).val());
-                        parent.mQuery('#' + id).html(mQuery(this).val());
                     }
                 });
 
+                // replace only the first editor content for DEC
+                if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                     parent.mQuery(this).val(slotHtml.html());
+                }
 
                 parent.mQuery(this).froalaEditor(parent.mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
             });
@@ -1227,6 +1233,7 @@ Mautic.initSlotListeners = function() {
                 var decs = mQuery('[data-slot="dynamicContent"]');
                 var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
                 var maxId = Math.max.apply(Math, ids);
+                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);

@@ -5515,16 +5515,12 @@
 
     var getStyles = function (elem) {
         // prevent Uncaught error: call to getComputedStyle on undefined
-        try {
+        if (elem.ownerDocument && elem.ownerDocument.defaultView)
             return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
-        } catch(err) {
-            if (elem.defaultView) {
-                return elem.defaultView.getComputedStyle(elem, null);
-            }
-            return null;
-        }
+        else if (window.getComputedStyle)
+            return getComputedStyle(elem, null);
+        return {};
     };
-
 
     function curCSS(elem, name, computed) {
         var width, minWidth, maxWidth, ret,

@@ -10,5 +10,5 @@
  */
 ?>
 
-__dynamicContent__
+<span>__dynamicContent__</span>
 
