@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
-    $view->extend('MauticSocialBundle:tweet:index.html.php');
+    $view->extend('MauticSocialBundle:Tweet:index.html.php');
 }
 ?>
 <?php if (count($items)): ?>
