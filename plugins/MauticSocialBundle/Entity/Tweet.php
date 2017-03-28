@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\PageBundle\Entity\Page;
@@ -105,7 +106,7 @@ class Tweet extends FormEntity
     private $asset;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var Category
      **/
     private $category;
 
@@ -476,6 +477,26 @@ class Tweet extends FormEntity
     public function setPage(Page $page)
     {
         $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * @return Category|null
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category $page
+     *
+     * @return $this
+     */
+    public function setCategory(Category $category)
+    {
+        $this->category = $category;
 
         return $this;
     }

@@ -170,6 +170,12 @@ return [
                 'access'   => 'plugin:mauticSocial:monitoring:view',
                 'priority' => 0,
             ],
+            'mautic.social.tweets' => [
+                'route'    => 'mautic_tweet_index',
+                'access'   => ['plugin:mauticSocial:tweets:viewown', 'plugin:mauticSocial:tweets:viewother'],
+                'parent'   => 'mautic.core.channels',
+                'priority' => 80,
+            ],
         ],
     ],
 

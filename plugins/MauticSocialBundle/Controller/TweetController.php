@@ -66,7 +66,7 @@ class TweetController extends FormController
      */
     protected function getControllerBase()
     {
-        return 'mautic_tweet';
+        return 'MauticSocialBundle:Tweet';
     }
 
     /**
@@ -120,7 +120,7 @@ class TweetController extends FormController
      */
     protected function getFormView(Form $form, $action)
     {
-        return $this->setFormTheme($form, 'MauticSocialBundle:SubscribedEvents\Channel:message.html.php', 'MauticSocialBundle:FormTheme');
+        return $this->setFormTheme($form, 'MauticSocialBundle:Tweet:form.html.php', ['MauticSocialBundle:FormTheme']);
     }
 
     /**
@@ -165,7 +165,7 @@ class TweetController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'tweet', 'social');
+        return parent::indexStandard(1);
     }
 
     /**

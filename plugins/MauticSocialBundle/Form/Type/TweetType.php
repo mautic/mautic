@@ -135,12 +135,17 @@ class TweetType extends AbstractType
             'handle',
             'button',
             [
-                'label' => '@',
+                'label' => 'mautic.social.twitter.handle',
                 'attr'  => [
                     'class' => 'form-control btn-primary tweet-insert-handle',
                 ],
             ]
         );
+
+        //add category
+        $builder->add('category', 'category', [
+            'bundle' => 'plugin:mauticSocial',
+        ]);
 
         if (!empty($options['update_select'])) {
             $builder->add(

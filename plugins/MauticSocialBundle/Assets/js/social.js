@@ -75,9 +75,9 @@ Mautic.composeSocialWatcher = function() {
 Mautic.getCharacterCount = function() {
     var tweetLenght = 140;
 
-    var length = mQuery('#compose-tweet textarea');
+    var currentLength = mQuery('textarea#twitter_tweet_text');
 
-    return (tweetLenght - length.val().length);
+    return (tweetLenght - currentLength.val().length);
 };
 
 /*
