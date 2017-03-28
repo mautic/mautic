@@ -59,7 +59,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'           => 'mautic.social.twitter.tweet.event.open',
             'description'     => 'mautic.social.twitter.tweet.event.open_desc',
             'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formTypeOptions' => ['update_select' => 'campaignevent_properties_tweet'],
+            'formTypeOptions' => ['update_select' => 'campaignevent_properties_channelId'],
             'formType'        => 'tweetsend_list',
             'channel'         => 'social.tweet',
             'channelIdField'  => 'channelId',
