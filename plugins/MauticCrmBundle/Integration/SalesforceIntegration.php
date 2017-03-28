@@ -1403,6 +1403,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushLeadToCampaign(Lead $lead, $integrationCampaignId, $status)
     {
         $mauticData = $salesforceIdMapping = [];
+        $objectId   = null;
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         //find campaignMember
