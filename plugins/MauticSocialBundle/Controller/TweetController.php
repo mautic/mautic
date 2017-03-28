@@ -144,6 +144,22 @@ class TweetController extends FormController
     }
 
     /**
+     * Get the template file.
+     *
+     * @param $file
+     *
+     * @return string
+     */
+    protected function getTemplateName($file)
+    {
+        if ($file === 'form.html.php' && $this->request->get('modal') == 1) {
+            return parent::getTemplateName('form.modal.html.php');
+        }
+
+        return parent::getTemplateName($file);
+    }
+
+    /**
      * Generates edit form and processes post data.
      *
      * @param int  $objectId
