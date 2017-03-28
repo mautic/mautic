@@ -50,7 +50,7 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+//            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
             CitrixEvents::ON_CITRIX_WEBINAR_EVENT   => ['onWebinarEvent', 0],
             CitrixEvents::ON_CITRIX_MEETING_EVENT   => ['onMeetingEvent', 0],
             CitrixEvents::ON_CITRIX_TRAINING_EVENT  => ['onTrainingEvent', 0],
