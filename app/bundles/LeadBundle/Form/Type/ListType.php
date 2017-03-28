@@ -12,9 +12,9 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
@@ -47,9 +47,18 @@ class ListType extends AbstractType
     private $categoriesChoices = [];
 
     /**
-     * @param MauticFactory $factory
+     * ListType constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param ListModel           $listModel
+     * @param EmailModel          $emailModel
+     * @param CorePermissions     $security
+     * @param LeadModel           $leadModel
+     * @param StageModel          $stageModel
+     * @param CategoryModel       $categoryModel
+     * @param UserHelper          $userHelper
      */
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper)
     {
         $this->translator = $translator;
 
@@ -67,8 +76,14 @@ class ListType extends AbstractType
             $this->listChoices[$list['id']] = $list['name'];
         }
 
-        $viewOther = $security->isGranted('email:emails:viewother');
-        $emails    = $emailModel->getRepository()->getEmailList('', 0, 0, $viewOther, true);
+        $viewOther   = $security->isGranted('email:emails:viewother');
+        $currentUser = $userHelper->getUser();
+        $emailRepo   = $emailModel->getRepository();
+
+        $emailRepo->setCurrentUser($currentUser);
+
+        $emails = $emailRepo->getEmailList('', 0, 0, $viewOther, true);
+
         foreach ($emails as $email) {
             $this->emailChoices[$email['language']][$email['id']] = $email['name'];
         }
