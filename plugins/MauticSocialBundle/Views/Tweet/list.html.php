@@ -67,7 +67,7 @@ if ($tmpl == 'index') {
                                     'edit'   => $view['security']->isGranted('plugin:mauticSocial:tweet:edit'),
                                     'delete' => $view['security']->isGranted('plugin:mauticSocial:tweet:delete'),
                                 ],
-                                'routeBase'  => 'social',
+                                'routeBase'  => 'mautic_tweet',
                                 'langVar'    => 'mautic.integration.Twitter',
                                 'nameGetter' => 'getName',
                             ]
