@@ -72,6 +72,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
             EmailEvents::EMAIL_ON_OPEN                => ['onEmailOpen', 0],
+            EmailEvents::EMAIL_ON_CLICK_LINK          => ['onEmailClickLink', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
@@ -97,7 +98,21 @@ class CampaignSubscriber extends CommonSubscriber
                 ],
             ]
         );
-
+        $event->addDecision(
+            'email.click_link',
+            [
+                'label'                  => 'mautic.email.campaign.event.click_link',
+                'description'            => 'mautic.email.campaign.event.click_link_descr',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
+                        ],
+                    ],
+                ],
+            ]
+        );
         $event->addAction(
             'email.send',
             [
@@ -127,6 +142,19 @@ class CampaignSubscriber extends CommonSubscriber
         }
     }
 
+    /**
+     * Trigger campaign event for clicking an email link.
+     *
+     * @param EmailOpenEvent $event
+     */
+    public function onEmailClickLink(EmailOpenEvent $event)
+    {
+        $email = $event->getEmail();
+
+        if ($email !== null) {
+            $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
+        }
+    }
     /**
      * @param CampaignExecutionEvent $event
      */
