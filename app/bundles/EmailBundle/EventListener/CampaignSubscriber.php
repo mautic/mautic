@@ -154,7 +154,7 @@ class CampaignSubscriber extends CommonSubscriber
         $hit= $event->getHit();
 
         if ($hit->getEmail() !== null) {
-            $this->campaignEventModel->triggerEvent('email.click_link', $hit, 'email', $hit->getEmail()->getId(),'url',$event->getHit()->getUrl());
+            $this->campaignEventModel->triggerEvent('email.click_link', $hit, 'email', $hit->getEmail()->getId());
         }
     }
     /**
@@ -184,6 +184,7 @@ class CampaignSubscriber extends CommonSubscriber
                     $urlMatches[$url] = fnmatch($url, $pageUrl);
                 }
             }
+
             if($event->getEvent()['type'] == 'email.click_link'){
                 if(in_array(true,$urlMatches)){
                     return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);

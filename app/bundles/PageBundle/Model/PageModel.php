@@ -673,7 +673,6 @@ class PageModel extends FormModel
             }
         }else{
 
-          $this->logger->addDebug("page hit click email");
             if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
                 $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
                 $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
