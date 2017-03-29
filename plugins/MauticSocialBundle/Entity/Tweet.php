@@ -367,6 +367,18 @@ class Tweet extends FormEntity
     }
 
     /**
+     * Add 1 to sentCount.
+     *
+     * @return $this
+     */
+    public function sentCountUp()
+    {
+        $this->setSentCount($this->getSentCount() + 1);
+
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getFavoriteCount()

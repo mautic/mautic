@@ -190,20 +190,19 @@ class TweetStat
     /**
      * @return string|null
      */
-    public function getTweetId()
+    public function getTwitterTweetId()
     {
-        return $this->tweetId;
+        return $this->twitterTweetId;
     }
 
     /**
-     * @param string $tweetId
+     * @param string $twitterTweetId
      *
      * @return $this
      */
-    public function setTweetId($tweetId)
+    public function setTwitterTweetId($twitterTweetId)
     {
-        $this->isChanged('tweetId', $tweetId);
-        $this->tweetId = $tweetId;
+        $this->twitterTweetId = $twitterTweetId;
 
         return $this;
     }
@@ -270,6 +269,14 @@ class TweetStat
     public function setRetryCount($retryCount)
     {
         $this->retryCount = $retryCount;
+    }
+
+    /**
+     * @param mixed $retryCount
+     */
+    public function retryCountUp()
+    {
+        $this->setRetryCount($this->getRetryCount() + 1);
     }
 
     /**

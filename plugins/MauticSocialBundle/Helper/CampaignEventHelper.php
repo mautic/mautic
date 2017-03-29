@@ -112,24 +112,22 @@ class CampaignEventHelper
         $status    = ['status' => $tweetText];
 
         // fire the tweet
-        $sendTweet = $twitterIntegration->makeRequest($tweetUrl, $status, 'POST', ['append_callback' => false]);
+        $sendResponse = $twitterIntegration->makeRequest($tweetUrl, $status, 'POST', ['append_callback' => false]);
 
         // verify the tweet was sent by checking for a tweet id
-        if (is_array($sendTweet) && array_key_exists('id_str', $sendTweet)) {
+        if (is_array($sendResponse) && array_key_exists('id_str', $sendResponse)) {
             $tweetSent = true;
         }
 
         if ($tweetSent) {
-            $tweetEntity->setTweetId($sendTweet['id_str'])
-                ->setDateTweeted(new \DateTime());
-            $this->tweetModel->saveEntity($tweetEntity);
+            $this->tweetModel->registerSend($tweetEntity, $lead, $sendResponse, 'campaign.event', $event['id']);
 
-            return ['timeline' => $tweetText, 'response' => $sendTweet];
+            return ['timeline' => $tweetText, 'response' => $sendResponse];
         }
 
-        $response = ['failed' => 1, 'response' => $sendTweet];
-        if (!empty($sendTweet['error']['message'])) {
-            $response['reason'] = $sendTweet['error']['message'];
+        $response = ['failed' => 1, 'response' => $sendResponse];
+        if (!empty($sendResponse['error']['message'])) {
+            $response['reason'] = $sendResponse['error']['message'];
         }
 
         return $response;

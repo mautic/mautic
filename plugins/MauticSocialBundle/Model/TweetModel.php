@@ -13,7 +13,9 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
+use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -70,6 +72,67 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
         return $results;
     }
+
+    /**
+     * Create/update Tweet Stat and update sent count for Tweet.
+     *
+     * @param Tweet  $tweet
+     * @param Lead   $lead
+     * @param array  $sendResponse
+     * @param string $source
+     * @param int    $sourceId
+     *
+     * @return $this
+     */
+    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null)
+    {
+        $statRepo = $this->getStatRepository();
+
+        // Update failed tweet
+        $stat = $statRepo->findOneBy(
+            [
+                'lead'     => $lead->getId(),
+                'tweet'    => $tweet->getId(),
+                'source'   => $source,
+                'sourceId' => $sourceId,
+                'isFailed' => true,
+            ]
+        );
+
+        if (!$stat) {
+            // Create new entity
+            $stat = new TweetStat();
+        } else {
+            // Or add 1 to the retry count
+            $stat->retryCountUp();
+        }
+
+        $stat->setTweet($tweet);
+        $stat->setLead($lead);
+        $stat->setResponseDetails($sendResponse);
+        $stat->setSource($source);
+        $stat->setSourceId($sourceId);
+
+        $fields = $lead->getProfileFields();
+        if (!empty($fields['twitter'])) {
+            $stat->setHandle($fields['twitter']);
+        }
+
+        if (!empty($sendResponse['id_str'])) {
+            $stat->setDateSent(new \DateTime());
+            $stat->setTwitterTweetId($sendResponse['id_str']);
+
+            $tweet->sentCountUp();
+            $this->saveEntity($tweet);
+        } else {
+            $stat->setIsFailed(true);
+        }
+
+        $statRepo->saveEntity($stat);
+
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -165,6 +228,14 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository()
     {
         return $this->em->getRepository('MauticSocialBundle:Tweet');
+    }
+
+    /**
+     * @return TweetStatRepository
+     */
+    public function getStatRepository()
+    {
+        return $this->em->getRepository('MauticSocialBundle:TweetStat');
     }
 
     /**
