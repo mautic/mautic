@@ -69,6 +69,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.social.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.social.sociallogin' => [

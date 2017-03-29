@@ -213,7 +213,7 @@ class Tweet extends FormEntity
                 [
                     'mediaId',
                     'mediaPath',
-                    'dateTweeted',
+                    'sentCount',
                     'favoriteCount',
                     'retweetCount',
                     'description',
