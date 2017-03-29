@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -32,13 +33,6 @@ class Tweet extends FormEntity
      * @var int
      */
     private $id;
-
-    /**
-     * ID of the tweet from Twitter.
-     *
-     * @var string
-     */
-    private $tweetId;
 
     /**
      * ID of the Twitter media object attached to the tweet.
@@ -81,9 +75,9 @@ class Tweet extends FormEntity
     private $language = 'en';
 
     /**
-     * @var \DateTime
+     * @var int
      */
-    private $dateTweeted;
+    private $sentCount = 0;
 
     /**
      * @var int
@@ -110,12 +104,27 @@ class Tweet extends FormEntity
      **/
     private $category;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $stats;
+
+    /**
+     * Tweet constructor.
+     */
+    public function __construct()
+    {
+        $this->stats = new ArrayCollection();
+    }
+
     public function __clone()
     {
         $this->id            = null;
         $this->tweetId       = null;
+        $this->sentCount     = 0;
         $this->favoriteCount = 0;
         $this->retweetCount  = 0;
+        $this->stats         = new ArrayCollection();
 
         parent::__clone();
     }
@@ -129,19 +138,13 @@ class Tweet extends FormEntity
 
         $builder->setTable('tweets')
             ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\TweetRepository')
-            ->addIndex(['tweet_id'], 'tweet_id_index')
             ->addIndex(['text'], 'tweet_text_index')
+            ->addIndex(['sent_count'], 'sent_count_index')
             ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index')
-            ->addIndex(['date_tweeted'], 'date_tweeted_index');
+            ->addIndex(['retweet_count'], 'retweet_count_index');
 
         $builder->addIdColumns();
         $builder->addCategory();
-
-        $builder->createField('tweetId', 'string')
-            ->columnName('tweet_id')
-            ->nullable()
-            ->build();
 
         $builder->createField('mediaId', 'string')
             ->columnName('media_id')
@@ -156,8 +159,8 @@ class Tweet extends FormEntity
         $builder->createField('text', 'string')
             ->build();
 
-        $builder->createField('dateTweeted', 'datetime')
-            ->columnName('date_tweeted')
+        $builder->createField('sentCount', 'integer')
+            ->columnName('sent_count')
             ->nullable()
             ->build();
 
@@ -180,6 +183,13 @@ class Tweet extends FormEntity
         $builder->createManyToOne('asset', Asset::class)
             ->addJoinColumn('asset_id', 'id', true, false, 'SET NULL')
             ->build();
+
+        $builder->createOneToMany('stats', 'TweetStat')
+            ->setIndexBy('id')
+            ->mappedBy('tweet')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -201,7 +211,6 @@ class Tweet extends FormEntity
             )
             ->addProperties(
                 [
-                    'tweetId',
                     'mediaId',
                     'mediaPath',
                     'dateTweeted',
@@ -276,27 +285,6 @@ class Tweet extends FormEntity
     /**
      * @return string|null
      */
-    public function getTweetId()
-    {
-        return $this->tweetId;
-    }
-
-    /**
-     * @param string $tweetId
-     *
-     * @return $this
-     */
-    public function setTweetId($tweetId)
-    {
-        $this->isChanged('tweetId', $tweetId);
-        $this->tweetId = $tweetId;
-
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getMediaId()
     {
         return $this->mediaId;
@@ -358,11 +346,11 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @return DateTime|null
+     * @return int|null
      */
-    public function getDateTweeted()
+    public function getSentCount()
     {
-        return $this->dateTweeted;
+        return $this->sentCount;
     }
 
     /**
@@ -370,10 +358,10 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setDateTweeted(\DateTime $dateTweeted)
+    public function setSentCount($sentCount)
     {
-        $this->isChanged('dateTweeted', $dateTweeted);
-        $this->dateTweeted = $dateTweeted;
+        $this->isChanged('sentCount', $sentCount);
+        $this->sentCount = $sentCount;
 
         return $this;
     }
@@ -499,5 +487,13 @@ class Tweet extends FormEntity
         $this->category = $category;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStats()
+    {
+        return $this->stats;
     }
 }
