@@ -228,6 +228,10 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailsend_list',
             ],
+            'mautic.form.type.email_click' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\CampaignEventPageHitType',
+                'alias' => 'campaignevent_email_click',
+            ],
             'mautic.form.type.formsubmit_sendemail_admin' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType',
                 'alias' => 'email_submitaction_useremail',
