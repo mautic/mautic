@@ -106,7 +106,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                     data-field-callback="<?php echo $callback; ?>"
                                                     data-field-operators="<?php echo $operators; ?>"
                                                     class="segment-filter fa <?php echo $icon; ?>">
-                                                <?php echo $view['translator']->trans($params['label']); ?>
+                                                    <?php echo $view['translator']->trans($params['label']); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </optgroup>

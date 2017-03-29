@@ -57,7 +57,7 @@ class FieldType extends AbstractType
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'length' => 50],
+                'attr'       => ['class' => 'form-control', 'length' => 50, 'data-placeholder' => 'abc'],
             ]
         );
 
