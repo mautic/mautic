@@ -139,10 +139,29 @@ class PluginController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function configAction($name)
+    public function configAction($name, $activeTab = 'details-container', $page = 1)
     {
         if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
+        }
+        if (!empty($this->request->get('activeTab'))) {
+            $activeTab = $this->request->get('activeTab');
+        }
+
+        $session = $this->get('session');
+        $limit   = $session->get('mautic.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $start   = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+        //set what page currently on so that we can return here after form submission/cancellation
+        if ($activeTab == 'leadFieldsContainer') {
+            $session->set('mautic.plugin.lead.start', $start);
+            $session->set('mautic.plugin.lead.page', $page);
+        }
+        if ($activeTab == 'companyFieldsContainer') {
+            $session->set('mautic.plugin.company.start', $start);
+            $session->set('mautic.plugin.company.lead.page', $page);
         }
 
         $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
@@ -161,7 +180,6 @@ class PluginController extends FormController
 
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
-
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
 
@@ -186,7 +204,6 @@ class PluginController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
-
                     // Merge keys
                     $keys = $form['apiKeys']->getData();
 
@@ -203,42 +220,67 @@ class PluginController extends FormController
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             //make sure now non-existent aren't saved
-                            $featureSettings = $entity->getFeatureSettings();
-                            $submittedFields = $this->request->request->get('integration_details[featureSettings][leadFields]', [], true);
-                            if (!empty($submittedFields)) {
-                                unset($featureSettings['leadFields']);
-                                unset($featureSettings['update_mautic']);
-                                foreach ($submittedFields as $f => $v) {
-                                    if (!strstr($f, 'update_mautic')) {
-                                        if (!empty($v) && strstr($f, 'i_')) {
-                                            $integrationField = $v;
-                                        }
-                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
-                                            $mauticField                                      = $v;
-                                            $featureSettings['leadFields'][$integrationField] = $mauticField;
-                                        }
-                                    } else {
-                                        $featureSettings['update_mautic'][$integrationField] = (int) $v;
-                                    }
+                            $featureSettings        = $entity->getFeatureSettings();
+                            $submittedObjects       = $this->request->get('integration_details[featureSettings][objects]', [], true);
+                            $submittedFields        = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
+                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
+                            //make sure now non-existent aren't saved
+                            $settings = [
+                                'ignore_field_cache' => false,
+                            ];
+                            $settings['feature_settings']['objects'] = $submittedObjects;
+                            $newIntegrationFields                    = $integrationObject->getAvailableLeadFields($settings);
+                            $leadNewIntegrationFields                = [];
+                            $removeCompanyFields                     = [];
+                            if (isset($newIntegrationFields['Lead'])) {
+                                $leadNewIntegrationFields = $newIntegrationFields['Lead'];
+                            }
+                            if (isset($newIntegrationFields['Contact'])) {
+                                $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
+                            }
+                            $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
+
+                            foreach ($removeLeadFields as $key => $removeLeadField) {
+                                unset($currentFeatureSettings['leadFields'][$key]);
+                                if (isset($currentFeatureSettings['update_mautic'])) {
+                                    unset($currentFeatureSettings['update_mautic'][$key]);
                                 }
                             }
-                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
+
+                            if (isset($newIntegrationFields['company'])) {
+                                $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
+                                $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
+                            }
+                            foreach ($removeCompanyFields as $key => $removeCompanyField) {
+                                unset($currentFeatureSettings['companyFields'][$key]);
+                                if (isset($currentFeatureSettings['update_mautic_company'])) {
+                                    unset($currentFeatureSettings['update_mautic_company'][$key]);
+                                }
+                            }
+
+                            if (!empty($submittedFields)) {
+                                if (isset($currentFeatureSettings['leadFields'])) {
+                                    $featureSettings['leadFields'] = $currentFeatureSettings['leadFields'];
+                                } else {
+                                    $featureSettings['leadFields'] = [];
+                                }
+                                if (isset($currentFeatureSettings['update_mautic'])) {
+                                    $featureSettings['update_mautic'] = $currentFeatureSettings['update_mautic'];
+                                } else {
+                                    $featureSettings['update_mautic'] = [];
+                                }
+                            }
 
                             if (!empty($submittedCompanyFields)) {
-                                unset($featureSettings['companyFields']);
-                                unset($featureSettings['update_mautic_company']);
-                                foreach ($submittedCompanyFields as $f => $v) {
-                                    if (!strstr($f, 'update_mautic_company')) {
-                                        if (!empty($v) && strstr($f, 'i_')) {
-                                            $integrationField = $v;
-                                        }
-                                        if (!empty($v) && strstr($f, 'm_') && isset($integrationField)) {
-                                            $mauticField                                         = $v;
-                                            $featureSettings['companyFields'][$integrationField] = $mauticField;
-                                        }
-                                    } else {
-                                        $featureSettings['update_mautic_company'][$integrationField] = (int) $v;
-                                    }
+                                if (isset($currentFeatureSettings['companyFields'])) {
+                                    $featureSettings['companyFields'] = $currentFeatureSettings['companyFields'];
+                                } else {
+                                    $featureSettings['companyFields'] = [];
+                                }
+                                if (isset($currentFeatureSettings['update_mautic_company'])) {
+                                    $featureSettings['update_mautic_company'] = $currentFeatureSettings['update_mautic_company'];
+                                } else {
+                                    $featureSettings['update_mautic_company'] = [];
                                 }
                             }
                             $entity->setFeatureSettings($featureSettings);
@@ -326,6 +368,7 @@ class PluginController extends FormController
                     'formSettings' => $formSettings,
                     'formNotes'    => $formNotes,
                     'callbackUrl'  => $callbackUrl,
+                    'activeTab'    => $activeTab,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [

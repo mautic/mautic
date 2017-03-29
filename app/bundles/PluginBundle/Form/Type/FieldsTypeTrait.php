@@ -15,7 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait FieldsTypeTrait
 {
@@ -31,9 +30,11 @@ trait FieldsTypeTrait
         array $options,
         array $integrationFields,
         array $mauticFields,
-        $fieldObject = ''
+        $fieldObject,
+        $limit,
+        $start
     ) {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
             $form = $event->getForm();
             $index = 0;
             $choices = [];
@@ -46,26 +47,21 @@ trait FieldsTypeTrait
 
             // First loop to build options
             foreach ($integrationFields as $field => $details) {
-                if ($matched = ($isPost) ? !empty($fieldData['m_'.$fieldData[$field]]) : !empty($fieldData[$field])) {
-                    $matchedFields[$field] = !empty($fieldData['m_'.$fieldData[$field]]) ? $fieldData['m_'.$fieldData[$field]] : $fieldData[$field];
-                }
-
                 if (is_array($details) && !empty($details['required'])) {
                     $requiredFields[$field] = $details;
-                } elseif ($matched) {
+                } elseif (isset($fieldData[$field])) {
                     $populatedFields[$field] = $details;
                 } else {
                     $optionalFields[$field] = $details;
                 }
-
                 if (is_array($details)) {
                     if (isset($details['group'])) {
                         if (!isset($choices[$details['group']])) {
                             $choices[$details['group']] = [];
                         }
-
                         $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                        $choices[$details['group']][$field] = $label;
+                        $group[$field] = $details['group'];
+                        $choices[$field] = $label;
                     } else {
                         $choices[$field] = $details['label'];
                     }
@@ -75,30 +71,28 @@ trait FieldsTypeTrait
             }
 
             $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-
-            foreach ($fields as $field => $details) {
-                $matched = isset($matchedFields[$field]);
+            $paginatedFields = array_slice($fields, $start, $limit);
+            foreach ($paginatedFields as $field => $details) {
+                $matched = isset($fieldData[$field]);
                 $required = (int) !empty($integrationFields[$field]['required']);
-                $disabled = (!$required && $index > 1 && !$matched);
-
+                $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
+                $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
                 ++$index;
-
                 $form->add(
-                    'i_'.$index,
-                    'choice',
+                    'label_'.$index,
+                    'text',
                     [
-                        'choices'  => $choices,
-                        'label'    => false,
-                        'required' => true,
-                        'data'     => $field, // default to this field
-                        'attr'     => [
-                            'class'            => 'field-selector integration-field form-control',
-                            'data-placeholder' => ' ',
-                            'data-required'    => $required,
-                            'data-value'       => $field,
-                            'data-matched'     => $matched,
+                        'label' => false,
+                        'data'  => $choices[$field],
+                        'attr'  => [
+                            'class'         => 'form-control integration-fields',
+                            'data-required' => $required,
+                            'data-label'    => $choices[$field],
+                            'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                            'readonly'      => true,
                         ],
-                        'disabled' => $disabled,
+                        'by_reference' => true,
+                        'mapped'       => false,
                     ]
                 );
                 if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
@@ -117,7 +111,7 @@ trait FieldsTypeTrait
                             'label'       => false,
                             'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
                             'empty_value' => false,
-                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update'],
+                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update', 'disabled' => $disabled],
                             'disabled'    => $disabled,
                         ]
                     );
@@ -128,26 +122,29 @@ trait FieldsTypeTrait
                     [
                         'choices'    => $mauticFields,
                         'label'      => false,
-                        'required'   => true,
-                        'data'       => $matched ? $matchedFields[$field] : '',
+                        'data'       => $matched ? $fieldData[$field] : '',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class'            => 'field-selector form-control',
+                            'class'            => 'field-selector',
                             'data-placeholder' => ' ',
                             'data-required'    => $required,
+                            'data-value'       => $matched ? $fieldData[$field] : '',
+                            'disabled'         => $mauticDisabled,
+                            'data-choices'     => $mauticFields,
                         ],
-                        'disabled'    => $disabled,
-                        'empty_value' => 'mautic.core.form.chooseone',
-                        'constraints' => ($required) ? [
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.core.value.required',
-                                ]
-                            ),
-                        ] : [],
+                        'disabled' => $mauticDisabled,
                     ]
                 );
-
+                $form->add(
+                    'i_'.$index,
+                    HiddenType::class,
+                    [
+                        'data' => $field,
+                        'attr' => [
+                            'data-required' => $required,
+                        ],
+                    ]
+                );
                 $form->add(
                     $field,
                     HiddenType::class,

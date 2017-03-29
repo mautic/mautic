@@ -12,12 +12,14 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -27,6 +29,16 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FeatureSettingsType extends AbstractType
 {
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -34,10 +46,12 @@ class FeatureSettingsType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory, TranslatorInterface $translator)
+    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
-        $this->factory    = $factory;
-        $this->translator = $translator;
+        $this->factory              = $factory;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -50,22 +64,38 @@ class FeatureSettingsType extends AbstractType
 
         //add custom feature settings
         $integration_object->appendToForm($builder, $options['data'], 'features');
+
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
         $formSettings  = $options['integration_object']->getFormDisplaySettings();
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields, $formSettings) {
+            $session = $this->session;
+            $limit   = $session->get('mautic.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+            $page    = $session->get('mautic.plugin.lead.page', 1);
+            $start   = $session->get('mautic.plugin.lead.start', 1);
+
+            $companyPage  = $session->get('mautic.plugin.company.lead.page', 1);
+            $companyStart = $session->get('mautic.plugin.company.start', 1);
+
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => ('GET' === $_SERVER['REQUEST_METHOD']),
+                'ignore_field_cache' => ($page == 1) ? true : false,
             ];
             try {
-                $fields = $integration_object->getFormLeadFields($settings);
-                $fields = (isset($fields[0])) ? $fields[0] : $fields;
-                unset($fields['company']);
+                if (empty($fields)) {
+                    $fields = $integration_object->getFormLeadFields($settings);
+                    $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                    unset($fields['company']);
+                }
+                $totalFields = count($fields);
+
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
-                    $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                    if (empty($integrationCompanyFields)) {
+                        $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                    }
+                    $totalCompanyFields = count($integrationCompanyFields);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
@@ -99,6 +129,7 @@ class FeatureSettingsType extends AbstractType
             foreach ($fieldsIntersection as $field) {
                 $autoMatchedFields[$field] = strtolower($field);
             }
+            $leadFields['-1'] = $this->translator->trans('mautic.plugin.integration.option.not.matched');
 
             $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
 
@@ -115,9 +146,16 @@ class FeatureSettingsType extends AbstractType
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
+                    'integration'          => $integration_object->getName(),
+                    'totalFields'          => $totalFields,
+                    'page'                 => $page,
+                    'limit'                => $limit,
+                    'start'                => $start,
+                    'fixedPageNum'         => round($totalFields / $limit),
                 ]
             );
             if (!empty($integrationCompanyFields)) {
+                $companyFields['-1'] = $this->translator->trans('mautic.plugin.integration.option.not.matched');
                 $form->add(
                     'companyFields',
                     'integration_company_fields',
@@ -131,6 +169,12 @@ class FeatureSettingsType extends AbstractType
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
                         'enable_data_priority'       => $enableDataPriority,
+                        'integration'                => $integration_object->getName(),
+                        'totalFields'                => $totalCompanyFields,
+                        'page'                       => $companyPage,
+                        'limit'                      => $limit,
+                        'start'                      => $companyStart,
+                        'fixedPageNum'               => round($totalCompanyFields / $limit),
                     ]
                 );
             }
