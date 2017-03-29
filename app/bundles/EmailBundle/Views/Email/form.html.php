@@ -121,21 +121,43 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
                         </div>
-
                         <br>
+                        <br>
+
+                        <fieldset>
+                            <legend><?php echo $view['translator']->trans('mautic.email.utm_tags');?></legend>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['utmSource']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['utmMedium']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['utmName']); ?>
+                            </div>
+
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['utmContent']); ?>
+                            </div>
+                        </div>
+                        </fieldset>
+                        <br>
+                        <fieldset>
+                            <legend><?php echo $view['translator']->trans('mautic.email.form.plaintext');?></legend>
+                            <p>
+                                <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                            </p>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-left">
-                                    <?php echo $view['form']->label($form['plainText']); ?>
-                                </div>
-                                <div class="text-right pr-10">
-                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                                </div>
-                                <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
+                            </fieldset>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">

@@ -160,6 +160,66 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            'utmSource',
+            'text',
+            [
+                'label'      => 'mautic.email.campaign_source',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                  //  'preaddon' => 'fa fa-user',
+                 //   'tooltip'  => 'mautic.email.from_name.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'utmMedium',
+            'text',
+            [
+                'label'      => 'mautic.email.campaign_medium',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                  //  'preaddon' => 'fa fa-user',
+                   // 'tooltip'  => 'mautic.email.from_name.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'utmName',
+            'text',
+            [
+                'label'      => 'mautic.email.campaign_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                  //  'preaddon' => 'fa fa-user',
+              //      'tooltip'  => 'mautic.email.from_name.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'utmContent',
+            'text',
+            [
+                'label'      => 'mautic.email.campaign_content',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                  //  'preaddon' => 'fa fa-user',
+              //      'tooltip'  => 'mautic.email.from_name.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'template',
             'theme_list',
             [
