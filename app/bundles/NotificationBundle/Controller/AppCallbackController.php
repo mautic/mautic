@@ -33,6 +33,7 @@ class AppCallbackController extends CommonController
         if ($contact === null) {
             $contact = new Lead();
             $contact->setEmail($requestBody['email']);
+            $contact->setLastActive(new \DateTime());
         }
 
         $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled']);
