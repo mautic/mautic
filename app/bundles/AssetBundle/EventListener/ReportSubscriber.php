@@ -117,8 +117,7 @@ class ReportSubscriber extends CommonSubscriber
                             $columns,
                             $downloadColumns,
                             $event->getLeadColumns(),
-                            $event->getIpColumn(),
-                            $event->getCampaignByChannelColumns()
+                            $event->getIpColumn()
                         ),
                     ],
                     'assets'

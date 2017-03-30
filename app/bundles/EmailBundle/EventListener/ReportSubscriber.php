@@ -219,8 +219,7 @@ class ReportSubscriber extends CommonSubscriber
                         $columns,
                         $statColumns,
                         $event->getLeadColumns(),
-                        $event->getIpColumn(),
-                        $event->getCampaignByChannelColumns()
+                        $event->getIpColumn()
                     ),
                 ];
                 $event->addTable('email.stats', $data, 'emails');
