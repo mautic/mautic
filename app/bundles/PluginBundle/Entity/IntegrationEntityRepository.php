@@ -93,6 +93,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('i.integration = :integration')
             ->andWhere('i.internal_entity = :internalEntity')
+            ->andWhere('i.integration_entity = "Lead" or i.integration_entity = "Contact"')
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 

@@ -944,12 +944,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = $leadsToUpdate            = $fields            = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $checkEmailsInSF       = [];
 
         if (!empty($config['leadFields'])) {
-            $fields          = implode(', l.', $config['leadFields']);
-            $fields          = 'l.'.$fields;
-            $result          = 0;
-            $checkEmailsInSF = [];
+            $fields = implode(', l.', $config['leadFields']);
+            $fields = 'l.'.$fields;
+            $result = 0;
 
             $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
             $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
@@ -971,7 +971,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($limit) {
             $limit -= count($leadsToUpdate);
         }
-        $checkEmailsInSF = [];
         //create lead records
         if (null === $limit || $limit && !empty($fields)) {
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
