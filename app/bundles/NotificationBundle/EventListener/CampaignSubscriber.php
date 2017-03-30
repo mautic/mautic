@@ -105,6 +105,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {

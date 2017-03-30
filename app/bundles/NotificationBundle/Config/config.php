@@ -141,6 +141,10 @@ return [
                 'path'       => '/manifest.json',
                 'controller' => 'MauticNotificationBundle:Js:manifest',
             ],
+            'mautic_app_notification' => [
+                'path'       => '/notification/appcallback',
+                'controller' => 'MauticNotificationBundle:AppCallback:index',
+            ],
         ],
         'api' => [
             'mautic_api_notificationsstandard' => [
