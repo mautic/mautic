@@ -72,7 +72,6 @@ class LeadListSubscriber extends CommonSubscriber
                     [
                         'include' => [
                             '=',
-                            '!=',
                         ],
                     ]),
                 'object' => 'lead',
