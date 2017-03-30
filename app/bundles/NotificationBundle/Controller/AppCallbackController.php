@@ -21,17 +21,12 @@ class AppCallbackController extends CommonController
 {
     public function indexAction(Request $request)
     {
-        $responseBody = [
-            'email'   => 'don.gilbert@mautic.com',
-            'push_id' => '710a6ea4-aa97-4aff-8a6b-63cc003d7df1',
-            'enabled' => true,
-        ];
-
+        $requestBody = json_decode($request->getContent(), true);
         $em          = $this->get('doctrine.orm.entity_manager');
         $contactRepo = $em->getRepository(Lead::class);
 
         /** @var Lead $lead */
-        $lead = $contactRepo->findOneBy(['email' => $responseBody['email']]);
+        $lead = $contactRepo->findOneBy(['email' => $requestBody['email']]);
 
         if ($lead) {
             $pushIds = $lead->getPushIDs();
@@ -40,15 +35,15 @@ class AppCallbackController extends CommonController
 
             /** @var PushID $id */
             foreach ($pushIds as $id) {
-                if ($id->getPushID() === $responseBody['push_id']) {
+                if ($id->getPushID() === $requestBody['push_id']) {
                     $matched = true;
                     $pushId  = $id;
                     break;
                 }
             }
 
-            $pushId->setPushID($responseBody['push_id']);
-            $pushId->setEnabled($responseBody['enabled']);
+            $pushId->setPushID($requestBody['push_id']);
+            $pushId->setEnabled($requestBody['enabled']);
 
             if ($matched) {
                 $lead->removePushID($pushId);
@@ -58,6 +53,6 @@ class AppCallbackController extends CommonController
             $em->persist($lead);
         }
 
-        return new Response($request->getContent());
+        return new Response();
     }
 }
