@@ -244,6 +244,51 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add IP left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     * @param string       $ipPrefix
+     *
+     * @return $this
+     */
+    public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel)
+    {
+        $selectedColumns = $this->report->getColumns();
+
+        if (in_array('cmp.name', $selectedColumns)
+            || in_array('clel.campaign_id', $selectedColumns)
+            || $this->columnsExistInFilter(['cmp.name', 'clel.campaign_id'])) {
+            $queryBuilder->innerJoin('a', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $prefix.'.id = clel.channel_id AND clel.channel="'.$channel.'"')
+                    ->innerJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Go through the used filters and let me know if the columns I provided exist in it.
+     *
+     * @param array $columns
+     *
+     * @return bool
+     */
+    public function columnsExistInFilter(array $columns)
+    {
+        $usedFilters = $this->report->getFilters();
+
+        if ($usedFilters) {
+            foreach ($usedFilters as $usedFilter) {
+                if (in_array($usedFilter['column'], $columns)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Join channel columns.
      *
      * @param QueryBuilder $queryBuilder
