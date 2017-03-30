@@ -186,7 +186,7 @@ class CampaignSubscriber extends CommonSubscriber
             }
 
             if($event->getEvent()['type'] == 'email.click_link'){
-                if(in_array(true,$urlMatches)){
+                if(in_array(true,$urlMatches) || empty($urlMatches)){
                     return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
                 }
             }else{
