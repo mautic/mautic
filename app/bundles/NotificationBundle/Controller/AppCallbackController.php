@@ -13,8 +13,8 @@ namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AppCallbackController extends CommonController
 {
@@ -32,6 +32,6 @@ class AppCallbackController extends CommonController
             $contactRepo->saveEntity($lead);
         }
 
-        return new Response();
+        return new JsonResponse($requestBody);
     }
 }
