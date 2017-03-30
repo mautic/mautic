@@ -861,12 +861,15 @@ Mautic.cloneAndIncrementId = function(id, jQueryVariant) {
     return $clone;
 };
 
-Mautic.cloneFocusForm = function(decId){
+Mautic.cloneFocusForm = function(decId, removeFroala){
+    var rf = (typeof removeFroala == 'undefined')? true : removeFroala;
     var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
     // show if hidden
     focusForm.removeClass('fade');
-    // remove froala editor
-    focusForm.find('.fr-box').remove();
+    if (rf) {
+        // remove froala editor
+        focusForm.find('.fr-box').remove();
+    }
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').remove();
     var removeButton = focusForm.find('.remove-item');
@@ -878,7 +881,8 @@ Mautic.cloneFocusForm = function(decId){
         parentButton.click();
         var focusForm = Mautic.cloneFocusForm(decId);
         // replace focusForm
-        parent.mQuery('#slot-form-container').empty().html(focusForm);
+        parent.mQuery('#slot_dynamiccontent').find('div.tab-pane.dynamic-content').remove();
+        focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
     });
     return focusForm;
 };
@@ -902,8 +906,10 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
     newDynConButton.on('click', function(e) {
         e.stopPropagation();
         Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
-        var focusForm = Mautic.cloneFocusForm(decId);
-        parent.mQuery('#slot-form-container').empty().html(focusForm);
+        var focusForm = Mautic.cloneFocusForm(decId, false);
+        // replace focusForm
+        parent.mQuery('#slot_dynamiccontent').find('div.tab-pane.dynamic-content').remove();
+        focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
     });
 
     focusFormHeader.append(newDynConButton);
@@ -1024,7 +1030,9 @@ Mautic.initSlotListeners = function() {
             if (focusType == 'dynamicContent') {
                 // check if the DEC slot is inside another slot to show/hide padding options
                 if (clickedSlot.parents('[data-slot]').length == 0) {
-                    focusForm.prepend(Mautic.initEmailDynamicContentSlotEdit(clickedSlot));
+                    var nff = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
+                    // replace focusForm
+                    nff.insertAfter(focusForm.find('#slot_dynamiccontent > div.has-error'));
                 } else {
                     focusForm = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
                 }
@@ -1047,8 +1055,8 @@ Mautic.initSlotListeners = function() {
                 });
             }
 
-            // slotFormContainer.html(focusForm);
-            slotFormContainer.empty().append(focusForm);
+            slotFormContainer.html(focusForm);
+            // slotFormContainer.empty().append(focusForm);
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
