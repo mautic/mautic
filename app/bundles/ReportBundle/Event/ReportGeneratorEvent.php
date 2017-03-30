@@ -254,10 +254,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel)
     {
-        if ($this->hasColumn('cmp.name')
-            || $this->hasFilter('cmp.name')
-            || $this->hasColumn('clel.campaign_id')
-            || $this->hasFilter('clel.campaign_id')) {
+        $options = $this->getOptions();
+        $cmpName = 'cmp.name';
+        $cmpId   = 'clel.campaign_id';
+
+        if ($this->hasColumn($cmpName)
+            || $this->hasFilter($cmpName)
+            || $this->hasColumn($cmpId)
+            || $this->hasFilter($cmpId)
+            || (!empty($options['order'][0]
+                    && ($options['order'][0] === $cmpName
+                        || $options['order'][0] === $cmpId)))) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $prefix.'.id = clel.channel_id AND clel.channel="'.$channel.'"')
                     ->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
         }
