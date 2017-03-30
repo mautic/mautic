@@ -303,6 +303,9 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
     Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
 
     var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val()};
+    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
+        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val()};
+    }
 
     mQuery('.integration-campaigns-status').html('');
 

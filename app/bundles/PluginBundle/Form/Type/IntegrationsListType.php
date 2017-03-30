@@ -95,7 +95,7 @@ class IntegrationsListType extends AbstractType
                         }
                     }
                 }
-                if (method_exists($integrationObject, 'getCampaignMemberStatus')) {
+                if (method_exists($integrationObject, 'getCampaignMemberStatus') && isset($data['config']['campaigns'])) {
                     $campaignStatus = $integrationObject->getCampaignMemberStatus($data['config']['campaigns']);
 
                     if (isset($campaignStatus['records']) && !empty($campaignStatus['records'])) {
