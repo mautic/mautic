@@ -33,6 +33,11 @@ class PushID
     private $pushID;
 
     /**
+     * @var bool
+     */
+    private $enabled;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -56,6 +61,8 @@ class PushID
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
             ->inversedBy('pushIds')
             ->build();
+
+        $builder->createField('enabled', 'boolean')->build();
     }
 
     /**
@@ -114,6 +121,26 @@ class PushID
     public function setPushID($pushID)
     {
         $this->pushID = $pushID;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param $enabled
+     *
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
 
         return $this;
     }
