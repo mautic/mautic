@@ -258,7 +258,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
             || $this->hasFilter('cmp.name')
             || $this->hasColumn('clel.campaign_id')
             || $this->hasFilter('clel.campaign_id')) {
-            $queryBuilder->leftJoin('a', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $prefix.'.id = clel.channel_id AND clel.channel="'.$channel.'"')
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $prefix.'.id = clel.channel_id AND clel.channel="'.$channel.'"')
                     ->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
         }
 
