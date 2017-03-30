@@ -29,7 +29,7 @@ class AppCallbackController extends CommonController
 
         if ($lead) {
             $lead->addPushIDEntry($requestBody['push_id'], $requestBody['enabled']);
-            $em->persist($lead);
+            $contactRepo->saveEntity($lead);
         }
 
         return new Response();
