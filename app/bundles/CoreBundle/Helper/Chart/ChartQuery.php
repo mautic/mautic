@@ -195,13 +195,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [])
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*')
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -214,8 +214,9 @@ class ChartQuery extends AbstractChart
      * @param QueryBuilder $query
      * @param string       $column      name
      * @param string       $tablePrefix
+     * @param string       $countColumn
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't')
+    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*')
     {
         // Convert time unitst to the right form for current database platform
         $dbUnit  = $this->translateTimeUnit($this->unit);
@@ -227,7 +228,7 @@ class ChartQuery extends AbstractChart
             unset($filters['groupBy']);
         }
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
+        $query->select($dateConstruct.' AS date, COUNT('.$countColumn.') AS count')
             ->groupBy($dateConstruct.$groupBy);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
