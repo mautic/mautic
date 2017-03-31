@@ -111,18 +111,8 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-        <!-- preview URL -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <!-- recent activity -->
-                    <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
-                </div>
-            </div>
-            <div class="panel-body pt-xs">
-
-            </div>
-        </div>
+        <!-- recent activity -->
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
 
