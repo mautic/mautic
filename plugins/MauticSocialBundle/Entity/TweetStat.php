@@ -14,7 +14,7 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Lead as TheLead;
 
 /**
  * Class TweetStat.
@@ -39,7 +39,7 @@ class TweetStat
     private $tweet;
 
     /**
-     * @var Lead
+     * @var TheLead
      */
     private $lead;
 
@@ -240,7 +240,7 @@ class TweetStat
     }
 
     /**
-     * @return Lead
+     * @return TheLead
      */
     public function getLead()
     {
@@ -250,7 +250,7 @@ class TweetStat
     /**
      * @param mixed $lead
      */
-    public function setLead(Lead $lead = null)
+    public function setLead(TheLead $lead = null)
     {
         $this->lead = $lead;
     }
