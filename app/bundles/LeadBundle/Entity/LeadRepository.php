@@ -350,7 +350,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $primary = null;
 
                 foreach ($companies as $company) {
-                    if ($company['is_primary'] == 1) {
+                    if (isset($company['is_primary']) && $company['is_primary'] == 1) {
                         $primary = $company;
                     }
                 }

@@ -575,13 +575,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
-        if (empty($mappedData[$object])) {
+        if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
+            $contactFiels          = $this->cleanSalesForceData($config, $fields, 'Contact');
+            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => 'Contact']);
+            $this->amendLeadDataBeforePush($mappedData['Contact']);
+        }
+        if (empty($mappedData)) {
             return false;
         }
 
         try {
             if ($this->isAuthorized()) {
-                $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
+                $createdLeadData = $this->getApiHelper()->createLead($mappedData, $lead, $this->factory);
                 if (isset($createdLeadData['id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -1057,15 +1062,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getSalesforceLeadId($lead)
     {
+        $config = $this->mergeConfigToFeatureSettings([]);
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $result                = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'Lead', $lead->getId());
-        if (empty($result)) {
-            //try searching for lead as this has been changed before in updated done to the plugin
-            $result = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', $lead->getId());
-        }
 
-        return $result;
+        if (isset($config['objects'])) {
+            //try searching for lead as this has been changed before in updated done to the plugin
+            if (array_search('Contact', $config['objects'])) {
+                $resultContact = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
+
+                if ($reslutContact) {
+                    return $resultContact;
+                }
+            }
+        }
+        $resultLead = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', $lead->getId());
+
+        return $resultLead;
     }
 
     /**
