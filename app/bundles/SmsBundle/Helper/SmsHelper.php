@@ -15,8 +15,8 @@ use Doctrine\ORM\EntityManager;
 use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
@@ -42,9 +42,9 @@ class SmsHelper
     protected $smsModel;
 
     /**
-     * @var int
+     * @var IntegrationHelper
      */
-    protected $smsFrequencyNumber;
+    protected $integrationHelper;
 
     /**
      * SmsHelper constructor.
@@ -53,15 +53,17 @@ class SmsHelper
      * @param LeadModel         $leadModel
      * @param PhoneNumberHelper $phoneNumberHelper
      * @param SmsModel          $smsModel
-     * @param int               $smsFrequencyNumber
+     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper, SmsModel $smsModel, $smsFrequencyNumber)
+    public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper, SmsModel $smsModel, IntegrationHelper $integrationHelper)
     {
         $this->em                 = $em;
         $this->leadModel          = $leadModel;
         $this->phoneNumberHelper  = $phoneNumberHelper;
         $this->smsModel           = $smsModel;
-        $this->smsFrequencyNumber = $smsFrequencyNumber;
+        $integration              = $integrationHelper->getIntegrationObject('Twilio');
+        $settings                 = $integration->getIntegrationSettings()->getFeatureSettings();
+        $this->smsFrequencyNumber = $settings['frequency_number'];
     }
 
     public function unsubscribe($number)

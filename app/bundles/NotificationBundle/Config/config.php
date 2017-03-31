@@ -15,14 +15,11 @@ return [
             'mautic.notification.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
                     'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
                 ],
-            ],
-            'mautic.notification.configbundle.subscriber' => [
-                'class' => 'Mautic\NotificationBundle\EventListener\ConfigSubscriber',
             ],
             'mautic.notification.pagebundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
@@ -44,7 +41,10 @@ return [
                 ],
             ],
             'mautic.notification.subscriber.channel' => [
-                'class' => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+                'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
             ],
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
@@ -86,6 +86,8 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.http.connector',
+                    'mautic.page.model.trackable',
+                    'mautic.helper.integration',
                 ],
                 'alias' => 'notification_api',
             ],

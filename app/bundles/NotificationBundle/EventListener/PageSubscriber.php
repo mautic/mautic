@@ -12,10 +12,10 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -24,25 +24,25 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PageSubscriber extends CommonSubscriber
 {
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var AssetsHelper
      */
     protected $assetsHelper;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * PageSubscriber constructor.
      *
-     * @param AssetsHelper         $assetsHelper
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param AssetsHelper      $assetsHelper
+     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
     {
-        $this->assetsHelper         = $assetsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->assetsHelper      = $assetsHelper;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -60,12 +60,18 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        if (!$this->coreParametersHelper->getParameter('notification_landing_page_enabled')) {
+        $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $settings          = $integrationObject->getIntegrationSettings();
+        $keys              = $settings->getApiKeys();
+        $features          = $settings->getFeatureSettings();
+
+        if (!in_array('landing_page_enabled', $features)) {
             return;
         }
-        $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
-        $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
-        $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
+
+        $appId                      = $keys['app_id'];
+        $safariWebId                = $keys['safari_web_id'];
+        $welcomenotificationEnabled = in_array('welcome_notification_enabled', $features);
 
         $this->assetsHelper->addScript($this->router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
         $this->assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
