@@ -137,6 +137,11 @@ class MailHelper
     protected $queuedRecipients = [];
 
     /**
+     * @var array
+     */
+    public $metadata = [];
+
+    /**
      * @var string
      */
     protected $subject = '';
@@ -300,35 +305,26 @@ class MailHelper
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue();
+                $result = $this->flushQueue(['To', 'Cc', 'Bcc'], $useOwnerAsMailer);
             }
 
             return $result;
         }
 
         // Set from email
-        if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
-            if (!isset($this->lead['owner_id'])) {
-                $this->lead['owner_id'] = 0;
-            } elseif (isset($this->lead['owner_id'])) {
-                if (!isset(self::$leadOwners[$this->lead['owner_id']])) {
-                    $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id']);
-                    if ($owner) {
-                        self::$leadOwners[$owner['id']] = $owner;
-                    }
+        $ownerSignature = false;
+        if (!$isQueueFlush) {
+            if ($useOwnerAsMailer) {
+                if ($owner = $this->getContactOwner($this->lead)) {
+                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+                    $ownerSignature = $this->getContactOwnerSignature($owner);
                 } else {
-                    $owner = self::$leadOwners[$this->lead['owner_id']];
+                    $this->setFrom($this->from);
                 }
-            }
-
-            if (!empty($owner)) {
-                $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
-            } else {
+            } elseif (!$from = $this->message->getFrom()) {
                 $this->setFrom($this->from);
             }
-        } elseif (!$from = $this->message->getFrom()) {
-            $this->setFrom($this->from);
-        }
+        } // from is set in flushQueue
 
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
@@ -337,7 +333,7 @@ class MailHelper
             $this->message->setReturnPath($this->returnPath);
         }
 
-        if (empty($this->errors)) {
+        if (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Only add unsubscribe header to one-off sends as tokenized sends are built by the transport
                 $this->addUnsubscribeHeader();
@@ -362,29 +358,32 @@ class MailHelper
             $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
+                // Replace token content
+                $tokens = $this->getTokens();
+                if ($ownerSignature) {
+                    $tokens['{signature}'] = $ownerSignature;
+                }
+
                 // Set metadata if applicable
                 if (method_exists($this->message, 'addMetadata')) {
                     foreach ($this->queuedRecipients as $email => $name) {
-                        $this->message->addMetadata($email,
+                        $this->message->addMetadata(
+                            $email,
                             [
                                 'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
                                 'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
                                 'hashId'  => $this->idHash,
                                 'source'  => $this->source,
-                                'tokens'  => $this->getTokens(),
+                                'tokens'  => $tokens,
                             ]
                         );
                     }
-                } else {
-                    // Replace token content
-                    $tokens = $this->getTokens();
-                    if (!empty($tokens)) {
-                        // Replace tokens
-                        $search  = array_keys($tokens);
-                        $replace = $tokens;
+                } elseif (!empty($tokens)) {
+                    // Replace tokens
+                    $search  = array_keys($tokens);
+                    $replace = $tokens;
 
-                        self::searchReplaceTokens($search, $replace, $this->message);
-                    }
+                    self::searchReplaceTokens($search, $replace, $this->message);
                 }
             }
 
@@ -448,7 +447,9 @@ class MailHelper
 
         $error = empty($this->errors);
 
-        $this->createAssetDownloadEntries();
+        if (!$isQueueFlush) {
+            $this->createAssetDownloadEntries();
+        } // else handled in flushQueue
 
         return $error;
     }
@@ -479,19 +480,34 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $this->message->addMetadata($email,
+                $fromKey = 'default';
+                $tokens  = $this->getTokens();
+
+                if ($owner = $this->getContactOwner($this->lead)) {
+                    $fromKey = $owner['email'];
+
+                    // Override default signature with owner
+                    if ($ownerSignature = $this->getContactOwnerSignature($owner)) {
+                        $tokens['{signature}'] = $ownerSignature;
+                    }
+                }
+
+                if (!isset($this->metadata[$fromKey])) {
+                    $this->metadata[$fromKey] = [
+                        'from'     => $owner,
+                        'contacts' => [],
+                    ];
+                }
+
+                $this->metadata[$fromKey]['contacts'][$email] =
                     [
                         'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
                         'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
                         'hashId'  => $this->idHash,
                         'source'  => $this->source,
-                        'tokens'  => $this->getTokens(),
-                    ]
-                );
+                        'tokens'  => $tokens,
+                    ];
             }
-
-            // Add asset stats if applicable
-            $this->queueAssetDownloadEntry();
 
             // Reset recipients
             $this->queuedRecipients = [];
@@ -536,16 +552,57 @@ class MailHelper
     /**
      * Send batched mail to mailer.
      *
-     * @param array $resetEmailTypes Array of email types to clear after flusing the queue
+     * @param array $resetEmailTypes  Array of email types to clear after flusing the queue
+     * @param bool  $useOwnerAsMailer
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
     {
         if ($this->tokenizationEnabled) {
-            $to = $this->message->getTo();
-            if (!empty($to)) {
-                $result = $this->send(false, true);
+            if (count($this->metadata) && empty($this->fatal)) {
+                $errors             = $this->errors;
+                $errors['failures'] = [];
+
+                $result = true;
+
+                foreach ($this->metadata as $fromKey => $metadatum) {
+                    $this->errors = [];
+
+                    if ($useOwnerAsMailer && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
+                    } else {
+                        $this->setFrom($this->from);
+                    }
+
+                    foreach ($metadatum['contacts'] as $email => $contact) {
+                        $this->message->addMetadata($email, $contact);
+
+                        // Add asset stats if applicable
+                        if (!empty($contact['leadId'])) {
+                            $this->queueAssetDownloadEntry($email, $contact);
+                        }
+                    }
+
+                    if (!$this->send(false, true)) {
+                        $result = false;
+                    }
+
+                    // Clear metadata for the previous recipients
+                    $this->message->clearMetadata();
+
+                    // Merge errors
+                    if (isset($this->errors['failures'])) {
+                        $errors['failures'] = array_merge($errors['failures'], $this->errors['failures']);
+                        unset($this->errors['failures']);
+                    }
+
+                    if (!empty($this->errors)) {
+                        $errors = array_merge($errors, $this->errors);
+                    }
+                }
+
+                $this->errors = $errors;
 
                 // Clear queued to recipients
                 $this->queuedRecipients = [];
@@ -554,9 +611,6 @@ class MailHelper
                     $type = ucfirst($type);
                     $this->message->{'set'.$type}([]);
                 }
-
-                // Clear metadata for the previous recipients
-                $this->message->clearMetadata();
 
                 return $result;
             }
@@ -1221,8 +1275,7 @@ class MailHelper
      */
     public function setLead($lead, $interalSend = false)
     {
-        $this->lead = $lead;
-
+        $this->lead         = $lead;
         $this->internalSend = $interalSend;
     }
 
@@ -1252,6 +1305,9 @@ class MailHelper
         $this->source = $source;
     }
 
+    /**
+     * @return Email|null
+     */
     public function getEmail()
     {
         return $this->email;
@@ -1617,17 +1673,37 @@ class MailHelper
 
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
+     *
+     * @param null $contactEmail
+     * @param null $metadata
      */
-    protected function queueAssetDownloadEntry()
+    protected function queueAssetDownloadEntry($contactEmail = null, array $metadata = null)
     {
-        if (!$this->internalSend && !empty($this->lead) && !empty($this->assets)) {
-            $this->assetStats[$this->lead['email']] = [
-                'lead'        => $this->lead['id'],
-                'email'       => $this->email->getId(),
-                'source'      => ['email', $this->email->getId()],
-                'tracking_id' => $this->idHash,
-            ];
+        if ($this->internalSend || empty($this->assets)) {
+            return;
         }
+
+        if (null === $contactEmail) {
+            if (!$this->lead) {
+                return;
+            }
+
+            $contactEmail = $this->lead['email'];
+            $contactId    = $this->lead['id'];
+            $emailId      = $this->email->getId();
+            $idHash       = $this->idHash;
+        } else {
+            $contactId = $metadata['leadId'];
+            $emailId   = $metadata['emailId'];
+            $idHash    = $metadata['hashId'];
+        }
+
+        $this->assetStats[$contactEmail] = [
+            'lead'        => $contactId,
+            'email'       => $emailId,
+            'source'      => ['email', $emailId],
+            'tracking_id' => $idHash,
+        ];
     }
 
     /**
@@ -1875,7 +1951,7 @@ class MailHelper
      *
      * @return null|string
      */
-    private function cleanName($name)
+    protected function cleanName($name)
     {
         if (null !== $name) {
             $name = trim($name);
@@ -1887,5 +1963,43 @@ class MailHelper
         }
 
         return $name;
+    }
+
+    /**
+     * @param $contact
+     *
+     * @return bool|array
+     */
+    protected function getContactOwner(&$contact)
+    {
+        $owner = false;
+
+        if ($this->factory->getParameter('mailer_is_owner') && is_array($contact) && isset($contact['id'])) {
+            if (!isset($contact['owner_id'])) {
+                $contact['owner_id'] = 0;
+            } elseif (isset($contact['owner_id'])) {
+                if (isset(self::$leadOwners[$contact['owner_id']])) {
+                    $owner = self::$leadOwners[$contact['owner_id']];
+                } elseif ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($contact['owner_id'])) {
+                    self::$leadOwners[$owner['id']] = $owner;
+                }
+            }
+        }
+
+        return $owner;
+    }
+
+    /**
+     * @param $owner
+     *
+     * @return mixed
+     */
+    protected function getContactOwnerSignature($owner)
+    {
+        return empty($owner['signature'])
+            ? false
+            : EmojiHelper::toHtml(
+                str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
+            );
     }
 }
