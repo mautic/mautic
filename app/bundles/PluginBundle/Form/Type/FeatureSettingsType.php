@@ -83,6 +83,7 @@ class FeatureSettingsType extends AbstractType
                 'feature_settings'   => $data,
                 'ignore_field_cache' => ($page == 1) ? true : false,
             ];
+            $totalFields = 0;
             try {
                 if (empty($fields)) {
                     $fields = $integration_object->getFormLeadFields($settings);
