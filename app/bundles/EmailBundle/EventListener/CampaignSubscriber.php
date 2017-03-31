@@ -172,23 +172,26 @@ class CampaignSubscriber extends CommonSubscriber
 
         //check to see if the parent event is a "send email" event and that it matches the current email opened
         if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
-            $urlMatches = [];
-
-            // Check Landing Pages URL or Tracing Pixel URL
-            if (isset($config['url']) && $config['url']) {
-                $pageUrl     = $eventDetails->getUrl();
-                $limitToUrls = explode(',', $config['url']);
-
-                foreach ($limitToUrls as $url) {
-                    $url              = trim($url);
-                    $urlMatches[$url] = fnmatch($url, $pageUrl);
-                }
-            }
-
             if($event->getEvent()['type'] == 'email.click_link'){
-                if(in_array(true,$urlMatches) || empty($urlMatches)){
+                $urlMatches = [];
+
+                // Check Email URL
+                if (isset($config['url']) && $config['url']) {
+                    $pageUrl     = $eventDetails->getUrl();
+                    $limitToUrls = explode(',', $config['url']);
+
+                    foreach ($limitToUrls as $url) {
+                        $url              = trim($url);
+                        $urlMatches[$url] = fnmatch($url, $pageUrl);
+                    }
+                  if(in_array(true,$urlMatches) ){
+                      return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
+                  }
+                }else {
+                    // when  url is not set execute for any url
                     return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
                 }
+
             }else{
                 return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
             }
