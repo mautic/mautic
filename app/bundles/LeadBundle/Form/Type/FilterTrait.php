@@ -259,15 +259,15 @@ trait FilterTrait
         } else {
             $form->add(
                 'filter',
-                $type,
+                'text',
                 array_merge(
                     [
                         'label'          => false,
                         'attr'           => $attr,
                         'data'           => isset($data['filter']) ? $data['filter'] : '',
                         'error_bubbling' => false,
-                    ],
-                    $customOptions
+                    ]
+                  //  ,$customOptions
                 )
             );
         }
