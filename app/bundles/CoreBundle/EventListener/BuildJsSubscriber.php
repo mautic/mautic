@@ -256,9 +256,11 @@ MauticJS.setTrackedContact = function(response) {
             
         // Set the id in local storage in case cookies are only allowed for sites visited and Mautic is on a different domain
         // than the current page
-        if (window.localStorage) {
+        try {
             localStorage.setItem('mtc_id', response.id);
             localStorage.setItem('mtc_sid', response.sid);
+        } catch (e) {
+            console.warn('Browser does not allow storing in local storage');
         }
     }
 };
