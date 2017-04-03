@@ -193,7 +193,7 @@ class CampaignSubscriber extends CommonSubscriber
                 }
 
             }else{
-                return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
+                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
             }
         }
 
