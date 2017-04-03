@@ -99,26 +99,26 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data, $lead, $factory)
+    public function createLead(array $data, $lead)
     {
         $createdLeadData = [];
-        $config = $this->integration->mergeConfigToFeatureSettings([]);
+        $config          = $this->integration->mergeConfigToFeatureSettings([]);
         //search for SF id in mautic records first to avoid making an API call
         if (is_object($lead)) {
             $sfLeadRecords = $this->integration->getSalesforceLeadId($lead);
         }
         //if not found then go ahead and make an API call to find all the records with that email
-        if (isset($data['Lead']['Email']) ||   && empty($sfLeadRecords)) {
-            $queryUrl = $this->integration->getQueryUrl();
+        if (isset($data['Lead']['Email']) && empty($sfLeadRecords)) {
+            $queryUrl            = $this->integration->getQueryUrl();
             $sfRecord['records'] = [];
             //try searching for lead as this has been changed before in updated done to the plugin
             if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
                 $findContact = 'select Id from Contact where email = \''.$data['Contact']['Email'].'\'';
-                $sfRecord   = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+                $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
             }
 
             if (empty($sfRecord['records'])) {
-                $findLead = 'select Id, ConvertedContactId from Lead where email = \'' . $data['Email'] . '\'';
+                $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Email'].'\'';
                 $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
             }
             $sfLeadRecords = $sfRecord['records'];

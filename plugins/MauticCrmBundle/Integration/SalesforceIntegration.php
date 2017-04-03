@@ -390,6 +390,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $dataObject[$key.$newName] = $item;
                     }
                 }
+                print_r($object);
                 if (isset($dataObject) && $dataObject) {
                     if ($object == 'Lead' or $object == 'Contact') {
                         // Set owner so that it maps if configured to do so
@@ -586,7 +587,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $createdLeadData = $this->getApiHelper()->createLead($mappedData, $lead, $this->factory);
+                $createdLeadData = $this->getApiHelper()->createLead($mappedData, $lead);
                 if (isset($createdLeadData['id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -991,8 +992,35 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($checkEmailsInSF) {
             $findLead = 'select Id, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                 .'\')';
-            $queryUrl = $this->getQueryUrl();
-            $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $findContact = 'select Id, Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                .'\')';
+            $queryUrl  = $this->getQueryUrl();
+            $sfContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+            $sfLead    = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            //process Contacts in SF first
+            if ($sfContactRecords = $sfContact['records']) {
+                foreach ($sfContactRecords as $sfContactRecord) {
+                    $key = mb_strtolower($sfContactRecord['Email']);
+                    if (isset($checkEmailsInSF[$key])) {
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfContactRecord['Id'];
+
+                        if (empty($sfContactRecord['IsDeleted'])) {
+                            $this->buildCompositeBody(
+                                $mauticData,
+                                $availableFields,
+                                $contactSfFields,
+                                'Contact',
+                                $checkEmailsInSF[$key],
+                                $sfContactRecord['Id']
+                            );
+                        } else {
+                            // @todo - Salesforce doesn't seem to be returning deleted contacts by default
+                            $deletedSFLeads[] = $sfContactRecord['Id'];
+                        }
+                        unset($checkEmailsInSF[$key]);
+                    } // Otherwise a duplicate in Salesforce and has already been processed
+                }
+            }
             if ($sfLeadRecords = $sfLead['records']) {
                 foreach ($sfLeadRecords as $sfLeadRecord) {
                     $key = mb_strtolower($sfLeadRecord['Email']);
