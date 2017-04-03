@@ -229,7 +229,7 @@ return [
                 'alias'     => 'emailsend_list',
             ],
             'mautic.form.type.email_click' => [
-                'class' => 'Mautic\EmailBundle\Form\Type\CampaignEventPageHitType',
+                'class' => 'Mautic\EmailBundle\Form\Type\CampaignEventEmailClickType',
                 'alias' => 'campaignevent_email_click',
             ],
             'mautic.form.type.formsubmit_sendemail_admin' => [

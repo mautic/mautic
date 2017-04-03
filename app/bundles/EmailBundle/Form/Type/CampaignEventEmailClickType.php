@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * Class CampaignEventPageHitType.
  */
-class CampaignEventPageHitType extends AbstractType
+class CampaignEventEmailClickType extends AbstractType
 {
     /**
      * {@inheritdoc}
