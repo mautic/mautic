@@ -15,12 +15,28 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 /**
  * Class ConfigSubscriber
  */
 class ConfigSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * ConfigSubscriber constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     /**
      * @return array
      */
@@ -50,6 +66,15 @@ class ConfigSubscriber extends CommonSubscriber
      */
     public function onConfigBeforeSave(ConfigEvent $event)
     {
+        $data = $event->getConfig('queueconfig');
 
+        // Don't erase password if someone doesn't provide it
+        foreach ($data as $key => $value) {
+            if (empty($value) && strpos($key, 'password') !== false) {
+                $data[$key] = $this->coreParametersHelper->getParameter($key);;
+            }
+        }
+
+        $event->setConfig($data, 'queueconfig');
     }
 }

@@ -25,6 +25,9 @@ return [
             ],
             'mautic.queue.configbundle.subscriber' => [
                 'class'     => 'Mautic\QueueBundle\EventListener\ConfigSubscriber',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
         ],
         'forms' => [

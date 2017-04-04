@@ -180,13 +180,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
                     'tooltip'      => 'mautic.queue.config.rabbitmq.password.tooltip',
                     'autocomplete' => 'off',
                 ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
                 'data' => empty($options['data']['rabbitmq_password']) ? 'guest' : $options['data']['rabbitmq_password'],
             ]
         );

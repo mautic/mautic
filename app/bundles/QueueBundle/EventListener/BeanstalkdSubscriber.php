@@ -82,15 +82,15 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 ->ignore('default')
                 ->reserve();
 
-            $event = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
+            $consumerEvent = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
 
-            if ($event->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
+            if ($consumerEvent->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
                 $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
 
-            } elseif ($event->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
+            } elseif ($consumerEvent->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
                 $pheanstalk->delete($job);
 
-            } elseif ($event->getResult() === QueueConsumerResults::REJECT) {
+            } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
                 $pheanstalk->bury($job);
             }
 
