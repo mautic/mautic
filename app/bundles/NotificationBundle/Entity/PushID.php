@@ -38,6 +38,11 @@ class PushID
     private $enabled;
 
     /**
+     * @var bool
+     */
+    private $mobile;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -63,6 +68,7 @@ class PushID
             ->build();
 
         $builder->createField('enabled', 'boolean')->build();
+        $builder->createField('mobile', 'boolean')->build();
     }
 
     /**
@@ -141,6 +147,26 @@ class PushID
     public function setEnabled($enabled)
     {
         $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
 
         return $this;
     }

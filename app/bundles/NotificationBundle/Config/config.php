@@ -25,7 +25,7 @@ return [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.core.js.subscriber' => [
@@ -115,6 +115,18 @@ return [
                 'path'       => '/notifications/view/{objectId}/contact/{page}',
                 'controller' => 'MauticNotificationBundle:Notification:contacts',
             ],
+            'mautic_mobile_notification_index' => [
+                'path'       => '/mobile_notifications/{page}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:index',
+            ],
+            'mautic_mobile_notification_action' => [
+                'path'       => '/mobile_notifications/{objectAction}/{objectId}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:execute',
+            ],
+            'mautic_mobile_notification_contacts' => [
+                'path'       => '/mobile_notifications/view/{objectId}/contact/{page}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:contacts',
+            ],
         ],
         'public' => [
             'mautic_receive_notification' => [
@@ -164,8 +176,26 @@ return [
                     'route'  => 'mautic_notification_index',
                     'access' => ['notification:notifications:viewown', 'notification:notifications:viewother'],
                     'checks' => [
-                        'parameters' => [
-                            'notification_enabled' => true,
+                        'integration' => [
+                            'OneSignal' => [
+                                'enabled' => true,
+                            ],
+                        ],
+                    ],
+                    'parent'   => 'mautic.core.channels',
+                    'priority' => 80,
+                ],
+                'mautic.notification.mobile_notifications' => [
+                    'route'  => 'mautic_mobile_notification_index',
+                    'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewother'],
+                    'checks' => [
+                        'integration' => [
+                            'OneSignal' => [
+                                'enabled'  => true,
+                                'features' => [
+                                    'mobile',
+                                ],
+                            ],
                         ],
                     ],
                     'parent'   => 'mautic.core.channels',

@@ -108,6 +108,11 @@ class Notification extends FormEntity
      */
     private $notificationType = 'template';
 
+    /**
+     * @var bool
+     */
+    private $mobile;
+
     public function __clone()
     {
         $this->id        = null;
@@ -196,6 +201,8 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
     }
 
     /**
@@ -590,5 +597,25 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
     }
 }

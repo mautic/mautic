@@ -38,5 +38,7 @@ class Version20170330165232 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE '.$this->prefix.'push_ids ADD enabled TINYINT(1) NOT NULL;');
+        $this->addSql('ALTER TABLE '.$this->prefix.'push_ids ADD mobile TINYINT(1) NOT NULL;');
+        $this->addSql('ALTER_TABLE '.$this->prefix.'push_notifications ADD mobile TINYINT(1) NOT NULL;');
     }
 }

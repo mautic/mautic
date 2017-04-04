@@ -947,11 +947,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param string $identifier
+     * @param      $identifier
+     * @param bool $enabled
+     * @param bool $mobile
      *
      * @return $this
      */
-    public function addPushIDEntry($identifier, $enabled = true)
+    public function addPushIDEntry($identifier, $enabled = true, $mobile = false)
     {
         $entity = new PushID();
 
@@ -970,6 +972,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $entity->setPushID($identifier);
         $entity->setLead($this);
         $entity->setEnabled($enabled);
+        $entity->setMobile($mobile);
 
         $this->addPushID($entity);
 

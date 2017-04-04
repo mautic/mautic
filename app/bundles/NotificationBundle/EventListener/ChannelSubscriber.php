@@ -68,9 +68,35 @@ class ChannelSubscriber extends CommonSubscriber
                         ],
                         'lookupFormType' => 'notification_list',
                         'repository'     => 'MauticNotificationBundle:Notification',
+                        'lookupOptions'  => [
+                            'mobile'  => false,
+                            'desktop' => true,
+                        ],
                     ],
                     ReportModel::CHANNEL_FEATURE => [
                         'table' => 'push_notifications',
+                    ],
+                ]
+            );
+        }
+
+        if (!empty($this->params['notification_enabled'])) {
+            $event->addChannel(
+                'mobile_notification',
+                [
+                    MessageModel::CHANNEL_FEATURE => [
+                        'campaignAction'             => 'notification.send_mobile_notification',
+                        'campaignDecisionsSupported' => [
+                            'page.pagehit',
+                            'asset.download',
+                            'form.submit',
+                        ],
+                        'lookupFormType' => 'notification_list',
+                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'lookupOptions'  => [
+                            'mobile'  => true,
+                            'desktop' => false,
+                        ],
                     ],
                 ]
             );

@@ -39,6 +39,15 @@ class OneSignalIntegration extends AbstractIntegration
         return 'app/bundles/NotificationBundle/Assets/img/OneSignal.png';
     }
 
+    public function getSupportedFeatures()
+    {
+        return [
+            'mobile',
+            'ios',
+            'android',
+        ];
+    }
+
     /**
      * {@inheritdoc}
      *

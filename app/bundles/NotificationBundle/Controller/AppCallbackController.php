@@ -36,7 +36,7 @@ class AppCallbackController extends CommonController
             $contact->setLastActive(new \DateTime());
         }
 
-        $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled']);
+        $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled'], true);
         $contactRepo->saveEntity($contact);
 
         return new JsonResponse($requestBody);

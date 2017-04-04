@@ -89,6 +89,23 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addAction(
+                'notification.send_mobile_notification',
+                [
+                    'label'            => 'mautic.notification.campaign.send_mobile_notification',
+                    'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
+                    'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'formType'         => 'notificationsend_list',
+                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
+                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
+                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'channel'          => 'mobile_notification',
+                    'channelIdField'   => 'mobile_notification',
+                ]
+            );
+        }
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+            $event->addAction(
                 'notification.send_notification',
                 [
                     'label'            => 'mautic.notification.campaign.send_notification',
