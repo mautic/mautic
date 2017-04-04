@@ -2,6 +2,7 @@
 
 namespace Mautic\QueueBundle\Helper;
 
+use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueService;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -28,7 +29,19 @@ class RabbitMqConsumer implements ConsumerInterface
      */
     public function execute(AMQPMessage $msg)
     {
-        $this->queueService->dispatchConsumerEventFromPayload($msg->body);
-        return true;
+        $event = $this->queueService->dispatchConsumerEventFromPayload($msg->body);
+
+        if ($event->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
+            return static::MSG_REJECT_REQUEUE;
+
+        } elseif ($event->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
+            return static::MSG_ACK;
+
+        } elseif ($event->getResult() === QueueConsumerResults::REJECT) {
+            return static::MSG_REJECT;
+
+        } else {
+            return static::MSG_SINGLE_NACK_REQUEUE;
+        }
     }
 }

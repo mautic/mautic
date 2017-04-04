@@ -19,6 +19,7 @@ use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
+use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 
 /**
@@ -172,5 +173,6 @@ class PageSubscriber extends CommonSubscriber
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
         $this->pageModel->hitPage($hit, $page, $request, $trackingNewlyGenerated);
+        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }

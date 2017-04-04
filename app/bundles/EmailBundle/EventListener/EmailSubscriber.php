@@ -19,6 +19,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
+use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 
 /**
@@ -213,5 +214,6 @@ class EmailSubscriber extends CommonSubscriber
         $request = $payload['request'];
         $idHash = $payload['idHash'];
         $this->emailModel->hitEmail($idHash, $request);
+        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }

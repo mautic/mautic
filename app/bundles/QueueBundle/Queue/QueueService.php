@@ -70,6 +70,7 @@ class QueueService
 
     /**
      * @param string $payload
+     * @return QueueConsumerEvent
      */
     public function dispatchConsumerEventFromPayload($payload)
     {
@@ -82,6 +83,7 @@ class QueueService
 
         $event = new QueueConsumerEvent($payload);
         $this->eventDispatcher->dispatch($eventName, $event);
+        return $event;
     }
 
     /**

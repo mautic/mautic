@@ -12,8 +12,10 @@
 namespace Mautic\QueueBundle\EventListener;
 
 use Mautic\QueueBundle\Event as Events;
+use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Mautic\QueueBundle\Queue\QueueService;
+use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -22,6 +24,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
 {
+    const DELAY_DURATION = 60;
+
     /**
      * @var string
      */
@@ -78,9 +82,17 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 ->ignore('default')
                 ->reserve();
 
-            $this->queueService->dispatchConsumerEventFromPayload($job->getData());
+            $event = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
 
-            $pheanstalk->delete($job);
+            if ($event->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
+                $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
+
+            } elseif ($event->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
+                $pheanstalk->delete($job);
+
+            } elseif ($event->getResult() === QueueConsumerResults::REJECT) {
+                $pheanstalk->bury($job);
+            }
 
             $messagesConsumed++;
         }
