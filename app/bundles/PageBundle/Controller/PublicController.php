@@ -422,7 +422,7 @@ class PublicController extends CommonFormController
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+        $this->hitPage($model, null, $this->request);
 
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');

@@ -12,16 +12,12 @@
 namespace Mautic\QueueBundle\EventListener;
 
 use Mautic\QueueBundle\Event as Events;
-use Mautic\QueueBundle\Model\RabbitMqConsumer;
-use Mautic\QueueBundle\Model\RabbitMqProducer;
 use Mautic\QueueBundle\Queue\QueueProtocol;
-use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 /**
- * Class RabbitMqSubscriber
+ * Class RabbitMqSubscriber.
  */
 class RabbitMqSubscriber extends AbstractQueueSubscriber
 {
@@ -42,6 +38,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
     /**
      * RabbitMqSubscriber constructor.
+     *
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -76,6 +73,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     public function buildConfig(Events\QueueConfigEvent $event)
     {
+        $options        = $event->getOptions();
         $showConditions = '{"config_queueconfig_queue_protocol":["rabbitmq"]}';
 
         $event->addFormField(
@@ -85,9 +83,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.host.tooltip',
+                    'tooltip'      => 'mautic.queue.config.host.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -107,9 +105,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.port.tooltip',
+                    'tooltip'      => 'mautic.queue.config.port.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -129,9 +127,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.rabbitmq.vhost',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.rabbitmq.vhost.tooltip',
+                    'tooltip'      => 'mautic.queue.config.rabbitmq.vhost.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -151,9 +149,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.rabbitmq.user',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.rabbitmq.user.tooltip',
+                    'tooltip'      => 'mautic.queue.config.rabbitmq.user.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(

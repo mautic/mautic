@@ -51,13 +51,10 @@ class ConsumeQueueCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $container    = $this->getContainer();
+        $queueService = $container->get('mautic.queue.service');
 
-        $parametersHelper  = $container->get('mautic.helper.core_parameters');
-        $useQueue = $parametersHelper->getParameter('use_queue');
-
-        // check to make sure we are in queue mode
-        if (!$useQueue) {
+        if (!$queueService->isQueueEnabled()) {
             $output->writeLn('You have not configured mautic to use queue mode, nothing will be processed');
 
             return 0;
@@ -77,8 +74,8 @@ class ConsumeQueueCommand extends ContainerAwareCommand
             return 0;
         }
 
-        $queueService = $container->get('mautic.queue.service');
         $queueService->consumeFromQueue($queueName, $messages);
+
         return 0;
     }
 }

@@ -52,8 +52,6 @@ return [
         ],
     ],
     'parameters' => [
-        'use_queue'            => false,
-        'track_mail_use_queue' => false,
         'queue_protocol'       => '',
         'rabbitmq_host'        => 'localhost',
         'rabbitmq_port'        => '5672',

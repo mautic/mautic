@@ -759,22 +759,6 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-
-        $builder->add(
-            'track_mail_use_queue',
-            'yesno_button_group',
-            array(
-                'label'      => 'mautic.email.config.track.mail.use.queue',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'      => 'form-control',
-                    'tooltip'    => 'mautic.email.config.track.mail.use.queue.tooltip',
-                    // 'onChange' => 'Mautic.testQueueConnection()'
-                ),
-                'data'       => empty($options['data']['track_mail_use_queue']) ? false : true,
-                'required'   => false
-            )
-        );
     }
 
     /**

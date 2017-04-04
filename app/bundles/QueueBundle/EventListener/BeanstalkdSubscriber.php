@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class BeanstalkdSubscriber
+ * Class BeanstalkdSubscriber.
  */
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
 {
@@ -48,13 +48,14 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
     /**
      * BeanstalkdSubscriber constructor.
+     *
      * @param ContainerInterface $container
-     * @param QueueService $queueService
+     * @param QueueService       $queueService
      */
     public function __construct(ContainerInterface $container, QueueService $queueService)
     {
         // The container is needed due to non-required binding of pheanstalk
-        $this->container = $container;
+        $this->container    = $container;
         $this->queueService = $queueService;
     }
 
@@ -77,7 +78,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         while ($event->getMessages() === null || $event->getMessages() > $messagesConsumed) {
             $pheanstalk = $this->container->get('leezy.pheanstalk');
-            $job = $pheanstalk
+            $job        = $pheanstalk
                 ->watch($event->getQueueName())
                 ->ignore('default')
                 ->reserve();
@@ -86,15 +87,13 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
             if ($consumerEvent->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
                 $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
-
             } elseif ($consumerEvent->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
                 $pheanstalk->delete($job);
-
             } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
                 $pheanstalk->bury($job);
             }
 
-            $messagesConsumed++;
+            ++$messagesConsumed;
         }
     }
 
@@ -103,6 +102,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
      */
     public function buildConfig(Events\QueueConfigEvent $event)
     {
+        $options        = $event->getOptions();
         $showConditions = '{"config_queueconfig_queue_protocol":["beanstalkd"]}';
 
         $event->addFormField(
@@ -112,9 +112,9 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.host.tooltip',
+                    'tooltip'      => 'mautic.queue.config.host.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -134,9 +134,9 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.port.tooltip',
+                    'tooltip'      => 'mautic.queue.config.port.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -156,9 +156,9 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 'label'      => 'mautic.queue.config.beanstalkd.timeout',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
+                    'class'        => 'form-control',
                     'data-show-on' => $showConditions,
-                    'tooltip' => 'mautic.queue.config.beanstalkd.timeout.tooltip',
+                    'tooltip'      => 'mautic.queue.config.beanstalkd.timeout.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(

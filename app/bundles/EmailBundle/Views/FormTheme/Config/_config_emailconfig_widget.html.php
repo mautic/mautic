@@ -176,14 +176,3 @@ $template  = '<div class="col-md-6">{content}</div>';
     </div>
 </div>
 
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.queue'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.config.alert.queue'); ?></div>
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'track_mail_use_queue', $template); ?>
-        </div>
-    </div>
-</div>
