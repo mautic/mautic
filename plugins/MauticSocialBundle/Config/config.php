@@ -181,6 +181,13 @@ return [
                 'access'   => ['plugin:mauticSocial:tweets:viewown', 'plugin:mauticSocial:tweets:viewother'],
                 'parent'   => 'mautic.core.channels',
                 'priority' => 80,
+                'checks'   => [
+                    'integration' => [
+                        'Twitter' => [
+                            'enabled' => true,
+                        ],
+                    ],
+                ],
             ],
         ],
     ],
