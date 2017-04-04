@@ -197,7 +197,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Separator',
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot',
+                'slot_separator',
                 400
             );
         }
