@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\DataCollectorTranslator;
 
 class ThemeHelper
 {
@@ -27,6 +28,11 @@ class ThemeHelper
      * @var TemplatingHelper
      */
     private $templatingHelper;
+
+    /**
+     * @var DataCollectorTranslator
+     */
+    private $translator;
 
     /**
      * @var array|mixed
@@ -54,15 +60,34 @@ class ThemeHelper
     private $themeHelpers = [];
 
     /**
+     * Default themes which cannot be deleted.
+     *
+     * @var array
+     */
+    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank', 'system'];
+
+    /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper      $pathsHelper
-     * @param TemplatingHelper $templatingHelper
+     * @param PathsHelper             $pathsHelper
+     * @param TemplatingHelper        $templatingHelper
+     * @param DataCollectorTranslator $translator
      */
-    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, DataCollectorTranslator $translator)
     {
         $this->pathsHelper      = $pathsHelper;
         $this->templatingHelper = $templatingHelper;
+        $this->translator       = $translator;
+    }
+
+    /**
+     * Get theme names which are stock Mautic.
+     *
+     * @return array
+     */
+    public function getDefaultThemes()
+    {
+        return $this->defaultThemes;
     }
 
     /**
@@ -253,10 +278,12 @@ class ThemeHelper
     /**
      * @param string $specificFeature
      * @param bool   $extended        returns extended information about the themes
+     * @param bool   $ignoreCache     true to get the fresh info
+     * @param bool   $includeDirs     true to get the theme dir details
      *
      * @return mixed
      */
-    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false)
+    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
         if (empty($this->themes[$specificFeature]) || $ignoreCache === true) {
             $dir      = $this->pathsHelper->getSystemPath('themes', true);
@@ -283,13 +310,16 @@ class ThemeHelper
                 }
 
                 if ($addTheme) {
-                    $this->themes[$specificFeature][$theme->getBasename()]                       = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]                   = [];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name']           = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key']            = $theme->getBasename();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']            = $theme->getRealPath();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config']         = $config;
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes', false);
+                    $this->themes[$specificFeature][$theme->getBasename()]               = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]           = [];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name']   = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key']    = $theme->getBasename();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
+
+                    if ($includeDirs) {
+                        $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']            = $theme->getRealPath();
+                        $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes', false);
+                    }
                 }
             }
         }
@@ -369,6 +399,13 @@ class ThemeHelper
         }
 
         $themeName = basename($zipFile, '.zip');
+
+        if (in_array($themeName, $this->getDefaultThemes())) {
+            throw new \Exception(
+                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
+            );
+        }
+
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $zipper    = new \ZipArchive();
         $archive   = $zipper->open($zipFile);
