@@ -9,6 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
+<div class="row">
+    <div class="col-xs-4">
+        <?php echo $view['form']->row($form['daily_max_limit']); ?>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-xs-<?php echo isset($form['email_type']) ? 7 : 12; ?>">

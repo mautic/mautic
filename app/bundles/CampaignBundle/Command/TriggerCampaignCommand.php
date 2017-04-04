@@ -121,6 +121,15 @@ class TriggerCampaignCommand extends ModeratedCommand
                         '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
                     );
                 }
+
+                if ((!$max || $totalProcessed < $max) && !$scheduleOnly) {
+                    //find and trigger queued events
+                    $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.queued').'</comment>');
+                    $processed = $model->triggerQueuedEvents($campaign, $totalProcessed, $batch, $max, $output);
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'."\n"
+                    );
+                }
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
@@ -180,6 +189,18 @@ class TriggerCampaignCommand extends ModeratedCommand
                             ."\n"
                         );
                     }
+
+                    if ($max && $totalProcessed >= $max) {
+                        continue;
+                    }
+
+                    //find and trigger queued events
+                    $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.queued').'</comment>');
+                    $processed = $model->triggerQueuedEvents($c, $totalProcessed, $batch, $max, $output);
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => $processed]).'</comment>'
+                        ."\n"
+                    );
                 }
 
                 $em->detach($c);

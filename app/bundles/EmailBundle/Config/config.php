@@ -124,6 +124,7 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.campaign.model.event_daily_send_log',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [

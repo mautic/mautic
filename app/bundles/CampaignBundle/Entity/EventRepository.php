@@ -314,6 +314,76 @@ class EventRepository extends CommonRepository
     }
 
     /**
+     * Get a list of queued events.
+     *
+     * @param     $campaignId
+     * @param int $limit
+     *
+     * @return array|bool
+     */
+    public function getQueuedEvents($campaignId, $limit = 0)
+    {
+        $qb = $this->getQueuedEventsQuery($campaignId);
+
+        $qb->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
+            ->orderBy('o.triggerDate', 'DESC');
+
+        if ($limit) {
+            $qb->setFirstResult(0)
+                ->setMaxResults($limit);
+        }
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        // Organize by lead
+        $logs = [];
+        foreach ($results as $e) {
+            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
+        }
+        unset($results);
+
+        return $logs;
+    }
+
+    /**
+     * Get a list of queued events.
+     *
+     * @param   $campaignId
+     *
+     * @return array|bool
+     */
+    public function getQueuedEventsCount($campaignId)
+    {
+        $qb = $this->getQueuedEventsQuery($campaignId);
+
+        $qb->select('COUNT(o) as event_count');
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function getQueuedEventsQuery($campaignId)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->from('MauticCampaignBundle:LeadEventLog', 'o');
+
+        $qb
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('IDENTITY(o.campaign)', (int) $campaignId),
+                    $qb->expr()->eq('o.isQueued', ':true')
+                )
+            )
+            ->setParameter('true', true, 'boolean');
+
+        return $qb;
+    }
+
+    /**
      * @param $campaignId
      *
      * @return array

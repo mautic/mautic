@@ -83,6 +83,7 @@ class LeadEventLogRepository extends CommonRepository
                     ll.metadata,
                     e.type,
                     ll.is_scheduled as isScheduled,
+                    ll.is_queued as isQueued,
                     ll.trigger_date as triggerDate,
                     ll.channel,
                     ll.channel_id as channel_id
@@ -113,6 +114,13 @@ class LeadEventLogRepository extends CommonRepository
                 );
             }
             $query->setParameter('scheduled', $options['scheduledState'], 'boolean');
+        }
+
+        if (isset($options['queuedState']) && $options['queuedState']) {
+            $query->andWhere(
+                $query->expr()->eq('ll.is_queued', ':queued')
+            );
+            $query->setParameter('queued', $options['queuedState'], 'boolean');
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -206,7 +214,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $includeQueued = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
                        ->select('o.event_id, count(o.lead_id) as lead_count')
@@ -232,9 +240,16 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
+        if ($includeQueued) {
+            $expr->add(
+                $q->expr()->eq('o.is_queued', ':true')
+            );
+        }
+
         $q->where($expr)
-          ->setParameter('false', false, 'boolean')
-          ->groupBy('o.event_id');
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('true', true, 'boolean')
+            ->groupBy('o.event_id');
 
         $results = $q->execute()->fetchAll();
 

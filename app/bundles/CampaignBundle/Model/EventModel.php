@@ -748,6 +748,189 @@ class EventModel extends CommonFormModel
     }
 
     /**
+     * Find and trigger queued events.
+     *
+     * @param Campaign        $campaign
+     * @param int             $totalEventCount
+     * @param int             $limit
+     * @param bool            $max
+     * @param OutputInterface $output
+     * @param bool|false      $returnCounts    If true, returns array of counters
+     *
+     * @return mixed
+     */
+    public function triggerQueuedEvents(
+        $campaign,
+        &$totalEventCount = 0,
+        $limit = 100,
+        $max = false,
+        OutputInterface $output = null,
+        $returnCounts = false
+    ) {
+        $campaignId   = $campaign->getId();
+        $campaignName = $campaign->getName();
+        $repo         = $this->getRepository();
+
+        $totalQueuedEventsCount = $repo->getQueuedEventsCount($campaignId);
+
+        if ($output) {
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    ['%events%' => $totalQueuedEventsCount, '%batch%' => $limit]
+                )
+            );
+        }
+
+        if (empty($totalQueuedEventsCount)) {
+            $this->logger->debug('CAMPAIGN: No events to trigger');
+
+            return ($returnCounts) ? $this->getCountsArray() : 0;
+        }
+
+        $maxCount = ($max) ? $max : $totalQueuedEventsCount;
+
+        // Event settings
+        $eventSettings = $this->campaignModel->getEvents();
+
+        // Get events to avoid joins
+        $campaignEvents = $repo->getCampaignActionAndConditionEvents($campaignId);
+
+        // Try to save some memory
+        gc_enable();
+
+        if ($output) {
+            $progress = ProgressBarHelper::init($output, $maxCount);
+            $progress->start();
+            if ($max) {
+                $progress->setProgress($totalQueuedEventsCount);
+            }
+        }
+
+        $evaluatedEventCount = $executedEventCount = $queuedExecutedCount = $queuedEvaluatedCount = 0;
+        $batchDebugCounter   = 1;
+        $sleepBatchCount     = 0;
+
+        while ($queuedEvaluatedCount < $totalQueuedEventsCount) {
+            $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+
+            $queuedEvents = $repo->getQueuedEvents($campaignId, $limit);
+
+            if (empty($queuedEvents)) {
+                unset($campaignEvents, $queuedEvents, $leads, $eventSettings);
+
+                $counts = $this->getCountsArray($totalQueuedEventsCount, $queuedEvaluatedCount, $queuedExecutedCount, $evaluatedEventCount, $executedEventCount);
+                $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+
+                return ($returnCounts) ? $counts : $executedEventCount;
+            }
+
+            // Get leads by Events
+            $leads = $this->getLeadsByEvents($queuedEvents);
+
+            if (!count($leads)) {
+                // Just a precaution in case non-existent leads are lingering in the campaign leads table
+                $this->logger->debug('CAMPAIGN: No contacts entities found');
+
+                return ($returnCounts) ? $this->getCountsArray() : 0;
+            }
+
+            $this->logger->debug('CAMPAIGN: Processing the following contacts '.implode(', ', array_keys($queuedEvents)));
+
+            foreach ($queuedEvents as $leadId => $leadEvents) {
+                if (!isset($leads[$leadId])) {
+                    $this->logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
+
+                    continue;
+                }
+
+                $lead = $leads[$leadId];
+
+                foreach ($leadEvents as $logData) {
+                    ++$queuedEvaluatedCount;
+
+                    $event = $campaignEvents[$logData['event_id']];
+
+                    // Set campaign ID
+                    $event['campaign'] = [
+                        'id'   => $campaignId,
+                        'name' => $campaignName,
+                    ];
+
+                    if ($sleepBatchCount == $limit) {
+                        // Keep CPU down
+                        $this->batchSleep();
+                        $sleepBatchCount = 0;
+                    } else {
+                        ++$sleepBatchCount;
+                    }
+
+                    $result = $this->executeEvent(
+                        $event,
+                        $campaign,
+                        $lead,
+                        $eventSettings,
+                        false,
+                        null,
+                        true,
+                        $logData['id'],
+                        $evaluatedEventCount,
+                        $executedEventCount,
+                        $totalEventCount
+                    );
+
+                    if ($result) {
+                        ++$queuedExecutedCount;
+                    }
+
+                    if ($max && $totalEventCount >= $max) {
+                        unset($campaignEvents, $event, $leads, $eventSettings);
+
+                        if ($output) {
+                            $progress->finish();
+                            $output->writeln('');
+                        }
+
+                        $this->logger->debug('CAMPAIGN: Max count hit so aborting.');
+
+                        // Hit the max, bye bye
+
+                        $counts = $this->getCountsArray($totalQueuedEventsCount, $queuedEvaluatedCount, $queuedExecutedCount, $evaluatedEventCount, $executedEventCount);
+                        $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+
+                        return ($returnCounts) ? $counts : $executedEventCount;
+                    } elseif ($output) {
+                        $currentCount = ($max) ? $totalEventCount : $evaluatedEventCount;
+                        $progress->setProgress($currentCount);
+                    }
+                }
+            }
+
+            // Free RAM
+            $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+            $this->em->clear('Mautic\UserBundle\Entity\User');
+            unset($events, $leads);
+
+            // Free some memory
+            gc_collect_cycles();
+
+            ++$batchDebugCounter;
+
+            $this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
+        }
+
+        if ($output) {
+            $progress->finish();
+            $output->writeln('');
+        }
+
+        $counts = $this->getCountsArray($totalQueuedEventsCount, $queuedEvaluatedCount, $queuedExecutedCount, $evaluatedEventCount, $executedEventCount);
+        $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
+
+        return ($returnCounts) ? $counts : $queuedExecutedCount;
+    }
+
+    /**
      * @param Campaign        $campaign
      * @param                 $totalEventCount
      * @param int             $limit
@@ -755,7 +938,7 @@ class EventModel extends CommonFormModel
      * @param OutputInterface $output
      * @param bool|false      $returnCounts    If true, returns array of counters
      *
-     * @return int
+     * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1480,6 +1663,52 @@ class EventModel extends CommonFormModel
     }
 
     /**
+     * @param int $events
+     * @param int $evaluated
+     * @param int $executed
+     * @param int $totalEvaluated
+     * @param int $totalExecuted
+     *
+     * @return array
+     */
+    private function getCountsArray($events = 0, $evaluated = 0, $executed = 0, $totalEvaluated = 0, $totalExecuted = 0)
+    {
+        return [
+            'events'         => $events,
+            'evaluated'      => $evaluated,
+            'executed'       => $executed,
+            'totalEvaluated' => $totalEvaluated,
+            'totalExecuted'  => $totalExecuted,
+        ];
+    }
+
+    /**
+     * @param $events
+     *
+     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    private function getLeadsByEvents($events)
+    {
+        return $this->leadModel->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => array_keys($events),
+                        ],
+                    ],
+                ],
+                'orderBy'            => 'l.id',
+                'orderByDir'         => 'asc',
+                'withPrimaryCompany' => true,
+                'withChannelRules'   => true,
+            ]
+        );
+    }
+
+    /**
      * Execute or schedule an event. Condition events are executed recursively.
      *
      * @param array          $event
@@ -1733,6 +1962,16 @@ class EventModel extends CommonFormModel
                 ++$executedEventCount;
 
                 if ($response !== true) {
+                    if (isset($response['queued']) && $response['queued'] == 1) {
+                        $log->setIsQueued(true);
+                        $logRepo->saveEntity($log);
+
+                        $this->em->detach($log);
+                        unset($log);
+
+                        return $result;
+                    }
+
                     if ($this->triggeredResponses !== false) {
                         $eventTypeKey = $event['eventType'];
                         $typeKey      = $event['type'];
@@ -1753,6 +1992,8 @@ class EventModel extends CommonFormModel
                     }
 
                     $log->setMetadata($response);
+                } else {
+                    $log->setIsQueued(false);
                 }
 
                 $logRepo->saveEntity($log);

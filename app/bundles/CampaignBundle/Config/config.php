@@ -233,6 +233,10 @@ return [
                     'mautic.campaign.model.campaign',
                 ],
             ],
+            'mautic.campaign.model.event_daily_send_log' => [
+                'class'     => 'Mautic\CampaignBundle\Model\EventDailySendModel',
+                'arguments' => [],
+            ],
         ],
     ],
     'parameters' => [

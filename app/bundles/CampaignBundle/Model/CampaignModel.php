@@ -1269,15 +1269,17 @@ class CampaignModel extends CommonFormModel
 
             if ($events) {
                 foreach ($events as $type => $eventIds) {
-                    $filter['event_id'] = $eventIds;
-                    $q                  = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                    $rawData            = $q->execute()->fetchAll();
+                    $filter['is_scheduled'] = 0;
+                    $filter['is_queued']    = 0;
+                    $filter['event_id']     = $eventIds;
+                    $q                      = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                    $rawData                = $q->execute()->fetchAll();
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);
                         $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);
                     }
                 }
-                unset($filter['event_id']);
+                unset($filter['event_id'], $filter['is_queued'], $filter['is_scheduled']);
             }
         }
 

@@ -643,16 +643,20 @@ class CampaignController extends AbstractStandardFormController
                 $events       = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
 
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true);
-                $sortedEvents      = [
+                $campaignLogCounts       = $eventLogRepo->getCampaignLogCounts($entity->getId(), true, false);
+                $campaignLogQueuedCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true, true);
+                $sortedEvents            = [
                     'decision'  => [],
                     'action'    => [],
                     'condition' => [],
                     'message'   => [],
                 ];
                 foreach ($events as $event) {
-                    $event['logCount']                   = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
+                    $event['queuedCount']                = (isset($campaignLogQueuedCounts[$event['id']])) ? (int) $campaignLogQueuedCounts[$event['id']] : 0;
+                    $event['logCount']                   = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] - $event['queuedCount'] : 0;
                     $event['percent']                    = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
+                    $event['percentQueued']              = ($leadCount) ? round($event['queuedCount'] / $leadCount * 100) : 0;
+                    $event['leadCount']                  = ($leadCount) ? $leadCount : 0;
                     $sortedEvents[$event['eventType']][] = $event;
                 }
 

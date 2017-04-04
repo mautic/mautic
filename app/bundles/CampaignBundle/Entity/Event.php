@@ -134,10 +134,16 @@ class Event
      */
     private $changes;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $dailySendLog;
+
     public function __construct()
     {
-        $this->log      = new ArrayCollection();
-        $this->children = new ArrayCollection();
+        $this->log          = new ArrayCollection();
+        $this->children     = new ArrayCollection();
+        $this->dailySendLog = new ArrayCollection();
     }
 
     /**
@@ -245,6 +251,12 @@ class Event
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
             ->nullable()
+            ->build();
+
+        $builder->createOneToMany('dailySendLog', 'EventDailySendLog')
+            ->mappedBy('event')
+            ->cascadeAll()
+            ->fetchExtraLazy()
             ->build();
     }
 
@@ -832,5 +844,44 @@ class Event
         $this->contactLog[] = $contactLog;
 
         return $this;
+    }
+
+    /**
+     * @param                   $key
+     * @param EventDailySendLog $dailySendLog
+     *
+     * @return Event
+     */
+    public function addDailySendLog($key, EventDailySendLog $dailySendLog)
+    {
+        $this->dailySendLog[$key] = $dailySendLog;
+
+        return $this;
+    }
+
+    /**
+     * @return EventDailySendLog
+     */
+    public function getDailySendLog()
+    {
+        return $this->dailySendLog;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDailyLimit()
+    {
+        $properties = $this->getProperties();
+
+        return isset($properties['daily_max_limit']) ? (int) $properties['daily_max_limit'] : 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLimited()
+    {
+        return $this->getDailyLimit() > 0;
     }
 }

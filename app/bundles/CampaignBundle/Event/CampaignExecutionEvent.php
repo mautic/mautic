@@ -171,6 +171,20 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
+     * @param int $queued
+     *
+     * @return $this
+     */
+    public function setQueued($queued = 0)
+    {
+        $this->result = [
+            'queued' => $queued,
+        ];
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getEventSettings()
