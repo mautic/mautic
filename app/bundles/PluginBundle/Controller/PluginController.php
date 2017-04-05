@@ -183,7 +183,7 @@ class PluginController extends FormController
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
                 $currentFeatureSettings = $entity->getFeatureSettings();
 
-                if ($valid = $this->isFormValid($form)) {
+                if ($authorize || $valid = $this->isFormValid($form)) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
 
