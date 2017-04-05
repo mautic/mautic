@@ -59,20 +59,32 @@ class MobileNotificationDetailsType extends AbstractType
                     'required' => false,
                 ]
             );
+            $builder->add(
+                'ios_sound',
+                TextType::class,
+                [
+                    'label' => 'mautic.notification.form.mobile.ios_sound',
+                    'attr'  => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.notification.form.mobile.ios_sound.tooltip',
+                    ],
+                    'required' => false,
+                ]
+            );
 
             $builder->add(
                 'ios_badges',
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'set'       => 'mautic.notification.form.mobile.ios_badges.set',
-                        'increment' => 'mautic.notification.form.mobile.ios_badges.increment',
+                        'SetTo'    => 'mautic.notification.form.mobile.ios_badges.set',
+                        'Increase' => 'mautic.notification.form.mobile.ios_badges.increment',
                     ],
                     'attr' => [
                         'tooltip' => 'mautic.notification.form.mobile.ios_badges.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.ios_badges',
-                    'empty_data'  => null,
+                    'empty_data'  => 'None',
                     'required'    => false,
                     'placeholder' => 'mautic.notification.form.mobile.ios_badges.placeholder',
                     'expanded'    => true,
@@ -230,14 +242,14 @@ class MobileNotificationDetailsType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'set'       => 'mautic.notification.form.mobile.android_lockscreen_visibility.private',
-                        'increment' => 'mautic.notification.form.mobile.android_lockscreen_visibility.secret',
+                        0  => 'mautic.notification.form.mobile.android_lockscreen_visibility.private',
+                        -1 => 'mautic.notification.form.mobile.android_lockscreen_visibility.secret',
                     ],
                     'attr' => [
                         'tooltip' => 'mautic.notification.form.mobile.android_lockscreen_visibility.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.android_lockscreen_visibility',
-                    'empty_data'  => null,
+                    'empty_data'  => 1,
                     'required'    => false,
                     'placeholder' => 'mautic.notification.form.mobile.android_lockscreen_visibility.placeholder',
                     'expanded'    => true,

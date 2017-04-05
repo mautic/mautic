@@ -524,12 +524,15 @@ class MobileNotificationController extends FormController
             $model->lockEntity($entity);
         }
 
+        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('OneSignal');
+
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:MobileNotification:form.html.php', 'MauticNotificationBundle:FormTheme\MobileNotification'),
                     'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
+                    'integration'        => $integration,
                 ],
                 'contentTemplate' => 'MauticNotificationBundle:MobileNotification:form.html.php',
                 'passthroughVars' => [

@@ -87,7 +87,14 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
+        $features = $integration->getSupportedFeatures();
+        $settings = $integration->getIntegrationSettings();
+
+        if (in_array('mobile', $features)) {
             $event->addAction(
                 'notification.send_mobile_notification',
                 [
@@ -104,22 +111,20 @@ class CampaignSubscriber extends CommonSubscriber
             );
         }
 
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
-            $event->addAction(
-                'notification.send_notification',
-                [
-                    'label'            => 'mautic.notification.campaign.send_notification',
-                    'description'      => 'mautic.notification.campaign.send_notification.tooltip',
-                    'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'notificationsend_list',
-                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
-                    'channel'          => 'notification',
-                    'channelIdField'   => 'notification',
-                ]
-            );
-        }
+        $event->addAction(
+            'notification.send_notification',
+            [
+                'label'            => 'mautic.notification.campaign.send_notification',
+                'description'      => 'mautic.notification.campaign.send_notification.tooltip',
+                'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'         => 'notificationsend_list',
+                'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
+                'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
+                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'channel'          => 'notification',
+                'channelIdField'   => 'notification',
+            ]
+        );
     }
 
     /**
@@ -142,6 +147,16 @@ class CampaignSubscriber extends CommonSubscriber
         $playerID = [];
 
         foreach ($pushIDs as $pushID) {
+            // Skip non-mobile PushIDs if this is a mobile event
+            if ($event->checkContext('notification.send_mobile_notification') && $pushID->isMobile() == false) {
+                continue;
+            }
+
+            // Skip mobile PushIDs if this is a non-mobile event
+            if ($event->checkContext('notification.send_notification') && $pushID->isMobile() == true) {
+                continue;
+            }
+
             $playerID[] = $pushID->getPushID();
         }
 
@@ -184,12 +199,13 @@ class CampaignSubscriber extends CommonSubscriber
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
+        $notification->setUrl($url);
+        $notification->setMessage($sendEvent->getMessage());
+        $notification->setHeading($sendEvent->getHeading());
+
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $sendEvent->getMessage(),
-            $sendEvent->getHeading(),
-            $url,
-            $notification->getButton()
+            $notification
         );
 
         $event->setChannel('notification', $notification->getId());

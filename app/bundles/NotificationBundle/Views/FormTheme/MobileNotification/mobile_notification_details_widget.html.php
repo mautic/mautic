@@ -15,6 +15,7 @@
         <div class="row">
             <div class="col-md-6">
                 <?php echo $view['form']->row($form['ios_subtitle']); ?>
+                <?php echo $view['form']->row($form['ios_sound']); ?>
                 <?php echo $view['form']->row($form['ios_badges']); ?>
                 <?php echo $view['form']->row($form['ios_badgeCount']); ?>
             </div>
