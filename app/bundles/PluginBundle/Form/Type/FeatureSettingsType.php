@@ -71,7 +71,7 @@ class FeatureSettingsType extends AbstractType
 
         $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields, $formSettings) {
             $session = $this->session;
-            $limit   = $session->get('mautic.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+            $limit   = $session->get('mautic.plugin.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
             $page    = $session->get('mautic.plugin.lead.page', 1);
             $start   = $session->get('mautic.plugin.lead.start', 1);
 

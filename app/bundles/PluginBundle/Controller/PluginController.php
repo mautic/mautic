@@ -149,7 +149,7 @@ class PluginController extends FormController
         }
 
         $session = $this->get('session');
-        $limit   = $session->get('mautic.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit   = $session->get('mautic.plugin.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start   = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
