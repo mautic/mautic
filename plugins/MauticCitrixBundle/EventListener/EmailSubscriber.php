@@ -31,9 +31,9 @@ class EmailSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-//            CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
-            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
-//            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
+            CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
+            EmailEvents::EMAIL_ON_BUILD            => ['onEmailBuild', 0],
+          //  EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
             EmailEvents::EMAIL_ON_DISPLAY => ['decodeTokensDisplay', 0],
         ];
     }
@@ -47,6 +47,9 @@ class EmailSubscriber extends CommonSubscriber
     public function onTokenGenerate(TokenGenerateEvent $event)
     {
         // inject product details in $event->params on email send
+        if ('webinar' == $event->getProduct()) {
+            $event->setProductText($this->translator->trans('plugin.citrix.token.join_webinar'));
+        }
     }
 
     /**
@@ -60,10 +63,10 @@ class EmailSubscriber extends CommonSubscriber
         // register tokens only if the plugins are enabled
         $tokens         = [];
         $activeProducts = [];
-        foreach (['meeting', 'training', 'assist'] as $p) {
+        foreach (['meeting', 'training', 'assist', 'webinar'] as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {
-                $activeProducts[]         = $p;
-                $tokens['{'.$p.'_button'] = $this->translator->trans('plugin.citrix.token.'.$p.'_button');
+                $activeProducts[]          = $p;
+                $tokens['{'.$p.'_button}'] = $this->translator->trans('plugin.citrix.token.'.$p.'_button');
             }
         }
         if (0 === count($activeProducts)) {
@@ -87,7 +90,7 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function decodeTokensDisplay(EmailSendEvent $event)
     {
-        $this->decodeTokens($event);
+        $this->decodeTokens($event, true);
     }
 
     /**
@@ -121,6 +124,7 @@ class EmailSubscriber extends CommonSubscriber
             CitrixProducts::GOTOMEETING,
             CitrixProducts::GOTOTRAINING,
             CitrixProducts::GOTOASSIST,
+            CitrixProducts::GOTOWEBINAR,
         ];
 
         foreach ($products as $product) {
