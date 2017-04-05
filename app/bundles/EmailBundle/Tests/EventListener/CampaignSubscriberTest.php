@@ -46,11 +46,12 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->emailModel             = $this->getMockEmailModel();
-        $this->eventModel             = $this->createMock(EventModelMock::class);
-        $this->eventDailySendModel    = $this->createMock(EventDailySendModelMock::class);
+        $this->eventModel             = $this->createMockClass(EventModelMock::class);
+        $this->eventDailySendModel    = $this->createMockClass(EventDailySendModelMock::class);
         $this->campaignExecutionEvent = $this->getCampaignExecutionEvent();
         $this->sendEmailCount         = 0;
     }
+
     public function testOnCampaignTriggerWithoutLimitsAction()
     {
         $event = new Event();
@@ -148,10 +149,10 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder(CampaignSubscriber::class)
             ->setConstructorArgs([
-                $this->createMock(LeadModel::class),
+                $this->createMockClass(LeadModel::class),
                 $this->emailModel,
                 $this->eventModel,
-                $this->createMock(MessageQueueModel::class),
+                $this->createMockClass(MessageQueueModel::class),
                 $this->eventDailySendModel,
             ])
             ->setMethods(null)
@@ -196,7 +197,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function createMock($classPath)
+    private function createMockClass($classPath)
     {
         return $this->getMockBuilder($classPath)
             ->disableOriginalConstructor()

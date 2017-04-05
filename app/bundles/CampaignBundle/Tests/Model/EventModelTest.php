@@ -25,7 +25,7 @@ class EventModelTest extends KernelTestCase
 
         $this->container = self::$kernel->getContainer();
 
-        $this->model = $this->createMock(EventModelMock::class);
+        $this->model = $this->createMockClass(EventModelMock::class);
         $this->model->setEntityManager($emMock = $this->getMockEntityManager());
         $this->model->setLogger($this->container->get('monolog.logger.mautic'));
 
@@ -88,19 +88,25 @@ class EventModelTest extends KernelTestCase
         $events     = [
             1 => [
                 [
-                    'id' => 1,
+                    'id'       => 1,
+                    'event_id' => 1,
                 ],
                 [
-                    'id' => 2,
+                    'id'       => 2,
+                    'event_id' => 2,
                 ],
             ],
+        ];
+        $campaignEvents = [
+            1 => [],
+            2 => [],
         ];
         $leads = [
             1 => [
                 'id' => 1,
             ],
         ];
-        $repository    = $this->getRepository($iterations, $events);
+        $repository    = $this->getRepository($iterations, $events, $campaignEvents);
         $campaignModel = $this->getMockCampaignModel($events);
         $leadModel     = $this->getMockLeadModel($leads);
 
@@ -147,8 +153,11 @@ class EventModelTest extends KernelTestCase
         $this->model->invokeEventCallbackResponse = $eventResponse;
 
         $event = [
-            'eventType' => 'eventType',
-            'type'      => 'type',
+            'id'          => 1,
+            'eventType'   => 'eventType',
+            'type'        => 'type',
+            'properties'  => null,
+            'triggerMode' => 'immediate',
         ];
         $campaign      = new Campaign();
         $lead          = new Lead(1);
@@ -187,11 +196,12 @@ class EventModelTest extends KernelTestCase
      *
      * @return RepositoryMock
      */
-    public function getRepository($count, $events)
+    public function getRepository($count, array $events = [], array $campaignEvents = [])
     {
         $repository = new RepositoryMock();
         $repository->setQueuedEventsCount($count);
         $repository->setQueuedEvents($events);
+        $repository->setCampaignEvents($campaignEvents);
 
         return $repository;
     }
@@ -308,7 +318,7 @@ class EventModelTest extends KernelTestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function createMock($classPath)
+    private function createMockClass($classPath)
     {
         return $this->getMockBuilder($classPath)
             ->disableOriginalConstructor()

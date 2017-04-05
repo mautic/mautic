@@ -8,6 +8,8 @@ class RepositoryMock
 
     private $queuedEvents = [];
 
+    private $campaignEvents = [];
+
     public function saveEntity()
     {
     }
@@ -40,8 +42,13 @@ class RepositoryMock
         return $this->queuedEvents = $queuedEvents;
     }
 
+    public function setCampaignEvents($campaignEvents)
+    {
+        return $this->campaignEvents = $campaignEvents;
+    }
+
     public function getCampaignActionAndConditionEvents()
     {
-        return [];
+        return $this->campaignEvents;
     }
 }
