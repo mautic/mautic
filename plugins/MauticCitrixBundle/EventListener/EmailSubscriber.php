@@ -16,15 +16,32 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
+use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
 use MauticPlugin\MauticCitrixBundle\Event\TokenGenerateEvent;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
+use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 
 /**
  * Class EmailSubscriber.
  */
 class EmailSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CitrixModel
+     */
+    protected $citrixModel;
+
+    /**
+     * FormSubscriber constructor.
+     *
+     * @param CitrixModel $citrixModel
+     */
+    public function __construct(CitrixModel $citrixModel)
+    {
+        $this->citrixModel = $citrixModel;
+    }
+
     /**
      * @return array
      */
@@ -33,8 +50,8 @@ class EmailSubscriber extends CommonSubscriber
         return [
             CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
             EmailEvents::EMAIL_ON_BUILD            => ['onEmailBuild', 0],
-          //  EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => ['decodeTokensDisplay', 0],
+            EmailEvents::EMAIL_ON_SEND             => ['decodeTokensSend', 0],
+            EmailEvents::EMAIL_ON_DISPLAY          => ['decodeTokensDisplay', 0],
         ];
     }
 
@@ -48,6 +65,25 @@ class EmailSubscriber extends CommonSubscriber
     {
         // inject product details in $event->params on email send
         if ('webinar' == $event->getProduct()) {
+            $event->setProductLink('https://www.gotomeeting.com/webinar');
+            $params = $event->getParams();
+            if (!empty($params['lead'])) {
+                $email  = $params['lead']['email'];
+                $repo   = $this->citrixModel->getRepository();
+                $result = $repo->findBy(
+                    [
+                        'product'   => 'webinar',
+                        'eventType' => 'registered',
+                        'email'     => $email,
+                    ], ['eventDate' => 'DESC'], 1);
+                if (0 !== count($result)) {
+                    /** @var CitrixEvent $ce */
+                    $ce = $result[0];
+                    $event->setProductLink($ce->getJoinUrl());
+                }
+            } else {
+                CitrixHelper::log('Updating webinar token failed! Email not found '.implode(', ', $event->getParams()));
+            }
             $event->setProductText($this->translator->trans('plugin.citrix.token.join_webinar'));
         }
     }
@@ -90,7 +126,7 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function decodeTokensDisplay(EmailSendEvent $event)
     {
-        $this->decodeTokens($event, true);
+        $this->decodeTokens($event, false);
     }
 
     /**
@@ -133,9 +169,14 @@ class EmailSubscriber extends CommonSubscriber
                     'product' => $product,
                 ];
 
+                if ('webinar' == $product) {
+                    $params['productText'] = $this->translator->trans('plugin.citrix.token.join_webinar');
+                }
+
                 // trigger event to replace the links in the tokens
                 if ($triggerEvent && $this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_TOKEN_GENERATE)) {
-                    $tokenEvent = new TokenGenerateEvent($params);
+                    $params['lead'] = $event->getLead();
+                    $tokenEvent     = new TokenGenerateEvent($params);
                     $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_TOKEN_GENERATE, $tokenEvent);
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
