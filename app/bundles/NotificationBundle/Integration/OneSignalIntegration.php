@@ -13,6 +13,8 @@
 namespace Mautic\NotificationBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class OneSignalIntegration.
@@ -43,8 +45,8 @@ class OneSignalIntegration extends AbstractIntegration
     {
         return [
             'mobile',
-            'ios',
-            'android',
+            'landing_page_enabled',
+            'welcome_notification_enabled',
         ];
     }
 
@@ -91,18 +93,22 @@ class OneSignalIntegration extends AbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'features') {
+            /* @var FormBuilder $builder */
             $builder->add(
-                'features',
-                'choice',
+                'platforms',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'landing_page_enabled'         => 'mautic.notification.config.form.notification.landingpage.enabled',
-                        'welcome_notification_enabled' => 'mautic.notification.config.form.notification.welcome.enabled',
+                        'ios'     => 'mautic.integration.form.platforms.ios',
+                        'android' => 'mautic.integration.form.platforms.android',
+                    ],
+                    'attr' => [
+                        'tooltip'      => 'mautic.integration.form.platforms.tooltip',
+                        'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => false,
-                    'label_attr'  => ['class' => ''],
+                    'label'       => 'mautic.integration.form.platforms',
                     'empty_value' => false,
                     'required'    => false,
                 ]

@@ -129,7 +129,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('notification', $entity, $options);
+        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+
+        return $formFactory->create($type, $entity, $options);
     }
 
     /**

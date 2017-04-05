@@ -282,7 +282,7 @@ class MobileNotificationController extends FormController
             $entity->setNotificationType('template');
         }
 
-        //create the form
+        // create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
@@ -359,13 +359,16 @@ class MobileNotificationController extends FormController
             }
         }
 
+        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('OneSignal');
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:MobileNotification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
+                    'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:MobileNotification:form.html.php', 'MauticNotificationBundle:FormTheme\MobileNotification'),
                     'notification' => $entity,
+                    'integration'  => $integration,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_mobile_notification_index',
                     'mauticContent' => 'mobile_notification',
@@ -763,7 +766,7 @@ class MobileNotificationController extends FormController
             'mobile_notification',
             'push_notification_stats',
             'mobile_notification',
-            'mobile_notification_id'
+            'notification_id'
         );
     }
 }

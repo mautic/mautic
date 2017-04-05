@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,10 +11,10 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -23,20 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class MobileNotificationType extends AbstractType
 {
-    private $translator;
-    private $em;
-    private $request;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->request    = $factory->getRequest();
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -71,7 +57,7 @@ class MobileNotificationType extends AbstractType
             'heading',
             'text',
             [
-                'label'      => 'mautic.notification.form.heading',
+                'label'      => 'mautic.notification.form.mobile.heading',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
@@ -94,25 +80,11 @@ class MobileNotificationType extends AbstractType
             'url',
             'url',
             [
-                'label'      => 'mautic.notification.form.url',
+                'label'      => 'mautic.notification.form.mobile.url',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.url.tooltip',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'button',
-            'text',
-            [
-                'label'      => 'mautic.notification.form.button',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.notification.form.button.tooltip',
+                    'tooltip' => 'mautic.notification.form.mobile.url.tooltip',
                 ],
                 'required' => false,
             ]
@@ -202,6 +174,19 @@ class MobileNotificationType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+
+        $builder->add(
+            'mobile',
+            HiddenType::class,
+            [
+                'data' => 1,
+            ]
+        );
+
+        $builder->add(
+            'mobileSettings',
+            MobileNotificationDetailsType::class
+        );
     }
 
     /**
@@ -223,6 +208,6 @@ class MobileNotificationType extends AbstractType
      */
     public function getName()
     {
-        return 'notification';
+        return 'mobile_notification';
     }
 }

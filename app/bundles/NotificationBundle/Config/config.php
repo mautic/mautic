@@ -55,9 +55,19 @@ return [
         ],
         'forms' => [
             'mautic.form.type.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'notification',
+                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'alias' => 'notification',
+            ],
+            'mautic.form.type.mobile.notification' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
+                'alias' => 'mobile_notification',
+            ],
+            'mautic.form.type.mobile.notification_details' => [
+                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+                'alias' => 'mobile_notification_details',
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
@@ -199,7 +209,7 @@ return [
                         ],
                     ],
                     'parent'   => 'mautic.core.channels',
-                    'priority' => 80,
+                    'priority' => 65,
                 ],
             ],
         ],

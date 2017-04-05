@@ -113,6 +113,11 @@ class Notification extends FormEntity
      */
     private $mobile;
 
+    /**
+     * @var array
+     */
+    private $mobileSettings;
+
     public function __clone()
     {
         $this->id        = null;
@@ -203,6 +208,8 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -615,6 +622,26 @@ class Notification extends FormEntity
     public function setMobile($mobile)
     {
         $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
 
         return $this;
     }

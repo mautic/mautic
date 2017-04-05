@@ -39,7 +39,7 @@ $view['slots']->set(
                     $notification->getCreatedBy()
                 ),
             ],
-            'routeBase' => 'notification',
+            'routeBase' => 'mobile_notification',
         ]
     )
 );
