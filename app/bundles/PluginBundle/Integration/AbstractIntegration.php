@@ -1306,17 +1306,20 @@ abstract class AbstractIntegration
         $matched = [];
 
         foreach ($availableFields as $key => $field) {
-            $integrationKey = $this->convertLeadFieldKey($key, $field);
+            $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (is_array($integrationKey)) {
+                list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            }
 
             if (isset($leadFields[$integrationKey])) {
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$integrationKey] = $fields[$mauticKey]['value'];
+                    $matched[$matchIntegrationKey] = $fields[$mauticKey]['value'];
                 }
             }
 
-            if (!empty($field['required']) && empty($matched[$integrationKey])) {
-                $matched[$integrationKey] = $unknown;
+            if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
+                $matched[$matchIntegrationKey] = $unknown;
             }
         }
 
