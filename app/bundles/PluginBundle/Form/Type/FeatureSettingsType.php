@@ -131,7 +131,7 @@ class FeatureSettingsType extends AbstractType
                 $autoMatchedFields[$field] = strtolower($field);
             }
             $leadFields['-1'] = $this->translator->trans('mautic.plugin.integration.option.not.matched');
-            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < 5) ? 1 : 0;
+            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < ($limit / 2)) ? 1 : 0;
             $form->add(
                 'leadFields',
                 'integration_fields',
@@ -154,7 +154,7 @@ class FeatureSettingsType extends AbstractType
                 ]
             );
             if (!empty($integrationCompanyFields)) {
-                $extraPage           = ($totalCompanyFields % $limit > 0 && $totalCompanyFields % $limit < 5) ? 1 : 0;
+                $extraPage           = ($totalCompanyFields % $limit > 0 && $totalCompanyFields % $limit < ($limit / 2)) ? 1 : 0;
                 $companyFields['-1'] = $this->translator->trans('mautic.plugin.integration.option.not.matched');
                 $form->add(
                     'companyFields',
