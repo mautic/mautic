@@ -1537,44 +1537,49 @@ class EmailController extends FormController
      */
     protected function isFormValidForWebinar(array $data, Form &$form, Email $email)
     {
-        if (CitrixHelper::isAuthorized('Gotowebinar')) {
-            // search for token in content
-            $html         = $email->getCustomHtml();
-            $isTokenFound = preg_match('/\{webinar_button\}/', $html);
-            if (!$isTokenFound) {
-                return true;
-            }
+        if (!CitrixHelper::isAuthorized('Gotowebinar')) {
+            return true;
+        }
 
-            // search for webinar filters in the email segments
-            if (array_key_exists('lists', $data)) {
-                $isWebinarFilterPresent = false;
-                $webinarFiltersCount    = 0;
-                $lists                  = $data['lists'];
-                /** @var ListModel $model */
-                $model = $this->getModel('lead.list');
-                foreach ($lists as $listId) {
-                    $list    = $model->getEntity($listId);
-                    $filters = $list->getFilters();
-                    foreach ($filters as $filter) {
-                        if ('webinar-registration' == $filter['field'] && 'in' == $filter['operator']) {
-                            $isWebinarFilterPresent = true;
-                            ++$webinarFiltersCount;
-                        }
-                    }
-                }
-                // make sure that each list has a webinar-registration filter
-                if (count($lists) !== $webinarFiltersCount) {
-                    $isWebinarFilterPresent = false;
-                }
-                if (!$isWebinarFilterPresent) {
-                    $error = 'Error! A "Join Webinar" token is in the email body, but a GotoWebinar filter is not present in the email segments';
-                    $form->addError(new FormError($error));
+        // search for webinar filters in the email segments
+        if (!array_key_exists('lists', $data) || 0 === count($data['lists'])) {
+            return true;
+        }
 
-                    return false;
+        // search for token in content
+        $html         = $email->getCustomHtml();
+        $isTokenFound = preg_match('/\{webinar_button\}/', $html);
+        if (!$isTokenFound) {
+            return true;
+        }
+
+        $isWebinarFilterPresent = false;
+        $webinarFiltersCount    = 0;
+        $lists                  = $data['lists'];
+        /** @var ListModel $model */
+        $model = $this->getModel('lead.list');
+        foreach ($lists as $listId) {
+            $list    = $model->getEntity($listId);
+            $filters = $list->getFilters();
+            foreach ($filters as $filter) {
+                if ('webinar-registration' == $filter['field'] && 'in' == $filter['operator']) {
+                    $isWebinarFilterPresent = true;
+                    ++$webinarFiltersCount;
                 }
             }
         }
+        // make sure that each list has a webinar-registration filter
+        if (count($lists) !== $webinarFiltersCount) {
+            $isWebinarFilterPresent = false;
+        }
+        if (!$isWebinarFilterPresent) {
+            $error = 'Error! A "Join Webinar" token is in the email body, but a GotoWebinar filter is not present in the email segments';
+            $form->addError(new FormError($error));
 
+            return false;
+        }
+
+        // everything is ok
         return true;
     }
 }
