@@ -33,6 +33,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * Get the array key for clientId.
      *
      * @return string

@@ -29,6 +29,14 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * @return string
      */
     public function getDisplayName()
