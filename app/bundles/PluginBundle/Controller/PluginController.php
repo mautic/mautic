@@ -238,6 +238,10 @@ class PluginController extends FormController
                             if (isset($newIntegrationFields['Contact'])) {
                                 $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
                             }
+
+                            if (!isset($currentFeatureSettings['leadFields'])) {
+                                $currentFeatureSettings['leadFields'] = [];
+                            }
                             $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
 
                             foreach ($removeLeadFields as $key => $removeLeadField) {
@@ -247,10 +251,14 @@ class PluginController extends FormController
                                 }
                             }
 
+                            if (!isset($currentFeatureSettings['companyFields'])) {
+                                $currentFeatureSettings['companyFields'] = [];
+                            }
                             if (isset($newIntegrationFields['company'])) {
                                 $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
                                 $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
                             }
+
                             foreach ($removeCompanyFields as $key => $removeCompanyField) {
                                 unset($currentFeatureSettings['companyFields'][$key]);
                                 if (isset($currentFeatureSettings['update_mautic_company'])) {
@@ -322,7 +330,7 @@ class PluginController extends FormController
                 }
             }
 
-            if (($cancelled || $valid) && !$authorize) {
+            if (($cancelled || ($valid && !$this->isFormApplied($form))) && !$authorize) {
                 // Close the modal and return back to the list view
                 return new JsonResponse(
                     [
@@ -330,6 +338,19 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
+                    ]
+                );
+            } elseif ($valid && $this->isFormApplied($form)) {
+                // Rebuild the form so that the new selected fields are moved to the top
+                $form = $this->createForm(
+                    'integration_details',
+                    $entity,
+                    [
+                        'integration'        => $entity->getName(),
+                        'lead_fields'        => $leadFields,
+                        'company_fields'     => $companyFields,
+                        'integration_object' => $integrationObject,
+                        'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name]),
                     ]
                 );
             }
