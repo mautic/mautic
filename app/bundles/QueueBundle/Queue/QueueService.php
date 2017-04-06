@@ -11,7 +11,6 @@
 
 namespace Mautic\QueueBundle\Queue;
 
-
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Event\QueueEvent;
@@ -20,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class QueueService
+ * Class QueueService.
  */
 class QueueService
 {
@@ -36,40 +35,42 @@ class QueueService
 
     /**
      * QueueService constructor.
-     * @param CoreParametersHelper $coreParametersHelper
+     *
+     * @param CoreParametersHelper     $coreParametersHelper
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $eventDispatcher)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher      = $eventDispatcher;
     }
 
     /**
      * @param string $queueName
-     * @param array $payload
+     * @param array  $payload
      */
-    public function publishToQueue($queueName, array $payload=[])
+    public function publishToQueue($queueName, array $payload = [])
     {
-        $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
+        $protocol                   = $this->coreParametersHelper->getParameter('queue_protocol');
         $payload['mauticQueueName'] = $queueName;
-        $event = new QueueEvent($protocol, $queueName, 'publish', $payload);
+        $event                      = new QueueEvent($protocol, $queueName, $payload);
         $this->eventDispatcher->dispatch(QueueEvents::PUBLISH_MESSAGE, $event);
     }
 
     /**
-     * @param string $queueName
+     * @param string   $queueName
      * @param int|null $messages
      */
-    public function consumeFromQueue($queueName, $messages=null)
+    public function consumeFromQueue($queueName, $messages = null)
     {
         $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
-        $event = new QueueEvent($protocol, $queueName, 'consume', [], $messages);
+        $event    = new QueueEvent($protocol, $queueName, [], $messages);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
     }
 
     /**
      * @param string $payload
+     *
      * @return QueueConsumerEvent
      */
     public function dispatchConsumerEventFromPayload($payload)
@@ -83,6 +84,7 @@ class QueueService
 
         $event = new QueueConsumerEvent($payload);
         $this->eventDispatcher->dispatch($eventName, $event);
+
         return $event;
     }
 

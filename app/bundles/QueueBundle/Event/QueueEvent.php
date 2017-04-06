@@ -14,7 +14,7 @@ namespace Mautic\QueueBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
- * Class QueueEvent
+ * Class QueueEvent.
  */
 class QueueEvent extends CommonEvent
 {
@@ -39,25 +39,19 @@ class QueueEvent extends CommonEvent
     private $queueName;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * QueueEvent constructor.
-     * @param string $protocol
-     * @param string $queueName
-     * @param string $type
-     * @param array $payload
+     *
+     * @param string   $protocol
+     * @param string   $queueName
+     * @param array    $payload
      * @param int|null $messages
      */
-    public function __construct($protocol, $queueName, $type='publish', $payload=[], $messages=null)
+    public function __construct($protocol, $queueName, $payload = [], $messages = null)
     {
-        $this->messages = $messages;
-        $this->payload = $payload;
-        $this->protocol = $protocol;
+        $this->messages  = $messages;
+        $this->payload   = $payload;
+        $this->protocol  = $protocol;
         $this->queueName = $queueName;
-        $this->type = $type;
     }
 
     /**
@@ -90,14 +84,6 @@ class QueueEvent extends CommonEvent
     public function getQueueName()
     {
         return $this->queueName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
