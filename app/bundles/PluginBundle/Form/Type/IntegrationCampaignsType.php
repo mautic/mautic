@@ -34,10 +34,9 @@ class IntegrationCampaignsType extends AbstractType
                     'choices' => $options['campaignContactStatus'],
                     'attr'    => [
                         'class' => 'form-control integration-campaigns-status', ],
-                    'label'       => 'mautic.plugin.integration.campaigns.member.status',
-                    'empty_value' => false,
+                    'label'    => 'mautic.plugin.integration.campaigns.member.status',
+                    'required' => false,
                 ]
-
             );
         }
     }
