@@ -511,7 +511,8 @@ class EmailController extends FormController
         if ($method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                $formData = $this->request->request->get('emailform');
+                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
                     $content = $entity->getCustomHtml();
 
                     $entity->setCustomHtml($content);
