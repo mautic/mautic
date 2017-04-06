@@ -54,7 +54,7 @@ $hasFeatureErrors =
     </div>
 <?php endif; ?>
 <ul class="nav nav-tabs">
-    <li class="active" id="details-tab">
+    <li class="<?php if (isset($activeTab) && $activeTab == 'details-container'): echo 'active'; endif; ?> " id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">
             <?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?>
         </a>
@@ -70,7 +70,7 @@ $hasFeatureErrors =
         </li>
     <?php endif; ?>
     <?php if ($hasFields): ?>
-        <li class="<?php echo $fieldTabClass; ?>" id="fields-tab">
+        <li class="<?php echo $fieldTabClass; ?> <?php if (isset($activeTab) && $activeTab == 'leadFieldsContainer'): echo 'active'; endif; ?> " id="fields-tab">
             <a href="#fields-container" role="tab" data-toggle="tab">
                 <?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?>
                 <?php if ($hasLeadFieldErrors): ?>
@@ -80,7 +80,7 @@ $hasFeatureErrors =
         </li>
     <?php endif; ?>
     <?php if (!empty($companyFieldHtml)) : ?>
-        <li class="<?php echo $fieldTabClass; ?>" id="fields-tab">
+        <li class="<?php echo $fieldTabClass; ?> <?php if (isset($activeTab) && $activeTab == 'companyFieldsContainer'): echo 'active'; endif; ?> " id="company-fields-tab">
             <a href="#company-fields-container" role="tab" data-toggle="tab">
                 <?php echo $view['translator']->trans('mautic.plugin.integration.tab.companyfieldmapping'); ?>
                 <?php if ($hasCompanyFieldErrors): ?>
@@ -94,7 +94,7 @@ $hasFeatureErrors =
 <?php echo $view['form']->start($form); ?>
 <!--/ tabs controls -->
 <div class="tab-content pa-md bg-white">
-    <div class="tab-pane fade in active bdr-w-0" id="details-container">
+    <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'details-container'): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->rowIfExists($form, 'virtual'); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
@@ -134,13 +134,13 @@ $hasFeatureErrors =
     <?php endif; ?>
 
     <?php if ($hasFields): ?>
-        <div class="tab-pane fade bdr-w-0" id="fields-container">
+        <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'leadFieldsContainer'): echo 'in active'; endif; ?>  bdr-w-0" id="fields-container">
             <h4 class="mb-sm"><?php echo $view['translator']->trans($fieldLabel); ?></h4>
             <?php echo $fieldHtml; ?>
         </div>
     <?php endif; ?>
     <?php if ($hasCompanyFields): ?>
-    <div class="tab-pane fade bdr-w-0" id="company-fields-container">
+    <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'companyFieldsContainer'): echo 'in active'; endif; ?> bdr-w-0" id="company-fields-container">
         <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>

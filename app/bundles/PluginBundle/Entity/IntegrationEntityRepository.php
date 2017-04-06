@@ -81,8 +81,6 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @param $integration
      * @param $internalEntity
-     * @param null $startDate
-     * @param null $endDate
      * @param $leadFields
      *
      * @return array
@@ -95,6 +93,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('i.integration = :integration')
             ->andWhere('i.internal_entity = :internalEntity')
+            ->andWhere('i.integration_entity = "Lead" or i.integration_entity = "Contact"')
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
@@ -155,5 +154,25 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('entity', $internalEntityType.'-deleted')
             ->execute();
+    }
+
+    /**
+     * @param $integration
+     * @param $internalEntity
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function findLeadsToDelete($internalEntity, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
+
+        $q->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+        ->execute();
     }
 }
