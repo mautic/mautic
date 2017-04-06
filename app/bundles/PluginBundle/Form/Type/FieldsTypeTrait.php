@@ -109,6 +109,10 @@ trait FieldsTypeTrait
                     $fields = array_merge($fields, $groupedFields);
                 }
 
+                // Ensure that fields aren't hidden
+                if ($start > count($fields)) {
+                    $start = 0;
+                }
                 $paginatedFields = array_slice($fields, $start, $limit);
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$field]);

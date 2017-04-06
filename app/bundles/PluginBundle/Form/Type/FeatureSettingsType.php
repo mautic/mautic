@@ -60,23 +60,26 @@ class FeatureSettingsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $integration_object = $options['integration_object'];
+        $integrationObject = $options['integration_object'];
 
         //add custom feature settings
-        $integration_object->appendToForm($builder, $options['data'], 'features');
-
+        $integrationObject->appendToForm($builder, $options['data'], 'features');
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
         $formSettings  = $options['integration_object']->getFormDisplaySettings();
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integration_object, $leadFields, $companyFields, $formSettings) {
-            $session = $this->session;
-            $limit   = $session->get('mautic.plugin.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-            $page    = $session->get('mautic.plugin.lead.page', 1);
-            $start   = $session->get('mautic.plugin.lead.start', 1);
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields, $formSettings) {
+            $integrationName = $integrationObject->getName();
+            $session         = $this->session;
+            $limit           = $session->get(
+                'mautic.plugin.'.$integrationName.'.lead.limit',
+                $this->coreParametersHelper->getParameter('default_pagelimit')
+            );
+            $page  = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
+            $start = $session->get('mautic.plugin.'.$integrationName.'.lead.start', 1);
 
-            $companyPage  = $session->get('mautic.plugin.company.lead.page', 1);
-            $companyStart = $session->get('mautic.plugin.company.start', 1);
+            $companyPage  = $session->get('mautic.plugin.'.$integrationName.'.company.lead.page', 1);
+            $companyStart = $session->get('mautic.plugin.'.$integrationName.'.company.start', 1);
 
             $settings = [
                 'silence_exceptions' => false,
@@ -86,7 +89,7 @@ class FeatureSettingsType extends AbstractType
             $totalFields = 0;
             try {
                 if (empty($fields)) {
-                    $fields = $integration_object->getFormLeadFields($settings);
+                    $fields = $integrationObject->getFormLeadFields($settings);
                     $fields = (isset($fields[0])) ? $fields[0] : $fields;
                     unset($fields['company']);
                 }
@@ -94,7 +97,7 @@ class FeatureSettingsType extends AbstractType
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     if (empty($integrationCompanyFields)) {
-                        $integrationCompanyFields = $integration_object->getFormCompanyFields($settings);
+                        $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
                     }
                     $totalCompanyFields = count($integrationCompanyFields);
                     if (isset($integrationCompanyFields['company'])) {
@@ -110,7 +113,7 @@ class FeatureSettingsType extends AbstractType
                 $fields = [];
                 $error  = $e->getMessage();
             }
-            list($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
+            list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
             /**
              * Auto Match Integration Fields with Mautic Fields.
              */
@@ -145,7 +148,7 @@ class FeatureSettingsType extends AbstractType
                     'special_instructions' => $specialInstructions,
                     'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
-                    'integration'          => $integration_object->getName(),
+                    'integration'          => $integrationObject->getName(),
                     'totalFields'          => $totalFields,
                     'page'                 => $page,
                     'limit'                => $limit,
@@ -160,16 +163,17 @@ class FeatureSettingsType extends AbstractType
                     'companyFields',
                     'integration_company_fields',
                     [
-                        'label'                      => 'mautic.integration.comapanyfield_matches',
-                        'required'                   => false,
-                        'company_fields'             => $companyFields,
-                        'data'                       => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
-                        'update_mautic_company'      => isset($data['update_mautic_company']) && !empty($data['update_mautic_company']) ? $data['update_mautic_company'] : [],
+                        'label'                 => 'mautic.integration.comapanyfield_matches',
+                        'required'              => false,
+                        'company_fields'        => $companyFields,
+                        'data'                  => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
+                        'update_mautic_company' => isset($data['update_mautic_company']) && !empty($data['update_mautic_company'])
+                            ? $data['update_mautic_company'] : [],
                         'integration_company_fields' => $integrationCompanyFields,
                         'special_instructions'       => $specialInstructions,
                         'alert_type'                 => $alertType,
                         'enable_data_priority'       => $enableDataPriority,
-                        'integration'                => $integration_object->getName(),
+                        'integration'                => $integrationObject->getName(),
                         'totalFields'                => $totalCompanyFields,
                         'page'                       => $companyPage,
                         'limit'                      => $limit,
