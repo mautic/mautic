@@ -13,9 +13,9 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ThemeHelper
 {
@@ -30,7 +30,7 @@ class ThemeHelper
     private $templatingHelper;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -69,11 +69,11 @@ class ThemeHelper
     /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper      $pathsHelper
-     * @param TemplatingHelper $templatingHelper
-     * @param Translator       $translator
+     * @param PathsHelper         $pathsHelper
+     * @param TemplatingHelper    $templatingHelper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, Translator $translator)
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator)
     {
         $this->pathsHelper      = $pathsHelper;
         $this->templatingHelper = $templatingHelper;
