@@ -133,39 +133,33 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
+            // Can't rely on alias in "where" - so have to repeat.
+            $dateExpression = $this->getLocalDateExpression($dateColumn, $tablePrefix);
+
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
+                $query->andWhere($dateExpression.' BETWEEN :dateFrom AND :dateTo');
+            } elseif ($this->dateFrom) {
+                // Apply the start date/time if set
+                $query->andWhere($dateExpression.' >= :dateFrom');
+            } elseif ($this->dateTo) {
+                // Apply the end date/time if set
+                $query->andWhere($dateExpression.' <= :dateTo');
+            }
+
+            if ($this->dateFrom) {
                 $dateFrom = clone $this->dateFrom;
-                $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 }
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+            }
+            if ($this->dateTo) {
+                $dateTo = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
-                $query->andWhere($tablePrefix.'.'.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
-            } else {
-                // Apply the start date/time if set
-                if ($this->dateFrom) {
-                    $dateFrom = clone $this->dateFrom;
-                    if ($this->isTimeUnit) {
-                        $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                    }
-                    $query->andWhere($tablePrefix.'.'.$dateColumn.' >= :dateFrom');
-                    $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-                }
-
-                // Apply the end date/time if set
-                if ($this->dateTo) {
-                    $dateTo = clone $this->dateTo;
-                    if ($this->isTimeUnit) {
-                        $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                    }
-                    $query->andWhere($tablePrefix.'.'.$dateColumn.' <= :dateTo');
-                    $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
-                }
             }
         }
     }
@@ -217,8 +211,6 @@ class ChartQuery extends AbstractChart
      */
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't')
     {
-        // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
@@ -226,11 +218,20 @@ class ChartQuery extends AbstractChart
             $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
             unset($filters['groupBy']);
         }
-        $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
-            ->groupBy($dateConstruct.$groupBy);
 
-        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
+        $query->select($this->getLocalDateExpression($column, $tablePrefix).' AS `date`, COUNT(*) AS `count`')
+            ->groupBy('`date`'.$groupBy);
+
+        $query->orderBy('`date`', 'ASC')->setMaxResults($limit);
+    }
+
+    public function getLocalDateExpression($column, $tablePrefix = 't')
+    {
+        // Convert time units to the right form for current database platform.
+        $dbUnit = $this->translateTimeUnit($this->unit);
+        // Take timezone into acount.
+        $localDateConstruct = 'CONVERT_TZ('.$tablePrefix.'.'.$column.',\'UTC\',\''.date_default_timezone_get().'\')';
+        return 'DATE_FORMAT('.$localDateConstruct.', \''.$dbUnit.'\')';
     }
 
     /**
