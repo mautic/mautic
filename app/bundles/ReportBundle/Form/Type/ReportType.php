@@ -176,7 +176,6 @@ class ReportType extends AbstractType
                         'expanded'   => false,
                         'attr'       => [
                             'class'         => 'form-control multiselect',
-                            'data-order'    => $order,
                             'data-sortable' => 'true',
                             'onchange'      => 'Mautic.checkSelectedGroupBy()',
                         ],
