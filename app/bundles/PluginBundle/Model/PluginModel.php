@@ -44,6 +44,11 @@ class PluginModel extends FormModel
         return $this->em->getRepository('MauticPluginBundle:Plugin');
     }
 
+    public function getIntegrationEntityRepository()
+    {
+        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -66,5 +71,11 @@ class PluginModel extends FormModel
     public function getCompanyFields()
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+    }
+
+    public function saveFeatureSettings($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
     }
 }
