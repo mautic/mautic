@@ -163,6 +163,26 @@ class ReportType extends AbstractType
                     ]
                 );
 
+                // Build the columns selector
+                $form->add(
+                    'groupBy',
+                    'choice',
+                    [
+                        'choices'    => $columns->choices,
+                        'label'      => false,
+                        'label_attr' => ['class' => 'control-label'],
+                        'required'   => false,
+                        'multiple'   => true,
+                        'expanded'   => false,
+                        'attr'       => [
+                            'class'         => 'form-control multiselect',
+                            'data-order'    => $order,
+                            'data-sortable' => 'true',
+                            'onchange'      => 'Mautic.checkSelectedGroupBy()',
+                        ],
+                    ]
+                );
+
                 // Build the filter selector
                 $form->add(
                     'filters',
@@ -185,6 +205,24 @@ class ReportType extends AbstractType
                         ],
                         'filters' => $filters->definitions,
                         'report'  => $formData,
+                    ]
+                );
+
+                // Build the filter selector
+                $form->add(
+                    'aggregators',
+                    'collection',
+                    [
+                        'type'    => 'aggregator',
+                        'label'   => false,
+                        'options' => [
+                            'columnList' => $columns->choices,
+                            'required'   => false,
+                        ],
+                        'allow_add'    => true,
+                        'allow_delete' => true,
+                        'prototype'    => true,
+                        'required'     => false,
                     ]
                 );
 

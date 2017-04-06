@@ -12,10 +12,12 @@ if ($tmpl == 'index') {
     $view->extend('MauticReportBundle:Report:details.html.php');
 }
 
-$dataCount   = count($data);
-$columnOrder = $report->getColumns();
-$graphOrder  = $report->getGraphs();
-$startCount  = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
+$dataCount       = count($data);
+$columnOrder     = $report->getColumns();
+$graphOrder      = $report->getGraphs();
+$aggregatorOrder = $report->getAggregators();
+$aggregatorCount = count($aggregatorOrder);
+$startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 ?>
 
 <?php if (!empty($columnOrder)): ?>
@@ -27,6 +29,23 @@ $startCount  = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 
                 <thead>
                 <tr>
                     <th class="col-report-count"></th>
+                    <?php
+                    if ($aggregatorCount) :
+                        foreach ($aggregatorOrder as $aggregator): ?>
+                            <?php
+                            $columnName = explode('.', $aggregator['column']);
+                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                                'sessionVar' => 'report.'.$report->getId(),
+                                'orderBy'    => $aggregator['function'],
+                                'text'       => $aggregator['function'].' '.strtoupper($columnName[1]),
+                                'dataToggle' => '',
+                                'target'     => '.report-content',
+                            ]);
+                            ?>
+                    <?php
+                        endforeach;
+                    endif;
+                    ?>
                     <?php foreach ($columnOrder as $key): ?>
                         <?php
                         if (isset($columns[$key])):
@@ -50,6 +69,19 @@ $startCount  = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 
                     <?php foreach ($data as $row): ?>
                         <tr>
                             <td><?php echo $startCount; ?></td>
+                            <?php
+                            if ($aggregatorCount) :
+                                foreach ($aggregatorOrder as $aggregator): ?>
+                                        <td>
+                                            <?php
+                                                if (isset($row[$aggregator['function']])) {
+                                                    echo $view['formatter']->_($row[$aggregator['function']], 'text');
+                                                }
+                                            ?>
+                                        </td>
+                            <?php endforeach;
+                            endif;
+                            ?>
                             <?php foreach ($columnOrder as $key): ?>
                                 <?php if (isset($columns[$key])): ?>
                                 <td>

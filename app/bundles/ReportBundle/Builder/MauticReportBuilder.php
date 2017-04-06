@@ -221,7 +221,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $queryBuilder->groupBy($options['groupby']);
             }
         }
-
+        // Build GROUP BY
+        if ($groupByOptions = $this->entity->getGroupBy()) {
+            foreach ($groupByOptions as $groupBy) {
+                $queryBuilder->addGroupBy($groupBy);
+            }
+        }
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -271,6 +276,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Add Aggregators
+        $aggregators = $this->entity->getAggregators();
+        if ($aggregators && $groupByOptions) {
+            foreach ($aggregators as $aggregator) {
+                $formula = $aggregator['function'].'('.$aggregator['column'].") as '".$aggregator['function']."'";
+                $queryBuilder->addSelect($formula);
+            }
+        }
 
         return $queryBuilder;
     }
