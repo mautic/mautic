@@ -102,7 +102,7 @@ class OneSignalApi extends AbstractNotificationApi
         }
 
         if ($notification->isMobile()) {
-            $data = $this->addMobileData($data, $notification->getMobileSettings());
+            $this->addMobileData($data, $notification->getMobileSettings());
 
             if ($button) {
                 $data['buttons'][] = ['id' => $buttonId, 'text' => $button];
@@ -125,16 +125,16 @@ class OneSignalApi extends AbstractNotificationApi
         foreach ($mobileConfig as $key => $value) {
             switch ($key) {
                 case 'ios_subtitle':
-                    $data['subtitle'] = $value;
+                    $data['subtitle'] = ['en' => $value];
                     break;
                 case 'ios_sound':
                     $data['ios_sound'] = $value;
                     break;
                 case 'ios_badges':
-                    $data['ios_badgeCount'] = $value;
+                    $data['ios_badgeType'] = $value;
                     break;
                 case 'ios_badgeCount':
-                    $data['ios_badgeType'] = (int) $value;
+                    $data['ios_badgeCount'] = (int) $value;
                     break;
                 case 'ios_contentAvailable':
                     $data['content_available'] = (bool) $value;
