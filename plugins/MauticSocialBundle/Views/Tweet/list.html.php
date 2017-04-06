@@ -24,7 +24,7 @@ if ($tmpl == 'index') {
                         'checkall'        => 'true',
                         'target'          => '#tweetTable',
                         'langVar'         => 'mautic.social.tweets',
-                        'routeBase'       => 'social',
+                        'routeBase'       => 'mautic_tweet',
                         'templateButtons' => [
                             'delete' => $view['security']->isGranted('plugin:mauticSocial:tweet:delete'),
                         ],
