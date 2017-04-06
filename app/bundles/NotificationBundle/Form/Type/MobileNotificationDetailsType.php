@@ -12,6 +12,7 @@
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -45,6 +46,17 @@ class MobileNotificationDetailsType extends AbstractType
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
+
+        $builder->add(
+            'additional_data',
+            SortableListType::class,
+            [
+                'required'        => false,
+                'label'           => 'mautic.notification.tab.data',
+                'option_required' => false,
+                'with_labels'     => true,
+            ]
+        );
 
         if (in_array('ios', $settings['platforms'])) {
             $builder->add(
@@ -242,14 +254,14 @@ class MobileNotificationDetailsType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        0  => 'mautic.notification.form.mobile.android_lockscreen_visibility.private',
-                        -1 => 'mautic.notification.form.mobile.android_lockscreen_visibility.secret',
+                        '0'  => 'mautic.notification.form.mobile.android_lockscreen_visibility.private',
+                        '-1' => 'mautic.notification.form.mobile.android_lockscreen_visibility.secret',
                     ],
                     'attr' => [
                         'tooltip' => 'mautic.notification.form.mobile.android_lockscreen_visibility.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.android_lockscreen_visibility',
-                    'empty_data'  => 1,
+                    'empty_data'  => '1',
                     'required'    => false,
                     'placeholder' => 'mautic.notification.form.mobile.android_lockscreen_visibility.placeholder',
                     'expanded'    => true,

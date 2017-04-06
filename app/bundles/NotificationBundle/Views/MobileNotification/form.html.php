@@ -34,6 +34,11 @@ $integrationSettings = $integration->getIntegrationSettings()->getFeatureSetting
                             <?php echo $view['translator']->trans('mautic.core.details'); ?>
                         </a>
                     </li>
+                    <li>
+                        <a href="#data-notification-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.notification.tab.data'); ?>
+                        </a>
+                    </li>
                     <?php if (in_array('ios', $integrationSettings['platforms'])) : ?>
                         <li>
                             <a href="#ios-notification-container" role="tab" data-toggle="tab">
@@ -60,6 +65,13 @@ $integrationSettings = $integration->getIntegrationSettings()->getFeatureSetting
                             </div>
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['message']); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade in bdr-w-0" id="data-notification-container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['mobileSettings']['additional_data']); ?>
                             </div>
                         </div>
                     </div>
