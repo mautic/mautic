@@ -390,7 +390,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $dataObject[$key.$newName] = $item;
                     }
                 }
-                print_r($object);
+
                 if (isset($dataObject) && $dataObject) {
                     if ($object == 'Lead' or $object == 'Contact') {
                         // Set owner so that it maps if configured to do so
