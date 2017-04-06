@@ -43,26 +43,20 @@ trait FieldsTypeTrait
                 $index = 0;
                 $choices = [];
                 $requiredFields = [];
-                $populatedFields = [];
                 $optionalFields = [];
+                $group = [];
                 $fieldData = $event->getData();
 
                 // First loop to build options
                 foreach ($integrationFields as $field => $details) {
-                    if (is_array($details) && !empty($details['required'])) {
-                        $requiredFields[$field] = $details;
-                    } elseif (isset($fieldData[$field])) {
-                        $populatedFields[$field] = $details;
-                    } else {
-                        $optionalFields[$field] = $details;
-                    }
+                    $groupName = '0default';
                     if (is_array($details)) {
                         if (isset($details['group'])) {
                             if (!isset($choices[$details['group']])) {
                                 $choices[$details['group']] = [];
                             }
                             $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                            $group[$field] = $details['group'];
+                            $group[$field] = $groupName = $details['group'];
                             $choices[$field] = $label;
                         } else {
                             $choices[$field] = $details['label'];
@@ -70,9 +64,23 @@ trait FieldsTypeTrait
                     } else {
                         $choices[$field] = $details;
                     }
+
+                    if (!isset($requiredFields[$groupName])) {
+                        $requiredFields[$groupName] = [];
+                        $optionalFields[$groupName] = [];
+                    }
+
+                    if (is_array($details) && !empty($details['required'])) {
+                        $requiredFields[$groupName][$field] = $details;
+                    } else {
+                        $optionalFields[$groupName][$field] = $details;
+                    }
                 }
 
                 // Order the fields by label
+                ksort($requiredFields, SORT_NATURAL);
+                ksort($optionalFields, SORT_NATURAL);
+
                 $sortFieldsFunction = function ($a, $b) {
                     if (is_array($a)) {
                         $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
@@ -88,11 +96,19 @@ trait FieldsTypeTrait
 
                     return strnatcasecmp($aLabel, $bLabel);
                 };
-                uasort($requiredFields, $sortFieldsFunction);
-                uasort($populatedFields, $sortFieldsFunction);
-                uasort($optionalFields, $sortFieldsFunction);
 
-                $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
+                $fields = [];
+                foreach ($requiredFields as $groupName => $groupedFields) {
+                    uasort($groupedFields, $sortFieldsFunction);
+
+                    $fields = array_merge($fields, $groupedFields);
+                }
+                foreach ($optionalFields as $groupName => $groupedFields) {
+                    uasort($groupedFields, $sortFieldsFunction);
+
+                    $fields = array_merge($fields, $groupedFields);
+                }
+
                 $paginatedFields = array_slice($fields, $start, $limit);
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$field]);

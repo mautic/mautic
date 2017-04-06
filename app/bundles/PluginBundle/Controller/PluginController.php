@@ -340,19 +340,6 @@ class PluginController extends FormController
                         'mauticContent' => 'integrationConfig',
                     ]
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
-                // Rebuild the form so that the new selected fields are moved to the top
-                $form = $this->createForm(
-                    'integration_details',
-                    $entity,
-                    [
-                        'integration'        => $entity->getName(),
-                        'lead_fields'        => $leadFields,
-                        'company_fields'     => $companyFields,
-                        'integration_object' => $integrationObject,
-                        'action'             => $this->generateUrl('mautic_plugin_config', ['name' => $name]),
-                    ]
-                );
             }
         }
 
