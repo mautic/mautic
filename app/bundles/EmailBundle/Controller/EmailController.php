@@ -1574,7 +1574,7 @@ class EmailController extends FormController
             $isWebinarFilterPresent = false;
         }
         if (!$isWebinarFilterPresent) {
-            $error = 'Error! A "Join Webinar" token is in the email body, but a GotoWebinar filter is not present in the email segments';
+            $error = $this->get('translator')->trans('plugin.citrix.webinar.token_error');
             $form->addError(new FormError($error));
 
             return false;
