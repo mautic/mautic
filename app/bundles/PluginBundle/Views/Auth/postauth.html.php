@@ -24,7 +24,7 @@ function postFormHandler() {
 }
 JS;
 
-if (empty($message)):
+if (!empty($message) && 'success' === $alert):
     $js .= <<<'JS'
     
 (function() {
