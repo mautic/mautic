@@ -158,21 +158,24 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id Notification to clear; will clear all if empty
+     * @param $id       Notification to clear; will clear all if empty
+     * @param $limit    Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id)
+    public function clearNotification($id, $limit = null)
     {
-        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id);
+        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }
 
     /**
      * Get content for notifications.
      *
      * @param null $afterId
+     * @param bool $includeRead
+     * @param int  $limit
      *
      * @return array
      */
-    public function getNotificationContent($afterId = null, $includeRead = false)
+    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
     {
         if ($this->userHelper->getUser()->isGuest) {
             return [[], false, ''];
@@ -180,10 +183,10 @@ class NotificationModel extends FormModel
 
         $this->updateUpstreamNotifications();
 
-        $userId        = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
-        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead);
-
         $showNewIndicator = false;
+        $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
+
+        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead, null, $limit);
 
         //determine if the new message indicator should be shown
         foreach ($notifications as $n) {

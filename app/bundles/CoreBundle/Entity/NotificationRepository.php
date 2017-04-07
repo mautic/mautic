@@ -53,18 +53,40 @@ class NotificationRepository extends CommonRepository
      *
      * @param      $userId
      * @param null $id     Clears all if empty
+     * @param null $limit  Clears a set number
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
-    public function clearNotificationsForUser($userId, $id = null)
+    public function clearNotificationsForUser($userId, $id = null, $limit = null)
     {
-        $filter = ['user_id' => (int) $userId];
-
         if (!empty($id)) {
-            $filter['id'] = (int) $id;
-        }
+            $this->getEntityManager()->getConnection()->update(
+                MAUTIC_TABLE_PREFIX.'notifications',
+                [
+                    'is_read' => 1,
+                ],
+                [
+                    'user_id' => (int) $userId,
+                    'id'      => $id,
+                ]
+            );
+        } else {
+            // Only mark the first 30 read
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $qb->update(MAUTIC_TABLE_PREFIX.'notifications')
+                ->set('is_read', 1)
+                ->where('user_id = '.(int) $userId.' AND is_read = 0')
+                ->orderBy('id');
 
-        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], $filter);
+            if ($limit) {
+                // Doctrine API doesn't support updates with limits
+                $this->getEntityManager()->getConnection()->executeUpdate(
+                    $qb->getSQL()." LIMIT $limit"
+                );
+            } else {
+                $qb->execute();
+            }
+        }
     }
 
     /**
@@ -91,10 +113,11 @@ class NotificationRepository extends CommonRepository
      * @param null $afterId
      * @param bool $includeRead
      * @param null $type
+     * @param null $limit
      *
      * @return array
      */
-    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null)
+    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null, $limit = null)
     {
         $qb = $this->createQueryBuilder('n');
 
@@ -121,7 +144,12 @@ class NotificationRepository extends CommonRepository
             $qb->setParameter('type', $type);
         }
 
-        $qb->where($expr);
+        $qb->where($expr)
+            ->orderBy('n.id');
+
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
 
         return $qb->getQuery()->getArrayResult();
     }

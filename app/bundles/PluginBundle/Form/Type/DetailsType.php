@@ -113,10 +113,7 @@ class DetailsType extends AbstractType
 
         $builder->add('in_auth', 'hidden', ['mapped' => false]);
 
-        $builder->add('buttons', 'form_buttons', [
-            'apply_text' => false,
-            'save_text'  => 'mautic.core.form.save',
-        ]);
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

@@ -77,7 +77,7 @@ foreach ($responsiveViewports as $viewport):
         <?php endif; ?>
 
         <div class="<?php echo $paginationWrapper; ?> text-center">
-            <ul class="pagination nm <?php echo $pageClass; ?>">
+            <ul class="pagination np nm <?php echo $pageClass; ?>">
                 <?php
                 $urlPage = '/1';
                 $url     = ($page > 1) ? $baseUrl.$urlPage.$queryString : 'javascript: void(0);';

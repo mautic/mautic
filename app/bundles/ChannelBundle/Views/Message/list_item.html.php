@@ -14,7 +14,7 @@ $messageChannels = $item->getChannels();
 $channels        = [];
 if ($messageChannels) {
     foreach ($messageChannels as $channelName => $channel) {
-        if (!$channel->getChannelId()) {
+        if (!$channel->isEnabled()) {
             continue;
         }
 
