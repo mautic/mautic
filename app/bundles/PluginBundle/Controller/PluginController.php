@@ -203,8 +203,9 @@ class PluginController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
                 $currentFeatureSettings = $entity->getFeatureSettings();
+                $valid                  = $this->isFormValid($form);
 
-                if ($authorize || $valid = $this->isFormValid($form)) {
+                if ($authorize || $valid) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
                     // Merge keys
@@ -262,7 +263,7 @@ class PluginController extends FormController
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
-                    if ($valid) {
+                    if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
