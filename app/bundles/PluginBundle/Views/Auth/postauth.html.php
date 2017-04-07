@@ -11,7 +11,6 @@
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 $view['slots']->set('mauticContent', 'social');
 
-if (empty($message)):
 $data = json_encode($data);
 $js   = <<<JS
 function postFormHandler() {
@@ -22,17 +21,23 @@ function postFormHandler() {
         Mautic.refreshIntegrationForm();
     }
     window.close()
-
 }
+JS;
+
+if (empty($message)):
+    $js .= <<<'JS'
+    
 (function() {
    postFormHandler();
 })();
 JS;
+endif;
 ?>
 <script>
     <?php echo $js; ?>
 </script>
-<?php else: ?>
+
+<?php if (!empty($message)): ?>
     <div class="alert alert-<?php echo $alert; ?>">
         <?php echo $message; ?>
     </div>
