@@ -1152,7 +1152,7 @@ Mautic.initSlotListeners = function() {
             } else if ('imagecaption' === type) {
                 params.slot.find('figcaption').css(fieldParam, '#' + params.field.val());
             } else {
-                params.slot.find('a.button').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a').css(fieldParam, '#' + params.field.val());
             }
         } else if (/gatedvideo/.test(fieldParam)) {
             // Handle gatedVideo replacements
