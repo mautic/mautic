@@ -366,8 +366,8 @@ class ReportModel extends FormModel
 public function exportResults($format, $report, $reportData, $handle, $page)
     {
         $formatter = $this->formatterHelper;
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, '-');
+        $date      = (new DateTimeHelper())->toLocalString();
+        $name      = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
@@ -393,13 +393,13 @@ public function exportResults($format, $report, $reportData, $handle, $page)
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     [
-                        'data' => $reportData['data'],
-                        'columns' => $reportData['columns'],
+                        'data'      => $reportData['data'],
+                        'columns'   => $reportData['columns'],
                         'pageTitle' => $name,
-                        'graphs' => $reportData['graphs'],
-                        'report' => $report,
-                        'dateFrom' => $reportData['dateFrom'],
-                        'dateTo' => $reportData['dateTo'],
+                        'graphs'    => $reportData['graphs'],
+                        'report'    => $report,
+                        'dateFrom'  => $reportData['dateFrom'],
+                        'dateTo'    => $reportData['dateTo'],
                     ]
                 )->getContent();
 
@@ -411,8 +411,10 @@ public function exportResults($format, $report, $reportData, $handle, $page)
                         function () use ($formatter, $reportData, $report, $name) {
                             $objPHPExcel = new \PHPExcel();
                             $objPHPExcel->getProperties()->setTitle($name);
+
                             $objPHPExcel->createSheet();
                             $header = [];
+
                             //build the data rows
                             foreach ($reportData['data'] as $count => $data) {
                                 $row = [];
@@ -423,9 +425,11 @@ public function exportResults($format, $report, $reportData, $handle, $page)
                                     }
                                     $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                                 }
+
                                 if ($count === 0) {
                                     //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+
                                 }
                                 //write the row
                                 $rowCount = $count + 2;
@@ -433,17 +437,21 @@ public function exportResults($format, $report, $reportData, $handle, $page)
                                 //free memory
                                 unset($row, $reportData['data'][$count]);
                             }
+
                             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
                             $objWriter->setPreCalculateFormulas(false);
+
                             $objWriter->save('php://output');
                         }
                     );
+
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');
                     $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
                     $response->headers->set('Expires', 0);
                     $response->headers->set('Cache-Control', 'must-revalidate');
                     $response->headers->set('Pragma', 'public');
+
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
