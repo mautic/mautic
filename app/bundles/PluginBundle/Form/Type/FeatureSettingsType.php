@@ -96,7 +96,7 @@ class FeatureSettingsType extends AbstractType
                 'feature_settings'   => $data,
                 'ignore_field_cache' => ($page == 1 && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
             ];
-            $totalFields = 0;
+
             try {
                 if (empty($fields)) {
                     $fields = $integrationObject->getFormLeadFields($settings);
@@ -120,10 +120,15 @@ class FeatureSettingsType extends AbstractType
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fields = [];
-                $error  = $e->getMessage();
+                $error = $e->getMessage();
                 $this->logger->error($e);
+
+                // Prevent pagination from confusing things by using the cache
+                $page        = 1;
+                $fields      = $integrationCompanyFields      = [];
+                $totalFields = $totalCompanyFields = 0;
             }
+
             list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
 
             $enableDataPriority = !empty($formSettings['enable_data_priority']);
@@ -151,6 +156,7 @@ class FeatureSettingsType extends AbstractType
                     'error_bubbling'       => false,
                 ]
             );
+
             if (!empty($integrationCompanyFields)) {
                 $form->add(
                     'companyFields',
