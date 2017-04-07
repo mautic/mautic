@@ -79,10 +79,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
-        $translator  = $factory->getTranslator();
+        $translator  = $container->get('translator');
         $integration = $input->getOption('integration');
         $startDate   = $input->getOption('start-date');
         $endDate     = $input->getOption('end-date');
@@ -107,11 +104,15 @@ class FetchLeadsCommand extends ContainerAwareCommand
         }
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-            $integrationHelper = $factory->getHelper('integration');
+            $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
+
+            if (!isset($config['objects'])) {
+                $config['objects'] = [];
+            }
 
             $params['start'] = $startDate;
             $params['end']   = $endDate;
@@ -123,11 +124,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
 
                         //Handle case when integration object are named "Contacts" and "Leads"
-                        $lead_object_name                                                  = 'Lead';
+                        $lead_object_name = 'Lead';
                         if (in_array('Leads', $config['objects'])) {
-                            $lead_object_name       = 'Leads';
+                            $lead_object_name = 'Leads';
                         }
-                        $contact_object_name                                               = 'Contact';
+                        $contact_object_name = 'Contact';
                         if (in_array('Contacts', $config['objects'])) {
                             $contact_object_name = 'Contacts';
                         }

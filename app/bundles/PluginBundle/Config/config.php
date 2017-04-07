@@ -80,6 +80,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.plugin.leadbundle.subscriber' => [
+                'class'     => 'Mautic\PluginBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.plugin.model.plugin',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.integration.details' => [
@@ -88,8 +94,13 @@ return [
             ],
             'mautic.form.type.integration.settings' => [
                 'class'     => 'Mautic\PluginBundle\Form\Type\FeatureSettingsType',
-                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters', 'translator'],
-                'alias'     => 'integration_featuresettings',
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+                'alias' => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\FieldsType',

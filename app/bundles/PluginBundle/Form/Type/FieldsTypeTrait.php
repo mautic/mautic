@@ -34,128 +34,170 @@ trait FieldsTypeTrait
         $limit,
         $start
     ) {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
-            $form = $event->getForm();
-            $index = 0;
-            $choices = [];
-            $populatedFields = [];
-            $requiredFields = [];
-            $optionalFields = [];
-            $fieldData = isset($options['data']) ? $options['data'] : [];
-            $isPost = (isset($fieldData['i_1']));
-            $matchedFields = [];
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
+                $form = $event->getForm();
+                $index = 0;
+                $choices = [];
+                $requiredFields = [];
+                $optionalFields = [];
+                $group = [];
+                $fieldData = $event->getData();
 
-            // First loop to build options
-            foreach ($integrationFields as $field => $details) {
-                if (is_array($details) && !empty($details['required'])) {
-                    $requiredFields[$field] = $details;
-                } elseif (isset($fieldData[$field])) {
-                    $populatedFields[$field] = $details;
-                } else {
-                    $optionalFields[$field] = $details;
-                }
-                if (is_array($details)) {
-                    if (isset($details['group'])) {
-                        if (!isset($choices[$details['group']])) {
-                            $choices[$details['group']] = [];
+                // First loop to build options
+                foreach ($integrationFields as $field => $details) {
+                    $groupName = '0default';
+                    if (is_array($details)) {
+                        if (isset($details['group'])) {
+                            if (!isset($choices[$details['group']])) {
+                                $choices[$details['group']] = [];
+                            }
+                            $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
+                            $group[$field] = $groupName = $details['group'];
+                            $choices[$field] = $label;
+                        } else {
+                            $choices[$field] = $details['label'];
                         }
-                        $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                        $group[$field] = $details['group'];
-                        $choices[$field] = $label;
                     } else {
-                        $choices[$field] = $details['label'];
+                        $choices[$field] = $details;
                     }
-                } else {
-                    $choices[$field] = $details;
-                }
-            }
 
-            $fields = array_merge($requiredFields, $populatedFields, $optionalFields);
-            $paginatedFields = array_slice($fields, $start, $limit);
-            foreach ($paginatedFields as $field => $details) {
-                $matched = isset($fieldData[$field]);
-                $required = (int) !empty($integrationFields[$field]['required']);
-                $disabled = (!$required && $index > 1 && !$matched) ? 'disabled' : '';
-                $mauticDisabled = ($required || $index == 1 || $matched) ? '' : 'disabled';
-                ++$index;
-                $form->add(
-                    'label_'.$index,
-                    'text',
-                    [
-                        'label' => false,
-                        'data'  => $choices[$field],
-                        'attr'  => [
-                            'class'         => 'form-control integration-fields',
-                            'data-required' => $required,
-                            'data-label'    => $choices[$field],
-                            'placeholder'   => isset($group[$field]) ? $group[$field] : '',
-                            'readonly'      => true,
-                        ],
-                        'by_reference' => true,
-                        'mapped'       => false,
-                    ]
-                );
-                if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
-                    $updateName = 'update_mautic';
-                    if ($fieldObject) {
-                        $updateName .= '_'.$fieldObject;
+                    if (!isset($requiredFields[$groupName])) {
+                        $requiredFields[$groupName] = [];
+                        $optionalFields[$groupName] = [];
                     }
+
+                    if (is_array($details) && !empty($details['required'])) {
+                        $requiredFields[$groupName][$field] = $details;
+                    } else {
+                        $optionalFields[$groupName][$field] = $details;
+                    }
+                }
+
+                // Order the fields by label
+                ksort($requiredFields, SORT_NATURAL);
+                ksort($optionalFields, SORT_NATURAL);
+
+                $sortFieldsFunction = function ($a, $b) {
+                    if (is_array($a)) {
+                        $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
+                    } else {
+                        $aLabel = $a;
+                    }
+
+                    if (is_array($b)) {
+                        $bLabel = (isset($b['optionLabel'])) ? $b['optionLabel'] : $b['label'];
+                    } else {
+                        $bLabel = $b;
+                    }
+
+                    return strnatcasecmp($aLabel, $bLabel);
+                };
+
+                $fields = [];
+                foreach ($requiredFields as $groupName => $groupedFields) {
+                    uasort($groupedFields, $sortFieldsFunction);
+
+                    $fields = array_merge($fields, $groupedFields);
+                }
+                foreach ($optionalFields as $groupName => $groupedFields) {
+                    uasort($groupedFields, $sortFieldsFunction);
+
+                    $fields = array_merge($fields, $groupedFields);
+                }
+
+                // Ensure that fields aren't hidden
+                if ($start > count($fields)) {
+                    $start = 0;
+                }
+                $paginatedFields = array_slice($fields, $start, $limit);
+
+                foreach ($paginatedFields as $field => $details) {
+                    $matched = isset($fieldData[$field]);
+                    $required = (int) !empty($integrationFields[$field]['required']);
+
+                    ++$index;
                     $form->add(
-                        $updateName.$index,
-                        'button_group',
+                        'label_'.$index,
+                        'text',
                         [
-                            'choices' => [
-                                '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>',
-                                '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
+                            'label' => false,
+                            'data'  => $choices[$field],
+                            'attr'  => [
+                                'class'         => 'form-control integration-fields',
+                                'data-required' => $required,
+                                'data-label'    => $choices[$field],
+                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                                'readonly'      => true,
                             ],
-                            'label'       => false,
-                            'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
-                            'empty_value' => false,
-                            'attr'        => ['data-toggle' => 'tooltip', 'title' => 'mautic.plugin.direction.data.update', 'disabled' => $disabled],
-                            'disabled'    => $disabled,
+                            'by_reference' => true,
+                            'mapped'       => false,
+                        ]
+                    );
+                    if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
+                        $updateName = 'update_mautic';
+                        if ($fieldObject) {
+                            $updateName .= '_'.$fieldObject;
+                        }
+                        $form->add(
+                            $updateName.$index,
+                            'button_group',
+                            [
+                                'choices' => [
+                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>',
+                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
+                                ],
+                                'label'       => false,
+                                'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
+                                'empty_value' => false,
+                                'attr'        => [
+                                    'data-toggle' => 'tooltip',
+                                    'title'       => 'mautic.plugin.direction.data.update',
+                                ],
+                            ]
+                        );
+                    }
+
+                    $form->add(
+                        'm_'.$index,
+                        'choice',
+                        [
+                            'choices'    => $mauticFields,
+                            'label'      => false,
+                            'data'       => $matched ? $fieldData[$field] : '',
+                            'label_attr' => ['class' => 'control-label'],
+                            'attr'       => [
+                                'class'            => 'field-selector',
+                                'data-placeholder' => ' ',
+                                'data-required'    => $required,
+                                'data-value'       => $matched ? $fieldData[$field] : '',
+                                'data-choices'     => $mauticFields,
+                            ],
+                        ]
+                    );
+                    $form->add(
+                        'i_'.$index,
+                        HiddenType::class,
+                        [
+                            'data' => $field,
+                            'attr' => [
+                                'data-required' => $required,
+                            ],
+                        ]
+                    );
+                    $form->add(
+                        $field,
+                        HiddenType::class,
+                        [
+                            'data' => $index,
+                            'attr' => [
+                                'data-required' => $required,
+                            ],
                         ]
                     );
                 }
-                $form->add(
-                    'm_'.$index,
-                    'choice',
-                    [
-                        'choices'    => $mauticFields,
-                        'label'      => false,
-                        'data'       => $matched ? $fieldData[$field] : '',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class'            => 'field-selector',
-                            'data-placeholder' => ' ',
-                            'data-required'    => $required,
-                            'data-value'       => $matched ? $fieldData[$field] : '',
-                            'disabled'         => $mauticDisabled,
-                            'data-choices'     => $mauticFields,
-                        ],
-                        'disabled' => $mauticDisabled,
-                    ]
-                );
-                $form->add(
-                    'i_'.$index,
-                    HiddenType::class,
-                    [
-                        'data' => $field,
-                        'attr' => [
-                            'data-required' => $required,
-                        ],
-                    ]
-                );
-                $form->add(
-                    $field,
-                    HiddenType::class,
-                    [
-                        'data' => $index,
-                        'attr' => [
-                            'data-required' => $required,
-                        ],
-                    ]
-                );
             }
-        });
+        );
     }
 }

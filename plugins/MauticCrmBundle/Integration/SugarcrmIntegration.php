@@ -283,8 +283,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
                                     //7.x
                                     foreach ($leadObject['fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment']) && !in_array($fieldInfo['type'], ['id', 'team_list', 'bool', 'link', 'relate'])) {
-                                            $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
+                                        if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment'])
+                                            && !in_array(
+                                                $fieldInfo['type'],
+                                                ['id', 'team_list', 'bool', 'link', 'relate']
+                                            )
+                                        ) {
+                                            $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false)
+                                                ? $fieldInfo['name']
+                                                : str_replace(
+                                                    'webtolead_',
+                                                    '',
+                                                    $fieldInfo['name']
+                                                );
 
                                             $sugarFields[$fieldName] = [
                                                 'type'     => 'string',
@@ -293,11 +304,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             ];
                                         }
                                     }
-                                    $this->cache->set('leadFields', $sugarFields);
                                 }
+
+                                $this->cache->set('leadFields', $sugarFields);
                             }
                         }
-                        asort($sugarFields[$sObject]);
                     } else {
                         throw new ApiErrorException($this->authorzationError);
                     }
