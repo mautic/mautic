@@ -42,7 +42,7 @@ class Version20170401000000 extends AbstractMauticMigration
     {
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD clicked_count INT NOT NULL;");
         $this->addSql("ALTER TABLE {$this->prefix}email_stats ADD is_clicked TINYINT(1) NOT NULL, ADD date_clicked DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)';");
-        $this->addSql("CREATE INDEX {$this->prefix}stat_email_clicked_search ON email_stats (is_clicked);");
+        $this->addSql("CREATE INDEX stat_email_clicked_search ON {$this->prefix}email_stats (is_clicked);");
     }
 
     /**
@@ -65,7 +65,7 @@ class Version20170401000000 extends AbstractMauticMigration
         // get all email_stats where lead and email ids are not null and where there is a page hit
         $qb->select('es.email_id as emailId, es.id as statId, es.lead_id as leadId')
             ->addSelect('ph.date_hit as hit')
-            ->from('email_stats', 'es')
+            ->from($this->prefix.'email_stats', 'es')
             ->join('es', 'page_hits', 'ph', 'ph.email_id = es.email_id')
             ->where('es.email_id IS NOT NULL')
             ->andWhere('es.lead_id IS NOT NULL')
