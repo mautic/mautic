@@ -11,8 +11,8 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -41,17 +41,30 @@ class FeatureSettingsType extends AbstractType
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    protected $translator;
 
     /**
-     * @param MauticFactory $factory
+     * @var LoggerInterface
      */
-    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
-        $this->factory              = $factory;
+    protected $logger;
+
+    /**
+     * FeatureSettingsType constructor.
+     *
+     * @param Session              $session
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param TranslatorInterface  $translator
+     */
+    public function __construct(
+        Session $session,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        LoggerInterface $logger
+    ) {
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
+        $this->logger               = $logger;
     }
 
     /**
@@ -75,16 +88,13 @@ class FeatureSettingsType extends AbstractType
                 'mautic.plugin.'.$integrationName.'.lead.limit',
                 $this->coreParametersHelper->getParameter('default_pagelimit')
             );
-            $page  = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
-            $start = $session->get('mautic.plugin.'.$integrationName.'.lead.start', 1);
-
-            $companyPage  = $session->get('mautic.plugin.'.$integrationName.'.company.lead.page', 1);
-            $companyStart = $session->get('mautic.plugin.'.$integrationName.'.company.start', 1);
+            $page        = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
+            $companyPage = $session->get('mautic.plugin.'.$integrationName.'.company.lead.page', 1);
 
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => ($page == 1) ? true : false,
+                'ignore_field_cache' => ($page == 1 && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
             ];
             $totalFields = 0;
             try {
@@ -112,29 +122,12 @@ class FeatureSettingsType extends AbstractType
             } catch (\Exception $e) {
                 $fields = [];
                 $error  = $e->getMessage();
+                $this->logger->error($e);
             }
             list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
-            /**
-             * Auto Match Integration Fields with Mautic Fields.
-             */
-            $flattenLeadFields = [];
-            foreach (array_values($leadFields) as $fieldsWithoutGroups) {
-                $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
-            }
-            $integrationFields  = array_keys($fields);
-            $flattenLeadFields  = array_keys($flattenLeadFields);
-            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
-            $enableDataPriority = false;
-            if (isset($formSettings['enable_data_priority'])) {
-                $enableDataPriority = $formSettings['enable_data_priority'];
-            }
 
-            $autoMatchedFields = [];
-            foreach ($fieldsIntersection as $field) {
-                $autoMatchedFields[$field] = strtolower($field);
-            }
-            $leadFields['-1'] = '';
-            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < ($limit / 2)) ? 1 : 0;
+            $enableDataPriority = !empty($formSettings['enable_data_priority']);
+
             $form->add(
                 'leadFields',
                 'integration_fields',
@@ -142,7 +135,7 @@ class FeatureSettingsType extends AbstractType
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
                     'lead_fields'          => $leadFields,
-                    'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
+                    'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
                     'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
@@ -150,15 +143,15 @@ class FeatureSettingsType extends AbstractType
                     'enable_data_priority' => $enableDataPriority,
                     'integration'          => $integrationObject->getName(),
                     'totalFields'          => $totalFields,
-                    'page'                 => $page,
                     'limit'                => $limit,
-                    'start'                => $start,
-                    'fixedPageNum'         => round($totalFields / $limit) + $extraPage,
+                    'start'                => (1 === $page) ? 0 : ($page - 1) * $limit,
+                    'page'                 => $page,
+                    'fixedPageNum'         => round($totalFields / $limit),
+                    'mapped'               => false,
+                    'error_bubbling'       => false,
                 ]
             );
             if (!empty($integrationCompanyFields)) {
-                $extraPage           = ($totalCompanyFields % $limit > 0 && $totalCompanyFields % $limit < ($limit / 2)) ? 1 : 0;
-                $companyFields['-1'] = '';
                 $form->add(
                     'companyFields',
                     'integration_company_fields',
@@ -175,10 +168,12 @@ class FeatureSettingsType extends AbstractType
                         'enable_data_priority'       => $enableDataPriority,
                         'integration'                => $integrationObject->getName(),
                         'totalFields'                => $totalCompanyFields,
-                        'page'                       => $companyPage,
                         'limit'                      => $limit,
-                        'start'                      => $companyStart,
-                        'fixedPageNum'               => (round($totalCompanyFields / $limit)) + $extraPage,
+                        'start'                      => (1 === $companyPage) ? 0 : ($companyPage - 1) * $limit,
+                        'page'                       => $companyPage,
+                        'fixedPageNum'               => (round($totalCompanyFields / $limit)),
+                        'mapped'                     => false,
+                        'error_bubbling'             => false,
                     ]
                 );
             }
@@ -207,7 +202,7 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }

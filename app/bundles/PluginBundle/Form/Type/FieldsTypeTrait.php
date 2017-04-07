@@ -15,8 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 trait FieldsTypeTrait
 {
@@ -114,6 +112,7 @@ trait FieldsTypeTrait
                     $start = 0;
                 }
                 $paginatedFields = array_slice($fields, $start, $limit);
+
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$field]);
                     $required = (int) !empty($integrationFields[$field]['required']);
@@ -160,20 +159,6 @@ trait FieldsTypeTrait
                         );
                     }
 
-                    $constraints = ($required) ? [
-                        new NotBlank(
-                            [
-                                'message' => 'mautic.core.value.required',
-                            ]
-                        ),
-                        new NotEqualTo(
-                            [
-                                'message' => 'mautic.core.value.required',
-                                'value'   => '-1',
-                            ]
-                        ),
-                    ] : [];
-
                     $form->add(
                         'm_'.$index,
                         'choice',
@@ -189,7 +174,6 @@ trait FieldsTypeTrait
                                 'data-value'       => $matched ? $fieldData[$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
-                            'constraints' => $constraints,
                         ]
                     );
                     $form->add(

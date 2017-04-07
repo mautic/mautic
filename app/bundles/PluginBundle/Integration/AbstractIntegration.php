@@ -1274,6 +1274,108 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param Integration $entity
+     * @param array       $mauticLeadFields
+     * @param array       $mauticCompanyFields
+     *
+     * @return array
+     */
+    public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
+    {
+        $featureSettings        = $entity->getFeatureSettings();
+        $submittedFields        = (isset($featureSettings['leadFields'])) ? $featureSettings['leadFields'] : [];
+        $submittedCompanyFields = (isset($featureSettings['companyFields'])) ? $featureSettings['companyFields'] : [];
+        $submittedObjects       = (isset($featureSettings['objects'])) ? $featureSettings['objects'] : [];
+        $missingRequiredFields  = [];
+
+        //make sure now non-existent aren't saved
+        $settings = [
+            'ignore_field_cache' => false,
+        ];
+        $settings['feature_settings']['objects'] = $submittedObjects;
+        $availableIntegrationFields              = $this->getAvailableLeadFields($settings);
+        $leadFields                              = [];
+
+        /**
+         * @param $mappedFields
+         * @param $integrationFields
+         * @param $mauticFields
+         * @param $fieldType
+         */
+        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings) {
+            $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
+            $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
+
+            // Find all the mapped fields that no longer exist in Mautic
+            if ($nonExistentFields = array_diff($mappedFields, array_keys($mauticFields))) {
+                // Remove those fields
+                $removeFields = array_merge($removeFields, array_keys($nonExistentFields));
+            }
+
+            foreach ($removeFields as $field) {
+                unset($mappedFields[$field]);
+
+                if (isset($featureSettings[$updateKey])) {
+                    unset($featureSettings[$updateKey][$field]);
+                }
+            }
+
+            // Check if required fields are missing
+            $required = $this->getRequiredFields($integrationFields);
+            if (array_diff_key($required, $mappedFields)) {
+                $missingRequiredFields[$fieldType] = true;
+            }
+        };
+
+        if ($submittedObjects) {
+            if (in_array('company', $submittedObjects)) {
+                // special handling for company fields
+                if (isset($availableIntegrationFields['company'])) {
+                    $cleanup($submittedCompanyFields, $availableIntegrationFields['company'], $mauticCompanyFields, 'companyFields');
+                    $featureSettings['companyFields'] = $submittedCompanyFields;
+                    unset($availableIntegrationFields['company']);
+                }
+            }
+
+            // Rest of the objects are merged and assumed to be leadFields
+            foreach ($submittedObjects as $object) {
+                if (isset($availableIntegrationFields[$object])) {
+                    $leadFields = array_merge($leadFields, $availableIntegrationFields[$object]);
+                }
+            }
+        } else {
+            // Cleanup assuming there are no objects as keys
+            $leadFields = $availableIntegrationFields;
+        }
+
+        if (!empty($leadFields)) {
+            $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
+            $featureSettings['leadFields'] = $submittedFields;
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        return $missingRequiredFields;
+    }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function getRequiredFields(array $fields)
+    {
+        $requiredFields = [];
+        foreach ($fields as $field => $details) {
+            if (is_array($details) && !empty($details['required'])) {
+                $requiredFields[$field] = $field;
+            }
+        }
+
+        return $requiredFields;
+    }
+
+    /**
      * Match lead data with integration fields.
      *
      * @param $lead

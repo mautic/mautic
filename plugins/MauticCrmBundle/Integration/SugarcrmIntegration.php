@@ -208,6 +208,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
+
+                    $this->cache->set('leadFields', $sugarFields);
                 }
             } else {
                 throw new ApiErrorException($this->authorzationError);
@@ -219,8 +221,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
-        $this->cache->set('leadFields', $sugarFields);
 
         return $sugarFields;
     }

@@ -14,11 +14,14 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -153,6 +156,7 @@ class PluginController extends FormController
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
+        /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
         // Verify that the requested integration exists
@@ -176,8 +180,7 @@ class PluginController extends FormController
         }
 
         /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
+        $pluginModel   = $this->getModel('plugin');
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
@@ -219,92 +222,48 @@ class PluginController extends FormController
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
-                            //make sure now non-existent aren't saved
-                            $featureSettings        = $entity->getFeatureSettings();
-                            $submittedObjects       = $this->request->get('integration_details[featureSettings][objects]', [], true);
-                            $submittedFields        = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
-                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
-                            //make sure now non-existent aren't saved
-                            $settings = [
-                                'ignore_field_cache' => false,
-                            ];
-                            $settings['feature_settings']['objects'] = $submittedObjects;
-                            $newIntegrationFields                    = $integrationObject->getAvailableLeadFields($settings);
-                            $leadNewIntegrationFields                = [];
-                            $removeCompanyFields                     = [];
-                            if (isset($newIntegrationFields['Lead'])) {
-                                $leadNewIntegrationFields = $newIntegrationFields['Lead'];
+                            // Ungroup the fields
+                            $mauticLeadFields = [];
+                            foreach ($leadFields as $group => $groupFields) {
+                                $mauticLeadFields = array_merge($mauticLeadFields, $groupFields);
                             }
-                            if (isset($newIntegrationFields['Contact'])) {
-                                $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
+                            $mauticCompanyFields = [];
+                            foreach ($companyFields as $group => $groupFields) {
+                                $mauticCompanyFields = array_merge($mauticCompanyFields, $groupFields);
                             }
 
-                            if (!isset($currentFeatureSettings['leadFields'])) {
-                                $currentFeatureSettings['leadFields'] = [];
-                            }
-                            $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
+                            if ($missing = $integrationObject->cleanUpFields($entity, $mauticLeadFields, $mauticCompanyFields)) {
+                                if (!empty($missing['leadFields'])) {
+                                    $valid = false;
 
-                            foreach ($removeLeadFields as $key => $removeLeadField) {
-                                unset($currentFeatureSettings['leadFields'][$key]);
-                                if (isset($currentFeatureSettings['update_mautic'])) {
-                                    unset($currentFeatureSettings['update_mautic'][$key]);
+                                    $form->get('featureSettings')->get('leadFields')->addError(
+                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
+                                    );
                                 }
-                            }
 
-                            if (!isset($currentFeatureSettings['companyFields'])) {
-                                $currentFeatureSettings['companyFields'] = [];
-                            }
-                            if (isset($newIntegrationFields['company'])) {
-                                $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
-                                $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
-                            }
+                                if (!empty($missing['companyFields'])) {
+                                    $valid = false;
 
-                            foreach ($removeCompanyFields as $key => $removeCompanyField) {
-                                unset($currentFeatureSettings['companyFields'][$key]);
-                                if (isset($currentFeatureSettings['update_mautic_company'])) {
-                                    unset($currentFeatureSettings['update_mautic_company'][$key]);
+                                    $form->get('featureSettings')->get('companyFields')->addError(
+                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
+                                    );
                                 }
                             }
-
-                            if (!empty($submittedFields)) {
-                                if (isset($currentFeatureSettings['leadFields'])) {
-                                    $featureSettings['leadFields'] = $currentFeatureSettings['leadFields'];
-                                } else {
-                                    $featureSettings['leadFields'] = [];
-                                }
-                                if (isset($currentFeatureSettings['update_mautic'])) {
-                                    $featureSettings['update_mautic'] = $currentFeatureSettings['update_mautic'];
-                                } else {
-                                    $featureSettings['update_mautic'] = [];
-                                }
-                            }
-
-                            if (!empty($submittedCompanyFields)) {
-                                if (isset($currentFeatureSettings['companyFields'])) {
-                                    $featureSettings['companyFields'] = $currentFeatureSettings['companyFields'];
-                                } else {
-                                    $featureSettings['companyFields'] = [];
-                                }
-                                if (isset($currentFeatureSettings['update_mautic_company'])) {
-                                    $featureSettings['update_mautic_company'] = $currentFeatureSettings['update_mautic_company'];
-                                } else {
-                                    $featureSettings['update_mautic_company'] = [];
-                                }
-                            }
-                            $entity->setFeatureSettings($featureSettings);
                         }
                     } else {
                         //make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
-                    $dispatcher = $this->get('event_dispatcher');
-                    if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                        $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
-                    }
+                    if ($valid) {
+                        $dispatcher = $this->get('event_dispatcher');
+                        if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
+                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
+                        }
 
-                    $em->persist($entity);
-                    $em->flush();
+                        $em->persist($entity);
+                        $em->flush();
+                    }
 
                     if ($authorize) {
                         //redirect to the oauth URL

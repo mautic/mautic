@@ -28,6 +28,13 @@ $baseUrl = $view['router']->path(
             <?php echo $view['translator']->trans($specialInstructions); ?>
         </div>
     <?php endif; ?>
+    <?php if (count($form->vars['errors'])): ?>
+        <div class="alert alert-danger">
+            <?php foreach ($form->vars['errors'] as $error): ?>
+                <p><?php echo $error->getMessage() ?></p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
     <div class="<?php echo $object; ?>-field form-group col-xs-12">
         <div class="row">
             <?php $class = ($numberOfFields == 5) ? 5 : 6; ?>
@@ -37,7 +44,6 @@ $baseUrl = $view['router']->path(
             <?php endif; ?>
             <div class="mb-xs col-sm-<?php echo $class; ?> text-center"><h4><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></h4></div>
         </div>
-        <?php echo $view['form']->errors($form); ?>
         <?php foreach ($form->children as $child):
             $selected = false;
             ?>
@@ -126,6 +132,7 @@ $baseUrl = $view['router']->path(
                         class="<?php echo $child->vars['attr']['class']; ?>"
                         data-placeholder=" "
                         autocomplete="false" onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')">
+                    <option value=""></option>
                     <?php
                     $mauticChoices = $child->vars['attr']['data-choices'];
                     foreach ($mauticChoices as $keyLabel => $options): ?>
@@ -160,6 +167,7 @@ $baseUrl = $view['router']->path(
             ?>
         <?php endforeach; ?>
     </div>
+    <?php if ($indexCount - 1 < $totalFields): ?>
     <div class="panel-footer">
 
         <?php echo $view->render(
@@ -175,4 +183,5 @@ $baseUrl = $view['router']->path(
             ]
         ); ?>
     </div>
+    <?php endif; ?>
 </div>

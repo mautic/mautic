@@ -184,6 +184,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                         ];
                     }
                 }
+
+                $this->cache->set('leadFields', $zohoFields);
             }
         } catch (ErrorException $exception) {
             $this->logIntegrationError($exception);
@@ -194,8 +196,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
             return false;
         }
-
-        $this->cache->set('leadFields', $zohoFields);
 
         return $zohoFields;
     }
