@@ -577,8 +577,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-            $contactFiels          = $this->cleanSalesForceData($config, $fields, 'Contact');
-            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => 'Contact']);
+            $contactFields         = $this->cleanSalesForceData($config, $fields, 'Contact');
+            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact']);
             $this->amendLeadDataBeforePush($mappedData['Contact']);
         }
         if (empty($mappedData)) {
