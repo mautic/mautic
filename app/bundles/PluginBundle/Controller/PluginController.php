@@ -233,20 +233,27 @@ class PluginController extends FormController
                             }
 
                             if ($missing = $integrationObject->cleanUpFields($entity, $mauticLeadFields, $mauticCompanyFields)) {
-                                if (!empty($missing['leadFields'])) {
-                                    $valid = false;
+                                if ($entity->getIsPublished()) {
+                                    // Only fail validation if the integration is enabled
+                                    if (!empty($missing['leadFields'])) {
+                                        $valid = false;
 
-                                    $form->get('featureSettings')->get('leadFields')->addError(
-                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
-                                    );
-                                }
+                                        $form->get('featureSettings')->get('leadFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
 
-                                if (!empty($missing['companyFields'])) {
-                                    $valid = false;
+                                    if (!empty($missing['companyFields'])) {
+                                        $valid = false;
 
-                                    $form->get('featureSettings')->get('companyFields')->addError(
-                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
-                                    );
+                                        $form->get('featureSettings')->get('companyFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
                                 }
                             }
                         }
