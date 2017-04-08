@@ -373,7 +373,7 @@ class FocusModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added');
+        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['focus_id' => $focus->getId()]);
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }
