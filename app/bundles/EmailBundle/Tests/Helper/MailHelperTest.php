@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -112,6 +113,43 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(true);
     }
 
+    public function testQueuedEmailFromOverride()
+    {
+        $mockFactory = $this->getMockFactory(false);
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $email = new Email();
+        $email->setFromAddress('override@nowhere.com');
+
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $contact) {
+            $mailer->setTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue();
+        $from = $mailer->message->getFrom();
+
+        $this->assertTrue(array_key_exists('override@nowhere.com', $from));
+
+        $mailer->reset();
+        foreach ($this->contacts as $contact) {
+            $mailer->setTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+        $mailer->flushQueue();
+        $from = $mailer->message->getFrom();
+
+        $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
+    }
+
     public function testQueuedOwnerAsMailer()
     {
         $mockFactory = $this->getMockFactory();
@@ -190,7 +228,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function getMockFactory()
+    protected function getMockFactory($mailIsOwner = true)
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -222,7 +260,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                     [
                         ['mailer_return_path', false, null],
                         ['mailer_spool_type', false, 'memory'],
-                        ['mailer_is_owner', false, true],
+                        ['mailer_is_owner', false, $mailIsOwner],
                     ]
                 )
             );

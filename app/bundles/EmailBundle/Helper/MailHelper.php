@@ -68,6 +68,11 @@ class MailHelper
     protected $from;
 
     /**
+     * @var
+     */
+    protected $systemFrom;
+
+    /**
      * @var string
      */
     protected $returnPath;
@@ -236,7 +241,7 @@ class MailHelper
             $this->logError($e);
         }
 
-        $this->from       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
+        $this->from       = $this->systemFrom       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
@@ -572,6 +577,8 @@ class MailHelper
                     if ($useOwnerAsMailer && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
                     } else {
+                        if ($this->email) {
+                        }
                         $this->setFrom($this->from);
                     }
 
@@ -641,7 +648,7 @@ class MailHelper
             $this->appendTrackingPixel = false;
 
             unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
-
+            $this->from    = $this->systemFrom;
             $this->headers = $this->source = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = [];
             $this->email   = null;
             $this->subject = $this->plainText = '';
@@ -1336,12 +1343,17 @@ class MailHelper
 
         $fromEmail = $email->getFromAddress();
         $fromName  = $email->getFromName();
-        if (!empty($fromEmail) && !empty($fromEmail)) {
+        if (!empty($fromEmail) || !empty($fromName)) {
+            if (!empty($fromEmail)) {
+                $fromName = array_values($this->from)[0];
+            } elseif (!empty($fromName)) {
+                $fromEmail = key($this->from);
+            }
+
             $this->setFrom($fromEmail, $fromName);
-        } elseif (!empty($fromEmail)) {
-            $this->setFrom($fromEmail, $this->from);
-        } elseif (!empty($fromName)) {
-            $this->setFrom(key($this->from), $fromName);
+            $this->from = [$fromEmail, $fromName];
+        } else {
+            $this->from = $this->systemFrom;
         }
 
         $replyTo = $email->getReplyToAddress();
