@@ -1351,7 +1351,7 @@ class MailHelper
             }
 
             $this->setFrom($fromEmail, $fromName);
-            $this->from = [$fromEmail, $fromName];
+            $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
         }

@@ -138,6 +138,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('override@nowhere.com', $from));
+        $this->assertTrue(count($from) === 1);
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
@@ -149,6 +150,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
+        $this->assertTrue(count($from) === 1);
     }
 
     public function testQueuedOwnerAsMailer()
