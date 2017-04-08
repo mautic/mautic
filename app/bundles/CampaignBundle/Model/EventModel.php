@@ -35,6 +35,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
 /**
  * Class EventModel
  * {@inheritdoc}
@@ -442,20 +445,7 @@ class EventModel extends CommonFormModel
         return $actionResponses;
     }
 
-    /**
-     * Trigger the root level action(s) in campaign(s).
-     *
-     * @param Campaign        $campaign
-     * @param                 $totalEventCount
-     * @param int             $limit
-     * @param bool            $max
-     * @param OutputInterface $output
-     * @param int|null        $leadId
-     * @param bool|false      $returnCounts    If true, returns array of counters
-     *
-     * @return int
-     */
-    public function triggerStartingEvents(
+    public function consumeStartingEvents(
         $campaign,
         &$totalEventCount,
         $limit = 100,
@@ -474,6 +464,11 @@ class EventModel extends CommonFormModel
         $campaignRepo = $this->getCampaignRepository();
         $logRepo      = $this->getLeadEventLogRepository();
 
+        // Create a channel and a queue for receiving  the events
+        $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $this->connection->channel();
+        $channel->queue_declare('trigger_start', false, false, false, false);
+
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
             // Include decisions if there are listeners
             $events = $repo->getRootLevelEvents($campaignId, true, true);
@@ -491,81 +486,21 @@ class EventModel extends CommonFormModel
 
         $rootEventCount = count($events);
 
-        if (empty($rootEventCount)) {
-            $this->logger->debug('CAMPAIGN: No events to trigger');
-
-            return ($returnCounts) ? [
-                'events'         => 0,
-                'evaluated'      => 0,
-                'executed'       => 0,
-                'totalEvaluated' => 0,
-                'totalExecuted'  => 0,
-            ] : 0;
-        }
-
         // Event settings
         $eventSettings = $this->campaignModel->getEvents();
-
-        // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
-        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, array_keys($events));
-
-        // Get a total number of events that will be processed
-        $totalStartingEvents = $leadCount * $rootEventCount;
-
-        if ($output) {
-            $output->writeln(
-                $this->translator->trans(
-                    'mautic.campaign.trigger.event_count',
-                    ['%events%' => $totalStartingEvents, '%batch%' => $limit]
-                )
-            );
-        }
-
-        if (empty($leadCount)) {
-            $this->logger->debug('CAMPAIGN: No contacts to process');
-
-            unset($events);
-
-            return ($returnCounts) ? [
-                'events'         => 0,
-                'evaluated'      => 0,
-                'executed'       => 0,
-                'totalEvaluated' => 0,
-                'totalExecuted'  => 0,
-            ] : 0;
-        }
-
-        $evaluatedEventCount = $executedEventCount = $rootEvaluatedCount = $rootExecutedCount = 0;
 
         // Try to save some memory
         gc_enable();
 
-        $maxCount = ($max) ? $max : $totalStartingEvents;
-
-        if ($output) {
-            $progress = ProgressBarHelper::init($output, $maxCount);
-            $progress->start();
-        }
-
-        $continue = true;
-
-        $sleepBatchCount   = 0;
-        $batchDebugCounter = 1;
-
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
 
-        while ($continue) {
-            $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+        $callback = function($msg) use ($output,$events,$eventSettings,$campaign,$campaignId) {
 
+          try{
             // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
-            $campaignLeads = ($leadId) ? [$leadId] : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
+            $campaignLeads= explode(' ',$msg->body);
 
-            if (empty($campaignLeads)) {
-                // No leads found
-                $this->logger->debug('CAMPAIGN: No campaign contacts found.');
-
-                break;
-            }
+            $this->em->getConnection()->beginTransaction();
 
             $leads = $this->leadModel->getEntities(
                 [
@@ -585,41 +520,16 @@ class EventModel extends CommonFormModel
                 ]
             );
 
-            $this->logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', array_keys($leads)));
-
-            if (!count($leads)) {
-                // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                $this->logger->debug('CAMPAIGN: No contact entities found.');
-
-                break;
-            }
-
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             $leadDebugCounter = 1;
             foreach ($leads as $lead) {
                 $this->logger->debug('CAMPAIGN: Current Lead ID# '.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
-                if ($rootEvaluatedCount >= $maxCount || ($max && ($rootEvaluatedCount + $rootEventCount) >= $max)) {
-                    // Hit the max or will hit the max mid-progress for a lead
-                    $continue = false;
-                    $this->logger->debug('CAMPAIGN: Hit max so aborting.');
-
-                    break;
-                }
-
                 // Set lead in case this is triggered by the system
                 $this->leadModel->setSystemCurrentLead($lead);
 
                 foreach ($events as $event) {
-                    ++$rootEvaluatedCount;
 
-                    if ($sleepBatchCount == $limit) {
-                        // Keep CPU down
-                        $this->batchSleep();
-                        $sleepBatchCount = 0;
-                    } else {
-                        ++$sleepBatchCount;
-                    }
 
                     if ($event['eventType'] == 'decision') {
                         ++$evaluatedEventCount;
@@ -705,9 +615,6 @@ class EventModel extends CommonFormModel
 
                     unset($event);
 
-                    if ($output && $rootEvaluatedCount < $maxCount) {
-                        $progress->setProgress($rootEvaluatedCount);
-                    }
                 }
 
                 // Free some RAM
@@ -717,6 +624,9 @@ class EventModel extends CommonFormModel
                 ++$leadDebugCounter;
             }
 
+            $this->em->flush();
+            $output->writeln('commit transaction');
+            $this->em->getConnection()->commit();
             $this->em->clear('Mautic\LeadBundle\Entity\Lead');
             $this->em->clear('Mautic\UserBundle\Entity\User');
 
@@ -727,7 +637,158 @@ class EventModel extends CommonFormModel
 
             $this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
 
-            ++$batchDebugCounter;
+          ++$batchDebugCounter;
+          $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+
+          }catch(Exception $e) {
+
+            $output->writeln('Exception while consuming message');
+            $output->writeln($e);
+          }
+        };
+
+
+        $channel->basic_qos(null,1,null);
+        $channel->basic_consume('trigger_start', '', false, false, false, false, $callback);
+
+        // Timeout in  $timeout_period in seconds  and give up on $max_timeout retries
+        // Reset counter on success
+        $max_timeout = 10;
+        $timeout_period = 0.2;
+        $timeout_counter = 0 ;
+
+        while(count($channel->callbacks) >=1 && ($timeout_counter < $max_timeout) ) {
+
+          try {
+
+            $channel->wait(null,false,$timeout_period);
+            $timeout_counter = 0;
+          }catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e){
+              $output->writeln('trigger_start wait timeout counter ' . $timeout_counter );
+              $timeout_counter = $timeout_counter + 1;
+          }
+        }
+
+    }
+
+
+    /**
+     * Trigger the root level action(s) in campaign(s).
+     *
+     * @param Campaign        $campaign
+     * @param                 $totalEventCount
+     * @param int             $limit
+     * @param bool            $max
+     * @param OutputInterface $output
+     * @param int|null        $leadId
+     * @param bool|false      $returnCounts    If true, returns array of counters
+     *
+     * @return int
+     */
+    public function triggerStartingEvents(
+        $campaign,
+        &$totalEventCount,
+        $limit = 100,
+        $max = false,
+        OutputInterface $output = null,
+        $leadId = null,
+        $returnCounts = false
+    ) {
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
+        $campaignId = $campaign->getId();
+
+        $this->logger->debug('CAMPAIGN: Queuing starting events');
+
+        $repo         = $this->getRepository();
+        $campaignRepo = $this->getCampaignRepository();
+        $logRepo      = $this->getLeadEventLogRepository();
+
+        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+        $channel->queue_declare('trigger_start', false, false, false, false);
+
+        $events = $repo->getRootLevelEvents($campaignId);
+        $rootEventCount = count($events);
+
+        if (empty($rootEventCount)) {
+            $this->logger->debug('CAMPAIGN: No events to trigger');
+
+            return ($returnCounts) ? [
+                'events'         => 0,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0,
+            ] : 0;
+        }
+
+        // Get a lead count; if $leadId, then use this as a check to ensure lead is part of the campaign
+        $leadCount = $campaignRepo->getCampaignLeadCount($campaignId, $leadId, array_keys($events));
+
+        // Get a total number of events that will be processed
+        $totalStartingEvents = $leadCount * $rootEventCount;
+
+        if ($output) {
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    ['%events%' => $totalStartingEvents, '%batch%' => $limit]
+                )
+            );
+        }
+
+        if (empty($leadCount)) {
+            $this->logger->debug('CAMPAIGN: No contacts to process');
+
+            unset($events);
+
+            return ($returnCounts) ? [
+                'events'         => 0,
+                'evaluated'      => 0,
+                'executed'       => 0,
+                'totalEvaluated' => 0,
+                'totalExecuted'  => 0,
+            ] : 0;
+        }
+
+
+        // Try to save some memory
+        gc_enable();
+
+        $maxCount = ($max) ? $max : $totalStartingEvents;
+
+        if ($output) {
+            $progress = ProgressBarHelper::init($output, $maxCount);
+            $progress->start();
+        }
+
+
+
+        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', array_keys($events)));
+
+        $batchCount = ceil($leadCount /$limit);
+
+        $batchIdx= 0;
+        // paginate
+        $lastId = null;
+
+        while ($batchIdx < $batchCount) {
+            $batchIdx++;
+            $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
+
+            //  Paginate the lead list limit  with the batch size
+            if($lastId == null) {
+                $campaignLeads = ($leadId) ? [$leadId] : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
+            }else{
+                $this->logger->debug('LAST BATCH ID #'.$lastId);
+                $campaignLeads = $campaignRepo->getCampaignLeadIdsNext($campaignId,$lastId, 0, $limit, true);
+            }
+
+
+            $msg = new AMQPMessage(implode(' ',$campaignLeads));
+            $channel->basic_publish($msg, '', 'trigger_start');
+            $lastId = array_values(array_slice($campaignLeads, -1))[0];
         }
 
         if ($output) {
@@ -735,6 +796,8 @@ class EventModel extends CommonFormModel
             $output->writeln('');
         }
 
+        # TODO: This counter does not work anymore because the events are now processed 
+        #  in other thread
         $counts = [
             'events'         => $totalStartingEvents,
             'evaluated'      => $rootEvaluatedCount,
@@ -871,6 +934,7 @@ class EventModel extends CommonFormModel
 
             $this->logger->debug('CAMPAIGN: Processing the following contacts '.implode(', ', array_keys($events)));
             $leadDebugCounter = 1;
+            $this->em->getConnection()->beginTransaction();
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
                     $this->logger->debug('CAMPAIGN: Lead ID# '.$leadId.' not found');
@@ -957,6 +1021,9 @@ class EventModel extends CommonFormModel
             }
 
             // Free RAM
+
+            $this->em->flush();
+            $this->em->getConnection().commit();
             $this->em->clear('Mautic\LeadBundle\Entity\Lead');
             $this->em->clear('Mautic\UserBundle\Entity\User');
             unset($events, $leads);
@@ -1165,6 +1232,7 @@ class EventModel extends CommonFormModel
 
                     $leadDebugCounter = 1;
                     /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+                    $this->em->getConnection()->beginTransaction();
                     foreach ($leads as $lead) {
                         ++$negativeEvaluatedCount;
 
@@ -1320,6 +1388,9 @@ class EventModel extends CommonFormModel
                 // Next batch
                 $start += $limit;
 
+                $this->em->flush();
+                $this->em->getConnection()->commit();
+
                 // Save RAM
                 $this->em->clear('Mautic\LeadBundle\Entity\Lead');
                 $this->em->clear('Mautic\UserBundle\Entity\User');
@@ -1430,6 +1501,7 @@ class EventModel extends CommonFormModel
                         }
 
                         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+                        $this->em->getConnection()->beginTransaction();
                         $leadDebugCounter = 0;
                         foreach ($leads as $lead) {
                             ++$leadDebugCounter; // start with 1
@@ -1466,6 +1538,8 @@ class EventModel extends CommonFormModel
                             }
                         }
 
+                        $this->em->flush();
+                        $this->em->getConnection()->commit();
                         // Free RAM
                         $this->em->clear('Mautic\LeadBundle\Entity\Lead');
                         $this->em->clear('Mautic\UserBundle\Entity\User');

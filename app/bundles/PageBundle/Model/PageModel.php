@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -665,10 +666,19 @@ class PageModel extends FormModel
             }
         }
 
-        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+        if ($hit->getEmail() != null ){
+            if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_CLICK_LINK)) {
+                $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
+                $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_CLICK_LINK, $event);
+            }
+        }else{
+
+            if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
+                $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
+                $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+            }
         }
+
 
         //save hit to the cookie to use to update the exit time
         $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId());

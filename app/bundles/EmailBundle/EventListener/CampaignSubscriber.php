@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Event\PageHitEvent;
 
 /**
  * Class CampaignSubscriber.
@@ -72,6 +73,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
             EmailEvents::EMAIL_ON_OPEN                => ['onEmailOpen', 0],
+            EmailEvents::EMAIL_ON_CLICK_LINK          => ['onEmailClickLink', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
@@ -97,7 +99,22 @@ class CampaignSubscriber extends CommonSubscriber
                 ],
             ]
         );
-
+        $event->addDecision(
+            'email.click_link',
+            [
+                'label'                  => 'mautic.email.campaign.event.click_link',
+                'description'            => 'mautic.email.campaign.event.click_link_descr',
+                'formType'               => 'campaignevent_email_click',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
+                        ],
+                    ],
+                ],
+            ]
+        );
         $event->addAction(
             'email.send',
             [
@@ -128,11 +145,25 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
+     * Trigger campaign event for clicking an email link.
+     *
+     * @param EmailOpenEvent $event
+     */
+    public function onEmailClickLink(PageHitEvent $event)
+    {
+        $hit= $event->getHit();
+
+        if ($hit->getEmail() !== null) {
+            $this->campaignEventModel->triggerEvent('email.click_link', $hit, 'email', $hit->getEmail()->getId());
+        }
+    }
+    /**
      * @param CampaignExecutionEvent $event
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
+        $config = $event->getConfig();
         $eventParent  = $event->getEvent()['parent'];
 
         if ($eventDetails == null) {
@@ -141,7 +172,29 @@ class CampaignSubscriber extends CommonSubscriber
 
         //check to see if the parent event is a "send email" event and that it matches the current email opened
         if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
-            return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            if($event->getEvent()['type'] == 'email.click_link'){
+                $urlMatches = [];
+
+                // Check Email URL
+                if (isset($config['url']) && $config['url']) {
+                    $pageUrl     = $eventDetails->getUrl();
+                    $limitToUrls = explode(',', $config['url']);
+
+                    foreach ($limitToUrls as $url) {
+                        $url              = trim($url);
+                        $urlMatches[$url] = fnmatch($url, $pageUrl);
+                    }
+                  if(in_array(true,$urlMatches) ){
+                      return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
+                  }
+                }else {
+                    // when  url is not set execute for any url
+                    return $event->setResult($eventDetails->getEmail()->getId() === (int) $eventParent['properties']['email']);
+                }
+
+            }else{
+                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            }
         }
 
         return $event->setResult(false);

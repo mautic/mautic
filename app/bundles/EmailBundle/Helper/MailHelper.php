@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+require_once '/var/www/html/vendor/autoload.php';
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -21,6 +22,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\LeadBundle\Entity\Lead;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * Class MailHelper.
@@ -231,6 +235,11 @@ class MailHelper
             $this->logError($e);
         }
 
+        // TODO : Create a mailer_spool_type amqp for the messsage queue
+        $this->connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $this->channel = $this->connection->channel();
+        $this->channel->queue_declare('email', false, false, false, false);
+
         $this->from       = (!empty($from)) ? $from : [$factory->getParameter('mailer_from_email') => $factory->getParameter('mailer_from_name')];
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -422,7 +431,9 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
-                $this->mailer->send($this->message, $failures);
+
+                $msg = new AMQPMessage(serialize($this->message));
+                $this->channel->basic_publish($msg, '', 'email');
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
@@ -1721,8 +1732,10 @@ class MailHelper
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
 
+
+        /* TODO : Recover email copy code and make it paralellizable
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
-        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
+        $id =  md5($this->subject.$this->body['content']);
         if (!isset($copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
@@ -1744,7 +1757,7 @@ class MailHelper
 
         if (isset($copies[$id])) {
             $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
-        }
+        }*/
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);
@@ -1888,4 +1901,6 @@ class MailHelper
 
         return $name;
     }
+
 }
+

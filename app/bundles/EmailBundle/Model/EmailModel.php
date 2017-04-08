@@ -1414,7 +1414,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 );
             }
         }
-
+      /* 
         // Update sent counts
         foreach ($emailSentCounts as $emailId => $count) {
             // Retry a few times in case of deadlock errors
@@ -1429,6 +1429,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 --$strikes;
             }
         }
+       */ 
 
         // Free RAM
         $this->em->clear('Mautic\EmailBundle\Entity\Stat');

@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 
 /**
  * CLI command to process the e-mail queue.
@@ -56,12 +58,69 @@ EOT
         $options    = $input->getOptions();
         $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
+        $this->dispatcher = $container->get('event_dispatcher');
 
         $skipClear = $input->getOption('do-not-clear');
         $quiet     = $input->getOption('quiet');
         $timeout   = $input->getOption('clear-timeout');
         $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+
+
+
+        // TODO: Create a queueMode ampq and execute this code only when this queue mode is selected
+        // if($queueMode == "ampq")
+        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+
+        $channel->queue_declare('email', false, false, false, false);
+
+        $this->transport = $this->getContainer()->get('swiftmailer.transport.real');
+            if (!$this->transport->isStarted()) {
+                $this->transport->start();
+            }
+
+        $callback = function($msg) {
+            try {
+
+              $message = unserialize($msg->body);
+              $this->transport->send($message);
+              $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            } catch (\Swift_TransportException $e) {
+              if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                  $event = new QueueEmailEvent($message);
+                  $this->dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+              }
+            }
+        };
+
+
+        // TODO: improve message retry functionality for now its is just going to retry forever
+        // until the message is sent, implement retry count limit, TTL expiring or dead lettered messages
+        $channel->basic_qos(null,1,null);
+        $channel->basic_consume('email', '', false, false, false, false, $callback);
+
+
+        // Timeout in 10 seconds  and give up on $max_timeout 
+        $max_timeout = 10;
+        $timeout_counter = 0 ;
+
+        while(count($channel->callbacks) >= 1 && ($timeout_counter < $max_timeout) ) {
+
+          try {
+
+            $channel->wait(null,false,0.2);
+            $timeout_counter = 0;
+          }catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e){
+
+              $output->writeln('Email wait timeout counter ' + $timeout_counter );
+              $timeout_counter = $timeout_counter + 1;
+          }
+
+
+        }
+        return 0;
+
+        // This code path is disabled for the moment
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');

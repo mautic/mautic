@@ -32,9 +32,9 @@ class EmailSubscriber extends CommonSubscriber
     {
         return [
 //            CitrixEvents::ON_CITRIX_TOKEN_GENERATE => ['onTokenGenerate', 254],
-            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
+            // EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
 //            EmailEvents::EMAIL_ON_SEND => array('decodeTokensSend', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => ['decodeTokensDisplay', 0],
+            // EmailEvents::EMAIL_ON_DISPLAY => ['decodeTokensDisplay', 0],
         ];
     }
 

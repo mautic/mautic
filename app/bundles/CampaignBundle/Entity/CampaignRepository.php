@@ -587,6 +587,71 @@ class CampaignRepository extends CommonRepository
      *
      * @return array
      */
+    public function getCampaignLeadIdsNext($campaignId, $lastLeadId , $start = 0, $limit = false, $pendingOnly = false)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('cl.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->andX(
+                        $q->expr()->gt('cl.lead_id',(int) $lastLeadId ),
+                        $q->expr()->eq('cl.manually_removed', ':false'))
+                )
+            )
+            ->setParameter('false', false, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if ($pendingOnly) {
+            // Only leads that have not started the campaign
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $sq->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
+                ->where(
+                    $sq->expr()->andX(
+                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
+                        $sq->expr()->eq('e.campaign_id', (int) $campaignId)
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $sq->getSQL())
+            );
+        }
+
+        if (!empty($limit)) {
+            $q->setMaxResults($limit);
+        }
+
+        if (!$pendingOnly && $start) {
+            $q->setFirstResult($start);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $leads = [];
+        foreach ($results as $r) {
+            $leads[] = $r['lead_id'];
+        }
+
+        unset($results);
+
+        return $leads;
+    }
+
+    /**
+     * Get lead IDs of a campaign.
+     *
+     * @param            $campaignId
+     * @param int        $start
+     * @param bool|false $limit
+     * @param bool|false  getCampaignLeadIds
+     *
+     * @return array
+     */
     public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $pendingOnly = false)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
