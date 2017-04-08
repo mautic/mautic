@@ -124,6 +124,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
+        $email->setFromName('Test');
 
         $mailer->setEmail($email);
 

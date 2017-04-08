@@ -1344,9 +1344,9 @@ class MailHelper
         $fromEmail = $email->getFromAddress();
         $fromName  = $email->getFromName();
         if (!empty($fromEmail) || !empty($fromName)) {
-            if (!empty($fromEmail)) {
+            if (empty($fromName)) {
                 $fromName = array_values($this->from)[0];
-            } elseif (!empty($fromName)) {
+            } elseif (empty($fromEmail)) {
                 $fromEmail = key($this->from);
             }
 
