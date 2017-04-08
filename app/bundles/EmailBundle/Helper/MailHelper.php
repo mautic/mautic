@@ -577,8 +577,6 @@ class MailHelper
                     if ($useOwnerAsMailer && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
                     } else {
-                        if ($this->email) {
-                        }
                         $this->setFrom($this->from);
                     }
 
