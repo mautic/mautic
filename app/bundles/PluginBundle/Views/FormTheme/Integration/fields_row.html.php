@@ -12,14 +12,6 @@
 /** @var int $numberOfFields */
 $rowCount   = 0;
 $indexCount = 1;
-
-$baseUrl = $view['router']->path(
-    'mautic_plugin_config',
-    [
-        'name' => $integration,
-    ]
-);
-
 ?>
 
 <div class="row fields-container" id="<?php echo $containerId; ?>">
@@ -99,7 +91,7 @@ $baseUrl = $view['router']->path(
                                            title=""
                                            autocomplete="false"
                                            value="0"
-                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')"
+                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
                                            <?php if ($checked): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
@@ -111,7 +103,7 @@ $baseUrl = $view['router']->path(
                                            title=""
                                            autocomplete="false"
                                            value="1"
-                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')"
+                                           onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
                                            <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
@@ -131,7 +123,7 @@ $baseUrl = $view['router']->path(
                         name="<?php echo $child->vars['full_name']; ?>"
                         class="<?php echo $child->vars['attr']['class']; ?>"
                         data-placeholder=" "
-                        autocomplete="false" onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php if ($object == 'contact'): echo 'lead'; else:  echo 'company'; endif; ?>', '<?php echo $integration; ?>')">
+                        autocomplete="false" onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')">
                     <option value=""></option>
                     <?php
                     $mauticChoices = $child->vars['attr']['data-choices'];
@@ -176,10 +168,15 @@ $baseUrl = $view['router']->path(
                 'page'        => $page,
                 'fixedPages'  => $fixedPageNum,
                 'fixedLimit'  => true,
-                'baseUrl'     => $baseUrl,
-                'target'      => '.modal-body-content',
+                'target'      => '#IntegrationEditModal',
                 'totalItems'  => $totalFields,
-                'queryString' => '&activeTab='.$containerId,
+                'jsCallback'  => 'Mautic.getIntegrationFields',
+                'jsArguments' => [
+                    [
+                        'object'      => $object,
+                        'integration' => $integration,
+                    ],
+                ],
             ]
         ); ?>
     </div>

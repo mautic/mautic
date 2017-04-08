@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 
 /**
  * Class ZohoIntegration.
@@ -147,7 +148,11 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param array $settings
+     *
+     * @return array|bool
+     *
+     * @throws ApiErrorException
      */
     public function getAvailableLeadFields($settings = [])
     {
@@ -157,6 +162,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $zohoFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
         try {
             if ($this->isAuthorized()) {
                 $leadObject = $this->getApiHelper()->getLeadFields();
@@ -187,10 +193,15 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                 $this->cache->set('leadFields', $zohoFields);
             }
-        } catch (ErrorException $exception) {
+        } catch (ApiErrorException $exception) {
             $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
+                if (strpos($exception->getMessage(), 'Invalid Ticket Id') !== false) {
+                    // Use a bit more friendly message
+                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthenticate.');
+                }
+
                 throw $exception;
             }
 

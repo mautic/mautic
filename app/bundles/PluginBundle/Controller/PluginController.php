@@ -149,20 +149,14 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $limit = $session->get('mautic.plugin.'.$name.'.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
+        $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
+        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
-        //set what page currently on so that we can return here after form submission/cancellation
-        if ($activeTab == 'leadFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.lead.start', $start);
-            $session->set('mautic.plugin.'.$name.'.lead.page', $page);
-        }
-        if ($activeTab == 'companyFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.company.start', $start);
-            $session->set('mautic.plugin.'.$name.'.company.lead.page', $page);
-        }
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
 
         /** @var PluginModel $pluginModel */
         $pluginModel   = $this->getModel('plugin');
@@ -186,11 +180,13 @@ class PluginController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
                 $currentFeatureSettings = $entity->getFeatureSettings();
-                if ($authorize || $valid = $this->isFormValid($form)) {
+                $valid                  = $this->isFormValid($form);
+
+                if ($authorize || $valid) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
-                    // Merge keys
-                    $keys = $form['apiKeys']->getData();
+                    $keys        = $form['apiKeys']->getData();
+
                     // Prevent merged keys
                     $secretKeys = $integrationObject->getSecretKeys();
                     foreach ($secretKeys as $secretKey) {
@@ -213,20 +209,27 @@ class PluginController extends FormController
                             }
 
                             if ($missing = $integrationObject->cleanUpFields($entity, $mauticLeadFields, $mauticCompanyFields)) {
-                                if (!empty($missing['leadFields'])) {
-                                    $valid = false;
+                                if ($entity->getIsPublished()) {
+                                    // Only fail validation if the integration is enabled
+                                    if (!empty($missing['leadFields'])) {
+                                        $valid = false;
 
-                                    $form->get('featureSettings')->get('leadFields')->addError(
-                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
-                                    );
-                                }
+                                        $form->get('featureSettings')->get('leadFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
 
-                                if (!empty($missing['companyFields'])) {
-                                    $valid = false;
+                                    if (!empty($missing['companyFields'])) {
+                                        $valid = false;
 
-                                    $form->get('featureSettings')->get('companyFields')->addError(
-                                        new FormError($this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators'))
-                                    );
+                                        $form->get('featureSettings')->get('companyFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -235,7 +238,7 @@ class PluginController extends FormController
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
-                    if ($valid) {
+                    if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
@@ -267,6 +270,7 @@ class PluginController extends FormController
                     }
                 }
             }
+
             if (($cancelled || ($valid && !$this->isFormApplied($form))) && !$authorize) {
                 // Close the modal and return back to the list view
                 return new JsonResponse(
@@ -279,6 +283,7 @@ class PluginController extends FormController
                 );
             }
         }
+
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
         $default     = 'MauticPluginBundle:FormTheme\Integration';
@@ -288,8 +293,10 @@ class PluginController extends FormController
         } elseif ($objectTheme !== $default) {
             $themes[] = $objectTheme;
         }
+
         $formSettings = $integrationObject->getFormSettings();
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
+
         $formNotes    = [];
         $noteSections = ['authorization', 'features', 'feature_settings'];
         foreach ($noteSections as $section) {
