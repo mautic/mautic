@@ -199,7 +199,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             if (!$silenceExceptions) {
                 if (strpos($exception->getMessage(), 'Invalid Ticket Id') !== false) {
                     // Use a bit more friendly message
-                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthenticate.');
+                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
                 }
 
                 throw $exception;
