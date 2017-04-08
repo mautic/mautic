@@ -164,20 +164,14 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $limit = $session->get('mautic.plugin.'.$name.'.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
+        $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
+        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
-        //set what page currently on so that we can return here after form submission/cancellation
-        if ($activeTab == 'leadFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.lead.start', $start);
-            $session->set('mautic.plugin.'.$name.'.lead.page', $page);
-        }
-        if ($activeTab == 'companyFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.company.start', $start);
-            $session->set('mautic.plugin.'.$name.'.company.lead.page', $page);
-        }
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
 
         /** @var PluginModel $pluginModel */
         $pluginModel   = $this->getModel('plugin');
@@ -208,8 +202,7 @@ class PluginController extends FormController
                 if ($authorize || $valid) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
-                    // Merge keys
-                    $keys = $form['apiKeys']->getData();
+                    $keys        = $form['apiKeys']->getData();
 
                     // Prevent merged keys
                     $secretKeys = $integrationObject->getSecretKeys();

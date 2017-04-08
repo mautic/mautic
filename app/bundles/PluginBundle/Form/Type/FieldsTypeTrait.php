@@ -15,6 +15,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 trait FieldsTypeTrait
 {
@@ -199,5 +202,55 @@ trait FieldsTypeTrait
                 }
             }
         );
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     * @param                 $object
+     */
+    protected function configureFieldOptions(OptionsResolver $resolver, $object)
+    {
+        $resolver->setRequired(['integration_fields', 'mautic_fields', 'integration', 'integration_object', 'page']);
+        $resolver->setDefined([('lead' === $object) ? 'update_mautic' : 'update_mautic_company']);
+        $resolver->setDefaults(
+            [
+                'special_instructions' => function (Options $options) use ($object) {
+                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+
+                    return $specialInstructions;
+                },
+                'alert_type' => function (Options $options) use ($object) {
+                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+
+                    return $alertType;
+                },
+                'allow_extra_fields'   => true,
+                'enable_data_priority' => false,
+                'totalFields'          => function (Options $options) {
+                    return count($options['integration_fields']);
+                },
+                'fixedPageNum' => function (Options $options) {
+                    return ceil($options['totalFields'] / $options['limit']);
+                },
+                'limit' => 10,
+                'start' => function (Options $options) {
+                    return (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'];
+                },
+            ]
+        );
+    }
+
+    /**
+     * @param FormView $view
+     * @param array    $options
+     */
+    protected function buildFieldView(FormView $view, array $options)
+    {
+        $view->vars['specialInstructions'] = $options['special_instructions'];
+        $view->vars['alertType']           = $options['alert_type'];
+        $view->vars['integration']         = $options['integration'];
+        $view->vars['totalFields']         = $options['totalFields'];
+        $view->vars['page']                = $options['page'];
+        $view->vars['fixedPageNum']        = $options['fixedPageNum'];
     }
 }

@@ -89,7 +89,7 @@ class FeatureSettingsType extends AbstractType
                 $this->coreParametersHelper->getParameter('default_pagelimit')
             );
             $page        = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
-            $companyPage = $session->get('mautic.plugin.'.$integrationName.'.company.lead.page', 1);
+            $companyPage = $session->get('mautic.plugin.'.$integrationName.'.company.page', 1);
 
             $settings = [
                 'silence_exceptions' => false,
@@ -103,13 +103,11 @@ class FeatureSettingsType extends AbstractType
                     $fields = (isset($fields[0])) ? $fields[0] : $fields;
                     unset($fields['company']);
                 }
-                $totalFields = count($fields);
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     if (empty($integrationCompanyFields)) {
                         $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
                     }
-                    $totalCompanyFields = count($integrationCompanyFields);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
@@ -124,12 +122,9 @@ class FeatureSettingsType extends AbstractType
                 $this->logger->error($e);
 
                 // Prevent pagination from confusing things by using the cache
-                $page        = 1;
-                $fields      = $integrationCompanyFields      = [];
-                $totalFields = $totalCompanyFields = 0;
+                $page   = 1;
+                $fields = $integrationCompanyFields = [];
             }
-
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
 
             $enableDataPriority = !empty($formSettings['enable_data_priority']);
 
@@ -139,47 +134,41 @@ class FeatureSettingsType extends AbstractType
                 [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
-                    'lead_fields'          => $leadFields,
+                    'mautic_fields'        => $leadFields,
                     'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
                     'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
                     'integration_fields'   => $fields,
-                    'special_instructions' => $specialInstructions,
-                    'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
                     'integration'          => $integrationObject->getName(),
-                    'totalFields'          => $totalFields,
+                    'integration_object'   => $integrationObject,
                     'limit'                => $limit,
-                    'start'                => (1 === $page) ? 0 : ($page - 1) * $limit,
                     'page'                 => $page,
-                    'fixedPageNum'         => round($totalFields / $limit),
                     'mapped'               => false,
                     'error_bubbling'       => false,
                 ]
             );
 
             if (!empty($integrationCompanyFields)) {
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
+
                 $form->add(
                     'companyFields',
                     'integration_company_fields',
                     [
                         'label'                 => 'mautic.integration.comapanyfield_matches',
                         'required'              => false,
-                        'company_fields'        => $companyFields,
+                        'mautic_fields'         => $companyFields,
                         'data'                  => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
                         'update_mautic_company' => isset($data['update_mautic_company']) && !empty($data['update_mautic_company'])
                             ? $data['update_mautic_company'] : [],
-                        'integration_company_fields' => $integrationCompanyFields,
-                        'special_instructions'       => $specialInstructions,
-                        'alert_type'                 => $alertType,
-                        'enable_data_priority'       => $enableDataPriority,
-                        'integration'                => $integrationObject->getName(),
-                        'totalFields'                => $totalCompanyFields,
-                        'limit'                      => $limit,
-                        'start'                      => (1 === $companyPage) ? 0 : ($companyPage - 1) * $limit,
-                        'page'                       => $companyPage,
-                        'fixedPageNum'               => (round($totalCompanyFields / $limit)),
-                        'mapped'                     => false,
-                        'error_bubbling'             => false,
+                        'integration_fields'   => $integrationCompanyFields,
+                        'enable_data_priority' => $enableDataPriority,
+                        'integration'          => $integrationObject->getName(),
+                        'integration_object'   => $integrationObject,
+                        'limit'                => $limit,
+                        'page'                 => $companyPage,
+                        'mapped'               => false,
+                        'error_bubbling'       => false,
                     ]
                 );
             }

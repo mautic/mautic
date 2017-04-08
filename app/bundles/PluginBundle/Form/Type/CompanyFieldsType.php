@@ -30,7 +30,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->buildFormFields($builder, $options, $options['integration_company_fields'], $options['company_fields'], 'company', $options['limit'], $options['start']);
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], 'company', $options['limit'], $options['start']);
     }
 
     /**
@@ -38,16 +38,7 @@ class CompanyFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['update_mautic_company']);
-        $resolver->setRequired(['integration_company_fields', 'company_fields', 'integration', 'totalFields', 'page', 'fixedPageNum', 'limit', 'start']);
-        $resolver->setDefaults(
-            [
-                'special_instructions' => '',
-                'alert_type'           => '',
-                'allow_extra_fields'   => true,
-                'enable_data_priority' => false,
-            ]
-        );
+        $this->configureFieldOptions($resolver, 'company');
     }
 
     /**
@@ -63,11 +54,6 @@ class CompanyFieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['specialInstructions'] = $options['special_instructions'];
-        $view->vars['alertType']           = $options['alert_type'];
-        $view->vars['integration']         = $options['integration'];
-        $view->vars['totalFields']         = $options['totalFields'];
-        $view->vars['page']                = $options['page'];
-        $view->vars['fixedPageNum']        = $options['fixedPageNum'];
+        $this->buildFieldView($view,  $options, 'company');
     }
 }
