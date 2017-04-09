@@ -591,7 +591,7 @@ class PageModel extends FormModel
                     $utmTags->setUtmTerm($query['utm_term']);
                 }
                 if (key_exists('utm_content', $query)) {
-                    $utmTags->setUtmConent($query['utm_content']);
+                    $utmTags->setUtmContent($query['utm_content']);
                 }
                 if (key_exists('utm_medium', $query)) {
                     $utmTags->setUtmMedium($query['utm_medium']);

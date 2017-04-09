@@ -135,6 +135,16 @@ return [
                 'path'       => '/contacts/{id}/companies',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getCompanies',
             ],
+            'mautic_api_utmcreateevent' => [
+                'path'       => '/contacts/{id}/utm/add',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addUtmTags',
+                'method'     => 'POST',
+            ],
+            'mautic_api_utmremoveevent' => [
+                'path'       => '/contacts/{id}/utm/{utmid}/remove',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeUtmTags',
+                'method'     => 'POST',
+            ],
             'mautic_api_getcontactowners' => [
                 'path'       => '/contacts/list/owners',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getOwners',
