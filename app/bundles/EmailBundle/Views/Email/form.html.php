@@ -252,7 +252,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
 <?php
 $type = $email->getEmailType();
-if ((empty($updateSelect) && !$isExisting && !$view['form']->containsErrors($form)) || empty($type) || !empty($forceTypeSelection)):
+if ((empty($updateSelect) && !$isExisting && !$view['form']->containsErrors($form) && !$variantParent) || empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         [
             'item'       => $email,

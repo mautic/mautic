@@ -266,6 +266,34 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'alias' => 'slot_button',
             ],
+            'mautic.form.type.slot.image' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
+                'alias' => 'slot_image',
+            ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
+            ],
+            'mautic.form.type.slot.imagecard' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
+                'alias' => 'slot_imagecard',
+            ],
+            'mautic.form.type.slot.imagecaption' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
+                'alias' => 'slot_imagecaption',
+            ],
+            'mautic.form.type.slot.socialshare' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialShareType',
+                'alias' => 'slot_socialshare',
+            ],
+            'mautic.form.type.slot.socialfollow' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
+                'alias' => 'slot_socialfollow',
+            ],
+            'mautic.form.type.slot.codemode' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
+                'alias' => 'slot_codemode',
+            ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias' => 'theme_upload',

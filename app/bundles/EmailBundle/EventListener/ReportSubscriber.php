@@ -336,9 +336,10 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    $chart       = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $sendQuery   = clone $queryBuilder;
-                    $readQuery   = clone $origQuery;
+                    $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $sendQuery = clone $queryBuilder;
+                    $readQuery = clone $origQuery;
+                    $readQuery->andWhere($qb->expr()->isNotNull('date_read'));
                     $failedQuery = clone $queryBuilder;
                     $failedQuery->andWhere($qb->expr()->eq('es.is_failed', ':true'));
                     $failedQuery->setParameter('true', true, 'boolean');

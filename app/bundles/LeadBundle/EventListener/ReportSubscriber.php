@@ -306,7 +306,6 @@ class ReportSubscriber extends CommonSubscriber
 
         switch ($context) {
             case 'leads':
-                $event->applyDateFilters($qb, 'date_added', 'l');
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
                 if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
@@ -320,6 +319,9 @@ class ReportSubscriber extends CommonSubscriber
 
                 if ($event->hasFilter('s.leadlist_id')) {
                     $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+                    $event->applyDateFilters($qb, 'date_added', 's');
+                } else {
+                    $event->applyDateFilters($qb, 'date_added', 'l');
                 }
                 break;
 

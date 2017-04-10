@@ -4258,23 +4258,29 @@ lesshat-selector { -lh-property: 0 ;
   -moz-hyphens: auto;
   hyphens: auto;
 }
-.builder {
+.builder,
+.builder-slot {
   position: relative;
 }
-.builder [data-token] {
+.builder [data-token],
+.builder-slot [data-token] {
   cursor: pointer;
 }
-.builder .btn-block.ui-draggable-dragging {
+.builder .btn-block.ui-draggable-dragging,
+.builder-slot .btn-block.ui-draggable-dragging {
   width: 104px;
   height: 68px;
   margin: 6px 12px;
   white-space: normal;
 }
-.builder .builder-panel-top {
+.builder .builder-panel-top,
+.builder-slot .builder-panel-top {
   margin-bottom: 10px;
 }
 .builder .template-dnd-help,
-.builder .custom-dnd-help {
+.builder-slot .template-dnd-help,
+.builder .custom-dnd-help,
+.builder-slot .custom-dnd-help {
   display: table-cell;
   vertical-align: middle;
   width: 100%;
@@ -4325,12 +4331,47 @@ lesshat-selector { -lh-property: 0 ;
 .builder-panel .panel a.btn {
   white-space: normal;
 }
+/********** SLOT ************/
+.builder-active-slot {
+  background-color: #fff;
+  z-index: 1030;
+}
+.builder-panel-slot {
+  width: 50%;
+  padding: 15px;
+  background-color: #d5d4d4;
+  overflow-y: auto;
+}
+.builder-panel-slot .btn-close-builder {
+  width: 100%;
+}
+.builder-content-slot {
+  left: 50%;
+  width: 50%;
+}
+.code-mode .builder-panel-slot {
+  width: 50%;
+}
+.code-mode .builder-content-slot {
+  width: 50%;
+}
+.code-mode .btn-close-builder {
+  width: 150px;
+  float: right;
+}
+.builder-panel-slot .panel a.btn {
+  white-space: normal;
+}
+/************* END SLOT ******************/
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
 }
 .CodeMirror {
   border: 1px solid #eee;
   height: auto;
+}
+#slot_codemode .CodeMirror {
+  height: 200px;
 }
 .CodeMirror-hints {
   position: absolute;
@@ -4691,4 +4732,22 @@ div[data-filter-container] .panel.in-group {
 td.col-id,
 th.col-id {
   width: 75px;
+}
+.badge-wrapper {
+  float: right;
+  vertical-align: middle;
+  margin-right: -10px;
+}
+span.slot-caption {
+  font-size: 12px;
+}
+.imagecard-caption,
+figcaption {
+  font-size: 16px;
+}
+.imagecard {
+  background-color: #ddd !important;
+}
+.imagecard .imagecard-caption {
+  background-color: #bbb !important;
 }
