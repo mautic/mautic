@@ -621,7 +621,7 @@ class ReportModel extends FormModel
         }
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate) {
+            if ($paginate && !$entity->getGroupBy()) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
@@ -660,7 +660,7 @@ class ReportModel extends FormModel
                 $queryTime .= 'ms';
             }
 
-            if (!$paginate) {
+            if (!$paginate || $entity->getGroupBy()) {
                 $totalResults = count($data);
             }
 
