@@ -72,7 +72,6 @@ Mautic.addReportRow = function (elId) {
         Mautic.updateReportFilterValueInput(newColumnId);
     } else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
         // Update the column options if applicable
-        alert("hi");
         mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
     }
 
