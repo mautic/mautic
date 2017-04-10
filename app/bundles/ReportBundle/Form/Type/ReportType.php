@@ -218,11 +218,10 @@ class ReportType extends AbstractType
                             'columnList' => $columns->choices,
                             'required'   => false,
                         ],
-                        'allow_add'     => true,
-                        'allow_delete'  => true,
-                        'prototype'     => true,
-                        'required'      => false,
-                        'entry_options' => ['label' => false],
+                        'allow_add'    => true,
+                        'allow_delete' => true,
+                        'prototype'    => true,
+                        'required'     => false,
                     ]
                 );
 

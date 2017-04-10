@@ -56,22 +56,18 @@ class AggregatorType extends AbstractType
         ]);
 
         // Build a list of columns
-        $builder->add(
-            'column',
-            'choice',
-            [
-                'choices'     => $options['columnList'],
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.report.report.label.filtercolumn',
-                'label_attr'  => ['class' => 'control-label filter-column'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
-                    'class' => 'form-control filter-columns',
-                ],
-            ]
-        );
+        $builder->add('column', 'choice', [
+            'choices'     => $options['columnList'],
+            'expanded'    => false,
+            'multiple'    => false,
+            'label'       => 'mautic.report.report.label.filtercolumn',
+            'label_attr'  => ['class' => 'control-label'],
+            'empty_value' => false,
+            'required'    => false,
+            'attr'        => [
+                'class' => 'form-control filter-columns',
+            ],
+        ]);
     }
 
     /**

@@ -9,6 +9,7 @@ Mautic.reportOnLoad = function (container) {
     if (mQuery('div[id=report_filters]').length) {
         mQuery('div[id=report_filters]').attr('data-index', mQuery('#report_filters > div').length + 1);
         mQuery('div[id=report_tableOrder]').attr('data-index', mQuery('#report_tableOrder > div').length + 1);
+        mQuery('div[id=report_aggregators]').attr('data-index', mQuery('#report_aggregators > div').length + 1);
 
         if (mQuery('.filter-columns').length) {
             mQuery('.filter-columns').each(function () {
@@ -58,7 +59,7 @@ Mautic.addReportRow = function (elId) {
     prototypeHolder.append(output);
 
     var newColumnId = '#' + elId + '_' + index + '_column';
-
+    console.log(newColumnId);
     if (elId == 'report_filters') {
         if (typeof Mautic.reportPrototypeFilterOptions != 'undefined') {
             // Update the column options if applicable
@@ -71,6 +72,7 @@ Mautic.addReportRow = function (elId) {
         Mautic.updateReportFilterValueInput(newColumnId);
     } else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
         // Update the column options if applicable
+        alert("hi");
         mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
     }
 
@@ -209,6 +211,9 @@ Mautic.updateReportSourceData = function (context) {
 
             // Reset index
             mQuery('#report_tableOrder').data('index', 0);
+            mQuery('#report_aggregators').find('div').remove().end();
+            // Reset index
+            mQuery('#report_aggregators').data('index', 0);
 
             // Update filter list
             Mautic.reportPrototypeFilterDefinitions = response.filterDefinitions;
