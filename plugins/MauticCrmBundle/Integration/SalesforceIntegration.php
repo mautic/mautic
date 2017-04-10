@@ -315,8 +315,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
                             }
                         }
+
+                        asort($salesFields[$sfObject]);
                     }
-                    asort($salesFields[$sfObject]);
                 }
             }
         } catch (\Exception $e) {
@@ -945,8 +946,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticData            = $leadsToUpdate            = $fields            = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields            = $config['leadFields'];
+        $checkEmailsInSF       = [];
 
         if (!empty($config['leadFields'])) {
+            $fields = implode(', l.', $config['leadFields']);
+            $fields = 'l.'.$fields;
+            $result = 0;
             if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $config['leadFields'])) {
                 $this->pushContactLink = true;
                 unset($leadFields[$mauticContactLinkField]);
@@ -980,6 +985,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $checkEmailsInSF = [];
+        // Only get the max limit
+        if ($limit) {
+            $limit -= count($leadsToUpdate);
+        }
         //create lead records
         if (null === $limit || $limit && !empty($fields)) {
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);

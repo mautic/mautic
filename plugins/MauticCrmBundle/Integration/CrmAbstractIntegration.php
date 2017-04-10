@@ -230,6 +230,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (!empty($fieldsToUpdateInMautic)) {
             $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
         }
         if (!isset($newMatchedFields['companyname'])) {
             if (isset($newMatchedFields['companywebsite'])) {

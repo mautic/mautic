@@ -270,6 +270,10 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
             ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
+            ],
             'mautic.form.type.slot.imagecard' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
                 'alias' => 'slot_imagecard',
