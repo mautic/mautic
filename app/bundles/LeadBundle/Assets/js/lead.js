@@ -257,7 +257,7 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId).prop('disabled', disabled);
+    mQuery(filterId+', #leadlist_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
@@ -312,6 +312,19 @@ Mautic.convertLeadFilterInput = function(el) {
 
         Mautic.activateChosenSelect(mQuery(filterId));
     }
+};
+
+Mautic.updateLookupListFilter = function(field, datum) {
+    if (datum && datum.id) {
+        var filterField = '#'+field.replace('_display', '_filter');
+        mQuery(filterField).val(datum.id);
+    }
+};
+
+Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions) {
+    mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
+
+    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
 };
 
 Mautic.addLeadListFilter = function (elId) {

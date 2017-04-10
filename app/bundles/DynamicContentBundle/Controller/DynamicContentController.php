@@ -66,9 +66,14 @@ class DynamicContentController extends FormController
         // fetch
         $search = $this->request->get('search', $this->get('session')->get('mautic.dynamicContent.filter', ''));
         $this->get('session')->set('mautic.dynamicContent.filter', $search);
-        //do not list variants in the main list
-        $filter['force'][] = ['column' => 'e.variantParent', 'expr' => 'isNull'];
-        $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
+
+        $filter = [
+            'string' => $search,
+            'force'  => [
+                ['column' => 'e.variantParent', 'expr' => 'isNull'],
+                ['column' => 'e.translationParent', 'expr' => 'isNull'],
+            ],
+        ];
 
         $orderBy    = $this->get('session')->get('mautic.dynamicContent.orderby', 'e.name');
         $orderByDir = $this->get('session')->get('mautic.dynamicContent.orderbydir', 'DESC');

@@ -137,6 +137,18 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array $data
+     *
+     * @return mixed|string
+     */
+    public function syncMauticToSalesforce(array $data)
+    {
+        $queryUrl = $this->integration->getCompositeUrl();
+
+        return $this->request('composite/', $data, 'POST', false, null, $queryUrl);
+    }
+
+    /**
      * @param array $activity
      * @param       $object
      *
@@ -238,10 +250,8 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
-
+        $queryUrl                = $this->integration->getQueryUrl();
         if (isset($query['start'])) {
-            $queryUrl = $this->integration->getQueryUrl();
-
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
@@ -251,7 +261,7 @@ class SalesforceApi extends CrmApi
         switch ($object) {
             case 'company':
             case 'Account':
-                $fields = array_keys(array_filter($fields['companyFields']));
+              $fields = array_keys(array_filter($fields['companyFields']));
                 break;
             default:
                 $mixedFields = array_filter($fields['leadFields']);
@@ -260,12 +270,15 @@ class SalesforceApi extends CrmApi
                     if (strpos($sfField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
+                    }
                 }
         }
-
+        $result = [];
         if (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
-            $fields   = implode(', ', $fields);
+            $fields   = implode(', ', array_unique($fields));
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
@@ -274,8 +287,9 @@ class SalesforceApi extends CrmApi
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } else {
-            $result = $this->request('query/'.$query, [], 'GET', false, null, $queryUrl);
+        } elseif (!isset($query['start'])) {
+            $query  = str_replace('/services/data/v34.0/query', '', $query);
+            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
         }
 
         return $result;

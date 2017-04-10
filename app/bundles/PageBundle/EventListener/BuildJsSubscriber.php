@@ -238,6 +238,10 @@ JS;
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
         $jQueryUrl       = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
 
+        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
+        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
+        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
+
         $mediaElementJs = <<<'JS'
 /*!
  *

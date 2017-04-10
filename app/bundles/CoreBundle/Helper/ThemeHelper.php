@@ -24,6 +24,11 @@ class ThemeHelper
     private $pathsHelper;
 
     /**
+     * @var TemplatingHelper
+     */
+    private $templatingHelper;
+
+    /**
      * @var array|mixed
      */
     private $themes = [];
@@ -51,7 +56,8 @@ class ThemeHelper
     /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper $pathsHelper
+     * @param PathsHelper      $pathsHelper
+     * @param TemplatingHelper $templatingHelper
      */
     public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
     {

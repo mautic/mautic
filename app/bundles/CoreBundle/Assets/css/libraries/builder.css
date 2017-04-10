@@ -2937,7 +2937,7 @@ html body .fr-gatedvideo-overlay {
 }
 .fa-border {
   padding: .2em .25em .15em;
-  border: solid 0.08em #eeeeee;
+  border: solid 0.08em #eee;
   border-radius: .1em;
 }
 .fa-pull-left {
@@ -3052,7 +3052,7 @@ html body .fr-gatedvideo-overlay {
   font-size: 2em;
 }
 .fa-inverse {
-  color: #ffffff;
+  color: #fff;
 }
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
@@ -5354,6 +5354,7 @@ div[data-slot-toolbar] {
   background-color: #4e5e9e;
   border-left: 1px solid #4e5e9e;
   border-right: 1px solid #4e5e9e;
+  padding-top: 2px;
 }
 div[data-slot-toolbar] .btn {
   width: 20px;
@@ -5375,8 +5376,8 @@ div[data-slot-toolbar] .btn {
   font-size: 11px;
   line-height: 1.456;
   float: right;
-  margin-right: 5px;
-  color: #ffffff;
+  margin-right: 2px;
+  color: #fff;
 }
 div[data-slot-toolbar] .btn .fa {
   padding-top: 4px;
@@ -5385,11 +5386,11 @@ div[data-slot],
 [data-section-wrapper] {
   position: relative;
 }
-div[data-slot="image"] {
+div[data-slot^="image"] {
   padding-top: 1px;
   padding-bottom: 1px;
 }
-div[data-slot="image"] img {
+div[data-slot^="image"] img {
   z-index: 2;
   position: relative;
 }
@@ -5433,13 +5434,16 @@ div[data-slot].ui-sortable-helper {
   color: inherit !important;
   min-height: inherit !important;
 }
-.slot-type-handle.btn {
+.slot-type-handle.btn,
+.section-type-handle.btn {
   float: left;
   width: 111px;
   margin: 2px;
   height: 62px;
+  padding: 10px;
 }
-.slot-type-handle.ui-draggable-dragging {
+.slot-type-handle.ui-draggable-dragging,
+.section-type-handle.ui-draggable-dragging {
   color: #5d6c7c;
   background-color: #f5f5f5;
   border-color: #d3d3d3;
