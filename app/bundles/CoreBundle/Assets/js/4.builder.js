@@ -1132,10 +1132,11 @@ Mautic.initSlotListeners = function() {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
         } else if (fieldParam === 'button-size') {
+            var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
-                {padding: '0 0', fontSize: '14px'},
-                {padding: '10px 13px', fontSize: '20px'},
-                {padding: '15px 20px', fontSize: '30px'}
+                {borderWidth: '10px 20px', padding: '0', fontSize: '14px', borderColor : bg_clr, borderStyle: 'solid'},
+                {borderWidth: '20px 23px', padding: '0', fontSize: '20px', borderColor : bg_clr, borderStyle: 'solid'},
+                {borderWidth: '25px 40px', padding: '0', fontSize: '30px', borderColor : bg_clr, borderStyle: 'solid'}
             ];
             params.slot.find('a').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
