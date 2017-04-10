@@ -573,12 +573,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $leadFields = $this->cleanSalesForceData($config, $fields, $object);
 
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
+        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]);
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
             $contactFields         = $this->cleanSalesForceData($config, $fields, 'Contact');
-            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact']);
+            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]);
             $this->amendLeadDataBeforePush($mappedData['Contact']);
         }
         if (empty($mappedData)) {
@@ -1099,7 +1099,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (array_search('Contact', $config['objects'])) {
                 $resultContact = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
 
-                if ($reslutContact) {
+                if ($resultContact) {
                     return $resultContact;
                 }
             }
@@ -1261,5 +1261,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return [$updated, $created];
+    }
+
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
     }
 }
