@@ -275,7 +275,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 
     Mautic.updateDynamicContentDropdown();
 
-    Mautic.initDynamicContentItem(tabId, mQuery);
+    Mautic.initDynamicContentItem(tabId, mQuery, tokenName);
 
     return tabId;
 };
@@ -283,6 +283,9 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     // To support the parent.mQuery from the builder
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
+    if (mQuery('#filterBlockPrototype').size() == 0) {
+        mQuery = parent.mQuery;
+    }
 
     var $this                = mQuery(el);
     var parentElement        = $this.parents('.panel');
@@ -338,7 +341,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     return filterContainerId;
 };
 
-Mautic.initDynamicContentItem = function (tabId, jQueryVariant) {
+Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
     // To support the parent.mQuery from the builder
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
 
@@ -354,19 +357,9 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant) {
         Mautic.createNewDynamicContentFilter(this);
     });
 
-    $el.find('.dynamic-content-token-name').on('input', function (e) {
-        var $this = mQuery(this);
-        var parentTab = $this.parents('.tab-pane');
-        var correspondingTabLink = mQuery('a[href="#' + parentTab.attr('id') + '"]');
-        var tabContainer = correspondingTabLink.parents('ul').first();
-        var correspondingTabLinkIndex = tabContainer.find('a[data-toggle="tab"]').index(correspondingTabLink);
-
-        var tokenName = $this.val() || 'Dynamic Content ' + (correspondingTabLinkIndex + 1);
-
-        correspondingTabLink.text(tokenName);
-
-        Mautic.updateDynamicContentDropdown();
-    });
+    if (typeof tokenName != 'undefined') {
+        $el.find('.dynamic-content-token-name').val(tokenName);
+    }
 
     $el.find('a.remove-selected').on('click', function() {
         mQuery(this).closest('.panel').animate(
@@ -443,7 +436,9 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     }
 };
 
-Mautic.addDynamicContentFilter = function (selectedFilter) {
+Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
+
     var dynamicContentItems  = mQuery('.tab-pane.dynamic-content');
     var activeDynamicContent = dynamicContentItems.filter(':visible');
     var dynamicContentIndex  = dynamicContentItems.index(activeDynamicContent);
@@ -519,7 +514,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     activeDynamicContentFilterContainer.append(prototype);
 
-    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"));
+    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"), mQuery);
 
     var filter = '#' + filterIdBase + '_filter';
 
@@ -599,10 +594,11 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     });
 
     // Convert based on first option in list
-    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator');
+    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator', mQuery);
 };
 
-Mautic.convertDynamicContentFilterInput = function(el) {
+Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     var operator = mQuery(el).val();
     // Extract the filter number
     var regExp    = /emailform_dynamicContent_(\d+)_filters_(\d+)_filters_(\d+)_operator/;
@@ -676,7 +672,7 @@ Mautic.convertDynamicContentFilterInput = function(el) {
 
         filterEl.attr('data-placeholder', placeholder);
 
-        Mautic.activateChosenSelect(filterEl);
+        Mautic.activateChosenSelect(filterEl, false, mQuery);
     }
 };
 

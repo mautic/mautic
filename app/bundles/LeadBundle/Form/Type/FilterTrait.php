@@ -266,8 +266,8 @@ trait FilterTrait
                         'attr'           => $attr,
                         'data'           => isset($data['filter']) ? $data['filter'] : '',
                         'error_bubbling' => false,
-                    ],
-                    $customOptions
+                    ]
+                   // ,$customOptions
                 )
             );
         }

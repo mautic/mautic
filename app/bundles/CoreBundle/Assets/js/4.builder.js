@@ -872,6 +872,23 @@ Mautic.cloneFocusForm = function(decId, removeFroala){
     }
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').remove();
+
+    // activate chosen filters
+    focusForm.find('select.chosen').chosen();
+    focusForm.find('select.chosen').chosen('destroy');
+    focusForm.find('.chosen-container').remove();
+    focusForm.find('select.chosen').chosen();
+    focusForm.find('.chosen-container').css('width', '100%');
+    focusForm.find('select[data-mautic="available_filters"]').on('change', function() {
+        var $this = mQuery(this);
+
+        if ($this.val()) {
+            Mautic.addDynamicContentFilter($this.val(), parent.mQuery);
+            $this.val('');
+            $this.trigger('chosen:updated');
+        }
+    });
+
     var removeButton = focusForm.find('.remove-item');
     removeButton.click(function (e) {
         // get ID of filter in the outside builder
@@ -902,7 +919,6 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
         .addClass('btn btn-success btn-xs');
 
     newDynConButton.text('Add Variant');
-
     newDynConButton.on('click', function(e) {
         e.stopPropagation();
         Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
@@ -1028,35 +1044,12 @@ Mautic.initSlotListeners = function() {
             var slotFormContainer = parent.mQuery('#slot-form-container');
 
             if (focusType == 'dynamicContent') {
-                // check if the DEC slot is inside another slot to show/hide padding options
-                if (clickedSlot.parents('[data-slot]').length == 0) {
-                    var nff = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
-                    // replace focusForm
-                    nff.insertAfter(focusForm.find('#slot_dynamiccontent > div.has-error'));
-                } else {
-                    focusForm = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
-                }
-                // update token name in outside form
-                focusForm.find('.dynamic-content-token-name').on('input', function (e) {
-                    var $this = mQuery(this);
-                    var id = $this.attr('id').replace(/^new_/, '');
-                    $this = parent.mQuery('#'+id);
-                    var parentTab = $this.parents('.tab-pane');
-                    var correspondingTabLink = parent.mQuery('a[href="#' + parentTab.attr('id') + '"]');
-                    var tabContainer = correspondingTabLink.parents('ul').first();
-                    var correspondingTabLinkIndex = tabContainer.find('a[data-toggle="tab"]').index(correspondingTabLink);
-
-                    var tokenName = mQuery(this).val() || 'Dynamic Content ' + (correspondingTabLinkIndex + 1);
-
-                    correspondingTabLink.text(tokenName);
-                    $this.val(tokenName);
-
-                    Mautic.updateDynamicContentDropdown();
-                });
+                var nff = Mautic.initEmailDynamicContentSlotEdit(clickedSlot);
+                // replace focusForm
+                nff.insertAfter(focusForm.find('#slot_dynamiccontent > div.has-error'));
             }
 
             slotFormContainer.html(focusForm);
-            // slotFormContainer.empty().append(focusForm);
 
             // Prefill the form field values with the values from slot attributes if any
             parent.mQuery.each(clickedSlot.get(0).attributes, function(i, attr) {
