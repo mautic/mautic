@@ -52,6 +52,12 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.notification.mobile_notification.report.subscriber' => [
+                'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [

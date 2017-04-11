@@ -13,6 +13,7 @@ namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -36,9 +37,31 @@ class AppCallbackController extends CommonController
             $contact->setLastActive(new \DateTime());
         }
 
-        $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled'], true);
-        $contactRepo->saveEntity($contact);
+        $pushIdCreated = false;
 
-        return new JsonResponse($requestBody);
+        if (array_key_exists('push_id', $requestBody)) {
+            $pushIdCreated = true;
+            $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled'], true);
+            $contactRepo->saveEntity($contact);
+        }
+
+        $statCreated = false;
+
+        if (array_key_exists('stat', $requestBody)) {
+            $stat             = $requestBody['stat'];
+            $notificationRepo = $em->getRepository(Notification::class);
+            $notification     = $notificationRepo->getEntity($stat['notification_id']);
+
+            if ($notification !== null) {
+                $statCreated = true;
+                $this->getModel('notification')->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
+            }
+        }
+
+        return new JsonResponse([
+            'contact_id'       => $contact->getId(),
+            'stat_recorded'    => $statCreated,
+            'push_id_recorded' => $pushIdCreated ?: 'existing',
+        ]);
     }
 }

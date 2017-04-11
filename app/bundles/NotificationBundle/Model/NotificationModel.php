@@ -156,14 +156,16 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param Notification $notification
      * @param Lead         $lead
      * @param string       $source
+     * @param int          $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setNotification($notification);
         $stat->setSource($source);
+        $stat->setSourceId($sourceId);
 
         $this->getStatRepository()->saveEntity($stat);
     }
