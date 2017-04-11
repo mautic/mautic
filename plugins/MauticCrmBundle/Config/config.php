@@ -31,5 +31,39 @@ return [
                 ],
             ],
         ],
+
+        /** Page : journal de bord de la synchro avec INES CRM **/
+		'main' => [
+			'ines_logs' => [
+				'path' => '/ines/logs',
+				'controller' => 'MauticCrmBundle:Ines:logs'
+			],
+            'ines_debug' => [
+				'path' => '/ines/debug',
+				'controller' => 'MauticCrmBundle:Ines:debug'
+			]
+		],
+
+		/** Ajout d'un End-Point dans l'API Mautic pour r�cup�rer le mapping et la config du plugin INES **/
+		'api' => [
+			'plugin_crm_bundle_ines_get_mapping_api' => [
+				'path' => '/ines/getMapping',
+				'controller' => 'MauticCrmBundle:Api:inesGetMapping',
+				'method' => 'GET'
+			]
+		],
     ],
+    'services' => [
+		'events' => [
+            'mautic.crm.leadbundle.subscriber' => [
+                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber'
+            ]
+		],
+		'models' =>  [
+            'mautic.crm.model.ines_sync_log' => [
+                'class' => 'MauticPlugin\MauticCrmBundle\Model\InesSyncLogModel',
+				'arguments' => ['mautic.factory']
+            ]
+		]
+	]
 ];
