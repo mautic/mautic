@@ -836,72 +836,21 @@ Mautic.getSlotFocus = function() {
     return mQuery('<div/>').attr('data-slot-focus', true);
 };
 
-Mautic.cloneAndIncrementId = function(id, jQueryVariant) {
-    // To support the parent.mQuery from the builder
-    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : parent.mQuery;
-    var $clone = mQuery(id).clone();    // Create your clone
-
-    // Get the number at the end of the ID, increment it, and replace the old id
-    $clone.attr('id', 'new_' + $clone.attr('id') );
-
-    // Find all elements in $clone that have an ID, and iterate using each()
-    $clone.find('[id]').each(function() {
-        //Perform the same replace as above
-        var $th = mQuery(this);
-        var newID = 'new_' + $th.attr('id');
-        $th.attr('id', newID);
-    });
-    // Find all elements in $clone that have an href to an id, and iterate using each()
-    $clone.find('[href^=#]').each(function() {
-        //Perform the same replace as above
-        var $th = mQuery(this);
-        var newHref = $th.attr('href').replace(/^#/, function() { return '#new_'; });
-        $th.attr('href', newHref);
-    });
-    return $clone;
-};
-
-Mautic.cloneFocusForm = function(decId, removeFroala){
-    var rf = (typeof removeFroala == 'undefined')? true : removeFroala;
-    var focusForm = Mautic.cloneAndIncrementId('#emailform_dynamicContent_' + decId);
+Mautic.cloneFocusForm = function(decId, removeFroala) {
+    // reattach DEC
+    if (typeof Mautic.activeDEC !== 'undefined') {
+        var element = Mautic.activeDEC.detach();
+        Mautic.activeDECParent.append(element);
+    }
+    var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
+    Mautic.activeDECParent = focusForm.parent();
     // show if hidden
     focusForm.removeClass('fade');
-    if (rf) {
-        // remove froala editor
-        focusForm.find('.fr-box').remove();
-    }
     // remove delete default button
-    focusForm.find('.tab-pane:first').find('.remove-item').remove();
-
-    // activate chosen filters
-    focusForm.find('select.chosen').chosen();
-    focusForm.find('select.chosen').chosen('destroy');
-    focusForm.find('.chosen-container').remove();
-    focusForm.find('select.chosen').chosen();
-    focusForm.find('.chosen-container').css('width', '100%');
-    focusForm.find('select[data-mautic="available_filters"]').on('change', function() {
-        var $this = mQuery(this);
-
-        if ($this.val()) {
-            Mautic.addDynamicContentFilter($this.val(), parent.mQuery);
-            $this.val('');
-            $this.trigger('chosen:updated');
-        }
-    });
-
-    var removeButton = focusForm.find('.remove-item');
-    removeButton.click(function (e) {
-        // get ID of filter in the outside builder
-        var id = mQuery(e.target).closest('.dynamic-content').find('.tab-pane.active').attr('id').replace(/^new_/, '');
-        var parentButton = parent.mQuery('#' + id).find('a.remove-item');
-        // delete filter
-        parentButton.click();
-        var focusForm = Mautic.cloneFocusForm(decId);
-        // replace focusForm
-        parent.mQuery('#slot_dynamiccontent').find('div.tab-pane.dynamic-content').remove();
-        focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
-    });
-    return focusForm;
+    focusForm.find('.tab-pane:first').find('.remove-item').hide();
+    var element =focusForm.detach();
+    Mautic.activeDEC = element;
+    return element;
 };
 
 Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
@@ -923,8 +872,6 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
         e.stopPropagation();
         Mautic.createNewDynamicContentFilter('#dynamicContentFilterTabs_'+decId, parent.mQuery);
         var focusForm = Mautic.cloneFocusForm(decId, false);
-        // replace focusForm
-        parent.mQuery('#slot_dynamiccontent').find('div.tab-pane.dynamic-content').remove();
         focusForm.insertAfter(parent.mQuery('#slot_dynamiccontent > div.has-error'));
     });
 
@@ -936,6 +883,11 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
 Mautic.removeAddVariantButton = function() {
     // Remove the Add Variant button for dynamicContent slots
     parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
+    // reattach DEC
+    if (typeof Mautic.activeDEC !== 'undefined') {
+        var element = Mautic.activeDEC.detach();
+        Mautic.activeDECParent.append(element);
+    }
 };
 
 Mautic.initSlotListeners = function() {
@@ -1188,13 +1140,6 @@ Mautic.initSlotListeners = function() {
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
                     }
-
-                    if (focusType == 'dynamicContent') {
-                        // update DEC content in outside form
-                        var id = mQuery(this).attr('id').replace(/^new_/, '');
-                        parent.document.getElementById(id).value = mQuery(this).val();
-                        parent.mQuery('#' + id).froalaEditor('html.set', mQuery(this).val());
-                    }
                 });
 
                 // replace only the first editor content for DEC
@@ -1267,7 +1212,6 @@ Mautic.initSlotListeners = function() {
     };
 
     Mautic.builderContents.on('slot:change', function(event, params) {
-
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         var type = params.type;
@@ -1378,6 +1322,12 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
+        // reattach DEC
+        if (typeof Mautic.activeDEC !== 'undefined') {
+            var element = Mautic.activeDEC.detach();
+            Mautic.activeDECParent.append(element);
+        }
+
         if (params.type === 'text') {
             if (parent.mQuery('#slot_content').length) {
                 parent.mQuery('#slot_content').froalaEditor('destroy');
@@ -1397,6 +1347,10 @@ Mautic.initSlotListeners = function() {
             // remove new DEC if name is empty
             var dynConId = params.slot.attr('data-param-dec-id');
             dynConId = '#emailform_dynamicContent_'+dynConId;
+            if (Mautic.activeDEC.attr('id') === dynConId.substr(1)) {
+                delete Mautic.activeDEC;
+                delete Mautic.activeDECParent;
+            }
             var dynConTarget = parent.mQuery(dynConId);
             var dynConName   = dynConTarget.find(dynConId+'_tokenName').val();
             if (dynConName === '') {
