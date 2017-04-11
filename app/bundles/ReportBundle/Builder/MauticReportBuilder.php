@@ -280,7 +280,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $aggregators = $this->entity->getAggregators();
         if ($aggregators && $groupByOptions) {
             foreach ($aggregators as $aggregator) {
-                $formula = $aggregator['function'].'('.$aggregator['column'].") as '".$aggregator['function']."'";
+                $column = '';
+                if (isset($options['columns'][$aggregator['column']])) {
+                    $fieldOptions = $options['columns'][$aggregator['column']];
+                    $column .= (isset($fieldOptions['formula'])) ? $aggregator['function'].'('.$fieldOptions['formula'].')' : $aggregator['function'].'('.$aggregator['column'].')';
+                }
+
+                $formula = $column." as '".$aggregator['function']."'";
                 $queryBuilder->addSelect($formula);
             }
         }

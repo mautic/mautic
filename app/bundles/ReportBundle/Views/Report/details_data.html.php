@@ -34,10 +34,11 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
                         foreach ($aggregatorOrder as $aggregator): ?>
                             <?php
                             $columnName = explode('.', $aggregator['column']);
+                            $columnName = isset($columnName[1]) ? $columnName[1] : $columnName[0];
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                 'sessionVar' => 'report.'.$report->getId(),
                                 'orderBy'    => $aggregator['function'],
-                                'text'       => $aggregator['function'].' '.strtoupper($columnName[1]),
+                                'text'       => $aggregator['function'].' '.strtoupper($columnName),
                                 'dataToggle' => '',
                                 'target'     => '.report-content',
                             ]);
