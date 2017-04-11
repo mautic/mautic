@@ -26,9 +26,15 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticPageBundle:Hit');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticPageBundle:Hit',
+                'MauticPageBundle:VideoHit',
+            ]
+        );
+
         $this->repositories[] = $em->getRepository('MauticPageBundle:Redirect');
-        $this->repositories[] = $em->getRepository('MauticPageBundle:VideoHit');
         $this->repositories[] = $em->getRepository('MauticPageBundle:Trackable');
     }
 }

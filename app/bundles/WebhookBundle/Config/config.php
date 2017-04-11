@@ -49,18 +49,6 @@ return [
             ],
         ],
         'events' => [
-            'mautic.webhook.lead.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\LeadSubscriber',
-            ],
-            'mautic.webhook.form.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\FormSubscriber',
-            ],
-            'mautic.webhook.email.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\EmailSubscriber',
-            ],
-            'mautic.webhook.page.hit.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\PageSubscriber',
-            ],
             'mautic.webhook.config.subscriber' => [
                 'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber',
             ],

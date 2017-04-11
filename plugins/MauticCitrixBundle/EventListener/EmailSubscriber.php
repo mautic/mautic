@@ -57,13 +57,20 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        // register tokens
-        $tokens = [
-            '{meeting_button}'  => $this->translator->trans('plugin.citrix.token.meeting_button'),
-            '{training_button}' => $this->translator->trans('plugin.citrix.token.training_button'),
-            '{assist_button}'   => $this->translator->trans('plugin.citrix.token.assist_button'),
-        ];
+        // register tokens only if the plugins are enabled
+        $tokens         = [];
+        $activeProducts = [];
+        foreach (['meeting', 'training', 'assist'] as $p) {
+            if (CitrixHelper::isAuthorized('Goto'.$p)) {
+                $activeProducts[]         = $p;
+                $tokens['{'.$p.'_button'] = $this->translator->trans('plugin.citrix.token.'.$p.'_button');
+            }
+        }
+        if (0 === count($activeProducts)) {
+            return;
+        }
 
+        // register tokens
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
                 $event->filterTokens($tokens)

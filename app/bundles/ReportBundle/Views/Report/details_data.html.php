@@ -15,7 +15,7 @@ if ($tmpl == 'index') {
 $dataCount   = count($data);
 $columnOrder = $report->getColumns();
 $graphOrder  = $report->getGraphs();
-$startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1) : 1;
+$startCount  = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 ?>
 
 <?php if (!empty($columnOrder)): ?>
@@ -32,7 +32,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         if (isset($columns[$key])):
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                 'sessionVar' => 'report.'.$report->getId(),
-                                'orderBy'    => $key,
+                                'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
                                 'text'       => $columns[$key]['label'],
                                 'class'      => 'col-report-'.$columns[$key]['type'],
                                 'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',

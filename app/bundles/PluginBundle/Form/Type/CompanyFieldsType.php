@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -23,24 +22,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CompanyFieldsType extends AbstractType
 {
+    use FieldsTypeTrait;
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['integration_company_fields'] as $field => $details) {
-            $label = (is_array($details)) ? $details['label'] : $details;
-            $field = InputHelper::alphanum($field, false, '_');
-
-            $builder->add($field, 'choice', [
-                'choices'    => $options['company_fields'],
-                'label'      => $label,
-                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' '],
-            ]);
-        }
+        $this->buildFormFields($builder, $options, $options['integration_company_fields'], $options['company_fields'], 'company', $options['limit'], $options['start']);
     }
 
     /**
@@ -48,12 +38,14 @@ class CompanyFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_company_fields', 'company_fields']);
+        $resolver->setDefined(['update_mautic_company']);
+        $resolver->setRequired(['integration_company_fields', 'company_fields', 'integration', 'totalFields', 'page', 'fixedPageNum', 'limit', 'start']);
         $resolver->setDefaults(
             [
                 'special_instructions' => '',
                 'alert_type'           => '',
                 'allow_extra_fields'   => true,
+                'enable_data_priority' => false,
             ]
         );
     }
@@ -73,5 +65,9 @@ class CompanyFieldsType extends AbstractType
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];
         $view->vars['alertType']           = $options['alert_type'];
+        $view->vars['integration']         = $options['integration'];
+        $view->vars['totalFields']         = $options['totalFields'];
+        $view->vars['page']                = $options['page'];
+        $view->vars['fixedPageNum']        = $options['fixedPageNum'];
     }
 }

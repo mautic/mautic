@@ -11,9 +11,9 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 
@@ -43,7 +43,7 @@ class MessageQueueSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
+            ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
         ];
     }
 

@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class CrmAbstractIntegration.
@@ -181,11 +182,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $helper;
     }
 
+    /**
+     * @param \DateTime|null $startDate
+     * @param \DateTime|null $endDate
+     * @param                $leadId
+     *
+     * @return array
+     */
     public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
     {
         return [];
     }
 
+    /**
+     * @param array $params
+     */
     public function pushLeadActivity($params = [])
     {
     }
@@ -211,15 +222,23 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
+        $matchedFields    = $this->populateMauticLeadData($data, $config, 'company');
+        $newMatchedFields = [];
 
-        if (!isset($matchedFields['companyname'])) {
-            if (isset($matchedFields['companywebsite'])) {
-                $matchedFields['companyname'] = $matchedFields['companywebsite'];
+        $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
+        }
+        if (!isset($newMatchedFields['companyname'])) {
+            if (isset($newMatchedFields['companywebsite'])) {
+                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
             }
         }
 
-        if (empty($matchedFields)) {
+        if (empty($newMatchedFields)) {
             return;
         }
 
@@ -233,6 +252,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
+        } else {
+            $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
         }
         $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
@@ -295,6 +316,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $lead = array_shift($existingLeads);
             }
         }
+        //use direction of fields only when updating existing lead
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+            $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        }
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
@@ -320,11 +347,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $lead->setInternal($internalInfo);
         }
 
-        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner'
-            && isset($data['Owner__Lead']) && isset($data['Owner__Lead']['Email']) && strlen($data['Owner__Lead']['Email'])) {
-            $mauticUser = $this->factory->getEntityManager()->getRepository('MauticUserBundle:User')
-                ->findOneBy(['email' => $data['Owner__Lead']['Email']]);
-            if ($mauticUser instanceof User) {
+        // Update the owner if it matches (needs to be set by the integration) when fetching the data
+        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+            if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
         }
@@ -335,5 +360,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $lead;
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array|mixed
+     */
+    protected function getFormFieldsByObject($object, $settings = [])
+    {
+        $settings['feature_settings']['objects'] = [$object => $object];
+
+        $fields = ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+
+        return (isset($fields[$object])) ? $fields[$object] : [];
     }
 }

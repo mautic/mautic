@@ -11,31 +11,13 @@
 
 namespace Mautic\LeadBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
+@trigger_error('\Mautic\LeadBundle\Event\ChannelEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\ChannelEvent instead', E_USER_DEPRECATED);
 
 /**
  * Class ChannelEvent.
+ *
+ * @deprecated 2.4 to be removed in 3.0; use \Mautic\ChannelBundle\Event\ChannelEvent instead
  */
-class ChannelEvent extends CommonEvent
+class ChannelEvent extends \Mautic\ChannelBundle\Event\ChannelEvent
 {
-    protected $channels = [];
-    /**
-     * Returns the channel.
-     *
-     * @return string
-     */
-    public function getChannels()
-    {
-        return $this->channels;
-    }
-
-    /**
-     * Sets the channel.
-     *
-     * @param $channel
-     */
-    public function setChannel($channel)
-    {
-        $this->channels[$channel] = $channel;
-    }
 }

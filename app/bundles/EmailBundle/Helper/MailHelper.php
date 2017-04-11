@@ -15,14 +15,12 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -434,7 +432,7 @@ class MailHelper
                 // Clear the log so that previous output is not associated with new errors
                 $this->logger->clear();
             } catch (\Exception $e) {
-                $this->logError($e);
+                $this->logError($e, 'send');
 
                 // Exception encountered when sending so all recipients are considered failures
                 $this->errors['failures'] = array_merge(
@@ -970,7 +968,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'to');
 
             return false;
         }
@@ -995,7 +993,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'to');
 
             return false;
         }
@@ -1019,7 +1017,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'cc');
 
             return false;
         }
@@ -1043,7 +1041,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'cc');
 
             return false;
         }
@@ -1067,7 +1065,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'bcc');
 
             return false;
         }
@@ -1091,7 +1089,7 @@ class MailHelper
 
             return true;
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'bcc');
 
             return false;
         }
@@ -1131,7 +1129,7 @@ class MailHelper
             $name = $this->cleanName($name);
             $this->message->setReplyTo($addresses, $name);
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'reply to');
         }
     }
 
@@ -1145,7 +1143,7 @@ class MailHelper
         try {
             $this->message->setReturnPath($address);
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'return path');
         }
     }
 
@@ -1161,7 +1159,7 @@ class MailHelper
             $name = $this->cleanName($name);
             $this->message->setFrom($address, $name);
         } catch (\Exception $e) {
-            $this->logError($e);
+            $this->logError($e, 'from');
         }
     }
 
@@ -1265,6 +1263,8 @@ class MailHelper
      * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
+     *
+     * @return bool Returns false if there were errors with the email configuration
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
@@ -1290,13 +1290,19 @@ class MailHelper
 
         $replyTo = $email->getReplyToAddress();
         if (!empty($replyTo)) {
-            $this->setReplyTo($replyTo);
+            $addresses = explode(',', $replyTo);
+
+            // Only a single email is supported
+            $this->setReplyTo($addresses[0]);
         }
 
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $this->addBcc($bccAddress);
+                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                foreach ($addresses as $bccAddress => $name) {
+                    $this->addBcc($bccAddress, $name);
+                }
             }
         }
 
@@ -1348,6 +1354,8 @@ class MailHelper
                 $this->attachAsset($asset);
             }
         }
+
+        return empty($this->errors);
     }
 
     /**
@@ -1465,7 +1473,7 @@ class MailHelper
      */
     public function useMailerTokenization($tokenizationEnabled = true)
     {
-        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_DEPRECATED);
+        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_USER_DEPRECATED);
 
         $this->enableQueue($tokenizationEnabled);
     }
@@ -1505,9 +1513,10 @@ class MailHelper
     /**
      * Log exception.
      *
-     * @param \Exception|string $error
+     * @param      $error
+     * @param null $context
      */
-    protected function logError($error)
+    protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
             $error = $error->getMessage();
@@ -1518,6 +1527,10 @@ class MailHelper
         $logDump = $this->logger->dump();
         if (!empty($logDump) && strpos($error, $logDump) === false) {
             $error .= " Log data: $logDump";
+        }
+
+        if ($context) {
+            $error .= " ($context)";
         }
 
         $this->errors[] = $error;
@@ -1853,43 +1866,6 @@ class MailHelper
             $value = isset($content[$slot]) ? $content[$slot] : '';
             $slotsHelper->set($slot, $value);
         }
-    }
-
-    /**
-     * @param Lead $lead
-     */
-    public function applyFrequencyRules(Lead $lead)
-    {
-        $frequencyRule = $lead->getFrequencyRules();
-
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
-
-        $statRepo = $emailModel->getStatRepository();
-
-        $now      = new \DateTime();
-        $channels = $frequencyRule['channels'];
-
-        if (!empty($frequencyRule) && !empty($channels) && in_array('email', $channels, true)) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
-            $frequencyNumber = $frequencyRule['frequency_number'];
-        } elseif ($this->factory->getParameter('frequency_number') > 0) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
-            $frequencyNumber = $this->factory->getParameter('frequency_number');
-        }
-
-        if (isset($frequencyTime)) {
-            $now->sub($frequencyTime);
-            $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
-        }
-
-        if (!empty($sentQuery) and count($sentQuery) < $frequencyNumber) {
-            return true;
-        } elseif (empty($sentQuery)) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

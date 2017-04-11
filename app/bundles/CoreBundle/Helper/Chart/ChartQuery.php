@@ -194,13 +194,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [])
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*')
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, 't');
+        $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -213,8 +213,9 @@ class ChartQuery extends AbstractChart
      * @param QueryBuilder $query
      * @param string       $column      name
      * @param string       $tablePrefix
+     * @param string       $countColumn
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't')
+    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*')
     {
         // Convert time unitst to the right form for current database platform
         $dbUnit  = $this->translateTimeUnit($this->unit);
@@ -226,7 +227,7 @@ class ChartQuery extends AbstractChart
             unset($filters['groupBy']);
         }
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-        $query->select($dateConstruct.' AS date, COUNT(*) AS count')
+        $query->select($dateConstruct.' AS date, COUNT('.$countColumn.') AS count')
             ->groupBy($dateConstruct.$groupBy);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
@@ -396,7 +397,7 @@ class ChartQuery extends AbstractChart
     public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, $tablePrefix);
+        $query->from($this->prepareTable($table), $tablePrefix);
         $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
@@ -490,7 +491,7 @@ class ChartQuery extends AbstractChart
     public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.$table, $tablePrefix);
+        $query->from($this->prepareTable($table), $tablePrefix);
         $this->modifyCountDateDiffQuery($query, $dateColumn1, $dateColumn2, $startSecond, $endSecond, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn1);
@@ -531,5 +532,23 @@ class ChartQuery extends AbstractChart
         $data = $query->execute()->fetch();
 
         return (int) $data['count'];
+    }
+
+    /**
+     * @param $table
+     *
+     * @return mixed
+     */
+    protected function prepareTable($table)
+    {
+        if (MAUTIC_TABLE_PREFIX && strpos($table, MAUTIC_TABLE_PREFIX) === 0) {
+            return $table;
+        }
+
+        if (strpos($table, '(') === 0) {
+            return $table;
+        }
+
+        return MAUTIC_TABLE_PREFIX.$table;
     }
 }

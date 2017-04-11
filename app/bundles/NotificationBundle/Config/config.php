@@ -43,6 +43,9 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+            'mautic.notification.subscriber.channel' => [
+                'class' => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+            ],
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
@@ -66,9 +69,8 @@ return [
                 'alias'     => 'notificationsend_list',
             ],
             'mautic.form.type.notification_list' => [
-                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'notification_list',
+                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
+                'alias' => 'notification_list',
             ],
         ],
         'helpers' => [

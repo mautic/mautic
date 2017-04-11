@@ -1,3 +1,47 @@
+@import "../../libraries/bootstrap/less/variables";
+
+@media (min-width: @screen-md-min) {
+  .modal-xl { width: 1140px; }
+}
+
+// vertical tabs
+.bg-auto {
+  .tabs-left>li.active>a,
+  .tabs-left>li.active>a:hover,
+  .tabs-left>li.active>a:focus {
+    border-left-width: 0;
+  }
+
+  .tabs-left, .tabs-right {
+    -webkit-box-shadow: inset 0 -3px 0 -3px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 -3px 0 -3px rgba(0, 0, 0, 0.05);
+
+    li:last-child {
+      margin-bottom: -2px;
+    }
+  }
+
+  .tabs-right>li.active>a,
+  .tabs-right>li.active>a:hover,
+  .tabs-right>li.active>a:focus {
+    border-right-width: 0;
+  }
+}
+
+.tab-button {
+  border-bottom: 1px solid #ebedf0 !important;
+}
+
+.modal-body.np {
+  .tabs-horizontal {
+    margin-top: -1px;
+  }
+  .tabs-left, .tabs-right {
+    li>a {
+      border-radius: 0;
+    }
+  }
+}
 
 //confirmation modal
 
@@ -216,4 +260,26 @@ div[data-filter-container] .panel.in-group {
   border-top:0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+td.col-id, th.col-id {
+  width: 75px;
+}
+
+.badge-wrapper {
+  float: right;
+  vertical-align: middle;
+  margin-right: -10px;
+}
+span.slot-caption {
+  font-size: 12px;
+}
+.imagecard-caption, figcaption {
+  font-size: 16px;
+}
+.imagecard {
+  background-color: #ddd !important;
+}
+.imagecard .imagecard-caption {
+  background-color: #bbb !important;
 }

@@ -178,6 +178,12 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.core.assets.subscriber' => [
+                'class'     => 'Mautic\CoreBundle\EventListener\AssetsSubscriber',
+                'arguments' => [
+                    'templating.helper.assets',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.spacer' => [
@@ -260,6 +266,34 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'alias' => 'slot_button',
             ],
+            'mautic.form.type.slot.image' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
+                'alias' => 'slot_image',
+            ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
+            ],
+            'mautic.form.type.slot.imagecard' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
+                'alias' => 'slot_imagecard',
+            ],
+            'mautic.form.type.slot.imagecaption' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
+                'alias' => 'slot_imagecaption',
+            ],
+            'mautic.form.type.slot.socialshare' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialShareType',
+                'alias' => 'slot_socialshare',
+            ],
+            'mautic.form.type.slot.socialfollow' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
+                'alias' => 'slot_socialfollow',
+            ],
+            'mautic.form.type.slot.codemode' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
+                'alias' => 'slot_codemode',
+            ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias' => 'theme_upload',
@@ -280,8 +314,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'alias'     => 'dynamic_content_filter_entry_filters',
                 'arguments' => [
-                    'mautic.factory',
-                    'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
             'mautic.form.type.entity_lookup' => [
@@ -332,8 +365,10 @@ return [
             ],
             'mautic.helper.template.canvas' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SidebarCanvasHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'canvas',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+                'alias' => 'canvas',
             ],
             'mautic.helper.template.button' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
@@ -343,6 +378,14 @@ return [
                     'event_dispatcher',
                 ],
                 'alias' => 'buttons',
+            ],
+            'mautic.helper.template.content' => [
+                'class'     => 'Mautic\CoreBundle\Templating\Helper\ContentHelper',
+                'arguments' => [
+                    'templating',
+                    'event_dispatcher',
+                ],
+                'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
@@ -385,6 +428,7 @@ return [
                 'arguments' => [
                     'kernel',
                 ],
+                'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
                 'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
@@ -425,8 +469,9 @@ return [
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
                 'arguments' => [
-                    '%kernel.environment%',
                     'monolog.logger.mautic',
+                    'monolog.logger',
+                    "@=container.has('monolog.logger.chrome') ? container.get('monolog.logger.chrome') : null",
                 ],
                 'tag' => 'kernel.event_subscriber',
             ],
@@ -440,10 +485,12 @@ return [
             ],
 
             // Template helper overrides
-            'templating.helper.assets.class' => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
-            'templating.helper.slots.class'  => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
-            'templating.name_parser.class'   => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-            'templating.helper.form.class'   => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
+            'templating.helper.assets.class'    => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
+            'templating.helper.slots.class'     => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
+            'templating.name_parser.class'      => 'Mautic\CoreBundle\Templating\TemplateNameParser',
+            'templating.helper.form.class'      => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
+            'templating.engine.php.class'       => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
+            'debug.templating.engine.php.class' => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
             // Translator overrides
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
@@ -527,13 +574,24 @@ return [
                     'request_stack',
                 ],
             ],
+            'mautic.helper.cache_storage' => [
+                'class'     => 'Mautic\CoreBundle\Helper\CacheStorageHelper',
+                'arguments' => [
+                    '"db"',
+                    '%mautic.db_table_prefix%',
+                    'doctrine.dbal.default_connection',
+                    '%kernel.cache_dir%',
+                ],
+            ],
             'mautic.helper.update' => [
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
                 'arguments' => 'mautic.factory',
             ],
             'mautic.helper.cache' => [
                 'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'kernel',
+                ],
             ],
             'mautic.helper.templating' => [
                 'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
@@ -626,6 +684,18 @@ return [
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'    => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
+            // Form extensions
+            'mautic.form.extension.custom' => [
+                'class'     => 'Mautic\CoreBundle\Form\Extension\CustomFormExtension',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+                'tag'          => 'form.type_extension',
+                'tagArguments' => [
+                    'alias' => 'form',
+                ],
+            ],
+
             // Twig
             'templating.twig.extension.slot' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
@@ -694,11 +764,13 @@ return [
             'mautic.core.model.form' => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
             ],
+            /* @deprecated - 2.4 to be removed in 3.0; use mautic.channel.model.queue instead */
             'mautic.core.model.messagequeue' => [
                 'class'     => 'Mautic\CoreBundle\Model\MessageQueueModel',
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
@@ -793,6 +865,7 @@ return [
         'cookie_secure'             => null,
         'cookie_httponly'           => false,
         'do_not_track_ips'          => [],
+        'do_not_track_bots'         => ['MSNBOT', 'msnbot-media', 'bingbot', 'Googlebot', 'Google Web Preview', 'Mediapartners-Google', 'Baiduspider', 'Ezooms', 'YahooSeeker', 'Slurp', 'AltaVista', 'AVSearch', 'Mercator', 'Scooter', 'InfoSeek', 'Ultraseek', 'Lycos', 'Wget', 'YandexBot', 'Java/1.4.1_04', 'SiteBot', 'Exabot', 'AhrefsBot', 'MJ12bot', 'NetSeer crawler', 'TurnitinBot', 'magpie-crawler', 'Nutch Crawler', 'CMS Crawler', 'rogerbot', 'Domnutch', 'ssearch_bot', 'XoviBot', 'digincore', 'fr-crawler', 'SeznamBot', 'Seznam screenshot-generator', 'Facebot', 'facebookexternalhit'],
         'do_not_track_internal_ips' => [],
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,

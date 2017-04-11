@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
@@ -49,14 +50,36 @@ abstract class AbstractIntegration
     protected $keys;
 
     /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
      * @param MauticFactory $factory
+     *
+     * @todo divorce from MauticFactory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory    = $factory;
         $this->dispatcher = $factory->getDispatcher();
+        $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em         = $factory->getEntityManager();
 
         $this->init();
+    }
+
+    /**
+     * @return CacheStorageHelper
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     /**
@@ -143,6 +166,15 @@ abstract class AbstractIntegration
      */
     abstract public function getAuthenticationType();
 
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return false;
+    }
     /**
      * Get a list of supported features for this integration.
      *
@@ -1231,6 +1263,13 @@ abstract class AbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if (empty($settings['ignore_field_cache'])) {
+            $cacheSuffix = (isset($settings['cache_suffix'])) ? $settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$cacheSuffix)) {
+                return $fields;
+            }
+        }
+
         return [];
     }
 
@@ -1260,14 +1299,17 @@ abstract class AbstractIntegration
 
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
-        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
-        $matched         = [];
+        if (isset($config['object'])) {
+            $availableFields = $availableFields[$config['object']];
+        }
+        $unknown = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched = [];
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $this->convertLeadFieldKey($key, $field);
 
-            if (isset($leadFields[$key])) {
-                $mauticKey = $leadFields[$key];
+            if (isset($leadFields[$integrationKey])) {
+                $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
                     $matched[$integrationKey] = $fields[$mauticKey]['value'];
                 }
@@ -1678,7 +1720,8 @@ abstract class AbstractIntegration
      */
     public function getFormSettings()
     {
-        $type = $this->getAuthenticationType();
+        $type               = $this->getAuthenticationType();
+        $enableDataPriority = $this->getDataPriority();
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
@@ -1693,9 +1736,13 @@ abstract class AbstractIntegration
             'requires_callback'      => $callback,
             'requires_authorization' => $authorization,
             'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getFormDisplaySettings()
     {
         /** @var PluginIntegrationFormDisplayEvent $event */

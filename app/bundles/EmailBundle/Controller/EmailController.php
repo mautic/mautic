@@ -11,8 +11,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
+    use BuilderControllerTrait;
+
     /**
      * @param int $page
      *
@@ -223,7 +225,6 @@ class EmailController extends FormController
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                     'permissions' => $permissions,
                     'model'       => $model,
-                    'security'    => $this->get('mautic.security'),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
                 'passthroughVars' => [
@@ -418,6 +419,7 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
+                    'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
@@ -508,9 +510,6 @@ class EmailController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
 
-                    // Parse visual placeholders into tokens
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
@@ -583,6 +582,7 @@ class EmailController extends FormController
         }
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
+        $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
@@ -590,18 +590,19 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'form'          => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                     'isVariant'     => $entity->isVariant(true),
-                    'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
+                    'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
+                    'updateSelect'  => $updateSelect,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'updateSelect'  => $updateSelect,
                     'route'         => $this->generateUrl(
                         'mautic_email_action',
                         [
@@ -694,8 +695,6 @@ class EmailController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
@@ -737,10 +736,9 @@ class EmailController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'emailId'      => $entity->getId(),
-                        'emailSubject' => $entity->getSubject(),
-                        'emailName'    => $entity->getName(),
-                        'emailLang'    => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }
@@ -773,9 +771,6 @@ class EmailController extends FormController
             //clear any modified content
             $session->remove('mautic.emailbuilder.'.$objectId.'.content');
 
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($entity, ['tokens', 'visualTokens', 'tokenSections']);
-
             // Set to view content
             $template = $entity->getTemplate();
             if (empty($template)) {
@@ -788,6 +783,7 @@ class EmailController extends FormController
         $attachmentSize = $this->getModel('asset')->getTotalFilesize($assets);
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
+        $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
@@ -795,8 +791,8 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                     'isVariant'          => $entity->isVariant(true),
-                    'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                     'slots'              => $this->buildSlotForms($slotTypes),
+                    'sections'           => $this->buildSlotForms($sections),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
@@ -1333,86 +1329,6 @@ class EmailController extends FormController
     }
 
     /**
-     * PreProcess page slots for public view.
-     *
-     * @param array $slots
-     * @param Email $entity
-     */
-    private function processSlots($slots, $entity)
-    {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->factory->getHelper('template.slots');
-        /** @var \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper */
-        $translatorHelper = $this->factory->getHelper('template.translator');
-
-        $content = $entity->getContent();
-
-        //Set the slots
-        foreach ($slots as $slot => $slotConfig) {
-            //support previous format where email slots are not defined with config array
-            if (is_numeric($slot)) {
-                $slot       = $slotConfig;
-                $slotConfig = [];
-            }
-
-            $value       = isset($content[$slot]) ? $content[$slot] : '';
-            $placeholder = isset($slotConfig['placeholder']) ? $slotConfig['placeholder'] : 'mautic.page.builder.addcontent';
-            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-        }
-
-        //add builder toolbar
-        $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
-        <?php
-        $slotsHelper->stop();
-    }
-
-    /**
-     * Get assets for builder.
-     */
-    private function getAssetsForBuilder()
-    {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
-        $routerHelper = $this->factory->getHelper('template.router');
-
-        $existingAssets = $assetsHelper->getAssets();
-
-        $assetsHelper->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';");
-        $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';");
-        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';");
-        $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';");
-        $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
-        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
-
-        // Use the assetsHelper to auto-build the asset html
-        $builderAssets = $assetsHelper->getHeadDeclarations();
-
-        // Reset the assets helper to what it was before.
-        $assetsHelper->setAssets($existingAssets);
-
-        return $builderAssets;
-    }
-
-    /**
-     * @param $slotTypes
-     *
-     * @return mixed
-     */
-    private function buildSlotForms($slotTypes)
-    {
-        foreach ($slotTypes as $key => $slotType) {
-            if (isset($slotType['form'])) {
-                $slotForm                = $this->get('form.factory')->create($slotType['form']);
-                $slotTypes[$key]['form'] = $slotForm->createView();
-            }
-        }
-
-        return $slotTypes;
-    }
-
-    /**
      * Generating the modal box content for
      * the send multiple example email option.
      */
@@ -1572,5 +1488,36 @@ class EmailController extends FormController
         }
 
         return $this->viewAction($objectId);
+    }
+
+    /**
+     * PreProcess page slots for public view.
+     *
+     * @param array $slots
+     * @param Email $entity
+     */
+    private function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('templating.helper.slots');
+        $content     = $entity->getContent();
+
+        //Set the slots
+        foreach ($slots as $slot => $slotConfig) {
+            //support previous format where email slots are not defined with config array
+            if (is_numeric($slot)) {
+                $slot       = $slotConfig;
+                $slotConfig = [];
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
+        }
+
+        //add builder toolbar
+        $slotsHelper->start('builder'); ?>
+        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
+        <?php
+        $slotsHelper->stop();
     }
 }

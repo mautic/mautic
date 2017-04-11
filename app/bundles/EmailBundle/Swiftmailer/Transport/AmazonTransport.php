@@ -145,7 +145,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
                     }
 
                     if ($reason == null) {
-                        $reason = $translator->trans('mautic.email.complaint.reason.unkown');
+                        $reason = $translator->trans('mautic.email.complaint.reason.unknown');
                     }
 
                     $rows[DoNotContact::UNSUBSCRIBED]['emails'][$complainedRecipient['emailAddress']] = $reason;

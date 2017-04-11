@@ -9,7 +9,7 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.initSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
 };
 
@@ -177,33 +177,35 @@ Mautic.getTotalAttachmentSize = function() {
 };
 
 Mautic.standardEmailUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
+    if (options && options.windowUrl && options.origin) {
+        var url = options.windowUrl;
         var editEmailKey = '/emails/edit/emailId';
         var previewEmailKey = '/email/preview/emailId';
         if (url.indexOf(editEmailKey) > -1 ||
             url.indexOf(previewEmailKey) > -1) {
-            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
+            options.windowUrl = url.replace('emailId', mQuery(options.origin).val());
         }
     }
 
     return options;
 };
 
-Mautic.disabledEmailAction = function(opener) {
+/**
+ * Enables/Disables email preview and edit. Can be triggered from campaign or form actions
+ * @param opener
+ * @param origin
+ */
+Mautic.disabledEmailAction = function(opener, origin) {
     if (typeof opener == 'undefined') {
         opener = window;
     }
-    var email = opener.mQuery('#campaignevent_properties_email').val();
+    var email = opener.mQuery(origin);
+    if (email.length == 0) return;
+    var emailId = email.val();
+    var disabled = emailId === '' || emailId === null;
 
-    var disabled = email === '' || email === null;
-
-    opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
-    opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+    opener.mQuery('[id$=_editEmailButton]').prop('disabled', disabled);
+    opener.mQuery('[id$=_previewEmailButton]').prop('disabled', disabled);
 };
 
 Mautic.initEmailDynamicContent = function() {
@@ -556,20 +558,12 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
         mQuery(filter).attr('type', fieldType);
     }
 
-    // Remove inapplicable operator types
-    var operators = selectedOption.data('field-operators');
-
-    if (typeof operators != "undefined") {
-        if (typeof operators.include != 'undefined') {
-            mQuery('#' + filterIdBase + '_operator option').filter(function () {
-                return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
-            }).remove();
-        } else if (typeof operators.exclude != 'undefined') {
-            mQuery('#' + filterIdBase + '_operator option').filter(function () {
-                return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
-            }).remove();
-        }
-    }
+    var operators = mQuery(selectedOption).data('field-operators');
+    mQuery('#' + filterIdBase + '_operator').html('');
+    mQuery.each(operators, function (value, label) {
+        var newOption = mQuery('<option/>').val(value).text(label);
+        newOption.appendTo(mQuery('#' + filterIdBase + '_operator'));
+    });
 
     // Convert based on first option in list
     Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator');

@@ -26,7 +26,12 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticCampaignBundle:Lead');
-        $this->repositories[] = $em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticCampaignBundle:Lead',
+                'MauticCampaignBundle:LeadEventLog',
+            ]
+        );
     }
 }

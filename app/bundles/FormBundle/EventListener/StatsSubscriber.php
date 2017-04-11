@@ -26,6 +26,6 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticFormBundle:Submission');
+        $this->addContactRestrictedRepositories($em, 'MauticFormBundle:Submission');
     }
 }

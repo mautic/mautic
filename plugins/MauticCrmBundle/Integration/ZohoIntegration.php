@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 
 /**
  * Class ZohoIntegration.
@@ -139,12 +140,21 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param array $settings
+     *
+     * @return array|bool
+     *
+     * @throws ApiErrorException
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $zohoFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
         try {
             if ($this->isAuthorized()) {
                 $leadObject = $this->getApiHelper()->getLeadFields();
@@ -174,7 +184,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (ErrorException $exception) {
+        } catch (ApiErrorException $exception) {
             $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
@@ -183,6 +193,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
             return false;
         }
+
+        $this->cache->set('leadFields', $zohoFields);
 
         return $zohoFields;
     }
