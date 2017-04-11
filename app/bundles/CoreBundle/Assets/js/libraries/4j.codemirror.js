@@ -3588,7 +3588,6 @@
     var start = posFromMouse(cm, e);
 
     if (typeof Mautic != 'undefined' && Mautic.codeMode != true) {
-      console.log(Mautic);
         window.focus();
     }
 
