@@ -245,6 +245,9 @@ class TrackableModel extends AbstractCommonModel
             'first_pass' => [
                 // Remove internal attributes
                 // Editor may convert to HTML4
+                'mautic:disable-tracking=""' => '',
+                // HTML5
+                'mautic:disable-tracking'        => '',
                 'data-mautic-tracking="disable"' => '',
             ],
             'second_pass' => [],
